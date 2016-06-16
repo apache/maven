@@ -51,7 +51,7 @@ public class ExecutionEventLogger
 
     private static final int LINE_LENGTH = 72;
     private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
-    private static final int MAX_PROJECT_NAME_LENGTH = 52;
+    private static final int MAX_PROJECT_NAME_LENGTH = LINE_LENGTH - MAX_PADDED_BUILD_TIME_DURATION_LENGTH - 12;
 
     public ExecutionEventLogger()
     {
@@ -83,7 +83,7 @@ public class ExecutionEventLogger
 
     private void infoMain( String msg )
     {
-        logger.info( ansi().bold().a( msg ).reset().toString() );
+        logger.info( ansi().fgBlue().a( msg ).reset().toString() );
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            logger.info( "Scanning for projects..." );
+            logger.info( ansi().fgBlue().a( "Scanning for projects..." ).reset().toString() );
         }
     }
 
@@ -108,7 +108,7 @@ public class ExecutionEventLogger
 
             for ( MavenProject project : event.getSession().getProjects() )
             {
-                logger.info( project.getName() );
+                logger.info( ansi().fgBlue().a( project.getName() ).reset().toString() );
             }
         }
     }
@@ -143,61 +143,74 @@ public class ExecutionEventLogger
 
         for ( MavenProject project : session.getProjects() )
         {
-            StringBuilder buffer = new StringBuilder( 128 );
-
-            buffer.append( project.getName() );
-            buffer.append( ' ' );
-
-            if ( buffer.length() <= MAX_PROJECT_NAME_LENGTH )
-            {
-                while ( buffer.length() < MAX_PROJECT_NAME_LENGTH )
-                {
-                    buffer.append( '.' );
-                }
-                buffer.append( ' ' );
-            }
-
             BuildSummary buildSummary = result.getBuildSummary( project );
+            Ansi ansi = ansi();
 
             if ( buildSummary == null )
             {
-                buffer.append( ansi().bold().fgYellow().a( "SKIPPED" ).reset() );
+                ansi.fgYellow();
             }
             else if ( buildSummary instanceof BuildSuccess )
             {
-                buffer.append( ansi().bold().fgGreen().a( "SUCCESS" ).reset() );
-                buffer.append( " [" );
-                String buildTimeDuration = formatDuration( buildSummary.getTime() );
-                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
-                if ( padSize > 0 )
-                {
-                    buffer.append( chars( ' ', padSize ) );
-                }
-                buffer.append( buildTimeDuration );
-                buffer.append( ']' );
+                ansi.fgGreen();
             }
             else if ( buildSummary instanceof BuildFailure )
             {
-                buffer.append( ansi().bold().fgRed().a( "FAILURE" ).reset() );
-                buffer.append( " [" );
+                ansi.fgRed();
+            }
+
+            ansi.a( project.getName() );
+            ansi.a( ' ' );
+
+            int dots = MAX_PROJECT_NAME_LENGTH - project.getName().length();
+
+            for ( int i = 0; i < dots; i++ )
+            {
+                ansi.a( '.' );
+            }
+
+            ansi.a( ' ' );
+
+            if ( buildSummary == null )
+            {
+                ansi.a( "SKIPPED" );
+            }
+            else if ( buildSummary instanceof BuildSuccess )
+            {
+                ansi.a( "SUCCESS" );
+                ansi.a( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
                 if ( padSize > 0 )
                 {
-                    buffer.append( chars( ' ', padSize ) );
+                    ansi.a( chars( ' ', padSize ) );
                 }
-                buffer.append( buildTimeDuration );
-                buffer.append( ']' );
+                ansi.a( buildTimeDuration );
+                ansi.a( ']' );
+            }
+            else if ( buildSummary instanceof BuildFailure )
+            {
+                ansi.a( "FAILURE" );
+                ansi.a( " [" );
+                String buildTimeDuration = formatDuration( buildSummary.getTime() );
+                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
+                if ( padSize > 0 )
+                {
+                    ansi.a( chars( ' ', padSize ) );
+                }
+                ansi.a( buildTimeDuration );
+                ansi.a( ']' );
             }
 
-            logger.info( buffer.toString() );
+            ansi.reset();
+            logger.info( ansi.toString() );
         }
     }
 
     private void logResult( MavenSession session )
     {
         infoLine( '-' );
-        Ansi ansi = ansi().bold();
+        Ansi ansi = ansi();
 
         if ( session.getResult().hasExceptions() )
         {
@@ -220,9 +233,9 @@ public class ExecutionEventLogger
 
         String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
-        logger.info( "Total time: " + formatDuration( time ) + wallClock );
+        logger.info( ansi().fgBlue().a( "Total time: " + formatDuration( time ) + wallClock ).reset().toString() );
 
-        logger.info( "Finished at: " + formatTimestamp( finish ) );
+        logger.info( ansi().fgBlue().a( "Finished at: " + formatTimestamp( finish ) ).reset().toString() );
 
         System.gc();
 
@@ -230,7 +243,8 @@ public class ExecutionEventLogger
 
         long mb = 1024 * 1024;
 
-        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / mb + "M/" + r.totalMemory() / mb + "M" );
+        logger.info( ansi().fgBlue().a( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / mb + "M/"
+                                            + r.totalMemory() / mb + "M" ).reset().toString() );
     }
 
     @Override
@@ -242,7 +256,8 @@ public class ExecutionEventLogger
             infoLine( '-' );
 
             infoMain( "Skipping " + event.getProject().getName() );
-            logger.info( "This project has been banned from the build due to previous failures." );
+            logger.info( ansi().fgBlue().a( "This project has been banned from the build due to previous failures." ).
+                reset().toString() );
 
             infoLine( '-' );
         }
@@ -267,8 +282,11 @@ public class ExecutionEventLogger
     {
         if ( logger.isWarnEnabled() )
         {
-            logger.warn( "Goal " + event.getMojoExecution().getGoal()
-                + " requires online mode for execution but Maven is currently offline, skipping" );
+            logger.warn( ansi().fgYellow().
+                a( "Goal " + event.getMojoExecution().getGoal()
+                       + " requires online mode for execution but Maven is currently offline, skipping" ).
+                reset().toString() );
+
         }
     }
 
@@ -282,10 +300,10 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( "--- " ).reset();
+            Ansi ansi = ansi().fgBlue().a( "--- " ).reset();
             append( ansi, event.getMojoExecution() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " ---" ).reset();
+            ansi.fgBlue().a( " ---" ).reset();
 
             logger.info( ansi.toString() );
         }
@@ -302,12 +320,12 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( ">>> " ).reset();
+            Ansi ansi = ansi().fgBlue().a( ">>> " ).reset();
             append( ansi, event.getMojoExecution() );
-            ansi.bold().a( " > " ).reset();
+            ansi.fgBlue().a( " > " ).reset();
             appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " >>>" ).reset();
+            ansi.fgBlue().a( " >>>" ).reset();
 
             logger.info( ansi.toString() );
         }
@@ -326,12 +344,12 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( "<<< " ).reset();
+            Ansi ansi = ansi().fgBlue().a( "<<< " ).reset();
             append( ansi, event.getMojoExecution() );
-            ansi.bold().a( " < " ).reset();
+            ansi.fgBlue().a( " < " ).reset();
             appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " <<<" ).reset();
+            ansi.fgBlue().a( " <<<" ).reset();
 
             logger.info( ansi.toString() );
         }
@@ -343,13 +361,13 @@ public class ExecutionEventLogger
         ansi.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            ansi.fgBlue().bold().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
+            ansi.fgBlue().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
         }
     }
 
     private void appendForkInfo( Ansi ansi, MojoDescriptor md )
     {
-        ansi.bold();
+        ansi.fgBlue();
         if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
         {
             // forked phase

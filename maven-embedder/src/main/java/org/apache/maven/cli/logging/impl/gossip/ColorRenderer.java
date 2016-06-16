@@ -46,20 +46,20 @@ extends com.planet57.gossip.render.PatternRenderer
         {
             case TRACE:
             case DEBUG:
-                buff.append( ansi().bold().fgCyan().a( level.name() ).reset() );
+                buff.append( ansi().fgCyan().a( level.name() ).reset() );
                 break;
 
             case INFO:
-                buff.append( ansi().bold().fgBlue().a( level.name() ).reset() );
+                buff.append( ansi().fgBlue().a( level.name() ).reset() );
                 break;
 
             case WARN:
                 // Maven uses WARNING instead of WARN
-                buff.append( ansi().bold().fgYellow().a( WARNING ).reset() );
+                buff.append( ansi().fgYellow().a( WARNING ).reset() );
                 break;
 
             case ERROR:
-                buff.append( ansi().bold().fgRed().a( level.name() ).reset() );
+                buff.append( ansi().fgRed().a( level.name() ).reset() );
                 break;
 
             default:
@@ -88,11 +88,11 @@ extends com.planet57.gossip.render.PatternRenderer
             return;
         }
 
-        buff.append( ansi().bold().fgRed().a( cause.getClass().getName() ).reset() );
+        buff.append( ansi().fgRed().a( cause.getClass().getName() ).reset() );
         if ( cause.getMessage() != null )
         {
-            buff.append( ": " );
-            buff.append( ansi().bold().fgRed().a( cause.getMessage() ).reset() );
+            buff.append( ansi().fgRed().a( ": " ).reset() );
+            buff.append( ansi().fgRed().a( cause.getMessage() ).reset() );
         }
         renderNewLine( buff );
 
@@ -101,21 +101,18 @@ extends com.planet57.gossip.render.PatternRenderer
             for ( StackTraceElement e : cause.getStackTrace() )
             {
                 buff.append( "    " );
-                buff.append( ansi().bold().a( "at" ).reset().a( " " )
-                        .a( e.getClassName() ).a( "." ).a( e.getMethodName() ) );
-                buff.append( ansi().a( " (" ).bold().a( getLocation( e ) ).reset().a( ")" ) );
+                buff.append( ansi().a( "at " ).a( e.getClassName() ).a( "." ).a( e.getMethodName() ) );
+                buff.append( ansi().a( " (" ).a( getLocation( e ) ).a( ")" ).reset() );
                 renderNewLine( buff );
             }
 
             cause = cause.getCause();
             if ( cause != null )
             {
-                buff.append( ansi().bold().a( "Caused by" ).reset().a( ": " )
-                        .a( cause.getClass().getName() ) );
+                buff.append( ansi().fgRed().a( "Caused by: " ).a( cause.getClass().getName() ) );
                 if ( cause.getMessage() != null )
                 {
-                    buff.append( ": " );
-                    buff.append( ansi().bold().fgRed().a( cause.getMessage() ).reset() );
+                    buff.append( ansi().fgRed().a( ": " ).a( cause.getMessage() ).reset() );
                 }
                 renderNewLine( buff );
             }

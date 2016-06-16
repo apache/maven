@@ -20,6 +20,7 @@ package org.apache.maven.cli.logging;
  */
 
 import org.codehaus.plexus.logging.Logger;
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Adapt an SLF4J logger to a Plexus logger, ignoring Plexus logger API parts that are not classical and
@@ -71,12 +72,12 @@ public class Slf4jLogger
 
     public void warn( String message )
     {
-        logger.warn( message );
+        logger.warn( ansi().fgYellow().a( message ).reset().toString() );
     }
 
     public void warn( String message, Throwable throwable )
     {
-        logger.warn( message, throwable );
+        logger.warn( ansi().fgYellow().a( message ).reset().toString(), throwable );
     }
 
     public boolean isWarnEnabled()
@@ -86,12 +87,12 @@ public class Slf4jLogger
 
     public void error( String message )
     {
-        logger.error( message );
+        logger.error( ansi().fgRed().a( message ).reset().toString() );
     }
 
     public void error( String message, Throwable throwable )
     {
-        logger.error( message, throwable );
+        logger.error( ansi().fgRed().a( message ).reset().toString(), throwable );
     }
 
     public boolean isErrorEnabled()
@@ -101,12 +102,12 @@ public class Slf4jLogger
 
     public void fatalError( String message )
     {
-        logger.error( message );
+        logger.error( ansi().fgRed().a( message ).reset().toString() );
     }
 
     public void fatalError( String message, Throwable throwable )
     {
-        logger.error( message, throwable );
+        logger.error( ansi().fgRed().a( message ).reset().toString(), throwable );
     }
 
     public boolean isFatalErrorEnabled()
