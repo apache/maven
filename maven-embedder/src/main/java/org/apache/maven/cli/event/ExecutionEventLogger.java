@@ -339,11 +339,11 @@ public class ExecutionEventLogger
 
     private void append( Ansi ansi, MojoExecution me )
     {
-        ansi.fgGreen().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
+        ansi.fgBlue().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
         ansi.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            ansi.bold().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
+            ansi.fgBlue().bold().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
         }
     }
 

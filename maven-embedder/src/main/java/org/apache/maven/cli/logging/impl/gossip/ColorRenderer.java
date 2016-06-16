@@ -72,7 +72,7 @@ extends com.planet57.gossip.render.PatternRenderer
     {
         StringBuilder tmp = new StringBuilder();
         super.renderName( event, tmp, shortName );
-        buff.append( ansi().fgGreen().a( tmp ).reset() );
+        buff.append( ansi().fgBlue().a( tmp ).reset() );
     }
 
 
