@@ -19,6 +19,16 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -28,6 +38,7 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
@@ -64,17 +75,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
@@ -1296,7 +1296,40 @@ public class DefaultModelBuilder
                     importMgmt = new DependencyManagement();
                 }
 
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                // [MNG-5600] Dependency management import should support exclusions.
+                if ( !dependency.getExclusions().isEmpty() )
+                {
+                    for ( final Exclusion exclusion : dependency.getExclusions() )
+                    {
+                        if ( exclusion.getGroupId() != null && exclusion.getArtifactId() != null )
+                        {
+                            for ( final Iterator<Dependency> dependencies = importMgmt.getDependencies().iterator();
+                                  dependencies.hasNext(); )
+                            {
+                                final Dependency candidate = dependencies.next();
+
+                                if ( ( exclusion.getGroupId().equals( "*" )
+                                       || exclusion.getGroupId().equals( candidate.getGroupId() ) )
+                                         && ( exclusion.getArtifactId().equals( "*" )
+                                              || exclusion.getArtifactId().equals( candidate.getArtifactId() ) ) )
+                                {
+                                    // Dependency excluded from import.
+                                    dependencies.remove();
+                                }
+                            }
+                        }
+                    }
+
+                    for ( final Dependency includedDependency : importMgmt.getDependencies() )
+                    {
+                        includedDependency.getExclusions().addAll( dependency.getExclusions() );
+                    }
+                }
+                else
+                {
+                    // Only dependency managements without exclusion processing applied can be cached.
+                    putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                }
             }
 
             if ( importMgmts == null )
