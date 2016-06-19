@@ -19,7 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,7 +57,7 @@ public final class CLIReportingUtils
         final String ls = System.getProperty( "line.separator" );
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder( 256 );
-        version.append( ansi().bold().a( createMavenVersionString( properties ) ).reset() ).append( ls );
+        version.append( ansi().strong( createMavenVersionString( properties ) ) ).append( ls );
         version.append( reduce(
             properties.getProperty( "distributionShortName" ) + " home: " + System.getProperty( "maven.home",
                                                                                                 "<unknown Maven "

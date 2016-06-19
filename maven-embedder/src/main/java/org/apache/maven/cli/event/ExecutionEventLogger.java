@@ -21,7 +21,7 @@ package org.apache.maven.cli.event;
 
 import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.AbstractExecutionListener;
@@ -34,8 +34,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.project.utils.AnsiUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class ExecutionEventLogger
 
     private void infoMain( String msg )
     {
-        logger.info( ansi().bold().a( msg ).reset().toString() );
+        logger.info( ansi().strong( msg ).toString() );
     }
 
     @Override
@@ -161,11 +161,11 @@ public class ExecutionEventLogger
 
             if ( buildSummary == null )
             {
-                buffer.append( ansi().bold().fgYellow().a( "SKIPPED" ).reset() );
+                buffer.append( ansi().warning( "SKIPPED" ) );
             }
             else if ( buildSummary instanceof BuildSuccess )
             {
-                buffer.append( ansi().bold().fgGreen().a( "SUCCESS" ).reset() );
+                buffer.append( ansi().success( "SUCCESS" ) );
                 buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
@@ -178,7 +178,7 @@ public class ExecutionEventLogger
             }
             else if ( buildSummary instanceof BuildFailure )
             {
-                buffer.append( ansi().bold().fgRed().a( "FAILURE" ).reset() );
+                buffer.append( ansi().failure( "FAILURE" ) );
                 buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
@@ -197,17 +197,17 @@ public class ExecutionEventLogger
     private void logResult( MavenSession session )
     {
         infoLine( '-' );
-        Ansi ansi = ansi().bold();
+        AnsiUtils ansi = ansi();
 
         if ( session.getResult().hasExceptions() )
         {
-            ansi.fgRed().a( "BUILD FAILURE" );
+            ansi.failure( "BUILD FAILURE" );
         }
         else
         {
-            ansi.fgGreen().a( "BUILD SUCCESS" );
+            ansi.success( "BUILD SUCCESS" );
         }
-        logger.info( ansi.reset().toString() );
+        logger.info( ansi.toString() );
     }
 
     private void logStats( MavenSession session )
@@ -282,10 +282,10 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( "--- " ).reset();
+            AnsiUtils ansi = ansi().strong( "--- " );
             append( ansi, event.getMojoExecution() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " ---" ).reset();
+            ansi.strong( " ---" );
 
             logger.info( ansi.toString() );
         }
@@ -302,12 +302,12 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( ">>> " ).reset();
+            AnsiUtils ansi = ansi().strong( ">>> " );
             append( ansi, event.getMojoExecution() );
-            ansi.bold().a( " > " ).reset();
+            ansi.strong( " > " );
             appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " >>>" ).reset();
+            ansi.strong( " >>>" );
 
             logger.info( ansi.toString() );
         }
@@ -326,30 +326,30 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            Ansi ansi = ansi().bold().a( "<<< " ).reset();
+            AnsiUtils ansi = ansi().strong( "<<< " );
             append( ansi, event.getMojoExecution() );
-            ansi.bold().a( " < " ).reset();
+            ansi.strong( " < " );
             appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
             append( ansi, event.getProject() );
-            ansi.bold().a( " <<<" ).reset();
+            ansi.strong( " <<<" );
 
             logger.info( ansi.toString() );
         }
     }
 
-    private void append( Ansi ansi, MojoExecution me )
+    private void append( AnsiUtils ansi, MojoExecution me )
     {
-        ansi.fgGreen().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
+        ansi.mojo().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
         ansi.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            ansi.bold().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
+            ansi.strong( " (" ).a( me.getExecutionId() ).a( ')' );
         }
     }
 
-    private void appendForkInfo( Ansi ansi, MojoDescriptor md )
+    private void appendForkInfo( AnsiUtils ansi, MojoDescriptor md )
     {
-        ansi.bold();
+        ansi.strong();
         if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
         {
             // forked phase
@@ -370,9 +370,9 @@ public class ExecutionEventLogger
         ansi.reset();
     }
 
-    private void append( Ansi ansi, MavenProject project )
+    private void append( AnsiUtils ansi, MavenProject project )
     {
-        ansi.a( " @ " ).fgCyan().a( project.getArtifactId() ).reset();
+        ansi.a( " @ " ).project( project.getArtifactId() );
     }
 
     @Override

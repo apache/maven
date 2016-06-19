@@ -19,11 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.fusesource.jansi.Ansi;
+import org.apache.maven.shared.project.utils.AnsiUtils;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -78,26 +78,27 @@ public class LifecycleExecutionException
 
     private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
     {
-        Ansi buffer = ansi( /*256*/ );
+        AnsiUtils buffer = ansi( 256 );
 
-        buffer.a( "Failed to execute goal" ).reset();
+        buffer.a( "Failed to execute goal" );
 
         if ( execution != null )
         {
-            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' ).fgGreen().a( execution.getArtifactId() );
-            buffer.a( ':' ).a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).reset();
-            buffer.bold().a( " (" ).a( execution.getExecutionId() ).a( ')' ).reset();
+            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' );
+            buffer.mojo().a( execution.getArtifactId() ).a( ':' );
+            buffer.a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).reset();
+            buffer.strong().a( " (" ).a( execution.getExecutionId() ).a( ')' ).reset();
         }
 
         if ( project != null )
         {
             buffer.a( " on project " );
-            buffer.fgCyan().a( project.getArtifactId() ).reset();
+            buffer.project( project.getArtifactId() );
         }
 
         if ( cause != null )
         {
-            buffer.a( ": " ).bold().fgRed().a( cause.getMessage() ).reset();
+            buffer.a( ": " ).failure( cause.getMessage() );
         }
 
         return buffer.toString();

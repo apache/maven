@@ -19,7 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
 
 import java.io.BufferedInputStream;
 import java.io.Console;
@@ -91,6 +91,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.shared.project.utils.AnsiUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -110,8 +111,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import org.eclipse.aether.transfer.TransferListener;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,9 +211,9 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
 
-        AnsiConsole.systemInstall();
+        AnsiUtils.systemInstall();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
-        AnsiConsole.systemUninstall();
+        AnsiUtils.systemUninstall();
 
         return result;
     }
@@ -476,7 +475,7 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
-            Ansi.setEnabled( false );
+            AnsiUtils.setEnabled( false );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
@@ -484,7 +483,7 @@ public class MavenCli
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
 
-            Ansi.setEnabled( false );
+            AnsiUtils.setEnabled( false );
 
             // redirect stdout and stderr to file
             try
@@ -1021,11 +1020,11 @@ public class MavenCli
             if ( !cliRequest.showErrors )
             {
                 slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the "
-                    + ansi().bold().a( "-e" ).reset() + " switch." );
+                    + ansi().strong( "-e" ) + " switch." );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the " + ansi().bold().a( "-X" ).reset()
+                slf4jLogger.error( "Re-run Maven using the " + ansi().strong( "-X" )
                     + " switch to enable full debug logging." );
             }
 
@@ -1037,7 +1036,7 @@ public class MavenCli
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
-                    slf4jLogger.error( ansi().bold().a( entry.getValue() ).reset() + " " + entry.getKey() );
+                    slf4jLogger.error( ansi().strong( entry.getValue() ) + " " + entry.getKey() );
                 }
             }
 
@@ -1045,7 +1044,7 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( ansi().bold().a( "  mvn <goals> -rf :" )
+                slf4jLogger.error( ansi().strong().a( "  mvn <goals> -rf :" )
                                    .a( project.getArtifactId() ).reset().toString() );
             }
 
