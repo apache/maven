@@ -19,6 +19,18 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -27,6 +39,7 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
@@ -61,18 +74,6 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
@@ -1443,14 +1444,46 @@ public class DefaultModelBuilder
                         importModel = importResult.getEffectiveModel();
                     }
 
-                    importMngt = importModel.getDependencyManagement();
+                    importMngt = importModel.getDependencyManagement() != null
+                                     ? importModel.getDependencyManagement().clone()
+                                     : new DependencyManagement();
 
-                    if ( importMngt == null )
+                    // [MNG-5600] Dependency management import should support exclusions.
+                    if ( !dependency.getExclusions().isEmpty() )
                     {
-                        importMngt = new DependencyManagement();
-                    }
+                        for ( final Exclusion exclusion : dependency.getExclusions() )
+                        {
+                            if ( exclusion.getGroupId() != null && exclusion.getArtifactId() != null )
+                            {
+                                for ( final Iterator<Dependency> dependencies = importMngt.getDependencies().iterator();
+                                      dependencies.hasNext(); )
+                                {
+                                    final Dependency candidate = dependencies.next();
 
-                    putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMngt );
+                                    if ( ( exclusion.getGroupId().equals( "*" )
+                                           || exclusion.getGroupId().equals( candidate.getGroupId() ) )
+                                             && ( exclusion.getArtifactId().equals( "*" )
+                                                  || exclusion.getArtifactId().equals( candidate.getArtifactId() ) ) )
+                                    {
+                                        // Dependency excluded from import.
+                                        dependencies.remove();
+                                    }
+                                }
+                            }
+                        }
+
+                        for ( final Dependency includedDependency : importMngt.getDependencies() )
+                        {
+                            includedDependency.getExclusions().addAll( dependency.getExclusions() );
+                        }
+                    }
+                    else
+                    {
+                        // Only dependency managements without exclusion processing applied can be cached.
+                        putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
+                                  importMngt );
+
+                    }
                 }
 
                 if ( importMngts == null )
