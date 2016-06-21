@@ -1510,10 +1510,11 @@ public class DefaultModelBuilder
                 return importModel;
             }
         }
-        catch ( UnresolvableModelException e )
+        catch ( final UnresolvableModelException e )
         {
-            StringBuilder buffer = new StringBuilder( 256 );
+            final StringBuilder buffer = new StringBuilder( 256 );
             buffer.append( "Non-resolvable " + dependency.getScope() + " POM" );
+
             if ( !containsCoordinates( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
                                        dependency.getVersion() ) )
             {
@@ -1521,6 +1522,7 @@ public class DefaultModelBuilder
                     dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() ) );
 
             }
+
             buffer.append( ": " ).append( e.getMessage() );
 
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
@@ -1529,8 +1531,26 @@ public class DefaultModelBuilder
                 setException( e ) );
 
         }
-        catch ( ModelBuildingException e )
+        catch ( final ModelBuildingException e )
         {
+            final StringBuilder buffer = new StringBuilder( 256 );
+            buffer.append( "Failure building " + dependency.getScope() + " POM" );
+
+            if ( !containsCoordinates( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
+                                       dependency.getVersion() ) )
+            {
+                buffer.append( ' ' ).append( ModelProblemUtils.toId(
+                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() ) );
+
+            }
+
+            buffer.append( ": " ).append( e.getMessage() );
+
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                setMessage( buffer.toString() ).
+                setLocation( dependency.getLocation( "" ) ).
+                setException( e ) );
+
             problems.addAll( e.getProblems() );
         }
 
