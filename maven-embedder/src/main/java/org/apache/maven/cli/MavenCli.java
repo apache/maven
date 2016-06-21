@@ -212,6 +212,7 @@ public class MavenCli
         MavenCli cli = new MavenCli();
 
         AnsiUtils.systemInstall();
+        AnsiUtils.setEnabled( true ); // activate colors by default: will be deactivated later if necessary
         int result = cli.doMain( new CliRequest( args, classWorld ) );
         AnsiUtils.systemUninstall();
 
