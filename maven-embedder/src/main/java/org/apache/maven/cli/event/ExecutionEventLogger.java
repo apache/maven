@@ -343,7 +343,7 @@ public class ExecutionEventLogger
         ansi.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            ansi.strong( " (" ).a( me.getExecutionId() ).a( ')' );
+            ansi.strong().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
         }
     }
 
