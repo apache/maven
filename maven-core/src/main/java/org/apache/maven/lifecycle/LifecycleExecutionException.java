@@ -93,12 +93,12 @@ public class LifecycleExecutionException
         if ( project != null )
         {
             buffer.a( " on project " );
-            buffer.project( project.getArtifactId() ).reset();
+            buffer.project( project.getArtifactId() );
         }
 
         if ( cause != null )
         {
-            buffer.a( ": " ).failure( cause.getMessage() ).reset();
+            buffer.a( ": " ).failure( cause.getMessage() );
         }
 
         return buffer.toString();
