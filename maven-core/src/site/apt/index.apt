@@ -53,7 +53,7 @@ Maven Core
  ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}), using
  {{{https://codehaus-plexus.github.io/plexus-classworlds/}Plexus Classworlds}},
 
- * {{{./extension.html}extension descriptor}},
+ * {{{./extension.html}extension descriptor}} and {{{./core-extensions.html}core extensions}},
 
  * <<<ExceptionHandler>>> component ({{{./apidocs/org/apache/maven/exception/ExceptionHandler.html}javadoc}}),
  with its <<<DefaultExceptionHandler>>> implementation
