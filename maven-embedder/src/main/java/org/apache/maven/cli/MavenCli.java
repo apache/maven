@@ -19,7 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import java.io.BufferedInputStream;
 import java.io.Console;
@@ -91,7 +91,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
-import org.apache.maven.shared.project.utils.AnsiUtils;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -211,10 +211,9 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
 
-        AnsiUtils.systemInstall();
-        AnsiUtils.setEnabled( true ); // activate colors by default: will be deactivated later if necessary
+        MessageUtils.systemInstall();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
-        AnsiUtils.systemUninstall();
+        MessageUtils.systemUninstall();
 
         return result;
     }
@@ -476,7 +475,7 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
-            AnsiUtils.setEnabled( false );
+            MessageUtils.setColor( false );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
@@ -484,7 +483,7 @@ public class MavenCli
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
 
-            AnsiUtils.setEnabled( false );
+            MessageUtils.setColor( false );
 
             // redirect stdout and stderr to file
             try
@@ -1021,11 +1020,11 @@ public class MavenCli
             if ( !cliRequest.showErrors )
             {
                 slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the "
-                    + ansi().strong( "-e" ) + " switch." );
+                    + buffer().strong( "-e" ) + " switch." );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the " + ansi().strong( "-X" )
+                slf4jLogger.error( "Re-run Maven using the " + buffer().strong( "-X" )
                     + " switch to enable full debug logging." );
             }
 
@@ -1037,7 +1036,7 @@ public class MavenCli
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
-                    slf4jLogger.error( ansi().strong( entry.getValue() ) + " " + entry.getKey() );
+                    slf4jLogger.error( buffer().strong( entry.getValue() ) + " " + entry.getKey() );
                 }
             }
 
@@ -1045,7 +1044,7 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( ansi().strong().a( "  mvn <goals> -rf :" )
+                slf4jLogger.error( buffer().strong().a( "  mvn <goals> -rf :" )
                                    .a( project.getArtifactId() ).reset().toString() );
             }
 

@@ -94,13 +94,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-project-utils</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-core</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>maven-shared-utils</artifactId>
     </dependency>
     <!-- Plexus -->
     <dependency>

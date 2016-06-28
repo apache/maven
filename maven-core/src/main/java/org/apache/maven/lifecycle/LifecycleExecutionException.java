@@ -19,11 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.project.utils.AnsiUtils;
+import org.apache.maven.shared.utils.logging.MessageBuffer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -78,7 +78,7 @@ public class LifecycleExecutionException
 
     private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
     {
-        AnsiUtils buffer = ansi( 256 );
+        MessageBuffer buffer = buffer( 256 );
 
         buffer.a( "Failed to execute goal" );
 

@@ -19,7 +19,7 @@ package org.apache.maven.cli.logging.impl.gossip;
  * under the License.
  */
 
-import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import com.planet57.gossip.Event;
 import com.planet57.gossip.Level;
@@ -46,20 +46,20 @@ extends com.planet57.gossip.render.PatternRenderer
         {
             case TRACE:
             case DEBUG:
-                buff.append( ansi().debug().a( level.name() ).reset() );
+                buff.append( buffer().debug().a( level.name() ).reset() );
                 break;
 
             case INFO:
-                buff.append( ansi().info().a( level.name() ).reset() );
+                buff.append( buffer().info().a( level.name() ).reset() );
                 break;
 
             case WARN:
                 // Maven uses WARNING instead of WARN
-                buff.append( ansi().warning().a( WARNING ).reset() );
+                buff.append( buffer().warning().a( WARNING ).reset() );
                 break;
 
             case ERROR:
-                buff.append( ansi().error().a( level.name() ).reset() );
+                buff.append( buffer().error().a( level.name() ).reset() );
                 break;
 
             default:
@@ -72,7 +72,7 @@ extends com.planet57.gossip.render.PatternRenderer
     {
         StringBuilder tmp = new StringBuilder();
         super.renderName( event, tmp, shortName );
-        buff.append( ansi().success( tmp ) );
+        buff.append( buffer().success( tmp ) );
     }
 
 
@@ -88,11 +88,11 @@ extends com.planet57.gossip.render.PatternRenderer
             return;
         }
 
-        buff.append( ansi().failure( cause.getClass().getName() ) );
+        buff.append( buffer().failure( cause.getClass().getName() ) );
         if ( cause.getMessage() != null )
         {
             buff.append( ": " );
-            buff.append( ansi().failure( cause.getMessage() ) );
+            buff.append( buffer().failure( cause.getMessage() ) );
         }
         renderNewLine( buff );
 
@@ -101,19 +101,19 @@ extends com.planet57.gossip.render.PatternRenderer
             for ( StackTraceElement e : cause.getStackTrace() )
             {
                 buff.append( "    " );
-                buff.append( ansi().strong( "at" ).a( " " ).a( e.getClassName() ).a( "." ).a( e.getMethodName() ) );
-                buff.append( ansi().a( " (" ).strong( getLocation( e ) ).a( ")" ) );
+                buff.append( buffer().strong( "at" ).a( " " ).a( e.getClassName() ).a( "." ).a( e.getMethodName() ) );
+                buff.append( buffer().a( " (" ).strong( getLocation( e ) ).a( ")" ) );
                 renderNewLine( buff );
             }
 
             cause = cause.getCause();
             if ( cause != null )
             {
-                buff.append( ansi().strong( "Caused by" ).a( ": " ).a( cause.getClass().getName() ) );
+                buff.append( buffer().strong( "Caused by" ).a( ": " ).a( cause.getClass().getName() ) );
                 if ( cause.getMessage() != null )
                 {
                     buff.append( ": " );
-                    buff.append( ansi().failure( cause.getMessage() ) );
+                    buff.append( buffer().failure( cause.getMessage() ) );
                 }
                 renderNewLine( buff );
             }

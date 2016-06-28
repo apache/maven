@@ -21,7 +21,7 @@ package org.apache.maven.cli.event;
 
 import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
-import static org.apache.maven.shared.project.utils.AnsiUtils.ansi;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.AbstractExecutionListener;
@@ -34,7 +34,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.project.utils.AnsiUtils;
+import org.apache.maven.shared.utils.logging.MessageBuffer;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class ExecutionEventLogger
 
     private void infoMain( String msg )
     {
-        logger.info( ansi().strong( msg ).toString() );
+        logger.info( buffer().strong( msg ).toString() );
     }
 
     @Override
@@ -161,11 +161,11 @@ public class ExecutionEventLogger
 
             if ( buildSummary == null )
             {
-                buffer.append( ansi().warning( "SKIPPED" ) );
+                buffer.append( buffer().warning( "SKIPPED" ) );
             }
             else if ( buildSummary instanceof BuildSuccess )
             {
-                buffer.append( ansi().success( "SUCCESS" ) );
+                buffer.append( buffer().success( "SUCCESS" ) );
                 buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
@@ -178,7 +178,7 @@ public class ExecutionEventLogger
             }
             else if ( buildSummary instanceof BuildFailure )
             {
-                buffer.append( ansi().failure( "FAILURE" ) );
+                buffer.append( buffer().failure( "FAILURE" ) );
                 buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
@@ -197,17 +197,17 @@ public class ExecutionEventLogger
     private void logResult( MavenSession session )
     {
         infoLine( '-' );
-        AnsiUtils ansi = ansi();
+        MessageBuffer buffer = buffer();
 
         if ( session.getResult().hasExceptions() )
         {
-            ansi.failure( "BUILD FAILURE" );
+            buffer.failure( "BUILD FAILURE" );
         }
         else
         {
-            ansi.success( "BUILD SUCCESS" );
+            buffer.success( "BUILD SUCCESS" );
         }
-        logger.info( ansi.toString() );
+        logger.info( buffer.toString() );
     }
 
     private void logStats( MavenSession session )
@@ -282,12 +282,12 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            AnsiUtils ansi = ansi().strong( "--- " );
-            append( ansi, event.getMojoExecution() );
-            append( ansi, event.getProject() );
-            ansi.strong( " ---" );
+            MessageBuffer buffer = buffer().strong( "--- " );
+            append( buffer, event.getMojoExecution() );
+            append( buffer, event.getProject() );
+            buffer.strong( " ---" );
 
-            logger.info( ansi.toString() );
+            logger.info( buffer.toString() );
         }
     }
 
@@ -302,14 +302,14 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            AnsiUtils ansi = ansi().strong( ">>> " );
-            append( ansi, event.getMojoExecution() );
-            ansi.strong( " > " );
-            appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
-            append( ansi, event.getProject() );
-            ansi.strong( " >>>" );
+            MessageBuffer buffer = buffer().strong( ">>> " );
+            append( buffer, event.getMojoExecution() );
+            buffer.strong( " > " );
+            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
+            append( buffer, event.getProject() );
+            buffer.strong( " >>>" );
 
-            logger.info( ansi.toString() );
+            logger.info( buffer.toString() );
         }
     }
 
@@ -326,53 +326,53 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            AnsiUtils ansi = ansi().strong( "<<< " );
-            append( ansi, event.getMojoExecution() );
-            ansi.strong( " < " );
-            appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
-            append( ansi, event.getProject() );
-            ansi.strong( " <<<" );
+            MessageBuffer buffer = buffer().strong( "<<< " );
+            append( buffer, event.getMojoExecution() );
+            buffer.strong( " < " );
+            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
+            append( buffer, event.getProject() );
+            buffer.strong( " <<<" );
 
-            logger.info( ansi.toString() );
+            logger.info( buffer.toString() );
         }
     }
 
-    private void append( AnsiUtils ansi, MojoExecution me )
+    private void append( MessageBuffer buffer, MojoExecution me )
     {
-        ansi.mojo().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
-        ansi.a( ':' ).a( me.getGoal() ).reset();
+        buffer.mojo().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
+        buffer.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            ansi.strong().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
+            buffer.strong().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
         }
     }
 
-    private void appendForkInfo( AnsiUtils ansi, MojoDescriptor md )
+    private void appendForkInfo( MessageBuffer buffer, MojoDescriptor md )
     {
-        ansi.strong();
+        buffer.strong();
         if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
         {
             // forked phase
             if ( StringUtils.isNotEmpty( md.getExecuteLifecycle() ) )
             {
-                ansi.a( '[' );
-                ansi.a( md.getExecuteLifecycle() );
-                ansi.a( ']' );
+                buffer.a( '[' );
+                buffer.a( md.getExecuteLifecycle() );
+                buffer.a( ']' );
             }
-            ansi.a( md.getExecutePhase() );
+            buffer.a( md.getExecutePhase() );
         }
         else
         {
             // forked goal
-            ansi.a( ':' );
-            ansi.a( md.getExecuteGoal() );
+            buffer.a( ':' );
+            buffer.a( md.getExecuteGoal() );
         }
-        ansi.reset();
+        buffer.reset();
     }
 
-    private void append( AnsiUtils ansi, MavenProject project )
+    private void append( MessageBuffer buffer, MavenProject project )
     {
-        ansi.a( " @ " ).project( project.getArtifactId() );
+        buffer.a( " @ " ).project( project.getArtifactId() );
     }
 
     @Override
