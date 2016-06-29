@@ -244,14 +244,48 @@ under the License.
       </properties>
     </profile>
     -->
+
+    <profile>
+      <id>default</id>
+
+      <repositories>
+        <repository>
+          <id>central</id>
+          <name>Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <layout>default</layout>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <name>Central Repository</name>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <layout>default</layout>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
   </profiles>
 
   <!-- activeProfiles
    | List of profiles that are active for all builds.
-   |
+   |-->
   <activeProfiles>
+    <!--
     <activeProfile>alwaysActiveProfile</activeProfile>
     <activeProfile>anotherAlwaysActiveProfile</activeProfile>
+    -->
+    <activeProfile>default</activeProfile>
   </activeProfiles>
-  -->
+
 </settings>
