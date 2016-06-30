@@ -245,6 +245,9 @@ under the License.
     </profile>
     -->
 
+    <!--
+    | Default profile holding various defaults.
+    |-->
     <profile>
       <id>default</id>
 
@@ -257,6 +260,9 @@ under the License.
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
+          <releases>
+            <updatePolicy>never</updatePolicy>
+          </releases>
         </repository>
       </repositories>
 
