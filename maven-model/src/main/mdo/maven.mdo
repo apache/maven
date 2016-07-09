@@ -246,7 +246,7 @@
             <![CDATA[
             The URL to the project's homepage.
             <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            project's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -256,7 +256,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from project's url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br /><b>Default value is</b>: <code>true</code>
@@ -2174,7 +2174,8 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -2186,7 +2187,8 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -2205,7 +2207,7 @@
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
             <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -2215,7 +2217,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from scm urls, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br /><b>Default value is</b>: <code>true</code>
@@ -2672,7 +2674,7 @@
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
             <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            site's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -2682,7 +2684,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from distribution management site url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br /><b>Default value is</b>: <code>true</code>
