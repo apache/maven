@@ -91,6 +91,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.shared.utils.logging.MessageBuffer;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
@@ -528,6 +529,26 @@ public class MavenCli
         else if ( MavenExecutionRequest.CHECKSUM_POLICY_FAIL.equals( cliRequest.request.getGlobalChecksumPolicy() ) )
         {
             slf4jLogger.info( "Enabling strict checksum verification on all artifact downloads." );
+        }
+
+        if ( slf4jLogger.isDebugEnabled() )
+        {
+            slf4jLogger.debug( "message scheme: " + ( MessageUtils.isColor() ? "color" : "plain" ) );
+            if ( MessageUtils.isColor() )
+            {
+                MessageBuffer buff = MessageUtils.buffer();
+                buff.a( "message styles: " );
+                buff.debug().a( "debug" ).reset().a( ' ' );
+                buff.info().a( "info" ).reset().a( ' ' );
+                buff.warning().a( "warning" ).reset().a( ' ' );
+                buff.error().a( "error" ).reset().a( ' ' );
+                buff.success( "success" ).a( ' ' );
+                buff.failure( "failure" ).a( ' ' );
+                buff.strong( "strong" ).a( ' ' );
+                buff.mojo( "mojo" ).a( ' ' );
+                buff.project( "project" );
+                slf4jLogger.debug( buff.toString() );
+            }
         }
     }
 
