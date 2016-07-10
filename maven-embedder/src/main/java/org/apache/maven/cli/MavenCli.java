@@ -533,11 +533,11 @@ public class MavenCli
 
         if ( slf4jLogger.isDebugEnabled() )
         {
-            slf4jLogger.debug( "message scheme: " + ( MessageUtils.isColor() ? "color" : "plain" ) );
+            slf4jLogger.debug( "Message scheme: " + ( MessageUtils.isColor() ? "color" : "plain" ) );
             if ( MessageUtils.isColor() )
             {
                 MessageBuffer buff = MessageUtils.buffer();
-                buff.a( "message styles: " );
+                buff.a( "Message styles: " );
                 buff.debug().a( "debug" ).reset().a( ' ' );
                 buff.info().a( "info" ).reset().a( ' ' );
                 buff.warning().a( "warning" ).reset().a( ' ' );
