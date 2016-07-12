@@ -245,7 +245,7 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
             project's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2174,7 +2174,7 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
             scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2187,7 +2187,7 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
             scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2206,7 +2206,7 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
             scm's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2673,7 +2673,7 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId, or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
             site's <code>child.inherit.append.path="false"</code>
             ]]>
           </description>
