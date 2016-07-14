@@ -217,17 +217,21 @@ public abstract class AbstractMavenTransferListener
     public void transferInitiated( TransferEvent event )
     {
         String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
-
         TransferResource resource = event.getResource();
-        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() );
+        String repositoryId = event.getSession().getLocalRepository().getId();
+        StringBuilder message = new StringBuilder(type + " from " + repositoryId);
+        message.append(": ");
+        message.append(resource.getRepositoryUrl() + resource.getResourceName());
+        out.println(message);
     }
-
+    
     @Override
     public void transferCorrupted( TransferEvent event )
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+        String repositoryId = event.getSession().getLocalRepository().getId();
+        out.println( "[WARNING] " + event.getException().getMessage() + " from " + repositoryId + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
 
@@ -239,6 +243,7 @@ public abstract class AbstractMavenTransferListener
 
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+        String repositoryId = event.getSession().getLocalRepository().getId();
         String len = format.format( contentLength );
 
         String throughput = "";
@@ -248,9 +253,10 @@ public abstract class AbstractMavenTransferListener
             double bytesPerSecond = contentLength / ( duration / 1000.0 );
             throughput = " at " + format.format( (long) bytesPerSecond ) + "/s";
         }
-
-        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-            + throughput + ")" );
+        
+        StringBuilder message = new StringBuilder(type + " from " + repositoryId);
+        message.append(": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len + throughput + ")");
+        out.println(message);
     }
 
 }
