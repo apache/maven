@@ -25,6 +25,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -218,7 +221,7 @@ public abstract class AbstractMavenTransferListener
     {
         String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         TransferResource resource = event.getResource();
-        String repositoryId = event.getSession().getLocalRepository().getId();
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
         StringBuilder message = new StringBuilder(type + " from " + repositoryId);
         message.append(": ");
         message.append(resource.getRepositoryUrl() + resource.getResourceName());
@@ -230,7 +233,7 @@ public abstract class AbstractMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        String repositoryId = event.getSession().getLocalRepository().getId();
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
         out.println( "[WARNING] " + event.getException().getMessage() + " from " + repositoryId + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
@@ -240,10 +243,9 @@ public abstract class AbstractMavenTransferListener
     {
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
-        String repositoryId = event.getSession().getLocalRepository().getId();
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
         String len = format.format( contentLength );
 
         String throughput = "";
