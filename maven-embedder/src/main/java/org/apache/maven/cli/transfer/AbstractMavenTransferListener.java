@@ -23,7 +23,6 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-
 import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -217,9 +216,15 @@ public abstract class AbstractMavenTransferListener
     public void transferInitiated( TransferEvent event )
     {
         String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
+        String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() );
+        StringBuilder message = new StringBuilder();
+        message.append( type ).append( ' ' ).append( direction ).append( ' ' ).append( resource.getRepositoryId() );
+        message.append( ": " );
+        message.append( resource.getRepositoryUrl() ).append( resource.getResourceName() );
+
+        out.println( message.toString() );
     }
 
     @Override
@@ -227,30 +232,35 @@ public abstract class AbstractMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
-            + resource.getResourceName() );
+        out.println( "[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
+            + resource.getRepositoryUrl() + resource.getResourceName() );
     }
 
     @Override
     public void transferSucceeded( TransferEvent event )
     {
+        String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+        String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
+
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
-        String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
-        String len = format.format( contentLength );
 
-        String throughput = "";
+        StringBuilder message = new StringBuilder();
+        message.append( type ).append( ' ' ).append( direction ).append( ' ' ).append( resource.getRepositoryId() );
+        message.append( ": " );
+        message.append( resource.getRepositoryUrl() ).append( resource.getResourceName() );
+        message.append( " (" ).append( format.format( contentLength ) );
+
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if ( duration > 0L )
         {
             double bytesPerSecond = contentLength / ( duration / 1000.0 );
-            throughput = " at " + format.format( (long) bytesPerSecond ) + "/s";
+            message.append( " at " ).append( format.format( (long) bytesPerSecond ) ).append( "/s" );
         }
 
-        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-            + throughput + ")" );
+        message.append( ')' );
+        out.println( message.toString() );
     }
 
 }
