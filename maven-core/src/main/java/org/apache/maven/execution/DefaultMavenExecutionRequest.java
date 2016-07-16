@@ -163,8 +163,11 @@ public class DefaultMavenExecutionRequest
 
     private Map<String, Object> data;
 
+    private FailLevel failLevel;
+
     public DefaultMavenExecutionRequest()
     {
+        this.failLevel = FailLevel.ERROR;
     }
 
     public static MavenExecutionRequest copy( MavenExecutionRequest original )
@@ -186,8 +189,8 @@ public class DefaultMavenExecutionRequest
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
         copy.setUserToolchainsFile( original.getUserToolchainsFile() );
         copy.setGlobalToolchainsFile( original.getGlobalToolchainsFile() );
-        copy.setBaseDirectory( ( original.getBaseDirectory() != null ) ? new File( original.getBaseDirectory() )
-                                                                       : null );
+        copy.setBaseDirectory(
+            ( original.getBaseDirectory() != null ) ? new File( original.getBaseDirectory() ) : null );
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
@@ -670,7 +673,9 @@ public class DefaultMavenExecutionRequest
         return useReactor;
     }
 
-    /** @deprecated use {@link #setPom(File)} */
+    /**
+     * @deprecated use {@link #setPom(File)}
+     */
     @Deprecated
     public MavenExecutionRequest setPomFile( String pomFilename )
     {
@@ -1282,5 +1287,30 @@ public class DefaultMavenExecutionRequest
         }
 
         return data;
+    }
+
+    @Override
+    public boolean isFailLevelWARN()
+    {
+        return this.failLevel.equals( FailLevel.WARN );
+    }
+
+    @Override
+    public boolean isFailLevelERROR()
+    {
+        return this.failLevel.equals( FailLevel.ERROR );
+    }
+
+    @Override
+    public FailLevel getFailLevel()
+    {
+        return this.failLevel;
+    }
+
+    @Override
+    public MavenExecutionRequest setFailLevel( FailLevel failLevel )
+    {
+        this.failLevel = failLevel;
+        return this;
     }
 }

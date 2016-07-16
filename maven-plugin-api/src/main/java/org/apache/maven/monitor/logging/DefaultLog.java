@@ -81,16 +81,19 @@ public class DefaultLog
     public void warn( CharSequence content )
     {
         logger.warn( toString( content ) );
+        logger.warn( " **** " );
     }
 
     public void warn( CharSequence content, Throwable error )
     {
         logger.warn( toString( content ), error );
+        logger.warn( " **** " );
     }
 
     public void warn( Throwable error )
     {
         logger.warn( "", error );
+        logger.warn( " **** " );
     }
 
     public void error( CharSequence content )

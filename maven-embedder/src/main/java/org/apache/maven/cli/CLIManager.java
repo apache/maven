@@ -80,6 +80,8 @@ public class CLIManager
     public static final String FAIL_AT_END = "fae";
 
     public static final String FAIL_NEVER = "fn";
+    
+    public static final String FAIL_LEVEL = "fl";
 
     public static final String RESUME_FROM = "rf";
 
@@ -140,6 +142,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
         options.addOption( OptionBuilder.withLongOpt( "legacy-local-repository" ).withDescription( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).create( LEGACY_LOCAL_REPOSITORY ) );
         options.addOption( OptionBuilder.withLongOpt( "builder" ).hasArg().withDescription( "The id of the build strategy to use" ).create( BUILDER ) );
+        options.addOption( OptionBuilder.withLongOpt( "fail-level" ).hasArg().withDescription( "Fail the build if XXXX" ).create( FAIL_LEVEL ) );
 
         // Adding this back in for compatibility with the verifier that hard codes this option.
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );
