@@ -476,7 +476,7 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
-            MessageUtils.setColor( false );
+            MessageUtils.setColorEnabled( false );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
@@ -484,7 +484,7 @@ public class MavenCli
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
 
-            MessageUtils.setColor( false );
+            MessageUtils.setColorEnabled( false );
 
             // redirect stdout and stderr to file
             try
@@ -533,8 +533,8 @@ public class MavenCli
 
         if ( slf4jLogger.isDebugEnabled() )
         {
-            slf4jLogger.debug( "Message scheme: " + ( MessageUtils.isColor() ? "color" : "plain" ) );
-            if ( MessageUtils.isColor() )
+            slf4jLogger.debug( "Message scheme: " + ( MessageUtils.isColorEnabled() ? "color" : "plain" ) );
+            if ( MessageUtils.isColorEnabled() )
             {
                 MessageBuffer buff = MessageUtils.buffer();
                 buff.a( "Message styles: " );
