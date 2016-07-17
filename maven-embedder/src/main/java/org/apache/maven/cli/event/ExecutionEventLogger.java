@@ -34,7 +34,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuffer;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,7 +197,7 @@ public class ExecutionEventLogger
     private void logResult( MavenSession session )
     {
         infoLine( '-' );
-        MessageBuffer buffer = buffer();
+        MessageBuilder buffer = buffer();
 
         if ( session.getResult().hasExceptions() )
         {
@@ -282,7 +282,7 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            MessageBuffer buffer = buffer().strong( "--- " );
+            MessageBuilder buffer = buffer().strong( "--- " );
             append( buffer, event.getMojoExecution() );
             append( buffer, event.getProject() );
             buffer.strong( " ---" );
@@ -302,7 +302,7 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            MessageBuffer buffer = buffer().strong( ">>> " );
+            MessageBuilder buffer = buffer().strong( ">>> " );
             append( buffer, event.getMojoExecution() );
             buffer.strong( " > " );
             appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
@@ -326,7 +326,7 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            MessageBuffer buffer = buffer().strong( "<<< " );
+            MessageBuilder buffer = buffer().strong( "<<< " );
             append( buffer, event.getMojoExecution() );
             buffer.strong( " < " );
             appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
@@ -337,40 +337,39 @@ public class ExecutionEventLogger
         }
     }
 
-    private void append( MessageBuffer buffer, MojoExecution me )
+    private void append( MessageBuilder buffer, MojoExecution me )
     {
-        buffer.mojo().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
-        buffer.a( ':' ).a( me.getGoal() ).reset();
+        buffer.mojo( me.getArtifactId() + ':' + me.getVersion() + ':' + me.getGoal() );
         if ( me.getExecutionId() != null )
         {
-            buffer.strong().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
+            buffer.a( ' ' ).strong( '(' + me.getExecutionId() + ')' );
         }
     }
 
-    private void appendForkInfo( MessageBuffer buffer, MojoDescriptor md )
+    private void appendForkInfo( MessageBuilder buffer, MojoDescriptor md )
     {
-        buffer.strong();
+        StringBuilder buff = new StringBuilder();
         if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
         {
             // forked phase
             if ( StringUtils.isNotEmpty( md.getExecuteLifecycle() ) )
             {
-                buffer.a( '[' );
-                buffer.a( md.getExecuteLifecycle() );
-                buffer.a( ']' );
+                buff.append( '[' );
+                buff.append( md.getExecuteLifecycle() );
+                buff.append( ']' );
             }
-            buffer.a( md.getExecutePhase() );
+            buff.append( md.getExecutePhase() );
         }
         else
         {
             // forked goal
-            buffer.a( ':' );
-            buffer.a( md.getExecuteGoal() );
+            buff.append( ':' );
+            buff.append( md.getExecuteGoal() );
         }
-        buffer.reset();
+        buffer.strong( buff.toString() );
     }
 
-    private void append( MessageBuffer buffer, MavenProject project )
+    private void append( MessageBuilder buffer, MavenProject project )
     {
         buffer.a( " @ " ).project( project.getArtifactId() );
     }

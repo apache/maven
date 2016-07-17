@@ -23,7 +23,7 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuffer;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -78,16 +78,15 @@ public class LifecycleExecutionException
 
     private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
     {
-        MessageBuffer buffer = buffer( 256 );
+        MessageBuilder buffer = buffer( 256 );
 
         buffer.a( "Failed to execute goal" );
 
         if ( execution != null )
         {
             buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' );
-            buffer.mojo().a( execution.getArtifactId() ).a( ':' );
-            buffer.a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).reset();
-            buffer.strong().a( " (" ).a( execution.getExecutionId() ).a( ')' ).reset();
+            buffer.mojo( execution.getArtifactId() + ':' + execution.getVersion() + ':' + execution.getGoal() );
+            buffer.a( ' ' ).strong( '(' + execution.getExecutionId() + ')' );
         }
 
         if ( project != null )

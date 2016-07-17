@@ -91,7 +91,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
-import org.apache.maven.shared.utils.logging.MessageBuffer;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
@@ -536,12 +536,12 @@ public class MavenCli
             slf4jLogger.debug( "Message scheme: " + ( MessageUtils.isColorEnabled() ? "color" : "plain" ) );
             if ( MessageUtils.isColorEnabled() )
             {
-                MessageBuffer buff = MessageUtils.buffer();
+                MessageBuilder buff = MessageUtils.buffer();
                 buff.a( "Message styles: " );
-                buff.debug().a( "debug" ).reset().a( ' ' );
-                buff.info().a( "info" ).reset().a( ' ' );
-                buff.warning().a( "warning" ).reset().a( ' ' );
-                buff.error().a( "error" ).reset().a( ' ' );
+                buff.debug( "debug" ).a( ' ' );
+                buff.info( "info" ).a( ' ' );
+                buff.warning( "warning" ).a( ' ' );
+                buff.error( "error" ).a( ' ' );
                 buff.success( "success" ).a( ' ' );
                 buff.failure( "failure" ).a( ' ' );
                 buff.strong( "strong" ).a( ' ' );
@@ -1065,8 +1065,8 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().strong().a( "  mvn <goals> -rf :" )
-                                   .a( project.getArtifactId() ).reset().toString() );
+                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <goals> -rf :"
+                    + project.getArtifactId() ).toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )

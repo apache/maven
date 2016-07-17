@@ -46,20 +46,20 @@ extends com.planet57.gossip.render.PatternRenderer
         {
             case TRACE:
             case DEBUG:
-                buff.append( buffer().debug().a( level.name() ).reset() );
+                buff.append( buffer().debug( level.name() ) );
                 break;
 
             case INFO:
-                buff.append( buffer().info().a( level.name() ).reset() );
+                buff.append( buffer().info( level.name() ) );
                 break;
 
             case WARN:
                 // Maven uses WARNING instead of WARN
-                buff.append( buffer().warning().a( WARNING ).reset() );
+                buff.append( buffer().warning( WARNING ) );
                 break;
 
             case ERROR:
-                buff.append( buffer().error().a( level.name() ).reset() );
+                buff.append( buffer().error( level.name() ) );
                 break;
 
             default:
