@@ -1398,7 +1398,7 @@
             It also assists in determining which artifacts to include in a distribution of
             this project. For more information, see
             <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
-            dependency mechanism</a>.
+            dependency mechanism</a>. If no scope is given the scope is <code>compile</code>.
             ]]>
           </description>
           <type>String</type>
