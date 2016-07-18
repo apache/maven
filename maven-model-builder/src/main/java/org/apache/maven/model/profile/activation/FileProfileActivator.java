@@ -83,6 +83,17 @@ public class FileProfileActivator
         String path;
         boolean missing;
 
+        try {
+        	isExistsAndMissingPropertiesNotEmpty(file.getExists(), file.getMissing());
+        	}
+        catch(Exception e) {
+        	ModelProblemCollectorRequest request = new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE);
+        	request.setMessage("Failed due to exists and missing properties are enabled for profile " + profile.getId());
+        	request.setException(e);
+        	problems.add(request);
+        	return false;
+        }
+        
         if ( StringUtils.isNotEmpty( file.getExists() ) )
         {
             path = file.getExists();
@@ -170,6 +181,18 @@ public class FileProfileActivator
         return missing ? !fileExists : fileExists;
     }
 
+    /**
+     * Check whether the exists and missing properties are both not empty
+     * @return false to indicate one or both properties are empty
+     * @throws Exception when both properties are not empty
+    */
+    private boolean isExistsAndMissingPropertiesNotEmpty(String exists, String missing) throws Exception {
+    	if(!StringUtils.isBlank(exists) && !StringUtils.isBlank(missing)) {
+    		throw new Exception("Failed due to exists and missing properties are enabled. Only of the properties are allowed.");
+          }
+    	return false;
+    }
+    
     @Override
     public boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
