@@ -19,25 +19,29 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.util.Properties;
+import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Konstantin Perikov
  */
 public class ComplexActivationTest
-        extends TestCase
 {
 
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+	
     private File getPom( String name )
     {
         return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
-    public void testAndConditionInActivation()
-            throws Exception
+    @Test
+    public void testAndConditionInActivation() throws Exception
     {
         Properties sysProperties = new Properties();
         sysProperties.setProperty( "myproperty", "test" );
@@ -57,25 +61,21 @@ public class ComplexActivationTest
         assertNull( result.getEffectiveModel().getProperties().get( "profile.miss" ) );
     }
     
+    @Test
     public void testConditionExistingAndMissingInActivation() throws Exception
     {
+    	exception.expect(ModelBuildingException.class);
+    	exception.expectMessage("Failed due to exists and missing properties are enabled for profile exists-missing-condition");
         Properties sysProperties = new Properties();
-        sysProperties.setProperty( "myproperty", "test" );
+        sysProperties.setProperty("myproperty", "test");
 
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull( builder );
+        assertNotNull(builder);
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setProcessPlugins( true );
-        request.setPomFile( getPom( "complexEmptyAndMissing" ) );
-        request.setSystemProperties( sysProperties );
-
-        try {
-        	builder.build( request );
-        }
-        catch(Exception e) {
-        	assertTrue(e instanceof ModelBuildingException);
-        }
+        request.setProcessPlugins(true);
+        request.setPomFile(getPom("complexEmptyAndMissing"));
+        request.setSystemProperties(sysProperties);
+    	builder.build(request);
     }
-
 }

@@ -16,7 +16,7 @@
 
     <profiles>
         <profile>
-            <id>two-conditions</id>
+            <id>exists-missing-condition</id>
             <activation>
                 <file>
                     <exists>simple.xml</exists>
@@ -29,22 +29,6 @@
             </activation>
             <properties>
                 <profile.file>activated-1</profile.file>
-            </properties>
-        </profile>
-        <profile>
-            <id>another-two-conditions</id>
-            <activation>
-                <property>
-                    <name>myproperty</name>
-                    <value>test</value>
-                </property>
-                <file>
-                	<exists>simple.xml</exists>
-                    <missing>simple.xml</missing>
-                </file>
-            </activation>
-            <properties>
-                <profile.miss>activated-2</profile.miss>
             </properties>
         </profile>
     </profiles>
