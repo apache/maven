@@ -80,17 +80,6 @@ Artifact handlers are required by the dependency resolution mechanism.
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>ejb3</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
-      <configuration>
-        <type>ejb3</type>
-        <includesDependencies>true</includesDependencies>
-        <language>java</language>
-        <addedToClasspath>false</addedToClasspath>
-      </configuration>
-    </component>
 
     <!--
      | TEST JAR
@@ -202,18 +191,17 @@ Artifact handlers are required by the dependency resolution mechanism.
     </component>
 
     <!--
-     | PAR
+     | ZIP
      |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>par</role-hint>
+      <role-hint>zip</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
-        <type>par</type>
-        <includesDependencies>true</includesDependencies>
-        <language>java</language>
-        <addedToClasspath>false</addedToClasspath>
+        <type>zip</type>
+        <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
+
   </components>
 </component-set>

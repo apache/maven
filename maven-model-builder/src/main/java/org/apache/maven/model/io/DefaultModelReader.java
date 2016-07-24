@@ -65,14 +65,7 @@ public class DefaultModelReader
     {
         Validate.notNull( input, "input cannot be null" );
 
-        try
-        {
-            return read( input, isStrict( options ), getSource( options ) );
-        }
-        finally
-        {
-            IOUtil.close( input );
-        }
+        return read( input, isStrict( options ), getSource( options ) );
     }
 
     @Override
@@ -81,14 +74,7 @@ public class DefaultModelReader
     {
         Validate.notNull( input, "input cannot be null" );
 
-        try
-        {
-            return read( ReaderFactory.newXmlReader( input ), isStrict( options ), getSource( options ) );
-        }
-        finally
-        {
-            IOUtil.close( input );
-        }
+        return read( ReaderFactory.newXmlReader( input ), isStrict( options ), getSource( options ) );
     }
 
     private boolean isStrict( Map<String, ?> options )
@@ -108,18 +94,22 @@ public class DefaultModelReader
     {
         try
         {
-            if ( source != null )
-            {
-                return new MavenXpp3ReaderEx().read( reader, strict, source );
-            }
-            else
-            {
-                return new MavenXpp3Reader().read( reader, strict );
-            }
+            final Model model = source != null
+                                    ? new MavenXpp3ReaderEx().read( reader, strict, source )
+                                    : new MavenXpp3Reader().read( reader, strict );
+
+            reader.close();
+            reader = null;
+
+            return model;
         }
         catch ( XmlPullParserException e )
         {
             throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
         }
     }
 

@@ -18,7 +18,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
+<!-- START SNIPPET: core-extension -->
 <extension>
   <exportedPackages>
     <!-- maven-* -->
@@ -118,6 +118,8 @@ under the License.
     <exportedPackage>org.slf4j.spi.*</exportedPackage>
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
 
+    <!-- JAnsi -->
+    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -156,9 +158,10 @@ under the License.
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
+    <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 
     <!--
-      | We must also filter out the old or NoClassDefFoundErrors will surface  
+      | We must also filter out the old Aether or NoClassDefFoundErrors will surface  
      -->
     <exportedArtifact>org.sonatype.aether:aether-api</exportedArtifact>
     <exportedArtifact>org.sonatype.aether:aether-spi</exportedArtifact>
@@ -172,3 +175,4 @@ under the License.
      -->
   </exportedArtifacts>
 </extension>
+<!-- END SNIPPET: core-extension -->

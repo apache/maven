@@ -160,13 +160,11 @@ class DefaultModelProblemCollector
             }
         }
 
-        modelId = modelId != null
-                      ? this.getModelId() + " [" + modelId + "]"
-                      : this.getModelId();
-
-        src = src != null
-                  ? this.getSource() + " [" + src + "]"
-                  : this.getSource();
+        if ( modelId == null )
+        {
+            modelId = getModelId();
+            src = getSource();
+        }
 
         if ( line <= 0 && column <= 0 && req.getException() instanceof ModelParseException )
         {

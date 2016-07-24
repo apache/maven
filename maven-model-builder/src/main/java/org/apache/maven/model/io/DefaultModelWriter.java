@@ -64,8 +64,10 @@ public class DefaultModelWriter
 
         try
         {
-            MavenXpp3Writer w = new MavenXpp3Writer();
-            w.write( output, model );
+            new MavenXpp3Writer().write( output, model );
+
+            output.close();
+            output = null;
         }
         finally
         {
@@ -80,20 +82,14 @@ public class DefaultModelWriter
         Validate.notNull( output, "output cannot be null" );
         Validate.notNull( model, "model cannot be null" );
 
-        try
+        String encoding = model.getModelEncoding();
+        // TODO Use StringUtils here
+        if ( encoding == null || encoding.length() <= 0 )
         {
-            String encoding = model.getModelEncoding();
-            // TODO Use StringUtils here
-            if ( encoding == null || encoding.length() <= 0 )
-            {
-                encoding = "UTF-8";
-            }
-            write( new OutputStreamWriter( output, encoding ), options, model );
+            encoding = "UTF-8";
         }
-        finally
-        {
-            IOUtil.close( output );
-        }
+
+        write( new OutputStreamWriter( output, encoding ), options, model );
     }
 
 }

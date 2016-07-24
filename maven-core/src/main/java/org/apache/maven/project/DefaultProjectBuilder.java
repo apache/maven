@@ -112,14 +112,14 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null ) );
+        return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null, null ) );
     }
 
     @Override
     public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( null, modelSource, new InternalConfig( request, null ) );
+        return build( null, modelSource, new InternalConfig( request, null, null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -271,7 +271,7 @@ public class DefaultProjectBuilder
         request.setUserProperties( configuration.getUserProperties() );
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
-        request.setModelCache( new ReactorModelCache() );
+        request.setModelCache( config.modelCache );
 
         return request;
     }
@@ -290,7 +290,7 @@ public class DefaultProjectBuilder
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
-        InternalConfig config = new InternalConfig( request, null );
+        InternalConfig config = new InternalConfig( request, null, null );
 
         boolean localProject;
 
@@ -352,7 +352,9 @@ public class DefaultProjectBuilder
 
         ReactorModelPool modelPool = new ReactorModelPool();
 
-        InternalConfig config = new InternalConfig( request, modelPool );
+        ReactorModelCache modelCache = new ReactorModelCache();
+
+        InternalConfig config = new InternalConfig( request, modelPool, modelCache );
 
         Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
@@ -893,11 +895,14 @@ public class DefaultProjectBuilder
         public final List<RemoteRepository> repositories;
 
         public final ReactorModelPool modelPool;
+        
+        public final ReactorModelCache modelCache;
 
-        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool )
+        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )
         {
             this.request = request;
             this.modelPool = modelPool;
+            this.modelCache = modelCache;
             session =
                 LegacyLocalRepositoryManager.overlay( request.getLocalRepository(), request.getRepositorySession(),
                                                       repoSystem );

@@ -22,10 +22,10 @@ package org.apache.maven.model.interpolation;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -48,6 +48,8 @@ import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
@@ -56,29 +58,18 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
+    private static final List<String> PROJECT_PREFIXES =
+        Collections.unmodifiableList( Arrays.asList( "pom.", "project." ) );
 
-    private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
-
-    static
-    {
-        Collection<String> translatedPrefixes = new HashSet<>();
-
-        // MNG-1927, MNG-2124, MNG-3355:
-        // If the build section is present and the project directory is non-null, we should make
-        // sure interpolation of the directories below uses translated paths.
-        // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
-        // code below...
-        translatedPrefixes.add( "build.directory" );
-        translatedPrefixes.add( "build.outputDirectory" );
-        translatedPrefixes.add( "build.testOutputDirectory" );
-        translatedPrefixes.add( "build.sourceDirectory" );
-        translatedPrefixes.add( "build.testSourceDirectory" );
-        translatedPrefixes.add( "build.scriptSourceDirectory" );
-        translatedPrefixes.add( "reporting.outputDirectory" );
-
-        TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
-    }
+    // MNG-1927, MNG-2124, MNG-3355:
+    // If the build section is present and the project directory is non-null, we should make
+    // sure interpolation of the directories below uses translated paths.
+    // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
+    // code below...
+    private static final Set<String> TRANSLATED_PATH_EXPRESSIONS =
+        ImmutableSet.of( "build.directory", "build.outputDirectory", "build.testOutputDirectory",
+                         "build.sourceDirectory", "build.testSourceDirectory", "build.scriptSourceDirectory",
+                         "reporting.outputDirectory" );
 
     @Requirement
     private PathTranslator pathTranslator;

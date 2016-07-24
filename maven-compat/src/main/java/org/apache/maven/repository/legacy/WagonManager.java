@@ -45,7 +45,8 @@ public interface WagonManager
     //
     // Retriever
     //
-    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener transferListener, boolean force )
+    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener transferListener,
+                      boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories,
@@ -71,7 +72,8 @@ public interface WagonManager
                       TransferListener downloadMonitor )
         throws TransferFailedException;
 
-    void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+    void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
+                        TransferListener downloadMonitor )
         throws TransferFailedException;
 
     void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )

@@ -47,8 +47,8 @@ public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
 
-    private static final Map<Class<?>, Field[]> fieldsByClass = new WeakHashMap<>();
-    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass = new WeakHashMap<>();
+    private static final Map<Class<?>, Field[]> FIELDS_BY_CLASS = new WeakHashMap<>();
+    private static final Map<Class<?>, Boolean> PRIMITIVE_BY_CLASS = new WeakHashMap<>();
 
     public StringSearchModelInterpolator()
     {
@@ -161,11 +161,11 @@ public class StringSearchModelInterpolator
             }
             else if ( isQualifiedForInterpolation( cls ) )
             {
-                Field[] fields = fieldsByClass.get( cls );
+                Field[] fields = FIELDS_BY_CLASS.get( cls );
                 if ( fields == null )
                 {
                     fields = cls.getDeclaredFields();
-                    fieldsByClass.put( cls, fields );
+                    FIELDS_BY_CLASS.put( cls, fields );
                 }
 
                 for ( Field field : fields )
@@ -350,12 +350,12 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
         {
-            if ( !fieldIsPrimitiveByClass.containsKey( fieldType ) )
+            if ( !PRIMITIVE_BY_CLASS.containsKey( fieldType ) )
             {
-                fieldIsPrimitiveByClass.put( fieldType, fieldType.isPrimitive() );
+                PRIMITIVE_BY_CLASS.put( fieldType, fieldType.isPrimitive() );
             }
 
-            if ( fieldIsPrimitiveByClass.get( fieldType ) )
+            if ( PRIMITIVE_BY_CLASS.get( fieldType ) )
             {
                 return false;
             }
