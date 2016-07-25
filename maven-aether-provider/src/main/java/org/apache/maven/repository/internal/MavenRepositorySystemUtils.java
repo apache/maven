@@ -131,7 +131,12 @@ public final class MavenRepositorySystemUtils
         Properties sysProps = new Properties();
         for ( String key : System.getProperties().stringPropertyNames() )
         {
-            sysProps.put( key, System.getProperty( key ) );
+            Object value = System.getProperty( key );
+            // MNG-6053 guard against key without value
+            if ( value != null )
+            {
+                sysProps.put( key, value );
+            }
         }
         session.setSystemProperties( sysProps );
         session.setConfigProperties( sysProps );
