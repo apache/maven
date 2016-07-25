@@ -20,7 +20,6 @@ package org.apache.maven.model.profile.activation;
  */
 
 import java.io.File;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
@@ -85,7 +84,7 @@ public class FileProfileActivator
 
         try {
         	isExistsAndMissingPropertiesNotEmpty(file.getExists(), file.getMissing());
-        	}
+        }
         catch(Exception e) {
         	ModelProblemCollectorRequest request = new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE);
         	request.setMessage("Failed due to exists and missing properties are enabled for profile " + profile.getId());

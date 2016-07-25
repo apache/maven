@@ -21,7 +21,9 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Properties;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -64,18 +66,18 @@ public class ComplexActivationTest
     @Test
     public void testConditionExistingAndMissingInActivation() throws Exception
     {
-    	exception.expect(ModelBuildingException.class);
-    	exception.expectMessage("Failed due to exists and missing properties are enabled for profile exists-missing-condition");
+    	exception.expect( ModelBuildingException.class );
+    	exception.expectMessage( "Failed due to exists and missing properties are enabled for profile another-two-conditions" );
         Properties sysProperties = new Properties();
         sysProperties.setProperty("myproperty", "test");
 
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertNotNull( builder );
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setProcessPlugins(true);
-        request.setPomFile(getPom("complexEmptyAndMissing"));
-        request.setSystemProperties(sysProperties);
-    	builder.build(request);
+        request.setProcessPlugins( true );
+        request.setPomFile( getPom( "complexEmptyAndMissing" ) );
+        request.setSystemProperties( sysProperties );
+    	builder.build( request );
     }
 }
