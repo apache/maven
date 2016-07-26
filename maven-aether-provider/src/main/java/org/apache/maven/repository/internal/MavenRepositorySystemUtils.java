@@ -19,6 +19,9 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -128,13 +131,27 @@ public final class MavenRepositorySystemUtils
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
         // MNG-5670 guard against ConcurrentModificationException
-        Properties sysProps = new Properties();
-        for ( String key : System.getProperties().stringPropertyNames() )
+        // MNG-6053 guard against key without value
+        final Properties systemProperties = new Properties();
+        // This relies on the fact that load/store are synchronized internally.
+        try ( final ByteArrayOutputStream out = new ByteArrayOutputStream() )
         {
-            sysProps.put( key, System.getProperty( key ) );
+            System.getProperties().store( out, null );
+            out.close();
+
+            try ( final ByteArrayInputStream in = new ByteArrayInputStream( out.toByteArray() ) )
+            {
+                systemProperties.load( in );
+                in.close();
+            }
         }
-        session.setSystemProperties( sysProps );
-        session.setConfigProperties( sysProps );
+        catch ( final IOException e )
+        {
+            throw new AssertionError( "Unexpected IO error copying system properties." );
+        }
+
+        session.setSystemProperties( systemProperties );
+        session.setConfigProperties( systemProperties );
 
         return session;
     }

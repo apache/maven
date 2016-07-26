@@ -249,7 +249,11 @@ under the License.
     | Default profile holding various defaults.
     |-->
     <profile>
-      <id>default</id>
+      <!--
+      This intentionally uses a UUID to not clash with any profile
+      id already in use before this profile got added to the settings.
+      -->
+      <id>f06abaa7-178e-441e-bb0d-10a92d7ce014</id>
 
       <repositories>
         <repository>
@@ -291,7 +295,7 @@ under the License.
     <activeProfile>alwaysActiveProfile</activeProfile>
     <activeProfile>anotherAlwaysActiveProfile</activeProfile>
     -->
-    <activeProfile>default</activeProfile>
+    <activeProfile>f06abaa7-178e-441e-bb0d-10a92d7ce014</activeProfile>
   </activeProfiles>
 
 </settings>
