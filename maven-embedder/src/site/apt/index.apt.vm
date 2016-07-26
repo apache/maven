@@ -40,3 +40,7 @@ ${project.name}
    * <<<.mvn/maven.config>>> containing Maven command-line parameter,
 
    * <<<.mvn/extensions.xml>>> containing {{{./core-extensions.html}a list of extensions}}.
+
+ * since 3.4.0, output is colorized by default, with color disabled in batch mode: see
+   {{{/shared/maven-shared-utils/apidocs/org/apache/maven/shared/utils/logging/package-summary.html}styled message API}}
+   for more details.

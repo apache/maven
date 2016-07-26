@@ -57,7 +57,7 @@
           <area shape="rect" coords="409,342,500,378" alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="88,59,192,94"    alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
           <area shape="rect" coords="551,58,707,94"   alt="commons-cli" href="http://commons.apache.org/cli/" />
-          <area shape="rect" coords="88,175,205,211"  alt="maven-project-utils" href="https://maven.apache.org/shared/maven-shared-utils/" />
+          <area shape="rect" coords="88,175,205,211"  alt="maven-shared-utils" href="https://maven.apache.org/shared/maven-shared-utils/" />
           <area shape="rect" coords="0,176,70,211"    alt="jansi" href="http://fusesource.github.io/jansi/" />
           <area shape="rect" coords="0,229,71,266"    alt="jansi-native" href="https://github.com/fusesource/jansi-native" />
           <area shape="rect" coords="551,116,739,152" alt="wagon-provider-api" href="https://maven.apache.org/wagon/wagon-provider-api/" />
