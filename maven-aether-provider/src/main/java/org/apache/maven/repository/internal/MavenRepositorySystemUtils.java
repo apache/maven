@@ -137,17 +137,15 @@ public final class MavenRepositorySystemUtils
         try ( final ByteArrayOutputStream out = new ByteArrayOutputStream() )
         {
             System.getProperties().store( out, null );
-            out.close();
 
             try ( final ByteArrayInputStream in = new ByteArrayInputStream( out.toByteArray() ) )
             {
                 systemProperties.load( in );
-                in.close();
             }
         }
         catch ( final IOException e )
         {
-            throw new AssertionError( "Unexpected IO error copying system properties." );
+            throw new AssertionError( "Unexpected IO error copying system properties.", e );
         }
 
         session.setSystemProperties( systemProperties );
