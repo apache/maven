@@ -19,6 +19,7 @@ package org.apache.maven.model.finalization;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,57 +29,56 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.management.DependencyManagementInjector;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * A {@code ModelFinalizer} adding classified dependency declarations to the dependency management for all unclassified
- * dependency declarations with classifiers taken from set of well-known classifiers.
+ * dependency declarations with classifiers taken from a collection of well-known classifiers.
  * <p>
- * This class requires the {@code Set} implementation of well-known classifiers to be provided by the runtime
- * environment. By default, no such implementation exists. As a starting point, that {@code Set} implementation should
- * at least contain the following classifiers corresponding to plugin defaults.
- * <table>
- * <tr>
- * <th>Plugin</th>
- * <th>Classifiers</th>
- * </tr>
- * <tr>
- * <td>maven-jar-plugin</td>
- * <td>tests</td>
- * </tr>
- * <tr>
- * <td>maven-javadoc-plugin</td>
- * <td>javadoc, test-javadoc</td>
- * </tr>
- * <tr>
- * <td>maven-shade-plugin</td>
- * <td>shaded</td>
- * </tr>
- * <tr>
- * <td>maven-site-plugin</td>
- * <td>site</td>
- * </tr>
- * <tr>
- * <td>maven-source-plugin</td>
- * <td>sources, test-sources</td>
- * </tr>
- * </table>
+ * This {@code ModelFinalizer} implementation is not wired by default. It will need to be setup manually. This can be
+ * done by adding a {@code META-INF/plexus/components.xml} file containing the following to the Maven core classpath,
+ * for example.
+ * <pre>
+ * &lt;component-set>
+ *   &lt;components>
+ *     &lt;component>
+ *       &lt;role>org.apache.maven.model.finalization.ModelFinalizer&lt;/role>
+ *       &lt;implementation>org.apache.maven.model.finalization.DependencyManagementModelFinalizer&lt;/implementation>
+ *       &lt;role-hint>dependency-management&lt;/role-hint>
+ *       &lt;requirements>
+ *         &lt;requirement>
+ *           &lt;role>org.apache.maven.model.management.DependencyManagementInjector</role>
+ *           &lt;field-name>dependencyManagementInjector</field-name>
+ *         &lt;/requirement>
+ *       &lt;/requirements>
+ *       &lt;configuration>
+ *         &lt;dependencyManagementClassifiers>
+ *           &lt;dependencyManagementClassifier>tests&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>javadoc&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>test-javadoc&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>shaded&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>site&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>sources&lt;/dependencyManagementClassifier>
+ *           &lt;dependencyManagementClassifier>test-sources&lt;/dependencyManagementClassifier>
+ *         &lt;/dependencyManagementClassifiers>
+ *       &lt;/configuration>
+ *     &lt;/component>
+ *   &lt;/components>
+ * &lt;/component-set>
+ * </pre>
  * </p>
  *
  * @author Christian Schulte
  * @since 3.4
  */
-@Component( role = ModelFinalizer.class, hint = "dependency-management" )
-public class DependencyManagementModelFinalizer
+public final class DependencyManagementModelFinalizer
     implements ModelFinalizer
 {
 
-    @Requirement( role = Set.class, hint = "dependency-management-classifiers", optional = true )
-    private Set<String> dependencyManagementClassifiers;
-
     @Requirement
     private DependencyManagementInjector dependencyManagementInjector;
+
+    private Collection<String> dependencyManagementClassifiers;
 
     public DependencyManagementModelFinalizer setDependencyManagementInjector( DependencyManagementInjector value )
     {
@@ -86,10 +86,19 @@ public class DependencyManagementModelFinalizer
         return this;
     }
 
-    public DependencyManagementModelFinalizer setDependencyManagementClassifiers( Set<String> value )
+    /**
+     * Gets the collection of well-known classifiers to use for adding classified dependency declarations.
+     *
+     * @return The collection of well-known classifiers to use.
+     */
+    public Collection<String> getDependencyManagementClassifiers()
     {
-        this.dependencyManagementClassifiers = value;
-        return this;
+        if ( this.dependencyManagementClassifiers == null )
+        {
+            this.dependencyManagementClassifiers = new HashSet<>();
+        }
+
+        return this.dependencyManagementClassifiers;
     }
 
     /**
@@ -104,18 +113,18 @@ public class DependencyManagementModelFinalizer
     public void finalizeModel( final Model model, final ModelBuildingRequest request,
                                final ModelProblemCollector problems )
     {
-        if ( this.dependencyManagementClassifiers != null && model.getDependencyManagement() != null )
+        if ( model.getDependencyManagement() != null )
         {
             final Set<Dependency> classifiedDependencies = new HashSet<>();
 
             for ( final Dependency managedDependency : model.getDependencyManagement().getDependencies() )
             {
-                for ( final String classifier : this.dependencyManagementClassifiers )
+                for ( final String classifier : this.getDependencyManagementClassifiers() )
                 {
                     Dependency classifiedDependency =
                         getDependency( model.getDependencyManagement(), managedDependency.getGroupId(),
                                        managedDependency.getArtifactId(), managedDependency.getType(),
-                                       managedDependency.getClassifier() );
+                                       classifier );
 
                     if ( classifiedDependency == null )
                     {
