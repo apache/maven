@@ -239,15 +239,15 @@ public class DefaultModelBuilder
         return this;
     }
 
-    /**
-     * @since 3.4
-     */
     public DefaultModelBuilder setReportingConverter( ReportingConverter reportingConverter )
     {
         this.reportingConverter = reportingConverter;
         return this;
     }
 
+    /**
+     * @since 3.4
+     */
     public DefaultModelBuilder setModelFinalizers( List<ModelFinalizer> value )
     {
         this.modelFinalizers = value;
