@@ -108,6 +108,8 @@ Maven Model Builder
    with its <<<DefaultPluginConfigurationExpander>>> implementation
    ({{{./xref/org/apache/maven/model/plugin/DefaultPluginConfigurationExpander.html}source}})
 
+   ** <(optional)> model finalization: <<<ModelFinalizer>>> ({{{./apidocs/org/apache/maven/model/finalization/ModelFinalizer.html}javadoc}})
+
    ** effective model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation
    ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})

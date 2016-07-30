@@ -51,6 +51,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
+import org.apache.maven.model.finalization.ModelFinalizer;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
@@ -138,6 +139,9 @@ public class DefaultModelBuilder
 
     @Requirement
     private ReportingConverter reportingConverter;
+
+    @Requirement( optional = true )
+    private List<ModelFinalizer> modelFinalizers;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -238,6 +242,12 @@ public class DefaultModelBuilder
     public DefaultModelBuilder setReportingConverter( ReportingConverter reportingConverter )
     {
         this.reportingConverter = reportingConverter;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelFinalizers( List<ModelFinalizer> value )
+    {
+        this.modelFinalizers = value;
         return this;
     }
 
@@ -500,6 +510,14 @@ public class DefaultModelBuilder
 
             // plugins configuration
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
+        }
+
+        if ( this.modelFinalizers != null )
+        {
+            for ( final ModelFinalizer modelFinalizer : this.modelFinalizers )
+            {
+                modelFinalizer.finalizeModel( resultModel, request, problems );
+            }
         }
 
         // effective model validation
