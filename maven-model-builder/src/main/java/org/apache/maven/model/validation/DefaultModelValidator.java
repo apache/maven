@@ -101,6 +101,7 @@ public class DefaultModelValidator
         {
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
+            validateStringNotEmpty( "modelVersion", problems, Severity.WARNING, Version.V20, m.getModelVersion(), m );
             validateEnum( "modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), null, m,
                           "4.0.0" );
 
