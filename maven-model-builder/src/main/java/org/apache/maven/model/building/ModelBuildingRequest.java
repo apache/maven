@@ -55,14 +55,15 @@ public interface ModelBuildingRequest
     int VALIDATION_LEVEL_MAVEN_3_0 = 30;
 
     /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects.
+     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects. As of Maven 3.4,
+     * this is the default validation level.
      */
     int VALIDATION_LEVEL_MAVEN_3_1 = 31;
 
     /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_1;
 
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
