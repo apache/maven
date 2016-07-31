@@ -100,9 +100,15 @@ public class DefaultModelValidator
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
-            Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
-            validateStringNotEmpty( "modelVersion", problems, errOn31, Version.V20, m.getModelVersion(), m );
+            // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
+            //            effective model.
+            //
+            // As of 3.4, the model version is mandatory even in raw models. The XML element still is optional in the
+            // XML schema and this will not change anytime soon. We do not want to build effective models based on
+            // models without a version starting with 3.4.
+            validateStringNotEmpty( "modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m );
+
             validateEnum( "modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), null, m,
                           "4.0.0" );
 
