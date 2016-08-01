@@ -288,6 +288,9 @@ public class DefaultProjectDependenciesResolver
                 buffer.append( ':' ).append( project.getArtifactId() );
                 buffer.append( ':' ).append( project.getPackaging() );
                 buffer.append( ':' ).append( project.getVersion() );
+                if(!isDescriptionEmpty(project.getDescription())) {
+                    buffer.append( indent ).append( project.getDescription() );
+                }
             }
 
             logger.debug( buffer.toString() );
@@ -301,6 +304,13 @@ public class DefaultProjectDependenciesResolver
             return true;
         }
 
+        private boolean isDescriptionEmpty(String description) {
+            if(StringUtils.isEmpty( description )) {
+                return true;
+            }
+            return false;
+        }
+        
         private void appendManagementSource( StringBuilder buffer, org.eclipse.aether.artifact.Artifact artifact,
                                              String field )
         {
