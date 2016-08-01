@@ -784,7 +784,9 @@ public class DefaultModelBuilder
 
                 if ( model.getModelVersion() != null )
                 {
-                    if ( !modelVersions.isEmpty() && modelVersions.add( model.getModelVersion() ) )
+                    final boolean initial = modelVersions.isEmpty();
+
+                    if ( modelVersions.add( model.getModelVersion() ) && !initial )
                     {
                         problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V31 )
                             .setMessage( String.format(
