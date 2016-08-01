@@ -440,12 +440,12 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "duplicate-plugin.xml" );
 
-        assertViolations( result, 0, 0, 4 );
+        assertViolations( result, 0, 4, 0 );
 
-        assertTrue( result.getWarnings().get( 0 ).contains( "duplicate declaration of plugin test:duplicate" ) );
-        assertTrue( result.getWarnings().get( 1 ).contains( "duplicate declaration of plugin test:managed-duplicate" ) );
-        assertTrue( result.getWarnings().get( 2 ).contains( "duplicate declaration of plugin profile:duplicate" ) );
-        assertTrue( result.getWarnings().get( 3 ).contains( "duplicate declaration of plugin profile:managed-duplicate" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "duplicate declaration of plugin test:duplicate" ) );
+        assertTrue( result.getErrors().get( 1 ).contains( "duplicate declaration of plugin test:managed-duplicate" ) );
+        assertTrue( result.getErrors().get( 2 ).contains( "duplicate declaration of plugin profile:duplicate" ) );
+        assertTrue( result.getErrors().get( 3 ).contains( "duplicate declaration of plugin profile:managed-duplicate" ) );
     }
 
     public void testDuplicatePluginExecution()
@@ -466,12 +466,12 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "reserved-repository-id.xml" );
 
-        assertViolations( result, 0, 0, 4 );
+        assertViolations( result, 0, 4, 0 );
 
-        assertContains( result.getWarnings().get( 0 ), "'repositories.repository.id'" + " must not be 'local'" );
-        assertContains( result.getWarnings().get( 1 ), "'pluginRepositories.pluginRepository.id' must not be 'local'" );
-        assertContains( result.getWarnings().get( 2 ), "'distributionManagement.repository.id' must not be 'local'" );
-        assertContains( result.getWarnings().get( 3 ),
+        assertContains( result.getErrors().get( 0 ), "'repositories.repository.id'" + " must not be 'local'" );
+        assertContains( result.getErrors().get( 1 ), "'pluginRepositories.pluginRepository.id' must not be 'local'" );
+        assertContains( result.getErrors().get( 2 ), "'distributionManagement.repository.id' must not be 'local'" );
+        assertContains( result.getErrors().get( 3 ),
                         "'distributionManagement.snapshotRepository.id' must not be 'local'" );
     }
 
@@ -520,9 +520,9 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-version.xml" );
 
-        assertViolations( result, 0, 0, 1 );
+        assertViolations( result, 0, 1, 0 );
 
-        assertContains( result.getWarnings().get( 0 ), "'version' must not contain any of these characters" );
+        assertContains( result.getErrors().get( 0 ), "'version' must not contain any of these characters" );
     }
 
     public void testBadSnapshotVersion()
@@ -530,9 +530,9 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-snapshot-version.xml" );
 
-        assertViolations( result, 0, 0, 1 );
+        assertViolations( result, 0, 1, 0 );
 
-        assertContains( result.getWarnings().get( 0 ), "'version' uses an unsupported snapshot version format" );
+        assertContains( result.getErrors().get( 0 ), "'version' uses an unsupported snapshot version format" );
     }
 
     public void testBadRepositoryId()
@@ -540,15 +540,15 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-repository-id.xml" );
 
-        assertViolations( result, 0, 0, 4 );
+        assertViolations( result, 0, 4, 0 );
 
-        assertContains( result.getWarnings().get( 0 ),
+        assertContains( result.getErrors().get( 0 ),
                         "'repositories.repository.id' must not contain any of these characters" );
-        assertContains( result.getWarnings().get( 1 ),
+        assertContains( result.getErrors().get( 1 ),
                         "'pluginRepositories.pluginRepository.id' must not contain any of these characters" );
-        assertContains( result.getWarnings().get( 2 ),
+        assertContains( result.getErrors().get( 2 ),
                         "'distributionManagement.repository.id' must not contain any of these characters" );
-        assertContains( result.getWarnings().get( 3 ),
+        assertContains( result.getErrors().get( 3 ),
                         "'distributionManagement.snapshotRepository.id' must not contain any of these characters" );
     }
 

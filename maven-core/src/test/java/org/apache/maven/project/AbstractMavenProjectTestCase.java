@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -196,6 +197,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
+        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         initRepoSession( configuration );
         return configuration;
     }
