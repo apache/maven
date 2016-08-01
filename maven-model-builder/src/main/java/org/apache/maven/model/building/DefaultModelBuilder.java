@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -387,6 +388,7 @@ public class DefaultModelBuilder
         }
 
         problems.setSource( inputModel );
+        checkModelVersions( lineage, request, problems );
         checkPluginVersions( lineage, request, problems );
 
         // [MNG-4052] import scope dependencies prefer to download pom rather than find it in the current project
@@ -764,6 +766,33 @@ public class DefaultModelBuilder
                         .setMessage( "'build.plugins.plugin.version' for " + key + " is missing." )
                         .setLocation( location ) );
 
+                }
+            }
+        }
+    }
+
+    private void checkModelVersions( final List<ModelData> lineage, final ModelBuildingRequest request,
+                                     final ModelProblemCollector problems )
+    {
+        if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
+        {
+            final Set<String> modelVersions = new HashSet<>( lineage.size() );
+
+            for ( int i = lineage.size() - 1; i >= 0; i-- )
+            {
+                final Model model = lineage.get( i ).getModel();
+
+                if ( model.getModelVersion() != null )
+                {
+                    if ( !modelVersions.isEmpty() && modelVersions.add( model.getModelVersion() ) )
+                    {
+                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V31 )
+                            .setMessage( String.format(
+                                    "Cannot inherit from parent '%s' with different model version '%s'."
+                                        + " Expected model version '%s'.",
+                                    model.getId(), model.getModelVersion(), modelVersions.iterator().next() ) ) );
+
+                    }
                 }
             }
         }
