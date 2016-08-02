@@ -230,7 +230,7 @@ public class DefaultProjectDependenciesResolver
             }
         }
     }
-
+    
     class GraphLogger
         implements DependencyVisitor
     {
@@ -288,8 +288,8 @@ public class DefaultProjectDependenciesResolver
                 buffer.append( ':' ).append( project.getArtifactId() );
                 buffer.append( ':' ).append( project.getPackaging() );
                 buffer.append( ':' ).append( project.getVersion() );
-                if(!isDescriptionEmpty(project.getDescription())) {
-                    buffer.append( indent ).append( project.getDescription() );
+                if( !isDescriptionEmpty( project.getDescription() ) ) {
+                    buffer.append( " " ).append( project.getDescription() );
                 }
             }
 
@@ -297,7 +297,7 @@ public class DefaultProjectDependenciesResolver
             indent += "   ";
             return true;
         }
-
+        
         public boolean visitLeave( DependencyNode node )
         {
             indent = indent.substring( 0, indent.length() - 3 );
@@ -305,10 +305,7 @@ public class DefaultProjectDependenciesResolver
         }
 
         private boolean isDescriptionEmpty(String description) {
-            if(StringUtils.isEmpty( description )) {
-                return true;
-            }
-            return false;
+            return StringUtils.isEmpty( description );
         }
         
         private void appendManagementSource( StringBuilder buffer, org.eclipse.aether.artifact.Artifact artifact,
