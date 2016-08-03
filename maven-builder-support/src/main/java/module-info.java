@@ -18,7 +18,6 @@
  */
 module maven.builder.support
 {
-    requires plexus.utils;
     requires commons.lang3;
 
     exports org.apache.maven.building;
