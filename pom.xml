@@ -77,7 +77,7 @@ under the License.
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>RedundantThrows,NewlineAtEndOfFile,ParameterNumber,MethodLength,FileLength,JavadocType,MagicNumber,InnerAssignment,MethodName</checkstyle.violation.ignore>
-    <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
+    <checkstyle.excludes>**/package-info.java,**/module-info.java</checkstyle.excludes>
   </properties>
 
   <modules>
