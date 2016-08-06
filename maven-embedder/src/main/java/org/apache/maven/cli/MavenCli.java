@@ -35,12 +35,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
@@ -108,9 +110,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -120,6 +119,10 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.google.inject.AbstractModule;
 
 // TODO: push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -393,7 +396,7 @@ public class MavenCli
 
         CLIManager cliManager = new CLIManager();
 
-        List<String> args = new ArrayList<>();
+        List<String> args = new LinkedList<>();
 
         try
         {
@@ -426,7 +429,7 @@ public class MavenCli
 
         try
         {
-            args.addAll( 0, Arrays.asList( cliRequest.args ) );
+            args.addAll( Arrays.asList( cliRequest.args ) );
             cliRequest.commandLine = cliManager.parse( args.toArray( new String[args.size()] ) );
         }
         catch ( ParseException e )
