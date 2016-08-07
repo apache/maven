@@ -21,9 +21,9 @@ package org.apache.maven.cli;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.cli.ParseException;
+
+import junit.framework.TestCase;
 
 public class MavenCliTest
     extends TestCase
@@ -81,8 +81,8 @@ public class MavenCliTest
         // read .mvn/maven.config
         cli.initialize( request );
         cli.cli( request );
-        assertEquals( "multithreaded", request.commandLine.getOptionValue( "builder" ) );
-        assertEquals( "8", request.commandLine.getOptionValue( "threads" ) );
+        assertEquals( "multithreaded", request.commandLine.getOptionValue( CLIManager.BUILDER ) );
+        assertEquals( "8", request.commandLine.getOptionValue( CLIManager.THREADS ) );
 
         // override from command line
         request = new CliRequest( new String[] { "--builder", "foobar" }, null );
@@ -106,5 +106,50 @@ public class MavenCliTest
         {
 
         }
+    }
+    
+    /**
+     * Read .mvn/maven.config with the following definitions:
+     * <pre>
+     *   -T 3
+     *   -Drevision=1.3.0
+     * </pre>
+     * and check if the {@code -T 3} option can be overwritten via command line
+     * argument.
+     * @throws Exception in case of failure.
+     */
+    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[]{ "-T", "5" }, null );
+
+        cli.initialize( request );
+        // read .mvn/maven.config
+        cli.cli( request );
+        
+        assertEquals( "5", request.commandLine.getOptionValue( CLIManager.THREADS ) );
+    }
+    
+    /**
+     * Read .mvn/maven.config with the following definitions:
+     * <pre>
+     *   -T 3
+     *   -Drevision=1.3.0
+     * </pre>
+     * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
+     * argument.
+     * @throws Exception
+     */
+    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0"}, null );
+
+        cli.initialize( request );
+        // read .mvn/maven.config
+        cli.cli( request );
+        cli.properties( request );
+        
+        String revision = System.getProperty( "revision" );
+        assertEquals( "8.1.0", revision );
+
     }
 }
