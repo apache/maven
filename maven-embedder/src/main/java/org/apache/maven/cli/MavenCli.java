@@ -44,6 +44,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -552,7 +553,9 @@ public class MavenCli
         }
     }
 
-    private void properties( CliRequest cliRequest )
+    //Needed to make this method package visible to make writing a unit test possible
+    //Maybe it's better to move some of those methods to separate class (SoC).
+    void properties( CliRequest cliRequest )
     {
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
@@ -1668,9 +1671,14 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
+            
             if ( defStrs != null )
             {
+                //The following is needed to get precedence
+                //of properties which are defined on command line
+                //over properties defined in the .mvn/maven.config. 
+                ArrayUtils.reverse( defStrs );
+                
                 for ( String defStr : defStrs )
                 {
                     setCliProperty( defStr, userProperties );
