@@ -66,17 +66,15 @@ public class ComplexActivationTest
     @Test
     public void testConditionExistingAndMissingInActivation() throws Exception
     {
-    	exception.expect( ModelBuildingException.class );
-    	exception.expectMessage( "Failed due to exists and missing properties are enabled for profile another-two-conditions" );
         Properties sysProperties = new Properties();
-        sysProperties.setProperty("myproperty", "test");
+        sysProperties.setProperty( "myproperty", "test" );
 
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull( builder );
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setProcessPlugins( true );
-        request.setPomFile( getPom( "complexEmptyAndMissing" ) );
+        request.setPomFile( getPom( "complexExistsAndMissing" ) );
         request.setSystemProperties( sysProperties );
     	builder.build( request );
     }

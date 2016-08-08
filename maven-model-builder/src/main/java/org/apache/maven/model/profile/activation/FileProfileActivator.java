@@ -81,27 +81,38 @@ public class FileProfileActivator
 
         String path;
         boolean missing;
-
-        try {
-        	isExistsAndMissingPropertiesNotEmpty(file.getExists(), file.getMissing());
-        }
-        catch(Exception e) {
-        	ModelProblemCollectorRequest request = new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE);
-        	request.setMessage("Failed due to exists and missing properties are enabled for profile " + profile.getId());
-        	request.setException(e);
-        	problems.add(request);
-        	return false;
-        }
         
         if ( StringUtils.isNotEmpty( file.getExists() ) )
         {
             path = file.getExists();
             missing = false;
+            
+            if ( StringUtils.isNotEmpty( file.getMissing() ) ) 
+            {
+                ModelProblemCollectorRequest request = new ModelProblemCollectorRequest( Severity.WARNING, 
+                                                                                         Version.BASE );
+                request.setMessage( "File activation for profile " + profile.getId() + " : missing " 
+                                                                                         + file.getMissing() 
+                                    + " assertion ignored since exists assertion defined too, you should remove one" );
+                request.setLocation( file.getLocation( "missing" ) );
+                problems.add( request );
+            }
         }
         else if ( StringUtils.isNotEmpty( file.getMissing() ) )
         {
             path = file.getMissing();
             missing = true;
+            
+            if ( StringUtils.isNotEmpty( file.getExists() ) ) 
+            {
+                ModelProblemCollectorRequest request = new ModelProblemCollectorRequest( Severity.WARNING, 
+                                                                                         Version.BASE );
+                request.setMessage( "File activation for profile " + profile.getId() + " : exists "  
+                                                                                         + file.getExists()  
+                                    + " assertion ignored since missing assertion defined too, you should remove one" );
+                request.setLocation( file.getLocation( "exists" ) );
+                problems.add( request );
+            }
         }
         else
         {
@@ -178,18 +189,6 @@ public class FileProfileActivator
         boolean fileExists = f.exists();
 
         return missing ? !fileExists : fileExists;
-    }
-
-    /**
-     * Check whether the exists and missing properties are both not empty
-     * @return false to indicate one or both properties are empty
-     * @throws Exception when both properties are not empty
-    */
-    private boolean isExistsAndMissingPropertiesNotEmpty(String exists, String missing) throws Exception {
-    	if(!StringUtils.isBlank(exists) && !StringUtils.isBlank(missing)) {
-    		throw new Exception("Failed due to exists and missing properties are enabled. Only of the properties are allowed.");
-          }
-    	return false;
     }
     
     @Override

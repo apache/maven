@@ -39,8 +39,8 @@
                     <value>test</value>
                 </property>
                 <file>
-                	<exists>simple.xml</exists>
-                    <missing>simple.xml</missing>
+                    <exists>simple.xml</exists>
+                    <missing>false</missing>
                 </file>
             </activation>
             <properties>
