@@ -850,13 +850,17 @@ public class DefaultModelBuilder
             child.setRepositories( repositories );
         }
 
+        final Properties effectiveProperties = intermediateLineage.get( 0 ).getProperties();
+
         final DefaultModelProblemCollector intermediateProblems =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
 
         // Interpolates the intermediate model.
+        // MNG-6079: Uses the effective properties of the result model to support property overriding.
         for ( int i = 0, s0 = intermediateLineage.size(); i < s0; i++ )
         {
             final Model model = intermediateLineage.get( i );
+            model.setProperties( effectiveProperties );
             intermediateProblems.setSource( model );
             this.interpolateModel( model, request, intermediateProblems );
         }
