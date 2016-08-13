@@ -106,7 +106,7 @@ public class DefaultDependencyManagementImporter
                     problems.add( new ModelProblemCollectorRequest(
                         effectiveSeverity( request.getValidationLevel(),
                                            ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_5 ),
-                        ModelProblem.Version.V35 ).
+                        ModelProblem.Version.V20 ).
                         setMessage( String.format(
                                 "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
                                     + "To resolve this conflict, either declare the dependency directly "
