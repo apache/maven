@@ -48,11 +48,7 @@ public interface ModelProblem
         BASE,
         V20,
         V30,
-        V31,
-        /**
-         * @since 3.4
-         */
-        V35
+        V31
 
     }
 
