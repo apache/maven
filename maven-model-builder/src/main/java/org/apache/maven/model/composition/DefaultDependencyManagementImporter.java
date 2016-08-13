@@ -19,15 +19,19 @@ package org.apache.maven.model.composition;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -47,14 +51,18 @@ public class DefaultDependencyManagementImporter
         if ( sources != null && !sources.isEmpty() )
         {
             final Map<String, Dependency> targetDependencies = new LinkedHashMap<>();
+            final DependencyManagement targetDependencyManagement = target.getDependencyManagement() != null
+                                                                        ? target.getDependencyManagement()
+                                                                        : new DependencyManagement();
 
-            if ( target.getDependencyManagement() != null )
+            target.setDependencyManagement( targetDependencyManagement );
+
+            for ( final Dependency targetDependency : targetDependencyManagement.getDependencies() )
             {
-                for ( final Dependency targetDependency : target.getDependencyManagement().getDependencies() )
-                {
-                    targetDependencies.put( targetDependency.getManagementKey(), targetDependency );
-                }
+                targetDependencies.put( targetDependency.getManagementKey(), targetDependency );
             }
+
+            final Map<String, List<Dependency>> sourceDependencies = new LinkedHashMap<>();
 
             for ( final DependencyManagement source : sources )
             {
@@ -62,13 +70,178 @@ public class DefaultDependencyManagementImporter
                 {
                     if ( !targetDependencies.containsKey( sourceDependency.getManagementKey() ) )
                     {
-                        targetDependencies.put( sourceDependency.getManagementKey(), sourceDependency );
+                        List<Dependency> conflictCanditates =
+                            sourceDependencies.get( sourceDependency.getManagementKey() );
+
+                        if ( conflictCanditates == null )
+                        {
+                            conflictCanditates = new ArrayList<>( source.getDependencies().size() );
+                            sourceDependencies.put( sourceDependency.getManagementKey(), conflictCanditates );
+                        }
+
+                        conflictCanditates.add( sourceDependency );
                     }
                 }
             }
 
-            target.setDependencyManagement( new DependencyManagement() );
-            target.getDependencyManagement().getDependencies().addAll( targetDependencies.values() );
+            for ( final List<Dependency> conflictCanditates : sourceDependencies.values() )
+            {
+                final List<Dependency> conflictingDependencies = removeRedundantDependencies( conflictCanditates );
+
+                // First declaration wins. This is what makes the conflict resolution indeterministic because this
+                // solely relies on the order of declaration. There is no such thing as the "first" declaration.
+                targetDependencyManagement.getDependencies().add( conflictingDependencies.get( 0 ) );
+
+                // As of Maven 3.4, we print a warning about such conflicting imports.
+                // As of Maven 3.5, those warnings will become errors.
+                if ( conflictingDependencies.size() > 1 )
+                {
+                    final StringBuilder conflictsBuilder = new StringBuilder( conflictingDependencies.size() * 128 );
+
+                    for ( final Dependency dependency : conflictingDependencies )
+                    {
+                        conflictsBuilder.append( ", '" ).append( dependency.getLocation( "" ) ).append( '\'' );
+                    }
+
+                    problems.add( new ModelProblemCollectorRequest(
+                        effectiveSeverity( request.getValidationLevel(),
+                                           ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_5 ),
+                        ModelProblem.Version.V35 ).
+                        setMessage( String.format(
+                                "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
+                                    + "To resolve this conflict, either declare the dependency directly "
+                                    + "in the dependency management of model '%2$s' to override what gets imported "
+                                    + "or, as of Maven 3.4, rearrange the causing imports in the inheritance hierarchy "
+                                    + "to apply standard override logic based on artifact coordinates. "
+                                    + "Without resolving this conflict, your build relies on indeterministic "
+                                    + "behaviour.",
+                                conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
+                                target.getPomFile() != null
+                                    ? " @ '" + target.getPomFile().getAbsolutePath() + "' "
+                                    : " ", conflictsBuilder.substring( 2 ) ) ) );
+
+                }
+            }
+        }
+    }
+
+    private static List<Dependency> removeRedundantDependencies( final List<Dependency> candidateDependencies )
+    {
+        final List<Dependency> resultDependencies = new ArrayList<>( candidateDependencies.size() );
+
+        while ( !candidateDependencies.isEmpty() )
+        {
+            final Dependency resultDependency = candidateDependencies.remove( 0 );
+            resultDependencies.add( resultDependency );
+
+            // Removes redundant dependencies.
+            for ( final Iterator<Dependency> it = candidateDependencies.iterator(); it.hasNext(); )
+            {
+                final Dependency candidateDependency = it.next();
+                boolean redundant = true;
+
+                redundancy_check:
+                {
+                    if ( !( resultDependency.getOptional() != null
+                            ? resultDependency.getOptional().equals( candidateDependency.getOptional() )
+                            : candidateDependency.getOptional() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( effectiveScope( resultDependency ).equals( effectiveScope( candidateDependency ) ) ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( resultDependency.getSystemPath() != null
+                            ? resultDependency.getSystemPath().equals( candidateDependency.getSystemPath() )
+                            : candidateDependency.getSystemPath() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( resultDependency.getVersion() != null
+                            ? resultDependency.getVersion().equals( candidateDependency.getVersion() )
+                            : candidateDependency.getVersion() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    for ( int i = 0, s0 = resultDependency.getExclusions().size(); i < s0; i++ )
+                    {
+                        final Exclusion resultExclusion = resultDependency.getExclusions().get( i );
+
+                        if ( !containsExclusion( candidateDependency.getExclusions(), resultExclusion ) )
+                        {
+                            redundant = false;
+                            break redundancy_check;
+                        }
+                    }
+
+                    for ( int i = 0, s0 = candidateDependency.getExclusions().size(); i < s0; i++ )
+                    {
+                        final Exclusion candidateExclusion = candidateDependency.getExclusions().get( i );
+
+                        if ( !containsExclusion( resultDependency.getExclusions(), candidateExclusion ) )
+                        {
+                            redundant = false;
+                            break redundancy_check;
+                        }
+                    }
+                }
+
+                if ( redundant )
+                {
+                    it.remove();
+                }
+            }
+        }
+
+        return resultDependencies;
+    }
+
+    private static boolean containsExclusion( final List<Exclusion> exclusions, final Exclusion exclusion )
+    {
+        for ( int i = 0, s0 = exclusions.size(); i < s0; i++ )
+        {
+            final Exclusion current = exclusions.get( i );
+
+            if ( ( exclusion.getArtifactId() != null
+                   ? exclusion.getArtifactId().equals( current.getArtifactId() )
+                   : current.getArtifactId() == null )
+                     && ( exclusion.getGroupId() != null
+                          ? exclusion.getGroupId().equals( current.getGroupId() )
+                          : current.getGroupId() == null ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static String effectiveScope( final Dependency dependency )
+    {
+        return dependency.getScope() == null
+                   ? "compile"
+                   : dependency.getScope();
+
+    }
+
+    private static ModelProblem.Severity effectiveSeverity( final int validationLevel, final int errorThreshold )
+    {
+        if ( validationLevel < errorThreshold )
+        {
+            return ModelProblem.Severity.WARNING;
+        }
+        else
+        {
+            return ModelProblem.Severity.ERROR;
         }
     }
 

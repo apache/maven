@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -55,10 +54,16 @@ public interface ModelBuildingRequest
     int VALIDATION_LEVEL_MAVEN_3_0 = 30;
 
     /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects. As of Maven 3.4,
-     * this is the default validation level.
+     * Denotes validation as performed by Maven 3.1. As of Maven 3.4, this is the default validation level.
      */
     int VALIDATION_LEVEL_MAVEN_3_1 = 31;
+
+    /**
+     * Denotes validation as performed by Maven 3.5. As of Maven 3.5, this is the default validation level.
+     *
+     * @since 3.4
+     */
+    int VALIDATION_LEVEL_MAVEN_3_5 = 35;
 
     /**
      * Denotes strict validation as recommended by the current Maven version.
@@ -67,7 +72,7 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
-     * 
+     *
      * @return The raw model to build or {@code null} if not set.
      */
     Model getRawModel();
