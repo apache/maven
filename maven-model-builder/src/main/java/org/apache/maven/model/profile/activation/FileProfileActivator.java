@@ -28,6 +28,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.condition.CombinedValueEvaluator;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.component.annotations.Component;
@@ -57,9 +58,18 @@ public class FileProfileActivator
     @Requirement
     private PathTranslator pathTranslator;
 
+    @Requirement
+    private CombinedValueEvaluator combinedValueEvaluator;
+
     public FileProfileActivator setPathTranslator( PathTranslator pathTranslator )
     {
         this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public FileProfileActivator setCombinedValueEvaluator( CombinedValueEvaluator combinedValueEvaluator )
+    {
+        this.combinedValueEvaluator = combinedValueEvaluator;
         return this;
     }
 
@@ -146,9 +156,8 @@ public class FileProfileActivator
             return false;
         }
 
-        path = pathTranslator.alignToBaseDirectory( path, basedir );
-
         // replace activation value with interpolated value
+        // (expression is still present & paths are still relative at this step)
         if ( missing )
         {
             file.setMissing( path );
@@ -158,16 +167,7 @@ public class FileProfileActivator
             file.setExists( path );
         }
 
-        File f = new File( path );
-
-        if ( !f.isAbsolute() )
-        {
-            return false;
-        }
-
-        boolean fileExists = f.exists();
-
-        return missing ? !fileExists : fileExists;
+        return combinedValueEvaluator.evaluate( path, new FileExistenceEvaluator( missing, pathTranslator, basedir ) );
     }
 
     @Override

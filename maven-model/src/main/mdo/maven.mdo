@@ -2616,6 +2616,9 @@
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, <code>exists</code> will test for the existence of the file and if it is
         there, the profile will be activated.<br>
+        To test for (non-)existence of multiple files, combine them with expressions : operator(file1,file2,...)
+        where operator can be : and, all, or, any. Nested expressions are not supported, but the operator can be
+        negated for each file by prepending its path with a !. Example : and(batch.mark,!test.mark)<br>
         Variable interpolation for these file specifications is limited to <code>${basedir}</code>,
         System properties and request properties.]]></description>
       <fields>
@@ -2624,13 +2627,20 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>The name of the file that must be missing to activate the
-          profile.</description>
+          profile, or an expression. If the operator used is 'and' or 'all',
+            then all files must be missing to activate the profile. If the operator
+            is 'any' or 'or', then at least one of the files must be missing to activate
+            the profile.</description>
         </field>
         <field>
           <name>exists</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The name of the file that must exist to activate the profile.</description>
+          <description>The name of the file that must exist to activate the profile,
+            or an expression. If the operator used is 'and' or 'all',
+            then all files must exist to activate the profile. If the operator
+            is 'any' or 'or', then at least one of the files must exist to activate
+            the profile.</description>
         </field>
       </fields>
     </class>
