@@ -121,10 +121,10 @@ public class DefaultMavenProjectBuilderTest
         assertNotNull( project.getArtifactId() );
 
         assertNotNull( project.getRemoteArtifactRepositories() );
-        assertTrue( project.getRemoteArtifactRepositories().isEmpty() );
+        assertFalse( project.getRemoteArtifactRepositories().isEmpty() );
 
         assertNotNull( project.getPluginArtifactRepositories() );
-        assertTrue( project.getPluginArtifactRepositories().isEmpty() );
+        assertFalse( project.getPluginArtifactRepositories().isEmpty() );
 
         assertNull( project.getParent() );
         assertNull( project.getParentArtifact() );

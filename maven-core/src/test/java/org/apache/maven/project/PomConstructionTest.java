@@ -393,7 +393,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "multiple-repos/sub" );
-        assertEquals( 2, ( (List<?>) pom.getValue( "repositories" ) ).size() );
+        assertEquals( 3, ( (List<?>) pom.getValue( "repositories" ) ).size() );
     }
 
     /** MNG-3965 */
@@ -1261,10 +1261,12 @@ public class PomConstructionTest
         assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
         assertEquals( "excluded-dep", pom.getValue( "dependencies[1]/exclusions[1]/artifactId" ) );
 
-        assertEquals( 1, ( (List<?>) pom.getValue( "repositories" ) ).size() );
+        assertEquals( 2, ( (List<?>) pom.getValue( "repositories" ) ).size() );
         assertEquals( "project-remote-repo", pom.getValue( "repositories[1]/id" ) );
         assertEquals( "http://project.url/remote", pom.getValue( "repositories[1]/url" ) );
         assertEquals( "repo", pom.getValue( "repositories[1]/name" ) );
+        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_ID, pom.getValue( "repositories[2]/id" ) );
+        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_URL, pom.getValue( "repositories[2]/url" ) );
 
         assertEquals( "test", pom.getValue( "build/defaultGoal" ) );
         assertEquals( "coreit", pom.getValue( "build/finalName" ) );
@@ -1480,7 +1482,7 @@ public class PomConstructionTest
 	    throws Exception
 	{
         PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub" );
-        assertEquals( 8, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );
+        assertEquals( 12, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );
 	}
 
     public void testDistributionManagement()
