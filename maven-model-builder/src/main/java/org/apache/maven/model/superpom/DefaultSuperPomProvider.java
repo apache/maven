@@ -21,11 +21,14 @@ package org.apache.maven.model.superpom;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.versioning.ModelVersions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -40,9 +43,10 @@ public class DefaultSuperPomProvider
 {
 
     /**
-     * The cached super POM, lazily created.
+     * Cached super POMs, lazily created.
      */
-    private Model superModel;
+    private volatile Reference<Map<String, Model>> modelCache =
+        new SoftReference<Map<String, Model>>( new HashMap<String, Model>() );
 
     @Requirement
     private ModelProcessor modelProcessor;
@@ -54,34 +58,46 @@ public class DefaultSuperPomProvider
     }
 
     @Override
-    public Model getSuperModel( String version )
+    public Model getSuperModel( final String version )
     {
-        if ( superModel == null )
+        // [MNG-666] need to be able to operate on a Maven 1 repository
+        //    Instead of throwing an exception if version == null, we return a version "4.0.0" super pom.
+        final String effectiveVersion = version == null ? ModelVersions.V4_0_0 : version;
+        final String resource = "/org/apache/maven/model/pom-" + effectiveVersion + ".xml";
+
+        try
         {
-            String resource = "/org/apache/maven/model/pom-" + version + ".xml";
-
-            InputStream is = getClass().getResourceAsStream( resource );
-
-            if ( is == null )
+            Map<String, Model> superPoms = this.modelCache.get();
+            if ( superPoms == null )
             {
-                throw new IllegalStateException( "The super POM " + resource + " was not found"
-                    + ", please verify the integrity of your Maven installation" );
+                superPoms = new HashMap<>();
+                this.modelCache = new SoftReference<>( superPoms );
             }
 
-            try
+            Model superModel = superPoms.get( effectiveVersion );
+
+            if ( superModel == null )
             {
-                Map<String, String> options = new HashMap<>();
-                options.put( "xml:4.0.0", "xml:4.0.0" );
-                superModel = modelProcessor.read( is, options );
+                InputStream is = getClass().getResourceAsStream( resource );
+
+                if ( is == null )
+                {
+                    throw new IllegalStateException( "The super POM " + resource + " was not found"
+                                                         + ", please verify the integrity of your Maven installation" );
+
+                }
+
+                superModel = modelProcessor.read( is, null );
+                superPoms.put( effectiveVersion, superModel );
             }
-            catch ( IOException e )
-            {
-                throw new IllegalStateException( "The super POM " + resource + " is damaged"
-                    + ", please verify the integrity of your Maven installation", e );
-            }
+
+            return superModel;
         }
-
-        return superModel;
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "The super POM " + resource + " is damaged"
+                                                 + ", please verify the integrity of your Maven installation", e );
+        }
     }
 
 }

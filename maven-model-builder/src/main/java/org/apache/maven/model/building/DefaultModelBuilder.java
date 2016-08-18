@@ -74,6 +74,7 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.model.versioning.ModelVersions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -294,7 +295,7 @@ public class DefaultModelBuilder
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
-        ModelData superData = new ModelData( null, getSuperModel() );
+        ModelData superData = new ModelData( null, getSuperModel( inputModel.getModelVersion() ) );
 
         Collection<String> parentIds = new LinkedHashSet<>();
         List<ModelData> lineage = new ArrayList<>();
@@ -466,8 +467,12 @@ public class DefaultModelBuilder
             lineage.add( result.getEffectiveModel( modelId ) );
         }
 
-        // [MNG-5971] Imported dependencies should be available to inheritance processing
-        processImports( lineage, request, problems );
+        if ( ModelVersions.supportsDependencyManagementImportInheritanceProcessing( resultModel ) )
+        {
+            // [MNG-5971] Imported dependencies should be available to inheritance processing
+            processImports( lineage, request, problems );
+        }
+
         problems.setSource( resultModel );
 
         // inheritance assembly
@@ -498,6 +503,11 @@ public class DefaultModelBuilder
 
             // lifecycle bindings injection
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
+        }
+
+        if ( !ModelVersions.supportsDependencyManagementImportInheritanceProcessing( resultModel ) )
+        {
+            this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
         }
 
         // dependency management injection
@@ -1324,9 +1334,9 @@ public class DefaultModelBuilder
         return parentData;
     }
 
-    private Model getSuperModel()
+    private Model getSuperModel( final String version )
     {
-        return superPomProvider.getSuperModel( "4.0.0" ).clone();
+        return superPomProvider.getSuperModel( version ).clone();
     }
 
     private void importDependencyManagement( Model model, String scope, ModelBuildingRequest request,
@@ -1440,7 +1450,8 @@ public class DefaultModelBuilder
                     if ( importModel == null )
                     {
                         // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
-                        importModel = this.buildImportModelFromRepository( request, dependency, importIds, problems );
+                        importModel = this.buildImportModelFromRepository( model, request, dependency, importIds,
+                                                                           problems );
 
                         if ( importModel == null )
                         {
@@ -1451,41 +1462,44 @@ public class DefaultModelBuilder
                     importMngt = importModel.getDependencyManagement() != null
                                     ? importModel.getDependencyManagement().clone() : new DependencyManagement();
 
-                    // [MNG-5600] Dependency management import should support exclusions.
-                    if ( !dependency.getExclusions().isEmpty() )
+                    if ( ModelVersions.supportsDependencyManagementImportExclusions( model ) )
                     {
-                        for ( final Exclusion exclusion : dependency.getExclusions() )
+                        if ( !dependency.getExclusions().isEmpty() )
                         {
-                            if ( exclusion.getGroupId() != null && exclusion.getArtifactId() != null )
+                            for ( final Exclusion exclusion : dependency.getExclusions() )
                             {
-                                for ( final Iterator<Dependency> dependencies =
-                                    importMngt.getDependencies().iterator(); dependencies.hasNext(); )
+                                if ( exclusion.getGroupId() != null && exclusion.getArtifactId() != null )
                                 {
-                                    final Dependency candidate = dependencies.next();
-
-                                    if ( ( exclusion.getGroupId().equals( "*" )
-                                        || exclusion.getGroupId().equals( candidate.getGroupId() ) )
-                                        && ( exclusion.getArtifactId().equals( "*" )
-                                            || exclusion.getArtifactId().equals( candidate.getArtifactId() ) ) )
+                                    for ( final Iterator<Dependency> dependencies =
+                                        importMngt.getDependencies().iterator(); dependencies.hasNext(); )
                                     {
-                                        // Dependency excluded from import.
-                                        dependencies.remove();
+                                        final Dependency candidate = dependencies.next();
+
+                                        if ( ( exclusion.getGroupId().equals( "*" )
+                                               || exclusion.getGroupId().equals( candidate.getGroupId() ) )
+                                                 && ( exclusion.getArtifactId().equals( "*" )
+                                                      || exclusion.getArtifactId().
+                                                     equals( candidate.getArtifactId() ) ) )
+                                        {
+                                            // Dependency excluded from import.
+                                            dependencies.remove();
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        for ( final Dependency includedDependency : importMngt.getDependencies() )
+                            for ( final Dependency includedDependency : importMngt.getDependencies() )
+                            {
+                                includedDependency.getExclusions().addAll( dependency.getExclusions() );
+                            }
+                        }
+                        else
                         {
-                            includedDependency.getExclusions().addAll( dependency.getExclusions() );
-                        }
-                    }
-                    else
-                    {
-                        // Only dependency managements without exclusion processing applied can be cached.
-                        putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
-                            importMngt );
+                            // Only dependency managements without exclusion processing applied can be cached.
+                            putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
+                                      importMngt );
 
+                        }
                     }
                 }
 
@@ -1503,21 +1517,28 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model buildImportModelFromRepository( final ModelBuildingRequest targetModelBuildingRequest,
+    private Model buildImportModelFromRepository( final Model model,
+                                                  final ModelBuildingRequest targetModelBuildingRequest,
                                                   final Dependency dependency, final Collection<String> importIds,
                                                   final DefaultModelProblemCollector problems )
     {
         try
         {
             final String imported = String.format( "%s:%s:%s", dependency.getGroupId(), dependency.getArtifactId(),
-                dependency.getVersion() );
+                                                   dependency.getVersion() );
 
             final Dependency resolvedDependency = dependency.clone();
-            final ModelSource importSource =
-                targetModelBuildingRequest.getModelResolver().resolveModel( resolvedDependency );
 
-            final String resolvedId = String.format( "%s:%s:%s", resolvedDependency.getGroupId(),
-                resolvedDependency.getArtifactId(), resolvedDependency.getVersion() );
+            final ModelSource importSource =
+                ModelVersions.supportsDependencyManagementImportVersionRanges( model )
+                    ? targetModelBuildingRequest.getModelResolver().resolveModel( resolvedDependency )
+                    : targetModelBuildingRequest.getModelResolver().resolveModel(
+                        resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
+                        resolvedDependency.getVersion() );
+
+            final String resolvedId =
+                String.format( "%s:%s:%s", resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
+                               resolvedDependency.getVersion() );
 
             if ( !imported.equals( resolvedId ) && importIds.contains( resolvedId ) )
             {
@@ -1547,7 +1568,8 @@ public class DefaultModelBuilder
                 Model importModel = importResult.getEffectiveModel();
 
                 if ( importModel.getDistributionManagement() != null
-                    && importModel.getDistributionManagement().getRelocation() != null )
+                         && importModel.getDistributionManagement().getRelocation() != null
+                         && ModelVersions.supportsDependencyManagementImportRelocations( model ) )
                 {
                     final Dependency relocated = dependency.clone();
                     relocated.setGroupId( importModel.getDistributionManagement().getRelocation().getGroupId() );
@@ -1556,20 +1578,20 @@ public class DefaultModelBuilder
 
                     String message =
                         String.format( "The dependency of type='%s' and scope='%s' has been relocated to '%s:%s:%s'",
-                            dependency.getType(), dependency.getScope(), relocated.getGroupId(),
-                            relocated.getArtifactId(), relocated.getVersion() );
+                                       dependency.getType(), dependency.getScope(), relocated.getGroupId(),
+                                       relocated.getArtifactId(), relocated.getVersion() );
 
                     if ( importModel.getDistributionManagement().getRelocation().getMessage() != null )
                     {
                         message += ". " + importModel.getDistributionManagement().getRelocation().getMessage();
                     }
 
-                    problems
-                        .add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE ).setMessage( message )
-                            .setLocation( importModel.getDistributionManagement().getRelocation().getLocation( "" ) ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
+                        .setMessage( message )
+                        .setLocation( importModel.getDistributionManagement().getRelocation().getLocation( "" ) ) );
 
-                    importModel = this.buildImportModelFromRepository( targetModelBuildingRequest, relocated, importIds,
-                        problems );
+                    importModel = this.buildImportModelFromRepository( model, targetModelBuildingRequest, relocated,
+                                                                       importIds, problems );
 
                 }
 
@@ -1582,10 +1604,11 @@ public class DefaultModelBuilder
             buffer.append( "Non-resolvable " + dependency.getScope() + " POM" );
 
             if ( !containsCoordinates( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
-                dependency.getVersion() ) )
+                                       dependency.getVersion() ) )
             {
                 buffer.append( ' ' ).append( ModelProblemUtils.toId( dependency.getGroupId(),
-                    dependency.getArtifactId(), dependency.getVersion() ) );
+                                                                     dependency.getArtifactId(),
+                                                                     dependency.getVersion() ) );
 
             }
 
@@ -1601,10 +1624,11 @@ public class DefaultModelBuilder
             buffer.append( "Failure building " + dependency.getScope() + " POM" );
 
             if ( !containsCoordinates( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
-                dependency.getVersion() ) )
+                                       dependency.getVersion() ) )
             {
                 buffer.append( ' ' ).append( ModelProblemUtils.toId( dependency.getGroupId(),
-                    dependency.getArtifactId(), dependency.getVersion() ) );
+                                                                     dependency.getArtifactId(),
+                                                                     dependency.getVersion() ) );
 
             }
 
