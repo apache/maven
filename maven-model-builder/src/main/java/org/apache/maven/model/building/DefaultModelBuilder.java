@@ -30,7 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -354,11 +353,13 @@ public class DefaultModelBuilder
             }
             else if ( currentData == resultData )
             { // First iteration - add initial id after version resolution.
-                currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
-                                : currentData.getRawModel().getGroupId() );
+                currentData.setGroupId( currentData.getRawModel().getGroupId() == null
+                                            ? parentData.getGroupId()
+                                            : currentData.getRawModel().getGroupId() );
 
-                currentData.setVersion( currentData.getRawModel().getVersion() == null ? parentData.getVersion()
-                                : currentData.getRawModel().getVersion() );
+                currentData.setVersion( currentData.getRawModel().getVersion() == null
+                                            ? parentData.getVersion()
+                                            : currentData.getRawModel().getVersion() );
 
                 currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
                 parentIds.add( currentData.getId() );
@@ -567,7 +568,7 @@ public class DefaultModelBuilder
 
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
-                                 throws ModelBuildingException
+        throws ModelBuildingException
     {
         Model model;
 
@@ -786,25 +787,28 @@ public class DefaultModelBuilder
     {
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
         {
-            final Set<String> modelVersions = new HashSet<>( lineage.size() );
+            final Model model = lineage.get( 0 ).getModel();
+            // [MNG-666] need to be able to operate on a Maven 1 repository
+            final String modelVersion = model.getModelVersion() == null
+                                            ? ModelVersions.V4_0_0
+                                            : model.getModelVersion();
 
-            for ( int i = lineage.size() - 1; i >= 0; i-- )
+            for ( int i = 1, s0 = lineage.size(); i < s0; i++ )
             {
-                final Model model = lineage.get( i ).getModel();
+                final Model parent = lineage.get( i ).getModel();
+                // [MNG-666] need to be able to operate on a Maven 1 repository
+                final String parentModelVersion = parent.getModelVersion() == null
+                                                      ? ModelVersions.V4_0_0
+                                                      : parent.getModelVersion();
 
-                if ( model.getModelVersion() != null )
+                if ( !parentModelVersion.equals( modelVersion ) )
                 {
-                    final boolean initial = modelVersions.isEmpty();
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V31 )
+                        .setMessage( String.format(
+                            "Project '%s' cannot inherit from parent '%s' with different model version '%s'."
+                                + " Expected model version '%s'.",
+                            model.getId(), parent.getId(), parentModelVersion, modelVersion ) ) );
 
-                    if ( modelVersions.add( model.getModelVersion() ) && !initial )
-                    {
-                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V31 )
-                            .setMessage( String.format(
-                                    "Cannot inherit from parent '%s' with different model version '%s'."
-                                        + " Expected model version '%s'.",
-                                    model.getId(), model.getModelVersion(), modelVersions.iterator().next() ) ) );
-
-                    }
                 }
             }
         }
@@ -905,7 +909,7 @@ public class DefaultModelBuilder
             {
 
                 @Override
-                public int getValidationLevel( )
+                public int getValidationLevel()
                 {
                     return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
                 }
@@ -1013,7 +1017,7 @@ public class DefaultModelBuilder
 
     private ModelData readParent( Model childModel, ModelSource childSource, ModelBuildingRequest request,
                                   DefaultModelProblemCollector problems )
-                                      throws ModelBuildingException
+        throws ModelBuildingException
     {
         ModelData parentData;
 
@@ -1053,7 +1057,7 @@ public class DefaultModelBuilder
                     ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
 
                     if ( expectedParentSource instanceof ModelSource2
-                        && !pomFile.toURI().equals( ( (ModelSource2) expectedParentSource ).getLocationURI() ) )
+                             && !pomFile.toURI().equals( ( (ModelSource2) expectedParentSource ).getLocationURI() ) )
                     {
                         parentData = readParentExternally( childModel, request, problems );
                     }
@@ -1066,7 +1070,7 @@ public class DefaultModelBuilder
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                     .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                        + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
+                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
                     .setLocation( parentModel.getLocation( "packaging" ) ) );
 
             }
@@ -1081,7 +1085,7 @@ public class DefaultModelBuilder
 
     private ModelData readParentLocally( Model childModel, ModelSource childSource, ModelBuildingRequest request,
                                          DefaultModelProblemCollector problems )
-                                             throws ModelBuildingException
+        throws ModelBuildingException
     {
         final Parent parent = childModel.getParent();
         final ModelSource candidateSource;
@@ -1145,7 +1149,7 @@ public class DefaultModelBuilder
         }
 
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
-            || !artifactId.equals( parent.getArtifactId() ) )
+                 || !artifactId.equals( parent.getArtifactId() ) )
         {
             StringBuilder buffer = new StringBuilder( 256 );
             buffer.append( "'parent.relativePath'" );
@@ -1186,15 +1190,12 @@ public class DefaultModelBuilder
                         .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
 
                 }
-                else
+                else if ( childModel.getVersion().contains( "${" ) )
                 {
-                    if ( childModel.getVersion().contains( "${" ) )
-                    {
-                        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
-                            .setMessage( "Version must be a constant" )
-                            .setLocation( childModel.getLocation( "version" ) ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                        .setMessage( "Version must be a constant" )
+                        .setLocation( childModel.getLocation( "version" ) ) );
 
-                    }
                 }
 
                 // MNG-2199: What else to check here ?
@@ -1238,7 +1239,7 @@ public class DefaultModelBuilder
 
     private ModelData readParentExternally( Model childModel, ModelBuildingRequest request,
                                             DefaultModelProblemCollector problems )
-                                                throws ModelBuildingException
+        throws ModelBuildingException
     {
         problems.setSource( childModel );
 
@@ -1251,7 +1252,8 @@ public class DefaultModelBuilder
         ModelResolver modelResolver = request.getModelResolver();
 
         Validate.notNull( modelResolver, "request.modelResolver cannot be null (parent POM %s and POM %s)",
-            ModelProblemUtils.toId( groupId, artifactId, version ), ModelProblemUtils.toSourceHint( childModel ) );
+                          ModelProblemUtils.toId( groupId, artifactId, version ),
+                          ModelProblemUtils.toSourceHint( childModel ) );
 
         ModelSource modelSource;
         try
@@ -1296,7 +1298,7 @@ public class DefaultModelBuilder
             {
 
                 @Override
-                public int getValidationLevel( )
+                public int getValidationLevel()
                 {
                     return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
                 }
@@ -1314,15 +1316,12 @@ public class DefaultModelBuilder
                     .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
 
             }
-            else
+            else if ( childModel.getVersion().contains( "${" ) )
             {
-                if ( childModel.getVersion().contains( "${" ) )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
-                        .setMessage( "Version must be a constant" )
-                        .setLocation( childModel.getLocation( "version" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                    .setMessage( "Version must be a constant" )
+                    .setLocation( childModel.getLocation( "version" ) ) );
 
-                }
             }
 
             // MNG-2199: What else to check here ?
@@ -1376,7 +1375,7 @@ public class DefaultModelBuilder
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for "
-                            + dependency.getManagementKey() + " is missing." )
+                                         + dependency.getManagementKey() + " is missing." )
                         .setLocation( dependency.getLocation( "" ) ) );
 
                     continue;
@@ -1385,7 +1384,7 @@ public class DefaultModelBuilder
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
-                            + dependency.getManagementKey() + " is missing." )
+                                         + dependency.getManagementKey() + " is missing." )
                         .setLocation( dependency.getLocation( "" ) ) );
 
                     continue;
@@ -1394,7 +1393,7 @@ public class DefaultModelBuilder
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
-                            + dependency.getManagementKey() + " is missing." )
+                                         + dependency.getManagementKey() + " is missing." )
                         .setLocation( dependency.getLocation( "" ) ) );
 
                     continue;
@@ -1460,7 +1459,8 @@ public class DefaultModelBuilder
                     }
 
                     importMngt = importModel.getDependencyManagement() != null
-                                    ? importModel.getDependencyManagement().clone() : new DependencyManagement();
+                                     ? importModel.getDependencyManagement().clone()
+                                     : new DependencyManagement();
 
                     if ( ModelVersions.supportsDependencyManagementImportExclusions( model ) )
                     {
@@ -1533,8 +1533,8 @@ public class DefaultModelBuilder
                 ModelVersions.supportsDependencyManagementImportVersionRanges( model )
                     ? targetModelBuildingRequest.getModelResolver().resolveModel( resolvedDependency )
                     : targetModelBuildingRequest.getModelResolver().resolveModel(
-                        resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
-                        resolvedDependency.getVersion() );
+                    resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
+                    resolvedDependency.getVersion() );
 
             final String resolvedId =
                 String.format( "%s:%s:%s", resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
@@ -1668,7 +1668,7 @@ public class DefaultModelBuilder
 
     private void fireEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems,
                             ModelBuildingEventCatapult catapult )
-                                throws ModelBuildingException
+        throws ModelBuildingException
     {
         ModelBuildingListener listener = request.getModelBuildingListener();
 
@@ -1683,8 +1683,8 @@ public class DefaultModelBuilder
     private boolean containsCoordinates( String message, String groupId, String artifactId, String version )
     {
         return message != null && ( groupId == null || message.contains( groupId ) )
-            && ( artifactId == null || message.contains( artifactId ) )
-            && ( version == null || message.contains( version ) );
+                   && ( artifactId == null || message.contains( artifactId ) )
+                   && ( version == null || message.contains( version ) );
 
     }
 
