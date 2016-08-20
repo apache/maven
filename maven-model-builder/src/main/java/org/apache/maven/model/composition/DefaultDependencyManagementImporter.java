@@ -108,17 +108,17 @@ public class DefaultDependencyManagementImporter
                                            ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_5 ),
                         ModelProblem.Version.V20 ).
                         setMessage( String.format(
-                                "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
-                                    + "To resolve this conflict, either declare the dependency directly "
-                                    + "in the dependency management of model '%2$s' to override what gets imported "
-                                    + "or, as of Maven 3.4, rearrange the causing imports in the inheritance hierarchy "
-                                    + "to apply standard override logic based on artifact coordinates. "
-                                    + "Without resolving this conflict, your build relies on indeterministic "
-                                    + "behaviour.",
-                                conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
-                                target.getPomFile() != null
-                                    ? " @ '" + target.getPomFile().getAbsolutePath() + "' "
-                                    : " ", conflictsBuilder.substring( 2 ) ) ) );
+                            "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
+                                + "To resolve this conflict, either declare the dependency directly "
+                                + "in the dependency management of model '%2$s' to override what gets imported "
+                                + "or, as of model version 4.1.0, rearrange the causing imports in the inheritance "
+                                + "hierarchy to apply standard override logic based on artifact coordinates. "
+                                + "Without resolving this conflict, your build relies on indeterministic "
+                                + "behaviour.",
+                            conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
+                            target.getPomFile() != null
+                                ? " @ '" + target.getPomFile().getAbsolutePath() + "' "
+                                : " ", conflictsBuilder.substring( 2 ) ) ) );
 
                 }
             }
