@@ -102,7 +102,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildProjectUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -466,7 +466,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildSiteUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -485,7 +485,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildScmUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -504,7 +504,8 @@ public class MavenModelMerger
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
+                target.setConnection( extrapolateChildUrl( src, source.isChildScmConnectionInheritAppendPath(),
+                                                           context ) );
                 target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
@@ -524,7 +525,8 @@ public class MavenModelMerger
             }
             else if ( target.getDeveloperConnection() == null )
             {
-                target.setDeveloperConnection( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
+                String e = extrapolateChildUrl( src, source.isChildScmDeveloperConnectionInheritAppendPath(), context );
+                target.setDeveloperConnection( e );
                 target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
