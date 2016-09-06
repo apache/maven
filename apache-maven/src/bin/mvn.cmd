@@ -84,7 +84,7 @@ set MAVEN_CMD_LINE_ARGS=%*
 @REM Fallback to current working directory if not found.
 
 set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
-IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+if not "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
 
 set EXEC_DIR=%CD%
 set WDIR=%EXEC_DIR%
@@ -130,11 +130,12 @@ exit /b
 
 :findBaseDir
 cd /d %WDIR%
+:findBaseDirLoop
 if exist "%WDIR%\.mvn" goto baseDirFound
 cd ..
 if "%WDIR%"=="%CD%" goto baseDirNotFound
 set "WDIR=%CD%"
-goto findBaseDir
+goto findBaseDirLoop
 
 :baseDirFound
 set "MAVEN_PROJECTBASEDIR=%WDIR%"
