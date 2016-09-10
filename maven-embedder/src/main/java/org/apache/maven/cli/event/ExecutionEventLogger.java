@@ -321,6 +321,8 @@ public class ExecutionEventLogger
 
             logger.info( "" );
             logger.info( buffer.toString() );
+
+            logger.info( "" );
         }
     }
 
