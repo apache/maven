@@ -139,7 +139,7 @@ Maven Model Builder
   <<<project/@child.project.url.inherit.append.path>>>,
   <<<project/distributionManagement/site/@child.site.url.inherit.append.path>>>,
   <<<project/scm/@child.scm.connection.inherit.append.path>>>,
-  <<<project/scm/@child.scm.developperConnection.inherit.append.path>>> and
+  <<<project/scm/@child.scm.developerConnection.inherit.append.path>>> and
   <<<project/scm/@child.scm.url.inherit.append.path>>>.
 
   []
