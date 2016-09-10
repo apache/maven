@@ -334,6 +334,8 @@ public class ExecutionEventLogger
             buffer.strong( " <<<" );
 
             logger.info( buffer.toString() );
+
+            logger.info( "" );
         }
     }
 
