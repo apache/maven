@@ -582,9 +582,9 @@ public class MavenCli
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
-        ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld ).setRealm(
-            containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true ).setName(
-            "maven" );
+        ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld ).
+            setRealm( containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true ).
+            setJSR250Lifecycle( true ).setName( "maven" );
 
         Set<String> exportedArtifacts = new HashSet<>( coreEntry.getExportedArtifacts() );
         Set<String> exportedPackages = new HashSet<>( coreEntry.getExportedPackages() );
@@ -680,6 +680,7 @@ public class MavenCli
                 .setRealm( containerRealm ) //
                 .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
                 .setAutoWiring( true ) //
+                .setJSR250Lifecycle( true ) //enable support for @PostConstruct and @PreDestroy
                 .setName( "maven" );
 
             DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
@@ -1671,14 +1672,14 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-            
+
             if ( defStrs != null )
             {
                 //The following is needed to get precedence
                 //of properties which are defined on command line
-                //over properties defined in the .mvn/maven.config. 
+                //over properties defined in the .mvn/maven.config.
                 ArrayUtils.reverse( defStrs );
-                
+
                 for ( String defStr : defStrs )
                 {
                     setCliProperty( defStr, userProperties );
