@@ -98,6 +98,8 @@ under the License.
     <exportedPackage>javax.enterprise.util.*</exportedPackage>
     <exportedPackage>javax.enterprise.inject.*</exportedPackage>
 
+    <!-- javax.annotation (JSR-250) -->
+    <exportedPackage>javax.annotation.*</exportedPackage>
 
     <!-- 
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
@@ -157,6 +159,7 @@ under the License.
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-impl</exportedArtifact>
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
+    <exportedArtifact>javax.annotation:jsr250-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 

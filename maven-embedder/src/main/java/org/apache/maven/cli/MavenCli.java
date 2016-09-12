@@ -601,9 +601,9 @@ public class MavenCli
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
-        ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld ).setRealm(
-            containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true ).setName(
-            "maven" );
+        ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld )
+            .setRealm( containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true )
+            .setJSR250Lifecycle( true ).setName( "maven" );
 
         Set<String> exportedArtifacts = new HashSet<>( coreEntry.getExportedArtifacts() );
         Set<String> exportedPackages = new HashSet<>( coreEntry.getExportedPackages() );
@@ -697,6 +697,7 @@ public class MavenCli
                 .setRealm( containerRealm ) //
                 .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
                 .setAutoWiring( true ) //
+                .setJSR250Lifecycle( true ) //
                 .setName( "maven" );
 
             DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
