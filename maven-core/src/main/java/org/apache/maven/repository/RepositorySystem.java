@@ -51,14 +51,14 @@ public interface RepositorySystem
     File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
     /**
-     * @deprecation As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
+     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
      * {@code central} if such a repository is not provided in the settings or the POM.
      */
     @Deprecated
     String DEFAULT_REMOTE_REPO_ID = "central";
 
     /**
-     * @deprecation As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
+     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
      * {@code central} if such a repository is not provided in the settings or the POM.
      */
     @Deprecated
@@ -81,7 +81,7 @@ public interface RepositorySystem
         throws InvalidRepositoryException;
 
     /**
-     * @deprecation As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
+     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
      * {@code central} if such a repository is not provided in the settings or the POM.
      */
     @Deprecated

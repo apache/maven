@@ -569,7 +569,7 @@ public class MavenRepositorySystem
     // Code taken from LegacyRepositorySystem
     //
     /**
-     * @deprecation As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
+     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
      * {@code central} if such a repository is not provided in the settings or the POM.
      */
     @Deprecated
