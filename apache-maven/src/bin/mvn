@@ -121,7 +121,7 @@ fi
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {
 (
-  basedir="`pwd`"
+  basedir=`find_file_argument_basedir "$@"`
   wdir="`pwd`"
   while [ "$wdir" != '/' ] ; do
     if [ -d "$wdir"/.mvn ] ; then
@@ -134,6 +134,33 @@ find_maven_basedir() {
 )
 }
 
+find_file_argument_basedir() {
+(
+  basedir="`pwd`"
+
+  found_file_switch=0
+  for arg in "$@"; do
+    if [ ${found_file_switch} -eq 1 ]; then
+      if [ -f ${arg} ]; then
+        basedir=$(dirname $(readlink -f "${arg}"))
+        if [ ! -d ${basedir} ]; then
+          echo "Directory ${basedir} extracted from the -f/--file command-line argument ${arg} does not exist" >&2
+          exit 1
+        fi
+      else
+        echo "POM file ${arg} specified with the -f/--file command line argument does not exist" >&2
+        exit 1
+      fi
+      break
+    fi
+    if [ "$arg" = "-f" -o "$arg" = "--file" ]; then
+      found_file_switch=1
+    fi
+  done
+  echo "${basedir}"
+)
+}
+
 # concatenates all lines of a file
 concat_lines() {
   if [ -f "$1" ]; then
@@ -141,7 +168,7 @@ concat_lines() {
   fi
 }
 
-MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir`}"
+MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir "$@"`}"
 MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"
 
 # For Cygwin, switch project base directory path to Windows format before
