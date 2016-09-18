@@ -3636,12 +3636,12 @@
           <type>String</type>
           <defaultValue>2.0</defaultValue>
           <description><![CDATA[
-            For a plugin project, the minimum version of Maven required to use
-            the resulting plugin.<br />
-            For specifying the minimum version of Maven required to build a
-            project, this element is <b>deprecated</b>. Use the Maven Enforcer
-            Plugin's <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html"><code>requireMavenVersion</code></a>
-            rule instead.
+            For a plugin project (packaging is <code>maven-plugin</code>), the minimum version of
+            Maven required to use the resulting plugin.<br />
+            In Maven 2, this was also specifying the minimum version of Maven required to build a
+            project, but this usage is <b>deprecated</b> in Maven 3 and checked not any more: use
+            the <a href="/enforcer/enforcer-rules/requireMavenVersion.html">Maven Enforcer Plugin's
+            <code>requireMavenVersion</code></a> rule instead.
             ]]>
           </description>
           <required>false</required>
