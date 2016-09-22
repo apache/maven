@@ -84,6 +84,7 @@
     <module>maven-artifact</module>
     <module>maven-aether-provider</module>
     <module>maven-repository-metadata</module>
+    <module>maven-slf4j-provider</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
@@ -215,6 +216,11 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-slf4j-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
