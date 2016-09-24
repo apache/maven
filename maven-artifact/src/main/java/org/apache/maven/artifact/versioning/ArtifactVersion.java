@@ -25,6 +25,7 @@ package org.apache.maven.artifact.versioning;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@Deprecated
 public interface ArtifactVersion
     extends Comparable<ArtifactVersion>
 {
