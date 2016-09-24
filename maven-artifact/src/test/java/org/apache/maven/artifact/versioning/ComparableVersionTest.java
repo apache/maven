@@ -28,11 +28,10 @@ import junit.framework.TestCase;
  *
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  */
-@SuppressWarnings( "unchecked" )
 public class ComparableVersionTest
     extends TestCase
 {
-    private Comparable newComparable( String version )
+    private ComparableVersion newComparable( String version )
     {
         ComparableVersion ret = new ComparableVersion( version );
         String canonical = ret.getCanonical();
@@ -56,7 +55,7 @@ public class ComparableVersionTest
 
     private void checkVersionsOrder( String[] versions )
     {
-        Comparable[] c = new Comparable[versions.length];
+        ComparableVersion[] c = new ComparableVersion[versions.length];
         for ( int i = 0; i < versions.length; i++ )
         {
             c[i] = newComparable( versions[i] );
@@ -64,10 +63,10 @@ public class ComparableVersionTest
 
         for ( int i = 1; i < versions.length; i++ )
         {
-            Comparable low = c[i - 1];
+            ComparableVersion low = c[i - 1];
             for ( int j = i; j < versions.length; j++ )
             {
-                Comparable high = c[j];
+                ComparableVersion high = c[j];
                 assertTrue( "expected " + low + " < " + high, low.compareTo( high ) < 0 );
                 assertTrue( "expected " + high + " > " + low, high.compareTo( low ) > 0 );
             }
@@ -76,8 +75,8 @@ public class ComparableVersionTest
 
     private void checkVersionsEqual( String v1, String v2 )
     {
-        Comparable c1 = newComparable( v1 );
-        Comparable c2 = newComparable( v2 );
+        ComparableVersion c1 = newComparable( v1 );
+        ComparableVersion c2 = newComparable( v2 );
         assertTrue( "expected " + v1 + " == " + v2, c1.compareTo( c2 ) == 0 );
         assertTrue( "expected " + v2 + " == " + v1, c2.compareTo( c1 ) == 0 );
         assertTrue( "expected same hashcode for " + v1 + " and " + v2, c1.hashCode() == c2.hashCode() );
@@ -87,8 +86,8 @@ public class ComparableVersionTest
 
     private void checkVersionsOrder( String v1, String v2 )
     {
-        Comparable c1 = newComparable( v1 );
-        Comparable c2 = newComparable( v2 );
+        ComparableVersion c1 = newComparable( v1 );
+        ComparableVersion c2 = newComparable( v2 );
         assertTrue( "expected " + v1 + " < " + v2, c1.compareTo( c2 ) < 0 );
         assertTrue( "expected " + v2 + " > " + v1, c2.compareTo( c1 ) > 0 );
     }
@@ -224,7 +223,7 @@ public class ComparableVersionTest
         ComparableVersion c1 = new ComparableVersion( "1" );
         c1.parseVersion( "2" );
 
-        Comparable c2 = newComparable( "2" );
+        ComparableVersion c2 = newComparable( "2" );
 
         assertEquals( "reused instance should be equivalent to new instance", c1, c2 );
     }
