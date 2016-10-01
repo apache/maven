@@ -204,10 +204,12 @@ public class DefaultMaven
     {
         try
         {
+            // CHECKSTYLE_OFF: LineLength
             for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
             {
                 listener.afterSessionStart( session );
             }
+            // CHECKSTYLE_ON: LineLength
         }
         catch ( MavenExecutionException e )
         {
