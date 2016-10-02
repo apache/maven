@@ -23,6 +23,11 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.building.Result;
 
+/**
+ * Builds the {@link ProjectDependencyGraph inter-dependencies graph} between projects in the reactor.
+ *
+ * @since 3.0-alpha
+ */
 public interface GraphBuilder
 {
     String HINT = "graphBuilder";
