@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.lang3.SystemUtils;
+import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 
 /**
@@ -70,19 +70,8 @@ public final class CLIReportingUtils
         version.append( "Java home: " ).append( System.getProperty( "java.home", "<unknown Java home>" ) ).append( ls );
         version.append( "Default locale: " ).append( Locale.getDefault() ).append( ", platform encoding: " ).append(
             System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( ls );
-        version.append( "OS name: \"" ).append( SystemUtils.OS_NAME ).
-            append( "\", version: \"" ).append( SystemUtils.OS_VERSION ).
-            append( "\", arch: \"" ).append( SystemUtils.OS_ARCH );
-        String osFamily = "<unknown family>";
-        if ( SystemUtils.IS_OS_WINDOWS )
-        {
-            osFamily = "Windows";
-        }
-        else if ( SystemUtils.IS_OS_UNIX )
-        {
-            osFamily = "Unix";
-        }
-        version.append( "\", family: \"" ).append( osFamily ).append( '\"' );
+        version.append( "OS name: \"" ).append( Os.OS_NAME ).append( "\", version: \"" ).append( Os.OS_VERSION ).append(
+            "\", arch: \"" ).append( Os.OS_ARCH ).append( "\", family: \"" ).append( Os.OS_FAMILY ).append( '\"' );
         return version.toString();
     }
 
