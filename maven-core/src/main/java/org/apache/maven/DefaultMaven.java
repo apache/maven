@@ -193,6 +193,10 @@ public class DefaultMaven
 
             return doExecute( request, session, result, repoSession );
         }
+        catch ( MavenExecutionException e )
+        {
+            return addExceptionToResult( result, e );
+        }
         finally
         {
             sessionScope.exit();
@@ -201,20 +205,9 @@ public class DefaultMaven
 
     private MavenExecutionResult doExecute( MavenExecutionRequest request, MavenSession session,
                                             MavenExecutionResult result, DefaultRepositorySystemSession repoSession )
+        throws MavenExecutionException
     {
-        try
-        {
-            // CHECKSTYLE_OFF: LineLength
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
-            {
-                listener.afterSessionStart( session );
-            }
-            // CHECKSTYLE_ON: LineLength
-        }
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
+        afterSessionStart( session );
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
@@ -257,24 +250,7 @@ public class DefaultMaven
 
         repoSession.setReadOnly();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterProjectsRead( session );
-            }
-        }
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
+        afterProjectRead( session );
 
         //
         // The projects need to be topologically after the participants have run their afterProjectsRead(session)
@@ -328,6 +304,35 @@ public class DefaultMaven
         }
 
         return result;
+    }
+
+    @SuppressWarnings( "checkstyle:linelength" )
+    private void afterSessionStart( MavenSession session )
+        throws MavenExecutionException
+    {
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        {
+            listener.afterSessionStart( session );
+        }
+    }
+
+    private void afterProjectRead( MavenSession session )
+        throws MavenExecutionException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                listener.afterProjectsRead( session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
     }
 
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
