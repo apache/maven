@@ -142,7 +142,7 @@ public class MavenCli
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
-        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/toolchains.xml" );
+        new File( System.getProperty( "maven.conf" ), "toolchains.xml" );
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 

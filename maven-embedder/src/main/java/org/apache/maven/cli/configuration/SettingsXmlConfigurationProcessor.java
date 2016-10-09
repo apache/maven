@@ -59,8 +59,8 @@ public class SettingsXmlConfigurationProcessor
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( USER_MAVEN_CONFIGURATION_HOME, "settings.xml" );
 
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System.getProperty( "maven.home", System
-        .getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
+        new File( System.getProperty( "maven.conf" ), "settings.xml" );
 
     @Requirement
     private Logger logger;

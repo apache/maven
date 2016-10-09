@@ -66,7 +66,7 @@ public class DefaultMavenSettingsBuilder
         throws IOException, XmlPullParserException
     {
         File globalSettingsFile =
-            getFile( "${maven.home}/conf/settings.xml", "maven.home",
+            getFile( "${maven.conf}/settings.xml", "maven.conf",
                      MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
