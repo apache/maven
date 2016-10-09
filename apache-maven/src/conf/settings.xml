@@ -32,7 +32,7 @@ under the License.
  |  2. Global Level. This settings.xml file provides configuration for all Maven
  |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in
- |                 ${maven.home}/conf/settings.xml.
+ |                 ${maven.conf}/settings.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |

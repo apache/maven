@@ -156,7 +156,7 @@ public class MavenCli
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
-        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/toolchains.xml" );
+        new File( System.getProperty( "maven.conf" ), "toolchains.xml" );
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
@@ -1671,14 +1671,14 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-            
+
             if ( defStrs != null )
             {
                 //The following is needed to get precedence
                 //of properties which are defined on command line
-                //over properties defined in the .mvn/maven.config. 
+                //over properties defined in the .mvn/maven.config.
                 ArrayUtils.reverse( defStrs );
-                
+
                 for ( String defStr : defStrs )
                 {
                     setCliProperty( defStr, userProperties );
