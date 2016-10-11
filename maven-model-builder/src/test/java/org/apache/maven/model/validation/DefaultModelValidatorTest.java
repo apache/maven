@@ -644,7 +644,7 @@ public class DefaultModelValidatorTest
     public void testInvalidArtifactIdInPluginManagement()
         throws Exception
     {
-        SimpleProblemCollector result = validateRaw( "raw-model/missing-artifactid-pluginManagement.xml" );
+        SimpleProblemCollector result = validateRaw( "raw-model/missing-artifactId-pluginManagement.xml" );
 
         assertViolations( result, 1, 0, 0 );
 
