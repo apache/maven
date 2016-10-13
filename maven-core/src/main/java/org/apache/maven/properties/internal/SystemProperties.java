@@ -35,7 +35,12 @@ public class SystemProperties
     {
         for ( String key : System.getProperties().stringPropertyNames() )
         {
-            props.put( key, System.getProperty( key ) );
+            String value = System.getProperty( key );
+            // could be null if another thread concurrently removed this key (MNG-6105)
+            if ( value != null )
+            {
+                props.put( key, value );
+            }
         }
     }
 
