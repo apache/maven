@@ -33,6 +33,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -535,8 +536,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( properties != null )
         {
-            this.systemProperties = new Properties();
-            this.systemProperties.putAll( properties );
+            this.systemProperties = SystemProperties.copyProperties( properties );
         }
         else
         {
