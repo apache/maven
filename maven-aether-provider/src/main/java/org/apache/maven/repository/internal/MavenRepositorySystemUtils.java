@@ -126,14 +126,18 @@ public final class MavenRepositorySystemUtils
 
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
+        final Properties systemProperties = new Properties();
+        
         // MNG-5670 guard against ConcurrentModificationException
-        Properties sysProps = new Properties();
-        for ( String key : System.getProperties().stringPropertyNames() )
+        // MNG-6053 guard against key without value
+        Properties sysProp = System.getProperties();
+        synchronized ( sysProp )
         {
-            sysProps.put( key, System.getProperty( key ) );
+            systemProperties.putAll( sysProp );
         }
-        session.setSystemProperties( sysProps );
-        session.setConfigProperties( sysProps );
+
+        session.setSystemProperties( systemProperties );
+        session.setConfigProperties( systemProperties );
 
         return session;
     }

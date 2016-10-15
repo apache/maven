@@ -28,6 +28,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.eclipse.aether.RepositorySystemSession;
 
 public class DefaultProjectBuildingRequest
@@ -165,11 +166,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( systemProperties != null )
         {
-            this.systemProperties = new Properties();
-            synchronized ( systemProperties )
-            { // avoid concurrentmodification if someone else sets/removes an unrelated system property
-                this.systemProperties.putAll( systemProperties );
-            }
+            this.systemProperties = SystemProperties.copyProperties( systemProperties );
         }
         else
         {
