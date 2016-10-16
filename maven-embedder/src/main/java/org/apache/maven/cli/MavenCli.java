@@ -1110,11 +1110,11 @@ public class MavenCli
         {
             if ( msg.indexOf( '\n' ) < 0 )
             {
-                msg += " -> " + referenceKey;
+                msg += " -> " + buffer().strong( referenceKey );
             }
             else
             {
-                msg += "\n-> " + referenceKey;
+                msg += "\n-> " + buffer().strong( referenceKey );
             }
         }
 
