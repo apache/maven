@@ -1056,7 +1056,6 @@ public class MavenCli
 
     private static final String ANSI_RESET = "\u001B\u005Bm";
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private void configure( CliRequest cliRequest )
         throws Exception
     {
@@ -1122,7 +1121,6 @@ public class MavenCli
         }
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private void toolchains( CliRequest cliRequest )
         throws Exception
     {
