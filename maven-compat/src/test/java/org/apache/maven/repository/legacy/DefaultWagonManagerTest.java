@@ -138,7 +138,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null, false );
+            wagonManager.getArtifact( artifact, repo, null, true );
 
             fail();
         }
