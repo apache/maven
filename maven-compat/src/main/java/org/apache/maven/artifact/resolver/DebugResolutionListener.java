@@ -71,7 +71,7 @@ public class DebugResolutionListener
 
         if ( omittedVersion != null ? !omittedVersion.equals( keptVersion ) : keptVersion != null )
         {
-            logger.debug( indent + omitted + " (removed - nearer found: " + kept.getVersion() + ")" );
+            logger.debug( indent + omitted + " (removed - nearer found: " + keptVersion + ")" );
         }
     }
 
