@@ -60,6 +60,7 @@ under the License.
           <editable>true</editable>
           <description>parameter-description</description>
           <deprecated>deprecated-parameter</deprecated>
+          <since>3.0.0</since>
         </parameter>
       </parameters>
       <configuration>
