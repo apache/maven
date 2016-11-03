@@ -170,6 +170,7 @@ public class Installer {
         continue;
       }
 
+      new File(dest, entry.getName()).getParentFile().mkdirs();
       copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(new File(dest, entry.getName()))));
     }
     zipFile.close();
