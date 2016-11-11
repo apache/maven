@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.model.versioning.ModelVersions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -62,7 +61,7 @@ public class DefaultSuperPomProvider
     {
         // [MNG-666] need to be able to operate on a Maven 1 repository
         //    Instead of throwing an exception if version == null, we return a version "4.0.0" super pom.
-        final String effectiveVersion = version == null ? ModelVersions.V4_0_0 : version;
+        final String effectiveVersion = version == null ? "4.0.0" : version;
         final String resource = "/org/apache/maven/model/pom-" + effectiveVersion + ".xml";
 
         try

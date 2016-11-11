@@ -73,7 +73,6 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.versioning.ModelVersions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -143,6 +142,26 @@ public class DefaultModelBuilder
 
     @Requirement( optional = true )
     private List<ModelFinalizer> modelFinalizers;
+
+    // [MNG-4463] Dependency management import should support version ranges.
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_VERSION_RANGES =
+        System.getProperty( DefaultModelBuilder.class.getName()
+                                + ".disableDependencyManagementImportVersionRanges" ) == null;
+
+    // [MNG-5600] Dependency management import should support exclusions.
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS =
+        System.getProperty( DefaultModelBuilder.class.getName()
+                                + ".disableDependencyManagementImportExclusions" ) == null;
+
+    // [MNG-5527] Dependency management import should support relocations.
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS =
+        System.getProperty( DefaultModelBuilder.class.getName()
+                                + ".disableDependencyManagementImportRelocations" ) == null;
+
+    // [MNG-5971] Imported dependencies should be available to inheritance processing.
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING =
+        System.getProperty( DefaultModelBuilder.class.getName()
+                                + ".disableDependencyManagementImportInheritanceProcessing" ) == null;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -468,10 +487,10 @@ public class DefaultModelBuilder
             lineage.add( result.getEffectiveModel( modelId ) );
         }
 
-        if ( ModelVersions.supportsDependencyManagementImportInheritanceProcessing( resultModel ) )
+        if ( DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING )
         {
-            // [MNG-5971] Imported dependencies should be available to inheritance processing
-            processImports( lineage, request, problems );
+            // [MNG-5971] Imported dependencies should be available to inheritance processing.
+            this.processImports( lineage, request, problems );
         }
 
         problems.setSource( resultModel );
@@ -506,7 +525,7 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
-        if ( !ModelVersions.supportsDependencyManagementImportInheritanceProcessing( resultModel ) )
+        if ( !DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING )
         {
             this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
         }
@@ -790,7 +809,7 @@ public class DefaultModelBuilder
             final Model model = lineage.get( 0 ).getModel();
             // [MNG-666] need to be able to operate on a Maven 1 repository
             final String modelVersion = model.getModelVersion() == null
-                                            ? ModelVersions.V4_0_0
+                                            ? "4.0.0"
                                             : model.getModelVersion();
 
             for ( int i = 1, s0 = lineage.size(); i < s0; i++ )
@@ -798,7 +817,7 @@ public class DefaultModelBuilder
                 final Model parent = lineage.get( i ).getModel();
                 // [MNG-666] need to be able to operate on a Maven 1 repository
                 final String parentModelVersion = parent.getModelVersion() == null
-                                                      ? ModelVersions.V4_0_0
+                                                      ? "4.0.0"
                                                       : parent.getModelVersion();
 
                 if ( !parentModelVersion.equals( modelVersion ) )
@@ -1462,7 +1481,7 @@ public class DefaultModelBuilder
                                      ? importModel.getDependencyManagement().clone()
                                      : new DependencyManagement();
 
-                    if ( ModelVersions.supportsDependencyManagementImportExclusions( model ) )
+                    if ( DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS )
                     {
                         if ( !dependency.getExclusions().isEmpty() )
                         {
@@ -1530,11 +1549,11 @@ public class DefaultModelBuilder
             final Dependency resolvedDependency = dependency.clone();
 
             final ModelSource importSource =
-                ModelVersions.supportsDependencyManagementImportVersionRanges( model )
+                DEPENDENCY_MANAGEMENT_IMPORT_VERSION_RANGES
                     ? targetModelBuildingRequest.getModelResolver().resolveModel( resolvedDependency )
                     : targetModelBuildingRequest.getModelResolver().resolveModel(
-                    resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
-                    resolvedDependency.getVersion() );
+                        resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
+                        resolvedDependency.getVersion() );
 
             final String resolvedId =
                 String.format( "%s:%s:%s", resolvedDependency.getGroupId(), resolvedDependency.getArtifactId(),
@@ -1569,7 +1588,7 @@ public class DefaultModelBuilder
 
                 if ( importModel.getDistributionManagement() != null
                          && importModel.getDistributionManagement().getRelocation() != null
-                         && ModelVersions.supportsDependencyManagementImportRelocations( model ) )
+                         && DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS )
                 {
                     final Dependency relocated = dependency.clone();
                     relocated.setGroupId( importModel.getDistributionManagement().getRelocation().getGroupId() );
