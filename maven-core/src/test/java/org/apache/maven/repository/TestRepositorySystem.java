@@ -106,15 +106,13 @@ public class TestRepositorySystem
         return createLocalRepository( new File( System.getProperty( "basedir", "" ), "target/local-repo" ).getAbsoluteFile() );
     }
 
-    /**
-     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     public ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException
     {
-        throw new UnsupportedOperationException();
+        return new MavenArtifactRepository( DEFAULT_REMOTE_REPO_ID, "file://"
+            + new File( System.getProperty( "basedir", "" ), "src/test/remote-repo" ).toURI().getPath(),
+                                            new DefaultRepositoryLayout(), new ArtifactRepositoryPolicy(),
+                                            new ArtifactRepositoryPolicy() );
     }
 
     public Artifact createDependencyArtifact( Dependency dependency )

@@ -416,8 +416,8 @@ public class MavenRepositorySystem
         }
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
-    }
-
+    }    
+    
     public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
@@ -439,7 +439,7 @@ public class MavenRepositorySystem
                                                 repositoryId ) );
         }
     }
-
+    
     public static ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
@@ -564,21 +564,19 @@ public class MavenRepositorySystem
         return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
                                     optional );
     }
-
+    
     //
     // Code taken from LegacyRepositorySystem
     //
-    /**
-     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     public ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
         throws Exception
     {
-        throw new UnsupportedOperationException();
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
-
+    
     public ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
                                                  String releaseUpdates, boolean snapshots, String snapshotUpdates,
                                                  String checksumPolicy ) throws Exception
@@ -591,7 +589,7 @@ public class MavenRepositorySystem
 
         return createArtifactRepository( repositoryId, url, "default", snapshotsPolicy, releasesPolicy );
     }
-
+        
     public Set<String> getRepoIds( List<ArtifactRepository> repositories )
     {
         Set<String> repoIds = new HashSet<>();
@@ -606,8 +604,8 @@ public class MavenRepositorySystem
 
         return repoIds;
     }
-
-
+    
+    
     public ArtifactRepository createLocalRepository( MavenExecutionRequest request, File localRepository )
         throws Exception
     {
@@ -616,8 +614,8 @@ public class MavenRepositorySystem
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                                  ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-    }
-
+    }    
+    
     private static final String WILDCARD = "*";
 
     private static final String EXTERNAL_WILDCARD = "external:*";
@@ -782,5 +780,5 @@ public class MavenRepositorySystem
         }
 
         return result;
-    }
+    }    
 }

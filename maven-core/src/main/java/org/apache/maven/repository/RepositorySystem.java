@@ -50,18 +50,8 @@ public interface RepositorySystem
 
     File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
-    /**
-     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     String DEFAULT_REMOTE_REPO_ID = "central";
 
-    /**
-     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
 
     Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
@@ -80,11 +70,6 @@ public interface RepositorySystem
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
 
-    /**
-     * @deprecated As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException;
 
