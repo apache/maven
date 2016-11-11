@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
@@ -133,10 +134,10 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertNotNull(project.getArtifactId());
 
         assertNotNull(project.getRemoteArtifactRepositories());
-        assertFalse(project.getRemoteArtifactRepositories().isEmpty());
+        assertTrue(project.getRemoteArtifactRepositories().isEmpty());
 
         assertNotNull(project.getPluginArtifactRepositories());
-        assertFalse(project.getPluginArtifactRepositories().isEmpty());
+        assertTrue(project.getPluginArtifactRepositories().isEmpty());
 
         assertNull(project.getParent());
         assertNull(project.getParentArtifact());
