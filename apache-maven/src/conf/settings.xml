@@ -244,47 +244,6 @@ under the License.
       </properties>
     </profile>
     -->
-
-    <!--
-    | Default profile holding various defaults.
-    |-->
-    <profile>
-      <!--
-      This intentionally uses a UUID to not clash with any profile
-      id already in use before this profile got added to the settings.
-      -->
-      <id>f06abaa7-178e-441e-bb0d-10a92d7ce014</id>
-
-      <repositories>
-        <repository>
-          <id>central</id>
-          <name>Central Repository</name>
-          <url>https://repo.maven.apache.org/maven2</url>
-          <layout>default</layout>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <releases>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-        </repository>
-      </repositories>
-
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <name>Central Repository</name>
-          <url>https://repo.maven.apache.org/maven2</url>
-          <layout>default</layout>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <releases>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
   </profiles>
 
   <!-- activeProfiles
@@ -295,7 +254,6 @@ under the License.
     <activeProfile>alwaysActiveProfile</activeProfile>
     <activeProfile>anotherAlwaysActiveProfile</activeProfile>
     -->
-    <activeProfile>f06abaa7-178e-441e-bb0d-10a92d7ce014</activeProfile>
   </activeProfiles>
 
 </settings>
