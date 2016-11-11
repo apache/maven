@@ -26,7 +26,7 @@ under the License.
   <repositories>
     <repository>
       <id>central</id>
-      <name>Central Repository</name>
+      <name>Maven Central Repository</name>
       <url>https://repo.maven.apache.org/maven2</url>
       <layout>default</layout>
       <snapshots>
@@ -38,7 +38,7 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>central</id>
-      <name>Central Repository</name>
+      <name>Maven Central Repository</name>
       <url>https://repo.maven.apache.org/maven2</url>
       <layout>default</layout>
       <snapshots>
