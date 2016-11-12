@@ -273,7 +273,7 @@ public class MavenSession
     {
         this.projectMap = projectMap;
     }
-    
+
     /** This is a provisional method and may be removed */
     public List<MavenProject> getAllProjects()
     {
@@ -285,24 +285,24 @@ public class MavenSession
     {
         this.allProjects = allProjects;
     }
-    
+
     /*if_not[MAVEN4]*/
 
     //
-    // Deprecated 
+    // Deprecated
     //
-        
-    private PlexusContainer container;    
-    
+
+    private PlexusContainer container;
+
     private final Settings settings;
-    
+
     @Deprecated
     /** @deprecated This appears to only be used in the ReactorReader and we can do any processing required there */
-    public Map<String, MavenProject> getProjectMap() 
+    public Map<String, MavenProject> getProjectMap()
     {
         return projectMap;
     }
-    
+
     @Deprecated
     public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
                          MavenExecutionRequest request, MavenExecutionResult result )
@@ -313,7 +313,7 @@ public class MavenSession
         this.settings = new SettingsAdapter( request );
         this.repositorySession = repositorySession;
     }
-    
+
     @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
                          MavenProject project )
@@ -363,7 +363,7 @@ public class MavenSession
     {
         return getProjects();
     }
-    
+
     @Deprecated
     //
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
@@ -401,7 +401,7 @@ public class MavenSession
 
         return executionProperties;
     }
-    
+
     @Deprecated
     public PlexusContainer getContainer()
     {
@@ -434,7 +434,7 @@ public class MavenSession
         throws ComponentLookupException
     {
         return container.lookupMap( role );
-    }   
-    
+    }
+
     /*end[MAVEN4]*/
 }

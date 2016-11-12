@@ -20,7 +20,7 @@
           <port>6667</port>
           <channel>#plexus</channel>
         </configuration>
-      </notifier>      
+      </notifier>
     </notifiers>
   </ciManagement>
   <inceptionYear>2001</inceptionYear>

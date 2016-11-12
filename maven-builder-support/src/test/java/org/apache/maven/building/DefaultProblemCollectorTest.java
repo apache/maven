@@ -35,10 +35,10 @@ public class DefaultProblemCollectorTest
         assertEquals( 0, collector.getProblems().size() );
 
         collector.add( null, "MESSAGE1", -1, -1, null );
-        
+
         Exception e2 = new Exception();
         collector.add( Severity.WARNING, null, 42, 127, e2 );
-        
+
         assertEquals( 2, collector.getProblems().size() );
 
         Problem p1 = collector.getProblems().get(0);
@@ -47,7 +47,7 @@ public class DefaultProblemCollectorTest
         assertEquals( -1, p1.getLineNumber() );
         assertEquals( -1, p1.getColumnNumber() );
         assertEquals( null, p1.getException() );
-        
+
         Problem p2 = collector.getProblems().get(1);
         assertEquals( Severity.WARNING, p2.getSeverity() );
         assertEquals( "",p2.getMessage() );
@@ -60,7 +60,7 @@ public class DefaultProblemCollectorTest
     public void testSetSource()
     {
         DefaultProblemCollector collector = new DefaultProblemCollector( null );
-        
+
         collector.add( null, "PROBLEM1", -1, -1, null );
 
         collector.setSource( "SOURCE_PROBLEM2" );

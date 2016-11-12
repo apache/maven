@@ -148,7 +148,7 @@ public class ComparableVersion
     {
         private static final List<String> QUALIFIERS =
             Arrays.asList( "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" );
-        
+
         private static final Properties ALIASES = new Properties();
         static
         {

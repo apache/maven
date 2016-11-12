@@ -53,9 +53,9 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {
-            
+
     private final MavenRepositorySystem repositorySystem;
-    
+
     @Inject
     public DefaultMavenExecutionRequestPopulator( MavenRepositorySystem repositorySystem )
     {
@@ -85,7 +85,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
         return request;
     }
-    
+
     @Override
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException
@@ -102,11 +102,11 @@ public class DefaultMavenExecutionRequestPopulator
 
         return request;
     }
-    
+
     //
     //
     //
-    
+
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
@@ -206,10 +206,10 @@ public class DefaultMavenExecutionRequestPopulator
         {
             request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
         }
-    }   
-    
+    }
+
     /*if_not[MAVEN4]*/
-    
+
     @Override
     @Deprecated
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
@@ -311,8 +311,8 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         return request;
-    }    
-    
+    }
+
     /*end[MAVEN4]*/
 
 }

@@ -38,8 +38,8 @@ public class SystemProperties
 
     /**
      * Returns a copy of {@link System#getProperties()} in a thread-safe manner.
-     * 
-     * @return {@link System#getProperties()} obtained in a thread-safe manner. 
+     *
+     * @return {@link System#getProperties()} obtained in a thread-safe manner.
      */
     public static Properties getSystemProperties()
     {

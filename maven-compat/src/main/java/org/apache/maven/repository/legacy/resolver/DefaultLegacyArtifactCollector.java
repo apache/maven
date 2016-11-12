@@ -692,7 +692,7 @@ public class DefaultLegacyArtifactCollector
             fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
 
             // previously we cloned the artifact, but it is more effecient to just update the artifactScope
-            // if problems are later discovered that the original object needs its original artifactScope value, 
+            // if problems are later discovered that the original object needs its original artifactScope value,
             // cloning may
             // again be appropriate
             nearestArtifact.setScope( farthestArtifact.getScope() );

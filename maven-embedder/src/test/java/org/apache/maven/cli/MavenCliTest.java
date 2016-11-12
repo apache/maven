@@ -107,7 +107,7 @@ public class MavenCliTest
 
         }
     }
-    
+
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
@@ -125,10 +125,10 @@ public class MavenCliTest
         cli.initialize( request );
         // read .mvn/maven.config
         cli.cli( request );
-        
+
         assertEquals( "5", request.commandLine.getOptionValue( CLIManager.THREADS ) );
     }
-    
+
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
@@ -147,7 +147,7 @@ public class MavenCliTest
         // read .mvn/maven.config
         cli.cli( request );
         cli.properties( request );
-        
+
         String revision = System.getProperty( "revision" );
         assertEquals( "8.1.0", revision );
 

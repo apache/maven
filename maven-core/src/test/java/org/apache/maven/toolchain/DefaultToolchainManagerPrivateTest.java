@@ -54,7 +54,7 @@ public class DefaultToolchainManagerPrivateTest
 
     @Mock
     private ToolchainFactory toolchainFactory_basicType;
-    
+
     @Mock
     private ToolchainFactory toolchainFactory_rareType;
 
@@ -113,7 +113,7 @@ public class DefaultToolchainManagerPrivateTest
         verify( logger ).error( "Missing toolchain factory for type: unknown. Possibly caused by misconfigured project." );
         assertEquals( 0, toolchains.length );
     }
-    
+
     @Test
     public void testToolchainsForConfiguredType()
         throws Exception
@@ -145,7 +145,7 @@ public class DefaultToolchainManagerPrivateTest
         verify( logger, never() ).error( anyString() );
         assertEquals( 2, toolchains.length );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test( expected = MisconfiguredToolchainException.class )
     public void testMisconfiguredToolchain()
@@ -159,7 +159,7 @@ public class DefaultToolchainManagerPrivateTest
 
         // execute
         toolchainManager.getToolchainsForType( "basic", session );
-        
+
         // verify
         fail( "Should exit with a MisconfiguredToolchainException" );
     }

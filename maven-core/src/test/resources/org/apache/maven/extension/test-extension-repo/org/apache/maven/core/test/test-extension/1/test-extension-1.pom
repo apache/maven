@@ -35,7 +35,7 @@
       <version>1.0-alpha-16</version>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -62,12 +62,12 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <distributionManagement>
     <repository>
       <id>dummy</id>
       <url>file:///tmp/dummy-repo</url>
     </repository>
   </distributionManagement>
-  
+
 </project>

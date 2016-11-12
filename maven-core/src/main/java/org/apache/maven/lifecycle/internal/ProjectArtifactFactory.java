@@ -27,7 +27,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 
 /**
  * Component interface responsible for creation of MavenProject#dependencyArtifacts instances.
- * 
+ *
  * @since 3.2.4
  * @provisional This interface is part of work in progress and can be changed or removed without notice.
  */

@@ -73,7 +73,7 @@ public class DefaultGraphBuilder
         {
             return dependencyGraph( session, session.getProjects(), false );
         }
-        
+
         List<MavenProject> projects = session.getProjects();
 
         if ( projects == null )
@@ -96,7 +96,7 @@ public class DefaultGraphBuilder
             return dependencyGraph( session, projects, false );
         }
     }
-    
+
     private Result<ProjectDependencyGraph> dependencyGraph( MavenSession session, List<MavenProject> projects,
                                                             boolean applyMakeBehaviour )
     {

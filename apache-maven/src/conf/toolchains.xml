@@ -44,24 +44,24 @@ under the License.
 <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/TOOLCHAINS/1.1.0 http://maven.apache.org/xsd/toolchains-1.1.0.xsd">
 
-  <!-- 
-   | With toolchains you can refer to installations on your system. This 
-   | way you don't have to hardcode paths in your pom.xml. 
-   | 
-   | Every toolchain consist of 3 elements: 
-   | * type: the type of tool. An often used value is 'jdk'. Toolchains-aware 
-   |   plugins should document which type you must use. 
-   | 
-   | * provides: A list of key/value-pairs. 
-   |   Based on the toolchain-configuration in the pom.xml Maven will search for 
-   |   matching <provides/> configuration. You can decide for yourself which key-value 
-   |   pairs to use. Often used keys are 'version', 'vendor' and 'arch'. By default 
-   |   the version has a special meaning. If you configured in the pom.xml '1.5' 
+  <!--
+   | With toolchains you can refer to installations on your system. This
+   | way you don't have to hardcode paths in your pom.xml.
+   |
+   | Every toolchain consist of 3 elements:
+   | * type: the type of tool. An often used value is 'jdk'. Toolchains-aware
+   |   plugins should document which type you must use.
+   |
+   | * provides: A list of key/value-pairs.
+   |   Based on the toolchain-configuration in the pom.xml Maven will search for
+   |   matching <provides/> configuration. You can decide for yourself which key-value
+   |   pairs to use. Often used keys are 'version', 'vendor' and 'arch'. By default
+   |   the version has a special meaning. If you configured in the pom.xml '1.5'
    |   Maven will search for 1.5 and above.
-   |   
+   |
    | * configuration: Additional configuration for this tool.
    |   Look for documentation of the toolchains-aware plugin which configuration elements
-   |   can be used.   
+   |   can be used.
    |
    | See also https://maven.apache.org/guides/mini/guide-using-toolchains.html
    |
@@ -69,12 +69,12 @@ under the License.
 
   <toolchain>
     <type/>
-    <provides> 
-      <version>1.0</version> 
-    </provides> 
+    <provides>
+      <version>1.0</version>
+    </provides>
     <configuration/>
   </toolchain>
-   
+
    | JDK examples
 
   <toolchain>
@@ -97,7 +97,7 @@ under the License.
       <jdkHome>/path/to/jdk/1.6</jdkHome>
     </configuration>
   </toolchain>
-   
+
   -->
 
 </toolchains>

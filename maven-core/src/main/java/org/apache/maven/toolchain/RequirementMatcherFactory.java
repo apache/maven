@@ -59,7 +59,7 @@ public final class RequirementMatcherFactory
         {
             return provides.equalsIgnoreCase( requirement );
         }
-        
+
         @Override
         public String toString()
         {
@@ -99,7 +99,7 @@ public final class RequirementMatcherFactory
                 return false;
             }
         }
-        
+
         @Override
         public String toString()
         {

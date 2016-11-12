@@ -4,13 +4,13 @@
   <artifactId>p0</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
-  
+
   <scm>
     <connection>scm:svn:http://host/p0</connection>
     <developerConnection>scm:svn:https://host/p0</developerConnection>
     <url>http://host/viewer?path=/p0</url>
   </scm>
-  
+
   <modules>
     <module>modules/p1</module>
   </modules>

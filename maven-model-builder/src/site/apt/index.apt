@@ -126,7 +126,7 @@ Maven Model Builder
 
   Notice that the 5 urls from the model (<<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>,
   <<<project.scm.url>>> and <<<project.distributionManagement.site.url>>>) have a special inheritance handling:
-  
+
   ** if not configured in current model, the inherited value is parent's one with current artifact id appended,
 
   ** since Maven 3.4.0, if <<<project.directory>>> POM property value is defined, it is used instead of artifact id:

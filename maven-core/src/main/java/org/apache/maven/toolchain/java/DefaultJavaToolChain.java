@@ -26,7 +26,7 @@ import org.codehaus.plexus.logging.Logger;
  * Provides backwards compatibility with Maven 3.2.3 and earlier. Clients that do not require compatibility with Maven
  * 3.2.3 and earlier are encouraged to use {@link JavaToolchainImpl}.
  * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
- * 
+ *
  * @deprecated clients that do not require compatibility with Maven 3.2.3 and earlier should link to
  *             {@link JavaToolchainImpl} instead.
  */
