@@ -111,6 +111,7 @@ public class MavenSettingsMerger
                                                                        String recessiveSourceLevel )
     {
         Map<String, T> dominantById = mapById( dominant );
+        final List<T> identifiables = new ArrayList<>( recessive.size() );
 
         for ( T identifiable : recessive )
         {
@@ -118,9 +119,11 @@ public class MavenSettingsMerger
             {
                 identifiable.setSourceLevel( recessiveSourceLevel );
 
-                dominant.add( identifiable );
+                identifiables.add( identifiable );
             }
         }
+
+        dominant.addAll( 0, identifiables );
     }
 
     /**
