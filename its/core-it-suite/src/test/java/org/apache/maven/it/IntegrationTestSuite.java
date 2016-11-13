@@ -108,6 +108,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng5958LifecyclePhaseBinaryCompat.class );
         suite.addTestSuite( MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest.class );
+        suite.addTestSuite( MavenITmng5889CoreExtensionsTest.class );
         suite.addTestSuite( MavenITmng5840ParentVersionRanges.class );
         suite.addTestSuite( MavenITmng5840RelativePathReactorMatching.class );
         suite.addTestSuite( MavenITmng5805PkgTypeMojoConfiguration.class );

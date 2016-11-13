@@ -5,6 +5,11 @@ import java.util.Properties;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
+/**
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5771">MNG-5771</a>:
+ * check that Maven loads core extensions and components contributed by <code>.mvn/extensions.xml</code>
+ * are available to regular plugins. 
+ */
 public class MavenITmng5771CoreExtensionsTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -83,6 +88,4 @@ public class MavenITmng5771CoreExtensionsTest
         
         server.stop();
     }
-    
-
 }
