@@ -44,7 +44,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project)
+ * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project).
+ * <p>
+ * This builder uses a number of threads equal to the minimum of the degree of concurrency (which is the thread count
+ * set with <code>-T</code> on the command-line) and the number of projects to build. As such, building a single project
+ * will always result in a sequential build, regardless of the thread count.
  *
  * @since 3.0
  * @author Kristian Rosenvold
@@ -73,9 +77,15 @@ public class MultiThreadedBuilder
                        List<TaskSegment> taskSegments, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
-        ExecutorService executor =
-            Executors.newFixedThreadPool( Math.min( session.getRequest().getDegreeOfConcurrency(),
-                                                    session.getProjects().size() ), new BuildThreadFactory() );
+        int nThreads = Math.min( session.getRequest().getDegreeOfConcurrency(), session.getProjects().size() );
+        boolean parallel = nThreads >= 2;
+        // Propagate the parallel flag to the root session and all of the cloned sessions in each project segment
+        session.setParallel( parallel );
+        for ( ProjectSegment segment : projectBuilds )
+        {
+            segment.getSession().setParallel( parallel );
+        }
+        ExecutorService executor = Executors.newFixedThreadPool( nThreads, new BuildThreadFactory() );
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<>( executor );
         ConcurrencyDependencyGraph analyzer =
             new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
