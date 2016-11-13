@@ -1122,7 +1122,6 @@ public class MavenCli
 
         String[] lines = msg.split( "(\r\n)|(\r)|(\n)" );
         String currentColor = "";
-        // TODO add multi-line color support: detect last ANSI code and if not EOC, add it to next line
 
         for ( int i = 0; i < lines.length; i++ )
         {
