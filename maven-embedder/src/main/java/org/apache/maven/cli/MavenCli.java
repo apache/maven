@@ -38,6 +38,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -1119,10 +1121,29 @@ public class MavenCli
         }
 
         String[] lines = msg.split( "(\r\n)|(\r)|(\n)" );
+        String currentColor = "";
+        // TODO add multi-line color support: detect last ANSI code and if not EOC, add it to next line
 
         for ( int i = 0; i < lines.length; i++ )
         {
-            String line = indent + lines[i].trim();
+            // add eventual current color inherited from previous line 
+            String line = currentColor + lines[i];
+
+            // look for last ANSI escape sequence to check if nextColor
+            Matcher matcher = LAST_ANSI_SEQUENCE.matcher( line );
+            String nextColor = "";
+            if ( matcher.find() )
+            {
+                nextColor = matcher.group( 1 );
+                if ( ANSI_RESET.equals( nextColor ) )
+                {
+                    // last ANSI escape code is reset: no next color
+                    nextColor = "";
+                }
+            }
+
+            // effective line, with indent and reset if end is colored
+            line = indent + line + ( "".equals( nextColor ) ? "" : ANSI_RESET );
 
             if ( ( i == lines.length - 1 ) && ( showErrors
                 || ( summary.getException() instanceof InternalErrorException ) ) )
@@ -1133,6 +1154,8 @@ public class MavenCli
             {
                 slf4jLogger.error( line );
             }
+
+            currentColor = nextColor;
         }
 
         indent += "  ";
@@ -1142,6 +1165,10 @@ public class MavenCli
             logSummary( child, references, indent, showErrors );
         }
     }
+
+    private static final Pattern LAST_ANSI_SEQUENCE = Pattern.compile( "(\u001B\\[[;\\d]*[ -/]*[@-~])[^\u001B]*$" );
+
+    private static final String ANSI_RESET = "\u001B\u005Bm";
 
     private void configure( CliRequest cliRequest )
         throws Exception
