@@ -20,7 +20,7 @@
  -----
  Hervé Boutemy
  -----
- 2015-03-12
+ 2016-11-14
  -----
 
 ${project.name}
@@ -33,13 +33,14 @@ ${project.name}
 
  * {{{./logging.html}logging API}}.
 
- * since 3.3.0, per project settings can be defined by files in <<<.mvn/>>> directory:
+ * since 3.3.1 (see {{{/docs/3.3.1/release-notes.html#Core_Extensions}3.3.1 release notes}} for more details),
+   per project settings can be defined by files in <<<.mvn/>>> directory:
 
    * <<<.mvn/jvm.config>>> containing jvm options,
 
    * <<<.mvn/maven.config>>> containing Maven command-line parameter,
 
-   * <<<.mvn/extensions.xml>>> containing {{{./core-extensions.html}a list of extensions}}.
+   * <<<.mvn/extensions.xml>>> containing {{{./core-extensions.html}a list of extensions}},
 
  * since 3.5.0, output is colorized by default, with color disabled in batch mode: see
    {{{/shared/maven-shared-utils/apidocs/org/apache/maven/shared/utils/logging/package-summary.html}styled message API}}
