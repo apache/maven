@@ -54,7 +54,7 @@ under the License.
     <commonsLangVersion>3.4</commonsLangVersion>
     <junitVersion>4.12</junitVersion>
     <plexusVersion>1.7</plexusVersion>
-    <plexusInterpolationVersion>1.22</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.24</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
     <guavaVersion>19.0</guavaVersion>
     <guiceVersion>4.1.0</guiceVersion>
