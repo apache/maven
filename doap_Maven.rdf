@@ -190,6 +190,12 @@ under the License.
         <browse rdf:resource="https://git-wip-us.apache.org/repos/asf/maven.git"/>
       </GitRepository>
     </repository>
+    <repository>
+      <GitRepository>
+        <location rdf:resource="https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git"/>
+        <browse rdf:resource="https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git"/>
+      </GitRepository>
+    </repository>
     <maintainer>
       <foaf:Person>
         <foaf:name>Apache Maven PMC</foaf:name>
