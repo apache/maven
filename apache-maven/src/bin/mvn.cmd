@@ -94,13 +94,13 @@ set WDIR=%EXEC_DIR%
 
 set FILE_ARG=
 :arg_loop
-if "%1" == "-f" (
-  set "FILE_ARG=%2"
+if "%~1" == "-f" (
+  set "FILE_ARG=%~2"
   shift
   goto process_file_arg
 )
-if "%1" == "--file" (
-  set "FILE_ARG=%2"
+if "%~1" == "--file" (
+  set "FILE_ARG=%~2"
   shift
   goto process_file_arg
 )
