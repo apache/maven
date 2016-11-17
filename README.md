@@ -2,6 +2,9 @@
 
 Maven is available under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
+[![Build Status](https://travis-ci.org/apache/maven.svg?branch=master)](https://travis-ci.org/apache/maven)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.apache.maven:maven)](https://sonarqube.com/dashboard/index/org.apache.maven:maven)
+
 - [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG)
 - [Maven Wiki](https://cwiki.apache.org/confluence/display/MAVEN/Index)
 - [Building Maven](https://maven.apache.org/guides/development/guide-building-maven.html)

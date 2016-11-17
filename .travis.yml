@@ -1,0 +1,46 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+language: java
+jdk:
+  - openjdk7
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+  sonarqube: true
+cache:
+  directories:
+    - "$HOME/.m2"
+    - "$HOME/.sonar/cache"
+env:
+  global:
+    - JAVA_TOOL_OPTIONS: "-Xmx512m"
+    - MAVEN_OPTS: "-Xmx512m"
+    - secure: fTuQG00/LoV6nPKinPr41wBmSblaNpFoEvLD2mG0FIokwBS3m+AUrfHnyvQkVbvkSGFzvTfXFca9ucobzuMV9z8SCBWBZv0ZzOm6D1wCBqbbjhvpNjLog0A3546MZ0Fzn7V6/6ZfK2qtERC6eF8uRSKSkiTmlUFR3bTZXE+m0fCiv53bGeNh0M6nj+pApC6wVkOfWvre/di8GvnKQc1RqN/EZCCxTAEyQfGkJKFNfqJfBwahUjAhm5jiAsFtqbyWmUCjHeigWYvHC1zj1knZ7v4F+du2NpUra6pOIwFdxFXp5eJGa8ano35DG2lEb/fIyeEYnfBw8bf63Wte8GSOLWg+qOxHgeIg9W1h9o8ywoyNvs1UOz3gTXj/lIQiGFmrW3g8YAzsfHac6Owyl6+QH6sft4xcVqbflclOpCJ3m5WJPX6km0N0tqkaAgT4mu7NSalWEKYNrTv1aPUU84C/Wj+lfP0dNzaYQpqK8zE1c1gzjsyoOm9dXxqZNJIk1/1axmr8xGC94ODMw2DJ//ibld74BVK0ybCQdgDepmbJgtE1SZCxpvOZPdCLMni4vG7uSKk116x5vKBdOnyXTaVKSqY94hiafh8QNdUSkObaWTr9M8rgIWkYJfpnvkT97dSS8SuA+CZQBGgYWkgq6QWLtdN482NxRD/AdVU+0MpuZDc=
+install:
+  - mvn dependency:go-offline
+before_script:
+  - mvn clean
+script:
+  - mvn -DdistributionTargetFolder="$HOME/app/maven/apache-maven-3.4.x-SNAPSHOT" org.jacoco:jacoco-maven-plugin:prepare-agent package
+after_success:
+  - jdk_switcher use oraclejdk8
+  - mvn sonar:sonar
