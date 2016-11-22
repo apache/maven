@@ -65,7 +65,7 @@ public class LifecycleStarter
 
     @Requirement
     private Map<String, Builder> builders;
-    
+
     @Requirement
     private SessionScope sessionScope;
 

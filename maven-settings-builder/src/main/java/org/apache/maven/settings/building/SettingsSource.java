@@ -25,7 +25,7 @@ import org.apache.maven.building.Source;
  * Provides access to the contents of settings independently of the backing store (e.g. file system, database, memory).
  *
  * @author Benjamin Bentmann
- * 
+ *
  * @deprecated instead use {@link Source}
  */
 @Deprecated

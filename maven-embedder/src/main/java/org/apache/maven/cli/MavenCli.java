@@ -38,6 +38,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -156,7 +158,7 @@ public class MavenCli
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
-        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/toolchains.xml" );
+        new File( System.getProperty( "maven.conf" ), "toolchains.xml" );
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
@@ -1111,19 +1113,37 @@ public class MavenCli
         {
             if ( msg.indexOf( '\n' ) < 0 )
             {
-                msg += " -> " + referenceKey;
+                msg += " -> " + buffer().strong( referenceKey );
             }
             else
             {
-                msg += "\n-> " + referenceKey;
+                msg += "\n-> " + buffer().strong( referenceKey );
             }
         }
 
         String[] lines = msg.split( "(\r\n)|(\r)|(\n)" );
+        String currentColor = "";
 
         for ( int i = 0; i < lines.length; i++ )
         {
-            String line = indent + lines[i].trim();
+            // add eventual current color inherited from previous line 
+            String line = currentColor + lines[i];
+
+            // look for last ANSI escape sequence to check if nextColor
+            Matcher matcher = LAST_ANSI_SEQUENCE.matcher( line );
+            String nextColor = "";
+            if ( matcher.find() )
+            {
+                nextColor = matcher.group( 1 );
+                if ( ANSI_RESET.equals( nextColor ) )
+                {
+                    // last ANSI escape code is reset: no next color
+                    nextColor = "";
+                }
+            }
+
+            // effective line, with indent and reset if end is colored
+            line = indent + line + ( "".equals( nextColor ) ? "" : ANSI_RESET );
 
             if ( ( i == lines.length - 1 ) && ( showErrors
                 || ( summary.getException() instanceof InternalErrorException ) ) )
@@ -1134,6 +1154,8 @@ public class MavenCli
             {
                 slf4jLogger.error( line );
             }
+
+            currentColor = nextColor;
         }
 
         indent += "  ";
@@ -1144,7 +1166,10 @@ public class MavenCli
         }
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
+    private static final Pattern LAST_ANSI_SEQUENCE = Pattern.compile( "(\u001B\\[[;\\d]*[ -/]*[@-~])[^\u001B]*$" );
+
+    private static final String ANSI_RESET = "\u001B\u005Bm";
+
     private void configure( CliRequest cliRequest )
         throws Exception
     {
@@ -1210,7 +1235,6 @@ public class MavenCli
         }
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private void toolchains( CliRequest cliRequest )
         throws Exception
     {

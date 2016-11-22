@@ -46,7 +46,7 @@ import com.google.common.collect.Iterables;
  * <li>error - (partial) model and diagnostics
  * </ol>
  * Could encode these variants as subclasses, but kept in one for now
- * 
+ *
  * @author bbusjaeger
  * @param <T>
  */

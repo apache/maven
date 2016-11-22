@@ -62,7 +62,7 @@ public class Lifecycle
     {
         return this.lifecyclePhases;
     }
-    
+
     /**
      * Method setId
      *
@@ -89,12 +89,12 @@ public class Lifecycle
         {
             return null;
         }
-        
+
         if ( lphases.isEmpty() )
         {
             return Collections.emptyMap();
         }
-        
+
         Map<String, String> phases = new LinkedHashMap<>();
         for ( Map.Entry<String, LifecyclePhase> e: lphases.entrySet() )
         {

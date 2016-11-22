@@ -3,7 +3,7 @@
   <groupId>org.test</groupId>
   <artifactId>bad-pom</artifactId>
   <version>1</version>
-  
+
   <packaging>${packaging}</packaging>
 
 </project>

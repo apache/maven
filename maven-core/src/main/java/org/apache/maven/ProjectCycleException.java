@@ -31,7 +31,7 @@ public class ProjectCycleException
     {
         super( message );
     }
-    
+
     public ProjectCycleException( String message, CycleDetectedException cause )
     {
         super( message, cause );

@@ -33,7 +33,7 @@ public class DefaultToolchainsBuildingRequest
     private Source globalToolchainsSource;
 
     private Source userToolchainsSource;
-    
+
     @Override
     public Source getGlobalToolchainsSource()
     {

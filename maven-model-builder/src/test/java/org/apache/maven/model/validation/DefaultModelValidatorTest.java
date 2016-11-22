@@ -163,7 +163,8 @@ public class DefaultModelValidatorTest
 
         assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getErrors().get( 1 ) );
+        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.",
+                      result.getErrors().get( 1 ) );
     }
 
     public void testMissingType()
@@ -203,8 +204,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains(
-            "'dependencies.dependency.artifactId' for groupId:null:jar is missing" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'dependencies.dependency.artifactId' for groupId:null:jar is missing" ) );
     }
 
     public void testMissingDependencyGroupId()
@@ -214,8 +214,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains(
-            "'dependencies.dependency.groupId' for null:artifactId:jar is missing" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'dependencies.dependency.groupId' for null:artifactId:jar is missing" ) );
     }
 
     public void testMissingDependencyVersion()
@@ -225,8 +224,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains(
-            "'dependencies.dependency.version' for groupId:artifactId:jar is missing" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'dependencies.dependency.version' for groupId:artifactId:jar is missing" ) );
     }
 
     public void testMissingDependencyManagementArtifactId()
@@ -236,8 +234,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains(
-            "'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing" ) );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -247,8 +244,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains(
-            "'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing" ) );
     }
 
     public void testMissingAll()
@@ -555,7 +551,8 @@ public class DefaultModelValidatorTest
     public void testBadDependencyExclusionId()
         throws Exception
     {
-        SimpleProblemCollector result = validateEffective( "bad-dependency-exclusion-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
+        SimpleProblemCollector result =
+            validateEffective( "bad-dependency-exclusion-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
 
         assertViolations( result, 0, 0, 2 );
 
@@ -620,6 +617,57 @@ public class DefaultModelValidatorTest
             + "should not point at files within the project directory" );
     }
 
+    public void testInvalidVersionInPluginManagement()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/missing-plugin-version-pluginManagement.xml" );
+
+        assertViolations( result, 1, 0, 0 );
+
+        assertEquals( "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' version of a plugin must be defined. ",
+                      result.getFatals().get( 0 ) );
+
+    }
+
+    public void testInvalidGroupIdInPluginManagement()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/missing-groupId-pluginManagement.xml" );
+
+        assertViolations( result, 1, 0, 0 );
+
+        assertEquals( "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
+                      result.getFatals().get( 0 ) );
+
+    }
+
+    public void testInvalidArtifactIdInPluginManagement()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/missing-artifactId-pluginManagement.xml" );
+
+        assertViolations( result, 1, 0, 0 );
+
+        assertEquals( "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
+                      result.getFatals().get( 0 ) );
+
+    }
+
+    public void testInvalidGroupAndArtifactIdInPluginManagement()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/missing-ga-pluginManagement.xml" );
+
+        assertViolations( result, 2, 0, 0 );
+
+        assertEquals( "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
+                      result.getFatals().get( 0 ) );
+
+        assertEquals( "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
+                      result.getFatals().get( 1 ) );
+
+    }
+
     public void testMissingReportPluginVersion()
         throws Exception
     {
@@ -627,4 +675,5 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 0, 0 );
     }
+
 }

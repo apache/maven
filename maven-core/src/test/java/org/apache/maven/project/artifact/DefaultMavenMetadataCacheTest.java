@@ -19,15 +19,11 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.MavenArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.project.artifact.DefaultMavenMetadataCache.CacheKey;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
@@ -57,36 +53,19 @@ public class DefaultMavenMetadataCacheTest
         super.tearDown();
     }
 
-    @SuppressWarnings( "deprecation" )
     public void testCacheKey()
         throws Exception
     {
         Artifact a1 = repositorySystem.createArtifact( "testGroup", "testArtifact", "1.2.3", "jar" );
-        ArtifactRepository lr1 =
-            new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
-
-        ArtifactRepository rr1 = new MavenArtifactRepository( "test",
-                                                              "file://" + new File( System.getProperty( "basedir", "" ),
-                                                                                    "src/test/remote-repo" ).toURI().
-                                                              getPath(),
-                                                              new DefaultRepositoryLayout(),
-                                                              new ArtifactRepositoryPolicy(),
-                                                              new ArtifactRepositoryPolicy() );
-
+        @SuppressWarnings( "deprecation" )
+        ArtifactRepository lr1 = new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
+        ArtifactRepository rr1 = repositorySystem.createDefaultRemoteRepository();
         a1.setDependencyFilter( new ExcludesArtifactFilter( Arrays.asList( "foo" ) ) );
 
         Artifact a2 = repositorySystem.createArtifact( "testGroup", "testArtifact", "1.2.3", "jar" );
-        ArtifactRepository lr2 =
-            new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
-
-        ArtifactRepository rr2 = new MavenArtifactRepository( "test",
-                                                              "file://" + new File( System.getProperty( "basedir", "" ),
-                                                                                    "src/test/remote-repo" ).toURI().
-                                                              getPath(),
-                                                              new DefaultRepositoryLayout(),
-                                                              new ArtifactRepositoryPolicy(),
-                                                              new ArtifactRepositoryPolicy() );
-
+        @SuppressWarnings( "deprecation" )
+        ArtifactRepository lr2 = new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
+        ArtifactRepository rr2 = repositorySystem.createDefaultRemoteRepository();
         a2.setDependencyFilter( new ExcludesArtifactFilter( Arrays.asList( "foo" ) ) );
 
         // sanity checks
@@ -97,7 +76,6 @@ public class DefaultMavenMetadataCacheTest
         CacheKey k1 = new CacheKey( a1, false, lr1, Collections.singletonList( rr1 ) );
         CacheKey k2 = new CacheKey( a2, false, lr2, Collections.singletonList( rr2 ) );
 
-        assertEquals( k1.hashCode(), k2.hashCode() );
+        assertEquals(k1.hashCode(), k2.hashCode());
     }
-
 }

@@ -260,7 +260,7 @@ public class MavenProject
 
     /**
      * Sets project {@code file} without changing project {@code basedir}.
-     * 
+     *
      * @since 3.2.4
      */
     public void setPomFile( File file )

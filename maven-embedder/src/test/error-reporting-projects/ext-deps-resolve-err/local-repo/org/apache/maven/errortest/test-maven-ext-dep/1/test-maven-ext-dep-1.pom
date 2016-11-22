@@ -22,5 +22,5 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>test-maven-ext-dep</artifactId>
   <version>1</ver>
-  
+
 </project>

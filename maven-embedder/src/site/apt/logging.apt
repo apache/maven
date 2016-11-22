@@ -54,7 +54,7 @@ Maven Logging
 
  Logging configuration loading is actually done by logging implementation, without any Maven extensions to support merging
  Maven installation configuration with per-user configuration for example:
- <<<$\{maven.home}/conf/logging>>> directory was added to core's classpath (see <<<$\{maven.home}/bin/m2.conf>>>). See your implementation
+ <<<$\{maven.conf}/logging>>> directory was added to core's classpath (see <<<$\{maven.home}/bin/m2.conf>>>). See your implementation
  documentation for details on file names, formats, and so on.
 
  During Maven initialization, Maven tweaks default root logging level to match CLI verbosity choice. Since such feature isn't available

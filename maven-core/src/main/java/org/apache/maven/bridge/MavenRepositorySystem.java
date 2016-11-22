@@ -568,15 +568,13 @@ public class MavenRepositorySystem
     //
     // Code taken from LegacyRepositorySystem
     //
-    /**
-     * @deprecation As of 3.4, Maven no longer falls back to a hard-coded default repository with identifier
-     * {@code central} if such a repository is not provided in the settings or the POM.
-     */
-    @Deprecated
     public ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
         throws Exception
     {
-        throw new UnsupportedOperationException();
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
     public ArtifactRepository createRepository( String url, String repositoryId, boolean releases,

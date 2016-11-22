@@ -76,7 +76,7 @@ public class LifecycleDependencyResolver
 
     @Inject
     private EventSpyDispatcher eventSpyDispatcher;
-    
+
     @Inject
     private ProjectArtifactsCache projectArtifactsCache;
 
@@ -127,13 +127,13 @@ public class LifecycleDependencyResolver
                     throw new LifecycleExecutionException( e );
                 }
             }
-            
+
             Set<Artifact> artifacts;
-            ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect, 
+            ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect,
                 scopesToResolve, aggregating, session.getRepositorySession() );
             ProjectArtifactsCache.CacheRecord recordArtifacts;
             recordArtifacts = projectArtifactsCache.get( cacheKey );
-            
+
             if ( recordArtifacts != null )
             {
                 artifacts = recordArtifacts.artifacts;
@@ -142,7 +142,7 @@ public class LifecycleDependencyResolver
             {
                 try
                 {
-                    artifacts = getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, 
+                    artifacts = getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
                         projectArtifacts );
                     recordArtifacts = projectArtifactsCache.put( cacheKey, artifacts );
                 }

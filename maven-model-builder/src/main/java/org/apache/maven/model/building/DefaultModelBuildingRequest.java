@@ -286,7 +286,10 @@ public class DefaultModelBuildingRequest
         if ( systemProperties != null )
         {
             this.systemProperties = new Properties();
-            this.systemProperties.putAll( systemProperties );
+            synchronized ( systemProperties )
+            { // avoid concurrentmodification if someone else sets/removes an unrelated system property
+                this.systemProperties.putAll( systemProperties );
+            }
         }
         else
         {

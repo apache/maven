@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>test-maven-ext</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -30,5 +30,5 @@ under the License.
       <version>[3.8,</version>
     </dependency>
   </dependencies>
-  
+
 </project>

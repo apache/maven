@@ -895,7 +895,7 @@ public class DefaultProjectBuilder
         public final List<RemoteRepository> repositories;
 
         public final ReactorModelPool modelPool;
-        
+
         public final ReactorModelCache modelCache;
 
         InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )

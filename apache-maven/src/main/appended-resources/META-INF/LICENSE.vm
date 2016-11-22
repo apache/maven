@@ -17,15 +17,15 @@
 ## under the License.
 ##
 
-Apache Maven includes a number of components and libraries with separate 
-copyright notices and license terms. Your use of those components are 
-subject to the terms and conditions of the following licenses. 
+Apache Maven includes a number of components and libraries with separate
+copyright notices and license terms. Your use of those components are
+subject to the terms and conditions of the following licenses.
 
 #set ( $apacheTxt = "The Apache Software License, Version 2.0" )
 
 #foreach ( $project in $projects )
 #foreach ( $license in $project.licenses)
-#if ( ! ($apacheTxt == $license.name) ) 
+#if ( ! ($apacheTxt == $license.name) )
 #set ( $artId = $project.artifact.artifactId)
 #set ( $lf = $locator )
 #set ( $url = $license.url )
@@ -33,7 +33,7 @@ subject to the terms and conditions of the following licenses.
 #if ($url == "https://glassfish.dev.java.net/public/CDDLv1.0.html")
 #set ( $url = 'https://glassfish.java.net/public/CDDLv1.0.html' )
 #end
-#if ($url) 
+#if ($url)
 #set ( $licFile = 'lib/' + $artId + '.license' )
 #set ( $downloaded = $lf.getResourceAsFile($url, "licenses/${licFile}") )
 #end

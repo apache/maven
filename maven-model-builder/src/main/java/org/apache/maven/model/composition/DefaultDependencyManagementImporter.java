@@ -27,6 +27,8 @@ import java.util.Map;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
@@ -100,7 +102,17 @@ public class DefaultDependencyManagementImporter
 
                     for ( final Dependency dependency : conflictingDependencies )
                     {
-                        conflictsBuilder.append( ", '" ).append( dependency.getLocation( "" ) ).append( '\'' );
+                        final InputLocation location = dependency.getLocation( "" );
+
+                        if ( location != null )
+                        {
+                            final InputSource inputSource = location.getSource();
+
+                            if ( inputSource != null )
+                            {
+                                conflictsBuilder.append( ", '" ).append( inputSource.getModelId() ).append( '\'' );
+                            }
+                        }
                     }
 
                     problems.add( new ModelProblemCollectorRequest(
@@ -108,17 +120,19 @@ public class DefaultDependencyManagementImporter
                                            ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_5 ),
                         ModelProblem.Version.V20 ).
                         setMessage( String.format(
-                            "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
-                                + "To resolve this conflict, either declare the dependency directly "
-                                + "in the dependency management of model '%2$s' to override what gets imported "
-                                + "or, as of model version 4.1.0, rearrange the causing imports in the inheritance "
-                                + "hierarchy to apply standard override logic based on artifact coordinates. "
-                                + "Without resolving this conflict, your build relies on indeterministic "
+                            "Dependency '%1$s' has conflicting dependency management in model '%2$s'%3$s%4$s. "
+                                + "To resolve the conflicts, either declare the dependency management for dependency "
+                                + "'%1$s' directly in the dependency management of model '%2$s' to override what gets "
+                                + "imported or - as of model version 4.1.0 - rearrange the causing imports in the "
+                                + "inheritance hierarchy to apply standard override logic based on artifact "
+                                + "coordinates. Without resolving the conflicts, your build relies on indeterministic "
                                 + "behaviour.",
                             conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
                             target.getPomFile() != null
                                 ? " @ '" + target.getPomFile().getAbsolutePath() + "' "
-                                : " ", conflictsBuilder.substring( 2 ) ) ) );
+                                : " ", conflictsBuilder.length() > 0
+                                           ? "(" + conflictsBuilder.substring( 2 ) + ")"
+                                           : "" ) ) );
 
                 }
             }

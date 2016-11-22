@@ -42,6 +42,7 @@ import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
+import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.plugin.LegacySupport;
@@ -111,7 +112,7 @@ public class DefaultMaven
         }
         catch ( RuntimeException e )
         {
-            //TODO Hack to make the cycle detection the same for the new graph builder
+            // TODO Hack to make the cycle detection the same for the new graph builder
             if ( e.getCause() instanceof ProjectCycleException )
             {
                 result = addExceptionToResult( new DefaultMavenExecutionResult(), e.getCause() );
@@ -160,7 +161,7 @@ public class DefaultMaven
     //
     @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
-    {        
+    {
         request.setStartTime( new Date() );
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
@@ -192,6 +193,10 @@ public class DefaultMaven
 
             return doExecute( request, session, result, repoSession );
         }
+        catch ( MavenExecutionException e )
+        {
+            return addExceptionToResult( result, e );
+        }
         finally
         {
             sessionScope.exit();
@@ -200,29 +205,18 @@ public class DefaultMaven
 
     private MavenExecutionResult doExecute( MavenExecutionRequest request, MavenSession session,
                                             MavenExecutionResult result, DefaultRepositorySystemSession repoSession )
+        throws MavenExecutionException
     {
-        try
-        {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections
-                .<MavenProject>emptyList() ) )
-            {
-                listener.afterSessionStart( session );
-            }
-        }
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
+        afterSessionStart( session );
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
         Result<? extends ProjectDependencyGraph> graphResult = buildGraph( session, result );
-        
+
         if ( graphResult.hasErrors() )
         {
-            return addExceptionToResult( result,
-                                         Iterables.toArray( graphResult.getProblems(), ModelProblem.class )[0]
-                                             .getException() );
+            return addExceptionToResult( result, Iterables.toArray( graphResult.getProblems(),
+                                                                    ModelProblem.class )[0].getException() );
         }
 
         try
@@ -256,24 +250,7 @@ public class DefaultMaven
 
         repoSession.setReadOnly();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterProjectsRead( session );
-            }
-        }
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
+        afterProjectRead( session );
 
         //
         // The projects need to be topologically after the participants have run their afterProjectsRead(session)
@@ -283,14 +260,13 @@ public class DefaultMaven
         // Note that participants may affect the topological order of the projects but it is
         // not expected that a participant will add or remove projects from the session.
         //
-        
+
         graphResult = buildGraph( session, result );
-        
+
         if ( graphResult.hasErrors() )
         {
-            return addExceptionToResult( result,
-                                         Iterables.toArray( graphResult.getProblems(), ModelProblem.class )[0]
-                                             .getException() );
+            return addExceptionToResult( result, Iterables.toArray( graphResult.getProblems(),
+                                                                    ModelProblem.class )[0].getException() );
         }
 
         try
@@ -303,6 +279,8 @@ public class DefaultMaven
             result.setTopologicallySortedProjects( session.getProjects() );
 
             result.setProject( session.getTopLevelProject() );
+
+            validatePrerequisitesForNonMavenPluginProjects( session.getProjects() );
 
             lifecycleStarter.execute( session );
 
@@ -328,6 +306,35 @@ public class DefaultMaven
         return result;
     }
 
+    @SuppressWarnings( "checkstyle:linelength" )
+    private void afterSessionStart( MavenSession session )
+        throws MavenExecutionException
+    {
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        {
+            listener.afterSessionStart( session );
+        }
+    }
+
+    private void afterProjectRead( MavenSession session )
+        throws MavenExecutionException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                listener.afterProjectsRead( session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
+    }
+
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
         throws MavenExecutionException
     {
@@ -346,7 +353,7 @@ public class DefaultMaven
             Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
     }
-    
+
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         return repositorySessionFactory.newRepositorySession( request );
@@ -369,8 +376,7 @@ public class DefaultMaven
 
     private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
     {
-        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
-            new LinkedHashSet<>();
+        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners = new LinkedHashSet<>();
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
@@ -423,6 +429,25 @@ public class DefaultMaven
         }
 
         return result;
+    }
+
+    private void validatePrerequisitesForNonMavenPluginProjects( List<MavenProject> projects )
+    {
+        for ( MavenProject mavenProject : projects )
+        {
+            if ( !"maven-plugin".equals( mavenProject.getPackaging() ) )
+            {
+                Prerequisites prerequisites = mavenProject.getPrerequisites();
+                if ( prerequisites != null && prerequisites.getMaven() != null )
+                {
+                    logger.warn( "The project " + mavenProject.getId() + " uses prerequisites"
+                        + " which is only intended for maven-plugin projects "
+                        + "but not for non maven-plugin projects. "
+                        + "For such purposes you should use the maven-enforcer-plugin. "
+                        + "See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html" );
+                }
+            }
+        }
     }
 
     private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
@@ -486,7 +511,7 @@ public class DefaultMaven
         return index;
     }
 
-    private Result<? extends ProjectDependencyGraph> buildGraph( MavenSession session, MavenExecutionResult result ) 
+    private Result<? extends ProjectDependencyGraph> buildGraph( MavenSession session, MavenExecutionResult result )
     {
         Result<? extends ProjectDependencyGraph> graphResult = graphBuilder.build( session );
         for ( ModelProblem problem : graphResult.getProblems() )
@@ -506,12 +531,12 @@ public class DefaultMaven
             ProjectDependencyGraph projectDependencyGraph = graphResult.get();
             session.setProjects( projectDependencyGraph.getSortedProjects() );
             session.setAllProjects( projectDependencyGraph.getSortedProjects() );
-            session.setProjectDependencyGraph( projectDependencyGraph );                
+            session.setProjectDependencyGraph( projectDependencyGraph );
         }
-        
-        return graphResult;        
+
+        return graphResult;
     }
-    
+
     @Deprecated
     // 5 January 2014
     protected Logger getLogger()

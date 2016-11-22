@@ -31,11 +31,11 @@ under the License.
   <artifactId>maven-artifact</artifactId>
   <version>3.0-SNAPSHOT</version>
   <name>Maven Artifact</name>
-  <scm>                                                                                                                                                                                
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>                                                                                            
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>                                                                         
-    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>                                                                                                                
-  </scm>       
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -56,7 +56,7 @@ under the License.
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-beta-2</version>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
@@ -68,7 +68,7 @@ under the License.
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>
       <scope>test</scope>
-    </dependency>      
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -80,25 +80,25 @@ under the License.
           <version>1.0.0</version>
           <model>src/main/mdo/metadata.mdo</model>
         </configuration>
-        <executions>                                                                                                                                          
-          <execution>                                                                                                                                         
-            <id>site-docs</id>                                                                                                                                
-            <phase>pre-site</phase>                                                                                                                           
-            <goals>                                                                                                                                           
-              <goal>xdoc</goal>                                                                                                                               
-              <goal>xsd</goal>                                                                                                                                
-            </goals>                                                                                                                                          
-          </execution>                                                                                                                                        
-          <execution>                                                                                                                                         
-            <id>standard</id>                                                                                                                                 
-            <goals>                                                                                                                                           
-              <goal>java</goal>                                                                                                                               
-              <goal>xpp3-reader</goal>                                                                                                                        
-              <goal>xpp3-writer</goal>                                                                                                                        
-            </goals>                                                                                                                                          
-          </execution>                                                                                                                                        
-        </executions>                      
-      </plugin>    
+        <executions>
+          <execution>
+            <id>site-docs</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>standard</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>

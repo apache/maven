@@ -39,7 +39,8 @@ public interface MavenProjectBuilder
     MavenProject build( File pom, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
-    //TODO maven-site-plugin -- Vincent, Dennis and Lukas are checking but this doesn't appear to be required anymore.
+    //TODO maven-site-plugin -- not used by the plugin directly, but used by Doxia Integration Tool & MPIR
+    // see DOXIASITETOOLS-167 & MPIR-349
     MavenProject build( File pom, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
 

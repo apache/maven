@@ -36,8 +36,8 @@
                   <exclude>classworlds:classworlds</exclude>
                   <exclude>junit:junit</exclude>
                   <exclude>jmock:jmock</exclude>
-                  <exclude>org.codehaus.plexus:plexus-classworlds</exclude>                  
-                  <exclude>org.codehaus.plexus:plexus-utils</exclude>                  
+                  <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+                  <exclude>org.codehaus.plexus:plexus-utils</exclude>
                 </excludes>
               </artifactSet>
             </configuration>

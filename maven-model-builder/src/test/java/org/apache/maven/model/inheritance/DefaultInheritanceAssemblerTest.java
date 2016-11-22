@@ -149,12 +149,12 @@ public class DefaultInheritanceAssemblerTest
         }
     }
 
-    public void testWithEmptyUrl() 
+    public void testWithEmptyUrl()
         throws Exception
     {
         	testInheritance( "empty-urls", false );
     }
-    
+
     public void testInheritance( String baseName )
         throws Exception
     {
@@ -195,7 +195,7 @@ public class DefaultInheritanceAssemblerTest
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-    }    
+    }
 
     public void testModulePathNotArtifactId()
         throws Exception

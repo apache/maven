@@ -51,12 +51,12 @@ under the License.
     <maven.compiler.target>1.7</maven.compiler.target>
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.3.1</commonsCliVersion>
-    <commonsLangVersion>3.4</commonsLangVersion>
+    <commonsLangVersion>3.5</commonsLangVersion>
     <junitVersion>4.12</junitVersion>
-    <plexusVersion>1.7</plexusVersion>
-    <plexusInterpolationVersion>1.22</plexusInterpolationVersion>
+    <plexusVersion>1.7.1</plexusVersion>
+    <plexusInterpolationVersion>1.24</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
-    <guavaVersion>19.0</guavaVersion>
+    <guavaVersion>20.0</guavaVersion>
     <guiceVersion>4.1.0</guiceVersion>
     <sisuInjectVersion>0.3.3</sisuInjectVersion>
     <wagonVersion>2.10</wagonVersion>
@@ -91,6 +91,7 @@ under the License.
     <module>maven-artifact</module>
     <module>maven-aether-provider</module>
     <module>maven-repository-metadata</module>
+    <module>maven-slf4j-provider</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
@@ -225,6 +226,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-slf4j-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -474,6 +480,11 @@ under the License.
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+           <version>3.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

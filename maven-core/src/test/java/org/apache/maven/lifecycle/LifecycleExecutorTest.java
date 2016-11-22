@@ -409,7 +409,7 @@ public class LifecycleExecutorTest
             {
                 return Collections.emptyList();
             }
-            
+
             public java.util.List<MavenProject> getAllSortedProjects()
             {
                 return Collections.emptyList();

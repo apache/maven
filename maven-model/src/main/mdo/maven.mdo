@@ -245,7 +245,7 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             project's <code>child.project.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2175,7 +2175,7 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.connection.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2188,7 +2188,7 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.developerConnection.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2207,7 +2207,7 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2723,7 +2723,7 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if 
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             site's <code>child.site.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -3636,12 +3636,12 @@
           <type>String</type>
           <defaultValue>2.0</defaultValue>
           <description><![CDATA[
-            For a plugin project, the minimum version of Maven required to use
-            the resulting plugin.<br />
-            For specifying the minimum version of Maven required to build a
-            project, this element is <b>deprecated</b>. Use the Maven Enforcer
-            Plugin's <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html"><code>requireMavenVersion</code></a>
-            rule instead.
+            For a plugin project (packaging is <code>maven-plugin</code>), the minimum version of
+            Maven required to use the resulting plugin.<br />
+            In Maven 2, this was also specifying the minimum version of Maven required to build a
+            project, but this usage is <b>deprecated</b> in Maven 3 and not checked any more: use
+            the <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html">Maven Enforcer Plugin's
+            <code>requireMavenVersion</code> rule</a> instead.
             ]]>
           </description>
           <required>false</required>

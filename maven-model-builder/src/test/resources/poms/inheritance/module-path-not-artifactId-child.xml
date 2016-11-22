@@ -34,7 +34,7 @@ under the License.
   <description>
     artifactId == "child-artifact-id"
     but expect path on SCM and site == "child"
-    feature: support "project.directory" property, ressembling future model addition of "directory" element along "artifactId" 
+    feature: support "project.directory" property, ressembling future model addition of "directory" element along "artifactId"
   </description>
 
   <properties>

@@ -41,11 +41,11 @@ public class FileModelSource extends FileSource implements ModelSource2
     {
         super( pomFile );
     }
-    
+
     /**
-     * 
+     *
      * @return the file of this source
-     * 
+     *
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
@@ -53,7 +53,7 @@ public class FileModelSource extends FileSource implements ModelSource2
     {
         return getFile();
     }
-    
+
     @Override
     public ModelSource2 getRelatedSource( String relPath )
     {

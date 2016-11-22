@@ -49,11 +49,11 @@ public interface ToolchainManager
      * @return the toolchain selected by <code>maven-toolchains-plugin</code>
      */
     Toolchain getToolchainFromBuildContext( String type, MavenSession context );
-    
+
     /**
      * Select all toolchains available in user settings matching the type and requirements,
      * independently from <code>maven-toolchains-plugin</code>.
-     * 
+     *
      * @param session the Maven session, must not be {@code null}
      * @param type the type, must not be {@code null}
      * @param requirements the requirements, may be {@code null}

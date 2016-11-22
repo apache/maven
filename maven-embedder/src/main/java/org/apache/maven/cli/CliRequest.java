@@ -113,8 +113,8 @@ public class CliRequest
         return request;
     }
 
-    public void setUserProperties( Properties properties ) 
+    public void setUserProperties( Properties properties )
     {
-        this.userProperties.putAll( properties );      
+        this.userProperties.putAll( properties );
     }
 }

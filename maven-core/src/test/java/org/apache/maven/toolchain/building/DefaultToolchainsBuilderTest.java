@@ -42,7 +42,7 @@ import org.mockito.MockitoAnnotations;
 public class DefaultToolchainsBuilderTest
 {
     private static final String LS = System.getProperty( "line.separator" );
-    
+
     @Mock
     private ToolchainsReader toolchainsReader;
 
@@ -143,7 +143,7 @@ public class DefaultToolchainsBuilderTest
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }
-    
+
     @Test
     public void testStrictToolchainsParseException() throws Exception
     {
@@ -151,18 +151,18 @@ public class DefaultToolchainsBuilderTest
         request.setGlobalToolchainsSource( new StringSource( "" ) );
         ToolchainsParseException parseException = new ToolchainsParseException( "MESSAGE", 4, 2 );
         when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenThrow( parseException );
-        
+
         try
         {
             toolchainBuilder.build( request );
         }
         catch ( ToolchainsBuildingException e )
         {
-            assertEquals( "1 problem was encountered while building the effective toolchains" + LS + 
+            assertEquals( "1 problem was encountered while building the effective toolchains" + LS +
                 "[FATAL] Non-parseable toolchains (memory): MESSAGE @ line 4, column 2" + LS, e.getMessage() );
         }
     }
-    
+
     @Test
     public void testIOException() throws Exception
     {
@@ -170,16 +170,16 @@ public class DefaultToolchainsBuilderTest
         request.setGlobalToolchainsSource( new StringSource( "", "LOCATION" ) );
         IOException ioException = new IOException( "MESSAGE" );
         when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenThrow( ioException );
-        
+
         try
         {
             toolchainBuilder.build( request );
         }
         catch ( ToolchainsBuildingException e )
         {
-            assertEquals( "1 problem was encountered while building the effective toolchains" + LS + 
+            assertEquals( "1 problem was encountered while building the effective toolchains" + LS +
                 "[FATAL] Non-readable toolchains LOCATION: MESSAGE" + LS, e.getMessage() );
         }
     }
-    
+
 }
