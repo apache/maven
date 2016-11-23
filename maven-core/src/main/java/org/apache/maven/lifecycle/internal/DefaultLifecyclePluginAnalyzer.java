@@ -43,6 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * @since 3.0
@@ -249,7 +250,12 @@ public class DefaultLifecyclePluginAnalyzer
                 execution.setPhase( phase );
                 execution.setPriority( i - mojos.size() );
                 execution.getGoals().add( gs.goal );
-                execution.setConfiguration( mojo.getConfiguration() );
+
+                Xpp3Dom lifecycleConfiguration = mojo.getConfiguration();
+                if ( lifecycleConfiguration != null )
+                {
+                    execution.setConfiguration( new Xpp3Dom( lifecycleConfiguration ) );
+                }
 
                 plugin.setDependencies( mojo.getDependencies() );
                 plugin.getExecutions().add( execution );
