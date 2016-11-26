@@ -22,6 +22,7 @@ package org.apache.maven.cli.transfer;
 import java.util.Locale;
 
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
+import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -52,7 +53,12 @@ public class Slf4jMavenTransferListener
         String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
         TransferResource resource = event.getResource();
-        out.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() );
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
+        StringBuilder message = new StringBuilder(type + " from " + repositoryId);
+        message.append(": ");
+        message.append(resource.getRepositoryUrl() + resource.getResourceName());
+        
+        out.info(message.toString());
     }
 
     @Override
@@ -60,7 +66,8 @@ public class Slf4jMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        out.warn( event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
+        out.warn( event.getException().getMessage() + " from " + repositoryId + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
 
@@ -72,6 +79,7 @@ public class Slf4jMavenTransferListener
 
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+        String repositoryId = ((ArtifactRequest) event.getResource().getTrace().getData()).getRepositories().get(0).getId();
         String len = format.format( contentLength );
 
         String throughput = "";
@@ -82,8 +90,9 @@ public class Slf4jMavenTransferListener
             throughput = " at " + format.format( (long) bytesPerSecond ) + "/s";
         }
 
-        out.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-            + throughput + ")" );
+        StringBuilder message = new StringBuilder(type + " from " + repositoryId);
+        message.append(": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len + throughput + ")");
+        out.info(message.toString());
     }
 
 }
