@@ -164,10 +164,12 @@ public class DefaultModelBuilder
      */
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS = true;
 
-    // [MNG-5971] Imported dependencies should be available to inheritance processing.
-    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING =
-        System.getProperty( DefaultModelBuilder.class.getName()
-                                + ".disableDependencyManagementImportInheritanceProcessing" ) == null;
+    /**
+     * [MNG-5971] Imported dependencies should be available to inheritance processing.
+     *
+     * @since 3.4.0
+     */
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING = true;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -496,7 +498,7 @@ public class DefaultModelBuilder
         if ( DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING )
         {
             // [MNG-5971] Imported dependencies should be available to inheritance processing.
-            this.processImports( lineage, request, problems );
+            this.processImports( lineage, "include", "pom", request, problems );
         }
 
         problems.setSource( resultModel );
@@ -839,8 +841,8 @@ public class DefaultModelBuilder
         }
     }
 
-    private void processImports( final List<Model> lineage, final ModelBuildingRequest request,
-                                 final DefaultModelProblemCollector problems )
+    private void processImports( final List<Model> lineage, final String scope, final String packaging,
+                                 final ModelBuildingRequest request, final DefaultModelProblemCollector problems )
     {
         // [MNG-5971] Imported dependencies should be available to inheritance processing
         // It's not possible to support all ${project.xyz} properties in dependency management import declarations
@@ -915,7 +917,7 @@ public class DefaultModelBuilder
                 {
                     final Dependency dependency = model.getDependencyManagement().getDependencies().get( j );
 
-                    if ( "import".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
+                    if ( scope.equals( dependency.getScope() ) && packaging.equals( dependency.getType() ) )
                     {
                         final Dependency interpolated =
                             intermediateLineage.get( i ).getDependencyManagement().getDependencies().get( j );
@@ -947,7 +949,7 @@ public class DefaultModelBuilder
         {
             final Model model = lineage.get( i );
             this.configureResolver( lenientRequest.getModelResolver(), intermediateLineage.get( i ), problems, true );
-            this.importDependencyManagement( model, "import", lenientRequest, problems, new HashSet<String>() );
+            this.importDependencyManagement( model, scope, lenientRequest, problems, new HashSet<String>() );
         }
     }
 
