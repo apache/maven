@@ -533,10 +533,7 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
-        if ( !DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING )
-        {
-            this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
-        }
+        this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
 
         // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
