@@ -150,10 +150,12 @@ public class DefaultModelBuilder
      */
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_VERSION_RANGES = true;
 
-    // [MNG-5600] Dependency management import should support exclusions.
-    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS =
-        System.getProperty( DefaultModelBuilder.class.getName()
-                                + ".disableDependencyManagementImportExclusions" ) == null;
+    /**
+     * [MNG-5600] Dependency management import should support exclusions.
+     *
+     * @since 3.4.0
+     */
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS = true;
 
     // [MNG-5527] Dependency management import should support relocations.
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS =
