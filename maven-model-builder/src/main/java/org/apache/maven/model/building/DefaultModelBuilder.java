@@ -143,10 +143,12 @@ public class DefaultModelBuilder
     @Requirement( optional = true )
     private List<ModelFinalizer> modelFinalizers;
 
-    // [MNG-4463] Dependency management import should support version ranges.
-    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_VERSION_RANGES =
-        System.getProperty( DefaultModelBuilder.class.getName()
-                                + ".disableDependencyManagementImportVersionRanges" ) == null;
+    /**
+     * [MNG-4463] Dependency management import should support version ranges.
+     *
+     * @since 3.4.0
+     */
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_VERSION_RANGES = true;
 
     // [MNG-5600] Dependency management import should support exclusions.
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS =
