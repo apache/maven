@@ -157,10 +157,12 @@ public class DefaultModelBuilder
      */
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_EXCLUSIONS = true;
 
-    // [MNG-5527] Dependency management import should support relocations.
-    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS =
-        System.getProperty( DefaultModelBuilder.class.getName()
-                                + ".disableDependencyManagementImportRelocations" ) == null;
+    /**
+     * [MNG-5527] Dependency management import should support relocations.
+     *
+     * @since 3.4.0
+     */
+    private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_RELOCATIONS = true;
 
     // [MNG-5971] Imported dependencies should be available to inheritance processing.
     private static final boolean DEPENDENCY_MANAGEMENT_IMPORT_INHERITANCE_PROCESSING =
