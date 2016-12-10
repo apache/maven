@@ -123,9 +123,9 @@ public class DefaultDependencyManagementImporter
                             "Dependency '%1$s' has conflicting dependency management in model '%2$s'%3$s%4$s. "
                                 + "To resolve the conflicts, declare the dependency management for dependency '%1$s' "
                                 + "directly in the dependency management of model '%2$s' to override what gets "
-                                + "imported, add exclusions for the conflicting dependencies or, if the Maven version "
-                                + "in use supports the include scope feature, use that feature to rearrange the "
-                                + "causing dependencies in the inheritance hierarchy to apply standard override logic "
+                                + "imported. If the Maven version in use supports it, add exclusions for the "
+                                + "conflicting dependencies or use the include scope feature to rearrange the "
+                                + "causing dependencies in the inheritance hierarchy applying standard override logic "
                                 + "based on artifact coordinates. Without resolving the conflicts, your build relies "
                                 + "on indeterministic behaviour.",
                             conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
