@@ -86,7 +86,7 @@ under the License.
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
-    <module>maven-aether-provider</module>
+    <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
     <module>maven-slf4j-provider</module>
     <module>maven-embedder</module>
@@ -209,7 +209,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-aether-provider</artifactId>
+        <artifactId>maven-resolver-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

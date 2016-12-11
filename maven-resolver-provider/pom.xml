@@ -28,9 +28,9 @@ under the License.
     <version>3.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-aether-provider</artifactId>
+  <artifactId>maven-resolver-provider</artifactId>
 
-  <name>Maven Aether Provider</name>
+  <name>Maven Artifact Resolver Provider</name>
   <description>Extensions to Maven Resolver for utilizing Maven POM and repository metadata.</description>
 
   <dependencies>

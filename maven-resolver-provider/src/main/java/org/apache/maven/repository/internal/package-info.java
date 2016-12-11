@@ -1,7 +1,7 @@
 // CHECKSTYLE_OFF: RegexpHeader
 /**
- * <a href="http://www.eclipse.org/aether/">Aether</a> extensions for utilizing the Maven POM and Maven repository
- * metadata.
+ * <a href="https://maven.apache.org/resolver/">Maven Resolver</a> extensions for utilizing the Maven POM and Maven
+ * repository metadata.
  */
 package org.apache.maven.repository.internal;
 
