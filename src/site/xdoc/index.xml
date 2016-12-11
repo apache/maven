@@ -46,7 +46,7 @@
           <area shape="rect" coords="228,58,361,95"   alt="maven-embedder" href="maven-embedder/" />
           <area shape="rect" coords="228,116,361,152" alt="maven-compat" href="maven-compat/" />
           <area shape="rect" coords="228,175,361,211" alt="maven-core" href="maven-core/" />
-          <area shape="rect" coords="118,233,275,269" alt="maven-aether-provider" href="maven-aether-provider/" />
+          <area shape="rect" coords="118,233,275,269" alt="maven-resolver-provider" href="maven-resolver-provider/" />
           <area shape="rect" coords="0,287,192,323"   alt="maven-repository-metadata" href="maven-repository-metadata/" />
           <area shape="rect" coords="245,342,343,378" alt="maven-plugin-api" href="maven-plugin-api/" />
           <area shape="rect" coords="253,401,336,436" alt="maven-artifact" href="maven-artifact/" />
@@ -69,7 +69,7 @@
           <area shape="rect" coords="550,401,682,437" alt="plexus-classworlds" href="https://codehaus-plexus.github.io/plexus-classworlds" />
           <area shape="rect" coords="685,455,775,491" alt="plexus-utils" href="https://codehaus-plexus.github.io/plexus-utils" />
           <area shape="rect" coords="542,167,783,502" alt="plexus" href="https://codehaus-plexus.github.io/" />
-          <area shape="rect" coords="68,338,240,482"  alt="aether" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.aether" />
+          <area shape="rect" coords="68,338,240,482"  alt="resolver" href="http://maven.apache.org/resolver/" />
           <area shape="rect" coords="401,393,509,524" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
           <area shape="rect" coords="416,543,493,577" alt="guice" href="http://code.google.com/p/google-guice/" />
           <area shape="rect" coords="550,543,673,577" alt="javax.inject" href="http://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html" />
