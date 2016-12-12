@@ -533,6 +533,9 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
+        // Re-configure the resolver to reflect the effective result model.
+        // It may have been modified during include scope processing.
+        this.configureResolver( request.getModelResolver(), resultModel, problems, true );
         this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
 
         // dependency management injection
@@ -889,6 +892,7 @@ public class DefaultModelBuilder
         }
 
         final Properties effectiveProperties = intermediateLineage.get( 0 ).getProperties();
+        final List<Repository> effectiveRepositories = intermediateLineage.get( 0 ).getRepositories();
 
         final DefaultModelProblemCollector intermediateProblems =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
@@ -903,7 +907,7 @@ public class DefaultModelBuilder
             this.interpolateModel( model, request, intermediateProblems );
         }
 
-        // Exchanges 'import' scope dependencies in the original lineage with possibly interpolated values.
+        // Exchanges 'include' scope dependencies in the original lineage with possibly interpolated values.
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
         {
             final Model model = lineage.get( i );
@@ -941,12 +945,29 @@ public class DefaultModelBuilder
             };
         }
 
-        // Imports dependencies into the original model using the repositories of the intermediate model.
+        // Sets up the resolver to use the effective repositories to support repository overriding.
+        if ( lenientRequest.getModelResolver() != null )
+        {
+            for ( Repository repository : effectiveRepositories )
+            {
+                try
+                {
+                    lenientRequest.getModelResolver().addRepository( repository, true );
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                        .setLocation( repository.getLocation( "" ) ).setException( e ) );
+
+                }
+            }
+        }
+
+        // Imports dependencies into the original model using the effective repositories.
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
         {
-            final Model model = lineage.get( i );
-            this.configureResolver( lenientRequest.getModelResolver(), intermediateLineage.get( i ), problems, true );
-            this.importDependencyManagement( model, scope, lenientRequest, problems, new HashSet<String>() );
+            this.importDependencyManagement( lineage.get( i ), scope, lenientRequest, problems, new HashSet<String>() );
         }
     }
 
