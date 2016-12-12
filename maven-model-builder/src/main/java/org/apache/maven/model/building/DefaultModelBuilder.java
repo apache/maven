@@ -533,9 +533,6 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
-        // Re-configure the resolver to reflect the effective result model.
-        // It may have been modified during include scope processing.
-        this.configureResolver( request.getModelResolver(), resultModel, problems, true );
         this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
 
         // dependency management injection
