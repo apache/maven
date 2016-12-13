@@ -889,7 +889,6 @@ public class DefaultModelBuilder
         }
 
         final Properties effectiveProperties = intermediateLineage.get( 0 ).getProperties();
-        final List<Repository> effectiveRepositories = intermediateLineage.get( 0 ).getRepositories();
 
         final DefaultModelProblemCollector intermediateProblems =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
@@ -945,7 +944,7 @@ public class DefaultModelBuilder
         // Sets up the resolver to use the effective repositories to support repository overriding.
         if ( lenientRequest.getModelResolver() != null )
         {
-            for ( Repository repository : effectiveRepositories )
+            for ( Repository repository : intermediateLineage.get( 0 ).getRepositories() )
             {
                 try
                 {
