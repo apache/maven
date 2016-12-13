@@ -80,22 +80,25 @@ public class DefaultProjectBuildingRequest
         pluginArtifactRepositories = new ArrayList<>();
     }
 
+    @SuppressWarnings( "deprecation" )
     public DefaultProjectBuildingRequest( ProjectBuildingRequest request )
     {
         this();
+        setActiveProfileIds( request.getActiveProfileIds() );
+        setBuildStartTime( request.getBuildStartTime() );
+        setInactiveProfileIds( request.getInactiveProfileIds() );
+        setLocalRepository( request.getLocalRepository() );
+        setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
         setProcessPlugins( request.isProcessPlugins() );
         setProfiles( request.getProfiles() );
-        setActiveProfileIds( request.getActiveProfileIds() );
-        setInactiveProfileIds( request.getInactiveProfileIds() );
+        setProject( request.getProject() );
+        setRemoteRepositories( request.getRemoteRepositories() );
+        setRepositoryMerging( request.getRepositoryMerging() );
+        setRepositorySession( request.getRepositorySession() );
+        setResolveDependencies( request.isResolveDependencies() );
+        setResolveVersionRanges( request.isResolveVersionRanges() );
         setSystemProperties( request.getSystemProperties() );
         setUserProperties( request.getUserProperties() );
-        setRemoteRepositories( request.getRemoteRepositories() );
-        setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
-        setRepositorySession( request.getRepositorySession() );
-        setLocalRepository( request.getLocalRepository() );
-        setBuildStartTime( request.getBuildStartTime() );
-        setProject( request.getProject() );
-        setResolveDependencies( request.isResolveDependencies() );
         setValidationLevel( request.getValidationLevel() );
     }
 
