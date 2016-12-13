@@ -20,7 +20,6 @@ package org.apache.maven.repository.internal;
  */
 
 import java.util.Properties;
-
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -33,7 +32,7 @@ import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
-import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
@@ -95,7 +94,7 @@ public final class MavenRepositorySystemUtils
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
-        DependencyManager depManager = new ClassicDependencyManager();
+        DependencyManager depManager = new TransitiveDependencyManager();
         session.setDependencyManager( depManager );
 
         DependencySelector depFilter =
