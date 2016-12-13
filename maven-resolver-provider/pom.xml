@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>maven-resolver-provider</artifactId>
 
-  <name>Maven Resolver Provider</name>
+  <name>Maven Artifact Resolver Provider</name>
   <description>Extensions to Maven Resolver for utilizing Maven POM and repository metadata.</description>
 
   <dependencies>
