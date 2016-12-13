@@ -39,7 +39,7 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
@@ -349,7 +349,7 @@ public abstract class AbstractArtifactComponentTestCase
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
-        DependencyManager depManager = new ClassicDependencyManager();
+        DependencyManager depManager = new TransitiveDependencyManager();
         session.setDependencyManager( depManager );
 
         DependencySelector depFilter = new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
