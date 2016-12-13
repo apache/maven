@@ -77,6 +77,8 @@ public class ProjectModelResolver
 
     private final Set<String> repositoryIds;
 
+    private final Set<String> externalRepositoryIds;
+
     private final ReactorModelPool modelPool;
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
@@ -98,7 +100,13 @@ public class ProjectModelResolver
         this.repositories.addAll( externalRepositories );
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<>();
+        this.externalRepositoryIds = new HashSet<>();
         this.modelPool = modelPool;
+        for ( final RemoteRepository repository : repositories )
+        {
+            this.repositoryIds.add( repository.getId() );
+            this.externalRepositoryIds.add( repository.getId() );
+        }
     }
 
     private ProjectModelResolver( ProjectModelResolver original )
@@ -112,6 +120,7 @@ public class ProjectModelResolver
         this.repositories = new ArrayList<>( original.repositories );
         this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<>( original.repositoryIds );
+        this.externalRepositoryIds = new HashSet<>( original.externalRepositoryIds );
         this.modelPool = original.modelPool;
     }
 
@@ -127,7 +136,8 @@ public class ProjectModelResolver
     {
         if ( !repositoryIds.add( repository.getId() ) )
         {
-            if ( !replace )
+            if ( !replace || ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging )
+                               && this.externalRepositoryIds.contains( repository.getId() ) ) )
             {
                 return;
             }
