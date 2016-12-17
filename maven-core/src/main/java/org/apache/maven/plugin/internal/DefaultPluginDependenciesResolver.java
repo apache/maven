@@ -165,12 +165,17 @@ public class DefaultPluginDependenciesResolver
         class PluginDependencySelector implements DependencySelector
         {
 
-            private int depth;
+            private final int depth;
 
             PluginDependencySelector()
             {
+                this( 0 );
+            }
+
+            private PluginDependencySelector( final int depth )
+            {
                 super();
-                this.depth = 0;
+                this.depth = depth;
             }
 
             @Override
@@ -186,8 +191,10 @@ public class DefaultPluginDependenciesResolver
             public DependencySelector deriveChildSelector( final DependencyCollectionContext context )
             {
                 assert context.getDependency() != null : "Unexpected POM resolution.";
-                this.depth++;
-                return this;
+                return this.depth >= 2
+                           ? this
+                           : new PluginDependencySelector( this.depth + 1 );
+
             }
 
         }
@@ -197,16 +204,24 @@ public class DefaultPluginDependenciesResolver
         class PluginDependencyManager implements DependencyManager
         {
 
-            private int depth;
+            private final int depth;
 
-            private DependencyManager defaultManager = session.getDependencyManager();
+            private final DependencyManager defaultManager;
 
-            private List<Artifact> exlusions = new LinkedList<>();
+            private final List<Artifact> exclusions;
 
             PluginDependencyManager()
             {
+                this( 0, session.getDependencyManager(), new LinkedList<Artifact>() );
+            }
+
+            private PluginDependencyManager( final int depth, final DependencyManager defaultManager,
+                                             final List<Artifact> exclusions )
+            {
                 super();
-                this.depth = 0;
+                this.depth = depth;
+                this.defaultManager = defaultManager;
+                this.exclusions = exclusions;
             }
 
             @Override
@@ -240,17 +255,17 @@ public class DefaultPluginDependenciesResolver
             public DependencyManager deriveChildManager( final DependencyCollectionContext context )
             {
                 assert context.getDependency() != null : "Unexpected POM resolution.";
-                this.depth++;
-                this.defaultManager = this.defaultManager != null
-                                          ? this.defaultManager.deriveChildManager( context )
-                                          : null;
+                return new PluginDependencyManager( this.depth + 1,
+                                                    this.defaultManager != null
+                                                        ? this.defaultManager.deriveChildManager( context )
+                                                        : null,
+                                                    this.exclusions );
 
-                return this;
             }
 
             public List<Artifact> getExclusions()
             {
-                return this.exlusions;
+                return this.exclusions;
             }
 
         }
