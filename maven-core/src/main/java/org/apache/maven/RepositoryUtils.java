@@ -114,12 +114,16 @@ public class RepositoryUtils
 
             List<String> nodeTrail = new ArrayList<>( trail.size() + 1 );
             nodeTrail.addAll( trail );
-            nodeTrail.add( artifact.getId() );
 
-            if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
+            if ( artifact != null )
             {
-                artifact.setDependencyTrail( nodeTrail );
-                artifacts.add( artifact );
+                nodeTrail.add( artifact.getId() );
+
+                if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
+                {
+                    artifact.setDependencyTrail( nodeTrail );
+                    artifacts.add( artifact );
+                }
             }
 
             toArtifacts( artifacts, node.getChildren(), nodeTrail, filter );
