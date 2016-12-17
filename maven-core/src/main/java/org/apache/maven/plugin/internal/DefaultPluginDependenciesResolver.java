@@ -20,9 +20,9 @@ package org.apache.maven.plugin.internal;
  */
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -37,8 +37,11 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManagement;
+import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -150,39 +153,124 @@ public class DefaultPluginDependenciesResolver
                                 session );
     }
 
-    private DependencyNode resolveInternal( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
-                                            DependencyGraphTransformer transformer,
-                                            List<RemoteRepository> repositories, RepositorySystemSession session )
+    private DependencyNode resolveInternal( final Plugin plugin, final Artifact artifact,
+                                            final DependencyFilter dependencyFilter,
+                                            final DependencyGraphTransformer transformer,
+                                            final List<RemoteRepository> repositories,
+                                            final RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = RequestTrace.newChild( null, plugin );
-
-        if ( pluginArtifact == null )
+        // This selector is a combination of the ScopeDependencySelector and the OptionalDependencySelector
+        // simulating the POM resolution case for the dependency resolution case we are going to perform below.
+        class PluginDependencySelector implements DependencySelector
         {
-            pluginArtifact = toArtifact( plugin, session );
+
+            private int depth;
+
+            PluginDependencySelector()
+            {
+                super();
+                this.depth = 0;
+            }
+
+            @Override
+            public boolean selectDependency( final org.eclipse.aether.graph.Dependency dependency )
+            {
+                return this.depth < 2 || !( dependency.isOptional()
+                                            || "test".equalsIgnoreCase( dependency.getScope() )
+                                            || "provided".equalsIgnoreCase( dependency.getScope() ) );
+
+            }
+
+            @Override
+            public DependencySelector deriveChildSelector( final DependencyCollectionContext context )
+            {
+                assert context.getDependency() != null : "Unexpected POM resolution.";
+                this.depth++;
+                return this;
+            }
+
         }
 
-        DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
-        DependencyFilter resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, dependencyFilter );
+        // This dependency manager delegates to the session's dependency manager but supports excluding plugin
+        // dependency overrides from the plugins/plugin/dependencies POM element.
+        class PluginDependencyManager implements DependencyManager
+        {
 
-        DependencyNode node;
+            private final List<Artifact> exlusions = new LinkedList<>();
+
+            @Override
+            public DependencyManagement manageDependency( final org.eclipse.aether.graph.Dependency dependency )
+            {
+                boolean excluded = false;
+
+                for ( final Artifact exclusion : this.getExclusions() )
+                {
+                    final Artifact artifact = dependency.getArtifact();
+
+                    if ( exclusion.getGroupId().equals( artifact.getGroupId() )
+                             && exclusion.getArtifactId().equals( artifact.getArtifactId() )
+                             && exclusion.getExtension().equals( artifact.getExtension() )
+                             && exclusion.getClassifier() != null
+                             ? exclusion.getClassifier().equals( artifact.getClassifier() )
+                             : dependency.getArtifact().getClassifier() == null )
+                    {
+                        excluded = true;
+                        break;
+                    }
+                }
+
+                return !excluded && session.getDependencyManager() != null
+                           ? session.getDependencyManager().manageDependency( dependency )
+                           : null;
+
+            }
+
+            @Override
+            public DependencyManager deriveChildManager( final DependencyCollectionContext context )
+            {
+                assert context.getDependency() != null : "Unexpected POM resolution.";
+                return session.getDependencyManager() != null
+                           ? session.getDependencyManager().deriveChildManager( context )
+                           : null;
+
+            }
+
+            public List<Artifact> getExclusions()
+            {
+                return this.exlusions;
+            }
+
+        }
+
+        final RequestTrace trace = RequestTrace.newChild( null, plugin );
+        final DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
+        final DependencyFilter resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, dependencyFilter );
+        final Artifact pluginArtifact = artifact != null
+                                            ? artifact
+                                            : toArtifact( plugin, session );
 
         try
         {
-            DependencySelector selector =
-                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
+            final DependencySelector pluginDependencySelector =
+                session.getDependencySelector() != null
+                    ? new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder(),
+                                                 session.getDependencySelector() )
+                    : new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder() );
 
-            transformer =
+            final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
 
+            final PluginDependencyManager pluginDependencyManager = new PluginDependencyManager();
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
-            pluginSession.setDependencySelector( selector );
-            pluginSession.setDependencyGraphTransformer( transformer );
+            pluginSession.setDependencySelector( pluginDependencySelector );
+            pluginSession.setDependencyGraphTransformer( pluginDependencyGraphTransformer );
+            pluginSession.setDependencyManager( pluginDependencyManager );
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );
             request.setRepositories( repositories );
-            request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
+
             for ( Dependency dependency : plugin.getDependencies() )
             {
                 org.eclipse.aether.graph.Dependency pluginDep =
@@ -192,14 +280,22 @@ public class DefaultPluginDependenciesResolver
                     pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
                 }
                 request.addDependency( pluginDep );
+                pluginDependencyManager.getExclusions().add( pluginDep.getArtifact() );
             }
+
+            // [MNG-6135] Maven plugins and core extensions are not dependencies, they should be resolved the same way
+            //            as projects.
+            // We would need to perform 'request.setRootArtifact' here to request POM resolution. This would not resolve
+            // the plugin JAR file later. So we perform dependency resolution and provide our own 'DependencySelector'
+            // and 'DependencyManager' (see above) simulating the POM resolution case.
+            request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
 
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
             depRequest.setTrace( trace );
 
             request.setTrace( RequestTrace.newChild( trace, depRequest ) );
 
-            node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
+            final DependencyNode node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
 
             if ( logger.isDebugEnabled() )
             {
@@ -208,6 +304,7 @@ public class DefaultPluginDependenciesResolver
 
             depRequest.setRoot( node );
             repoSystem.resolveDependencies( session, depRequest );
+            return node;
         }
         catch ( DependencyCollectionException e )
         {
@@ -217,8 +314,6 @@ public class DefaultPluginDependenciesResolver
         {
             throw new PluginResolutionException( plugin, e.getCause() );
         }
-
-        return node;
     }
 
     class GraphLogger
