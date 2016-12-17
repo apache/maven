@@ -197,7 +197,17 @@ public class DefaultPluginDependenciesResolver
         class PluginDependencyManager implements DependencyManager
         {
 
-            private final List<Artifact> exlusions = new LinkedList<>();
+            private int depth;
+
+            private DependencyManager defaultManager = session.getDependencyManager();
+
+            private List<Artifact> exlusions = new LinkedList<>();
+
+            PluginDependencyManager()
+            {
+                super();
+                this.depth = 0;
+            }
 
             @Override
             public DependencyManagement manageDependency( final org.eclipse.aether.graph.Dependency dependency )
@@ -220,8 +230,8 @@ public class DefaultPluginDependenciesResolver
                     }
                 }
 
-                return !excluded && session.getDependencyManager() != null
-                           ? session.getDependencyManager().manageDependency( dependency )
+                return !excluded && this.depth >= 2 && this.defaultManager != null
+                           ? this.defaultManager.manageDependency( dependency )
                            : null;
 
             }
@@ -230,10 +240,12 @@ public class DefaultPluginDependenciesResolver
             public DependencyManager deriveChildManager( final DependencyCollectionContext context )
             {
                 assert context.getDependency() != null : "Unexpected POM resolution.";
-                return session.getDependencyManager() != null
-                           ? session.getDependencyManager().deriveChildManager( context )
-                           : null;
+                this.depth++;
+                this.defaultManager = this.defaultManager != null
+                                          ? this.defaultManager.deriveChildManager( context )
+                                          : null;
 
+                return this;
             }
 
             public List<Artifact> getExclusions()
@@ -253,10 +265,7 @@ public class DefaultPluginDependenciesResolver
         try
         {
             final DependencySelector pluginDependencySelector =
-                session.getDependencySelector() != null
-                    ? new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder(),
-                                                 session.getDependencySelector() )
-                    : new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder() );
+                new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder() );
 
             final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
