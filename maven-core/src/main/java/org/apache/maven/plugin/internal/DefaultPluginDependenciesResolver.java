@@ -57,6 +57,7 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
@@ -342,23 +343,46 @@ public class DefaultPluginDependenciesResolver
         }
     }
 
+    // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
     class GraphLogger
         implements DependencyVisitor
     {
 
         private String indent = "";
 
+        GraphLogger()
+        {
+            super();
+        }
+
         public boolean visitEnter( DependencyNode node )
         {
+            assert node.getDependency() != null : "Unexpected POM resolution result.";
+
             StringBuilder buffer = new StringBuilder( 128 );
             buffer.append( indent );
             org.eclipse.aether.graph.Dependency dep = node.getDependency();
-            if ( dep != null )
-            {
-                Artifact art = dep.getArtifact();
+            org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
-                buffer.append( art );
-                buffer.append( ':' ).append( dep.getScope() );
+            buffer.append( art );
+            buffer.append( ':' ).append( dep.getScope() );
+
+            String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
+            if ( premanagedScope != null && !premanagedScope.equals( dep.getScope() ) )
+            {
+                buffer.append( " (scope managed from " ).append( premanagedScope ).append( ')' );
+            }
+
+            String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+            if ( premanagedVersion != null && !premanagedVersion.equals( art.getVersion() ) )
+            {
+                buffer.append( " (version managed from " ).append( premanagedVersion ).append( ')' );
+            }
+
+            Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
+            if ( premanagedOptional != null && !premanagedOptional.equals( dep.getOptional() ) )
+            {
+                buffer.append( " (optionality managed from " ).append( premanagedOptional ).append( ')' );
             }
 
             logger.debug( buffer.toString() );
