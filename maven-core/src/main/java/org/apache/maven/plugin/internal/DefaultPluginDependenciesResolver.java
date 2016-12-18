@@ -61,6 +61,7 @@ import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
@@ -307,7 +308,15 @@ public class DefaultPluginDependenciesResolver
                     pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
                 }
                 request.addDependency( pluginDep );
-                pluginDependencyManager.getExclusions().add( pluginDep.getArtifact() );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( String.format( "Collecting plugin dependency %s from project.", pluginDep ) );
+                }
+
+                pluginDependencyManager.getExclusions().
+                    addAll( this.collectPluginDependencyArtifacts( session, repositories, pluginDep ) );
+
             }
 
             // [MNG-6135] Maven plugins and core extensions are not dependencies, they should be resolved the same way
@@ -341,6 +350,29 @@ public class DefaultPluginDependenciesResolver
         {
             throw new PluginResolutionException( plugin, e.getCause() );
         }
+    }
+
+    private List<org.eclipse.aether.artifact.Artifact> collectPluginDependencyArtifacts(
+        final RepositorySystemSession session, final List<RemoteRepository> repositories,
+        final org.eclipse.aether.graph.Dependency pluginDependency )
+        throws DependencyCollectionException
+    {
+        final CollectRequest request = new CollectRequest();
+        request.setRequestContext( REPOSITORY_CONTEXT );
+        request.setRepositories( repositories );
+        request.setRoot( pluginDependency );
+        request.setTrace( RequestTrace.newChild( null, pluginDependency ) );
+
+        final DependencyNode node = repoSystem.collectDependencies( session, request ).getRoot();
+
+        if ( logger.isDebugEnabled() )
+        {
+            node.accept( new GraphLogger() );
+        }
+
+        final PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        node.accept( nlg );
+        return nlg.getArtifacts( true );
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
