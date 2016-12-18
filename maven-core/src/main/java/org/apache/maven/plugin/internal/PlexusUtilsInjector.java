@@ -68,16 +68,13 @@ class PlexusUtilsInjector
 
         find:
         {
-            if ( node.getDependency() != null )
+            if ( AID.equals( node.getArtifact().getArtifactId() )
+                     && GID.equals( node.getArtifact().getGroupId() )
+                     && EXT.equals( node.getArtifact().getExtension() )
+                     && "".equals( node.getArtifact().getClassifier() ) )
             {
-                Artifact artifact = node.getDependency().getArtifact();
-
-                if ( AID.equals( artifact.getArtifactId() ) && GID.equals( artifact.getGroupId() )
-                         && EXT.equals( artifact.getExtension() ) && "".equals( artifact.getClassifier() ) )
-                {
-                    plexusUtils = node;
-                    break find;
-                }
+                plexusUtils = node;
+                break find;
             }
 
             for ( DependencyNode child : node.getChildren() )

@@ -58,12 +58,7 @@ class WagonExcluder
     {
         WagonExcluder child = this;
 
-        if ( context.getDependency() == null && this.coreArtifact )
-        {
-            child = new WagonExcluder( false );
-        }
-        if ( context.getDependency() != null && !this.coreArtifact
-                 && isLegacyCoreArtifact( context.getDependency().getArtifact() ) )
+        if ( isLegacyCoreArtifact( context.getArtifact() ) && !this.coreArtifact )
         {
             child = new WagonExcluder( true );
         }
