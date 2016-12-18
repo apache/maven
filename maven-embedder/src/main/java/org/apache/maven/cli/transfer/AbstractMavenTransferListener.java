@@ -23,6 +23,8 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -112,7 +114,7 @@ public abstract class AbstractMavenTransferListener
 
             public static ScaleUnit getScaleUnit( long size )
             {
-                Validate.isTrue( size >= 0, "File size cannot be negative: %s", size );
+                Validate.isTrue( size >= 0L, "File size cannot be negative: %s", size );
 
                 if ( size >= GIGABYTE.bytes() )
                 {
@@ -154,7 +156,7 @@ public abstract class AbstractMavenTransferListener
 
         public String format( long size, ScaleUnit unit, boolean omitSymbol )
         {
-            Validate.isTrue( size >= 0, "File size cannot be negative: %s", size );
+            Validate.isTrue( size >= 0L, "File size cannot be negative: %s", size );
 
             if ( unit == null )
             {
@@ -166,7 +168,7 @@ public abstract class AbstractMavenTransferListener
 
             if ( omitSymbol )
             {
-                scaledSymbol = "";
+                scaledSymbol = StringUtils.EMPTY;
             }
 
             if ( unit == ScaleUnit.BYTE )
@@ -190,7 +192,7 @@ public abstract class AbstractMavenTransferListener
             Validate.isTrue( size >= 0L && progressedSize <= size || size < 0L,
                 "Progressed file size cannot be bigger than size: %s > %s", progressedSize, size );
 
-            if ( size >= 0 && progressedSize != size )
+            if ( size >= 0L && progressedSize != size )
             {
                 ScaleUnit unit = ScaleUnit.getScaleUnit( size );
                 String formattedProgressedSize = format( progressedSize, unit, true );
