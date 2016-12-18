@@ -58,6 +58,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
@@ -280,7 +281,8 @@ public class DefaultPluginDependenciesResolver
         try
         {
             final DependencySelector pluginDependencySelector =
-                new AndDependencySelector( new PluginDependencySelector(), new WagonExcluder() );
+                new AndDependencySelector( new PluginDependencySelector(), new ExclusionDependencySelector(),
+                                           new WagonExcluder() );
 
             final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
