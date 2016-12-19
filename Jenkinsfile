@@ -19,6 +19,7 @@
 
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
 
+try {
 node('ubuntu') {
     stage 'Checkout'
     def MAVEN_BUILD=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
@@ -36,26 +37,25 @@ node('ubuntu') {
     }
 }
 
-stage 'Integration Test (smoke)'
-node('ubuntu') {
-    def MAVEN_NIX_J7=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-    def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-    dir('test') {
-        def WORK_DIR=pwd()
-        git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-        sh "rm -rvf $WORK_DIR/apache-maven-*-bin.zip $WORK_DIR/it-local-repo $WORK_DIR/it-local-maven $WORK_DIR/apache-maven-*"
-        unstash 'dist'
-        sh "unzip apache-maven-*-bin.zip -d $WORK_DIR"
-        sh "mv \$(find $WORK_DIR -type d -maxdepth 1 -name apache-maven-\\*) $WORK_DIR/it-local-maven"
-        withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
-            sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
-            junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+stage 'Integration Test'
+parallel linuxJava7:{
+        node('ubuntu') {
+            def MAVEN_NIX_J7=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
+            def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
+            dir('test') {
+                def WORK_DIR=pwd()
+                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
+                sh "rm -rvf $WORK_DIR/apache-maven-*-bin.zip $WORK_DIR/it-local-repo $WORK_DIR/it-local-maven $WORK_DIR/apache-maven-*"
+                unstash 'dist'
+                sh "unzip apache-maven-*-bin.zip -d $WORK_DIR"
+                sh "mv \$(find $WORK_DIR -type d -maxdepth 1 -name apache-maven-\\*) $WORK_DIR/it-local-maven"
+                withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
+                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                }
+            }
         }
-    }
-}
-
-stage 'Integration Test (full)' 
-parallel linuxJava8: {
+    },linuxJava8: {
         node('ubuntu') {
             def MAVEN_NIX_J8=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
             def JAVA_NIX_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
@@ -83,3 +83,6 @@ parallel linuxJava8: {
             def JAVA_WIN_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
         }
     }
+} finally {
+emailext body: '$DEFAULT_CONTENT', recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: '$DEFAULT_SUBJECT', to: 'notifications@maven.apache.org'
+}
