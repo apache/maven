@@ -73,14 +73,46 @@ parallel linuxJava7:{
             }
         }
     }, winJava7: {
-        node('windows') {
+        node('Windows') {
             def MAVEN_WIN_J7=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
             def JAVA_WIN_J7=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
+            dir('test') {
+                def WORK_DIR=pwd()
+                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
+                batch "rmdir /s /q it-local-repo"
+                batch "rmdir /s /q it-local-maven"
+                batch "rmdir /s /q apache-maven-*"
+                batch "del /q apache-maven-*-bin.zip"
+                unstash 'dist'
+                batch "$JAVA_WIN_J7/bin/jar xf apache-maven-*-bin.zip"
+                batch "del /q apache-maven-*-bin.zip"
+                batch "ren apache-maven-* it-local-maven"
+                withEnv(["PATH+MAVEN=$MAVEN_WIN_J7/bin","PATH+JDK=$JAVA_WIN_J7/bin"]) {
+                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                }
+            }
         }
     }, winJava8: {
-        node('windows') {
+        node('Windows') {
             def MAVEN_WIN_J8=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
             def JAVA_WIN_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
+            dir('test') {
+                def WORK_DIR=pwd()
+                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
+                batch "rmdir /s /q it-local-repo"
+                batch "rmdir /s /q it-local-maven"
+                batch "rmdir /s /q apache-maven-*"
+                batch "del /q apache-maven-*-bin.zip"
+                unstash 'dist'
+                batch "$JAVA_WIN_J8/bin/jar xf apache-maven-*-bin.zip"
+                batch "del /q apache-maven-*-bin.zip"
+                batch "ren apache-maven-* it-local-maven"
+                withEnv(["PATH+MAVEN=$MAVEN_WIN_J8/bin","PATH+JDK=$JAVA_WIN_J8/bin"]) {
+                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                }
+            }
         }
     }
 } finally {
