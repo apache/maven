@@ -55,6 +55,15 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
 public class RepositoryUtils
 {
 
+    /**
+     * Package private field set on every invocation of the
+     * {@link DefaultMaven#execute(org.apache.maven.execution.MavenExecutionRequest)}. A very good example for why
+     * {@code public static} helper/utility/whatever methods are crap.
+     *
+     * @since 3.4.0
+     */
+    static boolean legacyDependencyManagement = false;
+
     private static String nullify( String string )
     {
         return ( string == null || string.length() <= 0 ) ? null : string;
@@ -320,14 +329,14 @@ public class RepositoryUtils
             exclusions.add( toExclusion( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact,
-                                            dependency.getScope(),
-                                            dependency.getOptional() != null
-                                                ? dependency.isOptional()
-                                                : null,
-                                            exclusions );
+        return RepositoryUtils.legacyDependencyManagement
+                   ? new Dependency( artifact, dependency.getScope(), dependency.isOptional(), exclusions )
+                   : new Dependency( artifact, dependency.getScope(),
+                                     dependency.getOptional() != null
+                                         ? dependency.isOptional()
+                                         : null,
+                                     exclusions );
 
-        return result;
     }
 
     private static Exclusion toExclusion( org.apache.maven.model.Exclusion exclusion )

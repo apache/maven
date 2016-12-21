@@ -339,4 +339,14 @@ public interface ModelBuildingRequest
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
 
+    /**
+     * @since 3.4.0
+     */
+    boolean isLegacyDependencyManagementRequested();
+
+    /**
+     * @since 3.4.0
+     */
+    ModelBuildingRequest setLegacyDependencyManagementRequested( boolean value );
+
 }

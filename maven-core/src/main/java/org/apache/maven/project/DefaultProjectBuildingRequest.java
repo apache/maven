@@ -68,6 +68,8 @@ public class DefaultProjectBuildingRequest
 
     private RepositoryMerging repositoryMerging = RepositoryMerging.POM_DOMINANT;
 
+    private boolean legacyDependencyManagementRequested = false;
+
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
@@ -100,6 +102,7 @@ public class DefaultProjectBuildingRequest
         setSystemProperties( request.getSystemProperties() );
         setUserProperties( request.getUserProperties() );
         setValidationLevel( request.getValidationLevel() );
+        setLegacyDependencyManagementRequested( request.isLegacyDependencyManagementRequested() );
     }
 
     public MavenProject getProject()
@@ -342,6 +345,25 @@ public class DefaultProjectBuildingRequest
     public RepositoryMerging getRepositoryMerging()
     {
         return repositoryMerging;
+    }
+
+    /**
+     * @since 3.4.0
+     */
+    @Override
+    public boolean isLegacyDependencyManagementRequested()
+    {
+        return this.legacyDependencyManagementRequested;
+    }
+
+    /**
+     * @since 3.4.0
+     */
+    @Override
+    public ProjectBuildingRequest setLegacyDependencyManagementRequested( final boolean value )
+    {
+        this.legacyDependencyManagementRequested = value;
+        return this;
     }
 
 }

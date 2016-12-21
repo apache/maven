@@ -102,30 +102,35 @@ public class DefaultMaven
     {
         MavenExecutionResult result;
 
-        try
+        synchronized ( RepositoryUtils.class )
         {
-            result = doExecute( request );
-        }
-        catch ( OutOfMemoryError e )
-        {
-            result = addExceptionToResult( new DefaultMavenExecutionResult(), e );
-        }
-        catch ( RuntimeException e )
-        {
-            // TODO Hack to make the cycle detection the same for the new graph builder
-            if ( e.getCause() instanceof ProjectCycleException )
+            try
             {
-                result = addExceptionToResult( new DefaultMavenExecutionResult(), e.getCause() );
+                RepositoryUtils.legacyDependencyManagement = request.isLegacyDependencyManagementRequested();
+                result = doExecute( request );
             }
-            else
+            catch ( OutOfMemoryError e )
             {
-                result = addExceptionToResult( new DefaultMavenExecutionResult(),
-                                               new InternalErrorException( "Internal error: " + e, e ) );
+                result = addExceptionToResult( new DefaultMavenExecutionResult(), e );
             }
-        }
-        finally
-        {
-            legacySupport.setSession( null );
+            catch ( RuntimeException e )
+            {
+                // TODO Hack to make the cycle detection the same for the new graph builder
+                if ( e.getCause() instanceof ProjectCycleException )
+                {
+                    result = addExceptionToResult( new DefaultMavenExecutionResult(), e.getCause() );
+                }
+                else
+                {
+                    result = addExceptionToResult( new DefaultMavenExecutionResult(),
+                                                   new InternalErrorException( "Internal error: " + e, e ) );
+                }
+            }
+            finally
+            {
+                legacySupport.setSession( null );
+                RepositoryUtils.legacyDependencyManagement = false;
+            }
         }
 
         return result;

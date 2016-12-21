@@ -163,6 +163,8 @@ public class DefaultMavenExecutionRequest
 
     private boolean useLegacyLocalRepositoryManager = false;
 
+    private boolean legacyDependencyManagementRequested = false;
+
     private Map<String, Object> data;
 
     public DefaultMavenExecutionRequest()
@@ -210,6 +212,7 @@ public class DefaultMavenExecutionRequest
         copy.setExecutionListener( original.getExecutionListener() );
         copy.setUseLegacyLocalRepository( original.isUseLegacyLocalRepository() );
         copy.setBuilderId( original.getBuilderId() );
+        copy.setLegacyDependencyManagementRequested( original.isLegacyDependencyManagementRequested() );
         return copy;
     }
 
@@ -1105,6 +1108,9 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setProfiles( getProfiles() );
             projectBuildingRequest.setProcessPlugins( true );
             projectBuildingRequest.setBuildStartTime( getStartTime() );
+            projectBuildingRequest.
+                setLegacyDependencyManagementRequested( this.isLegacyDependencyManagementRequested() );
+
         }
 
         return projectBuildingRequest;
@@ -1285,4 +1291,24 @@ public class DefaultMavenExecutionRequest
 
         return data;
     }
+
+    /**
+     * @since 3.4.0
+     */
+    @Override
+    public boolean isLegacyDependencyManagementRequested()
+    {
+        return this.legacyDependencyManagementRequested;
+    }
+
+    /**
+     * @since 3.4.0
+     */
+    @Override
+    public MavenExecutionRequest setLegacyDependencyManagementRequested( final boolean value )
+    {
+        this.legacyDependencyManagementRequested = value;
+        return this;
+    }
+
 }

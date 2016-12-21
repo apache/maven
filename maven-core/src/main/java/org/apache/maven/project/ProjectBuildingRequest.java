@@ -185,6 +185,16 @@ public interface ProjectBuildingRequest
     ProjectBuildingRequest setResolveVersionRanges( boolean value );
 
     /**
+     * @since 3.4.0
+     */
+    boolean isLegacyDependencyManagementRequested();
+
+    /**
+     * @since 3.4.0
+     */
+    ProjectBuildingRequest setLegacyDependencyManagementRequested( boolean value );
+
+    /**
      * The possible merge modes for combining remote repositories.
      */
     enum RepositoryMerging

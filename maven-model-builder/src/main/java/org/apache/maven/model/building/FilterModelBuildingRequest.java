@@ -282,4 +282,17 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
+    public boolean isLegacyDependencyManagementRequested()
+    {
+        return request.isLegacyDependencyManagementRequested();
+    }
+
+    @Override
+    public ModelBuildingRequest setLegacyDependencyManagementRequested( final boolean value )
+    {
+        this.request.setLegacyDependencyManagementRequested( value );
+        return this;
+    }
+
 }
