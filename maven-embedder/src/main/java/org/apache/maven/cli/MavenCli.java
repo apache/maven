@@ -301,11 +301,11 @@ public class MavenCli
         try
         {
             initialize( cliRequest );
-            legacy( cliRequest );
             cli( cliRequest );
             logging( cliRequest );
             version( cliRequest );
             properties( cliRequest );
+            legacy( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
             configure( cliRequest );
