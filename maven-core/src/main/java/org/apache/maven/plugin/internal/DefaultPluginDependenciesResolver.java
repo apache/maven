@@ -59,8 +59,8 @@ import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
-import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.visitor.FilteringDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
@@ -163,47 +163,9 @@ public class DefaultPluginDependenciesResolver
                                             final RepositorySystemSession session )
         throws PluginResolutionException
     {
-        // This selector is a combination of the ScopeDependencySelector and the OptionalDependencySelector
-        // simulating the POM resolution case for the dependency resolution case we are going to perform below.
-        class PluginDependencySelector implements DependencySelector
-        {
-
-            private final int depth;
-
-            PluginDependencySelector()
-            {
-                this( 0 );
-            }
-
-            private PluginDependencySelector( final int depth )
-            {
-                super();
-                this.depth = depth;
-            }
-
-            @Override
-            public boolean selectDependency( final org.eclipse.aether.graph.Dependency dependency )
-            {
-                return this.depth < 2 || !( dependency.isOptional()
-                                            || "test".equalsIgnoreCase( dependency.getScope() )
-                                            || "provided".equalsIgnoreCase( dependency.getScope() ) );
-
-            }
-
-            @Override
-            public DependencySelector deriveChildSelector( final DependencyCollectionContext context )
-            {
-                assert context.getDependency() != null : "Unexpected POM resolution.";
-                return this.depth >= 2
-                           ? this
-                           : new PluginDependencySelector( this.depth + 1 );
-
-            }
-
-        }
-
         // This dependency manager delegates to the session's dependency manager but supports excluding plugin
-        // dependency overrides from the plugins/plugin/dependencies POM element.
+        // dependency overrides from the plugins/plugin/dependencies POM element so that what is declared there will
+        // not get changed due to any management performed.
         class PluginDependencyManager implements DependencyManager
         {
 
@@ -257,7 +219,6 @@ public class DefaultPluginDependenciesResolver
             @Override
             public DependencyManager deriveChildManager( final DependencyCollectionContext context )
             {
-                assert context.getDependency() != null : "Unexpected POM resolution.";
                 return new PluginDependencyManager( this.depth + 1,
                                                     this.defaultManager != null
                                                         ? this.defaultManager.deriveChildManager( context )
@@ -283,8 +244,7 @@ public class DefaultPluginDependenciesResolver
         try
         {
             final DependencySelector pluginDependencySelector =
-                new AndDependencySelector( new PluginDependencySelector(), new ExclusionDependencySelector(),
-                                           new WagonExcluder() );
+                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
 
             final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
@@ -319,11 +279,6 @@ public class DefaultPluginDependenciesResolver
 
             }
 
-            // [MNG-6135] Maven plugins and core extensions are not dependencies, they should be resolved the same way
-            //            as projects.
-            // We would need to perform 'request.setRootArtifact' here to request POM resolution. This would not resolve
-            // the plugin JAR file later. So we perform dependency resolution and provide our own 'DependencySelector'
-            // and 'DependencyManager' (see above) simulating the POM resolution case.
             request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
 
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
@@ -370,9 +325,10 @@ public class DefaultPluginDependenciesResolver
             node.accept( new GraphLogger() );
         }
 
-        final PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        node.accept( nlg );
-        return nlg.getArtifacts( true );
+        final PreorderNodeListGenerator nodeListGenerator = new PreorderNodeListGenerator();
+        final DependencyFilter scopeDependencyFilter = new ScopeDependencyFilter( "provided", "test" );
+        node.accept( new FilteringDependencyVisitor( nodeListGenerator, scopeDependencyFilter ) );
+        return nodeListGenerator.getArtifacts( true );
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
