@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -724,7 +723,7 @@ public class DefaultProjectBuilder
         project.setProjectBuildingRequest( projectBuildingRequest );
 
         // pluginArtifacts
-        Set<Artifact> pluginArtifacts = new HashSet<>();
+        Set<Artifact> pluginArtifacts = new LinkedHashSet<>();
         for ( Plugin plugin : project.getBuildPlugins() )
         {
             Artifact artifact = repositorySystem.createPluginArtifact( plugin );
@@ -737,7 +736,7 @@ public class DefaultProjectBuilder
         project.setPluginArtifacts( pluginArtifacts );
 
         // reportArtifacts
-        Set<Artifact> reportArtifacts = new HashSet<>();
+        Set<Artifact> reportArtifacts = new LinkedHashSet<>();
         for ( ReportPlugin report : project.getReportPlugins() )
         {
             Plugin pp = new Plugin();
@@ -755,7 +754,7 @@ public class DefaultProjectBuilder
         project.setReportArtifacts( reportArtifacts );
 
         // extensionArtifacts
-        Set<Artifact> extensionArtifacts = new HashSet<>();
+        Set<Artifact> extensionArtifacts = new LinkedHashSet<>();
         List<Extension> extensions = project.getBuildExtensions();
         if ( extensions != null )
         {
