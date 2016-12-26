@@ -55,8 +55,9 @@
           <area shape="rect" coords="449,229,532,266" alt="maven-settings" href="maven-settings/" />
           <area shape="rect" coords="388,284,521,319" alt="maven-model-builder" href="maven-model-builder/" />
           <area shape="rect" coords="409,342,500,378" alt="maven-model" href="maven-model/" />
-          <area shape="rect" coords="TODO"            alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
-          <area shape="rect" coords="88,59,192,94"    alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
+          <area shape="rect" coords="42,0,198,35"     alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
+          <area shape="rect" coords="68,338,240,482"  alt="maven-resolver" href="https://maven.apache.org/resolver/" />
+          <area shape="rect" coords="70,57,171,93"    alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
           <area shape="rect" coords="551,58,707,94"   alt="commons-cli" href="http://commons.apache.org/cli/" />
           <area shape="rect" coords="88,175,205,211"  alt="maven-shared-utils" href="https://maven.apache.org/shared/maven-shared-utils/" />
           <area shape="rect" coords="0,176,70,211"    alt="jansi" href="http://fusesource.github.io/jansi/" />
@@ -69,14 +70,12 @@
           <area shape="rect" coords="550,401,682,437" alt="plexus-classworlds" href="https://codehaus-plexus.github.io/plexus-classworlds" />
           <area shape="rect" coords="685,455,775,491" alt="plexus-utils" href="https://codehaus-plexus.github.io/plexus-utils" />
           <area shape="rect" coords="542,167,783,502" alt="plexus" href="https://codehaus-plexus.github.io/" />
-          <area shape="rect" coords="68,338,240,482"  alt="resolver" href="http://maven.apache.org/resolver/" />
           <area shape="rect" coords="401,393,509,524" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
           <area shape="rect" coords="416,543,493,577" alt="guice" href="http://code.google.com/p/google-guice/" />
           <area shape="rect" coords="550,543,673,577" alt="javax.inject" href="http://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html" />
         </map>
       </p>
     </section>
-
 
   </body>
 
