@@ -23,9 +23,9 @@
  2012-09-29
  -----
 
-Maven Aether Provider
+Maven Artifact Resolver Provider
 
- Maven Aether Provider is an {{{http://www.eclipse.org/aether/}Aether}} extension to support
+ Maven Artifact Resolver Provider is a {{{/resolver/}Maven Artifact Resolver}} extension to support
  Maven POMs and local+remote repositories.
 
  Main component is <<<MavenRepositorySystemUtils>>>
