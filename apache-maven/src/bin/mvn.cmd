@@ -83,11 +83,11 @@ set MAVEN_CMD_LINE_ARGS=%*
 @REM Find the project basedir, i.e., the directory that contains the folder ".mvn".
 @REM Fallback to current working directory if not found.
 
-set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
+set "MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%"
 if not "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
 
-set EXEC_DIR=%CD%
-set WDIR=%EXEC_DIR%
+set "EXEC_DIR=%CD%"
+set "WDIR=%EXEC_DIR%"
 
 @REM Look for the --file switch and start the search for the .mvn directory from the specified
 @REM POM location, if supplied.
@@ -125,7 +125,7 @@ if not exist "%POM_DIR%" (
   echo Directory %POM_DIR% extracted from the -f/--file command-line argument %FILE_ARG% does not exist >&2
   goto error
 )
-set WDIR=%POM_DIR%
+set "WDIR=%POM_DIR%"
 goto findBaseDir
 
 :get_directory_from_file
@@ -138,7 +138,7 @@ goto stripPomDir
 exit /b
 
 :findBaseDir
-cd /d %WDIR%
+cd /d "%WDIR%"
 :findBaseDirLoop
 if exist "%WDIR%\.mvn" goto baseDirFound
 cd ..
@@ -152,7 +152,7 @@ cd /d "%EXEC_DIR%"
 goto endDetectBaseDir
 
 :baseDirNotFound
-if "_%EXEC_DIR:~-1%"=="_\" set EXEC_DIR=%EXEC_DIR:~0,-1%
+if "_%EXEC_DIR:~-1%"=="_\" set "EXEC_DIR=%EXEC_DIR:~0,-1%"
 set "MAVEN_PROJECTBASEDIR=%EXEC_DIR%"
 cd "%EXEC_DIR%"
 
