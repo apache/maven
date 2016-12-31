@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -57,8 +58,11 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.visitor.FilteringDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
@@ -79,6 +83,10 @@ public class DefaultPluginDependenciesResolver
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
+    private static final String DEFAULT_PREREQUISITES = "2.0";
+
+    private static final ComparableVersion DEFAULT_RESULTION_PREREQUISITES = new ComparableVersion( "3.4" );
+
     @Requirement
     private Logger logger;
 
@@ -91,50 +99,21 @@ public class DefaultPluginDependenciesResolver
                                     session.getArtifactTypeRegistry().get( "maven-plugin" ) );
     }
 
+    @Override
     public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = RequestTrace.newChild( null, plugin );
-
-        Artifact pluginArtifact = toArtifact( plugin, session );
-
         try
         {
-            DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
-            pluginSession.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, false ) );
-
-            ArtifactDescriptorRequest request =
-                new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
-            request.setTrace( trace );
-            ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor( pluginSession, request );
-
-            pluginArtifact = result.getArtifact();
-
-            String requiredMavenVersion = (String) result.getProperties().get( "prerequisites.maven" );
-            if ( requiredMavenVersion != null )
-            {
-                Map<String, String> props = new LinkedHashMap<>( pluginArtifact.getProperties() );
-                props.put( "requiredMavenVersion", requiredMavenVersion );
-                pluginArtifact = pluginArtifact.setProperties( props );
-            }
+            final Artifact pluginArtifact = this.createPluginArtifact( plugin, session, repositories );
+            final ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+            request.setTrace( RequestTrace.newChild( null, plugin ) );
+            return this.repoSystem.resolveArtifact( session, request ).getArtifact();
         }
-        catch ( ArtifactDescriptorException e )
+        catch ( ArtifactDescriptorException | ArtifactResolutionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
-
-        try
-        {
-            ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
-            request.setTrace( trace );
-            pluginArtifact = repoSystem.resolveArtifact( session, request ).getArtifact();
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
-        }
-
-        return pluginArtifact;
     }
 
     /**
@@ -234,17 +213,114 @@ public class DefaultPluginDependenciesResolver
 
         }
 
+        // This dependency selector matches the resolver's implementation before MRESOLVER-8 got fixed. It is
+        // used for plugin's with prerequisites < 3.4 to mimic incorrect but backwards compatible behaviour.
+        class ClassicScopeDependencySelector implements DependencySelector
+        {
+
+            private final boolean transitive;
+
+            ClassicScopeDependencySelector()
+            {
+                this( false );
+            }
+
+            private ClassicScopeDependencySelector( final boolean transitive )
+            {
+                super();
+                this.transitive = transitive;
+            }
+
+            @Override
+            public boolean selectDependency( final org.eclipse.aether.graph.Dependency dependency )
+            {
+                return !this.transitive
+                           || !( "test".equals( dependency.getScope() )
+                                 || "provided".equals( dependency.getScope() ) );
+
+            }
+
+            @Override
+            public DependencySelector deriveChildSelector( final DependencyCollectionContext context )
+            {
+                ClassicScopeDependencySelector child = this;
+
+                if ( context.getDependency() != null && !child.transitive )
+                {
+                    child = new ClassicScopeDependencySelector( true );
+                }
+                if ( context.getDependency() == null && child.transitive )
+                {
+                    child = new ClassicScopeDependencySelector( false );
+                }
+
+                return child;
+            }
+
+            @Override
+            public boolean equals( Object obj )
+            {
+                boolean equal = obj instanceof ClassicScopeDependencySelector;
+
+                if ( equal )
+                {
+                    final ClassicScopeDependencySelector that = (ClassicScopeDependencySelector) obj;
+                    equal = this.transitive == that.transitive;
+                }
+
+                return equal;
+            }
+
+            @Override
+            public int hashCode()
+            {
+                int hash = 17;
+                hash = hash * 31 + ( ( (Boolean) this.transitive ).hashCode() );
+                return hash;
+            }
+
+        }
+
         final RequestTrace trace = RequestTrace.newChild( null, plugin );
         final DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
         final DependencyFilter resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, dependencyFilter );
-        final Artifact pluginArtifact = artifact != null
-                                            ? artifact
-                                            : toArtifact( plugin, session );
 
         try
         {
+            final Artifact pluginArtifact = artifact != null
+                                                ? this.createPluginArtifact( artifact, session, repositories )
+                                                : this.createPluginArtifact( plugin, session, repositories );
+
+            final ComparableVersion prerequisites =
+                new ComparableVersion( pluginArtifact.getProperty( "requiredMavenVersion", DEFAULT_PREREQUISITES ) );
+
+            final boolean classicResolution = prerequisites.compareTo( DEFAULT_RESULTION_PREREQUISITES ) < 0;
+
+            if ( this.logger.isDebugEnabled() )
+            {
+                if ( classicResolution )
+                {
+                    this.logger.debug( String.format(
+                        "Constructing classic plugin classpath '%s' for prerequisites '%s'.",
+                        pluginArtifact, prerequisites ) );
+
+                }
+                else
+                {
+                    this.logger.debug( String.format(
+                        "Constructing default plugin classpath '%s' for prerequisites '%s'.",
+                        pluginArtifact, prerequisites ) );
+
+                }
+            }
+
             final DependencySelector pluginDependencySelector =
-                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
+                classicResolution
+                    ? new AndDependencySelector( new ClassicScopeDependencySelector(), // incorrect - see MRESOLVER-8
+                                                 new OptionalDependencySelector(),
+                                                 new ExclusionDependencySelector(),
+                                                 new WagonExcluder() )
+                    : AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
 
             final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
@@ -253,7 +329,9 @@ public class DefaultPluginDependenciesResolver
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
             pluginSession.setDependencySelector( pluginDependencySelector );
             pluginSession.setDependencyGraphTransformer( pluginDependencyGraphTransformer );
-            pluginSession.setDependencyManager( pluginDependencyManager );
+            pluginSession.setDependencyManager( classicResolution
+                                                    ? new ClassicDependencyManager()
+                                                    : pluginDependencyManager );
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );
@@ -269,14 +347,17 @@ public class DefaultPluginDependenciesResolver
                 }
                 request.addDependency( pluginDep );
 
-                if ( logger.isDebugEnabled() )
+                if ( !classicResolution )
                 {
-                    logger.debug( String.format( "Collecting plugin dependency %s from project.", pluginDep ) );
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( String.format( "Collecting plugin dependency %s from project.", pluginDep ) );
+                    }
+
+                    pluginDependencyManager.getExclusions().
+                        addAll( this.collectPluginDependencyArtifacts( session, repositories, pluginDep ) );
+
                 }
-
-                pluginDependencyManager.getExclusions().
-                    addAll( this.collectPluginDependencyArtifacts( session, repositories, pluginDep ) );
-
             }
 
             request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
@@ -297,7 +378,7 @@ public class DefaultPluginDependenciesResolver
             repoSystem.resolveDependencies( session, depRequest );
             return node;
         }
-        catch ( DependencyCollectionException e )
+        catch ( ArtifactDescriptorException | DependencyCollectionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
@@ -305,6 +386,44 @@ public class DefaultPluginDependenciesResolver
         {
             throw new PluginResolutionException( plugin, e.getCause() );
         }
+    }
+
+    private Artifact createPluginArtifact( final Plugin plugin,
+                                           final RepositorySystemSession session,
+                                           final List<RemoteRepository> repositories )
+        throws ArtifactDescriptorException
+    {
+        return this.createPluginArtifact( toArtifact( plugin, session ), session, repositories );
+    }
+
+    private Artifact createPluginArtifact( final Artifact artifact,
+                                           final RepositorySystemSession session,
+                                           final List<RemoteRepository> repositories )
+        throws ArtifactDescriptorException
+    {
+        Artifact pluginArtifact = artifact;
+        final DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
+        pluginSession.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, false ) );
+
+        final ArtifactDescriptorRequest request =
+            new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+
+        request.setTrace( RequestTrace.newChild( null, artifact ) );
+
+        final ArtifactDescriptorResult result = this.repoSystem.readArtifactDescriptor( pluginSession, request );
+
+        pluginArtifact = result.getArtifact();
+
+        final String requiredMavenVersion = (String) result.getProperties().get( "prerequisites.maven" );
+
+        if ( requiredMavenVersion != null )
+        {
+            final Map<String, String> props = new LinkedHashMap<>( pluginArtifact.getProperties() );
+            props.put( "requiredMavenVersion", requiredMavenVersion );
+            pluginArtifact = pluginArtifact.setProperties( props );
+        }
+
+        return pluginArtifact;
     }
 
     private List<org.eclipse.aether.artifact.Artifact> collectPluginDependencyArtifacts(
