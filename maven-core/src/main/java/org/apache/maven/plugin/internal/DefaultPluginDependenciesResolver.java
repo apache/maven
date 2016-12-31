@@ -150,21 +150,21 @@ public class DefaultPluginDependenciesResolver
 
             private final int depth;
 
-            private final DependencyManager defaultManager;
+            private final DependencyManager delegate;
 
             private final List<Artifact> exclusions;
 
-            PluginDependencyManager()
+            PluginDependencyManager( final DependencyManager delegate )
             {
-                this( 0, session.getDependencyManager(), new LinkedList<Artifact>() );
+                this( 0, delegate, new LinkedList<Artifact>() );
             }
 
-            private PluginDependencyManager( final int depth, final DependencyManager defaultManager,
+            private PluginDependencyManager( final int depth, final DependencyManager delegate,
                                              final List<Artifact> exclusions )
             {
                 super();
                 this.depth = depth;
-                this.defaultManager = defaultManager;
+                this.delegate = delegate;
                 this.exclusions = exclusions;
             }
 
@@ -189,8 +189,8 @@ public class DefaultPluginDependenciesResolver
                     }
                 }
 
-                return !excluded && this.depth >= 2 && this.defaultManager != null
-                           ? this.defaultManager.manageDependency( dependency )
+                return !excluded && this.depth >= 2 && this.delegate != null
+                           ? this.delegate.manageDependency( dependency )
                            : null;
 
             }
@@ -199,8 +199,8 @@ public class DefaultPluginDependenciesResolver
             public DependencyManager deriveChildManager( final DependencyCollectionContext context )
             {
                 return new PluginDependencyManager( this.depth + 1,
-                                                    this.defaultManager != null
-                                                        ? this.defaultManager.deriveChildManager( context )
+                                                    this.delegate != null
+                                                        ? this.delegate.deriveChildManager( context )
                                                         : null,
                                                     this.exclusions );
 
@@ -325,13 +325,15 @@ public class DefaultPluginDependenciesResolver
             final DependencyGraphTransformer pluginDependencyGraphTransformer =
                 ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
 
-            final PluginDependencyManager pluginDependencyManager = new PluginDependencyManager();
+            final PluginDependencyManager pluginDependencyManager =
+                    new PluginDependencyManager( classicResolution
+                            ? new ClassicDependencyManager()
+                            : session.getDependencyManager() );
+
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
             pluginSession.setDependencySelector( pluginDependencySelector );
             pluginSession.setDependencyGraphTransformer( pluginDependencyGraphTransformer );
-            pluginSession.setDependencyManager( classicResolution
-                                                    ? new ClassicDependencyManager()
-                                                    : pluginDependencyManager );
+            pluginSession.setDependencyManager( pluginDependencyManager );
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );
@@ -340,24 +342,20 @@ public class DefaultPluginDependenciesResolver
             for ( Dependency dependency : plugin.getDependencies() )
             {
                 org.eclipse.aether.graph.Dependency pluginDep =
-                    RepositoryUtils.toDependency( dependency, session.getArtifactTypeRegistry() );
+                        RepositoryUtils.toDependency( dependency, session.getArtifactTypeRegistry() );
                 if ( !JavaScopes.SYSTEM.equals( pluginDep.getScope() ) )
                 {
                     pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
                 }
                 request.addDependency( pluginDep );
 
-                if ( !classicResolution )
+                if ( logger.isDebugEnabled() )
                 {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( String.format( "Collecting plugin dependency %s from project.", pluginDep ) );
-                    }
-
-                    pluginDependencyManager.getExclusions().
-                        addAll( this.collectPluginDependencyArtifacts( session, repositories, pluginDep ) );
-
+                    logger.debug( String.format( "Collecting plugin dependency %s from project.", pluginDep ) );
                 }
+
+                pluginDependencyManager.getExclusions().
+                        addAll( this.collectPluginDependencyArtifacts( session, repositories, pluginDep ) );
             }
 
             request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
