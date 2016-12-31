@@ -73,8 +73,6 @@ public class DefaultModelBuildingRequest
 
     private WorkspaceModelResolver workspaceResolver;
 
-    private boolean legacyDependencyManagementRequested = false;
-
     /**
      * Creates an empty request.
      */
@@ -407,25 +405,6 @@ public class DefaultModelBuildingRequest
     public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
     {
         this.workspaceResolver = workspaceResolver;
-        return this;
-    }
-
-    /**
-     * @since 3.4.0
-     */
-    @Override
-    public boolean isLegacyDependencyManagementRequested()
-    {
-        return this.legacyDependencyManagementRequested;
-    }
-
-    /**
-     * @since 3.4.0
-     */
-    @Override
-    public ModelBuildingRequest setLegacyDependencyManagementRequested( final boolean value )
-    {
-        this.legacyDependencyManagementRequested = value;
         return this;
     }
 

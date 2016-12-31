@@ -62,7 +62,7 @@ public class ArtifactDescriptorReaderDelegate
 
         for ( org.apache.maven.model.Dependency dependency : model.getDependencies() )
         {
-            result.addDependency( convert( session, dependency, stereotypes ) );
+            result.addDependency( convert( dependency, stereotypes ) );
         }
 
         DependencyManagement mngt = model.getDependencyManagement();
@@ -70,7 +70,7 @@ public class ArtifactDescriptorReaderDelegate
         {
             for ( org.apache.maven.model.Dependency dependency : mngt.getDependencies() )
             {
-                result.addManagedDependency( convert( session, dependency, stereotypes ) );
+                result.addManagedDependency( convert( dependency, stereotypes ) );
             }
         }
 
@@ -98,8 +98,7 @@ public class ArtifactDescriptorReaderDelegate
         setArtifactProperties( result, model );
     }
 
-    private Dependency convert( RepositorySystemSession session, org.apache.maven.model.Dependency dependency,
-                                ArtifactTypeRegistry stereotypes )
+    private Dependency convert( org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes )
     {
         ArtifactType stereotype = stereotypes.get( dependency.getType() );
         if ( stereotype == null )
@@ -125,13 +124,11 @@ public class ArtifactDescriptorReaderDelegate
             exclusions.add( convert( exclusion ) );
         }
 
-        final Dependency result =
-            session.getData().get( "maven.legacyDependencyManagement" ) != null
-                ? new Dependency( artifact, dependency.getScope(), dependency.isOptional(), exclusions )
-                : new Dependency( artifact, dependency.getScope(), dependency.getOptional() != null
-                                                                       ? dependency.isOptional()
-                                                                       : null,
-                                  exclusions );
+        Dependency result = new Dependency( artifact, dependency.getScope(),
+                                            dependency.getOptional() != null
+                                                ? dependency.isOptional()
+                                                : null,
+                                            exclusions );
 
         return result;
     }

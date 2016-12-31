@@ -305,13 +305,13 @@ public class MavenCli
             logging( cliRequest );
             version( cliRequest );
             properties( cliRequest );
-            legacy( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
             configure( cliRequest );
             toolchains( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
+            repository( cliRequest );
             profiles( cliRequest );
             return execute( cliRequest );
         }
@@ -908,18 +908,13 @@ public class MavenCli
         }
     }
 
-    private void legacy( CliRequest cliRequest )
+    private void repository( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY )
                  || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
         {
             cliRequest.request.setUseLegacyLocalRepository( true );
-        }
-        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_DEPENDENCY_MANAGEMENT )
-                 || Boolean.getBoolean( "maven.legacyDependencyManagement" ) )
-        {
-            cliRequest.request.setLegacyDependencyManagementRequested( true );
         }
     }
 

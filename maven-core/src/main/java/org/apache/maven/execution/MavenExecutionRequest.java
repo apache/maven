@@ -442,15 +442,4 @@ public interface MavenExecutionRequest
      * @since 3.3.0
      */
     Map<String, Object> getData();
-
-    /**
-     * @since 3.4.0
-     */
-    boolean isLegacyDependencyManagementRequested();
-
-    /**
-     * @since 3.4.0
-     */
-    MavenExecutionRequest setLegacyDependencyManagementRequested( boolean value );
-
 }

@@ -271,7 +271,6 @@ public class DefaultProjectBuilder
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
         request.setModelCache( config.modelCache );
-        request.setLegacyDependencyManagementRequested( config.request.isLegacyDependencyManagementRequested() );
 
         return request;
     }

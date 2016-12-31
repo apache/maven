@@ -43,28 +43,17 @@ public class DefaultDependencyManagementInjector
     implements DependencyManagementInjector
 {
 
+    private ManagementModelMerger merger = new ManagementModelMerger();
+
     @Override
     public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        new ManagementModelMerger( request.isLegacyDependencyManagementRequested() ).mergeManagedDependencies( model );
+        merger.mergeManagedDependencies( model );
     }
 
     protected static class ManagementModelMerger
         extends MavenModelMerger
     {
-
-        private final boolean legacyDependencyManagementRequested;
-
-        ManagementModelMerger()
-        {
-            this( true );
-        }
-
-        ManagementModelMerger( final boolean legacyDependencyManagementRequested )
-        {
-            super();
-            this.legacyDependencyManagementRequested = legacyDependencyManagementRequested;
-        }
 
         public void mergeManagedDependencies( Model model )
         {
@@ -89,16 +78,6 @@ public class DefaultDependencyManagementInjector
                         mergeDependency( dependency, managedDependency, false, context );
                     }
                 }
-            }
-        }
-
-        @Override
-        protected void mergeDependency_Optional( Dependency target, Dependency source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
-        {
-            if ( !this.legacyDependencyManagementRequested )
-            {
-                super.mergeDependency_Optional( target, source, sourceDominant, context );
             }
         }
 

@@ -58,7 +58,6 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 
 /**
  * @since 3.3.0
@@ -238,12 +237,6 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
-
-        if ( request.isLegacyDependencyManagementRequested() )
-        {
-            session.setDependencyManager( new ClassicDependencyManager() );
-            session.getData().set( "maven.legacyDependencyManagement", Boolean.TRUE );
-        }
 
         return session;
     }
