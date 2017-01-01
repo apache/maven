@@ -103,5 +103,7 @@ parallel linuxJava7:{
         }
     }
 } finally {
-emailext body: '$DEFAULT_CONTENT', recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: '$DEFAULT_SUBJECT', to: 'notifications@maven.apache.org'
+    node('ubuntu') {
+        emailext body: '$DEFAULT_CONTENT', recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: '$DEFAULT_SUBJECT', to: 'notifications@maven.apache.org'
+    }
 }
