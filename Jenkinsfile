@@ -32,7 +32,8 @@ node('ubuntu') {
             sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository -DskipTests"
         }
         dir ('apache-maven/target') {
-            stash includes: 'apache-maven-*-bin.zip', name: 'dist'
+            sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
+            stash includes: 'apache-maven-dist.zip', name: 'dist'
         }
     }
 }
@@ -45,12 +46,10 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                sh "rm -rvf $WORK_DIR/apache-maven-*-bin.zip $WORK_DIR/it-local-repo $WORK_DIR/it-local-maven $WORK_DIR/apache-maven-*"
+                sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
-                sh "unzip apache-maven-*-bin.zip -d $WORK_DIR"
-                sh "mv \$(find $WORK_DIR -type d -maxdepth 1 -name apache-maven-\\*) $WORK_DIR/it-local-maven"
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
-                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
             }
@@ -62,12 +61,10 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                sh "rm -rvf $WORK_DIR/apache-maven-*-bin.zip $WORK_DIR/it-local-repo $WORK_DIR/it-local-maven $WORK_DIR/apache-maven-*"
+                sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
-                sh "unzip apache-maven-*-bin.zip -d $WORK_DIR"
-                sh "mv \$(find $WORK_DIR -type d -maxdepth 1 -name apache-maven-\\*) $WORK_DIR/it-local-maven"
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J8/bin","PATH+JDK=$JAVA_NIX_J8/bin"]) {
-                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
             }
@@ -80,15 +77,10 @@ parallel linuxJava7:{
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
                 batch "rmdir /s /q it-local-repo"
-                batch "rmdir /s /q it-local-maven"
-                batch "rmdir /s /q apache-maven-*"
-                batch "del /q apache-maven-*-bin.zip"
+                batch "del /q apache-maven-dist.zip"
                 unstash 'dist'
-                batch "$JAVA_WIN_J7/bin/jar xf apache-maven-*-bin.zip"
-                batch "del /q apache-maven-*-bin.zip"
-                batch "ren apache-maven-* it-local-maven"
                 withEnv(["PATH+MAVEN=$MAVEN_WIN_J7/bin","PATH+JDK=$JAVA_WIN_J7/bin"]) {
-                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
             }
@@ -101,15 +93,10 @@ parallel linuxJava7:{
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
                 batch "rmdir /s /q it-local-repo"
-                batch "rmdir /s /q it-local-maven"
-                batch "rmdir /s /q apache-maven-*"
-                batch "del /q apache-maven-*-bin.zip"
+                batch "del /q apache-maven-dist.zip"
                 unstash 'dist'
-                batch "$JAVA_WIN_J8/bin/jar xf apache-maven-*-bin.zip"
-                batch "del /q apache-maven-*-bin.zip"
-                batch "ren apache-maven-* it-local-maven"
                 withEnv(["PATH+MAVEN=$MAVEN_WIN_J8/bin","PATH+JDK=$JAVA_WIN_J8/bin"]) {
-                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -Dmaven.home=$WORK_DIR/it-local-maven"
+                    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
             }
