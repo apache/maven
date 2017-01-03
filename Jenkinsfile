@@ -55,7 +55,7 @@ parallel linuxJava7:{
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
                     sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
-                junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml core-it-suite/target/*-reports/*.xml'
             }
         }
     },linuxJava8: {
@@ -72,7 +72,7 @@ parallel linuxJava7:{
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J8/bin","PATH+JDK=$JAVA_NIX_J8/bin"]) {
                     sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
-                junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml core-it-suite/target/*-reports/*.xml'
             }
         }
     }, winJava7: {
@@ -97,7 +97,7 @@ parallel linuxJava7:{
                     unstash 'dist'
                     bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
-                junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml core-it-suite/target/*-reports/*.xml'
             }
         }
     }, winJava8: {
@@ -122,7 +122,7 @@ parallel linuxJava7:{
                     unstash 'dist'
                     bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
-                junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml core-it-suite/target/*-reports/*.xml'
             }
         }
     }
