@@ -53,7 +53,7 @@ parallel linuxJava7:{
                 sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
-                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
             }
@@ -70,7 +70,7 @@ parallel linuxJava7:{
                 sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J8/bin","PATH+JDK=$JAVA_NIX_J8/bin"]) {
-                    sh "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
             }
@@ -95,7 +95,7 @@ parallel linuxJava7:{
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin","JAVA_HOME=$JAVA_WIN_J7"]) {
                     bat "set"
                     unstash 'dist'
-                    bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
             }
@@ -120,7 +120,7 @@ parallel linuxJava7:{
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin","JAVA_HOME=$JAVA_WIN_J8"]) {
                     bat "set"
                     unstash 'dist'
-                    bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
             }
