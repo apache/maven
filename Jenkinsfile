@@ -71,8 +71,8 @@ parallel linuxJava7:{
         }
     }, winJava7: {
         node('Windows') {
-            def MAVEN_WIN_J7=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-            def JAVA_WIN_J7=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
+            def MAVEN_WIN_J7=tool name: 'Maven 3.3.9 (Windows))', type: 'hudson.tasks.Maven$MavenInstallation'
+            def JAVA_WIN_J7=tool name: 'JDK 1.7 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
@@ -88,8 +88,8 @@ parallel linuxJava7:{
         }
     }, winJava8: {
         node('Windows') {
-            def MAVEN_WIN_J8=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-            def JAVA_WIN_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
+            def MAVEN_WIN_J8=tool name: 'Maven 3.3.9 (Windows)', type: 'hudson.tasks.Maven$MavenInstallation'
+            def JAVA_WIN_J8=tool name: 'JDK 1.8 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
