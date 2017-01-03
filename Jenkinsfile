@@ -80,6 +80,7 @@ parallel linuxJava7:{
                 bat "if exist apache-maven-dist.zip /q apache-maven-dist.zip"
                 unstash 'dist'
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin"]) {
+                    bat "set"
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
@@ -96,6 +97,7 @@ parallel linuxJava7:{
                 bat "if exist apache-maven-dist.zip /q apache-maven-dist.zip"
                 unstash 'dist'
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin"]) {
+                    bat "set"
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
