@@ -31,7 +31,7 @@ node('ubuntu') {
         def WORK_DIR=pwd()
         stage 'Build / Unit Test'
         withEnv(["PATH+MAVEN=$MAVEN_BUILD/bin","PATH+JDK=$JAVA7_HOME/bin"]) {
-            sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository -DskipTests"
+            sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository"
         }
         dir ('apache-maven/target') {
             sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
