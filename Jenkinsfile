@@ -76,8 +76,8 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                bat "rmdir /s /q it-local-repo"
-                bat "del /q apache-maven-dist.zip"
+                bat "if exist it-local-repo rmdir /s /q it-local-repo"
+                bat "if exist it-local-repo apache-maven-dist.zip /q apache-maven-dist.zip"
                 unstash 'dist'
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin"]) {
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
@@ -92,8 +92,8 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                bat "rmdir /s /q it-local-repo"
-                bat "del /q apache-maven-dist.zip"
+                bat "if exist it-local-repo rmdir /s /q it-local-repo"
+                bat "if exist it-local-repo apache-maven-dist.zip /q apache-maven-dist.zip"
                 unstash 'dist'
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin"]) {
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
