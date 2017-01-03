@@ -76,13 +76,13 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                //batch "rmdir /s /q it-local-repo"
-                //batch "del /q apache-maven-dist.zip"
-                //unstash 'dist'
-                //withEnv(["PATH+MAVEN=$MAVEN_WIN_J7/bin","PATH+JDK=$JAVA_WIN_J7/bin"]) {
-                //    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
-                //    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
-                //}
+                bat "rmdir /s /q it-local-repo"
+                bat "del /q apache-maven-dist.zip"
+                unstash 'dist'
+                withEnv(["PATH+MAVEN=$MAVEN_WIN_J7/bin","PATH+JDK=$JAVA_WIN_J7/bin"]) {
+                    bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                }
             }
         }
     }, winJava8: {
@@ -92,18 +92,18 @@ parallel linuxJava7:{
             dir('test') {
                 def WORK_DIR=pwd()
                 git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: 'master')
-                //batch "rmdir /s /q it-local-repo"
-                //batch "del /q apache-maven-dist.zip"
-                //unstash 'dist'
-                //withEnv(["PATH+MAVEN=$MAVEN_WIN_J8/bin","PATH+JDK=$JAVA_WIN_J8/bin"]) {
-                //    batch "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
-                //    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
-                //}
+                bat "rmdir /s /q it-local-repo"
+                bat "del /q apache-maven-dist.zip"
+                unstash 'dist'
+                withEnv(["PATH+MAVEN=$MAVEN_WIN_J8/bin","PATH+JDK=$JAVA_WIN_J8/bin"]) {
+                    bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+                }
             }
         }
     }
 } finally {
     node('ubuntu') {
-        emailext body: '$DEFAULT_CONTENT', recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: '$DEFAULT_SUBJECT', to: 'notifications@maven.apache.org'
+        emailext body: "See ${env.BUILD_URL}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: "Maven Jenkinsfile finished with ${currentBuild.result}", to: 'notifications@maven.apache.org'
     }
 }
