@@ -79,7 +79,7 @@ parallel linuxJava7:{
                 bat "rmdir /s /q it-local-repo"
                 bat "del /q apache-maven-dist.zip"
                 unstash 'dist'
-                withEnv(["PATH+MAVEN=$MAVEN_WIN_J7/bin","PATH+JDK=$JAVA_WIN_J7/bin"]) {
+                withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin"]) {
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
@@ -95,7 +95,7 @@ parallel linuxJava7:{
                 bat "rmdir /s /q it-local-repo"
                 bat "del /q apache-maven-dist.zip"
                 unstash 'dist'
-                withEnv(["PATH+MAVEN=$MAVEN_WIN_J8/bin","PATH+JDK=$JAVA_WIN_J8/bin"]) {
+                withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin"]) {
                     bat "mvn clean verify  -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                     junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
                 }
