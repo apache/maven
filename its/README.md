@@ -21,4 +21,16 @@ Maven Core Integration Tests
 
 <http://maven.apache.org/core-its/>
 
+If you want to run the integration tests against a custom build of Maven use the following command:
+
+```
+mvn clean install -Prun-its -Dmaven.repo.local=`pwd`/repo -DmavenDistro=/path/to/apache-maven-dist.zip
+```
+
+or if behind a proxy
+
+```
+mvn clean install -Prun-its -Dmaven.repo.local=`pwd`/repo -DmavenDistro=/path/to/apache-maven-dist.zip -Dproxy.active=true -Dproxy.type=http -Dproxy.host=... -Dproxy.port=... -Dproxy.user=... -Dproxy.pass=...
+```
+
 Maven Developers List: dev@maven.apache.org
