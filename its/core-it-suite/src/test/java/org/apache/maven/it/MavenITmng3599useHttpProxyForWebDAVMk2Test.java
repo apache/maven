@@ -21,11 +21,9 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.StringUtils;
 import org.apache.maven.shared.utils.io.FileUtils;
@@ -36,16 +34,16 @@ import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3599">MNG-3599</a>.
- * 
+ *
  * @author Brett Porter
  * @author John Casey
  * @version $Id$
  */
-public class MavenITmng3599useHttpProxyForWebDAVTest
+public class MavenITmng3599useHttpProxyForWebDAVMk2Test
     extends AbstractMavenIntegrationTestCase
 {
     private static final String LS = System.getProperty( "line.separator" );
-    
+
     private Server server;
 
     private int port;
@@ -59,9 +57,9 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
                             "  <name>MNG-3599</name>\n" +
                             "</project>";
 
-    public MavenITmng3599useHttpProxyForWebDAVTest()
+    public MavenITmng3599useHttpProxyForWebDAVMk2Test()
     {
-        super( "(2.0.9,3.3.9)" );
+        super( "[3.3.9,)" );
     }
 
     public void setUp()
@@ -74,7 +72,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
             {
                 System.out.println( "Got request for URL: '" + request.getRequestURL() + "'" );
                 System.out.flush();
-                
+
                 response.setContentType( "text/plain" );
 
                 System.out.println( "Checking for 'Proxy-Connection' header..." );
@@ -82,7 +80,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
                     response.getWriter().println( content );
-                    
+
                     System.out.println( "Proxy-Connection found." );
                 }
                 /*
@@ -98,13 +96,13 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
                     response.getWriter().println( content );
-                    
+
                     System.out.println( "Correct proxied request 'http://www.example.com' for resource '/org/apache/maven/its/mng3599/test-dependency' found." );
                 }
                 else
                 {
                     response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
-                    
+
                     System.out.println( "Proxy-Connection not found." );
                 }
 
@@ -134,7 +132,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     public void testitUseHttpProxyForHttp()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-mk2" );
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
@@ -149,11 +147,12 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "http" );
-        
+
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
-        
+
         verifier = newVerifier( testDir.getAbsolutePath() );
 
+        verifier.addCliOption( "--legacy-local-repository" ); // FIXME this is a temporary band-aid MNG-6155
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-X" );
@@ -176,9 +175,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     public void testitUseHttpProxyForWebDAV()
         throws Exception
     {
-        requiresMavenVersion( "[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,3.3.9)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-mk2" );
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
@@ -193,11 +190,12 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
-        
+
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
+        verifier.addCliOption( "--legacy-local-repository" ); // FIXME this is a temporary band-aid MNG-6155
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-X" );

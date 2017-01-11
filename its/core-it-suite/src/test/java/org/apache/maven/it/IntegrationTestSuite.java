@@ -461,6 +461,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3607ClassLoadersUseValidUrlsTest.class );
         suite.addTestSuite( MavenITmng3600DeploymentModeDefaultsTest.class );
         suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAVTest.class );
+        suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAVMk2Test.class );
         suite.addTestSuite( MavenITmng3586SystemScopePluginDependencyTest.class );
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependencyTest.class );
         suite.addTestSuite( MavenITmng3575HexadecimalOctalPluginParameterConfigTest.class );

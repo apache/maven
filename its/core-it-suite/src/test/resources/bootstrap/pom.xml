@@ -43,6 +43,7 @@ under the License.
     <module>group-4</module>
     <module>group-5</module>
     <module>group-6</module>
+    <module>group-7</module>
   </modules>
 
   <properties>
