@@ -79,7 +79,7 @@ parallel linuxJava7:{
             }
         }
     }, winJava7: {
-        node('windows-2012-1') {
+        node('Windows') {
             def MAVEN_WIN_J7=tool name: 'Maven 3.3.9 (Windows)', type: 'hudson.tasks.Maven$MavenInstallation'
             dir(MAVEN_WIN_J7) {
                 MAVEN_WIN_J7=pwd()
@@ -104,7 +104,7 @@ parallel linuxJava7:{
             }
         }
     }, winJava8: {
-        node('windows-2012-1') {
+        node('Windows') {
             def MAVEN_WIN_J8=tool name: 'Maven 3.3.9 (Windows)', type: 'hudson.tasks.Maven$MavenInstallation'
             dir(MAVEN_WIN_J8) {
                 MAVEN_WIN_J8=pwd()
