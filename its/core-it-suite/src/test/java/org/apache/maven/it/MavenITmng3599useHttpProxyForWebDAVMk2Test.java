@@ -152,7 +152,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "--legacy-local-repository" ); // FIXME this is a temporary band-aid MNG-6155
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-X" );
@@ -195,7 +194,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "--legacy-local-repository" ); // FIXME this is a temporary band-aid MNG-6155
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-X" );

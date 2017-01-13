@@ -1,7 +1,7 @@
 <settings>
   <mirrors>
     <mirror>
-      <id>test-mirror</id>
+      <id>central</id>
       <url>@protocol@://www.example.com/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
