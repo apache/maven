@@ -25,7 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
- * Verifies scope of root project is preserved regardless of parent depenedency management.
+ * Verifies scope of root project is preserved regardless of parent dependency management.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
@@ -36,7 +36,7 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
-    // p0 inhertis from super model
+    // p0 inherits from super model
     //
     // or we can show it graphically as:
     //

@@ -64,11 +64,11 @@ public class ProjectSorterTest
 
     private Dependency createDependency( String groupId, String artifactId, String version )
     {
-        Dependency depdendency = new Dependency();
-        depdendency.setGroupId( groupId );
-        depdendency.setArtifactId( artifactId );
-        depdendency.setVersion( version );
-        return depdendency;
+        Dependency dependency = new Dependency();
+        dependency.setGroupId( groupId );
+        dependency.setArtifactId( artifactId );
+        dependency.setVersion( version );
+        return dependency;
     }
 
     private Plugin createPlugin( MavenProject project )

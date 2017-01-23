@@ -372,10 +372,10 @@ public class DefaultArtifactDescriptorReader
     private Relocation getRelocation( Model model )
     {
         Relocation relocation = null;
-        DistributionManagement distMngt = model.getDistributionManagement();
-        if ( distMngt != null )
+        DistributionManagement distMgmt = model.getDistributionManagement();
+        if ( distMgmt != null )
         {
-            relocation = distMngt.getRelocation();
+            relocation = distMgmt.getRelocation();
         }
         return relocation;
     }

@@ -22,7 +22,7 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 
 /**
- * Indiciates a cycle in the dependency graph.
+ * Indicates a cycle in the dependency graph.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */

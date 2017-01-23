@@ -197,7 +197,7 @@ public class DefaultProjectBuildingHelper
                 pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession() );
 
             final ClassRealm extensionRealm = recordRealm.realm;
-            final ExtensionDescriptor extensionDescriptor = recordRealm.desciptor;
+            final ExtensionDescriptor extensionDescriptor = recordRealm.descriptor;
             final List<Artifact> artifacts = recordRealm.artifacts;
 
             extensionRealms.add( extensionRealm );

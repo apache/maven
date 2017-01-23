@@ -84,7 +84,7 @@ public class MavenToolchainMergerTest
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
             assertEquals( 2, jdks.getToolchains().size() );
 
-            // switch dominant with reccessive
+            // switch dominant with recessive
             merger.merge( jdksExtra, jdks, TrackableBase.USER_LEVEL );
             assertEquals( 4, jdksExtra.getToolchains().size() );
             assertEquals( 2, jdks.getToolchains().size() );
@@ -119,7 +119,7 @@ public class MavenToolchainMergerTest
             PersistedToolchains jdksExtend = reader.read( jdksExtendIS );
             assertEquals( 2, jdks.getToolchains().size() );
 
-            // switch dominant with reccessive
+            // switch dominant with recessive
             merger.merge( jdksExtend, jdks, TrackableBase.USER_LEVEL );
             assertEquals( 2, jdksExtend.getToolchains().size() );
             Xpp3Dom config0 = (Xpp3Dom) jdksExtend.getToolchains().get( 0 ).getConfiguration();

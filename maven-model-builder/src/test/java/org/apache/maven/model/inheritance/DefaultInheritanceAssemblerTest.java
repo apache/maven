@@ -79,7 +79,7 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * Check most classical urls inheritance: directory structure where parent POM in parent directory
-     * and child directory == artifatId
+     * and child directory == artifactId
      * @throws Exception
      */
     public void testUrls()

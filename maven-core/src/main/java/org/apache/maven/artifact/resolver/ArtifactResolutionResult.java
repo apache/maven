@@ -37,7 +37,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *
  * @author Jason van Zyl
  * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
- *       complex requiring a long list of checks, need to create a parent/interfact/encapsulation
+ *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
  *       for the types of exceptions
  */
 public class ArtifactResolutionResult

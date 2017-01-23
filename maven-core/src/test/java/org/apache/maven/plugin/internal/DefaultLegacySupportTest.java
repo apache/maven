@@ -59,7 +59,7 @@ public class DefaultLegacySupportTest extends TestCase {
             {
                 latch.await();
             }
-            catch (InterruptedException ingore)
+            catch (InterruptedException ignore)
             {
                 // Test may fail if we get interrupted
             }

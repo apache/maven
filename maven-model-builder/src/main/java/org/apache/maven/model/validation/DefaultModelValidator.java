@@ -146,10 +146,10 @@ public class DefaultModelValidator
             {
                 validate20RawPlugins( problems, build.getPlugins(), "build.plugins.plugin", request );
 
-                PluginManagement mngt = build.getPluginManagement();
-                if ( mngt != null )
+                PluginManagement mgmt = build.getPluginManagement();
+                if ( mgmt != null )
                 {
-                    validate20RawPlugins( problems, mngt.getPlugins(), "build.pluginManagement.plugins.plugin",
+                    validate20RawPlugins( problems, mgmt.getPlugins(), "build.pluginManagement.plugins.plugin",
                                           request );
                 }
             }
@@ -189,10 +189,10 @@ public class DefaultModelValidator
                 {
                     validate20RawPlugins( problems, buildBase.getPlugins(), prefix + ".plugins.plugin", request );
 
-                    PluginManagement mngt = buildBase.getPluginManagement();
-                    if ( mngt != null )
+                    PluginManagement mgmt = buildBase.getPluginManagement();
+                    if ( mgmt != null )
                     {
-                        validate20RawPlugins( problems, mngt.getPlugins(), prefix + ".pluginManagement.plugins.plugin",
+                        validate20RawPlugins( problems, mgmt.getPlugins(), prefix + ".pluginManagement.plugins.plugin",
                                               request );
                     }
                 }

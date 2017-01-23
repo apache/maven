@@ -137,10 +137,10 @@ public class DefaultBeanConfigurationRequest
                     }
                 }
 
-                PluginManagement mngt = build.getPluginManagement();
-                if ( mngt != null )
+                PluginManagement mgmt = build.getPluginManagement();
+                if ( mgmt != null )
                 {
-                    for ( Plugin plugin : mngt.getPlugins() )
+                    for ( Plugin plugin : mgmt.getPlugins() )
                     {
                         if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                         {

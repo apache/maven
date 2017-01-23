@@ -230,7 +230,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        assembleDistributionInheritence( child, parent, childPathAdjustment, appendPaths );
+        assembleDistributionInheritance( child, parent, childPathAdjustment, appendPaths );
 
         // issueManagement
         if ( child.getIssueManagement() == null )
@@ -569,7 +569,7 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment,
+    private void assembleDistributionInheritance( Model child, Model parent, String childPathAdjustment,
                                                   boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )

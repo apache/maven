@@ -102,7 +102,7 @@ public interface MetadataResolutionRequest
     boolean isResolveManagedVersions();
 
     /**
-     * Enables/disables resolution of the dependency manageemnt information.
+     * Enables/disables resolution of the dependency management information.
      *
      * @param resolveManagedVersions {@code true} if the dependency management information should be retrieved, {@code
      *            false} otherwise.

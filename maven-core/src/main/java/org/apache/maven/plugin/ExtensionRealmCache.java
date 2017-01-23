@@ -49,14 +49,14 @@ public interface ExtensionRealmCache
 
         public final ClassRealm realm;
 
-        public final ExtensionDescriptor desciptor;
+        public final ExtensionDescriptor descriptor;
 
         public final List<Artifact> artifacts;
 
         public CacheRecord( ClassRealm realm, ExtensionDescriptor descriptor, List<Artifact> artifacts )
         {
             this.realm = realm;
-            this.desciptor = descriptor;
+            this.descriptor = descriptor;
             this.artifacts = artifacts;
         }
 

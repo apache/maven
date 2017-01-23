@@ -195,7 +195,7 @@ public class RepositorySystemTest
     {
         //InstallResult install( RepositorySystemSession session, InstallRequest request )
         //                throws InstallationException;
-        // release, snapshot unique ou non unique, attachement
+        // release, snapshot unique ou non unique, attachment
     }
 
     public void testDeploy()

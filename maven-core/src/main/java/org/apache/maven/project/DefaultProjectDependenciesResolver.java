@@ -153,10 +153,10 @@ public class DefaultProjectDependenciesResolver
             }
         }
 
-        DependencyManagement depMngt = project.getDependencyManagement();
-        if ( depMngt != null )
+        DependencyManagement depMgmt = project.getDependencyManagement();
+        if ( depMgmt != null )
         {
-            for ( Dependency dependency : depMngt.getDependencies() )
+            for ( Dependency dependency : depMgmt.getDependencies() )
             {
                 collect.addManagedDependency( RepositoryUtils.toDependency( dependency, stereotypes ) );
             }

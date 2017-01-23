@@ -171,7 +171,7 @@ public class ProjectDependencyGraphStub
 
     public List<MavenProject> getSortedProjects()
     {
-        return Arrays.asList( A, B, C, X, Y, Z ); // I'm not entirely sure about the order but this shold do...
+        return Arrays.asList( A, B, C, X, Y, Z ); // I'm not entirely sure about the order but this should do...
     }
 
     public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )

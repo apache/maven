@@ -40,9 +40,9 @@ Maven plugin execution isolation
 
  The <<<plexus.core>>> realm contains the resources required to run any
  plexus application; The <<<plexus.core.maven>>> realm contains all of the
- resources required to run Maven. Each subseqent plugin realm contains the
+ resources required to run Maven. Each subsequent plugin realm contains the
  JAR plugin as well as its dependencies. The realms noted above are setup
- in a hierachical structure where the resources in the parent realms are
+ in a hierarchical structure where the resources in the parent realms are
  available but the <<realm is searched first before a search is made in
  the parent realm>>.
 

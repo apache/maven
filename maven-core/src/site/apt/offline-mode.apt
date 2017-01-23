@@ -167,7 +167,7 @@ Offline Mode Design
   This is wholly dependent on Maven-Wagon, above.
 
   We could possibly use a flag on a particular Wagon to see whether it supports
-  offline mode, and then test to see if the file-based basedir for an aritfact
+  offline mode, and then test to see if the file-based basedir for an artifact
   repository works...if it doesn't work, we can mark that repository offline...
 
   OTOH, all offline-mode checks can probably be run from Wagon-based APIs.
@@ -201,7 +201,7 @@ Offline Mode Design
   The majority of mojos will leave the requiresOnline == false,
   since online/offline status will be irrelevant, provided they have
   access to their required artifacts and other classpath elements. In the case
-  of required artifacts and other classpath elemtents, this is assumed by the
+  of required artifacts and other classpath elements, this is assumed by the
   mojo API to be in a correct state, and will be handled by the Wagon
   modifications.
 

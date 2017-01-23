@@ -34,7 +34,7 @@ under the License.
   <description>Maven2 classes maintained as compatibility layer.</description>
 
   <properties>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation><!-- lazyness for code that will disappear in future... -->
+    <checkstyle.failOnViolation>false</checkstyle.failOnViolation><!-- laziness for code that will disappear in future... -->
   </properties>
 
   <dependencies>

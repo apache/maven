@@ -41,7 +41,7 @@ Maven Repository Metadata Model
 
  * <<<maven-metadata.xml>>> in a remote repository,
 
- * <<<maven-metadata-\<repo-id>.xml>>> in a local repository, for metatada from a repository with <<<repo-id>>> identifier.
+ * <<<maven-metadata-\<repo-id>.xml>>> in a local repository, for metadata from a repository with <<<repo-id>>> identifier.
 
  []
 
