@@ -61,9 +61,18 @@ public class DelegatingLocalArtifactRepository
         this.ideWorkspace = localRepository;
     }
 
+    /**
+     * @deprecated instead use {@link #getIdeWorkspace()}
+     */
+    @Deprecated
     public LocalArtifactRepository getIdeWorspace()
     {
         return ideWorkspace;
+    }
+
+    public LocalArtifactRepository getIdeWorkspace()
+    {
+        return getIdeWorspace();
     }
 
     @Override

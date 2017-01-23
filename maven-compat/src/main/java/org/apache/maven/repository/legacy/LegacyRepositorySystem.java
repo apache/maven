@@ -329,7 +329,7 @@ public class LegacyRepositorySystem
                 DelegatingLocalArtifactRepository delegatingLocalRepository =
                     (DelegatingLocalArtifactRepository) request.getLocalRepository();
 
-                LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorspace();
+                LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorkspace();
 
                 delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
 

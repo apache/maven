@@ -108,16 +108,34 @@ public class MetadataResolutionRequest
         return this;
     }
 
+    /**
+     * @deprecated instead use {@link #getRemoteRepositories()}
+     */
+    @Deprecated
     public List<ArtifactRepository> getRemoteRepostories()
     {
         return remoteRepositories;
     }
 
+    public List<ArtifactRepository> getRemoteRepositories()
+    {
+        return getRemoteRepostories();
+    }
+
+    /**
+     * @deprecated instead use {@link #setRemoteRepositories()}
+     */
+    @Deprecated
     public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
     {
         this.remoteRepositories = remoteRepostories;
 
         return this;
+    }
+
+    public MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    {
+        return setRemoteRepostories( remoteRepositories );
     }
 
     public Map getManagedVersionMap()

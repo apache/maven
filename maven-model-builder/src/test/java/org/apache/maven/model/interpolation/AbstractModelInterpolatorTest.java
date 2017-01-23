@@ -67,12 +67,22 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals( "Expected no fatals", 0, collector.getFatals().size() );
     }
 
+    /**
+     * @deprecated instead use {@link #assertCollectorState()}
+     */
+    @Deprecated
     protected void assertColllectorState( int numFatals, int numErrors, int numWarnings,
                                           SimpleProblemCollector collector )
     {
         assertEquals( "Errors",  numErrors, collector.getErrors().size() );
         assertEquals( "Warnings", numWarnings, collector.getWarnings().size() );
         assertEquals( "Fatals", numFatals, collector.getFatals().size() );
+    }
+
+    protected void assertCollectorState( int numFatals, int numErrors, int numWarnings,
+                                          SimpleProblemCollector collector )
+    {
+        assertColllectorState(numFatals, numErrors, numWarnings, collector);
     }
 
     private ModelBuildingRequest createModelBuildingRequest( Properties p )
@@ -178,7 +188,7 @@ public abstract class AbstractModelInterpolatorTest
 
             final SimpleProblemCollector collector = new SimpleProblemCollector();
             interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-            assertColllectorState(  0, 1, 0, collector );
+            assertCollectorState(  0, 1, 0, collector );
         }
         catch ( Exception e )
         {
@@ -247,7 +257,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertColllectorState(0, 0, 1, collector );
+        assertCollectorState(0, 0, 1, collector );
 
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -305,7 +315,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertColllectorState( 0, 0, 2, collector );
+        assertCollectorState( 0, 0, 2, collector );
 
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -450,7 +460,7 @@ public abstract class AbstractModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertColllectorState( 0, 0, 2, collector );
+        assertCollectorState( 0, 0, 2, collector );
 
 
         List<Resource> outResources = out.getBuild().getResources();
