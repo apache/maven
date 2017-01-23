@@ -105,7 +105,7 @@ public class ProjectSorter
             vertices.put( project.getVersion(), dag.addVertex( projectId ) );
         }
 
-        for ( Vertex projectVertex : dag.getVerticies() )
+        for ( Vertex projectVertex : dag.getVertices() )
         {
             String projectId = projectVertex.getLabel();
 
