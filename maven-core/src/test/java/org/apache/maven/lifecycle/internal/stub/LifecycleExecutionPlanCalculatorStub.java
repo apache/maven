@@ -87,8 +87,19 @@ public class LifecycleExecutionPlanCalculatorStub
 
     public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
 
-
+    /**
+     * @deprecated instead use {@link #getNumberOfExecutions()}
+     */
+    @Deprecated
     public int getNumberOfExceutions( ProjectBuildList projectBuildList )
+        throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
+        NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException
+    {
+        return getNumberOfExecutions(projectBuildList);
+    }
+
+    public int getNumberOfExecutions( ProjectBuildList projectBuildList )
         throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
         NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException

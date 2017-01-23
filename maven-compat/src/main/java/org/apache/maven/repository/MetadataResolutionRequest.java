@@ -108,14 +108,32 @@ public class MetadataResolutionRequest
         return this;
     }
 
+    /**
+     * @deprecated instead use {@link #getRemoteRepositories()}
+     */
+    @Deprecated
     public List<ArtifactRepository> getRemoteRepostories()
+    {
+        return getRemoteRepositories();
+    }
+
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
 
+    /**
+     * @deprecated instead use {@link #setRemoteRepositories()}
+     */
+    @Deprecated
     public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
     {
-        this.remoteRepositories = remoteRepostories;
+        return setRemoteRepositories(remoteRepositories);
+    }
+
+    public MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    {
+        this.remoteRepositories = remoteRepositories;
 
         return this;
     }
