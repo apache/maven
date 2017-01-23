@@ -27,7 +27,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
- * Verifies scope inheritence of direct and transitive dependencies.
+ * Verifies scope inheritance of direct and transitive dependencies.
  *
  * Should show three behaviors:
  *
@@ -44,7 +44,7 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
-    // p0 inhertis from super model
+    // p0 inherits from super model
     //
     // or we can show it graphically as:
     //

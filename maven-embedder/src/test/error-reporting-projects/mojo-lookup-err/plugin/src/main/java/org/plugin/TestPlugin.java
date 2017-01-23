@@ -19,7 +19,7 @@ public class TestPlugin
     private Log log;
 
     /**
-     * @component role-hint="nonexistant"
+     * @component role-hint="nonexistent"
      */
     private MavenProject project;
 

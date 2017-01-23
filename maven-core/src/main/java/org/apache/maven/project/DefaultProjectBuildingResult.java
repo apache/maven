@@ -48,7 +48,7 @@ class DefaultProjectBuildingResult
      * Creates a new result with the specified contents.
      *
      * @param project The project that was built, may be {@code null}.
-     * @param problems The problems that were encouterned, may be {@code null}.
+     * @param problems The problems that were encountered, may be {@code null}.
      * @param dependencyResolutionResult The result of the resolution for the project dependencies, may be {@code null}.
      */
     public DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems,
@@ -68,7 +68,7 @@ class DefaultProjectBuildingResult
      *
      * @param projectId The identifier of the project, may be {@code null}.
      * @param pomFile The POM file from which the project was built, may be {@code null}.
-     * @param problems The problems that were encouterned, may be {@code null}.
+     * @param problems The problems that were encountered, may be {@code null}.
      */
     public DefaultProjectBuildingResult( String projectId, File pomFile, List<ModelProblem> problems )
     {

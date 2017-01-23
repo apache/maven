@@ -140,7 +140,7 @@ h3. Plugins need a specific metadata model
 Each application will have its own model for plugins. Much of this model will be common across applications but there will always be issues specific to a particular applications’s plugins. Some of the issues that need to be taken into consideration:
 
 * Plugin dependencies
-* Plugin resources like Javascript files or images
+* Plugin resources like JavaScript files or images
 * Configuration metadata and default configuration values
 * Extension points that plugins might expose
 

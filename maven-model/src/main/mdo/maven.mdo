@@ -1359,7 +1359,7 @@
             The classifier of the dependency. It is appended to
             the filename after the version. This allows:
             <ul>
-            <li>refering to attached artifact, for example <code>sources</code> and <code>javadoc</code>:
+            <li>referring to attached artifact, for example <code>sources</code> and <code>javadoc</code>:
             see <a href="../maven-core/artifact-handlers.html">default artifact handlers</a> for a list,</li>
             <li>distinguishing two artifacts
             that belong to the same POM but were built differently.
@@ -1532,8 +1532,8 @@
      */
     public String getArtifact()
     {
-        // If the jar name has been explicty set then use that. This
-        // is when the <jar/> element is explicity used in the POM.
+        // If the jar name has been explicitly set then use that. This
+        // is when the <jar/> element is explicitly used in the POM.
         if ( getJar() != null)
         {
             return getJar();

@@ -47,7 +47,7 @@ under the License.
     <!--
     This checks the coalescing of CHARACTERS events which would otherwise be reported in chunks of the internal parser
     buffer size (usually 4 or 8 KB). The text block is designed such that its length is exactly 32 KB after leading
-    and traling whitespace has been removed and all line terminators have been removed.
+    and trailing whitespace has been removed and all line terminators have been removed.
     -->
     <prop2>
 00 KB     1         2         3         4         5         6  X

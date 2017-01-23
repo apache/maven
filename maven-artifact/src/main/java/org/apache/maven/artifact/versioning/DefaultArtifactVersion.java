@@ -180,7 +180,7 @@ public class DefaultArtifactVersion
                     fallback = Pattern.compile( "\\d+" ).matcher( qualifier ).matches();
                 }
 
-                // string tokenzier won't detect these and ignores them
+                // string tokenizer won't detect these and ignores them
                 if ( part1.contains( ".." ) || part1.startsWith( "." ) || part1.endsWith( "." ) )
                 {
                     fallback = true;

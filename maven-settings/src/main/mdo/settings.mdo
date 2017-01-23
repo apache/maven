@@ -600,7 +600,7 @@
           <version>1.0.0+</version>
           <type>String</type>
           <description>
-            The server ID of the repository being mirrored, eg
+            The server ID of the repository being mirrored, e.g.,
             "central". This MUST NOT match the mirror id.
           </description>
         </field>
@@ -809,7 +809,7 @@
       <description>
         <![CDATA[
         Repository contains the information needed
-        for establishing connections with remote repoistory
+        for establishing connections with remote repository
         ]]>
       </description>
       <fields>

@@ -66,7 +66,7 @@ ${maven.home}
  We once had a document that Vincent and I agreed upon and I was about to
  implement it and then I disappeared for 8 months so it never came to pass.
 
- So I guess it's important to figure out what people are using propeties
+ So I guess it's important to figure out what people are using properties
  files for and see if we can't incorporate it all into the POM. Or if we do
  have properties file (something I would like to avoid) say they don't
  contribute in any meaningful way to information in the POM. For example a
@@ -110,9 +110,9 @@ Unified source directory
  itself. This way locations of intermediary artifacts of a build would be
  in a known location. This would also help with developer setup i.e. getting
  new developers up and running. They could run a maven command and have all
- their source trees set up in the same way as their collegues.
+ their source trees set up in the same way as their colleagues.
 
- here's what I do currently in the netbeans part of the mevenide project to
+ here's what I do currently in the netbeans part of the mavenide project to
  find the relevant subprojects/sibling projects. I check if the user has
  defined the maven.multiproject.includes property in any of his properties
  files for the current project. if yes. then I'm able to find projects that
@@ -120,7 +120,7 @@ Unified source directory
  problems with the current solution are:
  1. information is duplicate. once in POM's dependencies and once in the
  maven.multiproject.includes property.
- 2. it works without problems only for projects with relative paths, eg. from
+ 2. it works without problems only for projects with relative paths, e.g., from
  one CVS repository.. for projects from multiple SCM repositories it's harder
  to maintain the same relative links on all developer computers.
  not sure the unified source directory structure addresses this issue.

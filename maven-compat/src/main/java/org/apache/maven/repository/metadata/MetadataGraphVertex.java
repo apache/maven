@@ -31,7 +31,7 @@ public class MetadataGraphVertex
 {
     ArtifactMetadata md;
 
-    // indications to use these in comparrison
+    // indications to use these in comparison
     private boolean compareVersion = false;
     private boolean compareScope   = false;
 

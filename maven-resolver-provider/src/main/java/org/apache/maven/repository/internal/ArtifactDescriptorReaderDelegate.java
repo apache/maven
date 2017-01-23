@@ -65,10 +65,10 @@ public class ArtifactDescriptorReaderDelegate
             result.addDependency( convert( dependency, stereotypes ) );
         }
 
-        DependencyManagement mngt = model.getDependencyManagement();
-        if ( mngt != null )
+        DependencyManagement mgmt = model.getDependencyManagement();
+        if ( mgmt != null )
         {
-            for ( org.apache.maven.model.Dependency dependency : mngt.getDependencies() )
+            for ( org.apache.maven.model.Dependency dependency : mgmt.getDependencies() )
             {
                 result.addManagedDependency( convert( dependency, stereotypes ) );
             }
@@ -137,10 +137,10 @@ public class ArtifactDescriptorReaderDelegate
     private void setArtifactProperties( ArtifactDescriptorResult result, Model model )
     {
         String downloadUrl = null;
-        DistributionManagement distMngt = model.getDistributionManagement();
-        if ( distMngt != null )
+        DistributionManagement distMgmt = model.getDistributionManagement();
+        if ( distMgmt != null )
         {
-            downloadUrl = distMngt.getDownloadUrl();
+            downloadUrl = distMgmt.getDownloadUrl();
         }
         if ( downloadUrl != null && downloadUrl.length() > 0 )
         {

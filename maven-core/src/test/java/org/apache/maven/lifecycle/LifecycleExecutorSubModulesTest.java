@@ -83,7 +83,7 @@ public class LifecycleExecutorSubModulesTest
         return "src/test/projects/lifecycle-executor";
     }
 
-    public void testCrweation()
+    public void testCreation()
         throws Exception
     {
         assertNotNull( defaultLifeCycles );

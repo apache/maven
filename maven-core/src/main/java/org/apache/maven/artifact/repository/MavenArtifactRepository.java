@@ -213,7 +213,7 @@ public class MavenArtifactRepository
      * Return the protocol name.
      * <br/>
      * E.g: for input
-     * <code>http://www.codehause.org</code> this method will return <code>http</code>
+     * <code>http://www.codehaus.org</code> this method will return <code>http</code>
      *
      * @param url the url
      * @return the host name

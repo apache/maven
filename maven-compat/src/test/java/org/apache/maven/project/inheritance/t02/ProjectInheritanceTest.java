@@ -49,7 +49,7 @@ public class ProjectInheritanceTest
     // p3 inherits from p2
     // p2 inherits from p1
     // p1 inherits from p0
-    // p0 inhertis from super model
+    // p0 inherits from super model
     //
     // or we can show it graphically as:
     //

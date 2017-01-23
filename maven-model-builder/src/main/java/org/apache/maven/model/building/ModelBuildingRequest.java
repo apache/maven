@@ -124,7 +124,7 @@ public interface ModelBuildingRequest
 
     /**
      * Sets the level of validation to perform on processed models. For building of projects,
-     * {@link #VALIDATION_LEVEL_STRICT} should be used to ensure proper building. For the mere retrievel of dependencies
+     * {@link #VALIDATION_LEVEL_STRICT} should be used to ensure proper building. For the mere retrieval of dependencies
      * during artifact resolution, {@link #VALIDATION_LEVEL_MINIMAL} should be used to account for models of poor
      * quality. By default, models are validated in strict mode.
      *

@@ -67,7 +67,7 @@ public interface PluginVersionRequest
     /**
      * Gets the POM whose build plugins are to be scanned for the version.
      *
-     * @return The POM whose build plugins are to be scanned for the verion or {@code null} to only search the plugin
+     * @return The POM whose build plugins are to be scanned for the version or {@code null} to only search the plugin
      *         repositories.
      */
     Model getPom();

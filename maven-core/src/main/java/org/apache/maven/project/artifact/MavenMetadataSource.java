@@ -208,8 +208,8 @@ public class MavenMetadataSource
             {
                 dependencies = rel.project.getDependencies();
 
-                DependencyManagement depMngt = rel.project.getDependencyManagement();
-                managedDependencies = ( depMngt != null ) ? depMngt.getDependencies() : null;
+                DependencyManagement depMgmt = rel.project.getDependencyManagement();
+                managedDependencies = ( depMgmt != null ) ? depMgmt.getDependencies() : null;
 
                 pomRepositories = rel.project.getRemoteArtifactRepositories();
             }

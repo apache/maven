@@ -38,7 +38,7 @@ public interface ProjectBuildingRequest
 
     List<ArtifactRepository> getRemoteRepositories();
 
-    ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifacgRepositories );
+    ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories );
 
     List<ArtifactRepository> getPluginArtifactRepositories();
 

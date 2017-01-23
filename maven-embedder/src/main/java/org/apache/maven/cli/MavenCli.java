@@ -1530,7 +1530,7 @@ public class MavenCli
         }
 
         //
-        // Allow the builder to be overriden by the user if requested. The builders are now pluggable.
+        // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
         if ( commandLine.hasOption( CLIManager.BUILDER ) )
         {

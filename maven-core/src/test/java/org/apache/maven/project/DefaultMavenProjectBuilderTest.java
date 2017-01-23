@@ -86,7 +86,7 @@ public class DefaultMavenProjectBuilderTest
     }
 
     /**
-     * Check that we can build ok from the middle pom of a (parent,child,grandchild) heirarchy
+     * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
      * @throws Exception
      */
     public void testBuildFromMiddlePom() throws Exception

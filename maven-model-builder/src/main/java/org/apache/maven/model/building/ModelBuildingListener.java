@@ -20,7 +20,7 @@ package org.apache.maven.model.building;
  */
 
 /**
- * Defines events that the model builder fires during construction of the effective model. When a listener encounteres
+ * Defines events that the model builder fires during construction of the effective model. When a listener encounters
  * errors while processing the event, it can report these problems via {@link ModelBuildingEvent#getProblems()}.
  * <em>Note:</em> To cope with future extensions to this interface, it is strongly recommended to extend
  * {@link AbstractModelBuildingListener} rather than to directly implement this interface.

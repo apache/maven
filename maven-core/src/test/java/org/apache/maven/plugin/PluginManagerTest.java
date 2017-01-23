@@ -119,7 +119,7 @@ public class PluginManagerTest
 
         This will not work until the RR plugin is released to get rid of the binding to the reporting exception which is a mistake.
 
-        This happpens after removing the reporting API from the core:
+        This happens after removing the reporting API from the core:
 
         java.lang.NoClassDefFoundError: org/apache/maven/reporting/MavenReportException
 

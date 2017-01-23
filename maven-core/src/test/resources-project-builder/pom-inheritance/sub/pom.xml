@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <!--
-  This minimalistic POM tests mere inheritance from its parent.
+  This minimalist POM tests mere inheritance from its parent.
   -->
 
   <parent>

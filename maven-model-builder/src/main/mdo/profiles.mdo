@@ -188,7 +188,7 @@ under the License.
       <version>1.0.0</version>
       <description><![CDATA[
          Repository contains the information needed
-         for establishing connections with remote repoistory
+         for establishing connections with remote repository
       ]]></description>
       <fields>
         <field>
@@ -250,7 +250,7 @@ under the License.
       <superClass>RepositoryBase</superClass>
       <version>1.0.0</version>
       <description>
-        Repository contains the information needed for establishing connections with remote repoistory
+        Repository contains the information needed for establishing connections with remote repository
       </description>
       <fields>
         <field>

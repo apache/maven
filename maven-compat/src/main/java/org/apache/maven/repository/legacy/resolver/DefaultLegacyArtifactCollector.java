@@ -477,7 +477,7 @@ public class DefaultLegacyArtifactCollector
                                     manageArtifact( child, managedVersions, listeners );
 
                                     // Also, we need to ensure that any exclusions it presents are
-                                    // added to the artifact before we retrive the metadata
+                                    // added to the artifact before we retrieve the metadata
                                     // for the artifact; otherwise we may end up with unwanted
                                     // dependencies.
                                     Artifact ma = managedVersions.get( childKey );
@@ -691,7 +691,7 @@ public class DefaultLegacyArtifactCollector
         {
             fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
 
-            // previously we cloned the artifact, but it is more effecient to just update the artifactScope
+            // previously we cloned the artifact, but it is more efficient to just update the artifactScope
             // if problems are later discovered that the original object needs its original artifactScope value, 
             // cloning may
             // again be appropriate

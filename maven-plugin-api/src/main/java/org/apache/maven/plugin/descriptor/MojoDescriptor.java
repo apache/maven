@@ -513,7 +513,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return <code>true</code> if the Mojo is herited, <code>false</code> otherwise.
+     * @return <code>true</code> if the Mojo is inherited, <code>false</code> otherwise.
      */
     public boolean isInheritedByDefault()
     {
@@ -521,7 +521,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @param inheritedByDefault <code>true</code> if the Mojo is herited, <code>false</code> otherwise.
+     * @param inheritedByDefault <code>true</code> if the Mojo is inherited, <code>false</code> otherwise.
      */
     public void setInheritedByDefault( boolean inheritedByDefault )
     {

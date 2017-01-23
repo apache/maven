@@ -33,7 +33,7 @@ import java.util.Stack;
  *
  * <p>Features:
  * <ul>
- * <li>mixing of '<code>-</code>' (dash) and '<code>.</code>' (dot) separators,</li>
+ * <li>mixing of '<code>-</code>' (hyphen) and '<code>.</code>' (dot) separators,</li>
  * <li>transition between characters and digits also constitutes a separator:
  *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
  * <li>unlimited number of version components,</li>
@@ -50,7 +50,7 @@ import java.util.Stack;
  *     </ul>
  *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
  *   </li>
- * <li>a dash usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
+ * <li>a hyphen usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
  * </ul></p>
  *
  * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
