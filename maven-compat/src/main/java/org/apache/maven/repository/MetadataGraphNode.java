@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MetadataGraph node - as it's a directed graph - holds adjacency lists for incident and exident nodes
+ * MetadataGraph node - as it's a directed graph - holds adjacency lists for incident and excident nodes
  *
  * @author Oleg Gusakov
  *
@@ -36,7 +36,7 @@ public class MetadataGraphNode
     /** nodes, incident to this (depend on me) */
     List<MetadataGraphNode> inNodes;
 
-    /** nodes, exident to this (I depend on) */
+    /** nodes, excident to this (I depend on) */
     List<MetadataGraphNode> exNodes;
 
     public MetadataGraphNode()
@@ -57,7 +57,7 @@ public class MetadataGraphNode
         return this;
     }
 
-    public MetadataGraphNode addExident( MetadataGraphNode node )
+    public MetadataGraphNode addExcident( MetadataGraphNode node )
     {
         exNodes.add( node );
         return this;
