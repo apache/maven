@@ -38,9 +38,13 @@ under the License.
   </skin>
 
   <body>
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <!--item name="FAQ" href="faq.html"/-->
+      <item name="License" href="http://www.apache.org/licenses/"/>
+    </menu>
 
     <menu ref="modules"/>
     <menu ref="reports"/>
-
   </body>
 </project>

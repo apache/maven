@@ -27,6 +27,7 @@ under the License.
       <item name="JavaDocs" href="testapidocs/org/apache/maven/it/package-summary.html"/>
       <item name="Source Xref" href="xref-test/org/apache/maven/it/package-summary.html"/>
       <!--item name="FAQ" href="faq.html"/-->
+      <item name="License" href="http://www.apache.org/licenses/"/>
     </menu>
     <menu name="Results">
       <item name="Surefire Report" href="surefire-report.html"/>
