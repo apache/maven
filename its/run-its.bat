@@ -1,5 +1,3 @@
-@REM How JvZ runs the ITs from a clean slate if it would be on Windows
-
 @REM
 @REM Licensed to the Apache Software Foundation (ASF) under one
 @REM or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,8 @@
 @REM specific language governing permissions and limitations
 @REM under the License.
 @REM
+
+@REM How JvZ runs the ITs from a clean slate if it would be on Windows
 
 mvn clean install -Prun-its,embedded -Dmaven.repo.local=%cd%/repo 
 
