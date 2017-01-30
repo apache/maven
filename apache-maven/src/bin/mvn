@@ -190,8 +190,7 @@ fi
 # traverses directory structure from process work directory to filesystem root
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {
-  local basedir
-  local wdir
+(
   basedir="`pwd`"
   wdir="`pwd`"
   while [ "$wdir" != '/' ] ; do
@@ -202,6 +201,7 @@ find_maven_basedir() {
     wdir="`cd "$wdir/.."; pwd`"
   done
   echo "${basedir}"
+)
 }
 
 # concatenates all lines of a file
