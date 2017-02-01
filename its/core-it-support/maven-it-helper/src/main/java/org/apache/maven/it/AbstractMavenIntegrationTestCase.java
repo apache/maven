@@ -60,6 +60,8 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private boolean skip;
 
+    private BrokenMavenVersionException invert;
+
     private static ArtifactVersion javaVersion;
 
     private ArtifactVersion mavenVersion;
@@ -213,11 +215,16 @@ public abstract class AbstractMavenIntegrationTestCase
             setupLocalRepo();
         }
 
+        invert = null;
         long milliseconds = System.currentTimeMillis();
         try
         {
             super.runTest();
             milliseconds = System.currentTimeMillis() - milliseconds;
+            if ( invert != null )
+            {
+                throw invert;
+            }
             out.println( "OK " + formatTime( milliseconds ) );
         }
         catch ( UnsupportedJavaVersionException e )
@@ -230,11 +237,25 @@ public abstract class AbstractMavenIntegrationTestCase
             out.println( "SKIPPED - Maven version " + e.mavenVersion + " not in range " + e.supportedRange );
             return;
         }
+        catch ( BrokenMavenVersionException e )
+        {
+            out.println( "UNEXPECTED OK - Maven version " + e.mavenVersion + " expected to fail "
+                    + formatTime( milliseconds ) );
+            fail( "Expected failure when with Maven version " + e.mavenVersion );
+        }
         catch ( Throwable t )
         {
             milliseconds = System.currentTimeMillis() - milliseconds;
-            out.println( "FAILURE " + formatTime( milliseconds ) );
-            throw t;
+            if ( invert != null )
+            {
+                out.println( "EXPECTED FAIL - Maven version " + invert.mavenVersion + " expected to fail "
+                        + formatTime( milliseconds ) );
+            }
+            else
+            {
+                out.println( "FAILURE " + formatTime( milliseconds ) );
+                throw t;
+            }
         }
     }
 
@@ -300,6 +321,42 @@ public abstract class AbstractMavenIntegrationTestCase
         }
     }
 
+    /**
+     * Inverts the execution of a test case for cases where we discovered a bug in the test case, have corrected the
+     * test case and shipped versions of Maven with a bug because of the faulty test case. This method allows the
+     * tests to continue passing against the historical releases as they historically would, as well as verifying that
+     * the test is no longer providing a false positive.
+     *
+     * @param versionRange
+     */
+    protected void failingMavenVersions( String versionRange )
+    {
+        assertNull( "Only call failingMavenVersions at most once per test", invert );
+        VersionRange range;
+        try
+        {
+            range = VersionRange.createFromVersionSpec( versionRange );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange, e );
+        }
+
+        ArtifactVersion version = getMavenVersion();
+        if ( version != null )
+        {
+            if ( range.containsVersion( removePattern( version ) ) )
+            {
+                invert = new BrokenMavenVersionException( version, range );
+            }
+        }
+        else
+        {
+            out.println( "WARNING: " + getITName() + ": version range '" + versionRange
+                             + "' supplied but no Maven version found - not marking test as expected to fail." );
+        }
+    }
+
     private class UnsupportedJavaVersionException
         extends RuntimeException
     {
@@ -327,6 +384,23 @@ public abstract class AbstractMavenIntegrationTestCase
         public VersionRange supportedRange;
 
         public UnsupportedMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
+        {
+            this.mavenVersion = mavenVersion;
+            this.supportedRange = supportedRange;
+        }
+
+    }
+
+    private class BrokenMavenVersionException
+        extends RuntimeException
+    {
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
+        public ArtifactVersion mavenVersion;
+
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
+        public VersionRange supportedRange;
+
+        public BrokenMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
         {
             this.mavenVersion = mavenVersion;
             this.supportedRange = supportedRange;
