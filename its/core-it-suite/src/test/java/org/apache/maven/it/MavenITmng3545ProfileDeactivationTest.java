@@ -68,7 +68,7 @@ public class MavenITmng3545ProfileDeactivationTest
      * Test command line deactivation of active by default profiles.
      * 
      */
-    public void testDeactivateDefaultProfilesDash()
+    public void testDeactivateDefaultProfilesHyphen()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );

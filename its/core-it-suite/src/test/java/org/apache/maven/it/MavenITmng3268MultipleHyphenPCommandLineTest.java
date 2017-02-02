@@ -29,7 +29,7 @@ import java.io.File;
  * 
  * @version $Id$
  */
-public class MavenITmng3268MultipleDashPCommandLineTest
+public class MavenITmng3268MultipleHyphenPCommandLineTest
     extends AbstractMavenIntegrationTestCase
 {
 
