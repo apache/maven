@@ -53,7 +53,7 @@ under the License.
     <commonsCliVersion>1.2</commonsCliVersion>
     <commonsLangVersion>3.4</commonsLangVersion>
     <junitVersion>4.11</junitVersion>
-    <plexusVersion>1.6</plexusVersion>
+    <plexusVersion>1.7.1</plexusVersion>
     <plexusInterpolationVersion>1.21</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.22</plexusUtilsVersion>
     <!-- Latest version of Guava that works with Sisu -->
