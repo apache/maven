@@ -26,14 +26,14 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3268">MNG-3268</a>.
- * 
+ *
  * @version $Id$
  */
 public class MavenITmng3268MultipleHyphenPCommandLineTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3268MultipleDashPCommandLineTest()
+    public MavenITmng3268MultipleHyphenPCommandLineTest()
     {
         super( "(2.0.9,)" );
     }
