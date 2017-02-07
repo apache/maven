@@ -40,8 +40,7 @@ install:
 before_script:
   - mvn clean
 script:
-  - mvn -DdistributionTargetFolder="$HOME/app/maven/apache-maven-3.4.x-SNAPSHOT" org.jacoco:jacoco-maven-plugin:prepare-agent package
-  - mvn org.jacoco:jacoco-maven-plugin:report-aggregate site
+  - mvn -DdistributionTargetFolder="$HOME/app/maven/apache-maven-3.4.x-SNAPSHOT" -Djacoco.destFile="${maven.multiModuleProjectDirectory}/target/jacoco.exec" org.jacoco:jacoco-maven-plugin:prepare-agent package
 after_success:
   - jdk_switcher use oraclejdk8
   - mvn sonar:sonar
