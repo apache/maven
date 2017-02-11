@@ -487,7 +487,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.2</version>
+          <version>1.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -544,7 +544,7 @@ under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.14</version>
+        <version>1.15</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
@@ -565,7 +565,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-doap-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
         <configuration>
           <asfExtOptions>
             <charter>The mission of the Apache Maven project is to create and maintain software
