@@ -77,8 +77,9 @@ under the License.
           <phase>post-clean</phase>
         </phases>
         <default-phases>
+          <!-- DO NOT upgrade to 3.0.0 or newer, SUREFIRE-722 fails repeatedly on FreeBSD -->
           <clean>
-            org.apache.maven.plugins:maven-clean-plugin:2.5:clean
+            org.apache.maven.plugins:maven-clean-plugin:2.6.1:clean
           </clean>
         </default-phases>
         <!-- END SNIPPET: clean -->
@@ -101,10 +102,10 @@ under the License.
         </phases>
         <default-phases>
           <site>
-            org.apache.maven.plugins:maven-site-plugin:3.3:site
+            org.apache.maven.plugins:maven-site-plugin:3.6:site
           </site>
           <site-deploy>
-            org.apache.maven.plugins:maven-site-plugin:3.3:deploy
+            org.apache.maven.plugins:maven-site-plugin:3.6:deploy
           </site-deploy>
         </default-phases>
         <!-- END SNIPPET: site -->
