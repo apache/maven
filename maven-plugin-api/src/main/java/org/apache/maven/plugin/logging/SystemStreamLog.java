@@ -141,7 +141,7 @@ public class SystemStreamLog
      */
     public boolean isDebugEnabled()
     {
-        // TODO: Not sure how best to set these for this implementation...
+        // TODO Not sure how best to set these for this implementation...
         return false;
     }
 

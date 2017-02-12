@@ -28,7 +28,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.repository.Proxy;
 
-//TODO: completely separate local and remote artifact repositories
+//TODO completely separate local and remote artifact repositories
 public class MavenArtifactRepository
     implements ArtifactRepository
 {
@@ -234,7 +234,7 @@ public class MavenArtifactRepository
      *
      * @param url the repository URL
      * @return the basedir of the repository
-     * @todo need to URL decode for spaces?
+     * TODO need to URL decode for spaces?
      */
     private String basedir( String url )
     {

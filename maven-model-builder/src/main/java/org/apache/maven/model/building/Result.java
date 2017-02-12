@@ -46,7 +46,7 @@ import com.google.common.collect.Iterables;
  * <li>error - (partial) model and diagnostics
  * </ol>
  * Could encode these variants as subclasses, but kept in one for now
- * 
+ *
  * @author bbusjaeger
  * @param <T>
  */
@@ -55,9 +55,8 @@ public class Result<T>
 
     /**
      * Success without warnings
-     * 
+     *
      * @param model
-     * @return
      */
     public static <T> Result<T> success( T model )
     {
@@ -66,10 +65,9 @@ public class Result<T>
 
     /**
      * Success with warnings
-     * 
+     *
      * @param model
      * @param problems
-     * @return
      */
     public static <T> Result<T> success( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -79,10 +77,9 @@ public class Result<T>
 
     /**
      * Success with warnings
-     * 
+     *
      * @param model
      * @param results
-     * @return
      */
     public static <T> Result<T> success( T model, Result<?>... results )
     {
@@ -93,7 +90,6 @@ public class Result<T>
      * Error with problems describing the cause
      *
      * @param problems
-     * @return
      */
     public static <T> Result<T> error( Iterable<? extends ModelProblem> problems )
     {
@@ -120,7 +116,6 @@ public class Result<T>
      *
      * @param model
      * @param problems
-     * @return
      */
     public static <T> Result<T> error( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -129,10 +124,9 @@ public class Result<T>
 
     /**
      * New result - determine whether error or success by checking problems for errors
-     * 
+     *
      * @param model
      * @param problems
-     * @return
      */
     public static <T> Result<T> newResult( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -142,10 +136,9 @@ public class Result<T>
     /**
      * New result consisting of given result and new problem. Convenience for newResult(result.get(),
      * concat(result.getProblems(),problems)).
-     * 
+     *
      * @param result
      * @param problem
-     * @return
      */
     public static <T> Result<T> addProblem( Result<T> result, ModelProblem problem )
     {
@@ -157,7 +150,6 @@ public class Result<T>
      *
      * @param result
      * @param problems
-     * @return
      */
     public static <T> Result<T> addProblems( Result<T> result, Iterable<? extends ModelProblem> problems )
     {
@@ -172,9 +164,8 @@ public class Result<T>
 
     /**
      * Turns the given results into a single result by combining problems and models into single collection.
-     * 
+     *
      * @param results
-     * @return
      */
     public static <T> Result<Iterable<T>> newResultSet( Iterable<? extends Result<? extends T>> results )
     {

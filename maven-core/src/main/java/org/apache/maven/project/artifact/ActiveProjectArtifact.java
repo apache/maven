@@ -38,7 +38,7 @@ import java.util.List;
  * attributes of this artifact.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @todo I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
+ * TODO I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
  * should be split. ie scope, file, etc depend on the context of use, whereas everything else is immutable.
  */
 @Deprecated

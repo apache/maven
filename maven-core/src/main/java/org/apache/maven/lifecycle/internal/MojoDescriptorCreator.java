@@ -239,8 +239,8 @@ public class MojoDescriptorCreator
                                                 session.getRepositorySession() );
     }
 
-    // TODO: take repo mans into account as one may be aggregating prefixes of many
-    // TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
+    // TODO take repo mans into account as one may be aggregating prefixes of many
+    // TODO collect at the root of the repository, read the one at the root, and fetch remote if something is missing
     // or the user forces the issue
 
     public Plugin findPluginForPrefix( String prefix, MavenSession session )

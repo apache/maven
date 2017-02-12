@@ -1088,7 +1088,7 @@ public class DefaultMavenExecutionRequest
         return pluginArtifactRepositories;
     }
 
-    // TODO: this does not belong here.
+    // TODO this does not belong here.
     @Override
     public ProjectBuildingRequest getProjectBuildingRequest()
     {

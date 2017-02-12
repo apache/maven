@@ -356,15 +356,15 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
     /**
-     * 
-     * 
+     *
+     *
      * @return the global toolchains file
      * @since 3.3.0
      */
     File getGlobalToolchainsFile();
 
     /**
-     * 
+     *
      * @param globalToolchainsFile the global toolchains file
      * @return this request
      * @since 3.3.0
@@ -388,29 +388,31 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
 
     /**
-     * Controls the {@link Builder} used by Maven by specification of the builder's id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification
+     * of the builder's id.
      *
      * @since 3.2.0
      */
     MavenExecutionRequest setBuilderId( String builderId );
 
     /**
-     * Controls the {@link Builder} used by Maven by specification of the builders id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification
+     * of the builders id.
      *
      * @since 3.2.0
      */
     String getBuilderId();
 
     /**
-     * 
-     * @param toolchains all toolchains grouped by type 
-     * @return this request 
+     *
+     * @param toolchains all toolchains grouped by type
+     * @return this request
      * @since 3.3.0
      */
     MavenExecutionRequest setToolchains( Map<String, List<ToolchainModel>> toolchains );
-    
+
     /**
-     * 
+     *
      * @return all toolchains grouped by type, never {@code null}
      * @since 3.3.0
      */
@@ -428,9 +430,9 @@ public interface MavenExecutionRequest
 
     /**
      * @since 3.3.0
-     */    
+     */
     MavenExecutionRequest setEventSpyDispatcher( EventSpyDispatcher eventSpyDispatcher );
-    
+
     /**
      * @since 3.3.0
      */

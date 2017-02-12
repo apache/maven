@@ -249,7 +249,7 @@ public class DefaultLegacyArtifactCollector
 
         Object key = node.getKey();
 
-        // TODO: Does this check need to happen here? Had to add the same call
+        // TODO Does this check need to happen here? Had to add the same call
         // below when we iterate on child nodes -- will that suffice?
         if ( managedVersions.containsKey( key ) )
         {
@@ -272,11 +272,11 @@ public class DefaultLegacyArtifactCollector
 
                         if ( ( previousRange != null ) && ( currentRange != null ) )
                         {
-                            // TODO: shouldn't need to double up on this work, only done for simplicity of handling
+                            // TODO shouldn't need to double up on this work, only done for simplicity of handling
                             // recommended
                             // version but the restriction is identical
                             VersionRange newRange = previousRange.restrict( currentRange );
-                            // TODO: ick. this forces the OCE that should have come from the previous call. It is still
+                            // TODO ick. this forces the OCE that should have come from the previous call. It is still
                             // correct
                             if ( newRange.isSelectedVersionKnown( previous.getArtifact() ) )
                             {
@@ -363,7 +363,7 @@ public class DefaultLegacyArtifactCollector
 
                         if ( resolved == null )
                         {
-                            // TODO: add better exception that can detail the two conflicting artifacts
+                            // TODO add better exception that can detail the two conflicting artifacts
                             ArtifactResolutionException are =
                                 new ArtifactResolutionException( "Cannot resolve artifact version conflict between "
                                                                      + previous.getArtifact().getVersion() + " and "
@@ -375,14 +375,14 @@ public class DefaultLegacyArtifactCollector
 
                         if ( ( resolved != previous ) && ( resolved != node ) )
                         {
-                            // TODO: add better exception
+                            // TODO add better exception
                             result.addVersionRangeViolation( new ArtifactResolutionException(
                                 "Conflict resolver returned unknown resolution node: ",
                                 resolved.getArtifact() ) );
 
                         }
 
-                        // TODO: should this be part of mediation?
+                        // TODO should this be part of mediation?
                         // previous one is more dominant
                         ResolutionNode nearest;
                         ResolutionNode farthest;
@@ -501,7 +501,7 @@ public class DefaultLegacyArtifactCollector
                                 if ( artifact.getVersion() == null )
                                 {
                                     // set the recommended version
-                                    // TODO: maybe its better to just pass the range through to retrieval and use a
+                                    // TODO maybe its better to just pass the range through to retrieval and use a
                                     // transformation?
                                     ArtifactVersion version;
                                     if ( !artifact.isSelectedVersionKnown() )

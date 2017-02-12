@@ -36,7 +36,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  * - network/transfer errors - file system errors: permissions
  *
  * @author Jason van Zyl
- * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
+ * TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
  *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
  *       for the types of exceptions
  */
@@ -173,7 +173,7 @@ public class ArtifactResolutionResult
     }
 
     /**
-     * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
+     * TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
      *       {@link DefaultLegacyArtifactCollector}
      */

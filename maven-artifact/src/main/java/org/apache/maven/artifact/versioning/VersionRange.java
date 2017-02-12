@@ -295,7 +295,7 @@ public class VersionRange
             // original recommended version
             version = restriction.recommendedVersion;
         }
-/* TODO: should throw this immediately, but need artifact
+/* TODO should throw this immediately, but need artifact
         else
         {
             throw new OverConstrainedVersionException( "Restricting incompatible version ranges" );
@@ -518,7 +518,7 @@ public class VersionRange
 
     public ArtifactVersion matchVersion( List<ArtifactVersion> versions )
     {
-        // TODO: could be more efficient by sorting the list and then moving along the restrictions in order?
+        // TODO could be more efficient by sorting the list and then moving along the restrictions in order?
 
         ArtifactVersion matched = null;
         for ( ArtifactVersion version : versions )

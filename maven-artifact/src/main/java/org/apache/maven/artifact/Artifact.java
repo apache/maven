@@ -48,7 +48,7 @@ public interface Artifact
 
     Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
-    // TODO: into artifactScope handler
+    // TODO into artifactScope handler
 
     String SCOPE_COMPILE = "compile";
 

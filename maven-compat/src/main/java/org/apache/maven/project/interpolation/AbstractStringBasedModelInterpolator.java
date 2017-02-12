@@ -58,7 +58,7 @@ import java.util.Properties;
  * Use a regular expression search to find and resolve expressions within the POM.
  *
  * @author jdcasey Created on Feb 3, 2005
- * @todo Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
+ * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated
 public abstract class AbstractStringBasedModelInterpolator
@@ -104,7 +104,7 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     /**
-     * @todo: Remove the throws clause.
+     * TODO Remove the throws clause.
      * @throws IOException This exception is not thrown any more, and needs to be removed.
      */
     protected AbstractStringBasedModelInterpolator()
@@ -190,8 +190,6 @@ public abstract class AbstractStringBasedModelInterpolator
      *       with the value, and continue to find other expressions.</li>
      *   <li>If the value is null, get it from the model properties.</li>
      *   <li>
-     * @param overrideContext
-     * @param outputDebugMessages
      */
     public String interpolate( String src,
                                Model model,

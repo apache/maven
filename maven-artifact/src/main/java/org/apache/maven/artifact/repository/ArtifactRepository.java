@@ -79,7 +79,6 @@ public interface ArtifactRepository
     /**
      *
      * @param artifact
-     * @return
      * @since 3.0-alpha-3
      */
     Artifact find( Artifact artifact );

@@ -123,7 +123,7 @@ public class MetadataResolutionRequest
     }
 
     /**
-     * @deprecated instead use {@link #setRemoteRepositories()}
+     * @deprecated instead use {@link #setRemoteRepositories(List)}
      */
     @Deprecated
     public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )

@@ -37,7 +37,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
-    // TODO: use settings?
+    // TODO use settings?
     private String globalUpdatePolicy;
 
     private String globalChecksumPolicy;

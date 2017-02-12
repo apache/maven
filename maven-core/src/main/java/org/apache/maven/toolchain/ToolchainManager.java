@@ -44,16 +44,16 @@ public interface ToolchainManager
      * <code>maven-toolchains-plugin</code> contains the configuration to select the appropriate
      * toolchain and is executed at the beginning of the build.
      *
-     * @param session the Maven session, must not be {@code null}
      * @param type the type, must not be {@code null}
+     * @param context the Maven session, must not be {@code null}
      * @return the toolchain selected by <code>maven-toolchains-plugin</code>
      */
     Toolchain getToolchainFromBuildContext( String type, MavenSession context );
-    
+
     /**
      * Select all toolchains available in user settings matching the type and requirements,
      * independently from <code>maven-toolchains-plugin</code>.
-     * 
+     *
      * @param session the Maven session, must not be {@code null}
      * @param type the type, must not be {@code null}
      * @param requirements the requirements, may be {@code null}

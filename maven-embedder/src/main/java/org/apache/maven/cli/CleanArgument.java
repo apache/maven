@@ -64,7 +64,7 @@ public class CleanArgument
                     // otherwise, we trim the trailing " and append to the buffer.
                     else
                     {
-                        // TODO: introducing a space here...not sure what else to do but collapse whitespace
+                        // TODO introducing a space here...not sure what else to do but collapse whitespace
                         currentArg.append( ' ' ).append( cleanArgPart );
                     }
 

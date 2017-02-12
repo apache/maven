@@ -90,7 +90,7 @@ public class MavenMetadataSourceTest
         */
     }
 
-    //TODO: restore these if it makes sense
+    //TODO restore these if it makes sense
     /*
     public void testShouldUseCompileScopeIfDependencyScopeEmpty()
         throws Exception

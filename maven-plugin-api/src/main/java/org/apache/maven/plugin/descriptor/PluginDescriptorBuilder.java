@@ -313,7 +313,7 @@ public class PluginDescriptorBuilder
 
         mojo.setParameters( parameters );
 
-        // TODO: this should not need to be handed off...
+        // TODO this should not need to be handed off...
 
         // ----------------------------------------------------------------------
         // Requirements

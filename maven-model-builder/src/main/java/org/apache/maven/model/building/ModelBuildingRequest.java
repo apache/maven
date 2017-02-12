@@ -66,7 +66,7 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
-     * 
+     *
      * @return The raw model to build or {@code null} if not set.
      */
     Model getRawModel();
@@ -74,7 +74,7 @@ public interface ModelBuildingRequest
     /**
      * Set raw model.
      *
-     * @param model
+     * @param rawModel
      */
     ModelBuildingRequest setRawModel( Model rawModel );
 

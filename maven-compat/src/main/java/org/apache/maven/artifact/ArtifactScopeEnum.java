@@ -49,8 +49,6 @@ public enum ArtifactScopeEnum
 
     /**
      * Helper method to simplify null processing
-     *
-     * @return
      */
     public static final ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
     {

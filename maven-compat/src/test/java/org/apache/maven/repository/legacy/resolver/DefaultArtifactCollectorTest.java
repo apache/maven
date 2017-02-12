@@ -166,7 +166,7 @@ public class DefaultArtifactCollectorTest
     public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
-        // TODO: use newest conflict resolver
+        // TODO use newest conflict resolver
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         ArtifactSpec c2 = b.addDependency( "c", "2.0" );
@@ -185,7 +185,7 @@ public class DefaultArtifactCollectorTest
     public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewestVersionReplaced()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
-        // TODO: use newest conflict resolver
+        // TODO use newest conflict resolver
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b1 = a.addDependency( "b", "1.0" );
         ArtifactSpec c = a.addDependency( "c", "1.0" );

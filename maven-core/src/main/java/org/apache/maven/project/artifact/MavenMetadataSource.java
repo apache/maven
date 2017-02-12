@@ -93,7 +93,7 @@ public class MavenMetadataSource
     @Requirement
     private ArtifactFactory repositorySystem;
 
-    //TODO: This prevents a cycle in the composition which shows us another problem we need to deal with.
+    //TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
     //@Requirement
     private ProjectBuilder projectBuilder;
 
@@ -175,7 +175,7 @@ public class MavenMetadataSource
 
         Artifact relocatedArtifact = null;
 
-        //TODO: Not even sure this is really required as the project will be cached in the builder, we'll see this
+        //TODO Not even sure this is really required as the project will be cached in the builder, we'll see this
         // is currently the biggest hotspot
         if ( artifact instanceof ArtifactWithDependencies )
         {
@@ -658,7 +658,7 @@ public class MavenMetadataSource
 
                         // MNG-2861: the artifact data has changed. If the available versions where previously
                         // retrieved, we need to update it.
-                        // TODO: shouldn't the versions be merged across relocations?
+                        // TODO shouldn't the versions be merged across relocations?
                         List<ArtifactVersion> available = artifact.getAvailableVersions();
                         if ( available != null && !available.isEmpty() )
                         {

@@ -30,7 +30,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
  * Use a regular expression search to find and resolve expressions within the POM.
  *
  * @author jdcasey Created on Feb 3, 2005
- * @todo Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
+ * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated
 public class RegexBasedModelInterpolator

@@ -306,7 +306,7 @@ public class StringSearchModelInterpolator
                             new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
                                 "Failed to interpolate field3: " + field + " on class: "
                                     + field.getType().getName() ).setException(
-                                e ) ); // todo: Not entirely the same message
+                                e ) ); // TODO Not entirely the same message
                     }
                     catch ( IllegalAccessException e )
                     {

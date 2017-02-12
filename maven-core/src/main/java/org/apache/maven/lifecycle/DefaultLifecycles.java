@@ -40,7 +40,7 @@ import java.util.Set;
  * @author Jason van Zyl
  * @author Kristian Rosenvold
  */
-// TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
+// TODO The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
 // wiring and reference and external source for the lifecycle configuration.
 @Component( role = DefaultLifecycles.class )
 public class DefaultLifecycles

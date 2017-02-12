@@ -532,7 +532,7 @@ public class DefaultModelValidator
                                      d.getManagementKey(), d );
 
                     /*
-                     * TODO: Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
                      * order to don't break backward-compat with those, only warn but don't error out.
                      */
                     validateEnum( prefix + "scope", problems, Severity.WARNING, Version.V20, d.getScope(),

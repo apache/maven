@@ -165,7 +165,7 @@ public class DefaultRepositoryMetadataManager
                     }
                 }
 
-                // TODO: should this be inside the above check?
+                // TODO should this be inside the above check?
                 // touch file so that this is not checked again until interval has passed
                 if ( file.exists() )
                 {
@@ -196,9 +196,9 @@ public class DefaultRepositoryMetadataManager
                                 ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException
     {
-        // TODO: currently this is first wins, but really we should take the latest by comparing either the
+        // TODO currently this is first wins, but really we should take the latest by comparing either the
         // snapshot timestamp, or some other timestamp later encoded into the metadata.
-        // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
+        // TODO this needs to be repeated here so the merging doesn't interfere with the written metadata
         //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
 
         Map<ArtifactRepository, Metadata> previousMetadata = new HashMap<>();
@@ -227,7 +227,7 @@ public class DefaultRepositoryMetadataManager
                                          ArtifactRepository selected, ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException
     {
-        // TODO: this could be a lot nicer... should really be in the snapshot transformation?
+        // TODO this could be a lot nicer... should really be in the snapshot transformation?
         if ( metadata.isSnapshot() )
         {
             Metadata prevMetadata = metadata.getMetadata();
@@ -312,7 +312,7 @@ public class DefaultRepositoryMetadataManager
     }
 
     /**
-     * @todo share with DefaultPluginMappingManager.
+     * TODO share with DefaultPluginMappingManager.
      */
     protected Metadata readMetadata( File mappingFile )
         throws RepositoryMetadataReadException

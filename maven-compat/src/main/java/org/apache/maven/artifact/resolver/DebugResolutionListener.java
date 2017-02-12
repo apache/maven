@@ -85,7 +85,7 @@ public class DebugResolutionListener
         logger.debug( indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope "
             + artifact.getScope() + " wins)" );
 
-        // TODO: better way than static? this might hide messages in a reactor
+        // TODO better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
             logger.warn( "\n\tArtifact " + artifact + " retains local artifactScope '" + artifact.getScope()

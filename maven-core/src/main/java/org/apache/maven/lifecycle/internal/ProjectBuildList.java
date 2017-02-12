@@ -51,7 +51,7 @@ public class ProjectBuildList
         this.items = Collections.unmodifiableList( items );
     }
 
-    // TODO: Optimize; or maybe just rewrite the whole way aggregating mojos are being run.
+    // TODO Optimize; or maybe just rewrite the whole way aggregating mojos are being run.
     /**
      * Returns aProjectBuildList that contains only items for the specified taskSegment
      * @param taskSegment the requested tasksegment

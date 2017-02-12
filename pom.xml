@@ -640,14 +640,15 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
-              <linksource>true</linksource>
-              <notimestamp>true</notimestamp>
-              <quiet>true</quiet>
-              <links combine.children="append">
-                <!-- TODO link to Maven Resolver Javadoc -->
-                <link>http://download.eclipse.org/aether/aether-core/${aetherVersion}/apidocs/</link>
-                <link>https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/</link>
-              </links>
+              <!-- TODO Remove when we upgrade to maven-parent 31 -->
+              <locale>en</locale>
+              <tags>
+                <tag>
+                  <name>provisional</name>
+                  <placement>tf</placement>
+                  <head>Provisional:</head>
+                </tag>
+              </tags>
             </configuration>
             <reportSets>
               <reportSet>

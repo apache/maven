@@ -888,7 +888,7 @@ public class DefaultModelBuilder
         }
 
         //
-        // TODO:jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
+        // TODO jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
         // have a model that is suitable, yet more checks are done here and the one for the version is problematic
         // before because with parents as ranges it will never work in this scenario.
         //

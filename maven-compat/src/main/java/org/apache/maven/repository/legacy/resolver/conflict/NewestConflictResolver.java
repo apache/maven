@@ -54,7 +54,7 @@ public class NewestConflictResolver
         }
         catch ( OverConstrainedVersionException exception )
         {
-            // TODO: log message or throw exception?
+            // TODO log message or throw exception?
 
             return null;
         }

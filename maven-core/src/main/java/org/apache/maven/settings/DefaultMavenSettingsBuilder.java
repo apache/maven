@@ -127,7 +127,7 @@ public class DefaultMavenSettingsBuilder
 
         if ( StringUtils.isEmpty( path ) )
         {
-            // TODO: This replacing shouldn't be necessary as user.home should be in the
+            // TODO This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
             String basedir = System.getProperty( basedirSysProp );
             if ( basedir == null )

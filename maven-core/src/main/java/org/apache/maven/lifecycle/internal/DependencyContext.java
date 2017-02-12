@@ -35,7 +35,7 @@ import java.util.TreeSet;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-// TODO: From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
+// TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
 public class DependencyContext
 {
 

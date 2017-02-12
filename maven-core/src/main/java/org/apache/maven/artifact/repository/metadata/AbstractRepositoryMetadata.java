@@ -181,7 +181,7 @@ public abstract class AbstractRepositoryMetadata
 
     public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
     {
-        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
+        // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );
@@ -189,7 +189,7 @@ public abstract class AbstractRepositoryMetadata
 
     public void merge( ArtifactMetadata metadata )
     {
-        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
+        // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );

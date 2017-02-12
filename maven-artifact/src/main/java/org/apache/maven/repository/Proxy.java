@@ -148,9 +148,9 @@ public class Proxy
     }
 
     /**
-     * Get the type of the proxy server.
+     * Get the protocol of the proxy server.
      *
-     * @return the type of the proxy server
+     * @return the protocol of the proxy server
      */
     public String getProtocol()
     {
@@ -158,7 +158,7 @@ public class Proxy
     }
 
     /**
-     * @param type the type of the proxy server like <i>SOCKSv4</i>
+     * @param protocol the protocol of the proxy server like <i>SOCKSv4</i>
      */
     public void setProtocol( String protocol )
     {

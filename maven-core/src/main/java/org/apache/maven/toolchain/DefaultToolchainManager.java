@@ -124,7 +124,7 @@ public class DefaultToolchainManager
 
             if ( current != null )
             {
-                //TODO: why is this using the context
+                //TODO why is this using the context
                 context = session.getPluginContext( desc, current );
             }
         }

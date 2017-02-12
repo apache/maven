@@ -188,7 +188,7 @@ public class BuilderCommon
         }
     }
 
-    // Todo: I'm really wondering where this method belongs; smells like it should be on MavenProject, but for some
+    // TODO I'm really wondering where this method belongs; smells like it should be on MavenProject, but for some
     // reason it isn't ? This localization is kind-of a code smell.
 
     public static String getKey( MavenProject project )

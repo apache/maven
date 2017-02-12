@@ -115,7 +115,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// TODO: push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
+// TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
 /**
  * @author Jason van Zyl
@@ -211,7 +211,7 @@ public class MavenCli
         return result;
     }
 
-    // TODO: need to externalize CliRequest
+    // TODO need to externalize CliRequest
     public static int doMain( String[] args, ClassWorld classWorld )
     {
         MavenCli cli = new MavenCli();
@@ -283,7 +283,7 @@ public class MavenCli
         }
     }
 
-    // TODO: need to externalize CliRequest
+    // TODO need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
         PlexusContainer localContainer = null;
@@ -1510,7 +1510,7 @@ public class MavenCli
         final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
             ? commandLine.getOptionValue( CLIManager.THREADS )
             : request.getSystemProperties().getProperty(
-                MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
+                MavenCli.THREADS_DEPRECATED ); // TODO Remove this setting. Note that the int-tests use it
 
         if ( threadConfiguration != null )
         {

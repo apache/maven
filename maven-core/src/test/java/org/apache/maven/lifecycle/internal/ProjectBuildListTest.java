@@ -36,7 +36,7 @@ public class ProjectBuildListTest
 
         final ProjectBuildList byTaskSegment = projectBuildList.getByTaskSegment( taskSegment );
         assertEquals( projectBuildList.size(),
-                      byTaskSegment.size() ); // Todo: Make multiple segments on projectBuildList
+                      byTaskSegment.size() ); // TODO Make multiple segments on projectBuildList
     }
 
 }

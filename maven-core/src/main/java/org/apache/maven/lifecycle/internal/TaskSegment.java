@@ -69,5 +69,5 @@ public final class TaskSegment
         return aggregating;
     }
 
-    // TODO: Consider throwing UnsupportedSomething on hashCode/equals
+    // TODO Consider throwing UnsupportedSomething on hashCode/equals
 }

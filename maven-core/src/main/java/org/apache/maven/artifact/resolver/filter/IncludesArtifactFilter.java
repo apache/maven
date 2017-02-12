@@ -49,7 +49,7 @@ public class IncludesArtifactFilter
         boolean matched = false;
         for ( Iterator<String> i = patterns.iterator(); i.hasNext() & !matched; )
         {
-            // TODO: what about wildcards? Just specifying groups? versions?
+            // TODO what about wildcards? Just specifying groups? versions?
             if ( id.equals( i.next() ) )
             {
                 matched = true;

@@ -58,7 +58,7 @@ public interface Mojo
      *
      * @param log a new logger
      */
-    // TODO: not sure about this here, and may want a getLog on here as well/instead
+    // TODO not sure about this here, and may want a getLog on here as well/instead
     void setLog( Log log );
 
     /**

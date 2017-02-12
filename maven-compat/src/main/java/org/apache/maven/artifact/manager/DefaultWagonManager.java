@@ -166,7 +166,7 @@ public class DefaultWagonManager
             String id = mirror.getId();
             if ( id == null )
             {
-                // TODO: this should be illegal in settings.xml
+                // TODO this should be illegal in settings.xml
                 id = repository.getId();
             }
 

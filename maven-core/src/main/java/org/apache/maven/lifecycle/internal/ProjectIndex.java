@@ -35,7 +35,7 @@ import java.util.Map;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-// Todo: Kristian wonders if this class really is necessary and if it overlaps other concepts.
+// TODO Kristian wonders if this class really is necessary and if it overlaps other concepts.
 public final class ProjectIndex
 {
 

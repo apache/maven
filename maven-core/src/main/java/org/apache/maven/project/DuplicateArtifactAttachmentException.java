@@ -27,7 +27,7 @@ import org.apache.maven.artifact.Artifact;
  *
  * @author pgier
  * @author jdcasey
- * @todo Make this a checked exception, and modify the API of MavenProjectHelper.
+ * TODO Make this a checked exception, and modify the API of MavenProjectHelper.
  * Currently, this modification would create compatibility problems for existing plugins.
  */
 public class DuplicateArtifactAttachmentException

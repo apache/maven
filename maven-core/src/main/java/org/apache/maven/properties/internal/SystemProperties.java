@@ -28,8 +28,6 @@ public class SystemProperties
 {
     /**
      * Thread-safe System.properties copy implementation.
-     *
-     * @see https://issues.apache.org/jira/browse/MNG-5670
      */
     public static void addSystemProperties( Properties props )
     {
@@ -38,8 +36,8 @@ public class SystemProperties
 
     /**
      * Returns a copy of {@link System#getProperties()} in a thread-safe manner.
-     * 
-     * @return {@link System#getProperties()} obtained in a thread-safe manner. 
+     *
+     * @return {@link System#getProperties()} obtained in a thread-safe manner.
      */
     public static Properties getSystemProperties()
     {

@@ -36,7 +36,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * <a href="https://maven.apache.org/developers/mojo-api-specification.html">
  * https://maven.apache.org/developers/mojo-api-specification.html</a>
  *
- * @todo is there a need for the delegation of MavenMojoDescriptor to this?
+ * TODO is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?
  */
 public class MojoDescriptor
@@ -269,7 +269,7 @@ public class MojoDescriptor
 
     /**
      * @return the required dependencies in a specified scope
-     * @TODO the name is not intelligible
+     * TODO the name is not intelligible
      */
     @Deprecated
     public String isDependencyResolutionRequired()

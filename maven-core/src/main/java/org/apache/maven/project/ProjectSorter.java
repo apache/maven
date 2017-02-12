@@ -233,7 +233,7 @@ public class ProjectSorter
         return !( StringUtils.isEmpty( version ) || version.startsWith( "[" ) || version.startsWith( "(" ) );
     }
 
-    // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+    // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
     public MavenProject getTopLevelProject()
     {
         if ( topLevelProject == null )

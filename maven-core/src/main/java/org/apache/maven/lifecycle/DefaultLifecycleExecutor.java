@@ -97,8 +97,8 @@ public class DefaultLifecycleExecutor
     // fully populated Plugin objects, including executions with goals and default configuration taken
     // from the plugin.xml inside a plugin.
     //
-    // TODO: This whole method could probably removed by injecting lifeCyclePluginAnalyzer straight into client site.
-    // TODO: But for some reason the whole plexus appcontext refuses to start when I try this.
+    // TODO This whole method could probably removed by injecting lifeCyclePluginAnalyzer straight into client site.
+    // TODO But for some reason the whole plexus appcontext refuses to start when I try this.
 
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {

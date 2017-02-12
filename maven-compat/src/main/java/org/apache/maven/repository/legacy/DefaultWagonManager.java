@@ -56,9 +56,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.util.ConfigUtils;
 
-//TODO: remove the update check manager
-//TODO: separate into retriever and publisher
-//TODO: remove hardcoding of checksum logic
+//TODO remove the update check manager
+//TODO separate into retriever and publisher
+//TODO remove hardcoding of checksum logic
 @Component( role = WagonManager.class )
 public class DefaultWagonManager
     implements WagonManager
@@ -378,7 +378,7 @@ public class DefaultWagonManager
                 ChecksumObserver sha1ChecksumObserver = null;
                 try
                 {
-                    // TODO: configure on repository
+                    // TODO configure on repository
                     int i = 0;
 
                     md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
@@ -594,7 +594,7 @@ public class DefaultWagonManager
 
         Map<String, String> sums = new HashMap<>( 2 );
 
-        // TODO: configure these on the repository
+        // TODO configure these on the repository
         for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
         {
             checksums.put( CHECKSUM_IDS[i], addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i] ) );
@@ -628,7 +628,7 @@ public class DefaultWagonManager
             // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
             for ( String extension : checksums.keySet() )
             {
-                // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
+                // TODO shouldn't need a file intermediatary - improve wagon to take a stream
                 File temp = File.createTempFile( "maven-artifact", null );
                 temp.deleteOnExit();
                 FileUtils.fileWrite( temp.getAbsolutePath(), "UTF-8", sums.get( extension ) );
