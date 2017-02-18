@@ -101,7 +101,7 @@ public class BuilderCommon
         if ( session.getRequest().getDegreeOfConcurrency() > 1 )
         {
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
-            if ( !unsafePlugins.isEmpty()  && logger.isDebugEnabled() )
+            if ( !unsafePlugins.isEmpty() )
             {
                 logger.warn( "*****************************************************************" );
                 logger.warn( "* Your build is requesting parallel execution, but project      *" );
