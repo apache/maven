@@ -520,15 +520,6 @@ public class DefaultMaven
                 logger.error( problem.toString() );
             }
         }
-
-        if ( !graphResult.hasErrors() )
-        {
-            ProjectDependencyGraph projectDependencyGraph = graphResult.get();
-            session.setProjects( projectDependencyGraph.getSortedProjects() );
-            session.setAllProjects( projectDependencyGraph.getSortedProjects() );
-            session.setProjectDependencyGraph( projectDependencyGraph );
-        }
-
         return graphResult;
     }
 
