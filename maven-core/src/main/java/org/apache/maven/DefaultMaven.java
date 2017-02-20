@@ -525,7 +525,7 @@ public class DefaultMaven
         {
             ProjectDependencyGraph projectDependencyGraph = graphResult.get();
             session.setProjects( projectDependencyGraph.getSortedProjects() );
-            session.setAllProjects( projectDependencyGraph.getSortedProjects() );
+            session.setAllProjects( projectDependencyGraph.getAllProjects() );
             session.setProjectDependencyGraph( projectDependencyGraph );
         }
 

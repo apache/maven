@@ -157,6 +157,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             new MavenSession( getContainer(), configuration.getRepositorySession(), request,
                               new DefaultMavenExecutionResult() );
         session.setProjects( Arrays.asList( project ) );
+        session.setAllProjects( session.getProjects() );
 
         return session;
     }

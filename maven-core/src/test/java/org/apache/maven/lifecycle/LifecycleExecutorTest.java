@@ -400,6 +400,11 @@ public class LifecycleExecutorTest
                 return Collections.emptyList();
             }
 
+            public List<MavenProject> getAllProjects()
+            {
+                return session.getAllProjects();
+            }
+
             public List<MavenProject> getSortedProjects()
             {
                 return Collections.singletonList( session.getCurrentProject() );

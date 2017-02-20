@@ -64,6 +64,14 @@ class FilteredProjectDependencyGraph
         }
     }
 
+    /**
+     * @since 3.5.0-alpha-2
+     */
+    public List<MavenProject> getAllProjects()
+    {
+        return this.projectDependencyGraph.getAllProjects();
+    }
+
     public List<MavenProject> getSortedProjects()
     {
         if ( sortedProjects == null )

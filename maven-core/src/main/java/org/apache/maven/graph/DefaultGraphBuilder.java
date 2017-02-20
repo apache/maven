@@ -28,12 +28,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
@@ -43,6 +43,7 @@ import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.model.building.UrlModelSource;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -54,12 +55,11 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
-import com.google.common.collect.Lists;
-
 @Component( role = GraphBuilder.class, hint = GraphBuilder.HINT )
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
+
     @Requirement
     private Logger logger;
 
@@ -69,77 +69,68 @@ public class DefaultGraphBuilder
     @Override
     public Result<ProjectDependencyGraph> build( MavenSession session )
     {
-        if ( session.getProjectDependencyGraph() != null )
-        {
-            return dependencyGraph( session, session.getProjects(), false );
-        }
-        
-        List<MavenProject> projects = session.getProjects();
-
-        if ( projects == null )
-        {
-            try
-            {
-                projects = getProjectsForMavenReactor( session );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
-            }
-
-            validateProjects( projects );
-
-            return dependencyGraph( session, projects, true );
-        }
-        else
-        {
-            return dependencyGraph( session, projects, false );
-        }
-    }
-    
-    private Result<ProjectDependencyGraph> dependencyGraph( MavenSession session, List<MavenProject> projects,
-                                                            boolean applyMakeBehaviour )
-    {
-        MavenExecutionRequest request = session.getRequest();
-
-        ProjectDependencyGraph projectDependencyGraph = null;
-
         try
         {
-            projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
+            Result<ProjectDependencyGraph> result = sessionDependencyGraph( session );
 
-            if ( applyMakeBehaviour )
+            if ( result == null )
             {
-                List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
-
-                activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, request );
-                activeProjects = trimExcludedProjects( activeProjects, request );
-                activeProjects = trimResumedProjects( activeProjects, request );
-
-                if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
-                {
-                    projectDependencyGraph =
-                        new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
-                }
+                final List<MavenProject> projects = getProjectsForMavenReactor( session );
+                validateProjects( projects );
+                result = reactorDependencyGraph( session, projects );
             }
+
+            return result;
         }
-        catch ( CycleDetectedException e )
+        catch ( final ProjectBuildingException e )
+        {
+            return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
+        }
+        catch ( final CycleDetectedException e )
         {
             String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
             ProjectCycleException error = new ProjectCycleException( message, e );
             return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, error ) ) );
         }
-        catch ( org.apache.maven.project.DuplicateProjectException e )
+        catch ( final DuplicateProjectException e )
         {
             return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
         }
-        catch ( MavenExecutionException e )
+        catch ( final MavenExecutionException e )
         {
             return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
+        }
+    }
+
+    private Result<ProjectDependencyGraph> sessionDependencyGraph( final MavenSession session )
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        Result<ProjectDependencyGraph> result = null;
+
+        if ( session.getProjectDependencyGraph() != null || session.getProjects() != null )
+        {
+            final ProjectDependencyGraph graph =
+                new DefaultProjectDependencyGraph( session.getAllProjects(), session.getProjects() );
+
+            result = Result.success( graph );
         }
 
-        session.setProjects( projectDependencyGraph.getSortedProjects() );
-        session.setProjectDependencyGraph( projectDependencyGraph );
+        return result;
+    }
+
+    private Result<ProjectDependencyGraph> reactorDependencyGraph( MavenSession session, List<MavenProject> projects )
+        throws CycleDetectedException, DuplicateProjectException, MavenExecutionException
+    {
+        ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
+        List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
+        activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
+        activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
+        activeProjects = trimResumedProjects( activeProjects, session.getRequest() );
+
+        if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
+        {
+            projectDependencyGraph = new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
+        }
 
         return Result.success( projectDependencyGraph );
     }
@@ -366,16 +357,6 @@ public class DefaultGraphBuilder
         }
 
         return false;
-    }
-
-    private MavenExecutionResult addExceptionToResult( MavenExecutionResult result, Throwable e )
-    {
-        if ( !result.getExceptions().contains( e ) )
-        {
-            result.addException( e );
-        }
-
-        return result;
     }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

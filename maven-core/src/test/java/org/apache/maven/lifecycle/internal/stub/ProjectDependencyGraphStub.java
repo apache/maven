@@ -169,6 +169,11 @@ public class ProjectDependencyGraphStub
         return dependencies;
     }
 
+    public List<MavenProject> getAllProjects()
+    {
+        return Arrays.asList( A, B, C, X, Y, Z, UNKNOWN );
+    }
+
     public List<MavenProject> getSortedProjects()
     {
         return Arrays.asList( A, B, C, X, Y, Z ); // I'm not entirely sure about the order but this should do...

@@ -33,6 +33,15 @@ public interface ProjectDependencyGraph
 {
 
     /**
+     * Gets all collected projects.
+     *
+     * @return All collected projects.
+     *
+     * @since 3.5.0-alpha-2
+     */
+    List<MavenProject> getAllProjects();
+
+    /**
      * Gets all projects in their intended build order, i.e. after topologically sorting the projects according to their
      * inter-dependencies.
      *
