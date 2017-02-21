@@ -383,7 +383,7 @@ public class MavenCli
         CLIManager cliManager = new CLIManager();
 
         List<String> args = new ArrayList<>();
-
+        CommandLine mavenConfig = null;
         try
         {
             File configFile = new File( cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG );
@@ -398,8 +398,8 @@ public class MavenCli
                     }
                 }
 
-                CommandLine config = cliManager.parse( args.toArray( new String[args.size()] ) );
-                List<?> unrecongized = config.getArgList();
+                mavenConfig = cliManager.parse( args.toArray( new String[args.size()] ) );
+                List<?> unrecongized = mavenConfig.getArgList();
                 if ( !unrecongized.isEmpty() )
                 {
                     throw new ParseException( "Unrecognized maven.config entries: " + unrecongized );
@@ -415,21 +415,14 @@ public class MavenCli
 
         try
         {
-            int index = 0;
-            for ( String arg : cliRequest.args )
+            if ( mavenConfig == null )
             {
-                if ( arg.startsWith( "-D" ) )
-                {
-                    // a property definition so needs to come last so that the last property wins
-                    args.add( arg );
-                }
-                else
-                {
-                    // not a property definition so needs to come first to override maven.config
-                    args.add( index++, arg );
-                }
+                cliRequest.commandLine = cliManager.parse( cliRequest.args );
             }
-            cliRequest.commandLine = cliManager.parse( args.toArray( new String[args.size()] ) );
+            else
+            {
+                cliRequest.commandLine = new MergedCommandLine( cliManager.parse( cliRequest.args ), mavenConfig );
+            }
         }
         catch ( ParseException e )
         {

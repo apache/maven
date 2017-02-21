@@ -19,11 +19,10 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.File;
-
+import junit.framework.TestCase;
 import org.apache.commons.cli.ParseException;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 public class MavenCliTest
     extends TestCase
@@ -75,7 +74,8 @@ public class MavenCliTest
     public void testMavenConfig()
         throws Exception
     {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/config" ).getCanonicalPath() );
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/config" ).getCanonicalPath() );
         CliRequest request = new CliRequest( new String[0], null );
 
         // read .mvn/maven.config
@@ -85,7 +85,7 @@ public class MavenCliTest
         assertEquals( "8", request.commandLine.getOptionValue( CLIManager.THREADS ) );
 
         // override from command line
-        request = new CliRequest( new String[] { "--builder", "foobar" }, null );
+        request = new CliRequest( new String[]{ "--builder", "foobar" }, null );
         cli.cli( request );
         assertEquals( "foobar", request.commandLine.getOptionValue( "builder" ) );
     }
@@ -93,7 +93,8 @@ public class MavenCliTest
     public void testMavenConfigInvalid()
         throws Exception
     {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
         CliRequest request = new CliRequest( new String[0], null );
 
         cli.initialize( request );
@@ -107,7 +108,7 @@ public class MavenCliTest
 
         }
     }
-    
+
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
@@ -116,19 +117,23 @@ public class MavenCliTest
      * </pre>
      * and check if the {@code -T 3} option can be overwritten via command line
      * argument.
+     *
      * @throws Exception in case of failure.
      */
-    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine()
+        throws Exception
+    {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
         CliRequest request = new CliRequest( new String[]{ "-T", "5" }, null );
 
         cli.initialize( request );
         // read .mvn/maven.config
         cli.cli( request );
-        
+
         assertEquals( "5", request.commandLine.getOptionValue( CLIManager.THREADS ) );
     }
-    
+
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
@@ -137,17 +142,21 @@ public class MavenCliTest
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
+     *
      * @throws Exception
      */
-    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0"}, null );
+    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine()
+        throws Exception
+    {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0" }, null );
 
         cli.initialize( request );
         // read .mvn/maven.config
         cli.cli( request );
         cli.properties( request );
-        
+
         String revision = System.getProperty( "revision" );
         assertEquals( "8.1.0", revision );
     }
@@ -160,11 +169,15 @@ public class MavenCliTest
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
+     *
      * @throws Exception
      */
-    public void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0", "-Drevision=8.2.0"}, null );
+    public void testMVNConfigurationCLIRepeatedPropertiesLastWins()
+        throws Exception
+    {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0", "-Drevision=8.2.0" }, null );
 
         cli.initialize( request );
         // read .mvn/maven.config
@@ -173,5 +186,39 @@ public class MavenCliTest
 
         String revision = System.getProperty( "revision" );
         assertEquals( "8.2.0", revision );
+    }
+
+    /**
+     * Read .mvn/maven.config with the following definitions:
+     * <pre>
+     *   -T 3
+     *   -Drevision=1.3.0
+     * </pre>
+     * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line argument when there are
+     * funky arguments present.
+     *
+     * @throws Exception
+     */
+    public void testMVNConfigurationFunkyArguments()
+        throws Exception
+    {
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+        CliRequest request = new CliRequest(
+            new String[]{ "-Drevision=8.1.0", "--file=-Dpom.xml", "\"-Dfoo=bar ", "\"-Dfoo2=bar two\"",
+                "-Drevision=8.2.0" }, null );
+
+        cli.initialize( request );
+        // read .mvn/maven.config
+        cli.cli( request );
+        cli.properties( request );
+
+        String revision = System.getProperty( "revision" );
+        assertEquals( "8.2.0", revision );
+
+        assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
+        assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
+
+        assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
     }
 }
