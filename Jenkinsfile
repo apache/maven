@@ -19,7 +19,7 @@
 
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
 
-def itBranch='master'
+def tests
 
 try {
 node('ubuntu') {
@@ -40,6 +40,7 @@ node('ubuntu') {
             stash includes: 'apache-maven-dist.zip', name: 'dist'
         }
         junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+        tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', excludes: '', gitTool: 'Default', id: '_', ignoreOnPushNotifications: false, includes: '*', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git'], targets: [BRANCH_NAME, 'master']
     }
 }
 
@@ -52,13 +53,14 @@ parallel linuxJava7:{
             echo "Running integration tests with Java $JAVA_NIX_J7"
             dir('test') {
                 def WORK_DIR=pwd()
-                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: itBranch)
+                checkout tests
                 sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
                     sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
+                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     },linuxJava8: {
@@ -69,13 +71,14 @@ parallel linuxJava7:{
             echo "Running integration tests with Java $JAVA_NIX_J8"
             dir('test') {
                 def WORK_DIR=pwd()
-                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: itBranch)
+                checkout tests
                 sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
                 unstash 'dist'
                 withEnv(["PATH+MAVEN=$MAVEN_NIX_J8/bin","PATH+JDK=$JAVA_NIX_J8/bin"]) {
                     sh "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
+                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }, winJava7: {
@@ -90,9 +93,12 @@ parallel linuxJava7:{
                 JAVA_WIN_J7=pwd()
             }
             echo "Running integration tests with Java $JAVA_WIN_J7"
-            dir('test') {
+            // need a short path or we hit 256 character limit for paths
+            // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
+            // will not trample each other
+            dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
                 def WORK_DIR=pwd()
-                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: itBranch)
+                checkout tests
                 bat "if exist it-local-repo rmdir /s /q it-local-repo"
                 bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin","JAVA_HOME=$JAVA_WIN_J7"]) {
@@ -101,6 +107,7 @@ parallel linuxJava7:{
                     bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
+                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }, winJava8: {
@@ -115,9 +122,12 @@ parallel linuxJava7:{
                 JAVA_WIN_J8=pwd()
             }
             echo "Running integration tests with Java $JAVA_WIN_J8"
-            dir('test') {
+            // need a short path or we hit 256 character limit for paths
+            // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
+            // will not trample each other
+            dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
                 def WORK_DIR=pwd()
-                git(url:'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', branch: itBranch)
+                checkout tests
                 bat "if exist it-local-repo rmdir /s /q it-local-repo"
                 bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                 withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin","JAVA_HOME=$JAVA_WIN_J8"]) {
@@ -126,6 +136,7 @@ parallel linuxJava7:{
                     bat "mvn clean install -Prun-its -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
                 }
                 junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
+                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }
