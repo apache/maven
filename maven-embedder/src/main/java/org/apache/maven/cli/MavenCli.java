@@ -19,15 +19,12 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -102,7 +99,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -114,6 +110,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -417,7 +415,20 @@ public class MavenCli
 
         try
         {
-            args.addAll( 0, Arrays.asList( cliRequest.args ) );
+            int index = 0;
+            for ( String arg : cliRequest.args )
+            {
+                if ( arg.startsWith( "-D" ) )
+                {
+                    // a property definition so needs to come last so that the last property wins
+                    args.add( arg );
+                }
+                else
+                {
+                    // not a property definition so needs to come first to override maven.config
+                    args.add( index++, arg );
+                }
+            }
             cliRequest.commandLine = cliManager.parse( args.toArray( new String[args.size()] ) );
         }
         catch ( ParseException e )
@@ -1587,11 +1598,6 @@ public class MavenCli
             
             if ( defStrs != null )
             {
-                //The following is needed to get precedence
-                //of properties which are defined on command line
-                //over properties defined in the .mvn/maven.config. 
-                ArrayUtils.reverse( defStrs );
-                
                 for ( String defStr : defStrs )
                 {
                     setCliProperty( defStr, userProperties );
