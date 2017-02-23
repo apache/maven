@@ -57,12 +57,6 @@ Maven Model Builder
 
    ** parent resolution until {{{./super-pom.html}super-pom}}
 
-   []
-
- * phase 2, with optional plugin processing
-
-   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
-
    ** inheritance assembly (see {{{./index.html#Inheritance_Assembly}below}})
 
    ** model interpolation (see {{{./index.html#Model_Interpolation}below}})
