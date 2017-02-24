@@ -32,7 +32,7 @@ public class MavenITmng2199ParentVersionRangeTest
     public void testValidParentVersionRangeWithInclusiveUpperBound()
         throws Exception
     {
-        failingMavenVersions( "(3.2.2,3.5.0)" );
+        failingMavenVersions( "(3.2.2,3.5.0-alpha-0)" );
         Verifier verifier = null;
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(),
@@ -67,7 +67,7 @@ public class MavenITmng2199ParentVersionRangeTest
     public void testValidParentVersionRangeWithExclusiveUpperBound()
         throws Exception
     {
-        failingMavenVersions( "(3.2.2,3.5.0)" );
+        failingMavenVersions( "(3.2.2,3.5.0-alpha-0)" );
         Verifier verifier = null;
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-exclusive-upper-bound" );
@@ -194,7 +194,7 @@ public class MavenITmng2199ParentVersionRangeTest
     public void testValidLocalParentVersionRange()
         throws Exception
     {
-        failingMavenVersions( "(,3.3.0),(3.3.9,3.5.0)" );
+        failingMavenVersions( "(,3.3.0),(3.3.9,3.5.0-alpha-0)" );
         Verifier verifier = null;
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-local/child" );
@@ -292,7 +292,7 @@ public class MavenITmng2199ParentVersionRangeTest
     public void testValidLocalParentVersionRangeInvalidVersionExpression()
         throws Exception
     {
-        failingMavenVersions( "(,3.5.0)" );
+        failingMavenVersions( "(,3.5.0-alpha-0)" );
         Verifier verifier = null;
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/expression-local/child" );
@@ -322,7 +322,7 @@ public class MavenITmng2199ParentVersionRangeTest
     public void testValidLocalParentVersionRangeInvalidVersionInheritance()
         throws Exception
     {
-        failingMavenVersions( "(,3.5.0)" );
+        failingMavenVersions( "(,3.5.0-alpha-0)" );
         Verifier verifier = null;
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/inherited-local/child" );
