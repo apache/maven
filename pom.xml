@@ -149,13 +149,6 @@ under the License.
     </contributor>
   </contributors>
 
-  <!-- This marked as deprecated for Maven 3.X. This is checked by maven-enforcer-plugin -->
-  <!--  https://issues.apache.org/jira/browse/MNG-4840 -->
-  <!--  https://issues.apache.org/jira/browse/MNG-5297 -->
-  <prerequisites>
-    <maven>${maven.version}</maven>
-  </prerequisites>
-
   <!--bootstrap-start-comment-->
   <dependencyManagement>
     <!--bootstrap-end-comment-->
