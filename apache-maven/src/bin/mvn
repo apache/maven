@@ -141,9 +141,9 @@ find_file_argument_basedir() {
   found_file_switch=0
   for arg in "$@"; do
     if [ ${found_file_switch} -eq 1 ]; then
-      if [ -f ${arg} ]; then
-        basedir=$(dirname $(readlink -f "${arg}"))
-        if [ ! -d ${basedir} ]; then
+      if [ -f "${arg}" ]; then
+        basedir=$(dirname "$(readlink -f "${arg}")")
+        if [ ! -d "${basedir}" ]; then
           echo "Directory ${basedir} extracted from the -f/--file command-line argument ${arg} does not exist" >&2
           exit 1
         fi
