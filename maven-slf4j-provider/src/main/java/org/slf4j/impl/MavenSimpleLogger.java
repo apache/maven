@@ -56,8 +56,12 @@ public class MavenSimpleLogger
     }
 
     @Override
-    protected void renderThrowable( Throwable t, PrintStream stream )
+    protected void writeThrowable( Throwable t, PrintStream stream )
     {
+        if ( t == null )
+        {
+            return;
+        }
         stream.print( buffer().failure( t.getClass().getName() ) );
         if ( t.getMessage() != null )
         {

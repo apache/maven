@@ -34,20 +34,3 @@ if ( content.contains( 'MavenSimpleLoggerFactory' ) )
 println '    patching StaticLoggerBinder.java';
 content = content.replaceAll( 'SimpleLoggerFactory', 'MavenSimpleLoggerFactory' );
 file.write( content );
-
-
-println '    patching SimpleLogger.java';
-file = new File( dir, 'SimpleLogger.java' );
-content = file.text;
-content = content.replaceAll( 'private static final int LOG_LEVEL_', 'protected static final int LOG_LEVEL_' );
-content = content.replaceAll( 't.printStackTrace(TARGET_STREAM)', 'renderThrowable(t, TARGET_STREAM);' );
-
-index = content.indexOf( 'switch (level) {' );
-end = content.indexOf( '}', index ) + 1;
-content = content.substring( 0, index ) + 'buf.append(renderLevel(level));' + content.substring( end );
-
-content = content.substring( 0, content.lastIndexOf( '}' ) );
-content += '  protected void renderThrowable(Throwable t, PrintStream stream) {}\n';
-content += '  protected String renderLevel(int level) { return ""; }\n}\n';
-
-file.write( content );
