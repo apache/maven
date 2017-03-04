@@ -185,11 +185,70 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
 
+        prepareJansiNative();
         MessageUtils.systemInstall();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
         MessageUtils.systemUninstall();
 
         return result;
+    }
+
+    /**
+     * temporary method while improvement reported to JAnsi+HawtJNI and integrated:
+     * library.jansi.path should point to lib/jansi-native and HawtJNI should be able to detect
+     * the platform instead of forcing the user having to point library.jansi.path to
+     * lib/jansi-native/[platform]
+     */
+    private static void prepareJansiNative()
+    {
+        if ( System.getProperty( "library.jansi.path" ) == null )
+        {
+            String mavenHome = System.getProperty( "maven.home" );
+
+            if ( mavenHome != null )
+            {
+                File jansiNative = new File( mavenHome, "lib/jansi-native/" + hawtJNIgetPlatform() );
+                System.setProperty( "library.jansi.path", jansiNative.getAbsolutePath() );
+            }
+        }
+    }
+
+    private static String hawtJNIgetOperatingSystem()
+    {
+        String name = System.getProperty( "os.name" ).toLowerCase().trim();
+        if ( name.startsWith( "linux" ) )
+        {
+            return "linux";
+        }
+        if ( name.startsWith( "mac os x" ) )
+        {
+            return "osx";
+        }
+        if ( name.startsWith( "win" ) )
+        {
+            return "windows";
+        }
+        return name.replaceAll( "\\W+", "_" );
+
+    }
+
+    private static String hawtJNIgetPlatform()
+    {
+        return hawtJNIgetOperatingSystem() + hawtJNIgetBitModel();
+    }
+
+    private static int hawtJNIgetBitModel()
+    {
+        String prop = System.getProperty( "sun.arch.data.model" );
+        if ( prop == null )
+        {
+            prop = System.getProperty( "com.ibm.vm.bitmode" );
+        }
+        if ( prop != null )
+        {
+            return Integer.parseInt( prop );
+        }
+        return -1; // we don't know..
     }
 
     // TODO need to externalize CliRequest

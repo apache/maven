@@ -178,7 +178,6 @@ set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
   "-Dclassworlds.conf=%MAVEN_HOME%\bin\m2.conf" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\ext" ^
   %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end

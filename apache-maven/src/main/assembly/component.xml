@@ -56,6 +56,14 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
+      <directory>target/dependency/META-INF/native</directory>
+      <outputDirectory>lib/jansi-native</outputDirectory>
+      <includes>
+        <include>**</include>
+      </includes>
+      <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
