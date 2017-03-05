@@ -84,8 +84,9 @@ public class LifecycleExecutionException
 
         if ( execution != null )
         {
-            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' );
-            buffer.mojo( execution.getArtifactId() + ':' + execution.getVersion() + ':' + execution.getGoal() );
+            buffer.a( ' ' );
+            buffer.mojo( execution.getGroupId() + ':' + execution.getArtifactId() + ':' + execution.getVersion() + ':'
+                + execution.getGoal() );
             buffer.a( ' ' ).strong( '(' + execution.getExecutionId() + ')' );
         }
 
