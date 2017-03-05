@@ -81,6 +81,7 @@ public class DefaultGraphBuilder
             try
             {
                 projects = getProjectsForMavenReactor( session );
+                session.setAllProjects( projects );
             }
             catch ( ProjectBuildingException e )
             {
