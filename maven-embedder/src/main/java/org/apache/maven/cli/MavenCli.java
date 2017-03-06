@@ -126,24 +126,11 @@ public class MavenCli
 
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
 
-    @SuppressWarnings( "checkstyle:constantname" )
-    public static final String userHome = System.getProperty( "user.home" );
+    public static final String USER_HOME = System.getProperty( "user.home" );
 
-    @SuppressWarnings( "checkstyle:constantname" )
-    public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
+    public static final File USER_MAVEN_CONFIGURATION_HOME = new File( USER_HOME, ".m2" );
 
-    /**
-     * @deprecated use {@link SettingsXmlConfigurationProcessor#DEFAULT_USER_SETTINGS_FILE}
-     */
-    public static final File DEFAULT_USER_SETTINGS_FILE = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
-
-    /**
-     * @deprecated use {@link SettingsXmlConfigurationProcessor#DEFAULT_GLOBAL_SETTINGS_FILE}
-     */
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
-        SettingsXmlConfigurationProcessor.DEFAULT_GLOBAL_SETTINGS_FILE;
-
-    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( USER_MAVEN_CONFIGURATION_HOME, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
         new File( System.getProperty( "maven.conf" ), "toolchains.xml" );
@@ -1257,7 +1244,7 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-        @SuppressWarnings( "unchecked" ) List<String> goals = commandLine.getArgList();
+        List<String> goals = commandLine.getArgList();
 
         boolean recursive = true;
 

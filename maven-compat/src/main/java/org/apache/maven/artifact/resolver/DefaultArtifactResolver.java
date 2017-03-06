@@ -258,7 +258,7 @@ public class DefaultArtifactResolver
                                                              throws ArtifactResolutionException,
                                                              ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
+        return resolveTransitively( artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
                                     remoteRepositories, source, filter );
 
     }
@@ -305,7 +305,7 @@ public class DefaultArtifactResolver
                                                              throws ArtifactResolutionException,
                                                              ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
+        return resolveTransitively( artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
                                     remoteRepositories, source, null, listeners );
     }
 
