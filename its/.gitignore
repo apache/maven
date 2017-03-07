@@ -11,3 +11,4 @@ bin
 .DS_Store
 .idea
 jvz-*
+.flattened-pom.xml

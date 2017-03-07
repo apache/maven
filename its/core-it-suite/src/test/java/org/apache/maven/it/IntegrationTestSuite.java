@@ -106,6 +106,9 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng6057CheckReactorOrderTest.class );
+        suite.addTestSuite( MavenITmng5895CIFriendlyUsageWithPropertyTest.class );
+        suite.addTestSuite( MavenITmng6090CIFriendlyTest.class );
         suite.addTestSuite( MavenITmng6173GetProjectsAndDependencyGraphTest.class );
         suite.addTestSuite( MavenITmng6173GetAllProjectsInReactorTest.class );
         suite.addTestSuite( MavenITmng5958LifecyclePhaseBinaryCompat.class );
