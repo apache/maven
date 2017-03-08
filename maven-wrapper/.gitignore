@@ -3,3 +3,5 @@
 .settings
 /target/
 .DS_Store
+.idea/
+*.iml
