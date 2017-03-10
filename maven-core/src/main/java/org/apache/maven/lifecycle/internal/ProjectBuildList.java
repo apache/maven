@@ -33,13 +33,14 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
 /**
+ * <p>
  * A list of project segments, ordered so that all ProjectSegments from first TaskSegment come before any
  * subsequent TaskSegments.
+ * </p>
+ * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  *
  * @since 3.0
  * @author Kristian Rosenvold
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 public class ProjectBuildList
     implements Iterable<ProjectSegment>

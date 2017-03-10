@@ -122,7 +122,7 @@ public class ArtifactTransferEvent
      * Returns the request type.
      *
      * @return Returns the request type. The Request type is one of
-     *         <code>TransferEvent.REQUEST_GET<code> or <code>TransferEvent.REQUEST_PUT<code>
+     *         <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>
      */
     public int getRequestType()
     {
@@ -134,7 +134,7 @@ public class ArtifactTransferEvent
      *
      * @param requestType The requestType to set.
      *                    The Request type value should be either
-     *                    <code>TransferEvent.REQUEST_GET<code> or <code>TransferEvent.REQUEST_PUT<code>.
+     *                    <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>.
      * @throws IllegalArgumentException when
      */
     public void setRequestType( final int requestType )

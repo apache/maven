@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 /**
  * Evaluator for plugin parameters expressions. Content surrounded by <code>${</code> and <code>}</code> is evaluated.
- * Recognized values are:<table border="1">
+ * Recognized values are:<table border="1" summary="Expression matrix">
  * <tr><th>expression</th>                     <th></th>               <th>evaluation result</th></tr>
  * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link MavenSession}</td></tr>
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>

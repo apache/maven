@@ -49,12 +49,12 @@ import org.codehaus.plexus.logging.Logger;
  * This builder uses a number of threads equal to the minimum of the degree of concurrency (which is the thread count
  * set with <code>-T</code> on the command-line) and the number of projects to build. As such, building a single project
  * will always result in a sequential build, regardless of the thread count.
+ * </p> 
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Component( role = Builder.class, hint = "multithreaded" )
 public class MultiThreadedBuilder

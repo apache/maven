@@ -30,12 +30,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * <p>
  * Presents a view of the Dependency Graph that is suited for concurrent building.
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Kristian Rosenvold
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 public class ConcurrencyDependencyGraph
 {

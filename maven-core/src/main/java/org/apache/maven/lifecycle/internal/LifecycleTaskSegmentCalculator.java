@@ -33,17 +33,17 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import java.util.List;
 
 /**
+ * <p>
  * Calculates the task segments in the build
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author jdcasey
  * @author Kristian Rosenvold (extracted interface)
- *         <p/>
- *         NOTE: This interface is not part of any public api and can be changed or deleted without prior notice.
  */
-
 public interface LifecycleTaskSegmentCalculator
 {
     List<TaskSegment> calculateTaskSegments( MavenSession session )

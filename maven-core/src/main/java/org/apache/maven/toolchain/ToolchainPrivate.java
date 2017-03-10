@@ -34,7 +34,7 @@ public interface ToolchainPrivate
     /**
      * Let the toolchain decide if it matches requirements defined
      * in the toolchain plugin configuration.
-     * @param requirements Map<String, String> key value pair, may not be {@code null}
+     * @param requirements Map&lt;String, String&gt; key value pair, may not be {@code null}
      * @return {@code true} if the requirements match, otherwise {@code false}
      */
     boolean matchesRequirements( Map<String, String> requirements );

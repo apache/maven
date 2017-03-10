@@ -20,9 +20,10 @@ package org.apache.maven.lifecycle.internal;
  */
 
 /**
+ * <p>
  * A task that is a lifecycle
- * <p/>
- * NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Benjamin Bentmann

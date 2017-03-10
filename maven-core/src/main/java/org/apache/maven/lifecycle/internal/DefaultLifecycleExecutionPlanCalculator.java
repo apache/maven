@@ -62,11 +62,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import com.google.common.collect.ImmutableMap;
 
 /**
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * 
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (Extract class)
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Component( role = LifecycleExecutionPlanCalculator.class )
 public class DefaultLifecycleExecutionPlanCalculator

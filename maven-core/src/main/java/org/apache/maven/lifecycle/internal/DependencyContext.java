@@ -27,13 +27,14 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 /**
+ * <p>
  * Context of dependency artifacts for a particular project.
- *
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * 
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (class extract only)
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 // TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
 public class DependencyContext

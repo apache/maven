@@ -27,29 +27,33 @@ import java.util.List;
 
 /**
  * A build context that matches a mavenproject to a given tasksegment, and the session to be used.
- * <p/>
+ * <p>
  * A note to the reader;
- * <p/>
+ * </p>
+ * <p>
  * There are several issues/discussions regarding how "aggregator" plugins should be handled.
  * Read for instance http://docs.codehaus.org/display/MAVEN/Deterministic+Lifecycle+Planning
- * <p/>
+ * </p>
+ * <p>
  * In their current implementation they are "bolted" onto the lifecycle by separating them
  * into TaskSegments. This class represents the execution context of one such task segment.
- * <p/>
+ * </p>
+ * <p>
  * Wise voices have suggested that maybe aggregators shouldn't be bound to the ordinary
  * lifecycle at all, in which case we wouldn't be needing this class at all ( and
  * ProjectBuildList.getByTaskSegments). Or maybe they should be introduced in the calculation
  * of the execution plan instead, which seems much nicer.
- * <p/>
+ * </p>
+ * <p>
  * Additionally this class contains a clone of the MavenSession, which is *only* needed
  * because it has as notion of a "current" project.
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Jason van Zyl
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 public final class ProjectSegment
 {

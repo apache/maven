@@ -72,9 +72,10 @@ public class VersionRange
     }
 
     /**
+     * <p>
      * Create a version range from a string representation
-     * <p/>
-     * Some spec examples are
+     * </p>
+     * Some spec examples are:
      * <ul>
      * <li><code>1.0</code> Version 1.0</li>
      * <li><code>[1.0,2.0)</code> Versions 1.0 (included) to 2.0 (not included)</li>

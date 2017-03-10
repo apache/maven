@@ -39,7 +39,6 @@ import java.util.List;
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold  (extract interface only)
- *         <p/>
  */
 public interface LifecycleExecutionPlanCalculator
 {

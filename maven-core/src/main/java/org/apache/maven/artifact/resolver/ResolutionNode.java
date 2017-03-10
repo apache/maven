@@ -108,7 +108,7 @@ public class ResolutionNode
     }
 
     /**
-     * @return {@link List} &lt; {@link String} > with artifact ids
+     * @return {@link List} &lt; {@link String} &gt; with artifact ids
      * @throws OverConstrainedVersionException
      */
     public List<String> getDependencyTrail()

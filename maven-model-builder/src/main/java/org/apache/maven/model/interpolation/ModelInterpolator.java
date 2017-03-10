@@ -30,8 +30,6 @@ import java.io.File;
  * calculated from the elements of the model itself and the execution properties from the building request.
  *
  * @author jdcasey
- *         <p/>
- *         Created on Feb 2, 2005
  */
 public interface ModelInterpolator
 {

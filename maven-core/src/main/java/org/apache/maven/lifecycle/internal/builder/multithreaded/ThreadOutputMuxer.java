@@ -33,12 +33,12 @@ import org.apache.maven.lifecycle.internal.ProjectBuildList;
 import org.apache.maven.lifecycle.internal.ProjectSegment;
 
 /**
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * This class in particular may spontaneously self-combust and be replaced by a plexus-compliant thread aware
+ * logger implementation at any time.
+ * 
  * @since 3.0
  * @author Kristian Rosenvold
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
- *         This class in particular may spontaneously self-combust and be replaced by a plexus-compliant thread aware
- *         logger implementation at any time.
  */
 @SuppressWarnings( { "SynchronizationOnLocalVariableOrMethodParameter" } )
 public class ThreadOutputMuxer

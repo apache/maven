@@ -29,9 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
  * Wraps individual MojoExecutions, containing information about completion status and scheduling.
- * <p/>
- * NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Kristian Rosenvold

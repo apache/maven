@@ -20,9 +20,10 @@ package org.apache.maven.lifecycle.internal;
  */
 
 /**
+ * <p>
  * A task that is a goal
- * <p/>
- * TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Benjamin Bentmann

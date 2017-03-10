@@ -121,10 +121,12 @@ public class DefaultMavenPluginManager
 {
 
     /**
-     * PluginId=>ExtensionRealmCache.CacheRecord map MavenProject context value key. The map is used to ensure the same
-     * class realm is used to load build extensions and load mojos for extensions=true plugins.
-     *
-     * @provisional This is part of internal implementation and may be changed or removed without notice
+     * <p>
+     * PluginId =&gt; ExtensionRealmCache.CacheRecord map MavenProject context value key. The map is used to ensure the
+     * same class realm is used to load build extensions and load mojos for extensions=true plugins.
+     * </p>
+     * <strong>Note:</strong> This is part of internal implementation and may be changed or removed without notice
+     * 
      * @since 3.3.0
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";

@@ -117,7 +117,6 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * @author Jason van Zyl
- * @noinspection UseOfSystemOutOrSystemErr, ACCESS_STATIC_VIA_INSTANCE
  */
 public class MavenCli
 {
@@ -195,9 +194,6 @@ public class MavenCli
         System.exit( result );
     }
 
-    /**
-     * @noinspection ConfusingMainMethod
-     */
     public static int main( String[] args, ClassWorld classWorld )
     {
         MavenCli cli = new MavenCli();

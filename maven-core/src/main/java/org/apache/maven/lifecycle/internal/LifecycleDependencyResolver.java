@@ -51,14 +51,14 @@ import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
 /**
+ * <p>
  * Resolves dependencies for the artifacts in context of the lifecycle build
- *
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author Kristian Rosenvold (extracted class)
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Named
 public class LifecycleDependencyResolver

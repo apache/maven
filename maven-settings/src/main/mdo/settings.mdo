@@ -120,7 +120,7 @@
           <required>true</required>
           <description>
             <![CDATA[
-            The local repository.<br /><b>Default value is:</b> <tt>${user.home}/.m2/repository</tt>
+            The local repository.<br><b>Default value is:</b> <tt>${user.home}/.m2/repository</tt>
             ]]>
           </description>
           <type>String</type>

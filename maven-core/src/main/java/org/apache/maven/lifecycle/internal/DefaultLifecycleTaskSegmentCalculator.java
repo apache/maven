@@ -40,17 +40,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * <p>
  * Calculates the task segments in the build
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class)
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-
 @Component( role = LifecycleTaskSegmentCalculator.class )
 public class DefaultLifecycleTaskSegmentCalculator
     implements LifecycleTaskSegmentCalculator

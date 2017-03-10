@@ -23,11 +23,9 @@ import org.apache.maven.plugin.logging.Log;
 
 /**
  * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
- * infrastructure.
- * <br/>
+ * infrastructure.<br>
  * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
- * a MojoExecutionException or MojoFailureException if error conditions occur.
- * <br/>
+ * a MojoExecutionException or MojoFailureException if error conditions occur.<br>
  * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which
  * will allow the Mojo to communicate to the outside world through standard Maven channels.
  *
@@ -39,8 +37,7 @@ public interface Mojo
     String ROLE = Mojo.class.getName();
 
     /**
-     * Perform whatever build-process behavior this <code>Mojo</code> implements.
-     * <br/>
+     * Perform whatever build-process behavior this <code>Mojo</code> implements.<br>
      * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
      * the <code>Mojo</code> to communicate errors.
      *

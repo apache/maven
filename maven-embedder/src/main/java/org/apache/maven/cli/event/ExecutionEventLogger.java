@@ -291,10 +291,12 @@ public class ExecutionEventLogger
         }
     }
 
+    // CHECKSTYLE_OFF: LineLength
     /**
-     * <pre>>>> mojo-artifactId:version:goal (mojo-executionId) > :forked-goal @ project-artifactId >>></pre>
-     * <pre>>>> mojo-artifactId:version:goal (mojo-executionId) > [lifecycle]phase @ project-artifactId >>></pre>
+     * <pre>&gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; :forked-goal @ project-artifactId &gt;&gt;&gt;</pre>
+     * <pre>&gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; [lifecycle]phase @ project-artifactId &gt;&gt;&gt;</pre>
      */
+    // CHECKSTYLE_ON: LineLength
     @Override
     public void forkStarted( ExecutionEvent event )
     {

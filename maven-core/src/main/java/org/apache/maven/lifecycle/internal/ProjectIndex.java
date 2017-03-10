@@ -27,13 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * <p>
  * Provides the positional index of the project
+ * </p>
+ * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (extracted class only)
- *         <p/>
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 // TODO Kristian wonders if this class really is necessary and if it overlaps other concepts.
 public final class ProjectIndex

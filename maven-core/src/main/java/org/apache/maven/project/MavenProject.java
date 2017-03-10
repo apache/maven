@@ -74,11 +74,11 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * The concern of the project is provide runtime values based on the model.
- * <p/>
+ * <p>
  * The values in the model remain untouched but during the process of building a project notions like inheritance and
  * interpolation can be added. This allows to have an entity which is useful in a runtime while preserving the model so
  * that it can be marshalled and unmarshalled without being tainted by runtime requirements.
- * <p/>
+ * </p>
  * <p>
  * With changes during 3.2.2 release MavenProject is closer to being immutable after construction with the removal of
  * all components from this class, and the upfront construction taken care of entirely by the @{ProjectBuilder}. There
@@ -696,7 +696,7 @@ public class MavenProject
      * what phases have run dependencies in some scopes won't be included. eg. if only compile phase has run,
      * dependencies with scope test won't be included.
      *
-     * @return {@link Set} &lt; {@link Artifact} >
+     * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
     public Set<Artifact> getArtifacts()
@@ -992,7 +992,7 @@ public class MavenProject
     /**
      * Direct dependencies that this project has.
      *
-     * @return {@link Set} &lt; {@link Artifact} >
+     * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getArtifacts() to get all transitive dependencies
      */
     @Deprecated
@@ -1152,7 +1152,6 @@ public class MavenProject
     }
 
     /**
-     * @throws CloneNotSupportedException
      * @since 2.0.9
      */
     @Override

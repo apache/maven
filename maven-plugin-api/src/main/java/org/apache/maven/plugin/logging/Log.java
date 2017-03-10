@@ -21,8 +21,7 @@ package org.apache.maven.plugin.logging;
 
 /**
  * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
- * <code>Maven</code> channels.
- * <br/>
+ * <code>Maven</code> channels.<br>
  * There should be no big surprises here, although you may notice that the methods accept
  * <code>java.lang.CharSequence</code> rather than <code>java.lang.String</code>. This is provided mainly as a
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
@@ -45,8 +44,7 @@ public interface Log
     void debug( CharSequence content );
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>debug</b> error level.
-     * <br/>
+     * Send a message (and accompanying exception) to the user in the <b>debug</b> error level.<br>
      * The error's stacktrace will be output when this error level is enabled.
      *
      * @param content
@@ -55,8 +53,7 @@ public interface Log
     void debug( CharSequence content, Throwable error );
 
     /**
-     * Send an exception to the user in the <b>debug</b> error level.
-     * <br/>
+     * Send an exception to the user in the <b>debug</b> error level.<br>
      * The stack trace for this exception will be output when this error level is enabled.
      *
      * @param error
@@ -76,8 +73,7 @@ public interface Log
     void info( CharSequence content );
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>info</b> error level.
-     * <br/>
+     * Send a message (and accompanying exception) to the user in the <b>info</b> error level.<br>
      * The error's stacktrace will be output when this error level is enabled.
      *
      * @param content
@@ -86,8 +82,7 @@ public interface Log
     void info( CharSequence content, Throwable error );
 
     /**
-     * Send an exception to the user in the <b>info</b> error level.
-     * <br/>
+     * Send an exception to the user in the <b>info</b> error level.<br>
      * The stack trace for this exception will be output when this error level is enabled.
      *
      * @param error
@@ -107,8 +102,7 @@ public interface Log
     void warn( CharSequence content );
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>warn</b> error level.
-     * <br/>
+     * Send a message (and accompanying exception) to the user in the <b>warn</b> error level.<br>
      * The error's stacktrace will be output when this error level is enabled.
      *
      * @param content
@@ -117,8 +111,7 @@ public interface Log
     void warn( CharSequence content, Throwable error );
 
     /**
-     * Send an exception to the user in the <b>warn</b> error level.
-     * <br/>
+     * Send an exception to the user in the <b>warn</b> error level.<br>
      * The stack trace for this exception will be output when this error level is enabled.
      *
      * @param error
@@ -138,8 +131,7 @@ public interface Log
     void error( CharSequence content );
 
     /**
-     * Send a message (and accompanying exception) to the user in the <b>error</b> error level.
-     * <br/>
+     * Send a message (and accompanying exception) to the user in the <b>error</b> error level.<br>
      * The error's stacktrace will be output when this error level is enabled.
      *
      * @param content
@@ -148,8 +140,7 @@ public interface Log
     void error( CharSequence content, Throwable error );
 
     /**
-     * Send an exception to the user in the <b>error</b> error level.
-     * <br/>
+     * Send an exception to the user in the <b>error</b> error level.<br>
      * The stack trace for this exception will be output when this error level is enabled.
      *
      * @param error

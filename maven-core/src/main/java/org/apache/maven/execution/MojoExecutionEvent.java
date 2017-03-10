@@ -24,13 +24,15 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 /**
+ * <p>
  * Encapsulates parameters of MojoExecutionListener callback methods and is meant to provide API evolution path should
  * it become necessary to introduce new parameters in the existing callbacks in the future.
+ * </p>
+ * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  *
  * @see MojoExecutionListener
  * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2
- * @provisional This class is part of work in progress and can be changed or removed without notice.
  */
 public class MojoExecutionEvent
 {

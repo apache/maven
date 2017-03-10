@@ -20,8 +20,7 @@ package org.apache.maven.plugin;
  */
 
 /**
- * An exception occurring during the execution of a plugin.
- * <br/>
+ * An exception occurring during the execution of a plugin.<br>
  * Throwing this exception causes a "BUILD ERROR" message to be displayed.
  *
  * @author Brett Porter

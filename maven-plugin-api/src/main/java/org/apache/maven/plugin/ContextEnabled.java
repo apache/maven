@@ -23,8 +23,7 @@ import java.util.Map;
 
 /**
  * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than
- * project's source root and project's attachment.
- * <br/>
+ * project's source root and project's attachment.<br>
  * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
  *
  * @author jdcasey
