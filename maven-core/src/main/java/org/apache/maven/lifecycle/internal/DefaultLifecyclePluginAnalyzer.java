@@ -73,7 +73,7 @@ public class DefaultLifecyclePluginAnalyzer
     // together and this really shows the problem of constructing a sensible default configuration but
     // it's all encapsulated here so it appears normalized to the POM builder.
 
-    // We are going to take the project packaging and find all plugin in the default lifecycle and create
+    // We are going to take the project packaging and find all plugins in the default lifecycle and create
     // fully populated Plugin objects, including executions with goals and default configuration taken
     // from the plugin.xml inside a plugin.
     //
@@ -82,7 +82,7 @@ public class DefaultLifecyclePluginAnalyzer
     {
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "Looking up lifecyle mappings for packaging " + packaging + " from "
+            logger.debug( "Looking up lifecycle mappings for packaging " + packaging + " from "
                 + Thread.currentThread().getContextClassLoader() );
         }
 
