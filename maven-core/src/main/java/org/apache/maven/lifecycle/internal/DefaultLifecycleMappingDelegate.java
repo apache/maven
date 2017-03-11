@@ -79,8 +79,8 @@ public class DefaultLifecycleMappingDelegate
         /*
          * Grab plugin executions that are bound to the selected lifecycle phases from project. The effective model of
          * the project already contains the plugin executions induced by the project's packaging type. Remember, all
-         * phases of interest and only those are in the lifecycle mapping, if a phase has no value in the map, we are not
-         * interested in any of the executions bound to it.
+         * phases of interest and only those are in the lifecycle mapping, if a phase has no value in the map, we are
+         * not interested in any of the executions bound to it.
          */
 
         for ( Plugin plugin : project.getBuild().getPlugins() )
