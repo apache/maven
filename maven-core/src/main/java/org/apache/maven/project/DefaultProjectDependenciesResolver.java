@@ -29,8 +29,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputSource;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -39,7 +37,6 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
-import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
@@ -239,8 +236,6 @@ public class DefaultProjectDependenciesResolver
 
         private String indent = "";
 
-        private Map<String, Dependency> managed;
-
         public GraphLogger( MavenProject project )
         {
             this.project = project;
@@ -258,28 +253,47 @@ public class DefaultProjectDependenciesResolver
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
 
-                String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
-                if ( premanagedScope != null && !premanagedScope.equals( dep.getScope() ) )
+                // TODO We currently cannot tell which <dependencyManagement> section contained the management
+                //      information. When resolver 1.1 provides this information, these log messages should be updated
+                //      to contain it.
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
-                    buffer.append( " (scope managed from " ).append( premanagedScope );
-                    appendManagementSource( buffer, art, "scope" );
+                    final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
+                    buffer.append( " (scope managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
                     buffer.append( ')' );
                 }
 
-                String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
-                if ( premanagedVersion != null && !premanagedVersion.equals( art.getVersion() ) )
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_VERSION ) == DependencyNode.MANAGED_VERSION )
                 {
-                    buffer.append( " (version managed from " ).append( premanagedVersion );
-                    appendManagementSource( buffer, art, "version" );
+                    final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+                    buffer.append( " (version managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
                     buffer.append( ')' );
                 }
 
-                Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
-                if ( premanagedOptional != null && !premanagedOptional.equals( dep.getOptional() ) )
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_OPTIONAL ) == DependencyNode.MANAGED_OPTIONAL )
                 {
-                    buffer.append( " (optionality managed from " ).append( premanagedOptional );
-                    appendManagementSource( buffer, art, "optional" );
+                    final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
+                    buffer.append( " (optionality managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
                     buffer.append( ')' );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
+                        == DependencyNode.MANAGED_EXCLUSIONS )
+                {
+                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedExclusions( node ).
+                    //      The resolver 1.0.x releases do not record premanaged state of exclusions.
+                    buffer.append( " (exclusions managed)" );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
+                        == DependencyNode.MANAGED_PROPERTIES )
+                {
+                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedProperties( node ).
+                    //      The resolver 1.0.x releases do not record premanaged state of properties.
+                    buffer.append( " (properties managed)" );
                 }
             }
             else
@@ -299,41 +313,6 @@ public class DefaultProjectDependenciesResolver
         {
             indent = indent.substring( 0, indent.length() - 3 );
             return true;
-        }
-
-        private void appendManagementSource( StringBuilder buffer, org.eclipse.aether.artifact.Artifact artifact,
-                                             String field )
-        {
-            if ( managed == null )
-            {
-                managed = new HashMap<>();
-                if ( project.getDependencyManagement() != null )
-                {
-                    for ( Dependency dep : project.getDependencyManagement().getDependencies() )
-                    {
-                        managed.put( dep.getManagementKey(), dep );
-                    }
-                }
-            }
-
-            String key =
-                ArtifactIdUtils.toVersionlessId( artifact.getGroupId(), artifact.getArtifactId(),
-                                                artifact.getProperty( ArtifactProperties.TYPE, "jar" ),
-                                                artifact.getClassifier() );
-
-            Dependency dependency = managed.get( key );
-            if ( dependency != null )
-            {
-                InputLocation location = dependency.getLocation( field );
-                if ( location != null )
-                {
-                    InputSource source = location.getSource();
-                    if ( source != null )
-                    {
-                        buffer.append( " by " ).append( source.getModelId() );
-                    }
-                }
-            }
         }
 
     }
