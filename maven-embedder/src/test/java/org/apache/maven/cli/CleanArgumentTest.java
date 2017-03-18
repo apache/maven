@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * @author Karl Heinz Marbaise <khmarbaise@apache.org>
+ * @author Karl Heinz Marbaise
  */
 public class CleanArgumentTest
 {

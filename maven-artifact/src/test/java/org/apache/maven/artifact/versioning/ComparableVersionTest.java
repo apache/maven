@@ -185,7 +185,7 @@ public class ComparableVersionTest
 
     /**
      * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case
-     * which was showing transitive inconsistency: since A > B and B > C then we should have A > C
+     * which was showing transitive inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C
      * otherwise sorting a list of ComparableVersions() will in some cases throw runtime exception;
      * see Netbeans issues <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>

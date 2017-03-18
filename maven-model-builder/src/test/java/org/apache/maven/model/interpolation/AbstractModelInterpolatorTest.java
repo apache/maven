@@ -68,7 +68,7 @@ public abstract class AbstractModelInterpolatorTest
     }
 
     /**
-     * @deprecated instead use {@link #assertCollectorState()}
+     * @deprecated instead use {@link #assertCollectorState(int, int, int, SimpleProblemCollector)}
      */
     @Deprecated
     protected void assertColllectorState( int numFatals, int numErrors, int numWarnings,

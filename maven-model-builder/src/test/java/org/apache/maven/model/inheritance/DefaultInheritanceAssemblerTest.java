@@ -89,7 +89,7 @@ public class DefaultInheritanceAssemblerTest
     }
 
     /**
-     * Flat directory structure: parent & child POMs in sibling directories, child directory == artifactId.
+     * Flat directory structure: parent &amp; child POMs in sibling directories, child directory == artifactId.
      * @throws Exception
      */
     public void testFlatUrls()

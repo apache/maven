@@ -88,7 +88,7 @@ public class LifecycleExecutionPlanCalculatorStub
     public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
 
     /**
-     * @deprecated instead use {@link #getNumberOfExecutions()}
+     * @deprecated instead use {@link #getNumberOfExecutions(ProjectBuildList)}
      */
     @Deprecated
     public int getNumberOfExceutions( ProjectBuildList projectBuildList )

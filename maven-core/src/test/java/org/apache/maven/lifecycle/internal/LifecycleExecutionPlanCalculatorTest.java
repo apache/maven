@@ -25,7 +25,7 @@ import org.apache.maven.lifecycle.internal.stub.PluginVersionResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 
 /**
- * @author Kristian Rosenvold>
+ * @author Kristian Rosenvold
  */
 public class LifecycleExecutionPlanCalculatorTest
     extends AbstractCoreMavenComponentTestCase
