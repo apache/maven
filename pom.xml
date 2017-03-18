@@ -531,6 +531,11 @@ under the License.
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>3.0.4</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
