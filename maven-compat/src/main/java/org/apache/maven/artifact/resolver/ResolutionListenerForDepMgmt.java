@@ -23,7 +23,7 @@ import org.apache.maven.artifact.Artifact;
 
 /**
  * Do not use!
- * <p/>
+ * <p>
  * Should only be implemented by DebugResolutionListener.  Remove this
  * when the ResolutionListener interface deprecation of the manageArtifact
  * method (and the [yet to be done] addition of these methods to that

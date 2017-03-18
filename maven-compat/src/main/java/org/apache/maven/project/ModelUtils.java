@@ -40,15 +40,16 @@ public final class ModelUtils
 
     /**
      * This should be the resulting ordering of plugins after merging:
-     * <p/>
+     * <p>
      * Given:
-     * <p/>
-     * parent: X -> A -> B -> D -> E
-     * child: Y -> A -> C -> D -> F
-     * <p/>
+     * <pre>
+     * parent: X -&gt; A -&gt; B -&gt; D -&gt; E
+     * child: Y -&gt; A -&gt; C -&gt; D -&gt; F
+     * </pre>
      * Result:
-     * <p/>
-     * X -> Y -> A -> B -> C -> D -> E -> F
+     * <pre>
+     * X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F
+     * </pre>
      */
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
                                          boolean handleAsInheritance )

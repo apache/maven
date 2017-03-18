@@ -27,8 +27,6 @@ import java.util.Map;
 
 /**
  * @author jdcasey
- *         <p/>
- *         Created on Feb 2, 2005
  */
 @Deprecated
 public interface ModelInterpolator

@@ -47,14 +47,14 @@ public class ProjectInheritanceTest
     /**
      * How the test project is set up:
      *
-     * 1. dependencyManagement lists dependencies on a & b,
+     * 1. dependencyManagement lists dependencies on a &amp; b,
      *    with an exclusion on c in b.
      * 2. the child project lists a dependency on project a only
      * 3. a depends on b (which is transitive to the child project),
      *    and b depends on c.
      *
      * We should see that the resulting size of collected artifacts is two:
-     * a & b only.
+     * a &amp; b only.
      */
     public void testDependencyManagementExclusionsExcludeTransitively()
         throws Exception
@@ -87,7 +87,7 @@ public class ProjectInheritanceTest
      * now depends upon d, which has a transitive dependency on c.  Even though
      * we did list an exclusion on c, it was only from within the context of
      * project b.  We will pick up project c in this case because no
-     * restrictions were placed on d.  This demonstrates that a, b, c, & d will
+     * restrictions were placed on d.  This demonstrates that a, b, c, &amp; d will
      * all be collected.
      *
      * @throws Exception

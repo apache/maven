@@ -103,10 +103,6 @@ public abstract class AbstractStringBasedModelInterpolator
         this.pathTranslator = pathTranslator;
     }
 
-    /**
-     * TODO Remove the throws clause.
-     * @throws IOException This exception is not thrown any more, and needs to be removed.
-     */
     protected AbstractStringBasedModelInterpolator()
     {
     }
@@ -120,7 +116,7 @@ public abstract class AbstractStringBasedModelInterpolator
     /**
      * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve
      * POM expressions, then re-parse into the resolved Model instance.
-     * <br/>
+     * <p>
      * <b>NOTE:</b> This will result in a different instance of Model being returned!!!
      *
      * @param model The inbound Model instance, to serialize and reference for expression resolution
@@ -189,7 +185,7 @@ public abstract class AbstractStringBasedModelInterpolator
      *   <li>If the value is null, but the context contains the expression, don't replace the expression string
      *       with the value, and continue to find other expressions.</li>
      *   <li>If the value is null, get it from the model properties.</li>
-     *   <li>
+     * </ul>
      */
     public String interpolate( String src,
                                Model model,

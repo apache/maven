@@ -650,10 +650,6 @@ under the License.
                 <reports>
                   <report>aggregate</report>
                 </reports>
-				<configuration>
-                  <!-- There's no maintenance on maven-compat -->
-                  <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
               </reportSet>
             </reportSets>
           </plugin>

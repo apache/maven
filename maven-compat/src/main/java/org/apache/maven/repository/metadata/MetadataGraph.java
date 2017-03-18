@@ -103,9 +103,9 @@ public class MetadataGraph
      * construct graph from a "dirty" tree
      *
      * @param tree "dirty" tree root
-     * @param versionedVertices true if graph nodes should be versioned (different versions -> different nodes)
+     * @param versionedVertices true if graph nodes should be versioned (different versions -&gt; different nodes)
      * @param scopedVertices true if graph nodes should be versioned and scoped
-     * (different versions and/or scopes -> different nodes)
+     * (different versions and/or scopes -&gt; different nodes)
      *
      */
     public MetadataGraph( MetadataTreeNode tree, boolean versionedVertices, boolean scopedVertices )

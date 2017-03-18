@@ -44,7 +44,7 @@ public class OldestConflictResolverTest
      * Tests that <code>a:1.0</code> wins in the scenario:
      * <pre>
      * a:1.0
-     * b:1.0 -> a:2.0
+     * b:1.0 -&gt; a:2.0
      * </pre>
      */
     public void testDepth()
@@ -60,7 +60,7 @@ public class OldestConflictResolverTest
     /**
      * Tests that <code>a:1.0</code> wins in the scenario:
      * <pre>
-     * b:1.0 -> a:2.0
+     * b:1.0 -&gt; a:2.0
      * a:1.0
      * </pre>
      */

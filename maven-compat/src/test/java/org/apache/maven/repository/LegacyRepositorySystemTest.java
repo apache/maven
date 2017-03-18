@@ -32,6 +32,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;

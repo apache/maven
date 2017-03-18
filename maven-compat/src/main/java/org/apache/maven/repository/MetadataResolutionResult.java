@@ -163,7 +163,7 @@ public class MetadataResolutionResult
     /**
      * TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
-     *       {@link DefaultLegacyArtifactCollector}
+     *       {@link org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector}
      */
     public MetadataResolutionResult addVersionRangeViolation( Exception e )
     {

@@ -94,15 +94,19 @@ public class ModelUtilsTest
 
     /**
      * Test that this is the resulting ordering of plugins after merging:
-     *
+     * <p>
      * Given:
-     *
-     *   parent: X -> A -> B -> D -> E
-     *   child: Y -> A -> C -> D -> F
-     *
+     * </p>
+     * <pre>
+     *   parent: X -&gt; A -&gt; B -&gt; D -&gt; E
+     *   child: Y -&gt; A -&gt; C -&gt; D -&gt; F
+     * </pre>
+     * <p>
      * Result:
-     *
-     *   X -> Y -> A -> B -> C -> D -> E -> F
+     * </p>
+     * <pre>
+     *   X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F
+     * </pre>
      */
     public void testShouldPreserveChildOrderingOfPluginsAfterParentMerge()
     {

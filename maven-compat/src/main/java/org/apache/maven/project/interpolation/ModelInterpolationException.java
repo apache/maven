@@ -21,8 +21,6 @@ package org.apache.maven.project.interpolation;
 
 /**
  * @author jdcasey
- *         <p/>
- *         Created on Feb 2, 2005
  */
 @SuppressWarnings( "serial" )
 @Deprecated
