@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 
@@ -94,7 +95,7 @@ public final class CLIReportingUtils
         {
             msg += " (";
             msg += ( rev != null ? rev : "" );
-            if ( timestamp != null )
+            if ( StringUtils.isNotBlank( timestamp ) )
             {
                 String ts = formatTimestamp( Long.valueOf( timestamp ) );
                 msg += ( rev != null ? "; " : "" ) + ts;
