@@ -28,12 +28,16 @@ import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * Handles conversion of the legacy reporting section into the configuration of the new Maven Site Plugin.
+ * Handles conversion of the <code>&lt;reporting&gt;</code> section into the configuration of Maven Site Plugin 3.x,
+ * i.e. <code>reportPlugins</code> and <code>outputDirectory</code> parameters.
  *
  * @author Benjamin Bentmann
  */
@@ -87,7 +91,12 @@ public class DefaultReportingConverter
 
         if ( reportPlugins != null )
         {
-            // new-style report configuration already present, assume user handled entire conversion
+            // new-style report configuration already present: warn since this new style has been deprecated
+            // in favor of classical reporting section MSITE-647 / MSITE-684
+            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
+                    .setMessage( "Reporting configuration should be done in <reporting> section, "
+                          + "not in maven-site-plugin <configuration> as reportPlugins parameter." )
+                    .setLocation( sitePlugin.getLocation( "configuration" ) ) );
             return;
         }
 
