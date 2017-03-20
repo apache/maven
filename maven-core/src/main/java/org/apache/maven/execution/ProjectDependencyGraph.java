@@ -37,7 +37,7 @@ public interface ProjectDependencyGraph
      *
      * @return All collected projects.
      *
-     * @since 3.5.0-alpha-2
+     * @since 3.5.0
      */
     List<MavenProject> getAllProjects();
 

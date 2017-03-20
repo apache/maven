@@ -81,7 +81,7 @@ public interface ModelResolver
      * @return The source of the requested POM, never {@code null}.
      *
      * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
-     * @since 3.5.0-alpha-2
+     * @since 3.5.0
      *
      * @see Dependency#clone()
      */

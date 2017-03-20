@@ -69,7 +69,7 @@ public class DefaultProjectDependencyGraph
      *
      * @throws DuplicateProjectException
      * @throws CycleDetectedException
-     * @since 3.5.0-alpha-2
+     * @since 3.5.0
      */
     public DefaultProjectDependencyGraph( final List<MavenProject> allProjects,
                                           final Collection<MavenProject> projects )
@@ -81,7 +81,7 @@ public class DefaultProjectDependencyGraph
     }
 
     /**
-     * @since 3.5.0-alpha-2
+     * @since 3.5.0
      */
     public List<MavenProject> getAllProjects()
     {

@@ -44,7 +44,7 @@ import static org.codehaus.plexus.PlexusTestCase.getBasedir;
  * Test cases for the project {@code ModelResolver} implementation.
  *
  * @author Christian Schulte
- * @since 3.5.0-alpha-2
+ * @since 3.5.0
  */
 public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 {

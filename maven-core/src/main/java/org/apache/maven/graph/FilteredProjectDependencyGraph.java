@@ -65,7 +65,7 @@ class FilteredProjectDependencyGraph
     }
 
     /**
-     * @since 3.5.0-alpha-2
+     * @since 3.5.0
      */
     public List<MavenProject> getAllProjects()
     {
