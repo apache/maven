@@ -111,8 +111,9 @@ public class DefaultArtifactDescriptorReader
 
     @Inject
     DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
-                                     ArtifactResolver artifactResolver, ModelBuilder modelBuilder,
-                                     RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+                                     VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
+                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher,
+                                     LoggerFactory loggerFactory )
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
@@ -124,17 +125,17 @@ public class DefaultArtifactDescriptorReader
 
     public void initService( ServiceLocator locator )
     {
-        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
         setVersionResolver( locator.getService( VersionResolver.class ) );
         setVersionRangeResolver( locator.getService( VersionRangeResolver.class ) );
         setArtifactResolver( locator.getService( ArtifactResolver.class ) );
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
         modelBuilder = locator.getService( ModelBuilder.class );
         if ( modelBuilder == null )
         {
             setModelBuilder( new DefaultModelBuilderFactory().newInstance() );
         }
+        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
+        setLoggerFactory( locator.getService( LoggerFactory.class ) );
     }
 
     public DefaultArtifactDescriptorReader setLoggerFactory( LoggerFactory loggerFactory )
