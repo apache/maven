@@ -22,24 +22,32 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 def tests
 
 try {
+
 node('ubuntu') {
-    stage 'Checkout'
-    def MAVEN_BUILD=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-    echo "Driving build and unit tests using Maven $MAVEN_BUILD"
-    def JAVA7_HOME=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-    echo "Running build and unit tests with Java $JAVA7_HOME"
     dir('build') {
-        checkout scm
+        stage('Checkout') {
+            checkout scm
+        }
+
         def WORK_DIR=pwd()
-        stage 'Build / Unit Test'
-        withEnv(["PATH+MAVEN=$MAVEN_BUILD/bin","PATH+JDK=$JAVA7_HOME/bin"]) {
-            sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository"
+
+        stage('Build / Unit Test') {
+            def MAVEN_BUILD=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
+            echo "Driving build and unit tests using Maven $MAVEN_BUILD"
+            def JAVA7_HOME=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
+            echo "Running build and unit tests with Java $JAVA7_HOME"
+
+            withEnv(["PATH+MAVEN=$MAVEN_BUILD/bin","PATH+JDK=$JAVA7_HOME/bin"]) {
+                sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository"
+            }
+
+            dir ('apache-maven/target') {
+                sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
+                stash includes: 'apache-maven-dist.zip', name: 'dist'
+            }
+            junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
         }
-        dir ('apache-maven/target') {
-            sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
-            stash includes: 'apache-maven-dist.zip', name: 'dist'
-        }
-        junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
+
         tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', excludes: '', gitTool: 'Default', id: '_', ignoreOnPushNotifications: false, includes: '*', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git'], targets: [BRANCH_NAME, 'master']
     }
 }
@@ -51,6 +59,7 @@ parallel linuxJava7:{
             echo "Driving integration tests using Maven $MAVEN_NIX_J7"
             def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
             echo "Running integration tests with Java $JAVA_NIX_J7"
+
             dir('test') {
                 def WORK_DIR=pwd()
                 checkout tests
@@ -69,6 +78,7 @@ parallel linuxJava7:{
             echo "Driving integration tests using Maven $MAVEN_NIX_J8"
             def JAVA_NIX_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
             echo "Running integration tests with Java $JAVA_NIX_J8"
+
             dir('test') {
                 def WORK_DIR=pwd()
                 checkout tests
@@ -93,6 +103,7 @@ parallel linuxJava7:{
                 JAVA_WIN_J7=pwd()
             }
             echo "Running integration tests with Java $JAVA_WIN_J7"
+
             // need a short path or we hit 256 character limit for paths
             // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
             // will not trample each other
@@ -122,6 +133,7 @@ parallel linuxJava7:{
                 JAVA_WIN_J8=pwd()
             }
             echo "Running integration tests with Java $JAVA_WIN_J8"
+
             // need a short path or we hit 256 character limit for paths
             // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
             // will not trample each other
@@ -140,6 +152,7 @@ parallel linuxJava7:{
             }
         }
     }
+
 } finally {
     node('ubuntu') {
         emailext body: "See ${env.BUILD_URL}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: "${env.JOB_NAME} - build ${env.BUILD_DISPLAY_NAME} - ${currentBuild.result}", to: 'notifications@maven.apache.org'
