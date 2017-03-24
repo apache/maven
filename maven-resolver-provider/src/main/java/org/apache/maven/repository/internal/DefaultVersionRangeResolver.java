@@ -24,7 +24,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
@@ -57,7 +56,9 @@ import org.eclipse.aether.version.VersionScheme;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -258,23 +259,20 @@ public class DefaultVersionRangeResolver
                                      ArtifactRepository repository, VersionRangeResult result )
     {
         Versioning versioning = null;
-
-        FileInputStream fis = null;
         try
         {
             if ( metadata != null )
             {
-
                 try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        fis = new FileInputStream( metadata.getFile() );
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-                        versioning = m.getVersioning();
+                        try ( final InputStream in = new FileInputStream( metadata.getFile() ) )
+                        {
+                            versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
+                        }
                     }
                 }
             }
@@ -283,10 +281,6 @@ public class DefaultVersionRangeResolver
         {
             invalidMetadata( session, trace, metadata, repository, e );
             result.addException( e );
-        }
-        finally
-        {
-            IOUtil.close( fis );
         }
 
         return ( versioning != null ) ? versioning : new Versioning();

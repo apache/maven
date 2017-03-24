@@ -30,7 +30,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.WriterFactory;
 
 /**
@@ -62,14 +61,9 @@ public class DefaultModelWriter
         Validate.notNull( output, "output cannot be null" );
         Validate.notNull( model, "model cannot be null" );
 
-        try
+        try ( final Writer out = output )
         {
-            MavenXpp3Writer w = new MavenXpp3Writer();
-            w.write( output, model );
-        }
-        finally
-        {
-            IOUtil.close( output );
+            new MavenXpp3Writer().write( out, model );
         }
     }
 
@@ -80,19 +74,16 @@ public class DefaultModelWriter
         Validate.notNull( output, "output cannot be null" );
         Validate.notNull( model, "model cannot be null" );
 
-        try
+        String encoding = model.getModelEncoding();
+        // TODO Use StringUtils here
+        if ( encoding == null || encoding.length() <= 0 )
         {
-            String encoding = model.getModelEncoding();
-            // TODO Use StringUtils here
-            if ( encoding == null || encoding.length() <= 0 )
-            {
-                encoding = "UTF-8";
-            }
-            write( new OutputStreamWriter( output, encoding ), options, model );
+            encoding = "UTF-8";
         }
-        finally
+
+        try ( final Writer out = new OutputStreamWriter( output, encoding ) )
         {
-            IOUtil.close( output );
+            write( out, options, model );
         }
     }
 

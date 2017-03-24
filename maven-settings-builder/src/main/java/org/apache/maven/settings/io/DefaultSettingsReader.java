@@ -29,7 +29,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -60,18 +59,13 @@ public class DefaultSettingsReader
     {
         Validate.notNull( input, "input cannot be null" );
 
-        try
+        try ( final Reader in = input )
         {
-            SettingsXpp3Reader r = new SettingsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            return new SettingsXpp3Reader().read( in, isStrict( options ) );
         }
         catch ( XmlPullParserException e )
         {
             throw new SettingsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
-        }
-        finally
-        {
-            IOUtil.close( input );
         }
     }
 
@@ -81,18 +75,13 @@ public class DefaultSettingsReader
     {
         Validate.notNull( input, "input cannot be null" );
 
-        try
+        try ( final InputStream in = input )
         {
-            SettingsXpp3Reader r = new SettingsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            return new SettingsXpp3Reader().read( in, isStrict( options ) );
         }
         catch ( XmlPullParserException e )
         {
             throw new SettingsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
-        }
-        finally
-        {
-            IOUtil.close( input );
         }
     }
 

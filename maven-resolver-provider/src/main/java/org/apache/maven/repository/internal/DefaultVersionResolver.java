@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
@@ -61,9 +60,11 @@ import org.eclipse.aether.util.ConfigUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -324,43 +325,38 @@ public class DefaultVersionResolver
                                      ArtifactRepository repository, VersionResult result )
     {
         Versioning versioning = null;
-
-        FileInputStream fis = null;
         try
         {
             if ( metadata != null )
             {
-
                 try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        fis = new FileInputStream( metadata.getFile() );
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-                        versioning = m.getVersioning();
-
-                        /*
-                         * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
-                         * of the local repository. This is especially troublesome during snapshot resolution so we try
-                         * to handle that gracefully.
-                         */
-                        if ( versioning != null && repository instanceof LocalRepository )
+                        try ( final InputStream in = new FileInputStream( metadata.getFile() ) )
                         {
-                            if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
-                            {
-                                Versioning repaired = new Versioning();
-                                repaired.setLastUpdated( versioning.getLastUpdated() );
-                                Snapshot snapshot = new Snapshot();
-                                snapshot.setLocalCopy( true );
-                                repaired.setSnapshot( snapshot );
-                                versioning = repaired;
+                            versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
 
+                            /*
+                            NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
+                            of the local repository. This is especially troublesome during snapshot resolution so we try
+                            to handle that gracefully.
+                             */
+                            if ( versioning != null && repository instanceof LocalRepository
+                                     && versioning.getSnapshot() != null
+                                     && versioning.getSnapshot().getBuildNumber() > 0 )
+                            {
+                                final Versioning repaired = new Versioning();
+                                repaired.setLastUpdated( versioning.getLastUpdated() );
+                                repaired.setSnapshot( new Snapshot() );
+                                repaired.getSnapshot().setLocalCopy( true );
+                                versioning = repaired;
                                 throw new IOException( "Snapshot information corrupted with remote repository data"
                                                            + ", please verify that no remote repository uses the id '"
                                                            + repository.getId() + "'" );
+
                             }
                         }
                     }
@@ -371,10 +367,6 @@ public class DefaultVersionResolver
         {
             invalidMetadata( session, trace, metadata, repository, e );
             result.addException( e );
-        }
-        finally
-        {
-            IOUtil.close( fis );
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
