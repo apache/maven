@@ -20,7 +20,7 @@
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
 
 def tests
-def CORE_IT_PROFILES='run-its'
+def CORE_IT_PROFILES='run-its,embedded'
 
 try {
 
