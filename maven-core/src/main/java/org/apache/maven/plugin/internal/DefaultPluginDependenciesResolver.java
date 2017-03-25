@@ -54,6 +54,7 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
@@ -178,6 +179,7 @@ public class DefaultPluginDependenciesResolver
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
             pluginSession.setDependencySelector( selector );
             pluginSession.setDependencyGraphTransformer( transformer );
+            pluginSession.setDependencyManager( new ClassicDependencyManager() );
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );
@@ -192,6 +194,7 @@ public class DefaultPluginDependenciesResolver
                     pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
                 }
                 request.addDependency( pluginDep );
+                request.addManagedDependency( pluginDep );
             }
 
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
