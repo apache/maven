@@ -59,6 +59,7 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
         if( Os.isFamily( Os.FAMILY_WINDOWS ) && !System.getProperties().contains( "CLASSWORLDS_LAUNCHER" ) )
         {
             verifier.setSystemProperty( "test.prop", "\"&x=y<>\"" );
+            verifier.setForkJvm( true ); // force forked JVM, since the workaround expects forked run 
         }
         else
         {
