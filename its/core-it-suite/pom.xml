@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
-  license agreements. See the NOTICE file distributed with this work for additional 
-  information regarding copyright ownership. The ASF licenses this file to 
-  you under the Apache License, Version 2.0 (the "License"); you may not use 
-  this file except in compliance with the License. You may obtain a copy of 
-  the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
-  by applicable law or agreed to in writing, software distributed under the 
-  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
-  OF ANY KIND, either express or implied. See the License for the specific 
-  language governing permissions and limitations under the License. -->
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -26,24 +34,34 @@
   <name>Maven ITs</name>
   <description>The effective Maven Integration Tests suite.</description>
 
-  <!-- By default, the project just packages the tests in an artifact. To 
-    actually run them, activate the profile "run-its": mvn clean test -Prun-its 
-    This will subject the Maven version running the build to the integration 
-    tests. If you would like to test a different Maven distribution, you can 
-    use the system property "mavenHome" to specify the path of the Maven distribution 
-    to test: mvn clean test -Prun-its -DmavenHome=<maven-under-test> Alternatively, 
-    you can just specify the version of a previously installed/deployed Maven 
-    distribution which will be downloaded, unpacked and tested: mvn clean test 
-    -Prun-its -DmavenVersion=2.2.1 It's also possible to point the ITs at an 
-    already downloaded Maven distribution: mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive> 
-    To run the ITs using embedded Maven 3.x, additionally activate the profile 
-    "embedded". ITs that don't require to fork Maven can also be run from the 
-    IDE using the Maven projects from the workspace if the Maven dependencies 
-    are added to the test class path. If you're behind a proxy, use the system 
-    properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the 
-    required proxy setup for the ITs. Alternatively, set the system property 
-    maven.it.central to a URL of a local repository manager that proxies the 
-    required artifacts. -->
+  <!--
+  By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
+  
+    mvn clean test -Prun-its
+  
+  This will subject the Maven version running the build to the integration tests. If you would like to test a different
+  Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
+  
+    mvn clean test -Prun-its -DmavenHome=<maven-under-test>
+  
+  Alternatively, you can just specify the version of a previously installed/deployed Maven distribution which will be
+  downloaded, unpacked and tested:
+
+    mvn clean test -Prun-its -DmavenVersion=2.2.1
+  
+  It's also possible to point the ITs at an already downloaded Maven distribution:
+  
+    mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
+  
+  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
+  
+  ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
+  Maven dependencies are added to the test class path.
+  
+  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the
+  required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
+  repository manager that proxies the required artifacts.
+  -->
 
   <properties>
     <surefireMemory>-Xmx384m</surefireMemory>
