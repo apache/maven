@@ -56,7 +56,7 @@ node('ubuntu') {
 stage 'Integration Test'
 parallel linuxJava7:{
         node('ubuntu') {
-            def MAVEN_NIX_J7=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
+            def MAVEN_NIX_J7=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
             echo "Driving integration tests using Maven $MAVEN_NIX_J7"
             def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
             echo "Running integration tests with Java $JAVA_NIX_J7"
@@ -75,7 +75,7 @@ parallel linuxJava7:{
         }
     },linuxJava8: {
         node('ubuntu') {
-            def MAVEN_NIX_J8=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
+            def MAVEN_NIX_J8=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
             echo "Driving integration tests using Maven $MAVEN_NIX_J8"
             def JAVA_NIX_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
             echo "Running integration tests with Java $JAVA_NIX_J8"
@@ -94,12 +94,12 @@ parallel linuxJava7:{
         }
     }, winJava7: {
         node('Windows') {
-            def MAVEN_WIN_J7=tool name: 'Maven 3.3.9 (Windows)', type: 'hudson.tasks.Maven$MavenInstallation'
+            def MAVEN_WIN_J7=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
             dir(MAVEN_WIN_J7) {
                 MAVEN_WIN_J7=pwd()
             }
             echo "Driving integration tests using Maven $MAVEN_WIN_J7"
-            def JAVA_WIN_J7=tool name: 'JDK 1.7 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
+            def JAVA_WIN_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
             dir(JAVA_WIN_J7) {
                 JAVA_WIN_J7=pwd()
             }
@@ -124,12 +124,12 @@ parallel linuxJava7:{
         }
     }, winJava8: {
         node('Windows') {
-            def MAVEN_WIN_J8=tool name: 'Maven 3.3.9 (Windows)', type: 'hudson.tasks.Maven$MavenInstallation'
+            def MAVEN_WIN_J8=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
             dir(MAVEN_WIN_J8) {
                 MAVEN_WIN_J8=pwd()
             }
             echo "Driving integration tests using Maven $MAVEN_WIN_J8"
-            def JAVA_WIN_J8=tool name: 'JDK 1.8.0_121 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
+            def JAVA_WIN_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
             dir(JAVA_WIN_J8) {
                 JAVA_WIN_J8=pwd()
             }
