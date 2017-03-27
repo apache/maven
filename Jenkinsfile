@@ -117,7 +117,7 @@ parallel linuxJava7:{
                 MAVEN_WIN_J8=pwd()
             }
             echo "Driving integration tests using Maven $MAVEN_WIN_J8"
-            def JAVA_WIN_J8=tool name: 'JDK 1.8 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
+            def JAVA_WIN_J8=tool name: 'JDK 1.8.0_121 (unlimited security) 64-bit Windows only', type: 'hudson.model.JDK'
             dir(JAVA_WIN_J8) {
                 JAVA_WIN_J8=pwd()
             }
