@@ -122,7 +122,7 @@ fi
 find_maven_basedir() {
 (
   basedir=`find_file_argument_basedir "$@"`
-  wdir=`pwd`
+  wdir="${basedir}"
   while [ "$wdir" != '/' ] ; do
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
