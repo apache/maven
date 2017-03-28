@@ -24,8 +24,6 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
@@ -60,6 +58,7 @@ import org.eclipse.aether.util.ConfigUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,7 +74,7 @@ import java.util.Map;
  * @author Benjamin Bentmann
  */
 @Named
-@Component( role = VersionResolver.class )
+@Singleton
 public class DefaultVersionResolver
     implements VersionResolver, Service
 {
@@ -89,16 +88,12 @@ public class DefaultVersionResolver
     private static final String SNAPSHOT = "SNAPSHOT";
 
     @SuppressWarnings( "unused" )
-    @Requirement( role = LoggerFactory.class )
     private Logger logger = NullLoggerFactory.LOGGER;
 
-    @Requirement
     private MetadataResolver metadataResolver;
 
-    @Requirement
     private SyncContextFactory syncContextFactory;
 
-    @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
     public DefaultVersionResolver()

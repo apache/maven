@@ -19,7 +19,9 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.impl.MetadataGenerator;
@@ -29,7 +31,8 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = MetadataGeneratorFactory.class, hint = "snapshot" )
+@Named( "snapshot" )
+@Singleton
 public class SnapshotMetadataGeneratorFactory
     implements MetadataGeneratorFactory
 {

@@ -22,8 +22,6 @@ package org.apache.maven.repository.internal;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
@@ -56,6 +54,7 @@ import org.eclipse.aether.version.VersionScheme;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -69,7 +68,7 @@ import java.util.Map;
  * @author Benjamin Bentmann
  */
 @Named
-@Component( role = VersionRangeResolver.class )
+@Singleton
 public class DefaultVersionRangeResolver
     implements VersionRangeResolver, Service
 {
@@ -77,16 +76,12 @@ public class DefaultVersionRangeResolver
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
     @SuppressWarnings( "unused" )
-    @Requirement( role = LoggerFactory.class )
     private Logger logger = NullLoggerFactory.LOGGER;
 
-    @Requirement
     private MetadataResolver metadataResolver;
 
-    @Requirement
     private SyncContextFactory syncContextFactory;
 
-    @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
     public DefaultVersionRangeResolver()

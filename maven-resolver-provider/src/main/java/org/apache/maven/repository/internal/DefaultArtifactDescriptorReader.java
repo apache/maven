@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.DistributionManagement;
@@ -39,8 +40,6 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -77,31 +76,24 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
  * @author Benjamin Bentmann
  */
 @Named
-@Component( role = ArtifactDescriptorReader.class )
+@Singleton
 public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
 
     @SuppressWarnings( "unused" )
-    @Requirement( role = LoggerFactory.class )
     private Logger logger = NullLoggerFactory.LOGGER;
 
-    @Requirement
     private RemoteRepositoryManager remoteRepositoryManager;
 
-    @Requirement
     private VersionResolver versionResolver;
 
-    @Requirement
     private VersionRangeResolver versionRangeResolver;
 
-    @Requirement
     private ArtifactResolver artifactResolver;
 
-    @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
-    @Requirement
     private ModelBuilder modelBuilder;
 
     public DefaultArtifactDescriptorReader()
@@ -117,6 +109,7 @@ public class DefaultArtifactDescriptorReader
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
+        setVersionRangeResolver( versionRangeResolver );
         setArtifactResolver( artifactResolver );
         setModelBuilder( modelBuilder );
         setLoggerFactory( loggerFactory );
