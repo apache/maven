@@ -18,45 +18,7 @@
  */
 
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
-
-def tests
-def CORE_IT_PROFILES='run-its,embedded'
-
-try {
-
-node('ubuntu') {
-    dir('build') {
-        stage('Checkout') {
-            checkout scm
-        }
-
-        def WORK_DIR=pwd()
-
-        stage('Build / Unit Test') {
-            def MAVEN_BUILD=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-            echo "Driving build and unit tests using Maven $MAVEN_BUILD"
-            def JAVA7_HOME=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-            echo "Running build and unit tests with Java $JAVA7_HOME"
-
-            withEnv(["PATH+MAVEN=$MAVEN_BUILD/bin","PATH+JDK=$JAVA7_HOME/bin"]) {
-                sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository"
-            }
-
-            dir ('apache-maven/target') {
-                sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
-                stash includes: 'apache-maven-dist.zip', name: 'dist'
-            }
-            junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
-        }
-
-        tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', excludes: '', gitTool: 'Default', id: '_', ignoreOnPushNotifications: false, includes: '*', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git'], targets: [BRANCH_NAME, 'master']
-    }
-}
-
-stage 'Integration Test'
-parallel linuxJava7:{
-        node('ubuntu') {
-            def MAVEN_NIX_J7=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
+C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepaam Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++C:\Program Files (x86)\Notepad++test)', type: 'hudson.tasks.Maven$MavenInstallation'
             echo "Driving integration tests using Maven $MAVEN_NIX_J7"
             def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
             echo "Running integration tests with Java $JAVA_NIX_J7"
