@@ -96,7 +96,7 @@ public class MyMojo
         policy.setEnabled( true );
 
         ArtifactRepository remote =
-            repositoryFactory.createArtifactRepository( "test", testProtocol + "://127.0.0.1:" + testPort, layout,
+            repositoryFactory.createArtifactRepository( "test", testProtocol + "://localhost:" + testPort, layout,
                                                         policy, policy );
         
         Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );

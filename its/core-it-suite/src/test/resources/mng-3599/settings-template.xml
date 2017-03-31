@@ -10,7 +10,7 @@
     <proxy>
       <id>http-proxy</id>
       <protocol>http</protocol>
-      <host>127.0.0.1</host>
+      <host>localhost</host>
       <port>@port@</port>
     </proxy>
   </proxies>
