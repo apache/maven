@@ -58,9 +58,10 @@ under the License.
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
   
-  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the
-  required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
-  repository manager that proxies the required artifacts.
+  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user, proxy.pass and
+  proxy.nonProxyHosts to specify the required proxy setup for the ITs. Alternatively, set the system property
+  maven.it.central to a URL of a local repository manager (anonymous authentication only) that proxies the
+  required artifacts.
   -->
 
   <properties>
@@ -78,6 +79,7 @@ under the License.
     <proxy.type>none</proxy.type>
     <proxy.user></proxy.user>
     <proxy.pass></proxy.pass>
+    <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
     <slf4jVersion>1.6.1</slf4jVersion>
     <jetty9Version>9.0.4.v20130625</jetty9Version>
   </properties>

@@ -34,7 +34,7 @@ plugins/artifacts from test repos so use of these settings should be the excepti
       <port>${proxy.port}</port>
       <username>${proxy.user}</username>
       <password>${proxy.pass}</password>
-      <nonProxyHosts>localhost</nonProxyHosts>
+      <nonProxyHosts>${proxy.nonProxyHosts}</nonProxyHosts>
     </proxy>
   </proxies>
   <profiles>
