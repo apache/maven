@@ -6,7 +6,7 @@ This directory contains definitions for different test environments.
 
 ## Linux based test environments
 
-The linux based test environments use [Docker] and will have a `Dockerfile`.
+The linux based test environments use [Docker](https://www.docker.com/) and will have a `Dockerfile`.
 
 The test procedure will typically be something like this:
 
