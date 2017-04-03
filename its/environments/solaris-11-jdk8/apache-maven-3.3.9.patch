@@ -1,0 +1,8 @@
+200,203c200,201
+<   local basedir
+<   local wdir
+<   basedir="$(pwd)"
+<   wdir="$(pwd)"
+---
+>   basedir=`pwd`
+>   wdir=`pwd`
