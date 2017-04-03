@@ -30,6 +30,7 @@ under the License.
       <item name="License" href="http://www.apache.org/licenses/"/>
     </menu>
     <menu name="Results">
+      <item name="Bootstrap" href="bootstrap.html"/>
       <item name="Surefire Report" href="surefire-report.html"/>
     </menu>
 

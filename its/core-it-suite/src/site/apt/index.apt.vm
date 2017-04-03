@@ -28,7 +28,8 @@
 
 Maven Core Integration Tests
 
-  This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Integration Tests suite}}.
+  This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Integration Tests suite}},
+  starting with {{{./bootstrap.html}bootstrap}}.
 
 * Running the ITs
 
