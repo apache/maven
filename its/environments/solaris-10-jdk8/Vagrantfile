@@ -26,8 +26,7 @@ Vagrant.configure("2") do |config|
     v.cpus = 2
   end
 
-  config.vm.provision "file", source:"jdk-7u80-solaris-i586.tar.Z", destination:"jdk-7u80-solaris-i586.tar.Z"
-  config.vm.provision "file", source:"jdk-7u80-solaris-x64.tar.Z", destination:"jdk-7u80-solaris-x64.tar.Z"
+  config.vm.provision "file", source:"jdk-8u121-solaris-x64.tar.Z", destination:"jdk-8u121-solaris-x64.tar.Z"
   config.vm.provision "file", source:"apache-maven-3.3.9-bin.tar.gz", destination:"apache-maven-3.3.9-bin.tar.gz"
   config.vm.provision "file", source:"apache-maven-3.3.9.patch", destination:"apache-maven-3.3.9.patch"
   config.vm.provision "file", source:"admin", destination:"admin"
@@ -35,16 +34,14 @@ Vagrant.configure("2") do |config|
     sudo pkgadd -d http://get.opencsw.org/now -a/export/home/vagrant/admin CSWpkgutil &&\
     sudo /opt/csw/bin/pkgutil -U &&\
     sudo /opt/csw/bin/pkgutil -y -i git &&\
-    zcat jdk-7u80-solaris-i586.tar.Z | tar xf - > /dev/null 2>&1 &&\
-    sudo pkgadd -n -a/export/home/vagrant/admin -d . SUNWj7rt SUNWj7dev SUNWj7cfg SUNWj7man > /dev/null 2>&1 &&\
-    zcat jdk-7u80-solaris-x64.tar.Z | tar xf - > /dev/null 2>&1 &&\
-    sudo pkgadd -n -a/export/home/vagrant/admin -d . SUNWj7rtx SUNWj7dvx > /dev/null 2>&1 &&\
-    rm -rf jdk-7u80-solaris-i586.tar.Z jdk-7u80-solaris-x64.tar.Z SUNWj7rt SUNWj7jmp SUNWj7dev SUNWj7cfg SUNWj7man SUNWj7rtx SUNWj7dvx SUNWj7dmx COPYRIGHT LICENSE README.html THIRDPARTYLICENSEREADME.txt admin > /dev/null 2>&1 &&\
+    zcat jdk-8u121-solaris-x64.tar.Z | tar xf - > /dev/null 2>&1 &&\
+    sudo pkgadd -n -a/export/home/vagrant/admin -d . SUNWj8rt SUNWj8dev SUNWj8cfg SUNWj8man > /dev/null 2>&1 &&\
+    sudo rm -rf jdk-8u121-solaris-x64.tar.Z SUNWj8cfg SUNWj8dev SUNWj8jmp SUNWj8man SUNWj8rt COPYRIGHT LICENSE README.html THIRDPARTYLICENSEREADME.txt admin > /dev/null 2>&1 &&\
     gunzip -c apache-maven-3.3.9-bin.tar.gz | sudo sh -c "cd /opt; tar xf - " 2>&1 &&\
     sudo patch -i apache-maven-3.3.9.patch /opt/apache-maven-3.3.9/bin/mvn &&\
     sudo ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn &&\
     rm -rf apache-maven-3.3.9-bin.tar.gz apache-maven-3.3.9.patch &&\
-    sudo sh -c "echo JAVA_HOME=/usr/jdk/jdk1.7.0_80 >> /etc/profile" &&\
+    sudo sh -c "echo JAVA_HOME=/usr/jdk/jdk1.8.0_121 >> /etc/profile" &&\
     sudo sh -c "echo export JAVA_HOME >> /etc/profile" &&\
     sudo sh -c "echo MAVEN_HOME=/opt/apache-maven-3.3.9 >> /etc/profile" &&\
     sudo sh -c "echo export MAVEN_HOME >> /etc/profile" &&\

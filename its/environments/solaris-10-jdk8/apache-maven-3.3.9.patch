@@ -1,0 +1,22 @@
+200,203c200,201
+<   local basedir
+<   local wdir
+<   basedir="$(pwd)"
+<   wdir="$(pwd)"
+---
+>   basedir=`pwd`
+>   wdir=`pwd`
+209c207
+<     wdir="$(cd "$wdir/.."; pwd)"
+---
+>     wdir=`cd "$wdir/.."; pwd`
+217c215
+<     echo "$(tr -s '\n' ' ' < "$1")"
+---
+>     echo "`tr -s '\n' ' ' < "$1"`"
+221,222c219,220
+< MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-$(find_maven_basedir)}"
+< MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
+---
+> MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir`}"
+> MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"

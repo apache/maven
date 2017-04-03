@@ -18,15 +18,12 @@
 default: build
 
 clean:
-	rm -f jdk-7u80-solaris-i586.tar.Z jdk-7u80-solaris-x64.tar.Z apache-maven-3.3.9-bin.tar.gz
+	rm -f jdk-7u80-solaris-x64.tar.Z apache-maven-3.3.9-bin.tar.gz
 
-jdk-7u80-solaris-i586.tar.Z:
-	wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-solaris-i586.tar.Z
-
-jdk-7u80-solaris-x64.tar.Z:
-	wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jdk-7u80-solaris-x64.tar.Z
+jdk-8u121-solaris-x64.tar.Z:
+	wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-solaris-x64.tar.Z
 
 apache-maven-3.3.9-bin.tar.gz:
 	wget --no-check-certificate https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 
-build: jdk-7u80-solaris-i586.tar.Z jdk-7u80-solaris-x64.tar.Z apache-maven-3.3.9-bin.tar.gz
+build: jdk-8u121-solaris-x64.tar.Z apache-maven-3.3.9-bin.tar.gz
