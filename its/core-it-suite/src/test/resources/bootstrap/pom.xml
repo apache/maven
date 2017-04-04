@@ -101,7 +101,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
+        <version>3.0.0</version>
         <configuration>
           <includeScope>runtime</includeScope>
           <prependGroupId>true</prependGroupId>
