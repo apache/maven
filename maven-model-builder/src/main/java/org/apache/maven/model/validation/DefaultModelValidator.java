@@ -131,6 +131,9 @@ public class DefaultModelValidator
 
             validate20RawDependencies( problems, m.getDependencies(), "dependencies.dependency", request );
 
+            validate20RawDependenciesSelfReferencing( problems, m, m.getDependencies(), "dependencies.dependency",
+                                                      request );
+
             if ( m.getDependencyManagement() != null )
             {
                 validate20RawDependencies( problems, m.getDependencyManagement().getDependencies(),
@@ -344,12 +347,12 @@ public class DefaultModelValidator
 
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
-        validateEffectiveDependencies( problems, m.getDependencies(), false, request );
+        validateEffectiveDependencies( problems, m, m.getDependencies(), false, request );
 
         DependencyManagement mgmt = m.getDependencyManagement();
         if ( mgmt != null )
         {
-            validateEffectiveDependencies( problems, mgmt.getDependencies(), true, request );
+            validateEffectiveDependencies( problems, m, mgmt.getDependencies(), true, request );
         }
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
@@ -524,7 +527,33 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateEffectiveDependencies( ModelProblemCollector problems, List<Dependency> dependencies,
+    private void validate20RawDependenciesSelfReferencing( ModelProblemCollector problems, Model m,
+                                                           List<Dependency> dependencies, String prefix,
+                                                           ModelBuildingRequest request )
+    {
+        // We only check for groupId/artifactId cause if there is another
+        // module with the same groupId/artifactId this will fail the build 
+        // earlier like "Project '...' is duplicated in the reactor.
+        // So it is sufficient to check only groupId/artifactId and not the
+        // packaging type.
+        for ( Dependency dependency : dependencies )
+        {
+            String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+            String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
+            if ( key.equals( mKey ) )
+            {
+                // This means a module which is build has a dependency which has the same
+                // groupId, artifactId and version coordinates. This is in consequence
+                // a self reference or in other words a circular reference which can not
+                // being resolved.
+                addViolation( problems, Severity.FATAL, Version.V31, prefix + " " + key, key, "is referencing itself.",
+                              dependency );
+
+            }
+        }
+    }
+
+    private void validateEffectiveDependencies( ModelProblemCollector problems, Model m, List<Dependency> dependencies,
                                                 boolean management, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
@@ -551,9 +580,28 @@ public class DefaultModelValidator
                      */
                     validateEnum( prefix + "scope", problems, Severity.WARNING, Version.V20, d.getScope(),
                                   d.getManagementKey(), d, "provided", "compile", "runtime", "test", "system" );
+
+                    validateEffectiveModelAgainstDependency( prefix, problems, m, d, request );
                 }
             }
         }
+    }
+
+    private void validateEffectiveModelAgainstDependency( String prefix, ModelProblemCollector problems, Model m,
+                                                          Dependency d, ModelBuildingRequest request )
+    {
+        String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion();
+        String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
+        if ( key.equals( mKey ) )
+        {
+            // This means a module which is build has a dependency which has the same
+            // groupId, artifactId and version coordinates. This is in consequence
+            // a self reference or in other words a circular reference which can not
+            // being resolved.
+            addViolation( problems, Severity.FATAL, Version.V31, prefix + " " + key, key, "is referencing itself.", d );
+
+        }
+
     }
 
     private void validate20EffectivePluginDependencies( ModelProblemCollector problems, Plugin plugin,
