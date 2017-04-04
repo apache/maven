@@ -28,6 +28,11 @@ $ ./mvnw.cmd clean install
 
 A normal Maven build will be executed with the one important change that if the user doesn't have the necessary version of Maven specified in `.mvn/wrapper/maven-wrapper.properties` it will be downloaded for the user first.
 
+
+## Changes
+
+Please check out the [changelog](./CHANGELOG.md) for more information about our releases.
+ 
 ## Using a Different Version of Maven
 
 To switch the version of Maven used to build a project you can initialize it using 
