@@ -27,7 +27,11 @@ most information at an easier glance.
   - fixes https://github.com/takari/maven-wrapper/issues/37
 - Plugin and other project updates
   - contributed by Manfred Moser - http://www.simpligility.com
-  
+- Support for spaces in path on Unix
+  - see https://github.com/takari/maven-wrapper/pull/25
+  - contributed by https://github.com/beverage
+  - and Manfred Moser - http://www.simpligility.com
+
 
 ## Version 0.1.6 - 2016-10-17
 
