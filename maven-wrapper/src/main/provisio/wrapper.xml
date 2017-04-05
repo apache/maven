@@ -10,6 +10,7 @@
       <include>mvnw</include>
       <include>mvnw.cmd</include>
       <include>.mvn/**</include>
+      <exclude>**/*.jar</exclude>
     </directory>
   </fileSet>
 </runtime>
