@@ -20,6 +20,14 @@ most information at an easier glance.
 - Removed unused MAVEN_CMD_LINE_ARGS
   - see https://github.com/takari/maven-wrapper/pull/28
   - contributed by Michal Domagala - https://github.com/michaldo
+- Fix for stale wrapper jar file
+  - see https://github.com/takari/maven-wrapper/pull/36
+  - contributed by Mark Chesney - https://github.com/mches
+  - and Manfred Moser - http://www.simpligility.com
+  - fixes https://github.com/takari/maven-wrapper/issues/37
+- Plugin and other project updates
+  - contributed by Manfred Moser - http://www.simpligility.com
+  
 
 ## Version 0.1.6 - 2016-10-17
 
