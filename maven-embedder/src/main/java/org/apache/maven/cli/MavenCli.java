@@ -1462,17 +1462,6 @@ public class MavenCli
             alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
         }
 
-        File userToolchainsFile;
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
-        {
-            userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
-            userToolchainsFile = resolveFile( userToolchainsFile, workingDirectory );
-        }
-        else
-        {
-            userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
-        }
-
         request.setBaseDirectory( baseDirectory ).setGoals( goals ).setSystemProperties(
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties ).setReactorFailureBehavior(
             reactorFailureBehaviour ) // default: fail fast
