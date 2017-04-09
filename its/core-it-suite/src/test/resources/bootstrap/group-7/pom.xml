@@ -46,5 +46,19 @@ under the License.
       <version>2.10</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- MNG-5019 -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>2.0.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- MNG-5224 -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
+      <version>2.0</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
