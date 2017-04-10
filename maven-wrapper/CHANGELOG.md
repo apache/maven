@@ -35,6 +35,9 @@ The following provides most information at an easier glance.
 - Upgraded default Maven version to 3.5.0
   - contributed by Manfred Moser - http://www.simpligility.com
   - and Fred Bricon
+- Support for simple shell like dash
+  - fixes https://github.com/takari/maven-wrapper/issues/34
+  - tested by Manfred Moser  - http://www.simpligility.com
 
 
 ## Version 0.1.6 - 2016-10-17
