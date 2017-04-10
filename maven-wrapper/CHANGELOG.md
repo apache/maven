@@ -1,7 +1,7 @@
 # Changelog
 
-The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes. The following provides 
-most information at an easier glance.
+The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
+The following provides most information at an easier glance.
 
 ## Version 0.2.0 - Upcoming
 
@@ -17,6 +17,7 @@ most information at an easier glance.
   - also see https://github.com/takari/maven-wrapper/pull/33
   - contributed by https://github.com/vicaya
   - fixes https://github.com/takari/maven-wrapper/issues/31
+  - tested on Linux, OSX and Windows
 - Removed unused MAVEN_CMD_LINE_ARGS
   - see https://github.com/takari/maven-wrapper/pull/28
   - contributed by Michal Domagala - https://github.com/michaldo
@@ -31,6 +32,8 @@ most information at an easier glance.
   - see https://github.com/takari/maven-wrapper/pull/25
   - contributed by https://github.com/beverage
   - and Manfred Moser - http://www.simpligility.com
+- Upgraded default Maven version to 3.5.0
+  - contributed by Manfred Moser - http://www.simpligility.com
 
 
 ## Version 0.1.6 - 2016-10-17
