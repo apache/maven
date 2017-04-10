@@ -34,6 +34,7 @@ The following provides most information at an easier glance.
   - and Manfred Moser - http://www.simpligility.com
 - Upgraded default Maven version to 3.5.0
   - contributed by Manfred Moser - http://www.simpligility.com
+  - and Fred Bricon
 
 
 ## Version 0.1.6 - 2016-10-17
