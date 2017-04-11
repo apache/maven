@@ -196,7 +196,13 @@ if [ -z "$BASE_DIR" ]; then
   exit 1;
 fi
 
-export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
+# Workaround for JBEAP-8937 (do not change, it may break on Solaris)
+if [ -z "${MAVEN_PROJECTBASEDIR}" ]; then
+  export MAVEN_PROJECTBASEDIR=`find_maven_basedir`
+fi
+# End of fix
+
+
 echo $MAVEN_PROJECTBASEDIR
 MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
 
