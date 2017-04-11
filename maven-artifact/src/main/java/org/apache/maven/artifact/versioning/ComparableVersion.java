@@ -472,8 +472,19 @@ public class ComparableVersion
 
     /**
      * Main to test version parsing and comparison.
+     * <p>
+     * Checks how "1.2.7" compares to "1.2-SNAPSHOT", for example, you can issue
+     * <code>java -cp ${maven.repo.local}/org/apache/maven/maven-artifact/${maven.version}/maven-artifact-${maven.version}.jar org.apache.maven.artifact.versioning.ComparableVersion "1.2.7" "1.2-SNAPSHOT"</code>
+     * command to command line. Result of given command will be something like this:
+     * <pre>
+     * Display parameters as parsed by Maven (in canonical form) and comparison result:
+     * 1. 1.2.7 == 1.2.7
+     *    1.2.7 &gt; 1.2-SNAPSHOT
+     * 2. 1.2-SNAPSHOT == 1.2-snapshot
+     * </pre>
      *
-     * @param args the version strings to parse and compare
+     * @param args the version strings to parse and compare. You can pass arbitrary number of version strings and always
+     * two adjacent will be compared
      */
     public static void main( String... args )
     {
