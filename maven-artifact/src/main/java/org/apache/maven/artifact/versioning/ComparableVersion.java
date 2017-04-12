@@ -470,11 +470,12 @@ public class ComparableVersion
         return canonical.hashCode();
     }
 
+    // CHECKSTYLE_OFF: LineLength
     /**
      * Main to test version parsing and comparison.
      * <p>
-     * Checks how "1.2.7" compares to "1.2-SNAPSHOT", for example, you can issue
-     * <code>java -cp ${maven.repo.local}/org/apache/maven/maven-artifact/${maven.version}/maven-artifact-${maven.version}.jar org.apache.maven.artifact.versioning.ComparableVersion "1.2.7" "1.2-SNAPSHOT"</code>
+     * To check how "1.2.7" compares to "1.2-SNAPSHOT", for example, you can issue
+     * <pre>java -jar ${maven.repo.local}/org/apache/maven/maven-artifact/${maven.version}/maven-artifact-${maven.version}.jar "1.2.7" "1.2-SNAPSHOT"</pre>
      * command to command line. Result of given command will be something like this:
      * <pre>
      * Display parameters as parsed by Maven (in canonical form) and comparison result:
@@ -486,6 +487,7 @@ public class ComparableVersion
      * @param args the version strings to parse and compare. You can pass arbitrary number of version strings and always
      * two adjacent will be compared
      */
+    // CHECKSTYLE_ON: LineLength
     public static void main( String... args )
     {
         System.out.println( "Display parameters as parsed by Maven (in canonical form) and comparison result:" );
