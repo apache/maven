@@ -172,14 +172,18 @@ find_maven_basedir() {
     return 1
   fi
 
-  local basedir="$1"
-  local wdir="$1"
+  basedir="$1"
+  wdir="$1"
   while [ "$wdir" != '/' ] ; do
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
       break
     fi
-    wdir=$(cd "$wdir/.."; pwd)
+    # workaround for JBEAP-8937 (on Solaris 10/Sparc)
+    if [ -d "${wdir}" ]; then
+      wdir=`cd "$wdir/.."; pwd`
+    fi
+    # end of workaround
   done
   echo "${basedir}"
 }
@@ -196,13 +200,7 @@ if [ -z "$BASE_DIR" ]; then
   exit 1;
 fi
 
-# Workaround for JBEAP-8937 (do not change, it may break on Solaris)
-if [ -z "${MAVEN_PROJECTBASEDIR}" ]; then
-  export MAVEN_PROJECTBASEDIR=`find_maven_basedir`
-fi
-# End of fix
-
-
+export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
 echo $MAVEN_PROJECTBASEDIR
 MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
 
