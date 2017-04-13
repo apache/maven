@@ -56,6 +56,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -63,6 +64,7 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
@@ -684,19 +686,19 @@ public class MavenCli
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm( null );
+        Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
         container.setLoggerManager( plexusLoggerManager );
 
         for ( CoreExtensionEntry extension : extensions )
         {
-            container.discoverComponents( extension.getClassRealm() );
+            container.discoverComponents( extension.getClassRealm(), new SessionScopeModule( container ),
+                                          new MojoExecutionScopeModule( container ) );
         }
 
         customizeContainer( container );
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
-
-        Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
         eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
 
