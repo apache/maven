@@ -696,6 +696,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0009GoalConfigurationTest.class );
         suite.addTestSuite( MavenIT0008SimplePluginTest.class );
         suite.addTestSuite( MavenITmng6209MultipleBuildExtensions.class );
+        suite.addTestSuite( MavenITmng6210CoreExtensionsCustomScopesTest.class );
 
         /*
          * Add tests in reverse alpha order above.
