@@ -28,6 +28,23 @@ $ ./mvnw.cmd clean install
 
 A normal Maven build will be executed with the one important change that if the user doesn't have the necessary version of Maven specified in `.mvn/wrapper/maven-wrapper.properties` it will be downloaded for the user first.
 
+## Supported Systems
+
+The wrapper should work on various operating systems including
+
+* Linux (numerous versions, tested on Ubuntu and CentOS)
+* OSX
+* Windows (various newer versions)
+* Solaris (10 and 11)
+
+For all those various shell systems should work including
+
+* bash
+* dash
+* zsh
+
+In term of Maven versions it should work with any Maven 3.x version and it defaults to the latest release - currently
+3.5.0.
 
 ## Changes
 
