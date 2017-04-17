@@ -37,14 +37,15 @@ The wrapper should work on various operating systems including
 * Windows (various newer versions)
 * Solaris (10 and 11)
 
-For all those various shell systems should work including
+For all those *nix operating systems, various shells should work including
 
+* sh
 * bash
 * dash
 * zsh
 
-In term of Maven versions it should work with any Maven 3.x version and it defaults to the latest release - currently
-3.5.0.
+In terms of Apache Maven versions itself, the wrapper should work with any Maven 3.x version and it defaults to the
+latest release - currently 3.5.0. We do NOT plan the deprecated, EOL'ed Maven 2.x.
 
 ## Changes
 
