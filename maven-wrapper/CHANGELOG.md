@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.2.0 - Upcoming
+## Version 0.2.0 - 2017-04-17
 
 - Use Apple-recommended strategy for locating JAVA_HOME
   - see https://github.com/takari/maven-wrapper/pull/14
@@ -38,6 +38,10 @@ The following provides most information at an easier glance.
 - Support for simple shell like dash
   - fixes https://github.com/takari/maven-wrapper/issues/34
   - tested by Manfred Moser  - http://www.simpligility.com
+- Support for Solaris
+  - see https://github.com/takari/maven-wrapper/pull/40
+  - fixes https://github.com/takari/maven-wrapper/issues/34
+  - contributed by Pelisse Romain https://github.com/rpelisse
 
 
 ## Version 0.1.6 - 2016-10-17
