@@ -589,6 +589,7 @@ public class MavenCli
 
             if ( "always".equals( color ) )
             {
+                System.setProperty( "jansi.force", "true" );
                 return;
             }
 
