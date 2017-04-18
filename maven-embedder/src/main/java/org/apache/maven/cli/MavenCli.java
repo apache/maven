@@ -553,17 +553,12 @@ public class MavenCli
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
-        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            MessageUtils.setColorEnabled( false );
-        }
+        configureColor( cliRequest );
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-
-            MessageUtils.setColorEnabled( false );
 
             // redirect stdout and stderr to file
             try
@@ -584,6 +579,41 @@ public class MavenCli
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
+    }
+
+    private void configureColor( CliRequest cliRequest )
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.COLOR ) )
+        {
+            String color = cliRequest.commandLine.getOptionValue( CLIManager.COLOR );
+
+            if ( "enabled".equals( color ) )
+            {
+                return;
+            }
+
+            if ( "disabled".equals( color ) )
+            {
+                MessageUtils.setColorEnabled( false );
+                return;
+            }
+
+            if ( !"auto".equals( color ) )
+            {
+                slf4jLogger.warn( "Ignoring color configuration option [" + color
+                        + "]. Supported values are (auto|enabled|disabled)." );
+            }
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            MessageUtils.setColorEnabled( false );
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            MessageUtils.setColorEnabled( false );
+        }
     }
 
     private void version( CliRequest cliRequest )
