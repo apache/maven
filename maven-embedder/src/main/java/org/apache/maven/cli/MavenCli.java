@@ -587,12 +587,12 @@ public class MavenCli
         {
             String color = cliRequest.commandLine.getOptionValue( CLIManager.COLOR );
 
-            if ( "enabled".equals( color ) )
+            if ( "always".equals( color ) )
             {
                 return;
             }
 
-            if ( "disabled".equals( color ) )
+            if ( "never".equals( color ) )
             {
                 MessageUtils.setColorEnabled( false );
                 return;
@@ -601,7 +601,7 @@ public class MavenCli
             if ( !"auto".equals( color ) )
             {
                 slf4jLogger.warn( "Ignoring color configuration option [" + color
-                        + "]. Supported values are (auto|enabled|disabled)." );
+                        + "]. Supported values are (auto|always|never)." );
             }
         }
 
