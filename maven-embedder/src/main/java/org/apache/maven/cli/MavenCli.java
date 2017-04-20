@@ -188,6 +188,8 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
 
+        System.setProperty( "jansi.force", "true" );
+
         prepareJansiNative();
         MessageUtils.systemInstall();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
@@ -532,6 +534,7 @@ public class MavenCli
      * configure logging
      */
     private void logging( CliRequest cliRequest )
+        throws Exception
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
@@ -582,6 +585,7 @@ public class MavenCli
     }
 
     private void configureColor( CliRequest cliRequest )
+        throws Exception
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.COLOR ) )
         {
@@ -589,7 +593,6 @@ public class MavenCli
 
             if ( "always".equals( color ) )
             {
-                System.setProperty( "jansi.force", "true" );
                 return;
             }
 
@@ -601,20 +604,25 @@ public class MavenCli
 
             if ( !"auto".equals( color ) )
             {
-                slf4jLogger.warn( "Ignoring color configuration option [" + color
+                throw new Exception( "Invalid color configuration option [" + color
                         + "]. Supported values are (auto|always|never)." );
             }
+
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             MessageUtils.setColorEnabled( false );
+            return;
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             MessageUtils.setColorEnabled( false );
+            return;
         }
+
+        MessageUtils.autoDetectColorSupport();
     }
 
     private void version( CliRequest cliRequest )
