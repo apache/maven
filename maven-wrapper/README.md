@@ -47,6 +47,10 @@ For all those *nix operating systems, various shells should work including
 In terms of Apache Maven versions itself, the wrapper should work with any Maven 3.x version and it defaults to the
 latest release - currently 3.5.0. We do NOT plan the deprecated, EOL'ed Maven 2.x.
 
+The maven-wrapper itself is compiled to work with Java 5. The Takari Maven Plugin for installation however uses Java 7.
+Once the wrapper is installed with the plugin you should be able to use the wrapper on the project with Java 5 and up.
+This is however not really tested by the committers.
+
 ## Changes
 
 Please check out the [changelog](./CHANGELOG.md) for more information about our releases.
