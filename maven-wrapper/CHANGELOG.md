@@ -3,6 +3,14 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
+## Version 0.2.0 - 2017-04-21
+
+- Compile wrapper with Java 1.5 language level to allow usage with Java1.5 +
+  - see https://github.com/takari/maven-wrapper/pull/45
+  - contributed by Mark Chesney - https://github.com/mches
+
+Release performed by Manfred Moser - http://www.simpligility.com
+
 ## Version 0.2.0 - 2017-04-17
 
 - Use Apple-recommended strategy for locating JAVA_HOME
@@ -43,6 +51,7 @@ The following provides most information at an easier glance.
   - fixes https://github.com/takari/maven-wrapper/issues/34
   - contributed by Pelisse Romain https://github.com/rpelisse
 
+Release performed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.1.6 - 2016-10-17
 
