@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.2.0 - 2017-04-21
+## Version 0.2.1 - 2017-04-21
 
 - Compile wrapper with Java 1.5 language level to allow usage with Java1.5 +
   - see https://github.com/takari/maven-wrapper/pull/45
