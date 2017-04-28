@@ -42,7 +42,7 @@ public class MavenWrapperMain {
     File rootDir = rootDir(wrapperJar);
 
     String wrapperVersion = wrapperVersion();
-    System.out.println("Takari Maven Wrapper: " + wrapperVersion);
+    System.out.println("Takari Maven Wrapper " + wrapperVersion);
 
     Properties systemProperties = System.getProperties();
     systemProperties.putAll(parseSystemPropertiesFromArgs(args));
