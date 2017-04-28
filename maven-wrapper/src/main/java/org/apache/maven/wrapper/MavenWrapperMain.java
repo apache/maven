@@ -41,13 +41,16 @@ public class MavenWrapperMain {
     File propertiesFile = wrapperProperties(wrapperJar);
     File rootDir = rootDir(wrapperJar);
 
+    String wrapperVersion = wrapperVersion();
+    System.out.println("Maven Wrapper: " + wrapperVersion);
+
     Properties systemProperties = System.getProperties();
     systemProperties.putAll(parseSystemPropertiesFromArgs(args));
 
     addSystemProperties(rootDir);
 
     WrapperExecutor wrapperExecutor = WrapperExecutor.forWrapperPropertiesFile(propertiesFile, System.out);
-    wrapperExecutor.execute(args, new Installer(new DefaultDownloader("mvnw", wrapperVersion()), new PathAssembler(mavenUserHome())), new BootstrapMainStarter());
+    wrapperExecutor.execute(args, new Installer(new DefaultDownloader("mvnw", wrapperVersion), new PathAssembler(mavenUserHome())), new BootstrapMainStarter());
   }
 
   private static Map<String, String> parseSystemPropertiesFromArgs(String[] args) {
