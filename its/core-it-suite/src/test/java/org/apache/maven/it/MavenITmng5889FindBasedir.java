@@ -14,7 +14,12 @@ public class MavenITmng5889FindBasedir
 {
     public MavenITmng5889FindBasedir()
     {
-        super( "[3.5.0,)" );
+        super( "[3.5.0,3.5.1)" );
+    }
+
+    protected MavenITmng5889FindBasedir( String constraint )
+    {
+        super( constraint );
     }
 
     /**
@@ -56,9 +61,15 @@ public class MavenITmng5889FindBasedir
     private void runCoreExtensionWithOption( String option, String subdir )
         throws Exception
     {
+        runCoreExtensionWithOption( option, subdir, true );
+    }
+
+    protected void runCoreExtensionWithOption( String option, String subdir, boolean pom )
+        throws Exception
+    {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5889-find.mvn" );
 
-        File basedir = new File( testDir, "../mng-5889-find.mvn" + option );
+        File basedir = new File( testDir, "../mng-" + ( pom ? "5889" : "6223" ) + "-find.mvn" + option + ( pom ? "Pom" : "Dir" ) );
         basedir.mkdir();
 
         if ( subdir != null )
@@ -71,7 +82,7 @@ public class MavenITmng5889FindBasedir
         Verifier verifier = newVerifier( basedir.getAbsolutePath() );
         verifier.getCliOptions().add( "-Dexpression.outputFile=" + new File( basedir, "expression.properties" ).getAbsolutePath() );
         verifier.getCliOptions().add( option ); // -f/--file client/pom.xml
-        verifier.getCliOptions().add( new File( testDir, "pom.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( ( pom ? new File( testDir, "pom.xml" ) : testDir ).getAbsolutePath() );
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/ location
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
