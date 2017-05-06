@@ -141,7 +141,9 @@ find_file_argument_basedir() {
   found_file_switch=0
   for arg in "$@"; do
     if [ ${found_file_switch} -eq 1 ]; then
-      if [ -f "${arg}" ]; then
+      if [ -d "${arg}" ]; then
+        basedir=`cd "${arg}" && pwd -P`
+      elif [ -f "${arg}" ]; then
         basedir=`dirname "${arg}"`
         basedir=`cd "${basedir}" && pwd -P`
         if [ ! -d "${basedir}" ]; then
