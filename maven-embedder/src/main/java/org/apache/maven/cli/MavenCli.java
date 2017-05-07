@@ -188,6 +188,8 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
 
+        System.setProperty( "jansi.force", "true" );
+
         prepareJansiNative();
         MessageUtils.systemInstall();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
@@ -532,6 +534,7 @@ public class MavenCli
      * configure logging
      */
     private void logging( CliRequest cliRequest )
+        throws Exception
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
@@ -553,17 +556,12 @@ public class MavenCli
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
-        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            MessageUtils.setColorEnabled( false );
-        }
+        configureColor( cliRequest );
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-
-            MessageUtils.setColorEnabled( false );
 
             // redirect stdout and stderr to file
             try
@@ -584,6 +582,47 @@ public class MavenCli
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
+    }
+
+    private void configureColor( CliRequest cliRequest )
+        throws Exception
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.COLOR ) )
+        {
+            String color = cliRequest.commandLine.getOptionValue( CLIManager.COLOR );
+
+            if ( "always".equals( color ) )
+            {
+                return;
+            }
+
+            if ( "never".equals( color ) )
+            {
+                MessageUtils.setColorEnabled( false );
+                return;
+            }
+
+            if ( !"auto".equals( color ) )
+            {
+                throw new Exception( "Invalid color configuration option [" + color
+                        + "]. Supported values are (auto|always|never)." );
+            }
+
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            MessageUtils.setColorEnabled( false );
+            return;
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            MessageUtils.setColorEnabled( false );
+            return;
+        }
+
+        MessageUtils.autoDetectColorSupport();
     }
 
     private void version( CliRequest cliRequest )
