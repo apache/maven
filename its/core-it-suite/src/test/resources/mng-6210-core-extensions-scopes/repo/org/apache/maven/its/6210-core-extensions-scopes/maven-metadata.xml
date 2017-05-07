@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test :: maven-it-plugin-core-extensions-custom-scopes-client</name>
+      <prefix>it</prefix>
+      <artifactId>maven-it-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
