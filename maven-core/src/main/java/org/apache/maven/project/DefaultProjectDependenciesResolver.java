@@ -295,6 +295,11 @@ public class DefaultProjectDependenciesResolver
                     //      The resolver 1.0.x releases do not record premanaged state of properties.
                     buffer.append( " (properties managed)" );
                 }
+
+                if ( dep.isOptional() )
+                {
+                    buffer.append( " (optional)" );
+                }
             }
             else
             {
