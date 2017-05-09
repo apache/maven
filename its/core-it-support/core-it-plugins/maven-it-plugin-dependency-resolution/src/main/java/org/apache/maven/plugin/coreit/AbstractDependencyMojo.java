@@ -100,8 +100,14 @@ public abstract class AbstractDependencyMojo
                     Artifact artifact = (Artifact) artifact1;
                     String id = getId( artifact );
                     writer.write( id );
+                    String optional = "";
+                    if ( artifact.isOptional() )
+                    {
+                        optional = " (optional)";
+                        writer.write( optional );
+                    }
                     writer.newLine();
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + id );
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + id + optional );
                 }
             }
         }
