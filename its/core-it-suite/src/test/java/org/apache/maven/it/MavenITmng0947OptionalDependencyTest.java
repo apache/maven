@@ -46,6 +46,8 @@ public class MavenITmng0947OptionalDependencyTest
     public void testit()
         throws Exception
     {
+        failingMavenVersions( "(,3.1.0-alpha-1)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0947" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
