@@ -117,6 +117,7 @@ public class DefaultArtifactDescriptorReader
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
+        setVersionRangeResolver( versionRangeResolver );
         setArtifactResolver( artifactResolver );
         setModelBuilder( modelBuilder );
         setLoggerFactory( loggerFactory );
