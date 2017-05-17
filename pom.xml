@@ -590,6 +590,7 @@ under the License.
             <exclude>.maven/spy.log</exclude> <!-- hudson maven3 integration log -->
             <exclude>.java-version</exclude>
             <exclude>README.md</exclude>
+            <exclude>dependency-reduced-pom.xml</exclude>
           </excludes>
         </configuration>
       </plugin>
