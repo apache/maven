@@ -485,6 +485,12 @@ public class DefaultModelValidator
                 }
             }
 
+            if ( equals( "LATEST", dependency.getVersion() ) || equals( "RELEASE", dependency.getVersion() ) )
+            {
+                addViolation( problems, Severity.WARNING, Version.BASE, prefix + ".version", key,
+                        "is either LATEST or RELEASE (both of them are being deprecated)", dependency );
+            }
+
             Dependency existing = index.get( key );
 
             if ( existing != null )
