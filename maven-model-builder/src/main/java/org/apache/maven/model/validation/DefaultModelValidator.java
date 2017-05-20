@@ -467,6 +467,12 @@ public class DefaultModelValidator
             }
             else if ( "system".equals( dependency.getScope() ) )
             {
+
+                if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 ) {
+                    addViolation( problems, Severity.WARNING, Version.V31, prefix + ".scope", key,
+                            "declares usage of deprecated 'system' scope ", dependency );
+                }
+
                 String sysPath = dependency.getSystemPath();
                 if ( StringUtils.isNotEmpty( sysPath ) )
                 {
