@@ -467,6 +467,13 @@ public class DefaultModelValidator
             }
             else if ( "system".equals( dependency.getScope() ) )
             {
+
+                if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
+                {
+                    addViolation( problems, Severity.WARNING, Version.V31, prefix + ".scope", key,
+                                  "declares usage of deprecated 'system' scope ", dependency );
+                }
+
                 String sysPath = dependency.getSystemPath();
                 if ( StringUtils.isNotEmpty( sysPath ) )
                 {
@@ -488,7 +495,7 @@ public class DefaultModelValidator
             if ( equals( "LATEST", dependency.getVersion() ) || equals( "RELEASE", dependency.getVersion() ) )
             {
                 addViolation( problems, Severity.WARNING, Version.BASE, prefix + ".version", key,
-                        "is either LATEST or RELEASE (both of them are being deprecated)", dependency );
+                              "is either LATEST or RELEASE (both of them are being deprecated)", dependency );
             }
 
             Dependency existing = index.get( key );
@@ -1034,9 +1041,8 @@ public class DefaultModelValidator
         buffer.append( ' ' ).append( message );
 
         // CHECKSTYLE_OFF: LineLength
-        problems.add( new ModelProblemCollectorRequest( severity,
-                                                        version ).setMessage( buffer.toString() ).setLocation( getLocation( fieldName,
-                                                                                                                            tracker ) ) );
+        problems.add( new ModelProblemCollectorRequest( severity, version ).setMessage(
+                                                                                        buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
         // CHECKSTYLE_ON: LineLength
     }
 
