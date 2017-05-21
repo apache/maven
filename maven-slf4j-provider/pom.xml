@@ -32,7 +32,7 @@ under the License.
 
   <name>Maven SLF4J Simple Provider</name>
   <description>
-    Maven SLF4J provider based on SLF4J's simple provider, monkey-patched to support Maven styled colors
+    Maven SLF4J provider based on SLF4J's simple provider, extended to support Maven styled colors
     for levels and stacktraces rendering.
   </description>
 
@@ -63,6 +63,7 @@ under the License.
               <overWrite>false</overWrite>
               <outputDirectory>${project.build.directory}/generated-sources/slf4j-simple</outputDirectory>
               <includes>org/slf4j/impl/*.java</includes>
+              <excludes>org/slf4j/impl/StaticLoggerBinder*</excludes>
             </artifactItem>
           </artifactItems>
         </configuration>
@@ -90,23 +91,6 @@ under the License.
               <sources>
                 <source>${project.build.directory}/generated-sources/slf4j-simple</source>
               </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>groovy-maven-plugin</artifactId>
-        <version>2.0</version>
-        <executions>
-          <execution>
-            <id>patch-slf4j-simple</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <source>${project.basedir}/src/main/script/patch-slf4j-simple.groovy</source>
             </configuration>
           </execution>
         </executions>
