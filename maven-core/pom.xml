@@ -214,7 +214,7 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>plugin-site-doc</id>
+            <id>modello-site-doc</id>
             <phase>pre-site</phase>
             <goals>
               <goal>xdoc</goal>

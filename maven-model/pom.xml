@@ -61,7 +61,7 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>standard</id>
+            <id>modello</id>
             <goals>
               <goal>java</goal>
               <goal>xpp3-reader</goal>

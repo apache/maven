@@ -465,7 +465,7 @@ under the License.
           <version>${modelloVersion}</version>
           <executions>
             <execution>
-              <id>site-docs</id>
+              <id>modello-site-docs</id>
               <phase>pre-site</phase>
               <goals>
                 <goal>xdoc</goal>
@@ -473,7 +473,7 @@ under the License.
               </goals>
             </execution>
             <execution>
-              <id>standard</id>
+              <id>modello</id>
               <goals>
                 <goal>java</goal>
                 <goal>xpp3-reader</goal>
@@ -567,7 +567,7 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>check-java-1.6-compat</id>
+            <id>check-java-compat</id>
             <phase>process-classes</phase>
             <goals>
               <goal>check</goal>
