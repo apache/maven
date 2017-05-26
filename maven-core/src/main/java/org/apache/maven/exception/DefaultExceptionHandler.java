@@ -88,6 +88,7 @@ public class DefaultExceptionHandler
     implements ExceptionHandler
 {
 
+    @Override
     public ExceptionSummary handleException( Throwable exception )
     {
         return handle( "", exception );
@@ -104,17 +105,24 @@ public class DefaultExceptionHandler
             List<ProjectBuildingResult> results = ( (ProjectBuildingException) exception ).getResults();
 
             children = new ArrayList<>();
-
-            for ( ProjectBuildingResult result : results )
+            
+            if ( results == null ) //#MNG-5288 not all ProjectBuildingException constructors populate the results.
             {
-                ExceptionSummary child = handle( result );
-                if ( child != null )
-                {
-                    children.add( child );
-                }
+                message = getMessage( message, exception );
             }
+            else
+            {
+                for ( ProjectBuildingResult result : results )
+                {
+                    ExceptionSummary child = handle( result );
+                    if ( child != null )
+                    {
+                        children.add( child );
+                    }
+                }
 
-            message = "The build could not read " + children.size() + " project" + ( children.size() == 1 ? "" : "s" );
+                message = "The build could not read " + children.size() + " project" + ( children.size() == 1 ? "" : "s" );
+            }
         }
         else
         {
