@@ -97,6 +97,8 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
+    public static final String QUIET_TRANSFER_LOGS = "qtl";
+
     public static final String LEGACY_LOCAL_REPOSITORY = "llr";
 
     public static final String BUILDER = "b";
@@ -138,6 +140,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasOptionalArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasOptionalArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
+        options.addOption( OptionBuilder.withLongOpt( "quiet_transfer_logs" ).withDescription( "quiets transfer logs, for example: downloading, uploading, bytes downloaded, etc.." ).create( QUIET_TRANSFER_LOGS) );
         options.addOption( OptionBuilder.withLongOpt( "legacy-local-repository" ).withDescription( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).create( LEGACY_LOCAL_REPOSITORY ) );
         options.addOption( OptionBuilder.withLongOpt( "builder" ).hasArg().withDescription( "The id of the build strategy to use" ).create( BUILDER ) );
 
@@ -155,7 +158,6 @@ public class CLIManager
         String[] cleanArgs = CleanArgument.cleanArgs( args );
 
         CommandLineParser parser = new GnuParser();
-
         return parser.parse( options, cleanArgs );
     }
 
