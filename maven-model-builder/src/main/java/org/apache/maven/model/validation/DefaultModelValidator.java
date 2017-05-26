@@ -485,6 +485,13 @@ public class DefaultModelValidator
                 }
             }
 
+            if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1
+                    && ( equals( "LATEST", dependency.getVersion() ) || equals( "RELEASE", dependency.getVersion() ) ) )
+            {
+                addViolation( problems, Severity.WARNING, Version.V31, prefix + ".version", key,
+                        "is either LATEST or RELEASE (both of them are being deprecated)", dependency );
+            }
+
             Dependency existing = index.get( key );
 
             if ( existing != null )
