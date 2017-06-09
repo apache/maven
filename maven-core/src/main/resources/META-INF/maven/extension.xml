@@ -134,6 +134,11 @@ under the License.
     <exportedArtifact>org.sonatype.sisu:sisu-inject-plexus</exportedArtifact>
     <exportedArtifact>org.eclipse.sisu:org.eclipse.sisu.plexus</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-artifact</exportedArtifact>
+    <!--
+      | MNG-6240: Plugins might depend on maven-aether-provider <= 3.3.9 before the rename to maven-resolver-provider.
+      | Since backwards-compatibility was kept, Maven Core also provides this artifact.
+     -->
+    <exportedArtifact>org.apache.maven:maven-aether-provider</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-resolver-provider</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-artifact-manager</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-compat</exportedArtifact>
