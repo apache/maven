@@ -32,14 +32,18 @@ under the License.
 
   <name>Maven SLF4J Simple Provider</name>
   <description>
-    Maven SLF4J provider based on SLF4J's simple provider, monkey-patched to support Maven styled colors
-    for levels and stacktraces rendering.
+    Maven SLF4J provider based on SLF4J's simple provider.
   </description>
 
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4jVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
@@ -49,68 +53,36 @@ under the License.
 
   <build>
     <plugins>
+      <!-- Shade slf4j-simple without StaticLoggerBinder to ensure SLF4J picks our implementation -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <configuration>
-          <artifactItems>
-            <artifactItem>
-              <groupId>org.slf4j</groupId>
-              <artifactId>slf4j-simple</artifactId>
-              <version>${slf4jVersion}</version>
-              <type>jar</type>
-              <classifier>sources</classifier>
-              <overWrite>false</overWrite>
-              <outputDirectory>${project.build.directory}/generated-sources/slf4j-simple</outputDirectory>
-              <includes>org/slf4j/impl/*.java</includes>
-            </artifactItem>
-          </artifactItems>
-        </configuration>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.0.0</version>
         <executions>
           <execution>
-            <id>unzip-slf4j-simple</id>
+            <phase>package</phase>
             <goals>
-              <goal>unpack</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.12</version>
-        <executions>
-          <execution>
-            <id>add-slf4j-simple</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
+              <goal>shade</goal>
             </goals>
             <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-sources/slf4j-simple</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>groovy-maven-plugin</artifactId>
-        <version>2.0</version>
-        <executions>
-          <execution>
-            <id>patch-slf4j-simple</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <source>${project.basedir}/src/main/script/patch-slf4j-simple.groovy</source>
+              <artifactSet>
+                <includes>
+                  <include>org.slf4j:slf4j-simple</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>org.slf4j:slf4j-simple</artifact>
+                  <excludes>
+                    <exclude>org/slf4j/impl/StaticLoggerBinder*</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>
