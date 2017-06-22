@@ -228,6 +228,7 @@ public class DefaultProjectDependenciesResolver
         }
     }
 
+    // Keep this class in sync with org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver.GraphLogger
     class GraphLogger
         implements DependencyVisitor
     {
@@ -252,9 +253,10 @@ public class DefaultProjectDependenciesResolver
 
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
+                buffer.append( ':' ).append( dep.isOptional() ? "optional" : "not optional" );
 
                 // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When resolver 1.1 provides this information, these log messages should be updated
+                //      information. When the resolver provides this information, these log messages should be updated
                 //      to contain it.
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
@@ -281,24 +283,25 @@ public class DefaultProjectDependenciesResolver
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
-                        == DependencyNode.MANAGED_EXCLUSIONS )
+                         == DependencyNode.MANAGED_EXCLUSIONS )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedExclusions( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of exclusions.
-                    buffer.append( " (exclusions managed)" );
+                    final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
+                        DependencyManagerUtils.getPremanagedExclusions( node );
+
+                    buffer.append( " (exclusions managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedExclusions, "default" ) );
+                    buffer.append( ')' );
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
-                        == DependencyNode.MANAGED_PROPERTIES )
+                         == DependencyNode.MANAGED_PROPERTIES )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedProperties( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of properties.
-                    buffer.append( " (properties managed)" );
-                }
+                    final Map<String, String> premanagedProperties =
+                        DependencyManagerUtils.getPremanagedProperties( node );
 
-                if ( dep.isOptional() )
-                {
-                    buffer.append( " (optional)" );
+                    buffer.append( " (properties managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedProperties, "default" ) );
+                    buffer.append( ')' );
                 }
             }
             else
