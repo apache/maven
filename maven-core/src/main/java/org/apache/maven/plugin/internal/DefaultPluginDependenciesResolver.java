@@ -19,6 +19,7 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -54,6 +56,7 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
@@ -221,6 +224,7 @@ public class DefaultPluginDependenciesResolver
         return node;
     }
 
+    // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
     class GraphLogger
         implements DependencyVisitor
     {
@@ -234,10 +238,67 @@ public class DefaultPluginDependenciesResolver
             org.eclipse.aether.graph.Dependency dep = node.getDependency();
             if ( dep != null )
             {
-                Artifact art = dep.getArtifact();
+                org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append( art );
-                buffer.append( ':' ).append( dep.getScope() );
+                if ( StringUtils.isNotEmpty( dep.getScope() ) )
+                {
+                    buffer.append( ':' ).append( dep.getScope() );
+                }
+
+                if ( dep.isOptional() )
+                {
+                    buffer.append( " (optional)" );
+                }
+
+                // TODO We currently cannot tell which <dependencyManagement> section contained the management
+                //      information. When the resolver provides this information, these log messages should be updated
+                //      to contain it.
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
+                {
+                    final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
+                    buffer.append( " (scope managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
+                    buffer.append( ')' );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_VERSION ) == DependencyNode.MANAGED_VERSION )
+                {
+                    final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+                    buffer.append( " (version managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
+                    buffer.append( ')' );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_OPTIONAL ) == DependencyNode.MANAGED_OPTIONAL )
+                {
+                    final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
+                    buffer.append( " (optionality managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
+                    buffer.append( ')' );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
+                         == DependencyNode.MANAGED_EXCLUSIONS )
+                {
+                    final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
+                        DependencyManagerUtils.getPremanagedExclusions( node );
+
+                    buffer.append( " (exclusions managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedExclusions, "default" ) );
+                    buffer.append( ')' );
+                }
+
+                if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
+                         == DependencyNode.MANAGED_PROPERTIES )
+                {
+                    final Map<String, String> premanagedProperties =
+                        DependencyManagerUtils.getPremanagedProperties( node );
+
+                    buffer.append( " (properties managed from " );
+                    buffer.append( StringUtils.defaultString( premanagedProperties, "default" ) );
+                    buffer.append( ')' );
+                }
             }
 
             logger.debug( buffer.toString() );
