@@ -53,7 +53,7 @@ public class ConcurrencyDependencyGraphTest
 
         final List<MavenProject> projectBuilds = graph.getRootSchedulableBuilds();
         assertEquals( 1, projectBuilds.size() );
-        assertEquals( A, projectBuilds.get( 0 ) );
+        assertEquals( A, projectBuilds.iterator().next() );
 
         final List<MavenProject> subsequent = graph.markAsFinished( A );
         assertEquals( 2, subsequent.size() );

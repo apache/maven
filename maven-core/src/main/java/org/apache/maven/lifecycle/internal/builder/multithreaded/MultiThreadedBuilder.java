@@ -49,7 +49,7 @@ import org.codehaus.plexus.logging.Logger;
  * This builder uses a number of threads equal to the minimum of the degree of concurrency (which is the thread count
  * set with <code>-T</code> on the command-line) and the number of projects to build. As such, building a single project
  * will always result in a sequential build, regardless of the thread count.
- * </p> 
+ * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
@@ -87,17 +87,19 @@ public class MultiThreadedBuilder
         }
         ExecutorService executor = Executors.newFixedThreadPool( nThreads, new BuildThreadFactory() );
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<>( executor );
-        ConcurrencyDependencyGraph analyzer =
-            new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
 
         // Currently disabled
         ThreadOutputMuxer muxer = null; // new ThreadOutputMuxer( analyzer.getProjectBuilds(), System.out );
 
         for ( TaskSegment taskSegment : taskSegments )
         {
+            ProjectBuildList segmentProjectBuilds = projectBuilds.getByTaskSegment( taskSegment );
             Map<MavenProject, ProjectSegment> projectBuildMap = projectBuilds.selectSegment( taskSegment );
             try
             {
+                ConcurrencyDependencyGraph analyzer =
+                    new ConcurrencyDependencyGraph( segmentProjectBuilds,
+                                                    session.getProjectDependencyGraph() );
                 multiThreadedProjectTaskSegmentBuild( analyzer, reactorContext, session, service, taskSegment,
                                                       projectBuildMap, muxer );
                 if ( reactorContext.getReactorBuildStatus().isHalted() )
@@ -143,7 +145,7 @@ public class MultiThreadedBuilder
                     break;
                 }
 
-                // MNG-6170: Only schedule other modules from reactor if we have more modules to build than one. 
+                // MNG-6170: Only schedule other modules from reactor if we have more modules to build than one.
                 if ( analyzer.getNumberOfBuilds() > 1 )
                 {
                     final List<MavenProject> newItemsThatCanBeBuilt =
