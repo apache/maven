@@ -61,12 +61,12 @@ public class ConcurrencyDependencyGraph
     /**
      * Gets all the builds that have no reactor-dependencies
      *
-     * @return A list of all the initial builds
+     * @return A set of all the initial builds
      */
 
-    public List<MavenProject> getRootSchedulableBuilds()
+    public Set<MavenProject> getRootSchedulableBuilds()
     {
-        List<MavenProject> result = new ArrayList<>();
+        Set<MavenProject> result = new HashSet<>();
         for ( ProjectSegment projectBuild : projectBuilds )
         {
             if ( projectDependencyGraph.getUpstreamProjects( projectBuild.getProject(), false ).size() == 0 )

@@ -87,17 +87,18 @@ public class MultiThreadedBuilder
         }
         ExecutorService executor = Executors.newFixedThreadPool( nThreads, new BuildThreadFactory() );
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<>( executor );
-        ConcurrencyDependencyGraph analyzer =
-            new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
 
         // Currently disabled
         ThreadOutputMuxer muxer = null; // new ThreadOutputMuxer( analyzer.getProjectBuilds(), System.out );
 
         for ( TaskSegment taskSegment : taskSegments )
         {
+          ProjectBuildList segmentProjectBuilds = projectBuilds.getByTaskSegment( taskSegment );
             Map<MavenProject, ProjectSegment> projectBuildMap = projectBuilds.selectSegment( taskSegment );
             try
             {
+                ConcurrencyDependencyGraph analyzer = new ConcurrencyDependencyGraph( segmentProjectBuilds, 
+                                                                                      session.getProjectDependencyGraph() );
                 multiThreadedProjectTaskSegmentBuild( analyzer, reactorContext, session, service, taskSegment,
                                                       projectBuildMap, muxer );
                 if ( reactorContext.getReactorBuildStatus().isHalted() )

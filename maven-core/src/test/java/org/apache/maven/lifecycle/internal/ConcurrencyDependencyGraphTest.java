@@ -31,6 +31,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.*;
 
@@ -51,9 +52,9 @@ public class ConcurrencyDependencyGraphTest
         ConcurrencyDependencyGraph graph =
             new ConcurrencyDependencyGraph( getProjectBuildList( session ), dependencyGraph );
 
-        final List<MavenProject> projectBuilds = graph.getRootSchedulableBuilds();
+        final Set<MavenProject> projectBuilds = graph.getRootSchedulableBuilds();
         assertEquals( 1, projectBuilds.size() );
-        assertEquals( A, projectBuilds.get( 0 ) );
+        assertEquals( A, projectBuilds.iterator().next() );
 
         final List<MavenProject> subsequent = graph.markAsFinished( A );
         assertEquals( 2, subsequent.size() );
