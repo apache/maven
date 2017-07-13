@@ -200,6 +200,68 @@ if [ -z "$BASE_DIR" ]; then
   exit 1;
 fi
 
+if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
+    echo "Found .mvn/wrapper/maven-wrapper.jar"
+else
+    echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
+
+    javaClass="/tmp/MavenWrapperDownloader.java"
+    if [ ! -e "$javaClass" ]; then
+        echo " - Generating MavenWrapperDownloader.java ..."
+        # Generating downloader application java class ...
+        cat <<EOF >"$javaClass"
+import java.net.*;
+import java.io.*;
+import java.nio.channels.*;
+
+public class MavenWrapperDownloader {
+
+    public static void main(String args[]) {
+        System.out.println("Downloader started");
+        String url="http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar";
+        File baseDirectory = new File(args[0]);
+        System.out.println("Using base directory: " + baseDirectory.getAbsolutePath());
+        File outputFile = new File(baseDirectory.getAbsolutePath()
+        , ".mvn/wrapper/maven-wrapper.jar");
+        if(!outputFile.getParentFile().exists()) {
+            outputFile.getParentFile().mkdirs();
+        }
+        System.out.println("Downloading to: " + outputFile.getAbsolutePath());
+        downloadFileFromURL(url, outputFile);
+        System.out.println("Done");
+    }
+
+    public static void downloadFileFromURL(String urlString, File destination) {
+        try {
+            URL website = new URL(urlString);
+            ReadableByteChannel rbc;
+            rbc = Channels.newChannel(website.openStream());
+            FileOutputStream fos = new FileOutputStream(destination);
+            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            fos.close();
+            rbc.close();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+EOF
+    fi
+
+    classFile=$(dirname "$javaClass")/MavenWrapperDownloader.class
+    if [ ! -e "$classFile" ]; then
+        echo " - Compiling MavenWrapperDownloader.java ..."
+        # Compiling the Java class
+        ("$JAVA_HOME/bin/javac" "$javaClass")
+    fi
+
+    # Running the downloader
+    echo " - Running MavenWrapperDownloader.java ..."
+    echo "$MAVEN_PROJECTBASEDIR"
+    ("$JAVA_HOME/bin/java" -cp /tmp MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+fi
+
 export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
 if [ "$MVNW_VERBOSE" = true ]; then
   echo $MAVEN_PROJECTBASEDIR
