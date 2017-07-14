@@ -204,7 +204,6 @@ fi
 # Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
 # This allows using the maven wrapper in projects that prohibit checking in binary data.
 ##########################################################################################
-
 JAR_URL="http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar"
 if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
     echo "Found .mvn/wrapper/maven-wrapper.jar"
@@ -233,7 +232,6 @@ else
         fi
     fi
 fi
-
 ##########################################################################################
 # End of extension
 ##########################################################################################
