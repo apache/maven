@@ -121,6 +121,17 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
 set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
 
+@REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+@REM This allows using the maven wrapper in projects that prohibit checking in binary data.
+if exist .mvn/wrapper/maven-wrapper.jar (
+    echo Found .mvn/wrapper/maven-wrapper.jar
+) else (
+    echo Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ...
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar', '.mvn/wrapper/maven-wrapper.jar')"
+    echo Finished downloading .mvn/wrapper/maven-wrapper.jar
+)
+@REM End of extension
+
 %MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %WRAPPER_JAR% "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %WRAPPER_LAUNCHER% %MAVEN_CONFIG% %*
 if ERRORLEVEL 1 goto error
 goto end
