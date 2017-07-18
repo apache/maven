@@ -209,10 +209,10 @@ if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
     echo "Found .mvn/wrapper/maven-wrapper.jar"
 else
     echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
-    if which wget >/dev/null; then
+    if command -v wget > /dev/null; then
         echo "Found wget ... using wget"
         wget ‐‐output-document=.mvn/wrapper/maven-wrapper.jar "$JAR_URL"
-    elif which curl >/dev/null; then
+    elif command -v curl > /dev/null; then
         echo "Found curl ... using curl"
         curl -o .mvn/wrapper/maven-wrapper.jar "$JAR_URL"
     else
