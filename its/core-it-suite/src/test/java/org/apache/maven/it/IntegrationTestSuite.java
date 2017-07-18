@@ -111,6 +111,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6386BaseUriPropertyTest.class );
         suite.addTestSuite( MavenITmng6330RelativePath.class );
         suite.addTestSuite( MavenITmng5965ParallelBuildMultipliesWorkTest.class );
+        suite.addTestSuite( MavenITmng6255FixConcatLines.class );
         suite.addTestSuite( MavenITmng6240PluginExtensionAetherProvider.class );
         suite.addTestSuite( MavenITmng6223FindBasedir.class );
         suite.addTestSuite( MavenITmng6189SiteReportPluginsWarningTest.class );
