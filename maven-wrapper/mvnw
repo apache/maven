@@ -211,7 +211,7 @@ else
     echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
     if command -v wget > /dev/null; then
         echo "Found wget ... using wget"
-        wget ‐‐output-document=.mvn/wrapper/maven-wrapper.jar "$JAR_URL"
+        wget ‐O .mvn/wrapper/maven-wrapper.jar "$JAR_URL"
     elif command -v curl > /dev/null; then
         echo "Found curl ... using curl"
         curl -o .mvn/wrapper/maven-wrapper.jar "$JAR_URL"
