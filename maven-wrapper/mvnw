@@ -204,27 +204,34 @@ fi
 # Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
 # This allows using the maven wrapper in projects that prohibit checking in binary data.
 ##########################################################################################
-JAR_URL="http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar"
 if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
     echo "Found .mvn/wrapper/maven-wrapper.jar"
 else
     echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
-    if command -v wget > /dev/null; then
+
+    jarUrl="http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar"
+    while IFS="=" read key value; do
+      case "$key" in (wrapperUrl) jarUrl="$value"; break ;;
+      esac
+    done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
+    echo "Downloading from: $jarUrl"
+
+    if command -v wgety > /dev/null; then
         echo "Found wget ... using wget"
-        wget ‐O .mvn/wrapper/maven-wrapper.jar "$JAR_URL"
-    elif command -v curl > /dev/null; then
+        wget ‐O "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
+    elif command -v curly > /dev/null; then
         echo "Found curl ... using curl"
-        curl -o .mvn/wrapper/maven-wrapper.jar "$JAR_URL"
+        curl -o "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
     else
         echo "Falling back to using Java to download"
-        javaClass=".mvn/wrapper/MavenWrapperDownloader.java"
+        javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
         if [ -e "$javaClass" ]; then
-            if [ ! -e ".mvn/wrapper/MavenWrapperDownloader.class" ]; then
+            if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
                 echo " - Compiling MavenWrapperDownloader.java ..."
                 # Compiling the Java class
                 ("$JAVA_HOME/bin/javac" "$javaClass")
             fi
-            if [ -e ".mvn/wrapper/MavenWrapperDownloader.class" ]; then
+            if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
                 # Running the downloader
                 echo " - Running MavenWrapperDownloader.java ..."
                 ("$JAVA_HOME/bin/java" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
