@@ -118,17 +118,23 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
+set DOWNLOAD_URL="http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar"
+FOR /F "tokens=3,* delims=.=" %%G IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO ( set %%G=%%H )
+    if "%%G"=="wrapperUrl"
+        set DOWNLOAD_URL=%%H
+echo Downloading from: "%DOWNLOAD_URL%"
+
 set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
 set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
 
 @REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
 @REM This allows using the maven wrapper in projects that prohibit checking in binary data.
-if exist .mvn/wrapper/maven-wrapper.jar (
-    echo Found .mvn/wrapper/maven-wrapper.jar
+if exist %WRAPPER_JAR%" (
+    echo Found %WRAPPER_JAR%"
 ) else (
-    echo Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://central.maven.org/maven2/io/takari/maven-wrapper/0.2.1/maven-wrapper-0.2.1.jar', '.mvn/wrapper/maven-wrapper.jar')"
-    echo Finished downloading .mvn/wrapper/maven-wrapper.jar
+    echo Couldn't find %WRAPPER_JAR%", downloading it ...
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"
+    echo Finished downloading %WRAPPER_JAR%"
 )
 @REM End of extension
 
