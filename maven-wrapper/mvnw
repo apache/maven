@@ -216,10 +216,10 @@ else
     done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
     echo "Downloading from: $jarUrl"
 
-    if command -v wgety > /dev/null; then
+    if command -v wget > /dev/null; then
         echo "Found wget ... using wget"
         wget ‐O "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
-    elif command -v curly > /dev/null; then
+    elif command -v curl > /dev/null; then
         echo "Found curl ... using curl"
         curl -o "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
     else
