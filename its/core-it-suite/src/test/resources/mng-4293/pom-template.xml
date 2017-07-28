@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4293</groupId>
-  <artifactId>test</artifactId>
+  <artifactId>it-test-mng-4293</artifactId>
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4293</name>
