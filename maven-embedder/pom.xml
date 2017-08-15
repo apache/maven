@@ -138,6 +138,11 @@ under the License.
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.fusesource.jansi</groupId>
+      <artifactId>jansi</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

@@ -19,26 +19,35 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.commons.cli.ParseException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
+import org.apache.commons.cli.ParseException;
+import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 public class MavenCliTest
-    extends TestCase
 {
     private MavenCli cli;
 
     private String origBasedir;
 
-    protected void setUp()
+    @Before
+    public void setUp()
     {
         cli = new MavenCli();
         origBasedir = System.getProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
     }
 
-    @Override
-    protected void tearDown()
+    @After
+    public void tearDown()
         throws Exception
     {
         if ( origBasedir != null )
@@ -49,9 +58,9 @@ public class MavenCliTest
         {
             System.getProperties().remove( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
         }
-        super.tearDown();
     }
 
+    @Test
     public void testCalculateDegreeOfConcurrencyWithCoreMultiplier()
     {
         int cores = Runtime.getRuntime().availableProcessors();
@@ -71,6 +80,7 @@ public class MavenCliTest
         }
     }
 
+    @Test
     public void testMavenConfig()
         throws Exception
     {
@@ -90,6 +100,7 @@ public class MavenCliTest
         assertEquals( "foobar", request.commandLine.getOptionValue( "builder" ) );
     }
 
+    @Test
     public void testMavenConfigInvalid()
         throws Exception
     {
@@ -120,6 +131,7 @@ public class MavenCliTest
      *
      * @throws Exception in case of failure.
      */
+    @Test
     public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine()
         throws Exception
     {
@@ -145,6 +157,7 @@ public class MavenCliTest
      *
      * @throws Exception
      */
+    @Test
     public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine()
         throws Exception
     {
@@ -172,6 +185,7 @@ public class MavenCliTest
      *
      * @throws Exception
      */
+    @Test
     public void testMVNConfigurationCLIRepeatedPropertiesLastWins()
         throws Exception
     {
@@ -199,6 +213,7 @@ public class MavenCliTest
      *
      * @throws Exception
      */
+    @Test
     public void testMVNConfigurationFunkyArguments()
         throws Exception
     {
@@ -220,5 +235,62 @@ public class MavenCliTest
         assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
 
         assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
+    }
+
+    @Test
+    public void testStyleColors()
+        throws Exception
+    {
+        assumeTrue( "ANSI not supported", MessageUtils.isColorEnabled() );
+        CliRequest request;
+
+        MessageUtils.setColorEnabled( true );
+        request = new CliRequest( new String[] { "-B" }, null );
+        cli.cli( request );
+        cli.properties( request );
+        cli.logging( request );
+        assertFalse( MessageUtils.isColorEnabled() );
+
+        MessageUtils.setColorEnabled( true );
+        request = new CliRequest( new String[] { "-l", "target/temp/mvn.log" }, null );
+        cli.cli( request );
+        cli.properties( request );
+        cli.logging( request );
+        assertFalse( MessageUtils.isColorEnabled() );
+
+        MessageUtils.setColorEnabled( false );
+        request = new CliRequest( new String[] { "-Dstyle.color=always" }, null );
+        cli.cli( request );
+        cli.properties( request );
+        cli.logging( request );
+        assertTrue( MessageUtils.isColorEnabled() );
+
+        MessageUtils.setColorEnabled( true );
+        request = new CliRequest( new String[] { "-Dstyle.color=never" }, null );
+        cli.cli( request );
+        cli.properties( request );
+        cli.logging( request );
+        assertFalse( MessageUtils.isColorEnabled() );
+
+        MessageUtils.setColorEnabled( false );
+        request = new CliRequest( new String[] { "-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log" }, null );
+        cli.cli( request );
+        cli.properties( request );
+        cli.logging( request );
+        assertTrue( MessageUtils.isColorEnabled() );
+
+        try
+        {
+            MessageUtils.setColorEnabled( false );
+            request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+            cli.cli( request );
+            cli.properties( request );
+            cli.logging( request );
+            fail( "maybe is not a valid option" );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            // noop
+        }
     }
 }

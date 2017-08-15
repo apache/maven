@@ -144,6 +144,8 @@ public class MavenCli
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
+    public static final String STYLE_COLOR_PROPERTY = "style.color";
+
     private ClassWorld classWorld;
 
     private LoggerManager plexusLoggerManager;
@@ -472,8 +474,9 @@ public class MavenCli
     /**
      * configure logging
      */
-    private void logging( CliRequest cliRequest )
+    void logging( CliRequest cliRequest )
     {
+        // LOG LEVEL
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
         cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
@@ -494,17 +497,32 @@ public class MavenCli
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
-        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        // LOG COLOR
+        String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
+        if ( "always".equals( styleColor ) )
+        {
+            MessageUtils.setColorEnabled( true );
+        }
+        else if ( "never".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( false );
         }
-
+        else if ( !"auto".equals( styleColor ) )
+        {
+            throw new IllegalArgumentException( "Invalid color configuration option [" + styleColor
+                + "]. Supported values are (auto|always|never)." );
+        }
+        else if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
+            || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            MessageUtils.setColorEnabled( false );
+        }
+        
+        // LOG STREAMS
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-
-            MessageUtils.setColorEnabled( false );
 
             // redirect stdout and stderr to file
             try
