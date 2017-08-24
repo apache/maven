@@ -120,7 +120,7 @@ public class DefaultClassRealmManager
             {
                 try
                 {
-                    ClassRealm classRealm = world.newRealm( realmId, null );
+                    ClassRealm classRealm = world.newRealm( realmId, PARENT_CLASSLOADER );
 
                     if ( logger.isDebugEnabled() )
                     {
