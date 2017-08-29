@@ -49,7 +49,7 @@ node('ubuntu') {
             junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
         }
 
-        tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', excludes: '', gitTool: 'Default', id: '_', ignoreOnPushNotifications: false, includes: '*', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git'], targets: [BRANCH_NAME, 'master']
+        tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', id: '_', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', traits: [[$class: 'jenkins.plugins.git.traits.BranchDiscoveryTrait'], [$class: 'GitToolSCMSourceTrait', gitTool: 'Default']]], targets: [BRANCH_NAME, 'master']
     }
 }
 
