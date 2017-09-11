@@ -34,6 +34,7 @@ import org.junit.Test;
 public class DefaultClassRealmManagerTest extends PlexusTestCase
 {
     private ClassRealmManager classRealmManager;
+    private boolean haveScriptEngineFactory;
 
     @Override
     protected void setUp()
@@ -41,6 +42,11 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
     {
         super.setUp();
         this.classRealmManager = lookup( ClassRealmManager.class );
+        ClassLoader testRealm = getClass().getClassLoader();
+        ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, testRealm );
+        // TODO switch to Assume.assumeTrue( sef.iterator().hasNext() ) when PlexusTestCase
+        // supports assumptions. Not every Java 7 JRE has a ScriptEngineFactory.
+        this.haveScriptEngineFactory = sef.iterator().hasNext();
     }
 
     @Override
@@ -59,7 +65,7 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
         
         ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, null, null, null );
         ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, pluginRealm );
-        assertTrue( sef.iterator().hasNext() );
+        assertEquals( haveScriptEngineFactory, sef.iterator().hasNext() );
     }
 
     @Test
@@ -70,7 +76,7 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
         
         ClassRealm extensionRealm = classRealmManager.createExtensionRealm( extension, null );
         ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, extensionRealm );
-        assertTrue( sef.iterator().hasNext() );
+        assertEquals( haveScriptEngineFactory, sef.iterator().hasNext() );
     }
 
     @Test
@@ -80,7 +86,7 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
         
         ClassRealm projectRealm = classRealmManager.createProjectRealm( model, null );
         ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, projectRealm );
-        assertTrue( sef.iterator().hasNext() );
+        assertEquals( haveScriptEngineFactory, sef.iterator().hasNext() );
     }
 
     @Test
@@ -88,7 +94,7 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
     {
         ClassRealm mavenApiRealm = classRealmManager.getMavenApiRealm();
         ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, mavenApiRealm );
-        assertTrue( sef.iterator().hasNext() );
+        assertEquals( haveScriptEngineFactory, sef.iterator().hasNext() );
     }
 
     @Test
@@ -96,6 +102,6 @@ public class DefaultClassRealmManagerTest extends PlexusTestCase
     {
         ClassRealm coreRealm = classRealmManager.getCoreRealm();
         ServiceLoader<ScriptEngineFactory> sef = ServiceLoader.load( ScriptEngineFactory.class, coreRealm );
-        assertTrue( sef.iterator().hasNext() );
+        assertEquals( haveScriptEngineFactory, sef.iterator().hasNext() );
     }
 }
