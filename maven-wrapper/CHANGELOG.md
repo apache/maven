@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.2.2 - 2017-09-12
+## Version 0.2.2 and 0.2.3 - 2017-09-12
 
 - Print out Maven Wrapper version with each invocation
   - see https://github.com/takari/maven-wrapper/pull/48
@@ -11,7 +11,9 @@ The following provides most information at an easier glance.
 - Verbose mode
   - only print out basedir and version in verbose mode
   - set by environment variable MVNW_VERBOSE="true"
-  - onctributed by Manfred Moser - http://www.simpligility.com
+  - fixed NPE with https://github.com/takari/maven-wrapper/pull/65
+  - contributed by Manfred Moser - http://www.simpligility.com
+  - and Tadaya Tsuyukubo https://github.com/ttddyy
 
 Release performed by Manfred Moser - http://www.simpligility.com
 
