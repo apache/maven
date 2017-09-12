@@ -36,13 +36,20 @@ public class MavenWrapperMain {
 
   public static final String MAVEN_USER_HOME_ENV_KEY = "MAVEN_USER_HOME";
 
+  public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
+
   public static void main(String[] args) throws Exception {
+    Boolean verbose = System.getenv(MVNW_VERBOSE).equalsIgnoreCase("true");
+
     File wrapperJar = wrapperJar();
     File propertiesFile = wrapperProperties(wrapperJar);
     File rootDir = rootDir(wrapperJar);
 
     String wrapperVersion = wrapperVersion();
-    System.out.println("Takari Maven Wrapper " + wrapperVersion);
+
+    if (verbose) {
+      System.out.println("Takari Maven Wrapper " + wrapperVersion);
+    }
 
     Properties systemProperties = System.getProperties();
     systemProperties.putAll(parseSystemPropertiesFromArgs(args));
