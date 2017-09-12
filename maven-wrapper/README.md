@@ -60,6 +60,13 @@ This is however not really tested by the committers.
 
 Please check out the [changelog](./CHANGELOG.md) for more information about our releases.
  
+## Verbose Mode
+
+The wrapper supports a verbose mode in which it outputs further information. It
+is activated by setting the MVNW_VERBOSE environment variable to `true`.
+
+By default it is off.
+
 ## Using a Different Version of Maven
 
 To switch the version of Maven used to build a project you can initialize it using 
