@@ -583,6 +583,12 @@ public class DefaultModelValidator
 
                     validateEffectiveModelAgainstDependency( prefix, problems, m, d, request );
                 }
+                else
+                {
+                    validateEnum( prefix + "scope", problems, Severity.WARNING, Version.V20, d.getScope(),
+                                  d.getManagementKey(), d, "provided", "compile", "runtime", "test", "system",
+                                  "import" );
+                }
             }
         }
     }
