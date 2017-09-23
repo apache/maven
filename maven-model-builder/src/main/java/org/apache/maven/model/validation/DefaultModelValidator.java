@@ -105,13 +105,13 @@ public class DefaultModelValidator
                                   + ", the parent element cannot have the same groupId:artifactId as the project.",
                               parent );
             }
-            
+
             if ( equals( "LATEST", parent.getVersion() ) || equals( "RELEASE", parent.getVersion() ) )
             {
                 addViolation( problems, Severity.WARNING, Version.BASE, "parent.version", null,
                               "is either LATEST or RELEASE (both of them are being deprecated)", parent );
             }
-            
+
         }
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
@@ -597,6 +597,12 @@ public class DefaultModelValidator
                                   d.getManagementKey(), d, "provided", "compile", "runtime", "test", "system" );
 
                     validateEffectiveModelAgainstDependency( prefix, problems, m, d, request );
+                }
+                else
+                {
+                    validateEnum( prefix + "scope", problems, Severity.WARNING, Version.V20, d.getScope(),
+                                  d.getManagementKey(), d, "provided", "compile", "runtime", "test", "system",
+                                  "import" );
                 }
             }
         }

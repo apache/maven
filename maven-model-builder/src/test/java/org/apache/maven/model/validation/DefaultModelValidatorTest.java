@@ -339,6 +339,16 @@ public class DefaultModelValidatorTest
         assertTrue( result.getWarnings().get( 1 ).contains( "test:g" ) );
     }
 
+    public void testBadDependencyManagementScope()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-dependency-management-scope.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertContains( result.getWarnings().get( 0 ), "test:g" );
+    }
+
     public void testBadDependencyVersion()
         throws Exception
     {
