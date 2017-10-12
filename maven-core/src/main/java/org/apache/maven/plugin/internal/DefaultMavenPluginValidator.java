@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,40 +19,26 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
- * MavenPluginValidator
+ * DefaultMavenPluginValidator
  */
-public class MavenPluginValidator
+@Named
+@Singleton
+class DefaultMavenPluginValidator
+        implements MavenPluginValidator
 {
-    private final Artifact pluginArtifact;
 
-    private List<String> errors = new ArrayList<>();
-
-    private boolean firstDescriptor = true;
-
-    public MavenPluginValidator( Artifact pluginArtifact )
+    @Override
+    public void validate( Artifact pluginArtifact, PluginDescriptor pluginDescriptor, List<String> errors )
     {
-        this.pluginArtifact = pluginArtifact;
-    }
-
-    public void validate( PluginDescriptor pluginDescriptor )
-    {
-        /*
-         * NOTE: For plugins that depend on other plugin artifacts the plugin realm contains more than one plugin
-         * descriptor. However, only the first descriptor is of interest.
-         */
-        if ( !firstDescriptor )
-        {
-            return;
-        }
-        firstDescriptor = false;
-
         if ( !pluginArtifact.getGroupId().equals( pluginDescriptor.getGroupId() ) )
         {
             errors.add( "Plugin's descriptor contains the wrong group ID: " + pluginDescriptor.getGroupId() );
@@ -67,15 +53,5 @@ public class MavenPluginValidator
         {
             errors.add( "Plugin's descriptor contains the wrong version: " + pluginDescriptor.getVersion() );
         }
-    }
-
-    public boolean hasErrors()
-    {
-        return !errors.isEmpty();
-    }
-
-    public List<String> getErrors()
-    {
-        return errors;
     }
 }
