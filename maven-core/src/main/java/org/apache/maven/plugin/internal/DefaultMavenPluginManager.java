@@ -164,6 +164,9 @@ public class DefaultMavenPluginManager
     @Requirement
     private PluginArtifactsCache pluginArtifactsCache;
 
+    @Requirement
+    private MavenPluginValidator pluginValidator;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -241,14 +244,13 @@ public class DefaultMavenPluginManager
             throw new PluginDescriptorParsingException( plugin, pluginFile.getAbsolutePath(), e );
         }
 
-        MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
+        List<String> errors = new ArrayList<>();
+        pluginValidator.validate( pluginArtifact, pluginDescriptor, errors );
 
-        validator.validate( pluginDescriptor );
-
-        if ( validator.hasErrors() )
+        if ( !errors.isEmpty() )
         {
             throw new InvalidPluginDescriptorException(
-                "Invalid plugin descriptor for " + plugin.getId() + " (" + pluginFile + ")", validator.getErrors() );
+                "Invalid plugin descriptor for " + plugin.getId() + " (" + pluginFile + ")", errors );
         }
 
         pluginDescriptor.setPluginArtifact( pluginArtifact );
