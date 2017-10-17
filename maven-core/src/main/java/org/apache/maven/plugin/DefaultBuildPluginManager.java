@@ -106,11 +106,8 @@ public class DefaultBuildPluginManager
             throw new PluginExecutionException( mojoExecution, project, e );
         }
 
-        // use project realm as thread context classloader to enable components from all extensions=true plugins
-        ClassRealm tccl = mojoExecution.getPlugin().isExtensions() ? project.getClassRealm() : pluginRealm;
-
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( tccl );
+        Thread.currentThread().setContextClassLoader( pluginRealm );
 
         MavenSession oldSession = legacySupport.getSession();
 
