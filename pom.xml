@@ -508,6 +508,9 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
           <version>1.1</version>
+          <configuration>
+            <serverId>apache.releases.https</serverId>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
