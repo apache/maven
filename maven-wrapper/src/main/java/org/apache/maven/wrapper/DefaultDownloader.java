@@ -77,13 +77,13 @@ public class DefaultDownloader implements Downloader {
       while ((numRead = in.read(buffer)) != -1) {
         progressCounter += numRead;
         if (progressCounter / PROGRESS_CHUNK > 0) {
-          System.out.print(".");
+          Logger.info(".");
           progressCounter = progressCounter - PROGRESS_CHUNK;
         }
         out.write(buffer, 0, numRead);
       }
     } finally {
-      System.out.println("");
+      Logger.info("");
       if (in != null) {
         in.close();
       }

@@ -39,17 +39,12 @@ public class MavenWrapperMain {
   public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
 
   public static void main(String[] args) throws Exception {
-    boolean verbose = "true".equalsIgnoreCase(System.getenv(MVNW_VERBOSE));
-
     File wrapperJar = wrapperJar();
     File propertiesFile = wrapperProperties(wrapperJar);
     File rootDir = rootDir(wrapperJar);
 
     String wrapperVersion = wrapperVersion();
-
-    if (verbose) {
-      System.out.println("Takari Maven Wrapper " + wrapperVersion);
-    }
+    Logger.info("Takari Maven Wrapper " + wrapperVersion);
 
     Properties systemProperties = System.getProperties();
     systemProperties.putAll(parseSystemPropertiesFromArgs(args));

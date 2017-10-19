@@ -60,7 +60,7 @@ public class Installer {
     if (alwaysDownload || !localZipFile.exists()) {
       File tmpZipFile = new File(localZipFile.getParentFile(), localZipFile.getName() + ".part");
       tmpZipFile.delete();
-      System.out.println("Downloading " + distributionUrl);
+      Logger.info("Downloading " + distributionUrl);
       download.download(distributionUrl, tmpZipFile);
       tmpZipFile.renameTo(localZipFile);
       downloaded = true;
@@ -71,10 +71,10 @@ public class Installer {
 
     if (downloaded || alwaysUnpack || dirs.isEmpty()) {
       for (File dir : dirs) {
-        System.out.println("Deleting directory " + dir.getAbsolutePath());
+        Logger.info("Deleting directory " + dir.getAbsolutePath());
         deleteDir(dir);
       }
-      System.out.println("Unzipping " + localZipFile.getAbsolutePath() + " to " + distDir.getAbsolutePath());
+      Logger.info("Unzipping " + localZipFile.getAbsolutePath() + " to " + distDir.getAbsolutePath());
       unzip(localZipFile, distDir);
       dirs = listDirs(distDir);
       if (dirs.isEmpty()) {
@@ -110,7 +110,7 @@ public class Installer {
       ProcessBuilder pb = new ProcessBuilder("chmod", "755", mavenCommand.getCanonicalPath());
       Process p = pb.start();
       if (p.waitFor() == 0) {
-        System.out.println("Set executable permissions for: " + mavenCommand.getAbsolutePath());
+        Logger.info("Set executable permissions for: " + mavenCommand.getAbsolutePath());
       } else {
         BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
         Formatter stdout = new Formatter();
@@ -126,8 +126,8 @@ public class Installer {
       errorMessage = e.getMessage();
     }
     if (errorMessage != null) {
-      System.out.println("Could not set executable permissions for: " + mavenCommand.getAbsolutePath());
-      System.out.println("Please do this manually if you want to use maven.");
+      Logger.warn("Could not set executable permissions for: " + mavenCommand.getAbsolutePath());
+      Logger.warn("Please do this manually if you want to use maven.");
     }
   }
 
