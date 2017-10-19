@@ -29,6 +29,8 @@ public class DownloaderTest {
     testDir = new File("target/test-files/DownloadTest");
     rootDir = new File(testDir, "root");
     downloadFile = new File(rootDir, "file");
+    if (downloadFile.exists())
+      downloadFile.delete();
     remoteFile = new File(testDir, "remoteFile");
     FileUtils.write(remoteFile, "sometext");
     sourceRoot = remoteFile.toURI();
