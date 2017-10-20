@@ -20,7 +20,7 @@ package org.apache.maven.toolchain;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyMapOf;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -142,7 +142,7 @@ public class DefaultToolchainManagerTest
         executionRequest.setToolchains( toolchainModels );
         when( session.getRequest() ).thenReturn( executionRequest );
         ToolchainPrivate basicPrivate = mock( ToolchainPrivate.class );
-        when( basicPrivate.matchesRequirements( anyMap() ) ).thenReturn( false ).thenReturn( true );
+        when( basicPrivate.matchesRequirements( anyMapOf( String.class, String.class ) ) ).thenReturn( false ).thenReturn( true );
         when( toolchainFactory_basicType.createToolchain( isA( ToolchainModel.class ) ) ).thenReturn( basicPrivate );
 
         List<Toolchain> toolchains =
