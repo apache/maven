@@ -51,19 +51,19 @@ class WagonExcluder
 
     public boolean selectDependency( Dependency dependency )
     {
-        return !coreArtifact || !isWagonProvider( dependency.getArtifact() );
+        return !( coreArtifact && isWagonProvider( dependency.getArtifact() ) );
     }
 
     public DependencySelector deriveChildSelector( DependencyCollectionContext context )
     {
-        if ( coreArtifact || !isLegacyCoreArtifact( context.getDependency().getArtifact() ) )
+        WagonExcluder child = this;
+
+        if ( isLegacyCoreArtifact( context.getArtifact() ) && !this.coreArtifact )
         {
-            return this;
+            child = new WagonExcluder( true );
         }
-        else
-        {
-            return new WagonExcluder( true );
-        }
+
+        return child;
     }
 
     private boolean isLegacyCoreArtifact( Artifact artifact )
