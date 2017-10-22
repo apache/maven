@@ -87,8 +87,7 @@ public class ProjectInheritanceTest
         // transitive dep, overridden b depMgmt
         assertTrue("Incorrect scope for " + b.getDependencyConflictId(), b.getScope().equals("runtime"));
 
-        // direct dep, overrides depMgmt
+        // child depMgmt overrides parent depMgmt
         assertTrue("Incorrect scope for " + c.getDependencyConflictId(), c.getScope().equals("runtime"));
-
     }
 }

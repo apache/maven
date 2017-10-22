@@ -19,6 +19,14 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -39,7 +47,7 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
+import org.eclipse.aether.util.graph.manager.DefaultDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
@@ -53,14 +61,6 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -349,7 +349,7 @@ public abstract class AbstractArtifactComponentTestCase
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
-        DependencyManager depManager = new TransitiveDependencyManager();
+        DependencyManager depManager = new DefaultDependencyManager();
         session.setDependencyManager( depManager );
 
         DependencySelector depFilter = new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),

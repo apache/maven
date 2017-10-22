@@ -58,8 +58,8 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.DefaultDependencyManager;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
-import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
@@ -272,7 +272,7 @@ public class DefaultPluginDependenciesResolver
             pluginSession.setDependencyGraphTransformer( pluginDependencyGraphTransformer );
             pluginSession.setDependencyManager( classicResolution
                                                     ? new ClassicDependencyManager()
-                                                    : new TransitiveDependencyManager() );
+                                                    : new DefaultDependencyManager() );
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );

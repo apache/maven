@@ -14,6 +14,17 @@
     <url>scm-url</url>
   </scm>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>maven-test</groupId>
+        <artifactId>t10-c</artifactId>
+        <version>1.0</version>
+        <scope>runtime</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
 
     <dependency>
@@ -24,7 +35,6 @@
     <dependency>
       <groupId>maven-test</groupId>
       <artifactId>t10-c</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
   </dependencies>
