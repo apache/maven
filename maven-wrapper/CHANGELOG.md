@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.3.0
+## Version 0.3.0 - 2017-10-25
 
 - Set title on shell window in Windows
   - see https://github.com/takari/maven-wrapper/pull/66
@@ -13,6 +13,8 @@ The following provides most information at an easier glance.
 - Respect MVNW_VERBOSE when printing progress reporting and diagnostic info
   - see https://github.com/takari/maven-wrapper/pull/67
   - contributed by Konstantin Sobolev https://github.com/eprst
+- Smaller chunk size for download progress reporting
+  - contributed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.2.2 and 0.2.3 - 2017-09-12
 
