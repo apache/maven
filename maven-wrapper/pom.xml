@@ -4,7 +4,6 @@
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
     <version>25</version>
-    <relativePath />
   </parent>
   
   <artifactId>maven-wrapper</artifactId>
