@@ -31,7 +31,7 @@ import java.net.URLConnection;
  * @author Hans Dockter
  */
 public class DefaultDownloader implements Downloader {
-  private static final int PROGRESS_CHUNK = 20000;
+  private static final int PROGRESS_CHUNK = 500000;
 
   private static final int BUFFER_SIZE = 10000;
 
