@@ -7,7 +7,7 @@
   </parent>
   
   <artifactId>maven-wrapper</artifactId>
-  <version>0.2.4-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>provisio</packaging>
   <name>Maven Wrapper</name>
   <licenses>
