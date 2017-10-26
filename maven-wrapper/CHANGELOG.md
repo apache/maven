@@ -16,6 +16,8 @@ The following provides most information at an easier glance.
 - Smaller chunk size for download progress reporting
   - contributed by Manfred Moser - http://www.simpligility.com
 
+Release performed by Manfred Moser - http://www.simpligility.com
+
 ## Version 0.2.2 and 0.2.3 - 2017-09-12
 
 - Print out Maven Wrapper version with each invocation
