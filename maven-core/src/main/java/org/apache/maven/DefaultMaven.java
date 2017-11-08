@@ -60,8 +60,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 
-import com.google.common.collect.Iterables;
-
 /**
  * @author Jason van Zyl
  */
@@ -222,8 +220,7 @@ public class DefaultMaven
 
         if ( graphResult.hasErrors() )
         {
-            return addExceptionToResult( result, Iterables.toArray( graphResult.getProblems(),
-                                                                    ModelProblem.class )[0].getException() );
+            return addExceptionToResult( result, graphResult.getProblems().iterator().next().getException() );
         }
 
         try
@@ -289,8 +286,7 @@ public class DefaultMaven
 
         if ( graphResult.hasErrors() )
         {
-            return addExceptionToResult( result, Iterables.toArray( graphResult.getProblems(),
-                                                                    ModelProblem.class )[0].getException() );
+            return addExceptionToResult( result, graphResult.getProblems().iterator().next().getException() );
         }
 
         try
