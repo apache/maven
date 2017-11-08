@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
@@ -46,7 +45,7 @@ public class SessionScope
 
         Memento( final Map<Key<?>, Provider<?>> seeded )
         {
-            this.seeded = ImmutableMap.copyOf( seeded );
+            this.seeded = Collections.unmodifiableMap( new HashMap<>( seeded ) );
         }
     }
 

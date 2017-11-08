@@ -43,8 +43,6 @@ import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
-import com.google.common.collect.Maps;
-
 /**
  * @author Jason van Zyl
  */
@@ -1280,7 +1278,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( data == null )
         {
-            data = Maps.newHashMap();
+            data = new HashMap<>();
         }
 
         return data;

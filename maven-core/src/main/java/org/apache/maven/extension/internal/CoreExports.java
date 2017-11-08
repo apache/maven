@@ -19,14 +19,14 @@ package org.apache.maven.extension.internal;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by
@@ -52,8 +52,8 @@ public class CoreExports
         {
             packages.put( pkg, realm );
         }
-        this.artifacts = ImmutableSet.copyOf( exportedArtifacts );
-        this.packages = ImmutableMap.copyOf( packages );
+        this.artifacts = Collections.unmodifiableSet( new HashSet<>( exportedArtifacts ) );
+        this.packages = Collections.unmodifiableMap( new HashMap<>( packages ) );
     }
 
     /**

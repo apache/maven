@@ -20,6 +20,7 @@ package org.apache.maven.execution.scope.internal;
  */
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -29,7 +30,6 @@ import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
@@ -52,9 +52,9 @@ public class MojoExecutionScope
 
     private static final class ScopeState
     {
-        private final Map<Key<?>, Provider<?>> seeded = Maps.newHashMap();
+        private final Map<Key<?>, Provider<?>> seeded = new HashMap<>();
 
-        private final Map<Key<?>, Object> provided = Maps.newHashMap();
+        private final Map<Key<?>, Object> provided = new HashMap<>();
     }
 
     private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();

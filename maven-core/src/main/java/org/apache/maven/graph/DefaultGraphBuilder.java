@@ -23,12 +23,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
@@ -85,23 +85,17 @@ public class DefaultGraphBuilder
 
             return result;
         }
-        catch ( final ProjectBuildingException e )
+        catch ( final ProjectBuildingException | DuplicateProjectException | MavenExecutionException e )
         {
-            return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
+            return Result.error( Collections.singletonList
+                    ( new DefaultModelProblem ( null, null, null, null, 0, 0, e ) ) );
         }
         catch ( final CycleDetectedException e )
         {
             String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
             ProjectCycleException error = new ProjectCycleException( message, e );
-            return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, error ) ) );
-        }
-        catch ( final DuplicateProjectException e )
-        {
-            return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
-        }
-        catch ( final MavenExecutionException e )
-        {
-            return Result.error( Lists.newArrayList( new DefaultModelProblem( null, null, null, null, 0, 0, e ) ) );
+            return Result.error( Collections.singletonList(
+                    new DefaultModelProblem( null, null, null, null, 0, 0, error ) ) );
         }
     }
 
