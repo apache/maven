@@ -23,6 +23,8 @@ import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
+import java.util.List;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
@@ -52,6 +54,9 @@ public class ExecutionEventLogger
     private static final int LINE_LENGTH = 72;
     private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
     private static final int MAX_PROJECT_NAME_LENGTH = 52;
+
+    private int totalProjects;
+    private volatile int currentVisitedProjectCount;
 
     public ExecutionEventLogger()
     {
@@ -106,10 +111,13 @@ public class ExecutionEventLogger
 
             logger.info( "" );
 
-            for ( MavenProject project : event.getSession().getProjects() )
+            final List<MavenProject> projects = event.getSession().getProjects();
+            for ( MavenProject project : projects )
             {
                 logger.info( project.getName() );
             }
+
+            totalProjects = projects.size();
         }
     }
 
@@ -259,6 +267,16 @@ public class ExecutionEventLogger
             infoMain( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
 
             infoLine( '-' );
+
+            if ( totalProjects > 1 )
+            {
+                int number;
+                synchronized ( this )
+                {
+                    number = ++currentVisitedProjectCount;
+                }
+                infoMain( "Module " + number + "/" + totalProjects );
+            } // else what's the point
         }
     }
 
