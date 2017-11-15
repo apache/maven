@@ -264,19 +264,28 @@ public class ExecutionEventLogger
             logger.info( "" );
             infoLine( '-' );
 
-            infoMain( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
+            String building = "Building " + event.getProject().getName() + " " + event.getProject().getVersion();
 
-            infoLine( '-' );
-
-            if ( totalProjects > 1 )
+            if ( totalProjects <= 1 )
             {
+                infoMain( building );
+            }
+            else
+            {
+                // display progress [i/n]
                 int number;
                 synchronized ( this )
                 {
                     number = ++currentVisitedProjectCount;
                 }
-                infoMain( "Module " + number + "/" + totalProjects );
+                String progress = " [" + number + '/' + totalProjects + ']';
+
+                int pad = LINE_LENGTH - building.length() - progress.length();
+
+                infoMain( building + ( ( pad > 0 ) ? chars( ' ', pad ) : "" ) + progress );
             } // else what's the point
+
+            infoLine( '-' );
         }
     }
 
