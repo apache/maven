@@ -277,9 +277,9 @@ public class MavenCli
         {
             initialize( cliRequest );
             cli( cliRequest );
+            properties( cliRequest );
             logging( cliRequest );
             version( cliRequest );
-            properties( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
             configure( cliRequest );
