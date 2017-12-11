@@ -47,7 +47,7 @@ node(jenkinsEnv.labelForOS(buildOs)) {
                 invokerPublisher(),
                 pipelineGraphPublisher()
             ]) {
-                sh "mvn clean verify -B -U -e -fae -V -maven.test.failure.ignore=true"
+                sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true"
             }
             dir ('apache-maven/target') {
                 sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
