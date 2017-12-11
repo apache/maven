@@ -19,12 +19,15 @@
 
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
 
+def buildOs = 'linux'
+def buildJdk = '7'
+def buildMvn = '3.5.0'
 def tests
 def CORE_IT_PROFILES='run-its,embedded'
 
 try {
 
-node('ubuntu') {
+node(jenkinsEnv.labelForOS(buildOs)) {
     dir('build') {
         stage('Checkout') {
             checkout scm
@@ -33,130 +36,144 @@ node('ubuntu') {
         def WORK_DIR=pwd()
 
         stage('Build / Unit Test') {
-            def MAVEN_BUILD=tool name: 'Maven 3.3.9', type: 'hudson.tasks.Maven$MavenInstallation'
-            echo "Driving build and unit tests using Maven $MAVEN_BUILD"
-            def JAVA7_HOME=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-            echo "Running build and unit tests with Java $JAVA7_HOME"
-
-            withEnv(["PATH+MAVEN=$MAVEN_BUILD/bin","PATH+JDK=$JAVA7_HOME/bin"]) {
-                sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/.repository"
+            String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
+            String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
+            withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
+                artifactsPublisher(disabled: disablePublishers),
+                junitPublisher(ignoreAttachments: false),
+                findbugsPublisher(disabled: disablePublishers),
+                openTasksPublisher(disabled: disablePublishers),
+                dependenciesFingerprintPublisher(),
+                invokerPublisher(),
+                pipelineGraphPublisher()
+            ]) {
+                sh "mvn clean verify -B -U -e -fae -V -maven.test.failure.ignore=true"
             }
-
             dir ('apache-maven/target') {
                 sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
                 stash includes: 'apache-maven-dist.zip', name: 'dist'
             }
-            junit allowEmptyResults: true, testResults:'**/target/*-reports/*.xml'
         }
 
         tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', id: '_', remote: 'https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git', traits: [[$class: 'jenkins.plugins.git.traits.BranchDiscoveryTrait'], [$class: 'GitToolSCMSourceTrait', gitTool: 'Default']]], targets: [BRANCH_NAME, 'master']
     }
 }
 
-stage 'Integration Test'
-parallel linuxJava7:{
-        node('ubuntu') {
-            def MAVEN_NIX_J7=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
-            echo "Driving integration tests using Maven $MAVEN_NIX_J7"
-            def JAVA_NIX_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-            echo "Running integration tests with Java $JAVA_NIX_J7"
 
-            dir('test') {
-                def WORK_DIR=pwd()
-                checkout tests
-                sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
-                unstash 'dist'
-                withEnv(["PATH+MAVEN=$MAVEN_NIX_J7/bin","PATH+JDK=$JAVA_NIX_J7/bin"]) {
-                    sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+parallel linuxJava7:{
+        node(jenkinsEnv.labelForOS('linux')) {
+            stage ('Linux Java 7') {
+                String jdkName = jenkinsEnv.jdkFromVersion('linux', '7')
+                String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
+                dir('test') {
+                    def WORK_DIR=pwd()
+                    checkout tests
+                    sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
+                    unstash 'dist'
+                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
+                        junitPublisher(ignoreAttachments: false)
+                    ]) {
+                        sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    }
+                    deleteDir() // clean up after ourselves to reduce disk space
                 }
-                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
-                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     },linuxJava8: {
-        node('ubuntu') {
-            def MAVEN_NIX_J8=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
-            echo "Driving integration tests using Maven $MAVEN_NIX_J8"
-            def JAVA_NIX_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
-            echo "Running integration tests with Java $JAVA_NIX_J8"
-
-            dir('test') {
-                def WORK_DIR=pwd()
-                checkout tests
-                sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
-                unstash 'dist'
-                withEnv(["PATH+MAVEN=$MAVEN_NIX_J8/bin","PATH+JDK=$JAVA_NIX_J8/bin"]) {
-                    sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+        node(jenkinsEnv.labelForOS('linux')) {
+            stage ('Linux Java 8') {
+                String jdkName = jenkinsEnv.jdkFromVersion('linux', '8')
+                String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
+                dir('test') {
+                    def WORK_DIR=pwd()
+                    checkout tests
+                    sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
+                    unstash 'dist'
+                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
+                        junitPublisher(ignoreAttachments: false)
+                    ]) {
+                        sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    }
+                    deleteDir() // clean up after ourselves to reduce disk space
                 }
-                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
-                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }, winJava7: {
-        node('Windows') {
-            def MAVEN_WIN_J7=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
-            dir(MAVEN_WIN_J7) {
-                MAVEN_WIN_J7=pwd()
-            }
-            echo "Driving integration tests using Maven $MAVEN_WIN_J7"
-            def JAVA_WIN_J7=tool name: 'JDK 1.7 (latest)', type: 'hudson.model.JDK'
-            dir(JAVA_WIN_J7) {
-                JAVA_WIN_J7=pwd()
-            }
-            echo "Running integration tests with Java $JAVA_WIN_J7"
+        node(jenkinsEnv.labelForOS('windows')) {
+            stage ('Windows Java 7') {
+                String jdkName = jenkinsEnv.jdkFromVersion('windows', '7')
+                String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
 
-            // need a short path or we hit 256 character limit for paths
-            // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-            // will not trample each other
-            dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
-                def WORK_DIR=pwd()
-                checkout tests
-                bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
-                withEnv(["Path+MAVEN=$MAVEN_WIN_J7\\bin","Path+JDK=$JAVA_WIN_J7\\bin","JAVA_HOME=$JAVA_WIN_J7"]) {
-                    bat "set"
+                // need a short path or we hit 256 character limit for paths
+                // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
+                // will not trample each other
+                dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                    def WORK_DIR=pwd()
+                    checkout tests
+                    bat "if exist it-local-repo rmdir /s /q it-local-repo"
+                    bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                     unstash 'dist'
-                    bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
+                        junitPublisher(ignoreAttachments: false)
+                    ]) {
+                        bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    }
+                    deleteDir() // clean up after ourselves to reduce disk space
                 }
-                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
-                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }, winJava8: {
-        node('Windows') {
-            def MAVEN_WIN_J8=tool name: 'Maven 3 (latest)', type: 'hudson.tasks.Maven$MavenInstallation'
-            dir(MAVEN_WIN_J8) {
-                MAVEN_WIN_J8=pwd()
-            }
-            echo "Driving integration tests using Maven $MAVEN_WIN_J8"
-            def JAVA_WIN_J8=tool name: 'JDK 1.8 (latest)', type: 'hudson.model.JDK'
-            dir(JAVA_WIN_J8) {
-                JAVA_WIN_J8=pwd()
-            }
-            echo "Running integration tests with Java $JAVA_WIN_J8"
+        node(jenkinsEnv.labelForOS('windows')) {
+            stage ('Windows Java 8') {
+                String jdkName = jenkinsEnv.jdkFromVersion('windows', '8')
+                String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
 
-            // need a short path or we hit 256 character limit for paths
-            // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-            // will not trample each other
-            dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
-                def WORK_DIR=pwd()
-                checkout tests
-                bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
-                withEnv(["Path+MAVEN=$MAVEN_WIN_J8\\bin","Path+JDK=$JAVA_WIN_J8\\bin","JAVA_HOME=$JAVA_WIN_J8"]) {
-                    bat "set"
+                // need a short path or we hit 256 character limit for paths
+                // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
+                // will not trample each other
+                dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                    def WORK_DIR=pwd()
+                    checkout tests
+                    bat "if exist it-local-repo rmdir /s /q it-local-repo"
+                    bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                     unstash 'dist'
-                    bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
+                        junitPublisher(ignoreAttachments: false)
+                    ]) {
+                        bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+                    }
+                    deleteDir() // clean up after ourselves to reduce disk space
                 }
-                junit allowEmptyResults: true, testResults:'core-it-support/**/target/*-reports/*.xml,core-it-suite/target/*-reports/*.xml'
-                deleteDir() // clean up after ourselves to reduce disk space
             }
         }
     }
 
-} finally {
-    node('ubuntu') {
-        emailext body: "See ${env.BUILD_URL}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'FailingTestSuspectsRecipientProvider'], [$class: 'FirstFailingBuildSuspectsRecipientProvider']], replyTo: 'dev@maven.apache.org', subject: "${env.JOB_NAME} - build ${env.BUILD_DISPLAY_NAME} - ${currentBuild.result}", to: 'notifications@maven.apache.org'
+// JENKINS-34376 seems to make it hard to detect the aborted builds
+} catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    // this ambiguous condition means a user probably aborted
+    if (e.causes.size() == 0) {
+        currentBuild.result = "ABORTED"
+    } else {
+        currentBuild.result = "FAILURE"
     }
+    throw e
+} catch (hudson.AbortException e) {
+    // this ambiguous condition means during a shell step, user probably aborted
+    if (e.getMessage().contains('script returned exit code 143')) {
+        currentBuild.result = "ABORTED"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+    throw e
+} catch (InterruptedException e) {
+    currentBuild.result = "ABORTED"
+    throw e
+} catch (Throwable e) {
+    currentBuild.result = "FAILURE"
+    throw e
+} finally {
+    // notify completion
+    stage("Notifications") {
+        jenkinsNotify()      
+    }    
 }
-
