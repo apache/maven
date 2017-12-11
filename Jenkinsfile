@@ -39,10 +39,10 @@ node(jenkinsEnv.labelForOS(buildOs)) {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
             String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
-                artifactsPublisher(disabled: disablePublishers),
+                artifactsPublisher(disabled: false),
                 junitPublisher(ignoreAttachments: false),
-                findbugsPublisher(disabled: disablePublishers),
-                openTasksPublisher(disabled: disablePublishers),
+                findbugsPublisher(disabled: false),
+                openTasksPublisher(disabled: false),
                 dependenciesFingerprintPublisher(),
                 invokerPublisher(),
                 pipelineGraphPublisher()
