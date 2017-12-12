@@ -462,6 +462,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>-Xmx256m</argLine>
+            <environmentVariables>JENKINS_MAVEN_AGENT_DISABLED=true</environmentVariables>
           </configuration>
         </plugin>
         <plugin>
