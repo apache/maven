@@ -133,7 +133,9 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <environmentVariables>JENKINS_MAVEN_AGENT_DISABLED=true</environmentVariables>
+            <environmentVariables>
+              <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
+            </environmentVariables>
           </configuration>
         </plugin>
         <plugin>
