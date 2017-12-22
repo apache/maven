@@ -69,9 +69,9 @@ public class MavenITmng6057CheckReactorOrderTest
         assertEquals( 3, resultingLines.size() );
 
         // We expect those lines in the following exact order.
-        assertEquals( "[INFO] base-project", resultingLines.get( 0 ) );
-        assertEquals( "[INFO] module-1", resultingLines.get( 1 ) );
-        assertEquals( "[INFO] module-2", resultingLines.get( 2 ) );
+        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] base-project" ) );
+        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-1" ) );
+        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-2" ) );
     }
 
     /**
@@ -94,7 +94,7 @@ public class MavenITmng6057CheckReactorOrderTest
         {
             if ( start )
             {
-                if ( line.startsWith( "[INFO] ----------------------------" ) )
+                if ( line.startsWith( "[INFO] -------------" ) )
                 {
                     start = false;
                 }
