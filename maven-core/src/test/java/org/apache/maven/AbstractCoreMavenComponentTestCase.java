@@ -20,6 +20,7 @@ package org.apache.maven;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -128,6 +129,12 @@ public abstract class AbstractCoreMavenComponentTestCase
     }
 
     protected MavenSession createMavenSession( File pom, Properties executionProperties )
+                    throws Exception
+    {
+        return createMavenSession( pom, executionProperties, false );
+    }
+    
+    protected MavenSession createMavenSession( File pom, Properties executionProperties, boolean includeModules )
         throws Exception
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
@@ -138,17 +145,32 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
             .setSystemProperties( executionProperties );
 
-        MavenProject project = null;
+        List<MavenProject> projects = new ArrayList<>();
 
         if ( pom != null )
         {
-            project = projectBuilder.build( pom, configuration ).getProject();
+            MavenProject project = projectBuilder.build( pom, configuration ).getProject();
+            
+            projects.add( project );
+            if ( includeModules )
+            {
+                for( String module : project.getModules() )
+                {
+                    File modulePom = new File( pom.getParentFile(), module );
+                    if( modulePom.isDirectory() )
+                    {
+                        modulePom = new File( modulePom, "pom.xml" );
+                    }
+                    projects.add( projectBuilder.build( modulePom, configuration ).getProject() );
+                }
+            }
         }
         else
         {
-            project = createStubMavenProject();
+            MavenProject project = createStubMavenProject();
             project.setRemoteArtifactRepositories( request.getRemoteRepositories() );
             project.setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
+            projects.add( project );
         }
 
         initRepoSession( configuration );
@@ -156,7 +178,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         MavenSession session =
             new MavenSession( getContainer(), configuration.getRepositorySession(), request,
                               new DefaultMavenExecutionResult() );
-        session.setProjects( Arrays.asList( project ) );
+        session.setProjects( projects );
         session.setAllProjects( session.getProjects() );
 
         return session;

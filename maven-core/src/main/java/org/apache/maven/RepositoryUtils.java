@@ -22,14 +22,17 @@ package org.apache.maven;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
@@ -44,6 +47,8 @@ import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
@@ -363,5 +368,69 @@ public class RepositoryUtils
             artifacts.add( toArtifact( a ) );
         }
         return artifacts;
+    }
+
+    public static WorkspaceRepository getWorkspace( RepositorySystemSession session )
+    {
+        WorkspaceReader reader = session.getWorkspaceReader();
+        return ( reader != null ) ? reader.getRepository() : null;
+    }
+
+    public static boolean repositoriesEquals( List<RemoteRepository> r1, List<RemoteRepository> r2 )
+    {
+        if ( r1.size() != r2.size() )
+        {
+            return false;
+        }
+    
+        for ( Iterator<RemoteRepository> it1 = r1.iterator(), it2 = r2.iterator(); it1.hasNext(); )
+        {
+            if ( !repositoryEquals( it1.next(), it2.next() ) )
+            {
+                return false;
+            }
+        }
+    
+        return true;
+    }
+
+    public static int repositoriesHashCode( List<RemoteRepository> repositories )
+    {
+        int result = 17;
+        for ( RemoteRepository repository : repositories )
+        {
+            result = 31 * result + repositoryHashCode( repository );
+        }
+        return result;
+    }
+
+    private static int repositoryHashCode( RemoteRepository repository )
+    {
+        int result = 17;
+        Object obj = repository.getUrl();
+        result = 31 * result + ( obj != null ? obj.hashCode() : 0 );
+        return result;
+    }
+
+    private static boolean policyEquals( RepositoryPolicy p1, RepositoryPolicy p2 )
+    {
+        if ( p1 == p2 )
+        {
+            return true;
+        }
+        // update policy doesn't affect contents
+        return p1.isEnabled() == p2.isEnabled() && Objects.equals( p1.getChecksumPolicy(), p2.getChecksumPolicy() );
+    }
+
+    private static boolean repositoryEquals( RemoteRepository r1, RemoteRepository r2 )
+    {
+        if ( r1 == r2 )
+        {
+            return true;
+        }
+    
+        return Objects.equals( r1.getId(), r2.getId() ) && Objects.equals( r1.getUrl(), r2.getUrl() )
+            && policyEquals( r1.getPolicy( false ), r2.getPolicy( false ) )
+            && policyEquals( r1.getPolicy( true ), r2.getPolicy( true ) );
     }
 }

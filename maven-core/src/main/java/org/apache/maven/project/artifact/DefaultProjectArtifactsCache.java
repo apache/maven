@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.project.artifact;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -25,13 +25,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
@@ -94,7 +95,7 @@ public class DefaultProjectArtifactsCache
             }
             dependencyArtifacts = Collections.unmodifiableSet( deps );
             
-            workspace = CacheUtils.getWorkspace( session );
+            workspace = RepositoryUtils.getWorkspace( session );
             this.localRepo = session.getLocalRepository();
             this.repositories = new ArrayList<>( repositories.size() );
             for ( RemoteRepository repository : repositories )
@@ -117,16 +118,16 @@ public class DefaultProjectArtifactsCache
             this.aggregating = aggregating;
 
             int hash = 17;
-            hash = hash * 31 + hash( groupId );
-            hash = hash * 31 + hash( artifactId );
-            hash = hash * 31 + hash( version );
-            hash = hash * 31 + hash( dependencyArtifacts );
-            hash = hash * 31 + hash( workspace );
-            hash = hash * 31 + hash( localRepo );
-            hash = hash * 31 + CacheUtils.repositoriesHashCode( repositories );
-            hash = hash * 31 + hash( collect );
-            hash = hash * 31 + hash( resolve );
-            hash = hash * 31 + hash( aggregating );
+            hash = hash * 31 + Objects.hashCode( groupId );
+            hash = hash * 31 + Objects.hashCode( artifactId );
+            hash = hash * 31 + Objects.hashCode( version );
+            hash = hash * 31 + Objects.hashCode( dependencyArtifacts );
+            hash = hash * 31 + Objects.hashCode( workspace );
+            hash = hash * 31 + Objects.hashCode( localRepo );
+            hash = hash * 31 + RepositoryUtils.repositoriesHashCode( repositories );
+            hash = hash * 31 + Objects.hashCode( collect );
+            hash = hash * 31 + Objects.hashCode( resolve );
+            hash = hash * 31 + Objects.hashCode( aggregating );
             this.hashCode = hash;
         }
 
@@ -140,11 +141,6 @@ public class DefaultProjectArtifactsCache
         public int hashCode()
         {
             return hashCode;
-        }
-
-        private static int hash( Object obj )
-        {
-            return obj != null ? obj.hashCode() : 0;
         }
 
         @Override
@@ -162,22 +158,21 @@ public class DefaultProjectArtifactsCache
 
             CacheKey that = (CacheKey) o;
 
-            return eq( groupId, that.groupId ) && eq( artifactId, that.artifactId ) && eq( version, that.version ) 
-                && eq( dependencyArtifacts, that.dependencyArtifacts )
-                && eq( workspace, that.workspace ) && eq( localRepo, that.localRepo ) 
-                && CacheUtils.repositoriesEquals( repositories, that.repositories ) && eq( collect, that.collect ) 
-                && eq( resolve, that.resolve ) && aggregating == that.aggregating;
+            return Objects.equals( groupId, that.groupId ) && Objects.equals( artifactId, that.artifactId )
+                && Objects.equals( version, that.version )
+                && Objects.equals( dependencyArtifacts, that.dependencyArtifacts )
+                && Objects.equals( workspace, that.workspace ) 
+                && Objects.equals( localRepo, that.localRepo )
+                && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
+                && Objects.equals( collect, that.collect ) 
+                && Objects.equals( resolve, that.resolve )
+                && aggregating == that.aggregating;
         }
-
-        private static <T> boolean eq( T s1, T s2 )
-        {
-            return s1 != null ? s1.equals( s2 ) : s2 == null;
-        }
-
     }
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
+    @Override
     public Key createKey( MavenProject project, Collection<String> scopesToCollect,
         Collection<String> scopesToResolve, boolean aggregating, RepositorySystemSession session )
     {
@@ -185,6 +180,7 @@ public class DefaultProjectArtifactsCache
             aggregating, session );
     }
 
+    @Override
     public CacheRecord get( Key key )
         throws LifecycleExecutionException
     {
@@ -198,6 +194,7 @@ public class DefaultProjectArtifactsCache
         return cacheRecord;
     }
 
+    @Override
     public CacheRecord put( Key key, Set<Artifact> projectArtifacts )
     {
         Validate.notNull( projectArtifacts, "projectArtifacts cannot be null" );
@@ -220,6 +217,7 @@ public class DefaultProjectArtifactsCache
         }
     }
 
+    @Override
     public CacheRecord put( Key key, LifecycleExecutionException exception )
     {
         Validate.notNull( exception, "exception cannot be null" );
@@ -233,21 +231,13 @@ public class DefaultProjectArtifactsCache
         return record;
     }
 
+    @Override
     public void flush()
     {
         cache.clear();
     }
 
-    protected static int pluginHashCode( Plugin plugin )
-    {
-        return CacheUtils.pluginHashCode( plugin );
-    }
-
-    protected static boolean pluginEquals( Plugin a, Plugin b )
-    {
-        return CacheUtils.pluginEquals( a, b );
-    }
-
+    @Override
     public void register( MavenProject project, Key cacheKey, CacheRecord record )
     {
         // default cache does not track record usage

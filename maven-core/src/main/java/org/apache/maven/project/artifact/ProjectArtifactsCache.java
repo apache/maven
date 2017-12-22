@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.project.artifact;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

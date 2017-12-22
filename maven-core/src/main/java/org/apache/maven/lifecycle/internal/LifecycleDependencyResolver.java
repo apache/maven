@@ -19,6 +19,8 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.io.File;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,13 +39,13 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.plugin.ProjectArtifactsCache;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.ProjectArtifactsCache;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -128,7 +130,7 @@ public class LifecycleDependencyResolver
                 }
             }
             
-            Set<Artifact> artifacts;
+            Set<Artifact> resolvedArtifacts;
             ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect, 
                 scopesToResolve, aggregating, session.getRepositorySession() );
             ProjectArtifactsCache.CacheRecord recordArtifacts;
@@ -136,15 +138,15 @@ public class LifecycleDependencyResolver
             
             if ( recordArtifacts != null )
             {
-                artifacts = recordArtifacts.artifacts;
+                resolvedArtifacts = recordArtifacts.artifacts;
             }
             else
             {
                 try
                 {
-                    artifacts = getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, 
-                        projectArtifacts );
-                    recordArtifacts = projectArtifactsCache.put( cacheKey, artifacts );
+                    resolvedArtifacts = getDependencies( project, scopesToCollect, scopesToResolve, session,
+                                                         aggregating, projectArtifacts );
+                    recordArtifacts = projectArtifactsCache.put( cacheKey, resolvedArtifacts );
                 }
                 catch ( LifecycleExecutionException e )
                 {
@@ -155,13 +157,31 @@ public class LifecycleDependencyResolver
             }
             projectArtifactsCache.register( project, cacheKey, recordArtifacts );
 
-            project.setResolvedArtifacts( artifacts );
+            Map<Artifact, File> reactorProjects = new HashMap<>( session.getProjects().size() );
+            for ( MavenProject reactorProject : session.getProjects() )
+            {
+                reactorProjects.put( reactorProject.getArtifact(), reactorProject.getArtifact().getFile() );
+            }
 
             Map<String, Artifact> map = new HashMap<>();
-            for ( Artifact artifact : artifacts )
+            for ( Artifact artifact : resolvedArtifacts )
             {
+                /**
+                 * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up to date 
+                 * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
+                 * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
+                 */
+                File reactorProjectFile = reactorProjects.get( artifact );
+                if ( reactorProjectFile != null )
+                {
+                    artifact.setFile( reactorProjectFile );
+                }
+
                 map.put( artifact.getDependencyConflictId(), artifact );
             }
+            
+            project.setResolvedArtifacts( resolvedArtifacts );
+            
             for ( Artifact artifact : project.getDependencyArtifacts() )
             {
                 if ( artifact.getFile() == null )
