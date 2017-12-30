@@ -61,10 +61,8 @@ goto error
 
 :chkMHome
 set "MAVEN_HOME=%~dp0.."
-if not "%MAVEN_HOME%"=="" goto valMHome
+if not "%MAVEN_HOME%"=="" goto stripMHome
 goto error
-
-:valMHome
 
 :stripMHome
 if not "_%MAVEN_HOME:~-1%"=="_\" goto checkMCmd
