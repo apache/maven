@@ -419,18 +419,19 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 0, 1 );
 
         assertContains( result.getWarnings().get( 0 ),
-                "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path" );
+                        "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path" );
 
-        SimpleProblemCollector result_31 = validateRaw( "hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+        SimpleProblemCollector result_31 =
+            validateRaw( "hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
         assertViolations( result_31, 0, 0, 3 );
 
         assertContains( result_31.getWarnings().get( 0 ),
-                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope" );
+                        "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope" );
         assertContains( result_31.getWarnings().get( 1 ),
-                "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path" );
+                        "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path" );
         assertContains( result_31.getWarnings().get( 2 ),
-                "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope" );
+                        "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope" );
 
     }
 
@@ -625,22 +626,23 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 0, 2 );
 
         assertContains( result.getWarnings().get( 0 ),
-                "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory" );
+                        "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory" );
         assertContains( result.getWarnings().get( 1 ),
-                "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory" );
+                        "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory" );
 
-        SimpleProblemCollector result_31 = validateRaw( "basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+        SimpleProblemCollector result_31 =
+            validateRaw( "basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
         assertViolations( result_31, 0, 0, 4 );
 
         assertContains( result_31.getWarnings().get( 0 ),
-                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope" );
+                        "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope" );
         assertContains( result_31.getWarnings().get( 1 ),
-                "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory" );
+                        "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory" );
         assertContains( result_31.getWarnings().get( 2 ),
-                "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope" );
+                        "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope" );
         assertContains( result_31.getWarnings().get( 3 ),
-                "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory" );
+                        "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory" );
     }
 
     public void testInvalidVersionInPluginManagement()
@@ -703,16 +705,16 @@ public class DefaultModelValidatorTest
     }
 
     public void testDeprecatedDependencyMetaversionsLatestAndRelease()
-            throws Exception
+        throws Exception
     {
         SimpleProblemCollector result = validateRaw( "deprecated-dependency-metaversions-latest-and-release.xml" );
 
         assertViolations( result, 0, 0, 2 );
 
         assertContains( result.getWarnings().get( 0 ),
-               "'dependencies.dependency.version' for test:a:jar is either LATEST or RELEASE (both of them are being deprecated)" );
+                        "'dependencies.dependency.version' for test:a:jar is either LATEST or RELEASE (both of them are being deprecated)" );
         assertContains( result.getWarnings().get( 1 ),
-                "'dependencies.dependency.version' for test:b:jar is either LATEST or RELEASE (both of them are being deprecated)" );
+                        "'dependencies.dependency.version' for test:b:jar is either LATEST or RELEASE (both of them are being deprecated)" );
     }
 
     public void testSelfReferencingDependencyInRawModel()
@@ -725,6 +727,58 @@ public class DefaultModelValidatorTest
         assertEquals( "'dependencies.dependency com.example.group:testinvalidpom:0.0.1-SNAPSHOT' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.",
                       result.getFatals().get( 0 ) );
 
+    }
+
+    public void testCiFriendlySha1()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/ok-ci-friendly-sha1.xml" );
+        assertViolations( result, 0, 0, 0 );
+    }
+
+    public void testCiFriendlyRevision()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/ok-ci-friendly-revision.xml" );
+        assertViolations( result, 0, 0, 0 );
+    }
+
+    public void testCiFriendlyChangeList()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/ok-ci-friendly-changelist.xml" );
+        assertViolations( result, 0, 0, 0 );
+    }
+
+    public void testCiFriendlyAllExpressions()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/ok-ci-friendly-all-expressions.xml" );
+        assertViolations( result, 0, 0, 0 );
+    }
+
+    public void testCiFriendlyBad()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/bad-ci-friendly.xml" );
+        assertViolations( result, 0, 0, 1 );
+        assertEquals( "'version' contains an expression but should be a constant.", result.getWarnings().get( 0 ) );
+    }
+
+    public void testCiFriendlyBadSha1Plus()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/bad-ci-friendly-sha1plus.xml" );
+        assertViolations( result, 0, 0, 1 );
+        assertEquals( "'version' contains an expression but should be a constant.", result.getWarnings().get( 0 ) );
+    }
+
+    public void testCiFriendlyBadSha1Plus2()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/bad-ci-friendly-sha1plus2.xml" );
+        assertViolations( result, 0, 0, 1 );
+        assertEquals( "'version' contains an expression but should be a constant.", result.getWarnings().get( 0 ) );
     }
 
 }
