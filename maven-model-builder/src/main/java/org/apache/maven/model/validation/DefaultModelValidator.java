@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.model.Activation;
@@ -64,6 +65,13 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultModelValidator
     implements ModelValidator
 {
+
+    private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile( "\\$\\{(.+?)\\}" );
+
+    private static final List<String> CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES =
+        Arrays.asList( AbstractStringBasedModelInterpolator.REVISION_PROPERTY,
+                       AbstractStringBasedModelInterpolator.CHANGELIST_PROPERTY,
+                       AbstractStringBasedModelInterpolator.SHA1_PROPERTY );
 
     private static final Pattern ID_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.]+" );
 
@@ -532,7 +540,7 @@ public class DefaultModelValidator
                                                            ModelBuildingRequest request )
     {
         // We only check for groupId/artifactId cause if there is another
-        // module with the same groupId/artifactId this will fail the build 
+        // module with the same groupId/artifactId this will fail the build
         // earlier like "Project '...' is duplicated in the reactor.
         // So it is sufficient to check only groupId/artifactId and not the
         // packaging type.
@@ -855,7 +863,6 @@ public class DefaultModelValidator
     private boolean validateVersionNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,
                                                  Version version, String string, InputLocationTracker tracker )
     {
-
         if ( !hasExpression( string ) )
         {
             return true;
@@ -868,18 +875,19 @@ public class DefaultModelValidator
         // revision
         // sha1
         //
-        string = string.trim();
-        if ( string.contains( "${" + AbstractStringBasedModelInterpolator.CHANGELIST_PROPERTY + "}" )
-            || string.contains( "${" + AbstractStringBasedModelInterpolator.REVISION_PROPERTY + "}" )
-            || string.contains( "${" + AbstractStringBasedModelInterpolator.SHA1_PROPERTY + "}" ) )
+        Matcher m = CI_FRIENDLY_EXPRESSION.matcher( string.trim() );
+        while ( m.find() )
         {
-            return true;
+            if ( !CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES.contains( m.group( 1 ) ) )
+            {
+                addViolation( problems, severity, version, fieldName, null,
+                              "contains an expression but should be a constant.", tracker );
+
+                return false;
+            }
         }
 
-        addViolation( problems, severity, version, fieldName, null, "contains an expression but should be a constant.",
-                      tracker );
-
-        return false;
+        return true;
     }
 
     private boolean hasExpression( String value )
