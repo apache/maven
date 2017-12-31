@@ -61,7 +61,7 @@ public abstract class AbstractStringBasedModelInterpolator
     public static final String CHANGELIST_PROPERTY = "changelist";
 
     public static final String REVISION_PROPERTY = "revision";
-
+    
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
