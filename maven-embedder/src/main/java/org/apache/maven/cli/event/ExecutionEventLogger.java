@@ -114,7 +114,9 @@ public class ExecutionEventLogger
             final List<MavenProject> projects = event.getSession().getProjects();
             for ( MavenProject project : projects )
             {
-                logger.info( project.getName() );
+                int len = LINE_LENGTH - project.getName().length() - project.getPackaging().length() - 2;
+                logger.info( project.getName() + chars( ' ', ( len > 0 ) ? len : 1 ) + '[' + project.getPackaging()
+                    + ']' );
             }
 
             totalProjects = projects.size();
@@ -302,7 +304,10 @@ public class ExecutionEventLogger
                 infoMain( building + ( ( pad > 0 ) ? chars( ' ', pad ) : "" ) + progress );
             }
 
-            infoLine( '-' );
+            // ----------[ packaging ]----------
+            prefix = chars( '-', Math.max( 0, ( LINE_LENGTH - project.getPackaging().length() - 4 ) / 2 ) );
+            suffix = chars( '-', Math.max( 0, LINE_LENGTH - project.getPackaging().length() - 4 - prefix.length() ) );
+            infoMain( prefix + "[ " + project.getPackaging() + " ]" + suffix );
         }
     }
 

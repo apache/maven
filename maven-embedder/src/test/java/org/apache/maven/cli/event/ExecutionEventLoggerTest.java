@@ -73,7 +73,7 @@ public class ExecutionEventLoggerTest
         inOrder.verify( logger ).info( "" );
         inOrder.verify( logger ).info( "------------------< org.apache.maven:maven-embedder >-------------------" );
         inOrder.verify( logger ).info( "Building Apache Maven Embedder 3.5.4-SNAPSHOT" );
-        inOrder.verify( logger ).info( "------------------------------------------------------------------------" );
+        inOrder.verify( logger ).info( "--------------------------------[ jar ]---------------------------------" );
     }
 
     @Test
@@ -101,6 +101,6 @@ public class ExecutionEventLoggerTest
         inOrder.verify( logger ).info( "" );
         inOrder.verify( logger ).info( "--< org.apache.maven.plugins.overflow:maven-project-info-reports-plugin >--" );
         inOrder.verify( logger ).info( "Building Apache Maven Project Info Reports Plugin 3.0.0-SNAPSHOT" );
-        inOrder.verify( logger ).info( "------------------------------------------------------------------------" );
+        inOrder.verify( logger ).info( "----------------------------[ maven-plugin ]----------------------------" );
     }
 }
