@@ -261,9 +261,26 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            logger.info( "" );
-            infoLine( '-' );
+            MavenProject project = event.getProject();
 
+            logger.info( "" );
+
+            // -------< groupId:artifactId >-------
+            String projectKey = project.getGroupId() + ':' + project.getArtifactId();
+            
+            final String preHeader  = "--< ";
+            final String postHeader = " >--";
+
+            final int headerLen = preHeader.length() + projectKey.length() + postHeader.length();
+
+            String prefix = chars( '-', Math.max( 0, ( LINE_LENGTH - headerLen ) / 2 ) ) + preHeader;
+
+            String suffix = postHeader
+                + chars( '-', Math.max( 0, LINE_LENGTH - headerLen - prefix.length() + preHeader.length() ) );
+
+            logger.info( buffer().strong( prefix ).project( projectKey ).strong( suffix ).toString() );
+
+            // Building Project Name Version    [i/n]
             String building = "Building " + event.getProject().getName() + " " + event.getProject().getVersion();
 
             if ( totalProjects <= 1 )
@@ -283,7 +300,7 @@ public class ExecutionEventLogger
                 int pad = LINE_LENGTH - building.length() - progress.length();
 
                 infoMain( building + ( ( pad > 0 ) ? chars( ' ', pad ) : "" ) + progress );
-            } // else what's the point
+            }
 
             infoLine( '-' );
         }
