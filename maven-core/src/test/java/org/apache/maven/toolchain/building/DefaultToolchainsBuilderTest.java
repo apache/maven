@@ -21,8 +21,7 @@ package org.apache.maven.toolchain.building;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -35,6 +34,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -78,7 +78,7 @@ public class DefaultToolchainsBuilderTest
         toolchain.setType( "TYPE" );
         toolchain.addProvide( "key", "user_value" );
         userResult.addToolchain(  toolchain );
-        when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenReturn( userResult );
+        when( toolchainsReader.read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap()) ).thenReturn( userResult );
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         assertNotNull( result.getEffectiveToolchains() );
@@ -101,7 +101,7 @@ public class DefaultToolchainsBuilderTest
         toolchain.setType( "TYPE" );
         toolchain.addProvide( "key", "global_value" );
         globalResult.addToolchain(  toolchain );
-        when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenReturn( globalResult );
+        when( toolchainsReader.read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap()) ).thenReturn( globalResult );
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         assertNotNull( result.getEffectiveToolchains() );
@@ -131,7 +131,7 @@ public class DefaultToolchainsBuilderTest
         globalToolchain.setType( "TYPE" );
         globalToolchain.addProvide( "key", "global_value" );
         globalResult.addToolchain(  globalToolchain );
-        when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenReturn( globalResult ).thenReturn( userResult );
+        when( toolchainsReader.read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap()) ).thenReturn( globalResult ).thenReturn( userResult );
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         assertNotNull( result.getEffectiveToolchains() );
@@ -150,7 +150,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource( new StringSource( "" ) );
         ToolchainsParseException parseException = new ToolchainsParseException( "MESSAGE", 4, 2 );
-        when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenThrow( parseException );
+        when( toolchainsReader.read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap()) ).thenThrow( parseException );
         
         try
         {
@@ -169,7 +169,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource( new StringSource( "", "LOCATION" ) );
         IOException ioException = new IOException( "MESSAGE" );
-        when( toolchainsReader.read( any( InputStream.class ), anyMap() ) ).thenThrow( ioException );
+        when( toolchainsReader.read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap()) ).thenThrow( ioException );
         
         try
         {
