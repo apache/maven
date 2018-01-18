@@ -100,7 +100,6 @@ under the License.
 
     <!-- javax.annotation (JSR-250) -->
     <exportedPackage>javax.annotation.*</exportedPackage>
-    <exportedPackage>javax.annotation.security.*</exportedPackage>
 
     <!-- 
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
