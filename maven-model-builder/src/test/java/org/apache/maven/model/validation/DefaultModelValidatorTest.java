@@ -781,4 +781,19 @@ public class DefaultModelValidatorTest
         assertEquals( "'version' contains an expression but should be a constant.", result.getWarnings().get( 0 ) );
     }
 
+    public void testParentVersionLATEST()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/bad-parent-version-latest.xml" );
+        assertViolations( result, 0, 0, 1 );
+        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
+    }
+
+    public void testParentVersionRELEASE()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/bad-parent-version-release.xml" );
+        assertViolations( result, 0, 0, 1 );
+        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
+    }
 }
