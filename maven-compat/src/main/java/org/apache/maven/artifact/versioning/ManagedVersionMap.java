@@ -25,6 +25,9 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * ManagedVersionMap
+ */
 @Deprecated
 public class ManagedVersionMap
     extends HashMap<String, Artifact>

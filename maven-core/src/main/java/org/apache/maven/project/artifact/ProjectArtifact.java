@@ -28,6 +28,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
 
+/**
+ * ProjectArtifact
+ */
 public class ProjectArtifact
     extends DefaultArtifact
     implements ArtifactWithDependencies

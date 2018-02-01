@@ -76,13 +76,13 @@ public class MavenRepositorySystem
     // DefaultProjectBuilder
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
-        return XcreateArtifact( groupId, artifactId, version, scope, type );
+        return createArtifactX( groupId, artifactId, version, scope, type );
     }
 
     // DefaultProjectBuilder
     public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )
     {
-        return XcreateProjectArtifact( groupId, artifactId, metaVersionId );
+        return createProjectArtifactX( groupId, artifactId, metaVersionId );
     }
 
     // DefaultProjectBuilder
@@ -104,7 +104,7 @@ public class MavenRepositorySystem
         }
 
         Artifact artifact =
-            XcreateDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
+            createDependencyArtifactX( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
                                                       d.getClassifier(), d.getScope(), d.isOptional() );
 
         if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && d.getSystemPath() != null )
@@ -140,13 +140,13 @@ public class MavenRepositorySystem
             return null;
         }
 
-        return XcreateExtensionArtifact( groupId, artifactId, versionRange );
+        return createExtensionArtifactX( groupId, artifactId, versionRange );
     }
 
     // DefaultProjectBuilder
     public Artifact createParentArtifact( String groupId, String artifactId, String version )
     {
-        return XcreateParentArtifact( groupId, artifactId, version );
+        return createParentArtifactX( groupId, artifactId, version );
     }
 
     // DefaultProjectBuilder
@@ -167,7 +167,7 @@ public class MavenRepositorySystem
             return null;
         }
 
-        return XcreatePluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
+        return createPluginArtifactX( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
     public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )
@@ -471,43 +471,43 @@ public class MavenRepositorySystem
     }
 
     // ArtifactFactory
-    private Artifact XcreateArtifact( String groupId, String artifactId, String version, String scope, String type )
+    private Artifact createArtifactX( String groupId, String artifactId, String version, String scope, String type )
     {
-        return XcreateArtifact( groupId, artifactId, version, scope, type, null, null );
+        return createArtifactX( groupId, artifactId, version, scope, type, null, null );
     }
 
-    private Artifact XcreateDependencyArtifact( String groupId, String artifactId, VersionRange versionRange,
-                                              String type, String classifier, String scope, boolean optional )
+    private Artifact createDependencyArtifactX( String groupId, String artifactId, VersionRange versionRange,
+                                               String type, String classifier, String scope, boolean optional )
     {
-        return XcreateArtifact( groupId, artifactId, versionRange, type, classifier, scope, null, optional );
+        return createArtifactX( groupId, artifactId, versionRange, type, classifier, scope, null, optional );
     }
 
-    private Artifact XcreateProjectArtifact( String groupId, String artifactId, String version )
+    private Artifact createProjectArtifactX( String groupId, String artifactId, String version )
     {
-        return XcreateProjectArtifact( groupId, artifactId, version, null );
+        return createProjectArtifactX( groupId, artifactId, version, null );
     }
 
-    private Artifact XcreateParentArtifact( String groupId, String artifactId, String version )
+    private Artifact createParentArtifactX( String groupId, String artifactId, String version )
     {
-        return XcreateProjectArtifact( groupId, artifactId, version );
+        return createProjectArtifactX( groupId, artifactId, version );
     }
 
-    private Artifact XcreatePluginArtifact( String groupId, String artifactId, VersionRange versionRange )
+    private Artifact createPluginArtifactX( String groupId, String artifactId, VersionRange versionRange )
     {
-        return XcreateArtifact( groupId, artifactId, versionRange, "maven-plugin", null, Artifact.SCOPE_RUNTIME, null );
+        return createArtifactX( groupId, artifactId, versionRange, "maven-plugin", null, Artifact.SCOPE_RUNTIME, null );
     }
 
-    private Artifact XcreateProjectArtifact( String groupId, String artifactId, String version, String scope )
+    private Artifact createProjectArtifactX( String groupId, String artifactId, String version, String scope )
     {
-        return XcreateArtifact( groupId, artifactId, version, scope, "pom" );
+        return createArtifactX( groupId, artifactId, version, scope, "pom" );
     }
 
-    private Artifact XcreateExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
+    private Artifact createExtensionArtifactX( String groupId, String artifactId, VersionRange versionRange )
     {
-        return XcreateArtifact( groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null );
+        return createArtifactX( groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null );
     }
 
-    private Artifact XcreateArtifact( String groupId, String artifactId, String version, String scope, String type,
+    private Artifact createArtifactX( String groupId, String artifactId, String version, String scope, String type,
                                      String classifier, String inheritedScope )
     {
         VersionRange versionRange = null;
@@ -515,16 +515,17 @@ public class MavenRepositorySystem
         {
             versionRange = VersionRange.createFromVersion( version );
         }
-        return XcreateArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
+        return createArtifactX( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    private Artifact XcreateArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+    private Artifact createArtifactX( String groupId, String artifactId, VersionRange versionRange, String type,
                                      String classifier, String scope, String inheritedScope )
     {
-        return XcreateArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, false );
+        return createArtifactX( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, false );
     }
 
-    private Artifact XcreateArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private Artifact createArtifactX( String groupId, String artifactId, VersionRange versionRange, String type,
                                      String classifier, String scope, String inheritedScope, boolean optional )
     {
         String desiredScope = Artifact.SCOPE_RUNTIME;

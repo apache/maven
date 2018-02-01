@@ -47,6 +47,9 @@ import org.eclipse.aether.metadata.MergeableMetadata;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
+/**
+ * DefaultArtifactDeployer
+ */
 @Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled

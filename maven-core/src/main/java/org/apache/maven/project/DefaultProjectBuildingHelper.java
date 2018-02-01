@@ -196,9 +196,9 @@ public class DefaultProjectBuildingHelper
             ExtensionRealmCache.CacheRecord recordRealm =
                 pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession() );
 
-            final ClassRealm extensionRealm = recordRealm.realm;
-            final ExtensionDescriptor extensionDescriptor = recordRealm.descriptor;
-            final List<Artifact> artifacts = recordRealm.artifacts;
+            final ClassRealm extensionRealm = recordRealm.getRealm();
+            final ExtensionDescriptor extensionDescriptor = recordRealm.getDescriptor();
+            final List<Artifact> artifacts = recordRealm.getArtifacts();
 
             extensionRealms.add( extensionRealm );
             if ( extensionDescriptor != null )

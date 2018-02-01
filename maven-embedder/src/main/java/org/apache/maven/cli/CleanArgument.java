@@ -22,6 +22,9 @@ package org.apache.maven.cli;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CleanArgument
+ */
 public class CleanArgument
 {
     public static String[] cleanArgs( String[] args )

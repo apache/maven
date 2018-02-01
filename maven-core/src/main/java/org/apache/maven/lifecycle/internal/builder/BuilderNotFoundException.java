@@ -19,6 +19,9 @@ package org.apache.maven.lifecycle.internal.builder;
  * under the License.
  */
 
+/**
+ * BuilderNotFoundException
+ */
 public class BuilderNotFoundException
     extends Exception
 {

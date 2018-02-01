@@ -29,6 +29,9 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * PluginParameterException
+ */
 public class PluginParameterException
     extends PluginConfigurationException
 {

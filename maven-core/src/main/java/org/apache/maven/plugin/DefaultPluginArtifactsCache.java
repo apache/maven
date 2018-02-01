@@ -46,7 +46,9 @@ import org.eclipse.aether.repository.WorkspaceRepository;
 public class DefaultPluginArtifactsCache
     implements PluginArtifactsCache
 {
-
+    /**
+     * CacheKey
+     */
     protected static class CacheKey
         implements Key
     {
@@ -139,9 +141,9 @@ public class DefaultPluginArtifactsCache
     {
         CacheRecord cacheRecord = cache.get( key );
 
-        if ( cacheRecord != null && cacheRecord.exception != null )
+        if ( cacheRecord != null && cacheRecord.getException() != null )
         {
-            throw cacheRecord.exception;
+            throw cacheRecord.getException();
         }
 
         return cacheRecord;

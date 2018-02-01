@@ -21,6 +21,9 @@ package org.apache.maven;
 
 import java.io.File;
 
+/**
+ * MissingModuleException
+ */
 public class MissingModuleException
     extends MavenExecutionException
 {

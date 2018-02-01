@@ -21,6 +21,9 @@ package org.apache.maven.plugin;
 
 import java.util.List;
 
+/**
+ * InvalidPluginDescriptorException
+ */
 public class InvalidPluginDescriptorException
     extends Exception
 {

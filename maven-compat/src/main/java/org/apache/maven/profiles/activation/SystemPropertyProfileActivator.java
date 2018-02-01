@@ -28,6 +28,9 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * SystemPropertyProfileActivator
+ */
 @Deprecated
 public class SystemPropertyProfileActivator
     extends DetectedProfileActivator implements Contextualizable

@@ -39,6 +39,9 @@ import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
 
+/**
+ * DefaultUpdateCheckManager
+ */
 @Component( role = UpdateCheckManager.class )
 public class DefaultUpdateCheckManager
     extends AbstractLogEnabled

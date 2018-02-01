@@ -81,6 +81,7 @@ public class MetadataGraphEdge
      * used to eliminate exact duplicates in the edge list
      */
     @Override
+    @SuppressWarnings( "checkstyle:equalshashcode" )
     public boolean equals( Object o )
     {
         if ( o instanceof MetadataGraphEdge )

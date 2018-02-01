@@ -87,6 +87,7 @@ public class DefaultLegacyArtifactCollector
         }
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
@@ -102,6 +103,7 @@ public class DefaultLegacyArtifactCollector
                         conflictResolvers );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions,
                                              ArtifactResolutionRequest repositoryRequest,
@@ -239,6 +241,7 @@ public class DefaultLegacyArtifactCollector
         return versionMap;
     }
 
+    @SuppressWarnings( { "checkstyle:parameternumber", "checkstyle:methodlength" } )
     private void recurse( ArtifactResolutionResult result, ResolutionNode node,
                           Map<Object, List<ResolutionNode>> resolvedArtifacts, ManagedVersionMap managedVersions,
                           ArtifactResolutionRequest request, ArtifactMetadataSource source, ArtifactFilter filter,
@@ -791,6 +794,7 @@ public class DefaultLegacyArtifactCollector
         }
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,

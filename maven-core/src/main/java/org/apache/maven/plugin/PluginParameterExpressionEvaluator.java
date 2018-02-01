@@ -144,6 +144,7 @@ public class PluginParameterExpressionEvaluator
     }
 
     @Override
+    @SuppressWarnings( "checkstyle:methodlength" )
     public Object evaluate( String expr, Class<?> type )
         throws ExpressionEvaluationException
     {

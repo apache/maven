@@ -29,6 +29,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import com.google.inject.AbstractModule;
 
+/**
+ * SessionScopeModule
+ */
 @Named
 public class SessionScopeModule
     extends AbstractModule

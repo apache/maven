@@ -19,6 +19,9 @@ package org.apache.maven.repository;
  * under the License.
  */
 
+/**
+ * ArtifactDoesNotExistException
+ */
 public class ArtifactDoesNotExistException
     extends Exception
 {

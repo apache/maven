@@ -24,6 +24,9 @@ import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.Os;
 
+/**
+ * OperatingSystemProfileActivator
+ */
 @Deprecated
 public class OperatingSystemProfileActivator
     implements ProfileActivator

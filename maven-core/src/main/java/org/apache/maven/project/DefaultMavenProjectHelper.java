@@ -31,6 +31,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+/**
+ * DefaultMavenProjectHelper
+ */
 @SuppressWarnings( "deprecation" )
 @Component( role = MavenProjectHelper.class )
 public class DefaultMavenProjectHelper

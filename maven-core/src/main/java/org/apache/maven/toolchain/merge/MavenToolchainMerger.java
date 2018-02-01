@@ -71,13 +71,13 @@ public class MavenToolchainMerger
             }
             else
             {
-                mergeToolchainModel_Configuration( dominantModel, recessiveModel );
+                mergeToolchainModelConfiguration( dominantModel, recessiveModel );
             }
         }
     }
 
-    protected void mergeToolchainModel_Configuration( ToolchainModel target,
-                                                      ToolchainModel source )
+    protected void mergeToolchainModelConfiguration( ToolchainModel target,
+                                                    ToolchainModel source )
     {
         Xpp3Dom src = (Xpp3Dom) source.getConfiguration();
         if ( src != null )

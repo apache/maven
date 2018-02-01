@@ -32,6 +32,9 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
 
+/**
+ * WagonManager
+ */
 public interface WagonManager
 {
     @Deprecated

@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
+/**
+ * MojoNotFoundException
+ */
 public class MojoNotFoundException
     extends Exception
 {

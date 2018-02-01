@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * LifecycleMojo
+ */
 public class LifecycleMojo
 {
     

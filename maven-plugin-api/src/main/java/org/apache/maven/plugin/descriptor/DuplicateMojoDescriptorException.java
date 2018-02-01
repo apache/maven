@@ -19,6 +19,9 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
+/**
+ * DuplicateMojoDescriptorException
+ */
 public class DuplicateMojoDescriptorException
     extends InvalidPluginDescriptorException
 {

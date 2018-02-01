@@ -31,6 +31,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 public interface Maven
 {
     @Deprecated
+    @SuppressWarnings( "checkstyle:constantname" )
     String POMv4 = "pom.xml";
 
     MavenExecutionResult execute( MavenExecutionRequest request );

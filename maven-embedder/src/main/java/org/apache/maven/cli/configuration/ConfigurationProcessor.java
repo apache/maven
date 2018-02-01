@@ -21,6 +21,9 @@ package org.apache.maven.cli.configuration;
 
 import org.apache.maven.cli.CliRequest;
 
+/**
+ * ConfigurationProcessor
+ */
 public interface ConfigurationProcessor
 {
     void process( CliRequest request )

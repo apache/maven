@@ -83,6 +83,9 @@ Plugins:
 // PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 // CycleDetectedInPluginGraphException;
 
+/**
+ * Transform an exception into useful end-user message.
+ */
 @Component( role = ExceptionHandler.class )
 public class DefaultExceptionHandler
     implements ExceptionHandler

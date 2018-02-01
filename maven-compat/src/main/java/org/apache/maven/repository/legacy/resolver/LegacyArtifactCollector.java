@@ -39,6 +39,7 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
+@SuppressWarnings( "checkstyle:parameternumber" )
 public interface LegacyArtifactCollector
 {
 

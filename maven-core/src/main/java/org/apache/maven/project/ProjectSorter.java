@@ -38,6 +38,9 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
+/**
+ * ProjectSorter
+ */
 public class ProjectSorter
 {
     private DAG dag;
@@ -165,7 +168,7 @@ public class ProjectSorter
 
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
     }
-
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private void addEdge( Map<String, MavenProject> projectMap, Map<String, Map<String, Vertex>> vertexMap,
                           MavenProject project, Vertex projectVertex, String groupId, String artifactId,
                           String version, boolean force, boolean safe )

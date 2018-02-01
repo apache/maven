@@ -42,6 +42,11 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
+ *             but should have been.
+ *
+ */
 @Deprecated
 @Component( role = ProjectDependenciesResolver.class )
 public class DefaultProjectDependenciesResolver

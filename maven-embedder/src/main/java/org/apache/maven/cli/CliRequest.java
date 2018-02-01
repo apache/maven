@@ -27,6 +27,9 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
+/**
+ * CliRequest
+ */
 public class CliRequest
 {
     String[] args;

@@ -21,6 +21,9 @@ package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * InversionArtifactFilter
+ */
 public class InversionArtifactFilter
     implements ArtifactFilter
 {

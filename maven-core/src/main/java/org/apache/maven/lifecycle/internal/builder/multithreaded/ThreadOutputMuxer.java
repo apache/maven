@@ -71,7 +71,7 @@ public class ThreadOutputMuxer
     class ConsolePrinter
         implements Runnable
     {
-        public volatile boolean running;
+        private volatile boolean running;
 
         private final ProjectBuildList projectBuildList;
 

@@ -24,6 +24,9 @@ import java.util.List;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 
+/**
+ * NoPluginFoundForPrefixException
+ */
 public class NoPluginFoundForPrefixException
     extends Exception
 {

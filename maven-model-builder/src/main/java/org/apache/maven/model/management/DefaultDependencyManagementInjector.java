@@ -38,6 +38,7 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
+@SuppressWarnings( { "checkstyle:methodname" } )
 @Component( role = DependencyManagementInjector.class )
 public class DefaultDependencyManagementInjector
     implements DependencyManagementInjector
@@ -51,6 +52,9 @@ public class DefaultDependencyManagementInjector
         merger.mergeManagedDependencies( model );
     }
 
+    /**
+     * ManagementModelMerger
+     */
     protected static class ManagementModelMerger
         extends MavenModelMerger
     {

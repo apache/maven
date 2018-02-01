@@ -19,6 +19,9 @@ package org.apache.maven.repository;
  * under the License.
  */
 
+/**
+ * ArtifactTransferFailedException
+ */
 public class ArtifactTransferFailedException
     extends Exception
 {

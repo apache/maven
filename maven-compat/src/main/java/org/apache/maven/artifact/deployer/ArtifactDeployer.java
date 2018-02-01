@@ -24,6 +24,9 @@ import java.io.File;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+/**
+ * ArtifactDeployer
+ */
 public interface ArtifactDeployer
 {
     String ROLE = ArtifactDeployer.class.getName();

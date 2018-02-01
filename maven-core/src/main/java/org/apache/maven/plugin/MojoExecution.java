@@ -27,6 +27,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * MojoExecution
+ */
 public class MojoExecution
 {
 

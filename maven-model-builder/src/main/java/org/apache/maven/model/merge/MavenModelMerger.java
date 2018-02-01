@@ -53,6 +53,7 @@ import org.apache.maven.model.Site;
  *
  * @author Benjamin Bentmann
  */
+@SuppressWarnings( { "checkstyle:methodname" } )
 public class MavenModelMerger
     extends ModelMerger
 {

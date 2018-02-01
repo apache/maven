@@ -21,6 +21,10 @@ package org.apache.maven.artifact.resolver;
 
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
+ * along with their metadata. No artifacts are downloaded.
+ */
 @Deprecated
 @Component( role = ArtifactCollector.class )
 public class DefaultArtifactCollector

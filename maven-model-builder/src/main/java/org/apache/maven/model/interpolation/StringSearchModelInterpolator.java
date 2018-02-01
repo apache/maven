@@ -44,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * StringSearchModelInterpolator
+ */
 @Component( role = ModelInterpolator.class )
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator

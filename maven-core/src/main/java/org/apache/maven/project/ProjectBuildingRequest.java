@@ -27,6 +27,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.eclipse.aether.RepositorySystemSession;
 
+/**
+ * ProjectBuildingRequest
+ */
 public interface ProjectBuildingRequest
 {
 

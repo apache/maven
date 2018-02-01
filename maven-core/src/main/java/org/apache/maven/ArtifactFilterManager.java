@@ -23,6 +23,9 @@ import java.util.Set;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
+/**
+ * ArtifactFilterManager
+ */
 public interface ArtifactFilterManager
 {
     /**

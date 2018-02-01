@@ -82,6 +82,7 @@ public class DefaultModelProblem
      * @param exception The exception that caused this problem, may be {@code null}.
      */
     //mkleint: does this need to be public?
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber,
                                 int columnNumber, String modelId, Exception exception )
     {

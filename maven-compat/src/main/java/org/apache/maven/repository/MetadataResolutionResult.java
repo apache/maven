@@ -74,7 +74,7 @@ public class MetadataResolutionResult
         return originatingArtifact;
     }
 
-    public MetadataResolutionResult ListOriginatingArtifact( final Artifact originatingArtifact )
+    public MetadataResolutionResult listOriginatingArtifact( final Artifact originatingArtifact )
     {
         this.originatingArtifact = originatingArtifact;
 
@@ -323,8 +323,9 @@ public class MetadataResolutionResult
     public String toString()
     {
         if ( artifacts == null )
+        {
             return "";
-
+        }
         StringBuilder sb = new StringBuilder( 256 );
         int i = 1;
         sb.append( "---------\n" );

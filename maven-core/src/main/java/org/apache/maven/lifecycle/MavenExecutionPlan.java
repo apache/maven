@@ -42,6 +42,9 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 //      from the plugin archive.
 //TODO this will be the class that people get in IDEs to modify
 
+/**
+ * MavenExecutionPlan
+ */
 public class MavenExecutionPlan
     implements Iterable<ExecutionPlanItem>
 {

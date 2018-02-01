@@ -258,7 +258,8 @@ public class DefaultArtifactResolver
                                                              throws ArtifactResolutionException,
                                                              ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
+        return resolveTransitively(
+                artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
                                     remoteRepositories, source, filter );
 
     }
@@ -305,10 +306,12 @@ public class DefaultArtifactResolver
                                                              throws ArtifactResolutionException,
                                                              ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
+        return resolveTransitively(
+                artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
                                     remoteRepositories, source, null, listeners );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
                                                          Map<String, Artifact> managedVersions,
                                                          ArtifactRepository localRepository,
@@ -322,6 +325,7 @@ public class DefaultArtifactResolver
                                     remoteRepositories, source, filter, listeners, null );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
                                                          Map<String, Artifact> managedVersions,
                                                          ArtifactRepository localRepository,
@@ -366,6 +370,7 @@ public class DefaultArtifactResolver
     //
     // ------------------------------------------------------------------------
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         Artifact rootArtifact = request.getArtifact();
@@ -599,7 +604,7 @@ public class DefaultArtifactResolver
 
         private final ArtifactResolutionResult result;
 
-        public ResolveTask( ClassLoader classLoader, CountDownLatch latch, Artifact artifact,
+        ResolveTask( ClassLoader classLoader, CountDownLatch latch, Artifact artifact,
                             RepositorySystemSession session, List<ArtifactRepository> remoteRepositories,
                             ArtifactResolutionResult result )
         {

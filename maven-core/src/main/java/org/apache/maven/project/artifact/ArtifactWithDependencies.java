@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.apache.maven.model.Dependency;
 
+/**
+ * ArtifactWithDependencies
+ */
 public interface ArtifactWithDependencies
 {
 

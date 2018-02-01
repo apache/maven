@@ -23,6 +23,9 @@ import java.io.File;
 
 import org.apache.maven.project.validation.ModelValidationResult;
 
+/**
+ * InvalidProjectModelException
+ */
 @Deprecated
 public class InvalidProjectModelException
     extends ProjectBuildingException
