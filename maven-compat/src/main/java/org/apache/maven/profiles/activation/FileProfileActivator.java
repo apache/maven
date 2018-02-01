@@ -33,6 +33,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * FileProfileActivator
+ */
 @Deprecated
 public class FileProfileActivator
     extends DetectedProfileActivator

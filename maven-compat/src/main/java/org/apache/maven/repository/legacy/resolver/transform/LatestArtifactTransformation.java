@@ -28,6 +28,9 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * Describes a version transformation during artifact resolution - "latest" type
+ */
 @Component( role = ArtifactTransformation.class, hint = "latest" )
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation

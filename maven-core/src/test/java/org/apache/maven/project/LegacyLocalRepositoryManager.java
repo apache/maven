@@ -43,7 +43,7 @@ public class LegacyLocalRepositoryManager
 
     private final LocalRepository repository;
 
-    public LegacyLocalRepositoryManager( File basedir )
+    LegacyLocalRepositoryManager( File basedir )
     {
         this.repository = new LocalRepository( basedir.getAbsoluteFile(), "legacy" );
     }

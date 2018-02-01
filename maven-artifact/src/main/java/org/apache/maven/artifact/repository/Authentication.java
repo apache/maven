@@ -19,6 +19,9 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+/**
+ * Authentication
+ */
 public class Authentication
 {
 

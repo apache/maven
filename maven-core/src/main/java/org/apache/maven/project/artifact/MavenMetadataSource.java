@@ -534,7 +534,7 @@ public class MavenMetadataSource
 
         return projectBuilder;
     }
-
+    @SuppressWarnings( "checkstyle:methodlength" )
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, MetadataResolutionRequest repositoryRequest )
         throws ArtifactMetadataRetrievalException
     {

@@ -21,6 +21,9 @@ package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
 
+/**
+ * BatchModeMavenTransferListener
+ */
 public class BatchModeMavenTransferListener
     extends AbstractMavenTransferListener
 {

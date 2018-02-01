@@ -19,6 +19,9 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
+/**
+ * PluginVersionNotFoundException
+ */
 public class PluginVersionNotFoundException
     extends Exception
 {

@@ -21,6 +21,9 @@ package org.apache.maven.model.resolution;
 
 import org.apache.maven.model.Model;
 
+/**
+ * WorkspaceModelResolver
+ */
 public interface WorkspaceModelResolver
 {
 

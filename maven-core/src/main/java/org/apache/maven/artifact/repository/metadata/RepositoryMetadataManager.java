@@ -25,6 +25,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 
+/**
+ * RepositoryMetadataManager
+ */
 public interface RepositoryMetadataManager
 {
 

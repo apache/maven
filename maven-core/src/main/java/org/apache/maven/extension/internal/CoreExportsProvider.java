@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Nullable;
 
+/**
+ * CoreExportsProvider
+ */
 @Named
 @Singleton
 public class CoreExportsProvider

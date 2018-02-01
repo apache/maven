@@ -27,6 +27,10 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
+/**
+ * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
+ * along with their metadata. No artifacts are downloaded.
+ */
 @Deprecated
 public interface ArtifactCollector
     extends org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector

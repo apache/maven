@@ -26,6 +26,9 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+/**
+ * ResolutionGroup
+ */
 @Deprecated
 public class ResolutionGroup
     extends org.apache.maven.repository.legacy.metadata.ResolutionGroup

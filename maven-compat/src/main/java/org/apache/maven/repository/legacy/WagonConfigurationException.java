@@ -21,7 +21,9 @@ package org.apache.maven.repository.legacy;
 
 import org.apache.maven.wagon.TransferFailedException;
 
-
+/**
+ * WagonConfigurationException
+ */
 public class WagonConfigurationException
     extends TransferFailedException
 {

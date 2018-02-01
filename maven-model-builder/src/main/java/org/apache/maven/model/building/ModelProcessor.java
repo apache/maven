@@ -22,6 +22,9 @@ package org.apache.maven.model.building;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
 
+/**
+ * ModelProcessor
+ */
 @SuppressWarnings( "checkstyle:interfaceistype" )
 public interface ModelProcessor
     extends ModelLocator, ModelReader

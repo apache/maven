@@ -27,7 +27,12 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * DefaultArtifactFactory
+ *
+ */
 @Component( role = ArtifactFactory.class )
+@SuppressWarnings( "checkstyle:parameternumber" )
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {

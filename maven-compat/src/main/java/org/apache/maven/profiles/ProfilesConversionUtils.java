@@ -27,6 +27,9 @@ import org.apache.maven.model.Repository;
 
 import java.util.List;
 
+/**
+ * ProfilesConversionUtils
+ */
 @Deprecated
 public class ProfilesConversionUtils
 {

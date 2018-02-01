@@ -29,6 +29,9 @@ import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * DefaultMirrorSelector
+ */
 @Component( role = MirrorSelector.class )
 public class DefaultMirrorSelector
     implements MirrorSelector

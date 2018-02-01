@@ -979,6 +979,7 @@ public class DefaultModelValidator
         return false;
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean validateEnum( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
                                   String string, String sourceHint, InputLocationTracker tracker,
                                   String... validValues )
@@ -1001,6 +1002,7 @@ public class DefaultModelValidator
         return false;
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean validateBannedCharacters( String fieldName, ModelProblemCollector problems, Severity severity,
                                               Version version, String string, String sourceHint,
                                               InputLocationTracker tracker, String banned )

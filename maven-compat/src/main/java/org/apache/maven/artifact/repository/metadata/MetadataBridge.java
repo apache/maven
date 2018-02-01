@@ -149,7 +149,7 @@ public final class MetadataBridge
 
         private File metadataFile;
 
-        public MetadataRepository( File metadataFile )
+        MetadataRepository( File metadataFile )
         {
             super( "local", "", null );
             this.metadataFile = metadataFile;

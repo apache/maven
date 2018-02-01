@@ -19,6 +19,9 @@ package org.apache.maven.artifact.metadata;
  * under the License.
  */
 
+/**
+ * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
+ */
 @Deprecated
 public interface ArtifactMetadata
     extends org.apache.maven.repository.legacy.metadata.ArtifactMetadata

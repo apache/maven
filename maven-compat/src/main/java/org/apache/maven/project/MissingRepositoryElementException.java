@@ -20,7 +20,9 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-
+/**
+ * Error constructing an artifact repository.
+ */
 public class MissingRepositoryElementException
     extends InvalidRepositoryException
 {

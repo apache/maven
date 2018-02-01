@@ -32,6 +32,11 @@ import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * <p>
+ * A {@link Builder} encapsulates a strategy for building a set of Maven projects. The default strategy in Maven builds
+ * the the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
+ */
 @Component( role = Builder.class, hint = "singlethreaded" )
 public class SingleThreadedBuilder
     implements Builder

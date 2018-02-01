@@ -29,7 +29,9 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
-/** Manages multiple ArtifactTransformation instances and applies them in succession. */
+/**
+ * Manages multiple ArtifactTransformation instances and applies them in succession.
+ */
 public interface ArtifactTransformationManager
 {
     String ROLE = ArtifactTransformationManager.class.getName();

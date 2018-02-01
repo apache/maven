@@ -78,7 +78,7 @@ public class CoreExtensionEntry
         return packages;
     }
 
-    private static final ExtensionDescriptorBuilder builder = new ExtensionDescriptorBuilder();
+    private static final ExtensionDescriptorBuilder BUILDER = new ExtensionDescriptorBuilder();
 
     public static CoreExtensionEntry discoverFrom( ClassRealm loader )
     {
@@ -87,13 +87,13 @@ public class CoreExtensionEntry
 
         try
         {
-            Enumeration<URL> urls = loader.getResources( builder.getExtensionDescriptorLocation() );
+            Enumeration<URL> urls = loader.getResources( BUILDER.getExtensionDescriptorLocation() );
             while ( urls.hasMoreElements() )
             {
 
                 try ( InputStream is = urls.nextElement().openStream() )
                 {
-                    ExtensionDescriptor descriptor = builder.build( is );
+                    ExtensionDescriptor descriptor = BUILDER.build( is );
                     artifacts.addAll( descriptor.getExportedArtifacts() );
                     packages.addAll( descriptor.getExportedPackages() );
                 }
@@ -116,7 +116,7 @@ public class CoreExtensionEntry
         {
             for ( File entry : classpath )
             {
-                ExtensionDescriptor descriptor = builder.build( entry );
+                ExtensionDescriptor descriptor = BUILDER.build( entry );
                 if ( descriptor != null )
                 {
                     artifacts.addAll( descriptor.getExportedArtifacts() );

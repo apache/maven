@@ -55,6 +55,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+/**
+ * Builds the {@link ProjectDependencyGraph inter-dependencies graph} between projects in the reactor.
+ */
 @Component( role = GraphBuilder.class, hint = GraphBuilder.HINT )
 public class DefaultGraphBuilder
     implements GraphBuilder

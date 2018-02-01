@@ -27,6 +27,9 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * LifecyclePhase
+ */
 public class LifecyclePhase
 {
     

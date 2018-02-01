@@ -23,6 +23,9 @@ import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
 
+/**
+ * MavenWorkspaceReader
+ */
 public interface MavenWorkspaceReader
     extends WorkspaceReader
 {

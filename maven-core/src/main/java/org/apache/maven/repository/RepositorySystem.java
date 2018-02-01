@@ -44,10 +44,13 @@ public interface RepositorySystem
 {
     String DEFAULT_LOCAL_REPO_ID = "local";
 
+    @SuppressWarnings( "checkstyle:constantname" )
     String userHome = System.getProperty( "user.home" );
 
+    @SuppressWarnings( "checkstyle:constantname" )
     File userMavenConfigurationHome = new File( userHome, ".m2" );
 
+    @SuppressWarnings( "checkstyle:constantname" )
     File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
     String DEFAULT_REMOTE_REPO_ID = "central";

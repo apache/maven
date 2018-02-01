@@ -28,6 +28,10 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.repository.Proxy;
 
+/**
+ * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or
+ * IDE workspace.
+ */
 //TODO completely separate local and remote artifact repositories
 public class MavenArtifactRepository
     implements ArtifactRepository

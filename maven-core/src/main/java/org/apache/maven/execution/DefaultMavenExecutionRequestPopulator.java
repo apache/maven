@@ -49,6 +49,9 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * Assists in populating an execution request for invocation of Maven.
+ */
 @Named
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator

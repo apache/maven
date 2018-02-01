@@ -25,6 +25,9 @@ import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.TimeZone;
 
+/**
+ * MavenBuildTimestamp
+ */
 public class MavenBuildTimestamp
 {
     // ISO 8601-compliant timestamp for machine readability

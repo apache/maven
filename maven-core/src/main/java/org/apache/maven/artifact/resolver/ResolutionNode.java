@@ -32,6 +32,9 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
+/**
+ * ResolutionNode
+ */
 public class ResolutionNode
 {
     private Artifact artifact;

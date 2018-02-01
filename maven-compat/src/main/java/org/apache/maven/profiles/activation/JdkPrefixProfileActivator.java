@@ -26,6 +26,9 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * JdkPrefixProfileActivator
+ */
 @Deprecated
 public class JdkPrefixProfileActivator
     extends DetectedProfileActivator

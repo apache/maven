@@ -35,6 +35,9 @@ import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.impl.guice.AetherModule;
 
+/**
+ * MavenResolverModule
+ */
 public final class MavenResolverModule
     extends AbstractModule
 {

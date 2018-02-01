@@ -48,7 +48,9 @@ import org.eclipse.aether.repository.WorkspaceRepository;
 public class DefaultPluginRealmCache
     implements PluginRealmCache, Disposable
 {
-
+    /**
+     * CacheKey
+     */
     protected static class CacheKey
         implements Key
     {
@@ -176,7 +178,7 @@ public class DefaultPluginRealmCache
     {
         for ( CacheRecord record : cache.values() )
         {
-            ClassRealm realm = record.realm;
+            ClassRealm realm = record.getRealm();
             try
             {
                 realm.getWorld().disposeRealm( realm.getId() );

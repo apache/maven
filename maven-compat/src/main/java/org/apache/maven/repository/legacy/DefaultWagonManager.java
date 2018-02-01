@@ -59,6 +59,10 @@ import org.eclipse.aether.util.ConfigUtils;
 //TODO remove the update check manager
 //TODO separate into retriever and publisher
 //TODO remove hardcoding of checksum logic
+
+/**
+ * Manages <a href="https://maven.apache.org/wagon">Wagon</a> related operations in Maven.
+ */
 @Component( role = WagonManager.class )
 public class DefaultWagonManager
     implements WagonManager
@@ -333,6 +337,7 @@ public class DefaultWagonManager
         return proxyInfo;
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
                                TransferListener downloadMonitor, String checksumPolicy, boolean force )

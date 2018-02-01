@@ -23,6 +23,9 @@ import java.io.File;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
+/**
+ * InvalidProjectVersionException
+ */
 public class InvalidProjectVersionException
     extends ProjectBuildingException
 {

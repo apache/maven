@@ -47,6 +47,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author Benjamin Bentmann
  */
 @Component( role = ProfileInjector.class )
+@SuppressWarnings( { "checkstyle:methodname" } )
 public class DefaultProfileInjector
     implements ProfileInjector
 {
@@ -72,6 +73,9 @@ public class DefaultProfileInjector
         }
     }
 
+    /**
+     * ProfileModelMerger
+     */
     protected static class ProfileModelMerger
         extends MavenModelMerger
     {

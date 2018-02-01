@@ -79,6 +79,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     @Deprecated
+    @SuppressWarnings( "checkstyle:parameternumber" )
     ArtifactResolutionResult resolveTransitively(
         Set<Artifact> artifacts, Artifact originatingArtifact,
         Map<String, Artifact> managedVersions, ArtifactRepository localRepository,

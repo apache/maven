@@ -19,6 +19,9 @@ package org.apache.maven.repository;
  * under the License.
  */
 
+/**
+ * ArtifactTransferListener
+ */
 public interface ArtifactTransferListener
 {
     boolean isShowChecksumEvents();

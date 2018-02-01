@@ -99,8 +99,8 @@ public class DefaultModelBuildingListener
                 ProjectRealmCache.CacheRecord record =
                     projectBuildingHelper.createProjectRealm( project, model, projectBuildingRequest );
 
-                project.setClassRealm( record.realm );
-                project.setExtensionDependencyFilter( record.extensionArtifactFilter );
+                project.setClassRealm( record.getRealm() );
+                project.setExtensionDependencyFilter( record.getExtensionArtifactFilter() );
             }
             catch ( PluginResolutionException | PluginManagerException | PluginVersionResolutionException e )
             {

@@ -22,6 +22,9 @@ package org.apache.maven.lifecycle.mapping;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * LifecycleMapping
+ */
 public interface LifecycleMapping
 {
 

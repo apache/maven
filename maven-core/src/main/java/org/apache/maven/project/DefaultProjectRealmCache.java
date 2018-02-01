@@ -38,7 +38,9 @@ import org.eclipse.aether.graph.DependencyFilter;
 public class DefaultProjectRealmCache
     implements ProjectRealmCache, Disposable
 {
-
+    /**
+     * CacheKey
+     */
     protected static class CacheKey
         implements Key
     {
@@ -118,7 +120,7 @@ public class DefaultProjectRealmCache
     {
         for ( CacheRecord record : cache.values() )
         {
-            ClassRealm realm = record.realm;
+            ClassRealm realm = record.getRealm();
             try
             {
                 realm.getWorld().disposeRealm( realm.getId() );

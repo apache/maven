@@ -30,6 +30,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 
+/**
+ * Default component responsible for creation of MavenProject#dependencyArtifacts instances.
+ */
 @SuppressWarnings( "deprecation" )
 @Named
 public class DefaultProjectArtifactFactory

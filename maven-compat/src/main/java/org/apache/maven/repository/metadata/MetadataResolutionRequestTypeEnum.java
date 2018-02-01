@@ -19,6 +19,9 @@ package org.apache.maven.repository.metadata;
  * under the License.
  */
 
+/**
+ * MetadataResolutionRequestTypeEnum
+ */
 public enum MetadataResolutionRequestTypeEnum
 {
       tree( 1 )

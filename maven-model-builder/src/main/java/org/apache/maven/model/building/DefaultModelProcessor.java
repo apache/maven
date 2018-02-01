@@ -31,6 +31,9 @@ import org.apache.maven.model.locator.ModelLocator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * DefaultModelProcessor
+ */
 @Component( role = ModelProcessor.class )
 public class DefaultModelProcessor
     implements ModelProcessor

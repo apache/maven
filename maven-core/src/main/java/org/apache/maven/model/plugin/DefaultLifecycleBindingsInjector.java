@@ -79,6 +79,9 @@ public class DefaultLifecycleBindingsInjector
         }
     }
 
+    /**
+     *  The domain-specific model merger for the Maven POM
+     */
     protected static class LifecycleBindingsMerger
         extends MavenModelMerger
     {
@@ -98,6 +101,7 @@ public class DefaultLifecycleBindingsInjector
             mergePluginContainer_Plugins( target.getBuild(), source.getBuild(), false, context );
         }
 
+        @SuppressWarnings( { "checkstyle:methodname" } )
         @Override
         protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
                                                      boolean sourceDominant, Map<Object, Object> context )

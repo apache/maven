@@ -21,6 +21,9 @@ package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Profile;
 
+/**
+ * DetectedProfileActivator
+ */
 @Deprecated
 public abstract class DetectedProfileActivator
     implements ProfileActivator

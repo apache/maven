@@ -94,6 +94,7 @@ public class DefaultArtifact
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler, boolean optional )
     {

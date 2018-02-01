@@ -21,6 +21,9 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * AbstractArtifactMetadata
+ */
 @Deprecated
 public abstract class AbstractArtifactMetadata
     extends org.apache.maven.repository.legacy.metadata.AbstractArtifactMetadata

@@ -27,6 +27,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import com.google.inject.AbstractModule;
 
+/**
+ * MojoExecutionScopeModule
+ */
 public class MojoExecutionScopeModule
     extends AbstractModule
 {

@@ -60,7 +60,7 @@ public class DefaultModelValidator
 
         ModelValidationResult result;
 
-        public SimpleModelProblemCollector( ModelValidationResult result )
+        SimpleModelProblemCollector( ModelValidationResult result )
         {
             this.result = result;
         }

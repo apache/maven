@@ -94,6 +94,9 @@ public class DefaultModelNormalizer
         }
     }
 
+    /**
+     * DuplicateMerger
+     */
     protected static class DuplicateMerger
         extends MavenModelMerger
     {

@@ -37,6 +37,9 @@ import org.eclipse.aether.RepositorySystemSession;
 // This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
 // getting the repositories from the project.
 
+/**
+ * ProjectUtils
+ */
 @Deprecated
 public final class ProjectUtils
 {

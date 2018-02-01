@@ -21,6 +21,9 @@ package org.apache.maven.plugin.descriptor;
 
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
+/**
+ * InvalidPluginDescriptorException
+ */
 public class InvalidPluginDescriptorException
     extends PlexusConfigurationException
 {

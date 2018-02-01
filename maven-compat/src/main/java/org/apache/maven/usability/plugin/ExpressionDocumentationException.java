@@ -19,6 +19,9 @@ package org.apache.maven.usability.plugin;
  * under the License.
  */
 
+/**
+ * ExpressionDocumentationException
+ */
 public class ExpressionDocumentationException
     extends Exception
 {

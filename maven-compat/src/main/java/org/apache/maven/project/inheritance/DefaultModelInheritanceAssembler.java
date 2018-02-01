@@ -47,6 +47,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * DefaultModelInheritanceAssembler
+ */
 @Component( role = ModelInheritanceAssembler.class )
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
