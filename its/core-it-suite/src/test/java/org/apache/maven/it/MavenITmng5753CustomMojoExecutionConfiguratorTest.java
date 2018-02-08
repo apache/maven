@@ -48,13 +48,15 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
+        File configurationFile = new File(projectDir, "configuration.txt");
+        configurationFile.delete();
+
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "validate" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
         
-        File configurationFile = new File(projectDir, "configuration.txt");
         verifier.assertFilePresent( configurationFile.getCanonicalPath() );
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
