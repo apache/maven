@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>27</version>
+    <version>31</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -497,22 +497,6 @@ under the License.
           <version>1.4</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.7</version>
-          <configuration>
-            <topSiteURL>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/components/${maven.site.path}</topSiteURL>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>1.1</version>
-          <configuration>
-            <serverId>apache.releases.https</serverId>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
@@ -548,16 +532,6 @@ under the License.
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>findbugs-maven-plugin</artifactId>
-          <version>3.0.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -604,31 +578,9 @@ under the License.
           <excludes combine.children="append">
             <exclude>bootstrap/**</exclude>
             <exclude>README.bootstrap.txt</exclude>
-            <exclude>.repository/**</exclude> <!-- jenkins with local maven repository -->
-            <exclude>.maven/spy.log</exclude> <!-- hudson maven3 integration log -->
-            <exclude>.java-version</exclude>
             <exclude>README.md</exclude>
           </excludes>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-maven</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>${maven.version}</version>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -660,10 +612,7 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.0.0-M1</version>
             <configuration>
-              <!-- TODO Remove when we upgrade to maven-parent 31 -->
-              <locale>en</locale>
               <tags>
                 <tag>
                   <name>provisional</name>
