@@ -499,6 +499,7 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
+          <version>3.7</version>
           <configuration>
             <topSiteURL>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/components/${maven.site.path}</topSiteURL>
           </configuration>
