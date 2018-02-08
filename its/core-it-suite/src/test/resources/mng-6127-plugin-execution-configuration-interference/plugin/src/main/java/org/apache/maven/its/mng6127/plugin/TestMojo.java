@@ -68,9 +68,9 @@ public class TestMojo
         {
             if ( name != null )
             {
-                w.write( name );
+                w.write( "name=" + name + ", " );
             }
-            w.write( secondName );
+            w.write( "secondName=" + secondName );
         }
         catch ( IOException e )
         {

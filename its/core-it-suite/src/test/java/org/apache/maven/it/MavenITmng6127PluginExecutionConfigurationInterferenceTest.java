@@ -53,25 +53,29 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
+        File modAconfigurationFile = new File( modAprojectDir, "configuration.txt" );
+        File modBconfigurationFile = new File( modBprojectDir, "configuration.txt" );
+        File modCconfigurationFile = new File( modCprojectDir, "configuration.txt" );
+        modAconfigurationFile.delete();
+        modBconfigurationFile.delete();
+        modCconfigurationFile.delete();
+
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "verify" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        File modAconfigurationFile = new File( modAprojectDir, "configuration.txt" );
         verifier.assertFilePresent( modAconfigurationFile.getCanonicalPath() );
         String modAactual = FileUtils.fileRead( modAconfigurationFile );
-        assertEquals( "mod-asecond", modAactual );
+        assertEquals( "name=mod-a, secondName=second from components.xml", modAactual );
 
-        File modBconfigurationFile = new File( modBprojectDir, "configuration.txt" );
         verifier.assertFilePresent( modBconfigurationFile.getCanonicalPath() );
         String modBactual = FileUtils.fileRead( modBconfigurationFile );
-        assertEquals( "mod-bsecond", modBactual );
+        assertEquals( "name=mod-b, secondName=second from components.xml", modBactual );
 
-        File modCconfigurationFile = new File( modCprojectDir, "configuration.txt" );
         verifier.assertFilePresent( modCconfigurationFile.getCanonicalPath() );
         String modCactual = FileUtils.fileRead( modCconfigurationFile );
-        assertEquals( "second", modCactual );
+        assertEquals( "secondName=second from components.xml", modCactual );
     }
 }
