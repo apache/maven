@@ -188,14 +188,6 @@ export MAVEN_PROJECTBASEDIR
 MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
 export MAVEN_CMD_LINE_ARGS
 
-# detect cygwin or mingw pseudo-terminal for Jansi
-# workaround for https://github.com/fusesource/jansi-native/issues/11
-if $cygwin || $mingw; then
-  if [ -t 1 ]; then
-    MAVEN_OPTS="-Djansi.passthrough=true $MAVEN_OPTS"
-  fi
-fi
-
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
