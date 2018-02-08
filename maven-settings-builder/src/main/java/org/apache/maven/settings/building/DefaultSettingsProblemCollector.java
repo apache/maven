@@ -37,7 +37,7 @@ class DefaultSettingsProblemCollector
 
     private String source;
 
-    public DefaultSettingsProblemCollector( List<SettingsProblem> problems )
+    DefaultSettingsProblemCollector( List<SettingsProblem> problems )
     {
         this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
     }

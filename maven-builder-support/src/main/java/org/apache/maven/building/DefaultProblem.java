@@ -55,7 +55,7 @@ class DefaultProblem
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
+    DefaultProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
                                    Exception exception )
     {
         this.message = message;

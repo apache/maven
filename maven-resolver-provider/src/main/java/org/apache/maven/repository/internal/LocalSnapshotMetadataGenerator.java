@@ -42,7 +42,7 @@ class LocalSnapshotMetadataGenerator
 
     private final boolean legacyFormat;
 
-    public LocalSnapshotMetadataGenerator( RepositorySystemSession session, InstallRequest request )
+    LocalSnapshotMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
         legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
 

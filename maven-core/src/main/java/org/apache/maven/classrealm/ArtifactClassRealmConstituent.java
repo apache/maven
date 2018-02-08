@@ -32,7 +32,7 @@ class ArtifactClassRealmConstituent
 
     private final Artifact artifact;
 
-    public ArtifactClassRealmConstituent( Artifact artifact )
+    ArtifactClassRealmConstituent( Artifact artifact )
     {
         this.artifact = artifact;
     }

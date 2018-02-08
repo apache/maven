@@ -78,9 +78,9 @@ class DefaultModelResolver
 
     private final Set<String> repositoryIds;
 
-    public DefaultModelResolver( RepositorySystemSession session, RequestTrace trace, String context,
-                                 ArtifactResolver resolver, VersionRangeResolver versionRangeResolver,
-                                 RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories )
+    DefaultModelResolver( RepositorySystemSession session, RequestTrace trace, String context,
+                          ArtifactResolver resolver, VersionRangeResolver versionRangeResolver,
+                          RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories )
     {
         this.session = session;
         this.trace = trace;

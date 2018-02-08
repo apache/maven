@@ -47,7 +47,7 @@ final class RemoteSnapshotMetadata
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-    public RemoteSnapshotMetadata( Artifact artifact, boolean legacyFormat )
+    RemoteSnapshotMetadata( Artifact artifact, boolean legacyFormat )
     {
         super( createRepositoryMetadata( artifact, legacyFormat ), null, legacyFormat );
     }

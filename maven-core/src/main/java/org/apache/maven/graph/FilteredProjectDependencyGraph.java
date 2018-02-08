@@ -50,8 +50,8 @@ class FilteredProjectDependencyGraph
      * @param projectDependencyGraph The project dependency graph to create a sub view from, must not be {@code null}.
      * @param whiteList The projects on which the dependency view should focus, must not be {@code null}.
      */
-    public FilteredProjectDependencyGraph( ProjectDependencyGraph projectDependencyGraph,
-                                           Collection<? extends MavenProject> whiteList )
+    FilteredProjectDependencyGraph( ProjectDependencyGraph projectDependencyGraph,
+                                    Collection<? extends MavenProject> whiteList )
     {
         this.projectDependencyGraph =
             Validate.notNull( projectDependencyGraph, "projectDependencyGraph cannot be null" );

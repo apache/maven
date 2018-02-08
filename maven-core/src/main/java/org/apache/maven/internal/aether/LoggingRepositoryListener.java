@@ -35,7 +35,7 @@ class LoggingRepositoryListener
 
     private final Logger logger;
 
-    public LoggingRepositoryListener( Logger logger )
+    LoggingRepositoryListener( Logger logger )
     {
         this.logger = logger;
     }

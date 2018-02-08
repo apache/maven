@@ -111,7 +111,7 @@ public class DefaultBeanConfigurator
 
         private final BeanConfigurationPathTranslator translator;
 
-        public BeanExpressionEvaluator( BeanConfigurationRequest request )
+        BeanExpressionEvaluator( BeanConfigurationRequest request )
         {
             preprocessor = request.getValuePreprocessor();
             translator = request.getPathTranslator();

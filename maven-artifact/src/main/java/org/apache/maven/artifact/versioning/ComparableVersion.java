@@ -98,7 +98,7 @@ public class ComparableVersion
             this.value = BIG_INTEGER_ZERO;
         }
 
-        public IntegerItem( String str )
+        IntegerItem( String str )
         {
             this.value = new BigInteger( str );
         }
@@ -169,7 +169,7 @@ public class ComparableVersion
 
         private String value;
 
-        public StringItem( String value, boolean followedByDigit )
+        StringItem( String value, boolean followedByDigit )
         {
             if ( followedByDigit && value.length() == 1 )
             {

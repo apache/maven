@@ -34,7 +34,7 @@ class EventSpyRepositoryListener
 
     private final RepositoryListener delegate;
 
-    public EventSpyRepositoryListener( EventSpyDispatcher dispatcher, RepositoryListener delegate )
+    EventSpyRepositoryListener( EventSpyDispatcher dispatcher, RepositoryListener delegate )
     {
         this.dispatcher = dispatcher;
         this.delegate = delegate;

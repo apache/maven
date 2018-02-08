@@ -39,7 +39,7 @@ class WagonExcluder
 
     private final boolean coreArtifact;
 
-    public WagonExcluder()
+    WagonExcluder()
     {
         this( false );
     }

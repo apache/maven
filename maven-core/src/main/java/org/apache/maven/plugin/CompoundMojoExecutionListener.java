@@ -30,7 +30,7 @@ class CompoundMojoExecutionListener
 
     private final Collection<MojoExecutionListener> listeners;
 
-    public CompoundMojoExecutionListener( Collection<MojoExecutionListener> listeners )
+    CompoundMojoExecutionListener( Collection<MojoExecutionListener> listeners )
     {
         this.listeners = listeners; // NB this is live injected collection
     }

@@ -39,8 +39,8 @@ class DefaultClassRealmRequest
 
     private final List<ClassRealmConstituent> constituents;
 
-    public DefaultClassRealmRequest( RealmType type, ClassLoader parent, List<String> parentImports,
-                                     Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
+    DefaultClassRealmRequest( RealmType type, ClassLoader parent, List<String> parentImports,
+                              Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
     {
         this.type = type;
         this.parent = parent;

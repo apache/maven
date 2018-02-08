@@ -42,7 +42,7 @@ class RemoteSnapshotMetadataGenerator
 
     private final boolean legacyFormat;
 
-    public RemoteSnapshotMetadataGenerator( RepositorySystemSession session, DeployRequest request )
+    RemoteSnapshotMetadataGenerator( RepositorySystemSession session, DeployRequest request )
     {
         legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
 

@@ -49,7 +49,7 @@ class DefaultModelBuildingResult
 
     private List<ModelProblem> problems;
 
-    public DefaultModelBuildingResult()
+    DefaultModelBuildingResult()
     {
         modelIds = new ArrayList<>();
         rawModels = new HashMap<>();

@@ -51,7 +51,7 @@ class DefaultModelProblemCollector
 
     private Set<ModelProblem.Severity> severities = EnumSet.noneOf( ModelProblem.Severity.class );
 
-    public DefaultModelProblemCollector( ModelBuildingResult result )
+    DefaultModelProblemCollector( ModelBuildingResult result )
     {
         this.result = result;
         this.problems = result.getProblems();

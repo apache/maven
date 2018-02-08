@@ -47,7 +47,7 @@ class SettingsAdapter
 
     private RuntimeInfo runtimeInfo;
 
-    public SettingsAdapter( MavenExecutionRequest request )
+    SettingsAdapter( MavenExecutionRequest request )
     {
         this.request = request;
 

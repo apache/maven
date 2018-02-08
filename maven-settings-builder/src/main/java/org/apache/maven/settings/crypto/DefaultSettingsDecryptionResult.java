@@ -41,7 +41,7 @@ class DefaultSettingsDecryptionResult
 
     private List<SettingsProblem> problems;
 
-    public DefaultSettingsDecryptionResult( List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems )
+    DefaultSettingsDecryptionResult( List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems )
     {
         this.servers = ( servers != null ) ? servers : new ArrayList<Server>();
         this.proxies = ( proxies != null ) ? proxies : new ArrayList<Proxy>();

@@ -236,7 +236,7 @@ public class DefaultProjectDependenciesResolver
 
         private String indent = "";
 
-        public GraphLogger( MavenProject project )
+        GraphLogger( MavenProject project )
         {
             this.project = project;
         }

@@ -30,7 +30,7 @@ class CompoundProjectExecutionListener
 {
     private final Collection<ProjectExecutionListener> listeners;
 
-    public CompoundProjectExecutionListener( Collection<ProjectExecutionListener> listeners )
+    CompoundProjectExecutionListener( Collection<ProjectExecutionListener> listeners )
     {
         this.listeners = listeners; // NB this is live injected collection
     }

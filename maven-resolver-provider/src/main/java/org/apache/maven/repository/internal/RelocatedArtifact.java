@@ -41,7 +41,7 @@ final class RelocatedArtifact
 
     private final String version;
 
-    public RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
+    RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
     {
         this.artifact = Validate.notNull( artifact, "artifact cannot be null" );
         // TODO Use StringUtils here

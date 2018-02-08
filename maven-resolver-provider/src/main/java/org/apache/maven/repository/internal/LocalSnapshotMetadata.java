@@ -42,13 +42,13 @@ final class LocalSnapshotMetadata
 
     private final boolean legacyFormat;
 
-    public LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat )
+    LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat )
     {
         super( createMetadata( artifact, legacyFormat ), null );
         this.legacyFormat = legacyFormat;
     }
 
-    public LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
+    LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
     {
         super( metadata, file );
         this.legacyFormat = legacyFormat;

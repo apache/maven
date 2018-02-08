@@ -347,7 +347,7 @@ public class RepositoryUtils
 
         private final ArtifactHandlerManager handlerManager;
 
-        public MavenArtifactTypeRegistry( ArtifactHandlerManager handlerManager )
+        MavenArtifactTypeRegistry( ArtifactHandlerManager handlerManager )
         {
             this.handlerManager = handlerManager;
         }

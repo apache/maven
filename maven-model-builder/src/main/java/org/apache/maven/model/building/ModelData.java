@@ -51,7 +51,7 @@ class ModelData
      *
      * @param model The model to wrap, may be {@code null}.
      */
-    public ModelData( ModelSource source, Model model )
+    ModelData( ModelSource source, Model model )
     {
         this.source = source;
         this.model = model;
@@ -65,7 +65,7 @@ class ModelData
      * @param artifactId The effective artifact identifier of the model, may be {@code null}.
      * @param version The effective version of the model, may be {@code null}.
      */
-    public ModelData( ModelSource source, Model model, String groupId, String artifactId, String version )
+    ModelData( ModelSource source, Model model, String groupId, String artifactId, String version )
     {
         this.source = source;
         this.model = model;

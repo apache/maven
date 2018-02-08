@@ -52,7 +52,7 @@ class PluginDependencyResolutionListener
 
     private Map<Artifact, Object> bannedArtifacts = new IdentityHashMap<>();
 
-    public PluginDependencyResolutionListener( ArtifactFilter coreFilter )
+    PluginDependencyResolutionListener( ArtifactFilter coreFilter )
     {
         this.coreFilter = coreFilter;
     }

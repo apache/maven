@@ -197,7 +197,7 @@ public class LegacyLocalRepositoryManager
 
         private final Metadata metadata;
 
-        public ArtifactMetadataAdapter( Metadata metadata )
+        ArtifactMetadataAdapter( Metadata metadata )
         {
             this.metadata = metadata;
         }
@@ -291,7 +291,7 @@ public class LegacyLocalRepositoryManager
 
         private final RemoteRepository repository;
 
-        public ArtifactRepositoryAdapter( RemoteRepository repository )
+        ArtifactRepositoryAdapter( RemoteRepository repository )
         {
             this.repository = repository;
         }

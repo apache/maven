@@ -475,7 +475,7 @@ public class DefaultVersionResolver
 
         ArtifactRepository repository;
 
-        public VersionInfo( String timestamp, String version, ArtifactRepository repository )
+        VersionInfo( String timestamp, String version, ArtifactRepository repository )
         {
             this.timestamp = ( timestamp != null ) ? timestamp : "";
             this.version = version;
@@ -512,7 +512,7 @@ public class DefaultVersionResolver
 
         private final int hashCode;
 
-        public Key( RepositorySystemSession session, VersionRequest request )
+        Key( RepositorySystemSession session, VersionRequest request )
         {
             Artifact artifact = request.getArtifact();
             groupId = artifact.getGroupId();
@@ -585,7 +585,7 @@ public class DefaultVersionResolver
 
         final Class<?> repoClass;
 
-        public Record( String version, ArtifactRepository repository )
+        Record( String version, ArtifactRepository repository )
         {
             this.version = version;
             if ( repository != null )

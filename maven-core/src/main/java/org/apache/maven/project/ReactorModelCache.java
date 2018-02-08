@@ -58,7 +58,7 @@ class ReactorModelCache
 
         private final int hashCode;
 
-        public CacheKey( String groupId, String artifactId, String version, String tag )
+        CacheKey( String groupId, String artifactId, String version, String tag )
         {
             this.groupId = ( groupId != null ) ? groupId : "";
             this.artifactId = ( artifactId != null ) ? artifactId : "";

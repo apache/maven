@@ -46,20 +46,20 @@ public interface ProjectArtifactsCache
         // marker interface for cache keys
     }
 
-    static class CacheRecord
+    class CacheRecord
     {
 
         public final Set<Artifact> artifacts;
 
         public final LifecycleExecutionException exception;
 
-        public CacheRecord( Set<Artifact> artifacts )
+        CacheRecord( Set<Artifact> artifacts )
         {
             this.artifacts = artifacts;
             this.exception = null;
         }
 
-        public CacheRecord( LifecycleExecutionException exception )
+        CacheRecord( LifecycleExecutionException exception )
         {
             this.artifacts = null;
             this.exception = exception;

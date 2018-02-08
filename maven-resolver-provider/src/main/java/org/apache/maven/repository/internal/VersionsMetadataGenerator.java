@@ -43,12 +43,12 @@ class VersionsMetadataGenerator
 
     private Map<Object, VersionsMetadata> processedVersions;
 
-    public VersionsMetadataGenerator( RepositorySystemSession session, InstallRequest request )
+    VersionsMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
         this( session, request.getMetadata() );
     }
 
-    public VersionsMetadataGenerator( RepositorySystemSession session, DeployRequest request )
+    VersionsMetadataGenerator( RepositorySystemSession session, DeployRequest request )
     {
         this( session, request.getMetadata() );
     }

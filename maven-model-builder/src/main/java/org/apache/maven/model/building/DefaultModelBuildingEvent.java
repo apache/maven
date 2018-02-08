@@ -36,7 +36,7 @@ class DefaultModelBuildingEvent
 
     private final ModelProblemCollector problems;
 
-    public DefaultModelBuildingEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    DefaultModelBuildingEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         this.model = model;
         this.request = request;

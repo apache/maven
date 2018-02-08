@@ -41,7 +41,7 @@ class JavaToolchainImpl
 
     public static final String KEY_JAVAHOME = "jdkHome"; //NOI18N
 
-    public JavaToolchainImpl( ToolchainModel model, Logger logger )
+    JavaToolchainImpl( ToolchainModel model, Logger logger )
     {
         super( model, "jdk", logger );
     }

@@ -35,7 +35,7 @@ class EventSpyExecutionListener
 
     private final ExecutionListener delegate;
 
-    public EventSpyExecutionListener( EventSpyDispatcher dispatcher, ExecutionListener delegate )
+    EventSpyExecutionListener( EventSpyDispatcher dispatcher, ExecutionListener delegate )
     {
         this.dispatcher = dispatcher;
         this.delegate = delegate;

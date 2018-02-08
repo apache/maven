@@ -36,7 +36,7 @@ class DefaultProblemCollector
 
     private String source;
 
-    public DefaultProblemCollector( List<Problem> problems )
+    DefaultProblemCollector( List<Problem> problems )
     {
         this.problems = ( problems != null ) ? problems : new ArrayList<Problem>();
     }

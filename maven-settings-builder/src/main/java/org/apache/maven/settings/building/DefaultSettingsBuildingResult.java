@@ -37,7 +37,7 @@ class DefaultSettingsBuildingResult
 
     private List<SettingsProblem> problems;
 
-    public DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
+    DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
     {
         this.effectiveSettings = effectiveSettings;
         this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();

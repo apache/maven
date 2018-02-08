@@ -29,7 +29,7 @@ class BuildTimestampValueSource
 {
     private final MavenBuildTimestamp mavenBuildTimestamp;
 
-    public BuildTimestampValueSource( Date startTime, Properties properties )
+    BuildTimestampValueSource( Date startTime, Properties properties )
     {
         super( false );
         this.mavenBuildTimestamp = new MavenBuildTimestamp( startTime, properties );

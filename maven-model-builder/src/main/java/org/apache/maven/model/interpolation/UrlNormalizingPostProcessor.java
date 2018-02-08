@@ -50,7 +50,7 @@ class UrlNormalizingPostProcessor
 
     private UrlNormalizer normalizer;
 
-    public UrlNormalizingPostProcessor( UrlNormalizer normalizer )
+    UrlNormalizingPostProcessor( UrlNormalizer normalizer )
     {
         this.normalizer = normalizer;
     }

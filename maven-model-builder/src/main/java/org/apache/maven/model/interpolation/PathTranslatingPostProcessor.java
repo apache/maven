@@ -39,7 +39,7 @@ class PathTranslatingPostProcessor
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List<String> expressionPrefixes, Collection<String> unprefixedPathKeys,
+    PathTranslatingPostProcessor( List<String> expressionPrefixes, Collection<String> unprefixedPathKeys,
                                          File projectDir, PathTranslator pathTranslator )
     {
         this.expressionPrefixes = expressionPrefixes;

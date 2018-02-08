@@ -47,14 +47,14 @@ public interface PluginArtifactsCache
         // marker interface for cache keys
     }
 
-    static class CacheRecord
+    class CacheRecord
     {
 
         public final List<Artifact> artifacts;
 
         public final PluginResolutionException exception;
 
-        public CacheRecord( List<Artifact> artifacts )
+        CacheRecord( List<Artifact> artifacts )
         {
             this.artifacts = artifacts;
             this.exception = null;

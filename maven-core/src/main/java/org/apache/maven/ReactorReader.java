@@ -64,7 +64,7 @@ class ReactorReader
     private WorkspaceRepository repository;
 
     @Inject
-    public ReactorReader( MavenSession session )
+    ReactorReader( MavenSession session )
     {
         projectsByGAV = session.getProjectMap();
 

@@ -41,7 +41,7 @@ class DefaultExecutionEvent
 
     private final Exception exception;
 
-    public DefaultExecutionEvent( Type type, MavenSession session, MojoExecution mojoExecution, Exception exception )
+    DefaultExecutionEvent( Type type, MavenSession session, MojoExecution mojoExecution, Exception exception )
     {
         this.type = type;
         this.session = session;

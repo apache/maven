@@ -36,12 +36,12 @@ class DefaultPluginVersionResult
 
     private ArtifactRepository repository;
 
-    public DefaultPluginVersionResult()
+    DefaultPluginVersionResult()
     {
         // does nothing
     }
 
-    public DefaultPluginVersionResult( String version )
+    DefaultPluginVersionResult( String version )
     {
         this.version = version;
     }

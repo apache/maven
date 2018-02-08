@@ -44,7 +44,7 @@ class ProblemDetectingValueSource
 
     private final ModelProblemCollector problems;
 
-    public ProblemDetectingValueSource( ValueSource valueSource, String bannedPrefix, String newPrefix,
+    ProblemDetectingValueSource( ValueSource valueSource, String bannedPrefix, String newPrefix,
                                         ModelProblemCollector problems )
     {
         this.valueSource = valueSource;

@@ -356,7 +356,7 @@ public class LifecycleDependencyResolver
 
         private Set<String> keys = new HashSet<>();
 
-        public ReactorDependencyFilter( Collection<Artifact> artifacts )
+        ReactorDependencyFilter( Collection<Artifact> artifacts )
         {
             for ( Artifact artifact : artifacts )
             {

@@ -1684,7 +1684,7 @@ public class MavenCli
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public int exitCode;
 
-        public ExitException( int exitCode )
+        ExitException( int exitCode )
         {
             this.exitCode = exitCode;
         }

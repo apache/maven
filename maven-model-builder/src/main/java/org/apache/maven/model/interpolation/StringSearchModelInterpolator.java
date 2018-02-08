@@ -106,10 +106,9 @@ public class StringSearchModelInterpolator
 
         private final ModelProblemCollector problems;
 
-        public InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
-                                        List<? extends InterpolationPostProcessor> postProcessors,
-                                        StringSearchModelInterpolator modelInterpolator,
-                                        ModelProblemCollector problems )
+        InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
+                                 List<? extends InterpolationPostProcessor> postProcessors,
+                                 StringSearchModelInterpolator modelInterpolator, ModelProblemCollector problems )
         {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;

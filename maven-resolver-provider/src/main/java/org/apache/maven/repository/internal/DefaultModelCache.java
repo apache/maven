@@ -77,7 +77,7 @@ class DefaultModelCache
 
         private final int hash;
 
-        public Key( String groupId, String artifactId, String version, String tag )
+        Key( String groupId, String artifactId, String version, String tag )
         {
             this.groupId = groupId;
             this.artifactId = artifactId;

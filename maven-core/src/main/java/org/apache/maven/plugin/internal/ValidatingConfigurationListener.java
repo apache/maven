@@ -43,7 +43,7 @@ class ValidatingConfigurationListener
 
     private final Map<String, Parameter> missingParameters;
 
-    public ValidatingConfigurationListener( Object mojo, MojoDescriptor mojoDescriptor, ConfigurationListener delegate )
+    ValidatingConfigurationListener( Object mojo, MojoDescriptor mojoDescriptor, ConfigurationListener delegate )
     {
         this.mojo = mojo;
         this.delegate = delegate;

@@ -38,13 +38,13 @@ final class VersionsMetadata
 
     private final Artifact artifact;
 
-    public VersionsMetadata( Artifact artifact )
+    VersionsMetadata( Artifact artifact )
     {
         super( createRepositoryMetadata( artifact ), null );
         this.artifact = artifact;
     }
 
-    public VersionsMetadata( Artifact artifact, File file )
+    VersionsMetadata( Artifact artifact, File file )
     {
         super( createRepositoryMetadata( artifact ), file );
         this.artifact = artifact;

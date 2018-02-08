@@ -41,7 +41,7 @@ class FilterModelBuildingRequest
 
     protected ModelBuildingRequest request;
 
-    public FilterModelBuildingRequest( ModelBuildingRequest request )
+    FilterModelBuildingRequest( ModelBuildingRequest request )
     {
         this.request = request;
     }

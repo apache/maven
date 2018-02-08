@@ -49,7 +49,7 @@ public abstract class AbstractMavenTransferListener
     // TODO Move me to Maven Shared Utils
     static class FileSizeFormat
     {
-        static enum ScaleUnit
+        enum ScaleUnit
         {
             BYTE
             {
@@ -137,7 +137,7 @@ public abstract class AbstractMavenTransferListener
         private DecimalFormat smallFormat;
         private DecimalFormat largeFormat;
 
-        public FileSizeFormat( Locale locale )
+        FileSizeFormat( Locale locale )
         {
             smallFormat = new DecimalFormat( "#0.0", new DecimalFormatSymbols( locale ) );
             largeFormat = new DecimalFormat( "###0", new DecimalFormatSymbols( locale ) );

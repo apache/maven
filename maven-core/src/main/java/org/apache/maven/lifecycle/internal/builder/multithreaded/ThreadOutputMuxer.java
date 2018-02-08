@@ -209,7 +209,7 @@ public class ThreadOutputMuxer
         extends PrintStream
     {
 
-        public ThreadBoundPrintStream( PrintStream systemOutStream )
+        ThreadBoundPrintStream( PrintStream systemOutStream )
         {
             super( systemOutStream );
         }

@@ -141,7 +141,7 @@ public class DefaultPluginDescriptorCache
 
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
+        CacheKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         {
             groupId = plugin.getGroupId();
             artifactId = plugin.getArtifactId();
