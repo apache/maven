@@ -20,11 +20,10 @@ package org.apache.maven.session.scope.internal;
  */
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
@@ -43,7 +42,7 @@ public class SessionScope
 
         Memento( final Map<Key<?>, Provider<?>> seeded )
         {
-            this.seeded = ImmutableMap.copyOf( seeded );
+            this.seeded = Collections.unmodifiableMap( new HashMap<>( seeded ) );
         }
     }
 
@@ -57,9 +56,9 @@ public class SessionScope
 
     private static final class ScopeState
     {
-        public final Map<Key<?>, Provider<?>> seeded = Maps.newHashMap();
+        public final Map<Key<?>, Provider<?>> seeded = new HashMap<>();
 
-        public final Map<Key<?>, Object> provided = Maps.newHashMap();
+        public final Map<Key<?>, Object> provided = new HashMap<>();
     }
 
     private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();

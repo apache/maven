@@ -23,11 +23,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -157,14 +156,15 @@ public class ProjectModelResolver
 
     private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
     {
-        Iterables.removeIf( repositories, new Predicate<RemoteRepository>()
+        Iterator iterator = repositories.iterator( );
+        while ( iterator.hasNext() )
         {
-            @Override
-            public boolean apply( RemoteRepository remoteRepository )
+            RemoteRepository next =  ( RemoteRepository ) iterator.next();
+            if ( next.getId().equals( id ) )
             {
-                return remoteRepository.getId().equals( id );
+                iterator.remove();
             }
-        } );
+        }
     }
 
     public ModelResolver newCopy()

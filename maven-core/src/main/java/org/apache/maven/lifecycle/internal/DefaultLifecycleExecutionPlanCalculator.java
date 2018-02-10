@@ -59,7 +59,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import com.google.common.collect.ImmutableMap;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -111,8 +110,8 @@ public class DefaultLifecycleExecutionPlanCalculator
         this.defaultLifeCycles = defaultLifeCycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
-        this.mojoExecutionConfigurators =
-            ImmutableMap.of( "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
+        this.mojoExecutionConfigurators = Collections.singletonMap(
+             "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
     }
 
     @Override
