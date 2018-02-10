@@ -31,6 +31,9 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.eclipse.aether.RepositorySystemSession;
 
+/**
+ * DefaultProjectBuildingRequest
+ */
 public class DefaultProjectBuildingRequest
     implements ProjectBuildingRequest
 {

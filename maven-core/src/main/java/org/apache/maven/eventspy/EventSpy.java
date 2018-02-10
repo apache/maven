@@ -31,7 +31,9 @@ import java.util.Map;
  */
 public interface EventSpy
 {
-
+    /**
+     * Context
+     */
     interface Context
     {
 

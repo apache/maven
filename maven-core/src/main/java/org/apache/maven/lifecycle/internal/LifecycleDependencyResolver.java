@@ -138,7 +138,7 @@ public class LifecycleDependencyResolver
             
             if ( recordArtifacts != null )
             {
-                resolvedArtifacts = recordArtifacts.artifacts;
+                resolvedArtifacts = recordArtifacts.getArtifacts();
             }
             else
             {

@@ -34,6 +34,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+/**
+ * DefaultMavenProfilesBuilder
+ */
 @Deprecated
 @Component( role = MavenProfilesBuilder.class )
 public class DefaultMavenProfilesBuilder

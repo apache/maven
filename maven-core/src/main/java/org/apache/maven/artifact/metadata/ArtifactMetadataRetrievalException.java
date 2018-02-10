@@ -21,6 +21,9 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * Error while retrieving repository metadata from the repository - deprecated
+ */
 @Deprecated
 public class ArtifactMetadataRetrievalException
     extends org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException

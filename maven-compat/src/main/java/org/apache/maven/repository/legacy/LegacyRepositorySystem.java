@@ -882,7 +882,7 @@ public class LegacyRepositorySystem
 
         private final ArtifactRepositoryLayout fallback;
 
-        public UnknownRepositoryLayout( String id, ArtifactRepositoryLayout fallback )
+        UnknownRepositoryLayout( String id, ArtifactRepositoryLayout fallback )
         {
             this.id = id;
             this.fallback = fallback;

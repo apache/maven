@@ -49,6 +49,9 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+/**
+ * BootstrapCoreExtensionManager
+ */
 @Named
 public class BootstrapCoreExtensionManager
 {

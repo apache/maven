@@ -41,7 +41,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 public class DefaultExtensionRealmCache
     implements ExtensionRealmCache, Disposable
 {
-
+    /**
+     * CacheKey
+     */
     protected static class CacheKey
         implements Key
     {
@@ -142,7 +144,7 @@ public class DefaultExtensionRealmCache
     {
         for ( CacheRecord record : cache.values() )
         {
-            ClassRealm realm = record.realm;
+            ClassRealm realm = record.getRealm();
             try
             {
                 realm.getWorld().disposeRealm( realm.getId() );

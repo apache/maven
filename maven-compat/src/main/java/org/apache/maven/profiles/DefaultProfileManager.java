@@ -39,6 +39,9 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
+/**
+ * DefaultProfileManager
+ */
 @Deprecated
 public class DefaultProfileManager
     implements ProfileManager

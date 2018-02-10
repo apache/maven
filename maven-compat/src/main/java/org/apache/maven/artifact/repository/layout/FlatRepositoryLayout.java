@@ -25,6 +25,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * FlatRepositoryLayout
+ */
 @Component( role = ArtifactRepositoryLayout.class, hint = "flat" )
 public class FlatRepositoryLayout
     implements ArtifactRepositoryLayout

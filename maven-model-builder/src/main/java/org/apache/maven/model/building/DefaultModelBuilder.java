@@ -239,6 +239,7 @@ public class DefaultModelBuilder
         return this;
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
@@ -1131,6 +1132,7 @@ public class DefaultModelBuilder
         return superPomProvider.getSuperModel( "4.0.0" ).clone();
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     private void importDependencyManagement( Model model, ModelBuildingRequest request,
                                              DefaultModelProblemCollector problems, Collection<String> importIds )
     {

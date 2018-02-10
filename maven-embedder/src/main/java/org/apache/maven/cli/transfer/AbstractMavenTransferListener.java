@@ -30,6 +30,9 @@ import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
 
+/**
+ * AbstractMavenTransferListener
+ */
 public abstract class AbstractMavenTransferListener
     extends AbstractTransferListener
 {
@@ -153,6 +156,7 @@ public abstract class AbstractMavenTransferListener
             return format( size, unit, false );
         }
 
+        @SuppressWarnings( "checkstyle:magicnumber" )
         public String format( long size, ScaleUnit unit, boolean omitSymbol )
         {
             Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );

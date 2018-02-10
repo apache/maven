@@ -32,7 +32,7 @@ class MavenArtifact
 
     private long transferStartTime;
 
-    public MavenArtifact( String repositoryUrl, Resource resource )
+    MavenArtifact( String repositoryUrl, Resource resource )
     {
         if ( repositoryUrl == null )
         {

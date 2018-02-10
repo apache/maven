@@ -24,6 +24,9 @@ import java.util.Map;
 
 import org.apache.maven.eventspy.EventSpy;
 
+/**
+ * DefaultEventSpyContext
+ */
 public class DefaultEventSpyContext
     implements EventSpy.Context
 {

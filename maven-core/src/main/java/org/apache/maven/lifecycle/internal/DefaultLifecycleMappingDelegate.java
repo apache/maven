@@ -42,6 +42,11 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+/**
+ * Lifecycle mapping delegate component interface. Calculates project build execution plan given {@link Lifecycle} and
+ * lifecycle phase. Standard lifecycles use plugin execution {@code <phase>} or mojo default lifecycle phase to
+ * calculate the execution plan, but custom lifecycles can use alternative mapping strategies.
+ */
 @Component( role = LifecycleMappingDelegate.class, hint = DefaultLifecycleMappingDelegate.HINT )
 public class DefaultLifecycleMappingDelegate
     implements LifecycleMappingDelegate

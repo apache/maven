@@ -33,10 +33,6 @@ under the License.
   <name>Maven Compat</name>
   <description>Maven2 classes maintained as compatibility layer.</description>
 
-  <properties>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation><!-- laziness for code that will disappear in future... -->
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

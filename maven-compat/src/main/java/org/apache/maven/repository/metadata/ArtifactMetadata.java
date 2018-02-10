@@ -94,36 +94,34 @@ public class ArtifactMetadata
         }
     }
 
-    // ------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version )
     {
         this( groupId, name, version, null );
     }
-    //------------------------------------------------------------------
+
     public ArtifactMetadata( String groupId, String name, String version, String type )
     {
         this( groupId, name, version, type, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope )
     {
         this( groupId, name, version, type, artifactScope, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
                              String classifier )
     {
         this( groupId, name, version, type, artifactScope, classifier, null );
     }
-    //------------------------------------------------------------------
+
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
                              String classifier, String artifactUri )
     {
         this( groupId, name, version, type, artifactScope, classifier, artifactUri, null, true, null );
     }
-    //------------------------------------------------------------------
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
                              String classifier, String artifactUri, String why, boolean resolved, String error )
     {
@@ -138,7 +136,8 @@ public class ArtifactMetadata
         this.resolved = resolved;
         this.error = error;
     }
-    //------------------------------------------------------------------
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactMetadata( String groupId, String name, String version, String type, String scopeString,
                              String classifier, String artifactUri, String why, boolean resolved, String error )
     {
@@ -147,7 +146,6 @@ public class ArtifactMetadata
               classifier, artifactUri, why, resolved, error );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( Artifact af )
     {
         /*
@@ -171,20 +169,17 @@ public class ArtifactMetadata
 //        this.resolved = af.isResolved();
 //    }
 
-    //------------------------------------------------------------------
     @Override
     public String toString()
     {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    //------------------------------------------------------------------
     public String toDomainString()
     {
         return groupId + ":" + artifactId;
     }
 
-    //------------------------------------------------------------------
     public String getGroupId()
     {
         return groupId;
@@ -327,7 +322,6 @@ public class ArtifactMetadata
         this.why = why;
     }
 
-    //-------------------------------------------------------------------
     public String getError()
     {
         return error;
@@ -343,11 +337,8 @@ public class ArtifactMetadata
         return error == null;
     }
 
-    //------------------------------------------------------------------
     public String getDependencyConflictId()
     {
         return groupId + ":" + artifactId;
     }
-    //------------------------------------------------------------------
-    //------------------------------------------------------------------
 }

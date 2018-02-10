@@ -44,6 +44,7 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @author Benjamin Bentmann
  */
+@SuppressWarnings( { "checkstyle:methodname" } )
 @Component( role = InheritanceAssembler.class )
 public class DefaultInheritanceAssembler
     implements InheritanceAssembler
@@ -135,6 +136,9 @@ public class DefaultInheritanceAssembler
         return adjustment;
     }
 
+    /**
+     * InheritanceModelMerger
+     */
     protected static class InheritanceModelMerger
         extends MavenModelMerger
     {

@@ -114,6 +114,7 @@ public class PluginDescriptorBuilder
         return pluginDescriptor;
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
         throws PlexusConfigurationException
     {

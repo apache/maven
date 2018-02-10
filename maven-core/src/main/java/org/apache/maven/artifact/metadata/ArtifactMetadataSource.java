@@ -26,6 +26,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 
+/**
+ * Provides some metadata operations, like querying the remote repository for a list of versions available for an
+ * artifact - deprecated
+ */
 @Deprecated
 public interface ArtifactMetadataSource
     extends org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource

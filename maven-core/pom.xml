@@ -33,10 +33,6 @@ under the License.
   <name>Maven Core</name>
   <description>Maven Core classes.</description>
 
-  <properties>
-    <checkstyle.violation.ignore>RedundantThrows,NewlineAtEndOfFile,ParameterNumber,MethodLength,FileLength,JavadocType,MethodName,MagicNumber,ConstantName,VisibilityModifier,InnerAssignment</checkstyle.violation.ignore>
-  </properties>
-
   <dependencies>
     <!--  Maven -->
     <dependency>

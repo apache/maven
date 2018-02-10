@@ -28,6 +28,9 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 
+/**
+ * PluginArtifact
+ */
 public class PluginArtifact
     extends DefaultArtifact
     implements ArtifactWithDependencies

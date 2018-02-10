@@ -24,6 +24,9 @@ import javax.inject.Named;
 
 import org.apache.maven.execution.MojoExecutionListener;
 
+/**
+ * MojoExecutionScopeCoreModule
+ */
 @Named
 public class MojoExecutionScopeCoreModule
     extends MojoExecutionScopeModule

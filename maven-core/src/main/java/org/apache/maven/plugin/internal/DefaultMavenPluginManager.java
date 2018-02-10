@@ -339,8 +339,8 @@ public class DefaultMavenPluginManager
                 throw new IllegalStateException( e );
             }
 
-            ClassRealm pluginRealm = extensionRecord.realm;
-            List<Artifact> pluginArtifacts = extensionRecord.artifacts;
+            ClassRealm pluginRealm = extensionRecord.getRealm();
+            List<Artifact> pluginArtifacts = extensionRecord.getArtifacts();
 
             for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
             {
@@ -362,11 +362,11 @@ public class DefaultMavenPluginManager
 
             if ( cacheRecord != null )
             {
-                pluginDescriptor.setClassRealm( cacheRecord.realm );
-                pluginDescriptor.setArtifacts( new ArrayList<>( cacheRecord.artifacts ) );
+                pluginDescriptor.setClassRealm( cacheRecord.getRealm() );
+                pluginDescriptor.setArtifacts( new ArrayList<>( cacheRecord.getArtifacts() ) );
                 for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
                 {
-                    componentDescriptor.setRealm( cacheRecord.realm );
+                    componentDescriptor.setRealm( cacheRecord.getRealm() );
                 }
             }
             else
@@ -832,7 +832,7 @@ public class DefaultMavenPluginManager
         }
         if ( recordArtifacts != null )
         {
-            artifacts = recordArtifacts.artifacts;
+            artifacts = recordArtifacts.getArtifacts();
         }
         else
         {

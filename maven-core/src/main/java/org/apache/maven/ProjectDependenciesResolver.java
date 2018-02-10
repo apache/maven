@@ -28,13 +28,13 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
-@Deprecated
 /**
  * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
  *             but should have been.
  * @author jvanzyl
  *
  */
+@Deprecated
 public interface ProjectDependenciesResolver
 {
 

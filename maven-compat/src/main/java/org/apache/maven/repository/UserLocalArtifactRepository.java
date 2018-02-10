@@ -25,6 +25,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+/**
+ * UserLocalArtifactRepository
+ */
 public class UserLocalArtifactRepository
     extends LocalArtifactRepository
 {

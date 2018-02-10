@@ -41,6 +41,7 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
+@SuppressWarnings( { "checkstyle:methodname" } )
 @Component( role = PluginManagementInjector.class )
 public class DefaultPluginManagementInjector
     implements PluginManagementInjector
@@ -54,6 +55,9 @@ public class DefaultPluginManagementInjector
         merger.mergeManagedBuildPlugins( model );
     }
 
+    /**
+     * ManagementModelMerger
+     */
     protected static class ManagementModelMerger
         extends MavenModelMerger
     {
@@ -66,12 +70,12 @@ public class DefaultPluginManagementInjector
                 PluginManagement pluginManagement = build.getPluginManagement();
                 if ( pluginManagement != null )
                 {
-                    mergePluginContainer_Plugins( build, pluginManagement );
+                    mergePluginContainerPlugins( build, pluginManagement );
                 }
             }
         }
 
-        private void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source )
+        private void mergePluginContainerPlugins( PluginContainer target, PluginContainer source )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )

@@ -150,6 +150,7 @@ public class DefaultVersionResolver
         return this;
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
@@ -482,7 +483,7 @@ public class DefaultVersionResolver
             this.repository = repository;
         }
 
-        public boolean isOutdated( String timestamp )
+        boolean isOutdated( String timestamp )
         {
             return timestamp != null && timestamp.compareTo( this.timestamp ) > 0;
         }

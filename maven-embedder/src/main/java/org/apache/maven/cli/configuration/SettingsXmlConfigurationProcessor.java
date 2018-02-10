@@ -47,6 +47,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 
+/**
+ * SettingsXmlConfigurationProcessor
+ */
 @Component( role = ConfigurationProcessor.class, hint = SettingsXmlConfigurationProcessor.HINT )
 public class SettingsXmlConfigurationProcessor
     implements ConfigurationProcessor

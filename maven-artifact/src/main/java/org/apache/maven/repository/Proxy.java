@@ -19,6 +19,9 @@ package org.apache.maven.repository;
  * under the License.
  */
 
+/**
+ * Proxy
+ */
 public class Proxy
 {
     public static final String PROXY_SOCKS5 = "SOCKS_5";

@@ -322,6 +322,7 @@ public class MavenSession
     }
 
     @Deprecated
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
                          String executionRootDir, Properties executionProperties, Date startTime )
@@ -331,6 +332,7 @@ public class MavenSession
     }
 
     @Deprecated
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
                          String executionRootDir, Properties executionProperties, Properties userProperties,

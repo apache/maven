@@ -19,6 +19,9 @@ package org.apache.maven.repository.metadata;
  * under the License.
  */
 
+/**
+ * MetadataResolutionException
+ */
 public class MetadataResolutionException
     extends Exception
 {

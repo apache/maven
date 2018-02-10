@@ -28,6 +28,9 @@ package org.apache.maven.cli.logging;
  */
 public interface Slf4jConfiguration
 {
+    /**
+     * Level
+     */
     enum Level
     {
         DEBUG, INFO, ERROR

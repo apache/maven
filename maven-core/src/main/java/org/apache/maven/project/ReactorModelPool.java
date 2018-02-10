@@ -96,7 +96,7 @@ class ReactorModelPool
         @Override
         public String toString()
         {
-            StringBuilder buffer = new StringBuilder( 96 );
+            StringBuilder buffer = new StringBuilder( 128 );
             buffer.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( version );
             return buffer.toString();
         }

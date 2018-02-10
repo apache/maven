@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * StringSearchModelInterpolator
+ */
 @Deprecated
 @Component( role = ModelInterpolator.class )
 public class StringSearchModelInterpolator
@@ -111,7 +114,7 @@ public class StringSearchModelInterpolator
         private final List<ValueSource> valueSources;
         private final List<InterpolationPostProcessor> postProcessors;
 
-        public InterpolateObjectAction( Object target, List<ValueSource> valueSources,
+        InterpolateObjectAction( Object target, List<ValueSource> valueSources,
                                         List<InterpolationPostProcessor> postProcessors, boolean debugEnabled,
                                         StringSearchModelInterpolator modelInterpolator, Logger logger )
         {
@@ -145,7 +148,7 @@ public class StringSearchModelInterpolator
             return null;
         }
 
-        @SuppressWarnings( "unchecked" )
+        @SuppressWarnings( { "unchecked", "checkstyle:methodlength" } )
         private void traverseObjectWithParents( Class<?> cls, Object target )
             throws ModelInterpolationException
         {

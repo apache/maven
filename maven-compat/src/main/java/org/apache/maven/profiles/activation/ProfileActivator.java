@@ -21,6 +21,9 @@ package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Profile;
 
+/**
+ * ProfileActivator
+ */
 @Deprecated
 public interface ProfileActivator
 {

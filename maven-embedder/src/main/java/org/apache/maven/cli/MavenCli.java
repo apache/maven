@@ -1268,6 +1268,7 @@ public class MavenCli
         return populateRequest( cliRequest, cliRequest.request );
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
         CommandLine commandLine = cliRequest.commandLine;
@@ -1681,8 +1682,7 @@ public class MavenCli
     static class ExitException
         extends Exception
     {
-        @SuppressWarnings( "checkstyle:visibilitymodifier" )
-        public int exitCode;
+        int exitCode;
 
         ExitException( int exitCode )
         {

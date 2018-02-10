@@ -21,6 +21,9 @@ package org.slf4j.impl;
 
 import org.slf4j.Logger;
 
+/**
+ * MavenSimpleLoggerFactory
+ */
 public class MavenSimpleLoggerFactory
     extends SimpleLoggerFactory
 {

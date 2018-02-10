@@ -36,6 +36,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * DefaultMavenMetadataCache
+ */
 @Component( role = MavenMetadataCache.class )
 public class DefaultMavenMetadataCache
     implements MavenMetadataCache
@@ -43,6 +46,9 @@ public class DefaultMavenMetadataCache
 
     protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<>();
 
+    /**
+     * CacheKey
+     */
     public static class CacheKey
     {
         private final Artifact artifact;
@@ -198,6 +204,9 @@ public class DefaultMavenMetadataCache
         return s1 != null ? s1.equals( s2 ) : s2 == null;
     }
 
+    /**
+     * CacheRecord
+     */
     public class CacheRecord
     {
         private Artifact pomArtifact;

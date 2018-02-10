@@ -36,6 +36,9 @@ import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.util.Providers;
 
+/**
+ * MojoExecutionScope
+ */
 public class MojoExecutionScope
     implements Scope, MojoExecutionListener
 {
@@ -49,9 +52,9 @@ public class MojoExecutionScope
 
     private static final class ScopeState
     {
-        public final Map<Key<?>, Provider<?>> seeded = Maps.newHashMap();
+        private final Map<Key<?>, Provider<?>> seeded = Maps.newHashMap();
 
-        public final Map<Key<?>, Object> provided = Maps.newHashMap();
+        private final Map<Key<?>, Object> provided = Maps.newHashMap();
     }
 
     private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();
