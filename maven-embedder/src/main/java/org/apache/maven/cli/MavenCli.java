@@ -191,6 +191,7 @@ public class MavenCli
         MavenCli cli = new MavenCli();
 
         MessageUtils.systemInstall();
+        MessageUtils.registerShutdownHook();
         int result = cli.doMain( new CliRequest( args, classWorld ) );
         MessageUtils.systemUninstall();
 
