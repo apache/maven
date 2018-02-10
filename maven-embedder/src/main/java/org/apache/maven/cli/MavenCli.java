@@ -576,10 +576,11 @@ public class MavenCli
             {
                 MessageBuilder buff = MessageUtils.buffer();
                 buff.a( "Message styles: " );
-                buff.debug( "debug" ).a( ' ' );
-                buff.info( "info" ).a( ' ' );
-                buff.warning( "warning" ).a( ' ' );
-                buff.error( "error" ).a( ' ' );
+                buff.a( MessageUtils.level().debug( "debug" ) ).a( ' ' );
+                buff.a( MessageUtils.level().info( "info" ) ).a( ' ' );
+                buff.a( MessageUtils.level().warning( "warning" ) ).a( ' ' );
+                buff.a( MessageUtils.level().error( "error" ) ).a( ' ' );
+
                 buff.success( "success" ).a( ' ' );
                 buff.failure( "failure" ).a( ' ' );
                 buff.strong( "strong" ).a( ' ' );
