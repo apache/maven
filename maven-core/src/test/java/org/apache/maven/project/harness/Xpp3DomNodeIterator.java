@@ -28,8 +28,9 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * A node iterator for JXPath to support <code>Xpp3Dom</code>.
@@ -123,7 +124,7 @@ class Xpp3DomNodeIterator
         if ( test instanceof NodeNameTest )
         {
             String nodeName = node.getName();
-            if ( StringUtils.isEmpty( nodeName ) )
+            if ( isEmpty( nodeName ) )
             {
                 return false;
             }
@@ -139,7 +140,7 @@ class Xpp3DomNodeIterator
             }
             if ( wildcard || testName.equals( nodeName ) )
             {
-                return StringUtils.isEmpty( namespaceURI ) || StringUtils.isEmpty( testPrefix );
+                return isEmpty( namespaceURI ) || isEmpty( testPrefix );
             }
             return false;
         }

@@ -72,12 +72,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * @author Jason van Zyl
@@ -202,7 +204,7 @@ public class LegacyRepositorySystem
     public Artifact createPluginArtifact( Plugin plugin )
     {
         String version = plugin.getVersion();
-        if ( StringUtils.isEmpty( version ) )
+        if ( isEmpty( version ) )
         {
             version = "RELEASE";
         }
@@ -534,7 +536,7 @@ public class LegacyRepositorySystem
             repository.setId( mirror.getId() );
             repository.setUrl( mirror.getUrl() );
 
-            if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
+            if ( isNotEmpty( mirror.getLayout() ) )
             {
                 repository.setLayout( getLayout( mirror.getLayout() ) );
             }
@@ -636,7 +638,7 @@ public class LegacyRepositorySystem
             {
                 if ( proxy.isActive() && repository.getProtocol().equalsIgnoreCase( proxy.getProtocol() ) )
                 {
-                    if ( StringUtils.isNotEmpty( proxy.getNonProxyHosts() ) )
+                    if ( isNotEmpty( proxy.getNonProxyHosts() ) )
                     {
                         ProxyInfo pi = new ProxyInfo();
                         pi.setNonProxyHosts( proxy.getNonProxyHosts() );
@@ -788,14 +790,14 @@ public class LegacyRepositorySystem
         {
             String id = repo.getId();
 
-            if ( StringUtils.isEmpty( id ) )
+            if ( isEmpty( id ) )
             {
                 throw new InvalidRepositoryException( "Repository identifier missing", "" );
             }
 
             String url = repo.getUrl();
 
-            if ( StringUtils.isEmpty( url ) )
+            if ( isEmpty( url ) )
             {
                 throw new InvalidRepositoryException( "URL missing for repository " + id, id );
             }
@@ -849,7 +851,7 @@ public class LegacyRepositorySystem
             return def;
         }
         String msg = error.getMessage();
-        if ( StringUtils.isNotEmpty( msg ) )
+        if ( isNotEmpty( msg ) )
         {
             return msg;
         }

@@ -32,8 +32,9 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Handles conversion of the <code>&lt;reporting&gt;</code> section into the configuration of Maven Site Plugin 3.x,
@@ -233,7 +234,7 @@ public class DefaultReportingConverter
 
     private void addDom( Xpp3Dom parent, String childName, String childValue )
     {
-        if ( StringUtils.isNotEmpty( childValue ) )
+        if ( isNotEmpty( childValue ) )
         {
             parent.addChild( newDom( childName, childValue ) );
         }

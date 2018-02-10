@@ -29,7 +29,8 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.FileUtils;
+
+import static org.apache.maven.shared.utils.io.FileUtils.fileWrite;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
@@ -101,7 +102,7 @@ public class CLIManagerDocumentationTest
         throws IOException
     {
         File options = getTestFile( "target/test-classes/options.html" );
-        FileUtils.fileWrite( options, "UTF-8", getOptionsAsHtml() );
+        fileWrite( options, "UTF-8", getOptionsAsHtml() );
     }
 
 }

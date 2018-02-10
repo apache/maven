@@ -46,8 +46,9 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -291,7 +292,7 @@ public class DefaultClassRealmManager
 
     private static String getId( String gid, String aid, String type, String cls, String ver )
     {
-        return gid + ':' + aid + ':' + type + ( StringUtils.isNotEmpty( cls ) ? ':' + cls : "" ) + ':' + ver;
+        return gid + ':' + aid + ':' + type + ( isNotEmpty( cls ) ? ':' + cls : "" ) + ':' + ver;
     }
 
     private void callDelegates( ClassRealm classRealm, RealmType type, ClassLoader parent, List<String> parentImports,

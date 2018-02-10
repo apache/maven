@@ -27,7 +27,8 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * DefaultMirrorSelector
@@ -164,7 +165,7 @@ public class DefaultMirrorSelector
         boolean result = false;
 
         // simple checks first to short circuit processing below.
-        if ( StringUtils.isEmpty( mirrorLayout ) || WILDCARD.equals( mirrorLayout ) )
+        if ( isEmpty( mirrorLayout ) || WILDCARD.equals( mirrorLayout ) )
         {
             result = true;
         }

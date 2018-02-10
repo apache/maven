@@ -25,7 +25,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * A basic bean configuration request.
@@ -100,7 +101,7 @@ public class DefaultBeanConfigurationRequest
         Plugin plugin = findPlugin( model, pluginGroupId, pluginArtifactId );
         if ( plugin != null )
         {
-            if ( StringUtils.isNotEmpty( pluginExecutionId ) )
+            if ( isNotEmpty( pluginExecutionId ) )
             {
                 for ( PluginExecution execution : plugin.getExecutions() )
                 {

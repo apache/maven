@@ -30,7 +30,6 @@ import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
@@ -41,6 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -208,7 +209,7 @@ public class DefaultLifecyclePluginAnalyzer
     {
         GoalSpec gs = new GoalSpec();
 
-        String[] p = StringUtils.split( goalSpec.trim(), ":" );
+        String[] p = split( goalSpec.trim(), ":" );
 
         if ( p.length == 3 )
         {

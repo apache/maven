@@ -22,7 +22,6 @@ package org.apache.maven.lifecycle;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +31,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.commons.lang3.StringUtils.join;
 
 /**
  * @since 3.0
@@ -139,7 +140,7 @@ public class DefaultLifecycles
             phases.addAll( lifecycle.getPhases() );
         }
 
-        return StringUtils.join( phases.iterator(), ", " );
+        return join( phases.iterator(), ", " );
     }
 
 }

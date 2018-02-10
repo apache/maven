@@ -55,10 +55,12 @@ import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -306,8 +308,8 @@ public class DefaultLifecycleExecutionPlanCalculator
                 {
                     parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
 
-                    if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
-                        && StringUtils.isNotEmpty( parameter.getImplementation() ) )
+                    if ( isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
+                        && isNotEmpty( parameter.getImplementation() ) )
                     {
                         parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
                     }
@@ -364,7 +366,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
             List<MojoExecution> forkedExecutions;
 
-            if ( StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() ) )
+            if ( isNotEmpty( mojoDescriptor.getExecutePhase() ) )
             {
                 forkedExecutions =
                     calculateForkedLifecycle( mojoExecution, session, forkedProject, alreadyForkedExecutions );
@@ -447,7 +449,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         String forkedLifecycle = mojoDescriptor.getExecuteLifecycle();
 
-        if ( StringUtils.isEmpty( forkedLifecycle ) )
+        if ( isEmpty( forkedLifecycle ) )
         {
             return;
         }

@@ -38,7 +38,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * <p>
@@ -105,7 +106,7 @@ public class MojoExecutor
 
     private Collection<String> toScopes( String classpath )
     {
-        if ( StringUtils.isNotEmpty( classpath ) )
+        if ( isNotEmpty( classpath ) )
         {
             if ( Artifact.SCOPE_COMPILE.equals( classpath ) )
             {
@@ -284,11 +285,11 @@ public class MojoExecutor
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
 
         List<String> scopes = new ArrayList<>( 2 );
-        if ( StringUtils.isNotEmpty( scopeToCollect ) )
+        if ( isNotEmpty( scopeToCollect ) )
         {
             scopes.add( scopeToCollect );
         }
-        if ( StringUtils.isNotEmpty( scopeToResolve ) )
+        if ( isNotEmpty( scopeToResolve ) )
         {
             scopes.add( scopeToResolve );
         }

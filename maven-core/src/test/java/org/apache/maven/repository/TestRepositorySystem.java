@@ -51,8 +51,9 @@ import org.apache.maven.settings.Server;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Benjamin Bentmann
@@ -145,7 +146,7 @@ public class TestRepositorySystem
         try
         {
             String version = plugin.getVersion();
-            if ( StringUtils.isEmpty( version ) )
+            if ( isEmpty( version ) )
             {
                 version = "RELEASE";
             }

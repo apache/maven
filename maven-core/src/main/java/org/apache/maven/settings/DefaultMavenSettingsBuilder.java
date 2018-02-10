@@ -31,8 +31,9 @@ import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author jdcasey
@@ -125,7 +126,7 @@ public class DefaultMavenSettingsBuilder
 
         String path = System.getProperty( altLocationSysProp );
 
-        if ( StringUtils.isEmpty( path ) )
+        if ( isEmpty( path ) )
         {
             // TODO This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus

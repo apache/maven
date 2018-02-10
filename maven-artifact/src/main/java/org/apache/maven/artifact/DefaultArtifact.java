@@ -35,7 +35,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * @author Jason van Zyl
@@ -163,7 +164,7 @@ public class DefaultArtifact
 
     public boolean hasClassifier()
     {
-        return StringUtils.isNotEmpty( classifier );
+        return isNotEmpty( classifier );
     }
 
     public String getScope()
