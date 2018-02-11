@@ -19,6 +19,7 @@ package org.slf4j.impl;
  * under the License.
  */
 
+import static org.apache.maven.shared.utils.logging.MessageUtils.level;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import java.io.PrintStream;
@@ -42,16 +43,16 @@ public class MavenSimpleLogger
         switch ( level )
         {
             case LOG_LEVEL_TRACE:
-                return buffer().debug( "TRACE" ).toString();
+                return level().debug( "TRACE" ).toString();
             case LOG_LEVEL_DEBUG:
-                return buffer().debug( "DEBUG" ).toString();
+                return level().debug( "DEBUG" ).toString();
             case LOG_LEVEL_INFO:
-                return buffer().info( "INFO" ).toString();
+                return level().info( "INFO" ).toString();
             case LOG_LEVEL_WARN:
-                return buffer().warning( "WARNING" ).toString();
+                return level().warning( "WARNING" ).toString();
             case LOG_LEVEL_ERROR:
             default:
-                return buffer().error( "ERROR" ).toString();
+                return level().error( "ERROR" ).toString();
         }
     }
 
