@@ -1270,6 +1270,9 @@ public class DefaultModelBuilder
                         importRequest.setSystemProperties( request.getSystemProperties() );
                         importRequest.setUserProperties( request.getUserProperties() );
                         importRequest.setLocationTracking( request.isLocationTracking() );
+                        importRequest.setProfiles( request.getProfiles() );
+                        importRequest.setActiveProfileIds( request.getActiveProfileIds() );
+                        importRequest.setInactiveProfileIds( request.getInactiveProfileIds() );
                     }
 
                     importRequest.setModelSource( importSource );
