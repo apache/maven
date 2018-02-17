@@ -124,8 +124,6 @@ public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
-    public static final String THREADS_DEPRECATED = "maven.threads.experimental";
-
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
 
     public static final String USER_HOME = System.getProperty( "user.home" );
@@ -1548,8 +1546,7 @@ public class MavenCli
         //
         final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
             ? commandLine.getOptionValue( CLIManager.THREADS )
-            : request.getSystemProperties().getProperty(
-                MavenCli.THREADS_DEPRECATED ); // TODO Remove this setting. Note that the int-tests use it
+            : null;
 
         if ( threadConfiguration != null )
         {
