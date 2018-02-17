@@ -151,12 +151,23 @@ public class ExecutionEventLogger
 
         MavenExecutionResult result = session.getResult();
 
-        for ( MavenProject project : session.getProjects() )
+        List<MavenProject> projects = session.getProjects();
+        MavenProject lastProject = projects.get( projects.size() - 1 );
+        MavenProject topProject = session.getTopLevelProject();
+
+        for ( MavenProject project : projects )
         {
             StringBuilder buffer = new StringBuilder( 128 );
 
             buffer.append( project.getName() );
             buffer.append( ' ' );
+
+            if ( topProject.equals( project ) || lastProject.equals( project )
+                || !topProject.getVersion().equals( project.getVersion() ) )
+            {
+                buffer.append( project.getVersion() );
+                buffer.append( ' ' );
+            }
 
             if ( buffer.length() <= MAX_PROJECT_NAME_LENGTH )
             {
