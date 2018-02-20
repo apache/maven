@@ -3,6 +3,15 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
+## Version 0.4.0 - upcoming
+
+- Allow for wrapper to work without the jar file
+  - see https://github.com/takari/maven-wrapper/pull/60
+  - see https://github.com/takari/maven-wrapper/pull/70
+  - contributed by  Christofer Dutz https://github.com/chrisdutz
+  - and Manfred Moser - http://www.simpligility.com
+
+
 ## Version 0.3.0 - 2017-10-25
 
 - Set title on shell window in Windows
