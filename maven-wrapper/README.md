@@ -99,3 +99,22 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
 ```
 
 [1]: https://github.com/takari/takari-maven-plugin
+
+
+## Developing and Releasing
+
+To test Maven wrapper usage:
+
+- build the maven wrapper as snapshot version
+- update version in maven plugin
+- build maven plugin
+- use on test project with maven plugin version
+
+
+For release
+
+- make sure version in mvnw files and config files and pom files is new upcoming
+  release
+- cut maven release with usual release plugin usage
+- update maven plugin to release version
+- release it as well
