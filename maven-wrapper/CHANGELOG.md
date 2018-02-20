@@ -17,6 +17,7 @@ and others as contributed.
 - Allow for wrapper to work without the jar file
   - see https://github.com/takari/maven-wrapper/pull/60
   - see https://github.com/takari/maven-wrapper/pull/70
+  - fixed https://github.com/takari/maven-wrapper/issues/24
   - contributed by  Christofer Dutz https://github.com/chrisdutz
   - and Manfred Moser - http://www.simpligility.com
 - Change URLs used to official Maven repo URL
