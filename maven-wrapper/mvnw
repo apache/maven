@@ -205,36 +205,51 @@ fi
 # This allows using the maven wrapper in projects that prohibit checking in binary data.
 ##########################################################################################
 if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
-    echo "Found .mvn/wrapper/maven-wrapper.jar"
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Found .mvn/wrapper/maven-wrapper.jar"
+    fi
 else
-    echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
-
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
+    fi
     jarUrl="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.3.0/maven-wrapper-0.3.0.jar"
     while IFS="=" read key value; do
       case "$key" in (wrapperUrl) jarUrl="$value"; break ;;
       esac
     done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
-    echo "Downloading from: $jarUrl"
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Downloading from: $jarUrl"
+    fi
     wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
 
     if command -v wget > /dev/null; then
-        echo "Found wget ... using wget"
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Found wget ... using wget"
+        fi
         wget "$jarUrl" -O "$wrapperJarPath"
     elif command -v curl > /dev/null; then
-        echo "Found curl ... using curl"
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Found curl ... using curl"
+        fi
         curl -o "$wrapperJarPath" "$jarUrl"
     else
-        echo "Falling back to using Java to download"
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Falling back to using Java to download"
+        fi
         javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
         if [ -e "$javaClass" ]; then
             if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
-                echo " - Compiling MavenWrapperDownloader.java ..."
+                if [ "$MVNW_VERBOSE" = true ]; then
+                  echo " - Compiling MavenWrapperDownloader.java ..."
+                fi
                 # Compiling the Java class
                 ("$JAVA_HOME/bin/javac" "$javaClass")
             fi
             if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
                 # Running the downloader
-                echo " - Running MavenWrapperDownloader.java ..."
+                if [ "$MVNW_VERBOSE" = true ]; then
+                  echo " - Running MavenWrapperDownloader.java ..."
+                fi
                 ("$JAVA_HOME/bin/java" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
             fi
         fi
