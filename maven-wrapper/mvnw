@@ -209,19 +209,20 @@ if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
 else
     echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
 
-    jarUrl="https://repo1.maven.org/maven2/io/takari/maven-wrapper/0.2.3/maven-wrapper-0.2.3.jar"
+    jarUrl="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.3.0/maven-wrapper-0.3.0.jar"
     while IFS="=" read key value; do
       case "$key" in (wrapperUrl) jarUrl="$value"; break ;;
       esac
     done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
     echo "Downloading from: $jarUrl"
+    wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
 
     if command -v wget > /dev/null; then
         echo "Found wget ... using wget"
-        wget ‐O "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
+        wget "$jarUrl" -O "$wrapperJarPath"
     elif command -v curl > /dev/null; then
         echo "Found curl ... using curl"
-        curl -o "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" "$jarUrl"
+        curl -o "$wrapperJarPath" "$jarUrl"
     else
         echo "Falling back to using Java to download"
         javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
