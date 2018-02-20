@@ -67,6 +67,22 @@ is activated by setting the MVNW_VERBOSE environment variable to `true`.
 
 By default it is off.
 
+## Usage without Binary JAR
+
+By default, the Maven Wrapper JAR archive is added to the using project as small
+binary file `.mvn/wrapper/maven-wrapper.jar`. It is used to bootstrap the download and
+invocation of Maven from the wrapper shell scripts.
+
+If your project is not allowed to contain binary files like this, you can
+configure your version control system to exclude checkin/commit of the wrapper
+jar.
+
+If the JAR is not found to be available by the scripts they will attempt to
+download the file from the URL specified in
+`.mvn/wrapper/maven-wrapper.properties` under `wrapperUrl` and put it in place. The
+download is attempted via curl, wget and, as last resort, by compiling the 
+`./mvn/wrapper/MavenWrapperDownloader.java` file and executing the resulting class.
+
 ## Using a Different Version of Maven
 
 To switch the version of Maven used to build a project you can initialize it using 
@@ -79,7 +95,7 @@ which works for any version except snapshots. Once you have a wrapper you can ch
 `distributionUrl` in `.mvn/wrapper/maven-wrapper.properties`, e.g.
 
 ```
-distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip
 ```
 
 [1]: https://github.com/takari/takari-maven-plugin
