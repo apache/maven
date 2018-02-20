@@ -10,7 +10,8 @@ The following provides most information at an easier glance.
   - see https://github.com/takari/maven-wrapper/pull/70
   - contributed by  Christofer Dutz https://github.com/chrisdutz
   - and Manfred Moser - http://www.simpligility.com
-
+- Change URLs used to official Maven repo URL
+  - done as part of above changes
 
 ## Version 0.3.0 - 2017-10-25
 
