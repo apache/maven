@@ -45,7 +45,7 @@ public class ConcurrencyDependencyGraph
 
     private final ProjectDependencyGraph projectDependencyGraph;
 
-    private final HashSet<MavenProject> finishedProjects = new HashSet<>();
+    private final Set<MavenProject> finishedProjects = new HashSet<>();
 
     public ConcurrencyDependencyGraph( ProjectBuildList projectBuilds, ProjectDependencyGraph projectDependencyGraph )
     {
@@ -69,7 +69,7 @@ public class ConcurrencyDependencyGraph
         List<MavenProject> result = new ArrayList<>();
         for ( ProjectSegment projectBuild : projectBuilds )
         {
-            if ( projectDependencyGraph.getUpstreamProjects( projectBuild.getProject(), false ).size() == 0 )
+            if ( projectDependencyGraph.getUpstreamProjects( projectBuild.getProject(), false ).isEmpty() )
             {
                 result.add( projectBuild.getProject() );
             }
@@ -111,7 +111,7 @@ public class ConcurrencyDependencyGraph
     public Set<MavenProject> getUnfinishedProjects()
     {
         Set<MavenProject> unfinished = new HashSet<>( projectBuilds.getProjects() );
-        unfinished.remove( finishedProjects );
+        unfinished.removeAll( finishedProjects );
         return unfinished;
     }
 
