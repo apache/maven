@@ -366,7 +366,7 @@ public abstract class AbstractMavenIntegrationTestCase
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public VersionRange supportedRange;
 
-        public UnsupportedJavaVersionException( ArtifactVersion javaVersion, VersionRange supportedRange )
+        private UnsupportedJavaVersionException( ArtifactVersion javaVersion, VersionRange supportedRange )
         {
             this.javaVersion = javaVersion;
             this.supportedRange = supportedRange;
@@ -383,7 +383,7 @@ public abstract class AbstractMavenIntegrationTestCase
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public VersionRange supportedRange;
 
-        public UnsupportedMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
+        private UnsupportedMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
         {
             this.mavenVersion = mavenVersion;
             this.supportedRange = supportedRange;
@@ -400,7 +400,7 @@ public abstract class AbstractMavenIntegrationTestCase
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public VersionRange supportedRange;
 
-        public BrokenMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
+        private BrokenMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
         {
             this.mavenVersion = mavenVersion;
             this.supportedRange = supportedRange;
