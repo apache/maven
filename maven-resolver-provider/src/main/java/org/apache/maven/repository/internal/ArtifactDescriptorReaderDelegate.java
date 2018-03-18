@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,12 +46,13 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- * 
+ *
  * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */
 public class ArtifactDescriptorReaderDelegate
 {
+
     public void populateResult( RepositorySystemSession session, ArtifactDescriptorResult result, Model model )
     {
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
@@ -62,7 +64,7 @@ public class ArtifactDescriptorReaderDelegate
 
         for ( org.apache.maven.model.Dependency dependency : model.getDependencies() )
         {
-            result.addDependency( convert( dependency, stereotypes ) );
+            result.addDependency( convert( dependency, stereotypes ).setSourceHint( toSourceHint( model ) ) );
         }
 
         DependencyManagement mgmt = model.getDependencyManagement();
@@ -70,7 +72,9 @@ public class ArtifactDescriptorReaderDelegate
         {
             for ( org.apache.maven.model.Dependency dependency : mgmt.getDependencies() )
             {
-                result.addManagedDependency( convert( dependency, stereotypes ) );
+                result.addManagedDependency( convert( dependency, stereotypes ).
+                    setSourceHint( toSourceHint( model ) ) );
+
             }
         }
 
@@ -154,4 +158,66 @@ public class ArtifactDescriptorReaderDelegate
             result.setArtifact( artifact.setProperties( props ) );
         }
     }
+
+    private static String toSourceHint( final Model model )
+    {
+        String sourceHint = null;
+
+        if ( model != null )
+        {
+            final StringBuilder sourceHintBuilder = new StringBuilder( 128 );
+
+            sourceHintBuilder.append( toId( model ) );
+
+            File pomFile = model.getPomFile();
+            if ( pomFile != null )
+            {
+                sourceHintBuilder.append( " @ " ).append( pomFile );
+            }
+
+            sourceHint = sourceHintBuilder.toString();
+        }
+
+        return sourceHint;
+    }
+
+    private static String toId( final Model model )
+    {
+        String id = null;
+
+        if ( model != null )
+        {
+            String groupId = model.getGroupId();
+            if ( groupId == null && model.getParent() != null )
+            {
+                groupId = model.getParent().getGroupId();
+            }
+
+            String artifactId = model.getArtifactId();
+
+            String version = model.getVersion();
+            if ( version == null && model.getParent() != null )
+            {
+                version = model.getParent().getVersion();
+            }
+
+            id = toId( groupId, artifactId, version );
+        }
+
+        return id;
+    }
+
+    private static String toId( final String groupId, final String artifactId, final String version )
+    {
+        final StringBuilder idBuilder = new StringBuilder( 128 );
+
+        idBuilder.append( ( groupId != null && groupId.length() > 0 ) ? groupId : "[unknown-group-id]" );
+        idBuilder.append( ':' );
+        idBuilder.append( ( artifactId != null && artifactId.length() > 0 ) ? artifactId : "[unknown-artifact-id]" );
+        idBuilder.append( ':' );
+        idBuilder.append( ( version != null && version.length() > 0 ) ? version : "[unknown-version]" );
+
+        return idBuilder.toString();
+    }
+
 }

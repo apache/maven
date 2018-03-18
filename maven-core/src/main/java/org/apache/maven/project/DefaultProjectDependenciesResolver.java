@@ -19,6 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -80,7 +82,7 @@ public class DefaultProjectDependenciesResolver
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
         if ( logger.isDebugEnabled()
-            && session.getConfigProperties().get( DependencyManagerUtils.CONFIG_PROP_VERBOSE ) == null )
+                 && session.getConfigProperties().get( DependencyManagerUtils.CONFIG_PROP_VERBOSE ) == null )
         {
             DefaultRepositorySystemSession verbose = new DefaultRepositorySystemSession( session );
             verbose.setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, Boolean.TRUE );
@@ -106,12 +108,14 @@ public class DefaultProjectDependenciesResolver
             for ( Dependency dependency : project.getDependencies() )
             {
                 if ( StringUtils.isEmpty( dependency.getGroupId() ) || StringUtils.isEmpty( dependency.getArtifactId() )
-                    || StringUtils.isEmpty( dependency.getVersion() ) )
+                         || StringUtils.isEmpty( dependency.getVersion() ) )
                 {
                     // guard against case where best-effort resolution for invalid models is requested
                     continue;
                 }
-                collect.addDependency( RepositoryUtils.toDependency( dependency, stereotypes ) );
+                collect.addDependency( RepositoryUtils.toDependency( dependency, stereotypes ).
+                    setSourceHint( toSourceHint( project.getModel() ) ) );
+
             }
         }
         else
@@ -130,7 +134,7 @@ public class DefaultProjectDependenciesResolver
                 }
                 String key =
                     ArtifactIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
-                                                    dependency.getType(), classifier );
+                                                     dependency.getType(), classifier );
                 dependencies.put( key, dependency );
             }
             for ( Artifact artifact : project.getDependencyArtifacts() )
@@ -146,7 +150,7 @@ public class DefaultProjectDependenciesResolver
                     art = art.setFile( null ).setVersion( art.getBaseVersion() );
                     dep = dep.setArtifact( art );
                 }
-                collect.addDependency( dep );
+                collect.addDependency( dep.setSourceHint( toSourceHint( project.getModel() ) ) );
             }
         }
 
@@ -155,7 +159,9 @@ public class DefaultProjectDependenciesResolver
         {
             for ( Dependency dependency : depMgmt.getDependencies() )
             {
-                collect.addManagedDependency( RepositoryUtils.toDependency( dependency, stereotypes ) );
+                collect.addManagedDependency( RepositoryUtils.toDependency( dependency, stereotypes ).
+                    setSourceHint( toSourceHint( project.getModel() ) ) );
+
             }
         }
 
@@ -175,7 +181,7 @@ public class DefaultProjectDependenciesResolver
             result.setCollectionErrors( e.getResult().getExceptions() );
 
             throw new DependencyResolutionException( result, "Could not resolve dependencies for project "
-                + project.getId() + ": " + e.getMessage(), e );
+                                                                 + project.getId() + ": " + e.getMessage(), e );
         }
 
         depRequest.setRoot( node );
@@ -187,7 +193,7 @@ public class DefaultProjectDependenciesResolver
                 if ( !child.getRelocations().isEmpty() )
                 {
                     logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
-                        + child.getDependency().getArtifact() );
+                                     + child.getDependency().getArtifact() );
                 }
             }
         }
@@ -206,7 +212,7 @@ public class DefaultProjectDependenciesResolver
             process( result, e.getResult().getArtifactResults() );
 
             throw new DependencyResolutionException( result, "Could not resolve dependencies for project "
-                + project.getId() + ": " + e.getMessage(), e );
+                                                                 + project.getId() + ": " + e.getMessage(), e );
         }
 
         return result;
@@ -226,6 +232,67 @@ public class DefaultProjectDependenciesResolver
                 result.setResolutionErrors( node.getDependency(), ar.getExceptions() );
             }
         }
+    }
+
+    private static String toSourceHint( final Model model )
+    {
+        String sourceHint = null;
+
+        if ( model != null )
+        {
+            final StringBuilder sourceHintBuilder = new StringBuilder( 128 );
+
+            sourceHintBuilder.append( toId( model ) );
+
+            File pomFile = model.getPomFile();
+            if ( pomFile != null )
+            {
+                sourceHintBuilder.append( " @ " ).append( pomFile );
+            }
+
+            sourceHint = sourceHintBuilder.toString();
+        }
+
+        return sourceHint;
+    }
+
+    private static String toId( final Model model )
+    {
+        String id = null;
+
+        if ( model != null )
+        {
+            String groupId = model.getGroupId();
+            if ( groupId == null && model.getParent() != null )
+            {
+                groupId = model.getParent().getGroupId();
+            }
+
+            String artifactId = model.getArtifactId();
+
+            String version = model.getVersion();
+            if ( version == null && model.getParent() != null )
+            {
+                version = model.getParent().getVersion();
+            }
+
+            id = toId( groupId, artifactId, version );
+        }
+
+        return id;
+    }
+
+    private static String toId( final String groupId, final String artifactId, final String version )
+    {
+        final StringBuilder idBuilder = new StringBuilder( 128 );
+
+        idBuilder.append( ( groupId != null && groupId.length() > 0 ) ? groupId : "[unknown-group-id]" );
+        idBuilder.append( ':' );
+        idBuilder.append( ( artifactId != null && artifactId.length() > 0 ) ? artifactId : "[unknown-artifact-id]" );
+        idBuilder.append( ':' );
+        idBuilder.append( ( version != null && version.length() > 0 ) ? version : "[unknown-version]" );
+
+        return idBuilder.toString();
     }
 
     class GraphLogger
@@ -251,54 +318,117 @@ public class DefaultProjectDependenciesResolver
                 org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append( art );
-                buffer.append( ':' ).append( dep.getScope() );
+                buffer.append( ':' ).append( dep.getScope() ).append( ":optional(" ).
+                    append( dep.getOptional() == null
+                                ? "default"
+                                : dep.isOptional()
+                                      ? "true"
+                                      : "false" ).append( ')' );
 
-                // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When resolver 1.1 provides this information, these log messages should be updated
-                //      to contain it.
+                if ( !dep.getExclusions().isEmpty() )
+                {
+                    buffer.append( ":exclusions(" ).append( dep.getExclusions() ).append( ')' );
+                }
+
+                if ( !dep.getArtifact().getProperties().isEmpty() )
+                {
+                    buffer.append( ":properties(" ).append( dep.getArtifact().getProperties() ).append( ')' );
+                }
+
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
                     final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
-                    buffer.append( " (scope managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedScope != null && !premanagedScope.equals( dep.getScope() ) )
+                    {
+                        buffer.append( " (scope managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getScopeManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_VERSION ) == DependencyNode.MANAGED_VERSION )
                 {
                     final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
-                    buffer.append( " (version managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedVersion != null && !premanagedVersion.equals( dep.getArtifact().getVersion() ) )
+                    {
+                        buffer.append( " (version managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getVersionManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_OPTIONAL ) == DependencyNode.MANAGED_OPTIONAL )
                 {
                     final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
-                    buffer.append( " (optionality managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedOptional != null && !premanagedOptional.equals( dep.getOptional() ) )
+                    {
+                        buffer.append( " (optionality managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getOptionalityManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
-                        == DependencyNode.MANAGED_EXCLUSIONS )
+                         == DependencyNode.MANAGED_EXCLUSIONS )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedExclusions( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of exclusions.
-                    buffer.append( " (exclusions managed)" );
+                    final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
+                        DependencyManagerUtils.getPremanagedExclusions( node );
+
+                    if ( premanagedExclusions != null && !premanagedExclusions.equals( dep.getExclusions() ) )
+                    {
+                        buffer.append( " (exclusions managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedExclusions, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getExclusionsManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
-                        == DependencyNode.MANAGED_PROPERTIES )
+                         == DependencyNode.MANAGED_PROPERTIES )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedProperties( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of properties.
-                    buffer.append( " (properties managed)" );
-                }
+                    final Map<String, String> premanagedProperties =
+                        DependencyManagerUtils.getPremanagedProperties( node );
 
-                if ( dep.isOptional() )
-                {
-                    buffer.append( " (optional)" );
+                    if ( premanagedProperties != null && !premanagedProperties.equals( art.getProperties() ) )
+                    {
+                        buffer.append( " (properties managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedProperties, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getPropertiesManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
             }
             else

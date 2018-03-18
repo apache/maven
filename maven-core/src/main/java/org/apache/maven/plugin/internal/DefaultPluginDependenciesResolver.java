@@ -19,6 +19,7 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -288,11 +289,20 @@ public class DefaultPluginDependenciesResolver
                     pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
                 }
 
-                request.addDependency( pluginDep );
-                request.addManagedDependency( pluginDep );
+                final Object sourceHint = dependency.getLocation( "" );
+                request.addDependency( pluginDep.setSourceHint( sourceHint != null
+                                                                    ? sourceHint.toString()
+                                                                    : dependency.toString() ) );
+
+                request.addManagedDependency( pluginDep.setSourceHint( sourceHint != null
+                                                                           ? sourceHint.toString()
+                                                                           : dependency.toString() ) );
+
             }
 
-            request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
+            final Object sourceHint = plugin.getLocation( "" );
+            request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ).
+                setSourceHint( sourceHint != null ? sourceHint.toString() : plugin.toString() ) );
 
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
             depRequest.setTrace( trace );
@@ -370,7 +380,6 @@ public class DefaultPluginDependenciesResolver
             super();
         }
 
-        @Override
         public boolean visitEnter( DependencyNode node )
         {
             StringBuilder buffer = new StringBuilder( 128 );
@@ -381,49 +390,117 @@ public class DefaultPluginDependenciesResolver
                 org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append( art );
-                buffer.append( ':' ).append( dep.getScope() );
+                buffer.append( ':' ).append( dep.getScope() ).append( ":optional(" ).
+                    append( dep.getOptional() == null
+                                ? "default"
+                                : dep.isOptional()
+                                      ? "true"
+                                      : "false" ).append( ')' );
 
-                // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When resolver 1.1 provides this information, these log messages should be updated
-                //      to contain it.
+                if ( !dep.getExclusions().isEmpty() )
+                {
+                    buffer.append( ":exclusions(" ).append( dep.getExclusions() ).append( ')' );
+                }
+
+                if ( !dep.getArtifact().getProperties().isEmpty() )
+                {
+                    buffer.append( ":properties(" ).append( dep.getArtifact().getProperties() ).append( ')' );
+                }
+
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
                     final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
-                    buffer.append( " (scope managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedScope != null && !premanagedScope.equals( dep.getScope() ) )
+                    {
+                        buffer.append( " (scope managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getScopeManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_VERSION ) == DependencyNode.MANAGED_VERSION )
                 {
                     final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
-                    buffer.append( " (version managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedVersion != null && !premanagedVersion.equals( dep.getArtifact().getVersion() ) )
+                    {
+                        buffer.append( " (version managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getVersionManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_OPTIONAL ) == DependencyNode.MANAGED_OPTIONAL )
                 {
                     final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
-                    buffer.append( " (optionality managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
-                    buffer.append( ')' );
+                    if ( premanagedOptional != null && !premanagedOptional.equals( dep.getOptional() ) )
+                    {
+                        buffer.append( " (optionality managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getOptionalityManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
                          == DependencyNode.MANAGED_EXCLUSIONS )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedExclusions( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of exclusions.
-                    buffer.append( " (exclusions managed)" );
+                    final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
+                        DependencyManagerUtils.getPremanagedExclusions( node );
+
+                    if ( premanagedExclusions != null && !premanagedExclusions.equals( dep.getExclusions() ) )
+                    {
+                        buffer.append( " (exclusions managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedExclusions, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getExclusionsManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
 
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
                          == DependencyNode.MANAGED_PROPERTIES )
                 {
-                    // TODO As of resolver 1.1, use DependencyManagerUtils.getPremanagedProperties( node ).
-                    //      The resolver 1.0.x releases do not record premanaged state of properties.
-                    buffer.append( " (properties managed)" );
+                    final Map<String, String> premanagedProperties =
+                        DependencyManagerUtils.getPremanagedProperties( node );
+
+                    if ( premanagedProperties != null && !premanagedProperties.equals( art.getProperties() ) )
+                    {
+                        buffer.append( " (properties managed from " );
+                        buffer.append( StringUtils.defaultString( premanagedProperties, "default" ) );
+
+                        final String sourceHint = DependencyManagerUtils.getPropertiesManagementSourceHint( node );
+                        if ( sourceHint != null )
+                        {
+                            buffer.append( " by " ).append( sourceHint ).append( ' ' );
+                        }
+
+                        buffer.append( ')' );
+                    }
                 }
             }
 
@@ -432,7 +509,6 @@ public class DefaultPluginDependenciesResolver
             return true;
         }
 
-        @Override
         public boolean visitLeave( DependencyNode node )
         {
             indent = indent.substring( 0, indent.length() - 3 );
