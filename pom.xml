@@ -95,8 +95,8 @@ under the License.
   </modules>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
     <tag>master</tag>
   </scm>
@@ -106,7 +106,7 @@ under the License.
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/job/maven-3.x/</url>
+    <url>https://builds.apache.org/job/maven-box/job/maven/</url>
   </ciManagement>
   <distributionManagement>
     <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
