@@ -19,7 +19,7 @@ under the License.
 Maven Core Integration Tests
 ========
 
-<http://maven.apache.org/core-its/>
+<https://maven.apache.org/core-its/>
 
 If you want to run the integration tests against a custom build of Maven use the following command:
 
