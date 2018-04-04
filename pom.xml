@@ -92,6 +92,7 @@ under the License.
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
+    <module>maven-toolchain</module>
   </modules>
 
   <scm>
@@ -146,6 +147,9 @@ under the License.
     </contributor>
     <contributor>
       <name>Joseph Walton (MNG-5297)</name>
+    </contributor>
+    <contributor>
+      <name>George Gastaldi (MNG-6389)</name>
     </contributor>
   </contributors>
 
@@ -218,6 +222,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-toolchain</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
