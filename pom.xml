@@ -505,7 +505,6 @@ under the License.
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
               <exclude>**/*.odg</exclude>
-              <exclude>**/.factorypath</exclude>
             </excludes>
           </configuration>
         </plugin>

@@ -31,10 +31,6 @@
     <p>Includes things that should not be distributed with the pom.xml file, such as developer identity, along with
     local settings, like proxy information.</p>
     <p>The default location for the settings file is <i>~/.m2/settings.xml</i></p>
-    <p>An XSD is available at:</p>
-    <ul>
-      <li><a href="https://maven.apache.org/xsd/settings-1.0.0.xsd">https://maven.apache.org/xsd/settings-1.0.0.xsd</a>.</li>
-    </ul>
     ]]>
   </description>
   <defaults>
