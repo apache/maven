@@ -388,6 +388,14 @@ public class DefaultModelBuilder
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
 
+        if ( resultModel.getParent() != null )
+        {
+            final ModelData parentData = lineage.get( 1 );
+            final Model interpolatedParent = interpolateModel( parentData.getModel(), request, problems );
+            // parentData.setModel( interpolatedParent );
+            parentData.setVersion( interpolatedParent.getVersion() );
+        }
+
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
 
