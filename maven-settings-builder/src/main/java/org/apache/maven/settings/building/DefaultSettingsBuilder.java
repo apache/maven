@@ -21,14 +21,13 @@ package org.apache.maven.settings.building;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.building.StringSource;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -43,6 +42,8 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -100,8 +101,6 @@ public class DefaultSettingsBuilder
         settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         problems.setSource( "" );
-
-        userSettings = interpolate( userSettings, request, problems );
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = userSettings.getLocalRepository();
@@ -161,6 +160,19 @@ public class DefaultSettingsBuilder
 
         problems.setSource( settingsSource.getLocation() );
 
+        Source interpolatedSettingsSource;
+        try ( XmlStreamReader xmlStreamReader = new XmlStreamReader( settingsSource.getInputStream() ) )
+        {
+            String serializedSettings = IOUtil.toString( xmlStreamReader );
+            interpolatedSettingsSource = new StringSource( interpolate( serializedSettings, request, problems ) );
+        }
+        catch ( IOException e )
+        {
+            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation()
+                + ": " + e.getMessage(), -1, -1, e );
+            return new Settings();
+        }
+
         Settings settings;
 
         try
@@ -169,13 +181,13 @@ public class DefaultSettingsBuilder
 
             try
             {
-                settings = settingsReader.read( settingsSource.getInputStream(), options );
+                settings = settingsReader.read( interpolatedSettingsSource.getInputStream(), options );
             }
             catch ( SettingsParseException e )
             {
                 options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.FALSE );
 
-                settings = settingsReader.read( settingsSource.getInputStream(), options );
+                settings = settingsReader.read( interpolatedSettingsSource.getInputStream(), options );
 
                 problems.add( SettingsProblem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(),
                               e );
@@ -199,22 +211,9 @@ public class DefaultSettingsBuilder
         return settings;
     }
 
-    private Settings interpolate( Settings settings, SettingsBuildingRequest request,
+    private String interpolate( String serializedSettings, SettingsBuildingRequest request,
                                   SettingsProblemCollector problems )
     {
-        StringWriter writer = new StringWriter( 1024 * 4 );
-
-        try
-        {
-            settingsWriter.write( writer, null, settings );
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Failed to serialize settings to memory", e );
-        }
-
-        String serializedSettings = writer.toString();
-
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
         interpolator.addValueSource( new PropertiesBasedValueSource( request.getUserProperties() ) );
@@ -246,29 +245,17 @@ public class DefaultSettingsBuilder
             }
         } );
 
+        String result;
         try
         {
-            serializedSettings = interpolator.interpolate( serializedSettings, "settings" );
+            result = interpolator.interpolate( serializedSettings, "settings" );
         }
         catch ( InterpolationException e )
         {
             problems.add( SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1,
                           e );
 
-            return settings;
-        }
-
-        Settings result;
-        try
-        {
-            Map<String, ?> options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.FALSE );
-            result = settingsReader.read( new StringReader( serializedSettings ), options );
-        }
-        catch ( IOException e )
-        {
-            problems.add( SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1,
-                          e );
-            return settings;
+            return serializedSettings;
         }
 
         return result;
