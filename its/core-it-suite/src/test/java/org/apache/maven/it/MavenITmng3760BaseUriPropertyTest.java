@@ -37,7 +37,7 @@ public class MavenITmng3760BaseUriPropertyTest
 
     public MavenITmng3760BaseUriPropertyTest()
     {
-        super( "(2.1.0-M1,3.0-alpha-1),(3.0-alpha-2,)" ); // 2.1.0-M2+
+        super( "(2.1.0-M1,3.0-alpha-1),(3.0-alpha-2,3.5.4)" ); // 2.1.0-M2+
     }
 
     public void testitMNG3760()
