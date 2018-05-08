@@ -160,11 +160,11 @@ public class DefaultSettingsBuilder
 
         problems.setSource( settingsSource.getLocation() );
 
-        Source effectiveSettingsSource;
+        Source interpolatedSettingsSource;
         try ( XmlStreamReader xmlStreamReader = new XmlStreamReader( settingsSource.getInputStream() ) )
         {
-            String serializedSettings = interpolate( IOUtil.toString( xmlStreamReader ), request, problems );
-            effectiveSettingsSource = new StringSource( serializedSettings );
+            String serializedSettings = IOUtil.toString( xmlStreamReader );
+            interpolatedSettingsSource = new StringSource( interpolate( serializedSettings, request, problems ) );
         }
         catch ( IOException e )
         {
@@ -181,13 +181,13 @@ public class DefaultSettingsBuilder
 
             try
             {
-                settings = settingsReader.read( effectiveSettingsSource.getInputStream(), options );
+                settings = settingsReader.read( interpolatedSettingsSource.getInputStream(), options );
             }
             catch ( SettingsParseException e )
             {
                 options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.FALSE );
 
-                settings = settingsReader.read( effectiveSettingsSource.getInputStream(), options );
+                settings = settingsReader.read( interpolatedSettingsSource.getInputStream(), options );
 
                 problems.add( SettingsProblem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(),
                               e );
