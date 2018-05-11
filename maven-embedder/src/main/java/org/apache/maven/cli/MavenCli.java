@@ -1006,8 +1006,8 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <goals> -rf :"
-                                + project.getArtifactId() ).toString() );
+                slf4jLogger.error( buffer().a( "  " ).strong( "mvn " + goals( cliRequest ) + "-rf :"
+                    + project.getArtifactId() ).toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1025,6 +1025,17 @@ public class MavenCli
         {
             return 0;
         }
+    }
+
+    /**
+     * Drop requested goals in useful form for re-execution.
+     *
+     * @param cliRequest Requested build.
+     * @return Goals used in build.
+     */
+    private String goals( CliRequest cliRequest )
+    {
+        return StringUtils.join( cliRequest.getRequest().getGoals().iterator(), " " );
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
