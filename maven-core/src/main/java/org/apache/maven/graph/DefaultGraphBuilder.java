@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -311,11 +312,27 @@ public class DefaultGraphBuilder
             if ( !resumed )
             {
                 throw new MavenExecutionException( "Could not find project to resume reactor build from: " + selector
-                    + " vs " + projects, request.getPom() );
+                    + " vs " + formatProjects( projects ), request.getPom() );
             }
         }
 
         return result;
+    }
+
+    private String formatProjects( List<MavenProject> projects )
+    {
+        StringBuilder projectNames = new StringBuilder();
+        Iterator<MavenProject> iterator = projects.iterator();
+        while ( iterator.hasNext() )
+        {
+            MavenProject project = iterator.next();
+            projectNames.append( project.getGroupId() ).append( ":" ).append( project.getArtifactId() );
+            if ( iterator.hasNext() )
+            {
+                projectNames.append( ", " );
+            }
+        }
+        return projectNames.toString();
     }
 
     private boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
