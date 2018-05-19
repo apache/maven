@@ -1006,8 +1006,8 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <goals> -rf :"
-                                + project.getArtifactId() ).toString() );
+                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <goals> -rf "
+                    + getFailedProject( result.getTopologicallySortedProjects(), project ) ).toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1025,6 +1025,32 @@ public class MavenCli
         {
             return 0;
         }
+    }
+
+    /**
+     * A helper method to determine value returned for re execution of build.
+     *
+     * By default -rf :artifactId will pick up first module which matches, but quite often failed project might be later
+     * in build queue. This means that developer will either have to type group id or wait for build execution of all
+     * modules which were fine, but they are still before one which reported errors.
+     * Since build reactor might contain multiple projects with same artifact id for developer convenience we print
+     * out groupId:artifactId when there is name clash and :artifactId, if there is no conflict.
+     *
+     * @param mavenProjects Maven projects which are part of build execution.
+     * @param failedProject Project which have failed.
+     * @return Value for -rf flag to restart build exactly from place where it failed.
+     */
+    private String getFailedProject( List<MavenProject> mavenProjects, MavenProject failedProject )
+    {
+        for ( MavenProject buildProject : mavenProjects )
+        {
+            if ( failedProject.getArtifactId().equals( buildProject.getArtifactId() ) && !failedProject.equals(
+                    buildProject ) )
+            {
+                return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
+            }
+        }
+        return ":" + failedProject.getArtifactId();
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
