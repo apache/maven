@@ -62,7 +62,7 @@ node(jenkinsEnv.labelForOS(buildOs)) {
 
 parallel linuxJava7:{
         node(jenkinsEnv.labelForOS('linux')) {
-            stage ('Linux Java 7') {
+            stage ('Run ITs Linux Java 7') {
                 String jdkName = jenkinsEnv.jdkFromVersion('linux', '7')
                 String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
                 dir('test') {
@@ -81,7 +81,7 @@ parallel linuxJava7:{
         }
     },linuxJava8: {
         node(jenkinsEnv.labelForOS('linux')) {
-            stage ('Linux Java 8') {
+            stage ('Run ITs Linux Java 8') {
                 String jdkName = jenkinsEnv.jdkFromVersion('linux', '8')
                 String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
                 dir('test') {
@@ -100,7 +100,7 @@ parallel linuxJava7:{
         }
     }, winJava7: {
         node(jenkinsEnv.labelForOS('windows')) {
-            stage ('Windows Java 7') {
+            stage ('Run ITs Windows Java 7') {
                 String jdkName = jenkinsEnv.jdkFromVersion('windows', '7')
                 String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
 
@@ -124,7 +124,7 @@ parallel linuxJava7:{
         }
     }, winJava8: {
         node(jenkinsEnv.labelForOS('windows')) {
-            stage ('Windows Java 8') {
+            stage ('Run ITs Windows Java 8') {
                 String jdkName = jenkinsEnv.jdkFromVersion('windows', '8')
                 String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
 
