@@ -457,6 +457,9 @@
       <description>
         <![CDATA[
         The <code>&lt;proxy&gt;</code> element contains informations required to a proxy settings.
+        Note: While the type
+        of this field is <code>String</code> for technical reasons, the semantic type is actually
+        <code>Boolean</code>. Default value is <code>true</code>.
         ]]></description>
       <fields>
         <field>
@@ -469,7 +472,7 @@
             Whether this proxy configuration is the active one.
             ]]>
           </description>
-          <type>boolean</type>
+          <type>String</type>
         </field>
         <field>
           <name>protocol</name>
@@ -502,15 +505,17 @@
           </description>
           <type>String</type>
         </field>
-        <field>
-          <name>port</name>
+        <field xml.tagName="port">
+          <name>portString</name>
           <version>1.0.0+</version>
           <description>
             <![CDATA[
-            The proxy port.
+            The proxy port. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>integer</code>.
             ]]>
           </description>
-          <type>int</type>
+          <type>String</type>
           <defaultValue>8080</defaultValue>
         </field>
         <field>
@@ -535,6 +540,34 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code>
+            <![CDATA[
+    public boolean isActive()
+    {
+        return ( active != null ) ? Boolean.parseBoolean( active ) : true;
+    }
+
+    public void setActive( boolean active )
+    {
+        this.active = String.valueOf( active );
+    }
+
+    public int getPort()
+    {
+        return ( portString != null ) ? Integer.parseInt( portString ) : 0;
+    }
+
+    public void setPort( int port )
+    {
+        this.portString = String.valueOf( port );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Server</name>
