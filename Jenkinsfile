@@ -22,8 +22,11 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 def buildOs = 'linux'
 def buildJdk = '7'
 def buildMvn = '3.5.0'
+def runITsOses = ['linux', 'windows']
+def runITsJdks = ['7', '8']
+def runITsMvn = '3.5.0'
+def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
-def CORE_IT_PROFILES='run-its,embedded'
 
 try {
 
@@ -59,94 +62,51 @@ node(jenkinsEnv.labelForOS(buildOs)) {
     }
 }
 
+Map runITsTasks = [:]
+for (String os in runITsOses) {
+    for (def jdk in runITsJdks) {
+        String osLabel = jenkinsEnv.labelForOS(os);
+        String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
+        String mvnName = jenkinsEnv.mvnFromVersion(os, "${runITsMvn}")
+        echo "OS: ${os} JDK: ${jdk} => Label: ${osLabel} JDK: ${jdkName}"
 
-parallel linuxJava7:{
-        node(jenkinsEnv.labelForOS('linux')) {
-            stage ('Run ITs Linux Java 7') {
-                String jdkName = jenkinsEnv.jdkFromVersion('linux', '7')
-                String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
-                dir('test') {
-                    def WORK_DIR=pwd()
-                    checkout tests
-                    sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
-                    unstash 'dist'
-                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
-                        junitPublisher(ignoreAttachments: false)
-                    ]) {
-                        sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
+        String stageId = "${os}-jdk${jdk}"
+        String stageLabel = "Run ITs ${os.capitalize()} Java ${jdk}"
+        runITsTasks[stageId] = {
+            node(osLabel) {
+                stage("${stageLabel}") {
+                    // on Windows, need a short path or we hit 256 character limit for paths
+                    // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
+                    // will not trample each other
+                    dir(isUnix() ? 'test' : "/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                        def WORK_DIR=pwd()
+                        checkout tests
+                        if (isUnix()) {
+                            sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
+                        } else {
+                            bat "if exist it-local-repo rmdir /s /q it-local-repo"
+                            bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
+                        }
+                        unstash 'dist'
+                        withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
+                            junitPublisher(ignoreAttachments: false)
+                        ]) {
+                            if (isUnix()) {
+                                sh "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                            } else {
+                                bat "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                            }
+                        }
+                        deleteDir() // clean up after ourselves to reduce disk space
                     }
-                    deleteDir() // clean up after ourselves to reduce disk space
-                }
-            }
-        }
-    },linuxJava8: {
-        node(jenkinsEnv.labelForOS('linux')) {
-            stage ('Run ITs Linux Java 8') {
-                String jdkName = jenkinsEnv.jdkFromVersion('linux', '8')
-                String mvnName = jenkinsEnv.mvnFromVersion('linux', buildMvn)
-                dir('test') {
-                    def WORK_DIR=pwd()
-                    checkout tests
-                    sh "rm -rvf $WORK_DIR/apache-maven-dist.zip $WORK_DIR/it-local-repo"
-                    unstash 'dist'
-                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
-                        junitPublisher(ignoreAttachments: false)
-                    ]) {
-                        sh "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
-                    }
-                    deleteDir() // clean up after ourselves to reduce disk space
-                }
-            }
-        }
-    }, winJava7: {
-        node(jenkinsEnv.labelForOS('windows')) {
-            stage ('Run ITs Windows Java 7') {
-                String jdkName = jenkinsEnv.jdkFromVersion('windows', '7')
-                String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
-
-                // need a short path or we hit 256 character limit for paths
-                // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-                // will not trample each other
-                dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
-                    def WORK_DIR=pwd()
-                    checkout tests
-                    bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                    bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
-                    unstash 'dist'
-                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
-                        junitPublisher(ignoreAttachments: false)
-                    ]) {
-                        bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
-                    }
-                    deleteDir() // clean up after ourselves to reduce disk space
-                }
-            }
-        }
-    }, winJava8: {
-        node(jenkinsEnv.labelForOS('windows')) {
-            stage ('Run ITs Windows Java 8') {
-                String jdkName = jenkinsEnv.jdkFromVersion('windows', '8')
-                String mvnName = jenkinsEnv.mvnFromVersion('windows', buildMvn)
-
-                // need a short path or we hit 256 character limit for paths
-                // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-                // will not trample each other
-                dir("/mvn-it-${EXECUTOR_NUMBER}.tmp") {
-                    def WORK_DIR=pwd()
-                    checkout tests
-                    bat "if exist it-local-repo rmdir /s /q it-local-repo"
-                    bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
-                    unstash 'dist'
-                    withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
-                        junitPublisher(ignoreAttachments: false)
-                    ]) {
-                        bat "mvn clean install -P$CORE_IT_PROFILES -B -U -V -Dmaven.test.failure.ignore=true -DmavenDistro=$WORK_DIR/apache-maven-dist.zip"
-                    }
-                    deleteDir() // clean up after ourselves to reduce disk space
                 }
             }
         }
     }
+}
+
+// run the parallel ITs
+parallel(runITsTasks)
 
 // JENKINS-34376 seems to make it hard to detect the aborted builds
 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
