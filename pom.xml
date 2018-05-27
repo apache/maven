@@ -238,12 +238,6 @@ under the License.
         <version>${guiceVersion}</version>
       </dependency>
       <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guiceVersion}</version>
-        <classifier>no_aop</classifier>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuInjectVersion}</version>
