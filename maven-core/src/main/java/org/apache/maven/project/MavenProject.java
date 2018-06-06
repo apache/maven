@@ -81,8 +81,8 @@ import org.eclipse.aether.repository.RemoteRepository;
  * </p>
  * <p>
  * With changes during 3.2.2 release MavenProject is closer to being immutable after construction with the removal of
- * all components from this class, and the upfront construction taken care of entirely by the @{ProjectBuilder}. There
- * is still the issue of having to run the lifecycle in order to find all the compile source roots and resource
+ * all components from this class, and the upfront construction taken care of entirely by the {@link ProjectBuilder}.
+ * There is still the issue of having to run the lifecycle in order to find all the compile source roots and resource
  * directories but I hope to take care of this during the Maven 4.0 release (jvz).
  * </p>
  */
@@ -260,7 +260,7 @@ public class MavenProject
 
     /**
      * Sets project {@code file} without changing project {@code basedir}.
-     * 
+     *
      * @since 3.2.4
      */
     public void setPomFile( File file )

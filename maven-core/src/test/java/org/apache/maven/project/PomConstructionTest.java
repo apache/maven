@@ -39,6 +39,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import static org.junit.Assert.assertNotEquals;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -140,9 +141,9 @@ public class PomConstructionTest
 
     /*MNG-3900*/
     public void testProfilePropertiesInterpolation()
-    	throws Exception
+        throws Exception
     {
-    	PomTestWrapper pom = buildPom( "profile-properties-interpolation", "interpolation-profile" );
+        PomTestWrapper pom = buildPom( "profile-properties-interpolation", "interpolation-profile" );
         assertEquals( "PASSED", pom.getValue( "properties[1]/test" ) );
         assertEquals( "PASSED", pom.getValue( "properties[1]/property" ) );
     }
@@ -1082,11 +1083,21 @@ public class PomConstructionTest
     }
 
     /* MNG-3760*/
-    public void testInterpolationOfBaseUrl()
+    public void testInterpolationOfBaseUri()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "baseurl-interpolation/pom.xml" );
-        assertEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
+        PomTestWrapper pom = buildPom( "baseuri-interpolation/pom.xml" );
+        assertNotEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
+    }
+
+    /* MNG-6386 */
+    public void testInterpolationOfRfc3986BaseUri()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "baseuri-interpolation/pom.xml" );
+        String prop1 = pom.getValue( "properties/prop1" ).toString();
+        assertEquals( pom.getBasedir().toPath().toUri().toASCIIString(), prop1 );
+        assertTrue( prop1.startsWith( "file:///" ) );
     }
 
     /* MNG-3811*/
@@ -1103,9 +1114,9 @@ public class PomConstructionTest
     }
 
     public void testPropertiesNoDuplication()
-    	throws Exception
+        throws Exception
     {
-    	PomTestWrapper pom = buildPom( "properties-no-duplication/sub" );	
+        PomTestWrapper pom = buildPom( "properties-no-duplication/sub" );
         assertEquals( 1, ( (Properties) pom.getValue( "properties" ) ).size() );
         assertEquals( "child", pom.getValue( "properties/pomProfile" ) );
     }
@@ -1416,9 +1427,9 @@ public class PomConstructionTest
 
     /*MNG-1957*/
     public void testJdkActivation()
-    	throws Exception
-	{
-    	Properties props = new Properties();
+        throws Exception
+    {
+        Properties props = new Properties();
         props.put( "java.version", "1.5.0_15" );
 
         PomTestWrapper pom = buildPom( "jdk-activation", props );
@@ -1426,7 +1437,7 @@ public class PomConstructionTest
         assertEquals( "PASSED", pom.getValue( "properties/jdkProperty3" ) );
         assertEquals( "PASSED", pom.getValue( "properties/jdkProperty2" ) );
         assertEquals( "PASSED", pom.getValue( "properties/jdkProperty1" ) );
-	}
+    }
 
     /* MNG-2174 */
     public void testProfilePluginMngDependencies()
@@ -1464,54 +1475,54 @@ public class PomConstructionTest
     }
 
     public void testProfilePlugins()
-	    throws Exception
-	{
+        throws Exception
+    {
         PomTestWrapper pom = this.buildPom( "profile-plugins", "standard" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
         assertEquals( "maven-assembly2-plugin", pom.getValue( "build/plugins[2]/artifactId" ) );
-	}
+    }
 
     public void testPluginInheritanceSimple()
-	    throws Exception
-	{
+        throws Exception
+    {
         PomTestWrapper pom = this.buildPom( "plugin-inheritance-simple/sub" );
-	    assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
-	}
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
+    }
 
     public void testPluginManagementDuplicate()
-	    throws Exception
-	{
+        throws Exception
+    {
         PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub" );
         assertEquals( 12, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );
-	}
+    }
 
     public void testDistributionManagement()
-	    throws Exception
-	{
+        throws Exception
+    {
         PomTestWrapper pom = this.buildPom( "distribution-management" );
         assertEquals( "legacy", pom.getValue( "distributionManagement/repository/layout" ) );
-	}
+    }
 
     public void testDependencyScopeInheritance()
-	    throws Exception
-	{
+        throws Exception
+    {
         PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
         String scope = (String) pom.getValue( "dependencies[1]/scope" );
         assertEquals( "compile", scope );
-	}
+    }
 
     public void testDependencyScope()
-	    throws Exception
-	{
-	    buildPom( "dependency-scope/sub" );
-	}
+        throws Exception
+    {
+        buildPom( "dependency-scope/sub" );
+    }
 
     //This will fail on a validation error if incorrect
     public void testDependencyManagementWithInterpolation()
-	    throws Exception
-	{
-	    buildPom( "dependency-management-with-interpolation/sub" );
-	}
+        throws Exception
+    {
+        buildPom( "dependency-management-with-interpolation/sub" );
+    }
 
     public void testInterpolationWithSystemProperty()
         throws Exception

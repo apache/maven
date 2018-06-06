@@ -63,12 +63,11 @@ public final class CLIReportingUtils
             properties.getProperty( "distributionShortName" ) + " home: " + System.getProperty( "maven.home",
                                                                                                 "<unknown Maven "
                                                                                                     + "home>" ) ) )
-            .append(
-            ls );
+            .append( ls );
         version.append( "Java version: " ).append(
             System.getProperty( "java.version", "<unknown Java version>" ) ).append( ", vendor: " ).append(
-            System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( ls );
-        version.append( "Java home: " ).append( System.getProperty( "java.home", "<unknown Java home>" ) ).append( ls );
+            System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( ", runtime: " ).append(
+            System.getProperty( "java.home", "<unknown runtime>" ) ).append( ls );
         version.append( "Default locale: " ).append( Locale.getDefault() ).append( ", platform encoding: " ).append(
             System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( ls );
         version.append( "OS name: \"" ).append( Os.OS_NAME ).append( "\", version: \"" ).append( Os.OS_VERSION ).append(

@@ -61,7 +61,7 @@ public abstract class AbstractStringBasedModelInterpolator
     public static final String CHANGELIST_PROPERTY = "changelist";
 
     public static final String REVISION_PROPERTY = "revision";
-    
+
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
@@ -158,7 +158,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     if ( "baseUri".equals( expression ) )
                     {
-                        return projectDir.getAbsoluteFile().toURI().toString();
+                        return projectDir.getAbsoluteFile().toPath().toUri().toASCIIString();
                     }
                     return null;
                 }

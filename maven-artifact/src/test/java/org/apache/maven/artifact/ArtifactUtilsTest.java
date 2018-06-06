@@ -49,6 +49,7 @@ public class ArtifactUtilsTest
         assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-SNAPSHOT" ) );
         assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-snapshot" ) );
         assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-20090413.094722-2" ) );
+        assertEquals( false, ArtifactUtils.isSnapshot( "1.2.3-20090413X094722-2"));
     }
 
     public void testToSnapshotVersion()
@@ -56,6 +57,7 @@ public class ArtifactUtilsTest
         assertEquals( "1.2.3", ArtifactUtils.toSnapshotVersion( "1.2.3" ) );
         assertEquals( "1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion( "1.2.3-SNAPSHOT" ) );
         assertEquals( "1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion( "1.2.3-20090413.094722-2" ) );
+        assertEquals( "1.2.3-20090413X094722-2", ArtifactUtils.toSnapshotVersion( "1.2.3-20090413X094722-2" ) );
     }
 
     /**
