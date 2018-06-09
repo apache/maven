@@ -55,7 +55,7 @@ under the License.
     <junitVersion>4.12</junitVersion>
     <mockitoVersion>2.12.0</mockitoVersion>
     <plexusVersion>1.7.1</plexusVersion>
-    <plexusInterpolationVersion>1.24</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
     <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
     <guavaVersion>20.0</guavaVersion>
     <guiceVersion>4.2.0</guiceVersion>
