@@ -150,7 +150,7 @@ under the License.
       <!-- bounds close to current Java version (MNG-4512) -->
       <id>test-6e</id>
       <activation>
-        <jdk>[1.8,1.9)</jdk>
+        <jdk>[1.8,9)</jdk>
       </activation>
       <properties>
         <jdkProperty6>PASSED</jdkProperty6>
@@ -160,7 +160,17 @@ under the License.
       <!-- bounds close to current Java version (MNG-4512) -->
       <id>test-6f</id>
       <activation>
-        <jdk>[1.9,1.10)</jdk>
+        <jdk>[9,10)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6g</id>
+      <activation>
+        <jdk>[10,11)</jdk>
       </activation>
       <properties>
         <jdkProperty6>PASSED</jdkProperty6>
