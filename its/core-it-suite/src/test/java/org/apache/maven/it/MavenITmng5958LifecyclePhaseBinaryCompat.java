@@ -17,19 +17,19 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5958-lifecycle-phases/good" );
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "CLASS_NAME=java.lang.String" );
         verifier.resetStreams();
     }
-    
+
     public void testBad()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5958-lifecycle-phases/bad" );
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
@@ -37,8 +37,10 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         }
         catch ( VerificationException e )
         {
+            // TODO There is no good way to test for Java 9+ in Verifier in order to add 'java.base/'
+            // to the string.
             verifier.verifyTextInLog( "[ERROR] Internal error: java.lang.ClassCastException: "
-                + "org.apache.maven.lifecycle.mapping.LifecyclePhase cannot be cast to java.lang.String -> [Help 1]" );
+                + "org.apache.maven.lifecycle.mapping.LifecyclePhase cannot be cast to " );
         }
         verifier.resetStreams();
     }
