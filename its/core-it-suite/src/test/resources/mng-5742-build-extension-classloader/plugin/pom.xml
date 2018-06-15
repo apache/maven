@@ -30,8 +30,6 @@ under the License.
 
   <properties>
     <maven-version>3.2.1</maven-version>
-    <maven.compiler.source>1.5</maven.compiler.source>
-    <maven.compiler.target>1.5</maven.compiler.target>    
   </properties>
 
   <dependencies>
