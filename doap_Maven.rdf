@@ -33,6 +33,17 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2018-06-21</created>
+        <revision>3.5.4</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.4/source/apache-maven-3.5.4-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.4/source/apache-maven-3.5.4-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.5.3</name>
         <created>2018-03-08</created>
         <revision>3.5.3</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.zip</file-release>
@@ -43,7 +54,7 @@ under the License.
     </release>
     <release>
       <Version>
-        <name>Apache Maven 3.5.3</name>
+        <name>Apache Maven 3.5.2</name>
         <created>2017-10-24</created>
         <revision>3.5.2</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.zip</file-release>
