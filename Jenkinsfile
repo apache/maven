@@ -91,10 +91,16 @@ for (String os in runITsOses) {
                         withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
                             junitPublisher(ignoreAttachments: false)
                         ]) {
+                            def cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                            if (jdk == '7') {
+                              // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
+                              cmd += ' -Dhttps.protocols=TLSv1.2'
+                            }
+                            
                             if (isUnix()) {
-                                sh "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                                sh "${cmd}"
                             } else {
-                                bat "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                                bat "${cmd}"
                             }
                         }
                         deleteDir() // clean up after ourselves to reduce disk space
