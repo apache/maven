@@ -91,7 +91,7 @@ for (String os in runITsOses) {
                         withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
                             junitPublisher(ignoreAttachments: false)
                         ]) {
-                            def cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
+                            String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
                             if (jdk == '7') {
                               // Java 7u80 has TLS 1.2 disabled by default: need to explicitly enable
                               cmd = "${cmd} -Dhttps.protocols=TLSv1.2"
