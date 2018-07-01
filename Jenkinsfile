@@ -93,8 +93,8 @@ for (String os in runITsOses) {
                         ]) {
                             def cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
                             if (jdk == '7') {
-                              // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
-                              cmd += ' -Dhttps.protocols=TLSv1.2'
+                              // Java 7u80 has TLS 1.2 disabled by default: need to explicitly enable
+                              cmd = "${cmd} -Dhttps.protocols=TLSv1.2"
                             }
                             
                             if (isUnix()) {
