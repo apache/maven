@@ -71,7 +71,7 @@ under the License.
           <area shape="rect" coords="685,455,775,491" alt="plexus-utils" href="https://codehaus-plexus.github.io/plexus-utils" />
           <area shape="rect" coords="542,167,783,502" alt="plexus" href="https://codehaus-plexus.github.io/" />
           <area shape="rect" coords="401,393,509,524" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
-          <area shape="rect" coords="416,543,493,577" alt="guice" href="http://code.google.com/p/google-guice/" />
+          <area shape="rect" coords="416,543,493,577" alt="guice" href="https://github.com/google/guice" />
           <area shape="rect" coords="550,543,673,577" alt="javax.inject" href="http://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html" />
         </map>
       </p>
