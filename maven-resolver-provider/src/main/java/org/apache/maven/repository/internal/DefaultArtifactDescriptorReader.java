@@ -67,9 +67,6 @@ import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
-import org.eclipse.aether.spi.log.Logger;
-import org.eclipse.aether.spi.log.LoggerFactory;
-import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
@@ -80,10 +77,6 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
-
-    @SuppressWarnings( "unused" )
-    private Logger logger = NullLoggerFactory.LOGGER;
-
     private RemoteRepositoryManager remoteRepositoryManager;
 
     private VersionResolver versionResolver;
@@ -104,15 +97,13 @@ public class DefaultArtifactDescriptorReader
     @Inject
     DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
                                      VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
-                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher,
-                                     LoggerFactory loggerFactory )
+                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher )
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
         setVersionRangeResolver( versionRangeResolver );
         setArtifactResolver( artifactResolver );
         setModelBuilder( modelBuilder );
-        setLoggerFactory( loggerFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
     }
 
@@ -128,19 +119,6 @@ public class DefaultArtifactDescriptorReader
             setModelBuilder( new DefaultModelBuilderFactory().newInstance() );
         }
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-        setLoggerFactory( locator.getService( LoggerFactory.class ) );
-    }
-
-    public DefaultArtifactDescriptorReader setLoggerFactory( LoggerFactory loggerFactory )
-    {
-        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
-        return this;
-    }
-
-    void setLogger( LoggerFactory loggerFactory )
-    {
-        // plexus support
-        setLoggerFactory( loggerFactory );
     }
 
     public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
