@@ -22,8 +22,7 @@ package org.apache.maven.building;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 
 /**
  * Wraps an ordinary {@link URL} as a source.
@@ -43,7 +42,7 @@ public class UrlSource
      */
     public UrlSource( URL url )
     {
-        this.url = Validate.notNull( url, "url cannot be null" );
+        this.url = Objects.requireNonNull( url, "url cannot be null" );
     }
 
     @Override

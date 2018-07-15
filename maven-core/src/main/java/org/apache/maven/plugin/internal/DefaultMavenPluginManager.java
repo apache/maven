@@ -19,7 +19,6 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -104,6 +103,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -385,10 +385,11 @@ public class DefaultMavenPluginManager
                                     Map<String, ClassLoader> foreignImports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
-        Plugin plugin = Validate.notNull( pluginDescriptor.getPlugin(), "pluginDescriptor.plugin cannot be null" );
+        Plugin plugin =
+            Objects.requireNonNull( pluginDescriptor.getPlugin(), "pluginDescriptor.plugin cannot be null" );
 
-        Artifact pluginArtifact =
-            Validate.notNull( pluginDescriptor.getPluginArtifact(), "pluginDescriptor.pluginArtifact cannot be null" );
+        Artifact pluginArtifact = Objects.requireNonNull( pluginDescriptor.getPluginArtifact(),
+                                                          "pluginDescriptor.pluginArtifact cannot be null" );
 
         MavenProject project = session.getCurrentProject();
 

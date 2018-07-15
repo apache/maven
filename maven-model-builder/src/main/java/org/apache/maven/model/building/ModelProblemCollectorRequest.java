@@ -19,7 +19,8 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
+
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
@@ -45,8 +46,8 @@ public final class ModelProblemCollectorRequest
      */
     public ModelProblemCollectorRequest( Severity severity, Version version )
     {
-        this.severity = Validate.notNull( severity, "severity cannot be null" );
-        this.version = Validate.notNull( version, "version cannot be null" );
+        this.severity = Objects.requireNonNull( severity, "severity cannot be null" );
+        this.version = Objects.requireNonNull( version, "version cannot be null" );
     }
 
     public Severity getSeverity()

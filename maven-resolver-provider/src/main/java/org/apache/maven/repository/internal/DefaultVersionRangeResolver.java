@@ -19,7 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.eclipse.aether.RepositoryEvent;
@@ -63,6 +62,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Benjamin Bentmann
@@ -121,20 +121,20 @@ public class DefaultVersionRangeResolver
 
     public DefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )
     {
-        this.metadataResolver = Validate.notNull( metadataResolver, "metadataResolver cannot be null" );
+        this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
         return this;
     }
 
     public DefaultVersionRangeResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
     {
-        this.syncContextFactory = Validate.notNull( syncContextFactory, "syncContextFactory cannot be null" );
+        this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
         return this;
     }
 
     public DefaultVersionRangeResolver setRepositoryEventDispatcher(
         RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        this.repositoryEventDispatcher = Validate.notNull( repositoryEventDispatcher,
+        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
             "repositoryEventDispatcher cannot be null" );
         return this;
     }

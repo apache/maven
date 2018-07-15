@@ -22,9 +22,9 @@ package org.apache.maven.project;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
@@ -102,7 +102,7 @@ public class DefaultProjectRealmCache
 
     public CacheRecord put( Key key, ClassRealm projectRealm, DependencyFilter extensionArtifactFilter )
     {
-        Validate.notNull( projectRealm, "projectRealm cannot be null" );
+        Objects.requireNonNull( projectRealm, "projectRealm cannot be null" );
 
         if ( cache.containsKey( key ) )
         {

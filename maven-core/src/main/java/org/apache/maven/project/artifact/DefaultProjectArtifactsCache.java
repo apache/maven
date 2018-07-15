@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -199,7 +198,7 @@ public class DefaultProjectArtifactsCache
     @Override
     public CacheRecord put( Key key, Set<Artifact> projectArtifacts )
     {
-        Validate.notNull( projectArtifacts, "projectArtifacts cannot be null" );
+        Objects.requireNonNull( projectArtifacts, "projectArtifacts cannot be null" );
 
         assertUniqueKey( key );
 
@@ -222,7 +221,7 @@ public class DefaultProjectArtifactsCache
     @Override
     public CacheRecord put( Key key, LifecycleExecutionException exception )
     {
-        Validate.notNull( exception, "exception cannot be null" );
+        Objects.requireNonNull( exception, "exception cannot be null" );
 
         assertUniqueKey( key );
 

@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
@@ -105,7 +105,7 @@ public class ModelMerger
      */
     public void merge( Model target, Model source, boolean sourceDominant, Map<?, ?> hints )
     {
-        Validate.notNull( target, "target cannot be null" );
+        Objects.requireNonNull( target, "target cannot be null" );
 
         if ( source == null )
         {

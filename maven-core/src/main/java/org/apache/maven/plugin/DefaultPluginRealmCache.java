@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
@@ -159,8 +158,8 @@ public class DefaultPluginRealmCache
 
     public CacheRecord put( Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
-        Validate.notNull( pluginRealm, "pluginRealm cannot be null" );
-        Validate.notNull( pluginArtifacts, "pluginArtifacts cannot be null" );
+        Objects.requireNonNull( pluginRealm, "pluginRealm cannot be null" );
+        Objects.requireNonNull( pluginArtifacts, "pluginArtifacts cannot be null" );
 
         if ( cache.containsKey( key ) )
         {

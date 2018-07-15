@@ -22,8 +22,8 @@ package org.apache.maven.artifact.repository;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -89,7 +89,7 @@ public class LegacyLocalRepositoryManager
 
     private LegacyLocalRepositoryManager( ArtifactRepository delegate )
     {
-        this.delegate = Validate.notNull( delegate, "delegate cannot be null" );
+        this.delegate = Objects.requireNonNull( delegate, "delegate cannot be null" );
 
         ArtifactRepositoryLayout layout = delegate.getLayout();
         repo =

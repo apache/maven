@@ -23,9 +23,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -126,7 +126,7 @@ public class DefaultExtensionRealmCache
     public CacheRecord put( Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor,
                             List<Artifact> artifacts )
     {
-        Validate.notNull( extensionRealm, "extensionRealm cannot be null" );
+        Objects.requireNonNull( extensionRealm, "extensionRealm cannot be null" );
 
         if ( cache.containsKey( key ) )
         {

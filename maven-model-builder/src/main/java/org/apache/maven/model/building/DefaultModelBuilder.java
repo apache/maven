@@ -20,7 +20,6 @@ package org.apache.maven.model.building;
  */
 
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -74,6 +73,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import static org.apache.maven.model.building.Result.error;
@@ -1042,9 +1042,10 @@ public class DefaultModelBuilder
         String version = parent.getVersion();
 
         ModelResolver modelResolver = request.getModelResolver();
-
-        Validate.notNull( modelResolver, "request.modelResolver cannot be null (parent POM %s and POM %s)",
-            ModelProblemUtils.toId( groupId, artifactId, version ), ModelProblemUtils.toSourceHint( childModel ) );
+        Objects.requireNonNull( modelResolver,
+                                String.format( "request.modelResolver cannot be null (parent POM %s and POM %s)",
+                                               ModelProblemUtils.toId( groupId, artifactId, version ),
+                                               ModelProblemUtils.toSourceHint( childModel ) ) );
 
         ModelSource modelSource;
         try

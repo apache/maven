@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,8 +46,8 @@ public class DefaultSettingsWriter
     public void write( File output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( settings, "settings cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( settings, "settings cannot be null" );
 
         output.getParentFile().mkdirs();
 
@@ -58,8 +58,8 @@ public class DefaultSettingsWriter
     public void write( Writer output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( settings, "settings cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( settings, "settings cannot be null" );
 
         try ( final Writer out = output )
         {
@@ -71,8 +71,8 @@ public class DefaultSettingsWriter
     public void write( OutputStream output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( settings, "settings cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( settings, "settings cannot be null" );
 
         String encoding = settings.getModelEncoding();
         // TODO Use StringUtils here

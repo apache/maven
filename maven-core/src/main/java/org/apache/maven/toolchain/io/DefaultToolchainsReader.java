@@ -24,11 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -50,7 +50,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( File input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         return read( ReaderFactory.newXmlReader( input ), options );
     }
@@ -59,7 +59,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( Reader input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         try ( final Reader in = input )
         {
@@ -75,7 +75,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( InputStream input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         try ( final InputStream in = input )
         {

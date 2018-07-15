@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,8 +46,8 @@ public class DefaultModelWriter
     public void write( File output, Map<String, Object> options, Model model )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( model, "model cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( model, "model cannot be null" );
 
         output.getParentFile().mkdirs();
 
@@ -58,8 +58,8 @@ public class DefaultModelWriter
     public void write( Writer output, Map<String, Object> options, Model model )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( model, "model cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( model, "model cannot be null" );
 
         try ( final Writer out = output )
         {
@@ -71,8 +71,8 @@ public class DefaultModelWriter
     public void write( OutputStream output, Map<String, Object> options, Model model )
         throws IOException
     {
-        Validate.notNull( output, "output cannot be null" );
-        Validate.notNull( model, "model cannot be null" );
+        Objects.requireNonNull( output, "output cannot be null" );
+        Objects.requireNonNull( model, "model cannot be null" );
 
         String encoding = model.getModelEncoding();
         // TODO Use StringUtils here

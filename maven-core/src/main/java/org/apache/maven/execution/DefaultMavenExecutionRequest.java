@@ -25,9 +25,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
@@ -778,7 +778,7 @@ public class DefaultMavenExecutionRequest
     @Override
     public MavenExecutionRequest addProxy( Proxy proxy )
     {
-        Validate.notNull( proxy, "proxy cannot be null" );
+        Objects.requireNonNull( proxy, "proxy cannot be null" );
 
         for ( Proxy p : getProxies() )
         {
@@ -821,7 +821,7 @@ public class DefaultMavenExecutionRequest
     @Override
     public MavenExecutionRequest addServer( Server server )
     {
-        Validate.notNull( server, "server cannot be null" );
+        Objects.requireNonNull( server, "server cannot be null" );
 
         for ( Server p : getServers() )
         {
@@ -864,7 +864,7 @@ public class DefaultMavenExecutionRequest
     @Override
     public MavenExecutionRequest addMirror( Mirror mirror )
     {
-        Validate.notNull( mirror, "mirror cannot be null" );
+        Objects.requireNonNull( mirror, "mirror cannot be null" );
 
         for ( Mirror p : getMirrors() )
         {
@@ -1111,7 +1111,7 @@ public class DefaultMavenExecutionRequest
     @Override
     public MavenExecutionRequest addProfile( Profile profile )
     {
-        Validate.notNull( profile, "profile cannot be null" );
+        Objects.requireNonNull( profile, "profile cannot be null" );
 
         for ( Profile p : getProfiles() )
         {

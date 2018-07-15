@@ -19,7 +19,8 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
+
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -48,7 +49,7 @@ public abstract class BuildSummary
      */
     protected BuildSummary( MavenProject project, long time )
     {
-        this.project = Validate.notNull( project, "project cannot be null" );
+        this.project = Objects.requireNonNull( project, "project cannot be null" );
         // TODO Validate for < 0?
         this.time = time;
     }

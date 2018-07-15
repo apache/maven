@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
@@ -45,7 +45,7 @@ public class DefaultMetadataReader
     public Metadata read( File input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         Metadata metadata = read( ReaderFactory.newXmlReader( input ), options );
 
@@ -55,7 +55,7 @@ public class DefaultMetadataReader
     public Metadata read( Reader input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         try ( final Reader in = input )
         {
@@ -70,7 +70,7 @@ public class DefaultMetadataReader
     public Metadata read( InputStream input, Map<String, ?> options )
         throws IOException
     {
-        Validate.notNull( input, "input cannot be null" );
+        Objects.requireNonNull( input, "input cannot be null" );
 
         try ( final InputStream in = input )
         {

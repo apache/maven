@@ -21,11 +21,11 @@ package org.apache.maven.project.harness;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.project.MavenProject;
 
 public class PomTestWrapper
@@ -44,14 +44,14 @@ public class PomTestWrapper
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
     {
-        this.mavenProject = Validate.notNull( mavenProject, "mavenProject cannot be null" );
+        this.mavenProject = Objects.requireNonNull( mavenProject, "mavenProject cannot be null" );
         this.pomFile = pomFile;
         context = JXPathContext.newContext( mavenProject.getModel() );
     }
 
     public PomTestWrapper( MavenProject mavenProject )
     {
-        this.mavenProject = Validate.notNull( mavenProject, "mavenProject cannot be null" );
+        this.mavenProject = Objects.requireNonNull( mavenProject, "mavenProject cannot be null" );
         context = JXPathContext.newContext( mavenProject.getModel() );
     }
 

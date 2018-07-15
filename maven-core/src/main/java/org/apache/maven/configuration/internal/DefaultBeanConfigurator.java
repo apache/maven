@@ -20,8 +20,8 @@ package org.apache.maven.configuration.internal;
  */
 
 import java.io.File;
+import java.util.Objects;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;
@@ -54,8 +54,8 @@ public class DefaultBeanConfigurator
     public void configureBean( BeanConfigurationRequest request )
         throws BeanConfigurationException
     {
-        Validate.notNull( request, "request cannot be null" );
-        Validate.notNull( request.getBean(), "request.bean cannot be null" );
+        Objects.requireNonNull( request, "request cannot be null" );
+        Objects.requireNonNull( request.getBean(), "request.bean cannot be null" );
 
         Object configuration = request.getConfiguration();
         if ( configuration == null )

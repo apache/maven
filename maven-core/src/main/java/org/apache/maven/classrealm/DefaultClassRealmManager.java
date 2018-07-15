@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -34,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExportsProvider;
@@ -227,7 +227,7 @@ public class DefaultClassRealmManager
 
     public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts )
     {
-        Validate.notNull( model, "model cannot be null" );
+        Objects.requireNonNull( model, "model cannot be null" );
 
         ClassLoader parent = getMavenApiRealm();
 
@@ -241,7 +241,7 @@ public class DefaultClassRealmManager
 
     public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts )
     {
-        Validate.notNull( plugin, "plugin cannot be null" );
+        Objects.requireNonNull( plugin, "plugin cannot be null" );
 
         ClassLoader parent = PARENT_CLASSLOADER;
 
@@ -259,7 +259,7 @@ public class DefaultClassRealmManager
     public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
                                          Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
     {
-        Validate.notNull( plugin, "plugin cannot be null" );
+        Objects.requireNonNull( plugin, "plugin cannot be null" );
 
         if ( parent == null )
         {

@@ -23,8 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 
 /**
  * Wraps an ordinary {@link File} as a source.
@@ -43,7 +42,7 @@ public class FileSource
      */
     public FileSource( File file )
     {
-        this.file = Validate.notNull( file, "file cannot be null" ).getAbsoluteFile();
+        this.file = Objects.requireNonNull( file, "file cannot be null" ).getAbsoluteFile();
     }
 
     @Override

@@ -30,7 +30,8 @@ def tests
 
 try {
 
-node(jenkinsEnv.labelForOS(buildOs)) {
+def osNode = jenkinsEnv.labelForOS(buildOs) 
+node(jenkinsEnv.nodeSelection(osNode)) {
     dir('build') {
         stage('Checkout') {
             checkout scm
@@ -73,7 +74,7 @@ for (String os in runITsOses) {
         String stageId = "${os}-jdk${jdk}"
         String stageLabel = "Run ITs ${os.capitalize()} Java ${jdk}"
         runITsTasks[stageId] = {
-            node(osLabel) {
+            node(jenkinsEnv.nodeSelection(osLabel)) {
                 stage("${stageLabel}") {
                     // on Windows, need a short path or we hit 256 character limit for paths
                     // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
