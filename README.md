@@ -27,13 +27,13 @@ Apache Maven is a software project management and comprehension tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
-If you think you have found a bug, please file in an issue into [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG)
+If you think you have found a bug, please file an issue in the [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG).
 
 Documentation
 -------------
 
 More information can be found on [Apache Maven Homepage][maven-home].
-Question related to the usage of the Maven should be posted on
+Questions related to the usage of Maven should be posted on
 the [Maven User List][users-list].
 
 
