@@ -477,11 +477,6 @@ public class DefaultModelValidator
                     addViolation( problems, Severity.WARNING, Version.V20, prefix + ".type", key,
                                   "must be 'pom' to import the managed dependencies.", dependency );
                 }
-                else if ( StringUtils.isNotEmpty( dependency.getClassifier() ) )
-                {
-                    addViolation( problems, errOn30, Version.V20, prefix + ".classifier", key,
-                                  "must be empty, imported POM cannot have a classifier.", dependency );
-                }
             }
             else if ( "system".equals( dependency.getScope() ) )
             {

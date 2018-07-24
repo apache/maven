@@ -607,15 +607,12 @@ public class DefaultModelValidatorTest
                         "'dependencyManagement.dependencies.dependency.type' for test:a:jar must be 'pom'" );
     }
 
-    public void testBadImportScopeClassifier()
+    public void testImportScopeClassifier()
         throws Exception
     {
-        SimpleProblemCollector result = validateRaw( "bad-import-scope-classifier.xml" );
+        SimpleProblemCollector result = validateRaw( "import-scope-classifier.xml" );
 
-        assertViolations( result, 0, 1, 0 );
-
-        assertContains( result.getErrors().get( 0 ),
-                        "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls must be empty" );
+        assertViolations( result, 0, 0, 0 );
     }
 
     public void testSystemPathRefersToProjectBasedir()
