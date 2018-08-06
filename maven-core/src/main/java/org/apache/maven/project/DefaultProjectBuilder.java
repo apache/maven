@@ -669,6 +669,9 @@ public class DefaultProjectBuilder
                 else
                 {
                     Artifact parentArtifact = project.getParentArtifact();
+                    if (parentArtifact.getVersion().matches("\\$\\{(revision|sha1|changelist)}")) {
+                        parentArtifact.setVersion(project.getModel().getParent().getVersion());
+                    }
                     try
                     {
                         parent = build( parentArtifact, projectBuildingRequest ).getProject();
