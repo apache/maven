@@ -31,7 +31,7 @@ Maven Core
 
  * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle}},
 
- * {{{./artifact-handlers.html}default artifact handlers}},
+ * {{{./artifact-handlers.html}default artifact handlers}}, to manage {{{../maven-model/maven.html#class_dependency}dependency types}},
 
  * {{{./extension.html}extension descriptor}} and {{{./core-extensions.html}core extensions}},
 
