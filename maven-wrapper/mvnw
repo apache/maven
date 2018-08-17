@@ -225,12 +225,21 @@ else
         if [ "$MVNW_VERBOSE" = true ]; then
           echo "Found wget ... using wget"
         fi
-        wget "$jarUrl" -O "$wrapperJarPath"
+        if [ -z "$MVNW_WRAPPER_AUTH_USERNAME" ] || [ -z "$MVNW_WRAPPER_AUTH_PASSWORD" ]; then
+            wget "$jarUrl" -O "$wrapperJarPath"
+        else
+            wget --http-user=$MVNW_WRAPPER_AUTH_USERNAME --http-password=$MVNW_WRAPPER_AUTH_PASSWORD "$jarUrl" -O "$wrapperJarPath"
+        fi
     elif command -v curl > /dev/null; then
         if [ "$MVNW_VERBOSE" = true ]; then
           echo "Found curl ... using curl"
         fi
-        curl -o "$wrapperJarPath" "$jarUrl"
+        if [ -z "$MVNW_WRAPPER_AUTH_USERNAME" ] || [ -z "$MVNW_WRAPPER_AUTH_PASSWORD" ]; then
+            curl -o "$wrapperJarPath" "$jarUrl" -f
+        else
+            curl --user $MVNW_WRAPPER_AUTH_USERNAME:$MVNW_WRAPPER_AUTH_PASSWORD -o "$wrapperJarPath" "$jarUrl" -f
+        fi
+        
     else
         if [ "$MVNW_VERBOSE" = true ]; then
           echo "Falling back to using Java to download"
