@@ -98,6 +98,16 @@ public class MavenWrapperDownloader {
     }
 
     private static void downloadFileFromURL(String urlString, File destination) throws Exception {
+        if (System.getenv("MVNW_WRAPPER_AUTH_USERNAME") != null && System.getenv("MVNW_WRAPPER_AUTH_PASSWORD") != null) {
+            String username = System.getenv("MVNW_WRAPPER_AUTH_USERNAME");
+            char[] password = System.getenv("MVNW_WRAPPER_AUTH_PASSWORD").toCharArray();
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password);
+                }
+            });
+        }
         URL website = new URL(urlString);
         ReadableByteChannel rbc;
         rbc = Channels.newChannel(website.openStream());
