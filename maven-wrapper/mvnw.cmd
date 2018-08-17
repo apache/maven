@@ -132,7 +132,14 @@ if exist %WRAPPER_JAR% (
 ) else (
     echo Couldn't find %WRAPPER_JAR%, downloading it ...
 	echo Downloading from: %DOWNLOAD_URL%
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"
+	
+    powershell -Command "&{"^
+		"$webclient = new-object System.Net.WebClient;"^
+		"if (-not ([string]::IsNullOrEmpty('%MVNW_WRAPPER_AUTH_USERNAME%') -and [string]::IsNullOrEmpty('%MVNW_WRAPPER_AUTH_PASSWORD%'))) {"^
+		"$webclient.Credentials = new-object System.Net.NetworkCredential('%MVNW_WRAPPER_AUTH_USERNAME%', '%MVNW_WRAPPER_AUTH_PASSWORD%');"^
+		"}"^
+		"$webclient.DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"^
+		"}"
     echo Finished downloading %WRAPPER_JAR%
 )
 @REM End of extension
