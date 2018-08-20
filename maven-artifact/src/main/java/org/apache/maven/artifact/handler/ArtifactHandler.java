@@ -20,8 +20,8 @@ package org.apache.maven.artifact.handler;
  */
 
 /**
- * An artifact handler defies for one type (defined as Plexus role):<ul>
- * <li>extension and classifier to be able to download the file,</li>
+ * An artifact handler defines for a dependency type, defined as Plexus role:<ul>
+ * <li>extension and classifier, to be able to download the file,</li>
  * <li>information on how to use the artifact: whether to add it to the classpath, or to take into account its
  * dependencies.</li>
  * </ul>
@@ -33,16 +33,16 @@ public interface ArtifactHandler
     String ROLE = ArtifactHandler.class.getName();
 
     /**
-     * Get the file extension associated to the type of artifact.
+     * Get the file extension associated to the file represented by the dependency type.
      *
-     * @return the extension
+     * @return the file extension
      */
     String getExtension();
 
     String getDirectory();
 
     /**
-     * Get the classifier associated to the type of artifact.
+     * Get the classifier associated to the dependency type.
      * 
      * @return the classifier
      */
