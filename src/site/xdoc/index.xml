@@ -40,39 +40,39 @@ under the License.
     process.</p>
 
       <p>
-        <img src="images/maven-deps.png" width="930" height="612" border="0" usemap="#Maven_dependencies" />
+        <img src="images/maven-deps.png" width="930" height="579" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
           <area shape="rect" coords="228,1,361,36"    alt="apache-maven"  href="apache-maven/" />
           <area shape="rect" coords="228,59,362,94"   alt="maven-embedder" href="maven-embedder/" />
           <area shape="rect" coords="228,116,362,152" alt="maven-compat" href="maven-compat/" />
           <area shape="rect" coords="229,176,362,211" alt="maven-core" href="maven-core/" />
-          <area shape="rect" coords="133,413,292,449" alt="maven-resolver-provider" href="maven-resolver-provider/" />
-          <area shape="rect" coords="186,543,378,580" alt="maven-repository-metadata" href="maven-repository-metadata/" />
+          <area shape="rect" coords="134,364,292,399" alt="maven-resolver-provider" href="maven-resolver-provider/" />
+          <area shape="rect" coords="183,544,374,578" alt="maven-repository-metadata" href="maven-repository-metadata/" />
           <area shape="rect" coords="433,176,531,211" alt="maven-plugin-api" href="maven-plugin-api/" />
-          <area shape="rect" coords="388,235,471,270" alt="maven-artifact" href="maven-artifact/" />
+          <area shape="rect" coords="495,544,577,577" alt="maven-artifact" href="maven-artifact/" />
           <area shape="rect" coords="304,414,452,450" alt="maven-builder-support" href="maven-builder-support/" />
-          <area shape="rect" coords="305,293,451,328" alt="maven-settings-builder" href="maven-settings-builder/" />
-          <area shape="rect" coords="388,351,472,387" alt="maven-settings" href="maven-settings/" />
-          <area shape="rect" coords="278,472,411,507" alt="maven-model-builder" href="maven-model-builder/" />
-          <area shape="rect" coords="442,544,532,579" alt="maven-model" href="maven-model/" />
+          <area shape="rect" coords="304,233,451,269" alt="maven-settings-builder" href="maven-settings-builder/" />
+          <area shape="rect" coords="284,293,367,328" alt="maven-settings" href="maven-settings/" />
+          <area shape="rect" coords="275,473,407,507" alt="maven-model-builder" href="maven-model-builder/" />
+          <area shape="rect" coords="397,544,488,578" alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="43,0,200,36"     alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
-          <area shape="rect" coords="0,469,171,611"   alt="maven-resolver" href="https://maven.apache.org/resolver/" />
+          <area shape="rect" coords="0,434,172,578"   alt="maven-resolver" href="https://maven.apache.org/resolver/" />
           <area shape="rect" coords="71,59,173,94"    alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
           <area shape="rect" coords="551,58,707,94"   alt="commons-cli" href="http://commons.apache.org/cli/" />
           <area shape="rect" coords="88,175,205,212"  alt="maven-shared-utils" href="https://maven.apache.org/shared/maven-shared-utils/" />
           <area shape="rect" coords="0,175,70,211"    alt="jansi" href="http://fusesource.github.io/jansi/" />
           <area shape="rect" coords="0,234,70,269"    alt="jansi-native" href="https://github.com/fusesource/jansi-native" />
           <area shape="rect" coords="551,116,739,152" alt="wagon-provider-api" href="https://maven.apache.org/wagon/wagon-provider-api/" />
-          <area shape="rect" coords="560,356,700,390" alt="plexus-sec-dispatcher" href="https://github.com/codehaus-plexus/plexus-sec-dispatcher" />
-          <area shape="rect" coords="724,356,802,391" alt="plexus-cipher" href="https://github.com/codehaus-plexus/plexus-cipher" />
+          <area shape="rect" coords="560,338,699,374" alt="plexus-sec-dispatcher" href="https://github.com/codehaus-plexus/plexus-sec-dispatcher" />
+          <area shape="rect" coords="723,339,802,374" alt="plexus-cipher" href="https://github.com/codehaus-plexus/plexus-cipher" />
           <area shape="rect" coords="563,405,690,441" alt="plexus-interpolation" href="https://codehaus-plexus.github.io/plexus-interpolation" />
-          <area shape="rect" coords="559,304,785,341" alt="plexus-component-annotations" href="https://codehaus-plexus.github.io/plexus-containers" />
-          <area shape="rect" coords="799,305,918,341" alt="plexus-classworlds" href="https://codehaus-plexus.github.io/plexus-classworlds" />
+          <area shape="rect" coords="560,289,784,324" alt="plexus-component-annotations" href="https://codehaus-plexus.github.io/plexus-containers" />
+          <area shape="rect" coords="799,289,917,324" alt="plexus-classworlds" href="https://codehaus-plexus.github.io/plexus-classworlds" />
           <area shape="rect" coords="819,405,909,441" alt="plexus-utils" href="https://codehaus-plexus.github.io/plexus-utils" />
-          <area shape="rect" coords="551,297,929,478" alt="plexus" href="https://codehaus-plexus.github.io/" />
-          <area shape="rect" coords="579,164,804,248" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
+          <area shape="rect" coords="552,276,929,477" alt="plexus" href="https://codehaus-plexus.github.io/" />
+          <area shape="rect" coords="551,163,777,248" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
           <area shape="rect" coords="831,176,905,211" alt="guice" href="http://code.google.com/p/google-guice/" />
-          <area shape="rect" coords="806,238,929,273" alt="javax.inject" href="http://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html" />
+          <area shape="rect" coords="807,230,929,265" alt="javax.inject" href="http://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html" />
         </map>
       </p>
     </section>
