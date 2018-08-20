@@ -43,11 +43,22 @@ public class DefaultDownloader implements Downloader {
     this.applicationName = applicationName;
     this.applicationVersion = applicationVersion;
     configureProxyAuthentication();
+    configureAuthentication();
   }
 
   private void configureProxyAuthentication() {
     if (System.getProperty("http.proxyUser") != null) {
       Authenticator.setDefault(new SystemPropertiesProxyAuthenticator());
+    }
+  }
+  
+  private void configureAuthentication() {
+    if (System.getProperty("MVNW_WRAPPER_AUTH_USERNAME") != null && System.getProperty("MVNW_WRAPPER_AUTH_PASSWORD") != null && System.getProperty("http.proxyUser") == null) {
+      Authenticator.setDefault(new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(System.getProperty("MVNW_WRAPPER_AUTH_USERNAME"), System.getProperty("MVNW_WRAPPER_AUTH_PASSWORD").toCharArray());
+            }
+        });
     }
   }
 
