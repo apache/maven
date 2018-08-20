@@ -83,6 +83,10 @@ download the file from the URL specified in
 download is attempted via curl, wget and, as last resort, by compiling the 
 `./mvn/wrapper/MavenWrapperDownloader.java` file and executing the resulting class.
 
+If your maven repository is password protected you can specify your username via the 
+environment variable `MVNW_WRAPPER_AUTH_USERNAME` and the password via the environment
+variable `MVNW_WRAPPER_AUTH_PASSWORD`.
+
 ## Using a Different Version of Maven
 
 To switch the version of Maven used to build a project you can initialize it using 
