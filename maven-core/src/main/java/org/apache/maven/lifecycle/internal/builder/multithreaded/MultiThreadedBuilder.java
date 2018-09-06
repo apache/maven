@@ -196,12 +196,24 @@ public class MultiThreadedBuilder
         {
             public ProjectSegment call()
             {
-                // muxer.associateThreadWithProjectSegment( projectBuild );
-                lifecycleModuleBuilder.buildProject( projectBuild.getSession(), rootSession, reactorContext,
-                                                     projectBuild.getProject(), taskSegment );
-                // muxer.setThisModuleComplete( projectBuild );
+                final Thread currentThread = Thread.currentThread();
+                final String originalThreadName = currentThread.getName();
+                currentThread.setName( projectBuild.getProject().getArtifactId() );
 
-                return projectBuild;
+                try
+                {
+                    // muxer.associateThreadWithProjectSegment( projectBuild );
+                    lifecycleModuleBuilder.buildProject(
+                            projectBuild.getSession(), rootSession, reactorContext,
+                            projectBuild.getProject(), taskSegment );
+                    // muxer.setThisModuleComplete( projectBuild );
+
+                    return projectBuild;
+                }
+                finally
+                {
+                    currentThread.setName( originalThreadName );
+                }
             }
         };
     }
