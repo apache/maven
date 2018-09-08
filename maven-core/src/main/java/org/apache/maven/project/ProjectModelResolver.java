@@ -19,14 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -48,6 +40,14 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A model resolver to assist building of projects. This resolver gives priority to those repositories that have been
@@ -91,9 +91,7 @@ public class ProjectModelResolver
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<>();
-        List<RemoteRepository> externalRepositories = new ArrayList<>();
-        externalRepositories.addAll( repositories );
-        this.externalRepositories = Collections.unmodifiableList( externalRepositories );
+        this.externalRepositories = Collections.unmodifiableList( new ArrayList<>( repositories ) );
         this.repositories = new ArrayList<>();
         this.repositories.addAll( externalRepositories );
         this.repositoryMerging = repositoryMerging;
