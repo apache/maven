@@ -49,6 +49,7 @@ import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 
+
 /**
  * A model resolver to assist building of projects. This resolver gives priority to those repositories that have been
  * declared in the POM.
@@ -91,9 +92,7 @@ public class ProjectModelResolver
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<>();
-        List<RemoteRepository> externalRepositories = new ArrayList<>();
-        externalRepositories.addAll( repositories );
-        this.externalRepositories = Collections.unmodifiableList( externalRepositories );
+        this.externalRepositories = Collections.unmodifiableList( new ArrayList<>( repositories ) );
         this.repositories = new ArrayList<>();
         this.repositories.addAll( externalRepositories );
         this.repositoryMerging = repositoryMerging;

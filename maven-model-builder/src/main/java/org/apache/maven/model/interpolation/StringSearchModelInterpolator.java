@@ -263,9 +263,8 @@ public class StringSearchModelInterpolator
                             fields.add( new ObjectField( currentField ) );
                         }
                     }
-
                 }
-                this.fields = fields.toArray( new CacheField[fields.size()] );
+                this.fields = fields.toArray( new CacheField[0] );
 
             }
 

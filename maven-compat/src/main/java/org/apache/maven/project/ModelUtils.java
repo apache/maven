@@ -313,12 +313,8 @@ public final class ModelUtils
 
     public static List<Repository> mergeRepositoryLists( List<Repository> dominant, List<Repository> recessive )
     {
-        List<Repository> repositories = new ArrayList<>();
 
-        for ( Repository repository : dominant )
-        {
-            repositories.add( repository );
-        }
+        List<Repository> repositories = new ArrayList<>( dominant );
 
         for ( Repository repository : recessive )
         {

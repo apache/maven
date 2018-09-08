@@ -89,9 +89,7 @@ class DefaultModelResolver
         this.versionRangeResolver = versionRangeResolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.repositories = repositories;
-        List<RemoteRepository> externalRepositories = new ArrayList<>();
-        externalRepositories.addAll( repositories );
-        this.externalRepositories = Collections.unmodifiableList( externalRepositories );
+        this.externalRepositories = Collections.unmodifiableList( new ArrayList<>( repositories ) );
 
         this.repositoryIds = new HashSet<>();
     }
