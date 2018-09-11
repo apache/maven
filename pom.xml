@@ -57,7 +57,6 @@ under the License.
     <plexusVersion>1.7.1</plexusVersion>
     <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
     <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
-    <guavaVersion>20.0</guavaVersion>
     <guiceVersion>4.2.0</guiceVersion>
     <sisuInjectVersion>0.3.3</sisuInjectVersion>
     <wagonVersion>3.1.0</wagonVersion>
@@ -226,11 +225,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexusUtilsVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${guavaVersion}</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>
