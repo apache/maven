@@ -79,7 +79,7 @@ for (String os in runITsOses) {
                     // on Windows, need a short path or we hit 256 character limit for paths
                     // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
                     // will not trample each other
-                    dir(isUnix() ? 'test' : "/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                    dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
                         checkout tests
                         if (isUnix()) {
