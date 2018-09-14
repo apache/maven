@@ -45,8 +45,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 
-import org.codehaus.plexus.util.FileUtils;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.maven.shared.utils.io.FileUtils.fileRead;
+import static org.apache.maven.shared.utils.io.FileUtils.fileWrite;
 
 public class TestFileManager
 {
@@ -146,7 +149,7 @@ public class TestFileManager
             {
                 if ( file.isDirectory() )
                 {
-                    FileUtils.deleteDirectory( file );
+                    deleteDirectory( file );
                 }
                 else
                 {
@@ -181,7 +184,7 @@ public class TestFileManager
 
         File file = new File( dir, filename );
 
-        String contents = FileUtils.fileRead( file, encoding );
+        String contents = fileRead( file, encoding );
 
         Assert.assertEquals( contentsTest, contents );
     }
@@ -193,7 +196,7 @@ public class TestFileManager
 
         file.getParentFile().mkdirs();
 
-        FileUtils.fileWrite( file.getPath(), encoding, contents );
+        fileWrite( file.getPath(), encoding, contents );
 
         markForDeletion( file );
 
@@ -203,7 +206,7 @@ public class TestFileManager
     public String getFileContents( File file, String encoding )
         throws IOException
     {
-        return FileUtils.fileRead( file, encoding );
+        return fileRead( file, encoding );
     }
 
     protected void finalize()

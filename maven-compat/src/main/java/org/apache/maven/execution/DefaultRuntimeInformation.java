@@ -25,7 +25,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Describes runtime information about the application.
@@ -53,7 +54,7 @@ public class DefaultRuntimeInformation
     {
         String mavenVersion = rtInfo.getMavenVersion();
 
-        if ( StringUtils.isEmpty( mavenVersion ) )
+        if ( isEmpty( mavenVersion ) )
         {
             throw new InitializationException( "Unable to read Maven version from maven-core" );
         }

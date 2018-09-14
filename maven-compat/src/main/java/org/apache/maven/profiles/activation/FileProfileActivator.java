@@ -31,7 +31,9 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.replace;
 
 /**
  * FileProfileActivator
@@ -72,18 +74,18 @@ public class FileProfileActivator
 
             try
             {
-                if ( StringUtils.isNotEmpty( fileString ) )
+                if ( isNotEmpty( fileString ) )
                 {
-                    fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                    fileString = replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
                     return FileUtils.fileExists( fileString );
                 }
 
                 // check if the file is missing, if it is then the profile will be active
                 fileString = actFile.getMissing();
 
-                if ( StringUtils.isNotEmpty( fileString ) )
+                if ( isNotEmpty( fileString ) )
                 {
-                    fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                    fileString = replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
                     return !FileUtils.fileExists( fileString );
                 }
             }

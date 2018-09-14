@@ -23,7 +23,6 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -69,6 +68,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.codehaus.plexus.util.StringUtils.clean;
 
 /**
  * @author Benjamin Bentmann
@@ -292,7 +295,7 @@ public class DefaultVersionResolver
                 }
             }
 
-            if ( StringUtils.isEmpty( result.getVersion() ) )
+            if ( isEmpty( result.getVersion() ) )
             {
                 throw new VersionResolutionException( result );
             }
@@ -383,19 +386,19 @@ public class DefaultVersionResolver
     private void merge( Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning,
                         ArtifactRepository repository )
     {
-        if ( StringUtils.isNotEmpty( versioning.getRelease() ) )
+        if ( isNotEmpty( versioning.getRelease() ) )
         {
             merge( RELEASE, infos, versioning.getLastUpdated(), versioning.getRelease(), repository );
         }
 
-        if ( StringUtils.isNotEmpty( versioning.getLatest() ) )
+        if ( isNotEmpty( versioning.getLatest() ) )
         {
             merge( LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository );
         }
 
         for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
         {
-            if ( StringUtils.isNotEmpty( sv.getVersion() ) )
+            if ( isNotEmpty( sv.getVersion() ) )
             {
                 String key = getKey( sv.getClassifier(), sv.getExtension() );
                 merge( SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository );
@@ -446,7 +449,7 @@ public class DefaultVersionResolver
 
     private String getKey( String classifier, String extension )
     {
-        return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
+        return clean( classifier ) + ':' + clean( extension );
     }
 
     private boolean isSafelyCacheable( RepositorySystemSession session, Artifact artifact )

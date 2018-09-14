@@ -35,7 +35,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
@@ -83,12 +84,12 @@ public class FileProfileActivator
         String path;
         boolean missing;
 
-        if ( StringUtils.isNotEmpty( file.getExists() ) )
+        if ( isNotEmpty( file.getExists() ) )
         {
             path = file.getExists();
             missing = false;
         }
-        else if ( StringUtils.isNotEmpty( file.getMissing() ) )
+        else if ( isNotEmpty( file.getMissing() ) )
         {
             path = file.getMissing();
             missing = true;

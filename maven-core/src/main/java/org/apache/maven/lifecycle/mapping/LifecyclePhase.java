@@ -25,7 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.util.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * LifecyclePhase
@@ -58,9 +59,9 @@ public class LifecyclePhase
     {
         mojos = new ArrayList<>();
         
-        if ( StringUtils.isNotEmpty( goals ) )
+        if ( isNotEmpty( goals ) )
         {
-            String[] mojoGoals = StringUtils.split( goals, "," );
+            String[] mojoGoals = split( goals, "," );
             
             for ( String mojoGoal: mojoGoals )
             {

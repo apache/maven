@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.apache.maven.settings.IdentifiableBase;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
@@ -90,7 +91,7 @@ public class MavenSettingsMerger
             }
         }
 
-        if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
+        if ( isEmpty( dominant.getLocalRepository() ) )
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
         }

@@ -21,7 +21,8 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Exception in the plugin manager.
@@ -78,7 +79,7 @@ public class PluginExecutionException
             message = "Mojo execution failed";
         }
 
-        if ( cause != null && StringUtils.isNotEmpty( cause.getMessage() ) )
+        if ( cause != null && isNotEmpty( cause.getMessage() ) )
         {
             message += ": " + cause.getMessage();
         }

@@ -79,7 +79,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -106,6 +105,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -299,7 +301,7 @@ public class DefaultMavenPluginManager
         throws PluginIncompatibleException
     {
         String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
-        if ( StringUtils.isNotBlank( requiredMavenVersion ) )
+        if ( isNotBlank( requiredMavenVersion ) )
         {
             try
             {
@@ -613,7 +615,7 @@ public class DefaultMavenPluginManager
 
         String configuratorId = mojoDescriptor.getComponentConfigurator();
 
-        if ( StringUtils.isEmpty( configuratorId ) )
+        if ( isEmpty( configuratorId ) )
         {
             configuratorId = "basic";
         }

@@ -26,6 +26,8 @@ import java.util.Objects;
 import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+
 /**
  * @author Benjamin Bentmann
  */
@@ -44,10 +46,9 @@ final class RelocatedArtifact
     RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
     {
         this.artifact = Objects.requireNonNull( artifact, "artifact cannot be null" );
-        // TODO Use StringUtils here
-        this.groupId = ( groupId != null && groupId.length() > 0 ) ? groupId : null;
-        this.artifactId = ( artifactId != null && artifactId.length() > 0 ) ? artifactId : null;
-        this.version = ( version != null && version.length() > 0 ) ? version : null;
+        this.groupId = defaultIfEmpty( groupId, null );
+        this.artifactId = defaultIfEmpty( artifactId, null );
+        this.version = defaultIfEmpty ( version, null );
     }
 
     public String getGroupId()

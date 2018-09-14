@@ -26,11 +26,12 @@ import java.util.Map;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 import org.eclipse.aether.metadata.Metadata;
+
+import static org.apache.commons.io.FileUtils.copyFile;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -59,7 +60,7 @@ public final class MetadataBridge
         {
             if ( current.exists() )
             {
-                FileUtils.copyFile( current, result );
+                copyFile( current, result );
             }
             ArtifactRepository localRepo = new MetadataRepository( result );
             metadata.storeInLocalRepository( localRepo, localRepo );

@@ -37,7 +37,8 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Handles inheritance of model values.
@@ -149,7 +150,7 @@ public class DefaultInheritanceAssembler
             Object childDirectory = context.get( CHILD_DIRECTORY );
             Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
 
-            if ( StringUtils.isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null )
+            if ( isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null )
             {
                 return parentUrl;
             }

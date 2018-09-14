@@ -33,7 +33,8 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Handles normalization of a model.
@@ -127,7 +128,7 @@ public class DefaultModelNormalizer
     {
         for ( Dependency dependency : dependencies )
         {
-            if ( StringUtils.isEmpty( dependency.getScope() ) )
+            if ( isEmpty( dependency.getScope() ) )
             {
                 // we cannot set this directly in the MDO due to the interactions with dependency management
                 dependency.setScope( "compile" );

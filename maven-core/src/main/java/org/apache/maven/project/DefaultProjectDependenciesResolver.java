@@ -32,7 +32,6 @@ import org.apache.maven.model.Exclusion;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -49,6 +48,9 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Benjamin Bentmann
@@ -105,8 +107,8 @@ public class DefaultProjectDependenciesResolver
         {
             for ( Dependency dependency : project.getDependencies() )
             {
-                if ( StringUtils.isEmpty( dependency.getGroupId() ) || StringUtils.isEmpty( dependency.getArtifactId() )
-                    || StringUtils.isEmpty( dependency.getVersion() ) )
+                if ( isEmpty( dependency.getGroupId() ) || isEmpty( dependency.getArtifactId() )
+                    || isEmpty( dependency.getVersion() ) )
                 {
                     // guard against case where best-effort resolution for invalid models is requested
                     continue;
@@ -260,7 +262,7 @@ public class DefaultProjectDependenciesResolver
                 {
                     final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
                     buffer.append( " (scope managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedScope, "default" ) );
+                    buffer.append( defaultString( premanagedScope, "default" ) );
                     buffer.append( ')' );
                 }
 
@@ -268,7 +270,7 @@ public class DefaultProjectDependenciesResolver
                 {
                     final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
                     buffer.append( " (version managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedVersion, "default" ) );
+                    buffer.append( defaultString( premanagedVersion, "default" ) );
                     buffer.append( ')' );
                 }
 
@@ -276,7 +278,7 @@ public class DefaultProjectDependenciesResolver
                 {
                     final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
                     buffer.append( " (optionality managed from " );
-                    buffer.append( StringUtils.defaultString( premanagedOptional, "default" ) );
+                    buffer.append( ( premanagedOptional == null ? "default" : premanagedOptional ) );
                     buffer.append( ')' );
                 }
 

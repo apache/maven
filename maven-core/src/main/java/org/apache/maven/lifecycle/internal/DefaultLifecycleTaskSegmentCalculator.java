@@ -33,11 +33,13 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * <p>
@@ -75,9 +77,9 @@ public class DefaultLifecycleTaskSegmentCalculator
 
         List<String> tasks = session.getGoals();
 
-        if ( ( tasks == null || tasks.isEmpty() ) && !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
+        if ( ( tasks == null || tasks.isEmpty() ) && !isEmpty( rootProject.getDefaultGoal() ) )
         {
-            tasks = Arrays.asList( StringUtils.split( rootProject.getDefaultGoal() ) );
+            tasks = Arrays.asList( split( rootProject.getDefaultGoal() ) );
         }
 
         return calculateTaskSegments( session, tasks );

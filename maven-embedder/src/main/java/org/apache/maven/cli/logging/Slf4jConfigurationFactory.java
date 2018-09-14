@@ -28,8 +28,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
-import org.codehaus.plexus.util.PropertyUtils;
 import org.slf4j.ILoggerFactory;
+
+import static org.apache.maven.shared.utils.PropertyUtils.loadOptionalProperties;
 
 /**
  * Slf4jConfiguration factory, loading implementations from <code>META-INF/maven/slf4j-configuration.properties</code>
@@ -57,7 +58,7 @@ public class Slf4jConfigurationFactory
             {
                 URL resource = resources.nextElement();
 
-                Properties conf = PropertyUtils.loadProperties( resource.openStream() );
+                Properties conf = loadOptionalProperties( resource.openStream() );
 
                 String impl = conf.getProperty( slf4jBinding );
 

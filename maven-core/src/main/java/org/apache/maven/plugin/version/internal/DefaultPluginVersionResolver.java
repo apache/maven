@@ -42,7 +42,6 @@ import org.apache.maven.plugin.version.PluginVersionResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryListener;
@@ -58,6 +57,9 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.maven.shared.utils.StringUtils.clean;
 
 /**
  * Resolves a version for a plugin.
@@ -154,12 +156,12 @@ public class DefaultPluginVersionResolver
         String version = null;
         ArtifactRepository repo = null;
 
-        if ( StringUtils.isNotEmpty( versions.releaseVersion ) )
+        if ( isNotEmpty( versions.releaseVersion ) )
         {
             version = versions.releaseVersion;
             repo = versions.releaseRepository;
         }
-        else if ( StringUtils.isNotEmpty( versions.latestVersion ) )
+        else if ( isNotEmpty( versions.latestVersion ) )
         {
             version = versions.latestVersion;
             repo = versions.latestRepository;
@@ -317,9 +319,9 @@ public class DefaultPluginVersionResolver
         Versioning versioning = source.getVersioning();
         if ( versioning != null )
         {
-            String timestamp = StringUtils.clean( versioning.getLastUpdated() );
+            String timestamp = clean( versioning.getLastUpdated() );
 
-            if ( StringUtils.isNotEmpty( versioning.getRelease() )
+            if ( isNotEmpty( versioning.getRelease() )
                 && timestamp.compareTo( versions.releaseTimestamp ) > 0 )
             {
                 versions.releaseVersion = versioning.getRelease();
@@ -327,7 +329,7 @@ public class DefaultPluginVersionResolver
                 versions.releaseRepository = repository;
             }
 
-            if ( StringUtils.isNotEmpty( versioning.getLatest() )
+            if ( isNotEmpty( versioning.getLatest() )
                 && timestamp.compareTo( versions.latestTimestamp ) > 0 )
             {
                 versions.latestVersion = versioning.getLatest();
