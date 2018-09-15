@@ -282,6 +282,33 @@ under the License.
               </execution>
             </executions>
           </plugin>
+          <!-- calculate checksums of source release for Apache dist area -->
+          <plugin>
+            <groupId>net.nicoulaj.maven.plugins</groupId>
+            <artifactId>checksum-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>source-release-checksum</id>
+                <goals>
+                  <goal>files</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>${project.artifactId}-${project.version}-src.zip</include>
+                    <include>${project.artifactId}-${project.version}-src.tar.gz</include>
+                    <include>${project.artifactId}-${project.version}-bin.zip</include>
+                    <include>${project.artifactId}-${project.version}-bin.tar.gz</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+              <failIfNoFiles>true</failIfNoFiles>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
