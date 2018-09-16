@@ -24,19 +24,25 @@ subject to the terms and conditions of the following licenses:
 
 #set ( $apacheLicenseNames = [ "Apache License, Version 2.0", "The Apache Software License, Version 2.0",
     "ASLv2", "Apache Public License 2.0", "Apache 2.0" ] )
+#set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses)
-#*  *##if ( !$apacheLicenseNames.contains( $license.name) )
+#*  *##if ( !$apacheLicenseNames.contains( $license.name ) )
 #*    *##set ( $artId = $project.artifact.artifactId )
-#*    *##set ( $lf = $locator )
 #*    *##set ( $url = $license.url )
-#*    *### glass fish URL is now invalid, use a fixed one
+#*    *### glassfish URL is now invalid, use a fixed one
 #*    *##if ( $url == "https://glassfish.dev.java.net/public/CDDLv1.0.html" )
-#*      *##set ( $url = 'https://glassfish.java.net/public/CDDLv1.0.html' )
+#*      *##set ( $url = 'https://repository.jboss.org/licenses/cddl.txt' )
+#*    *##end
+#*    *##if ( $MITLicenseNames.contains( $license.name ) )
+#*      *##set ( $url = 'https://repository.jboss.org/licenses/mit.txt' )
+#*    *##end
+#*    *##if ( $url == "http://www.eclipse.org/legal/epl-v10.html" )
+#*      *##set ( $url = 'http://www.eclipse.org/org/documents/epl-1.0/EPL-1.0.txt' )
 #*    *##end
 #*    *##if ( $url )
 #*      *##set ( $licFile = 'lib/' + $artId + '.license' )
-#*      *##set ( $downloaded = $lf.getResourceAsFile( $url, "licenses/${licFile}" ) )
+#*      *##set ( $downloaded = $locator.getResourceAsFile( $url, "licenses/${licFile}" ) )
 #*    *##end
 
 - $project.name#if ( $project.url ) ($project.url)#end $project.artifact
