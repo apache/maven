@@ -21,7 +21,7 @@
 Apache Maven includes a number of components and libraries with separate 
 copyright notices and license terms. Your use of those components are 
 subject to the terms and conditions of the following licenses: 
-
+#
 #set ( $apacheLicenseNames = [ "Apache License, Version 2.0", "The Apache Software License, Version 2.0",
     "ASLv2", "Apache Public License 2.0", "Apache 2.0" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
@@ -30,25 +30,37 @@ subject to the terms and conditions of the following licenses:
 #*  *##if ( !$apacheLicenseNames.contains( $license.name ) )
 #*    *##set ( $artId = $project.artifact.artifactId )
 #*    *##set ( $url = $license.url )
-#*    *### glassfish URL is now invalid, use a fixed one
-#*    *##if ( $url == "https://glassfish.dev.java.net/public/CDDLv1.0.html" )
-#*      *##set ( $url = 'https://repository.jboss.org/licenses/cddl.txt' )
+#*    *##set ( $spdx = false )
+#*    *##set ( $includeLicense = true )
+#*    *###
+#*    *##if ( ( $project.artifact.toString() == "org.checkerframework:checker-compat-qual:jar:2.0.0" )
+              && ( $url == "http://www.gnu.org/software/classpath/license.html" ) )
+#*      *### checkerframework is MIT for qual: https://github.com/typetools/checker-framework/blob/master/LICENSE.txt
+#*      *##set ( $includeLicense = false )
+#*    *##end
+#*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
+#*      *##set ( $spdx = 'CDDL-1.0' )
 #*    *##end
 #*    *##if ( $MITLicenseNames.contains( $license.name ) )
-#*      *##set ( $url = 'https://repository.jboss.org/licenses/mit.txt' )
+#*      *##set ( $spdx = 'MIT' )
 #*    *##end
-#*    *##if ( $url == "http://www.eclipse.org/legal/epl-v10.html" )
-#*      *##set ( $url = 'http://www.eclipse.org/org/documents/epl-1.0/EPL-1.0.txt' )
+#*    *##if ( $license.name == "Eclipse Public License, Version 1.0" )
+#*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##end
-#*    *##if ( $url )
-#*      *##set ( $licFile = 'lib/' + $artId + '.license' )
-#*      *##set ( $downloaded = $locator.getResourceAsFile( $url, "licenses/${licFile}" ) )
-#*    *##end
+#*    *##if ( $includeLicense )
+#*      *##if ( $url || $spdx )
+#*        *##set ( $licFile = 'lib/' + $artId + '.license' )
+#*        *##if ( $spdx )
+#*          *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}.txt", "licenses/${licFile}" ) )
+#*        *##else
+#*          *##set ( $downloaded = $locator.getResourceAsFile( $url, "licenses/${licFile}" ) )
+#*        *##end
+#*      *##end
 
 - $project.name#if ( $project.url ) ($project.url)#end $project.artifact
-    License: $license.name#if ( $url )  $url ($licFile)#end
+    License: $license.name#if ( $spdx ) ($spdx)#end#if ( $url )  $url ($licFile)#end
 
+#*    *##end
 #*  *##end
 #**##end
 #end
-
