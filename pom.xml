@@ -512,6 +512,11 @@ under the License.
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
               <exclude>**/*.odg</exclude>
+              <!--
+                ! Excluded the license files itself cause they do not have have a license of themselfs.
+              -->
+              <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
