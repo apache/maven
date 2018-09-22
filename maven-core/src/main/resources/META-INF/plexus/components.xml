@@ -56,8 +56,12 @@ under the License.
           <phase>integration-test</phase>
           <phase>post-integration-test</phase>
           <phase>verify</phase>
-          <phase>install</phase>
-          <phase>deploy</phase>
+          <choice>
+            <phases>
+              <phase>install</phase>
+              <phase>deploy</phase>
+            </phases>
+          </choice>
         </phases>
         <!-- END SNIPPET: lifecycle -->
       </configuration>

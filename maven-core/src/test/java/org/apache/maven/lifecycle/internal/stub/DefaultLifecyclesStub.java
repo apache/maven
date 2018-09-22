@@ -17,6 +17,8 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecyclePhase;
+import org.apache.maven.lifecycle.Phase;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,20 +37,31 @@ public class DefaultLifecyclesStub
     public static DefaultLifecycles createDefaultLifecycles()
     {
 
-        List<String> stubDefaultCycle =
-            Arrays.asList( VALIDATE.getPhase(), INITIALIZE.getPhase(), PROCESS_RESOURCES.getPhase(), COMPILE.getPhase(),
-                           TEST.getPhase(), PROCESS_TEST_RESOURCES.getPhase(), PACKAGE.getPhase(), "BEER",
-                           INSTALL.getPhase() );
+        List<LifecyclePhase> stubDefaultCycle =
+            Arrays.<LifecyclePhase>asList( new Phase( VALIDATE.getPhase() ),
+                                           new Phase( INITIALIZE.getPhase() ),
+                                           new Phase( PROCESS_RESOURCES.getPhase() ),
+                                           new Phase( COMPILE.getPhase() ),
+                                           new Phase( TEST.getPhase() ),
+                                           new Phase( PROCESS_TEST_RESOURCES.getPhase() ),
+                                           new Phase( PACKAGE.getPhase() ),
+                                           new Phase( "BEER" ),
+                                           new Phase( INSTALL.getPhase() ) );
 
         // The two phases below are really for future expansion, some would say they lack a drink
         // The point being that they do not really have to match the "real" stuff,
-        List<String> stubCleanCycle = Arrays.asList( PRE_CLEAN.getPhase(), CLEAN.getPhase(), POST_CLEAN.getPhase() );
+        List<LifecyclePhase> stubCleanCycle =
+            Arrays.<LifecyclePhase>asList( new Phase( PRE_CLEAN.getPhase() ),
+                                           new Phase( CLEAN.getPhase() ), 
+                                           new Phase( POST_CLEAN.getPhase() ) );
 
-        List<String> stubSiteCycle =
-            Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase() );
+        List<LifecyclePhase> stubSiteCycle =
+            Arrays.<LifecyclePhase>asList( new Phase( PRE_SITE.getPhase() ),
+                                           new Phase( SITE.getPhase() ),
+                                           new Phase( POST_SITE.getPhase() ),
+                                           new Phase( SITE_DEPLOY.getPhase() ) );
 
-        @SuppressWarnings( "unchecked" )
-        Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
+        Iterator<List<LifecyclePhase>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
 
         Map<String, Lifecycle> lifeCycles = new HashMap<>();
         for ( String s : DefaultLifecycles.STANDARD_LIFECYCLES )

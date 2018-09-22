@@ -28,6 +28,8 @@ import java.util.TreeMap;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
+import org.apache.maven.lifecycle.LifecycleResolver;
+import org.apache.maven.lifecycle.Phase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -55,6 +57,9 @@ public class DefaultLifecycleMappingDelegate
 
     @Requirement
     private BuildPluginManager pluginManager;
+    
+    @Requirement
+    private LifecycleResolver lifecycleResolver;
 
     public Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                         Lifecycle lifecycle, String lifecyclePhase )
@@ -66,19 +71,13 @@ public class DefaultLifecycleMappingDelegate
          * is interested in, i.e. all phases up to and including the specified phase.
          */
 
-        Map<String, Map<Integer, List<MojoExecution>>> mappings =
-            new LinkedHashMap<>();
+        Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
 
-        for ( String phase : lifecycle.getPhases() )
+        for ( Phase phase : lifecycleResolver.resolve( lifecycle, lifecyclePhase ) )
         {
             Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
 
-            mappings.put( phase, phaseBindings );
-
-            if ( phase.equals( lifecyclePhase ) )
-            {
-                break;
-            }
+            mappings.put( phase.getValue(), phaseBindings );
         }
 
         /*

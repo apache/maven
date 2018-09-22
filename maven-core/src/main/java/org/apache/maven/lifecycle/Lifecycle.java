@@ -19,10 +19,9 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**
  * Class Lifecycle.
@@ -33,10 +32,11 @@ public class Lifecycle
     {
     }
 
-    public Lifecycle( String id, List<String> phases, Map<String, LifecyclePhase> defaultPhases )
+    public Lifecycle( String id, List<LifecyclePhase> phases,
+                      Map<String, org.apache.maven.lifecycle.mapping.LifecyclePhase> defaultPhases )
     {
         this.id = id;
-        this.phases = phases;
+        this.phases.getPhases().addAll( phases );
         this.defaultPhases = defaultPhases;
     }
 
@@ -54,21 +54,53 @@ public class Lifecycle
 
     private String id;
 
-    private List<String> phases;
+    // Must be called phases for backward compatibility; use to be List<String>
+    private PhasesWrapper phases = new PhasesWrapper();
 
-    private Map<String, LifecyclePhase> defaultPhases;
+    private Map<String, org.apache.maven.lifecycle.mapping.LifecyclePhase> defaultPhases;
 
     public String getId()
     {
         return this.id;
     }
 
+    /**
+     * Flattened (original) lifecycle
+     * 
+     * @return
+     */
     public List<String> getPhases()
     {
-        return this.phases;
+        List<String> names = new ArrayList<>();
+        for ( LifecyclePhase phase : this.phases.getPhases() )
+        {
+            if ( phase instanceof Phase )
+            {
+                names.add( ( (Phase) phase ).getValue() );
+            }
+            else if ( phase instanceof Choice )
+            {
+                Choice choice = (Choice) phase;
+                for ( Phase choicePhase : choice.getPhases() )
+                {
+                    names.add( choicePhase.getValue() );
+                }
+            }
+        }
+        return names;
+    }
+    
+    /**
+     * Structured lifecycle
+     * 
+     * @return
+     */
+    public List<LifecyclePhase> phases()
+    {
+        return phases.getPhases();
     }
 
-    public Map<String, LifecyclePhase> getDefaultLifecyclePhases()
+    public Map<String, org.apache.maven.lifecycle.mapping.LifecyclePhase> getDefaultLifecyclePhases()
     {
         return defaultPhases;
     }
@@ -76,7 +108,7 @@ public class Lifecycle
     @Deprecated
     public Map<String, String> getDefaultPhases()
     {
-        return LifecyclePhase.toLegacyMap( getDefaultLifecyclePhases() );
+        return org.apache.maven.lifecycle.mapping.LifecyclePhase.toLegacyMap( getDefaultLifecyclePhases() );
     }
 
     @Override
@@ -84,5 +116,4 @@ public class Lifecycle
     {
         return id + " -> " + phases;
     }
-
 }
