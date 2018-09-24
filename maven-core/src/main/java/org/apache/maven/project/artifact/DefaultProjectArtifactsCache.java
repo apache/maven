@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,7 +87,7 @@ public class DefaultProjectArtifactsCache
             artifactId = project.getArtifactId();
             version = project.getVersion();
             
-            Set<String> deps = new HashSet<>();
+            Set<String> deps = new LinkedHashSet<>();
             if ( project.getDependencyArtifacts() != null )
             {
               for ( Artifact dep: project.getDependencyArtifacts() )
@@ -203,7 +204,7 @@ public class DefaultProjectArtifactsCache
         assertUniqueKey( key );
 
         CacheRecord record =
-            new CacheRecord( Collections.unmodifiableSet( new HashSet<>( projectArtifacts ) ) );
+            new CacheRecord( Collections.unmodifiableSet( new LinkedHashSet<>( projectArtifacts ) ) );
 
         cache.put( key, record );
 
