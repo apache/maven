@@ -12,3 +12,4 @@ bin
 .idea
 jvz-*
 .flattened-pom.xml
+.checkstyle

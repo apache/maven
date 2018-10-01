@@ -32,17 +32,17 @@ import java.util.List;
  * information during the reactor summary output at the correct
  * positions.
  *  
- * <a href="https://issues.apache.org/jira/browse/MNG-6352">MNG-6352</a>.
+ * <a href="https://issues.apache.org/jira/browse/MNG-6391">MNG-6391</a>.
  * 
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
-public class MavenITmng6352PrintVersionTest
+public class MavenITmng6391PrintVersionTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng6352PrintVersionTest()
+    public MavenITmng6391PrintVersionTest()
     {
-        super( "[3.5.3-SNAPSHOT,3.5.4-SNAPSHOT]" );
+        super( "[3.6.0-SNAPSHOT,)" );
     }
 
     /**
@@ -54,7 +54,7 @@ public class MavenITmng6352PrintVersionTest
     public void testitShouldPrintVersionAtTopAndAtBottom()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6352-print-version" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6391-print-version" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
@@ -69,13 +69,14 @@ public class MavenITmng6352PrintVersionTest
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
 
         // We expecting exactly four lines as result.
-        assertEquals( 4, resultingLines.size() );
+        assertEquals( 5, resultingLines.size() );
 
         // We expect those lines in the following exact order.
-        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] base-project 1.3.0-SNAPSHOT ........................ SUCCESS [" ) );
-        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-1 ........................................... SUCCESS [" ) );
-        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-2 ........................................... SUCCESS [" ) );
-        assertTrue( resultingLines.get( 3 ).startsWith( "[INFO] module-3 1.3.0-SNAPSHOT ............................ SUCCESS [" ) );
+        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] Reactor Summary for base-project 1.3.0-SNAPSHOT:" ) );
+        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] base-project ....................................... SUCCESS [" ) );
+        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-1 ........................................... SUCCESS [" ) );
+        assertTrue( resultingLines.get( 3 ).startsWith( "[INFO] module-2 ........................................... SUCCESS [" ) );
+        assertTrue( resultingLines.get( 4 ).startsWith( "[INFO] module-3 ........................................... SUCCESS [" ) );
         
     }
 
@@ -87,7 +88,7 @@ public class MavenITmng6352PrintVersionTest
     public void testitShouldPrintVersionInAllLines()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6352-print-version-aggregator" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6391-print-version-aggregator" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
@@ -102,22 +103,22 @@ public class MavenITmng6352PrintVersionTest
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
 
         // We expecting exactly four lines as result.
-        assertEquals( 4, resultingLines.size() );
+        assertEquals( 5, resultingLines.size() );
 
         // We expect those lines in the following exact order.
-        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] module-1 1.2.7.43.RELEASE .......................... SUCCESS [  " ) );
-        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-2 7.5-SNAPSHOT .............................. SUCCESS [  " ) );
-        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-3 1-RC1 ..................................... SUCCESS [  " ) );
-        assertTrue( resultingLines.get( 3 ).startsWith( "[INFO] base-project 1.0.0-SNAPSHOT ........................ SUCCESS [  " ) );
+        assertTrue( resultingLines.get( 0 ).startsWith( "[INFO] Reactor Summary:" ) );
+        assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-1 1.2.7.43.RELEASE .......................... SUCCESS [  " ) );
+        assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-2 7.5-SNAPSHOT .............................. SUCCESS [  " ) );
+        assertTrue( resultingLines.get( 3 ).startsWith( "[INFO] module-3 1-RC1 ..................................... SUCCESS [  " ) );
+        assertTrue( resultingLines.get( 4 ).startsWith( "[INFO] base-project 1.0.0-SNAPSHOT ........................ SUCCESS [  " ) );
 
     }
-
     
     /**
      * Extract the lines at the end of the Maven output:
      * 
      * <pre>
-     * [INFO] Reactor Summary:
+     * [INFO] Reactor Summary..: XXX
      * [INFO]
      * [INFO] ...SUCCESS [  0.035 s]
      * [INFO] ...SUCCESS [  0.035 s]
@@ -143,9 +144,10 @@ public class MavenITmng6352PrintVersionTest
             }
             else
             {
-                if ( line.startsWith( "[INFO] Reactor Summary:" ) )
+                if ( line.startsWith( "[INFO] Reactor Summary" ) )
                 {
                     start = true;
+                    resultingLines.add( line );
                 }
 
             }
