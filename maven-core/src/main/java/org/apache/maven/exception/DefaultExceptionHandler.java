@@ -19,20 +19,13 @@ package org.apache.maven.exception;
  * under the License.
  */
 
-import java.io.IOException;
-import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginContainerException;
-import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.component.annotations.Component;
@@ -98,8 +91,6 @@ public class DefaultExceptionHandler
 
     private ExceptionSummary handle( String message, Throwable exception )
     {
-        String reference = getReference( exception );
-
         List<ExceptionSummary> children = null;
 
         if ( exception instanceof ProjectBuildingException )
@@ -124,7 +115,7 @@ public class DefaultExceptionHandler
             message = getMessage( message, exception );
         }
 
-        return new ExceptionSummary( exception, message, reference, children );
+        return new ExceptionSummary( exception, message, null, children );
     }
 
     private ExceptionSummary handle( ProjectBuildingResult result )
@@ -171,98 +162,6 @@ public class DefaultExceptionHandler
         {
             return null;
         }
-    }
-
-    private String getReference( Throwable exception )
-    {
-        String reference = "";
-
-        if ( exception != null )
-        {
-            if ( exception instanceof MojoExecutionException )
-            {
-                reference = MojoExecutionException.class.getSimpleName();
-
-                Throwable cause = exception.getCause();
-                if ( cause instanceof IOException )
-                {
-                    cause = cause.getCause();
-                    if ( cause instanceof ConnectException )
-                    {
-                        reference = ConnectException.class.getSimpleName();
-                    }
-                }
-            }
-            else if ( exception instanceof MojoFailureException )
-            {
-                reference = MojoFailureException.class.getSimpleName();
-            }
-            else if ( exception instanceof LinkageError )
-            {
-                reference = LinkageError.class.getSimpleName();
-            }
-            else if ( exception instanceof PluginExecutionException )
-            {
-                Throwable cause = exception.getCause();
-
-                if ( cause instanceof PluginContainerException )
-                {
-                    Throwable cause2 = cause.getCause();
-
-                    if ( cause2 instanceof NoClassDefFoundError
-                        && cause2.getMessage().contains( "org/sonatype/aether/" ) )
-                    {
-                        reference = "AetherClassNotFound";
-                    }
-                }
-
-                if ( StringUtils.isEmpty( reference ) )
-                {
-                    reference = getReference( cause );
-                }
-
-                if ( StringUtils.isEmpty( reference ) )
-                {
-                    reference = exception.getClass().getSimpleName();
-                }
-            }
-            else if ( exception instanceof LifecycleExecutionException )
-            {
-                reference = getReference( exception.getCause() );
-            }
-            else if ( isNoteworthyException( exception ) )
-            {
-                reference = exception.getClass().getSimpleName();
-            }
-        }
-
-        if ( StringUtils.isNotEmpty( reference ) && !reference.startsWith( "http:" ) )
-        {
-            reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
-        }
-
-        return reference;
-    }
-
-    private boolean isNoteworthyException( Throwable exception )
-    {
-        if ( exception == null )
-        {
-            return false;
-        }
-        else if ( exception instanceof Error )
-        {
-            return true;
-        }
-        else if ( exception instanceof RuntimeException )
-        {
-            return false;
-        }
-        else if ( exception.getClass().getName().startsWith( "java" ) )
-        {
-            return false;
-        }
-        return true;
     }
 
     private String getMessage( String message, Throwable exception )
