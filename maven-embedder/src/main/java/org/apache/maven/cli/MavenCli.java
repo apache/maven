@@ -992,18 +992,6 @@ public class MavenCli
                     + " switch to enable full debug logging." );
             }
 
-            if ( !references.isEmpty() )
-            {
-                slf4jLogger.error( "" );
-                slf4jLogger.error( "For more information about the errors and possible solutions"
-                                       + ", please read the following articles:" );
-
-                for ( Map.Entry<String, String> entry : references.entrySet() )
-                {
-                    slf4jLogger.error( buffer().strong( entry.getValue() ) + " " + entry.getKey() );
-                }
-            }
-
             if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
             {
                 slf4jLogger.error( "" );

@@ -24,14 +24,14 @@ import java.net.ConnectException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:baerrach@apache.org">Barrie Treloar</a>
  */
-public class DefaultExceptionHandlerTest
-    extends TestCase
-{
+public class DefaultExceptionHandlerTest {
     /**
      * Running Maven under JDK7 may cause connection issues because IPv6 is used by default.
      * <p>
@@ -42,19 +42,19 @@ public class DefaultExceptionHandlerTest
      * http://cwiki.apache.org/confluence/display/MAVEN/ConnectException
      * </p>
      */
+    @Test
     public void testJdk7ipv6()
     {
         ConnectException connEx = new ConnectException( "Connection refused: connect" );
-        IOException ioEx = new IOException( "Unable to establish loopback connection" );
-        ioEx.initCause( connEx );
+        IOException ioEx = new IOException( "Unable to establish loopback connection", connEx );
         MojoExecutionException mojoEx =
             new MojoExecutionException( "Error executing Jetty: Unable to establish loopback connection", ioEx );
 
         ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
         ExceptionSummary exceptionSummary = exceptionHandler.handleException( mojoEx );
 
-        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/ConnectException";
-        assertEquals( expectedReference, exceptionSummary.getReference() );
+        assertEquals( "", exceptionSummary.getReference() );
+        assertEquals( mojoEx, exceptionSummary.getException() );
 
     }
 }
