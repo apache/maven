@@ -51,7 +51,7 @@ under the License.
     <maven.compiler.target>1.7</maven.compiler.target>
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
-    <commonsLangVersion>3.5</commonsLangVersion>
+    <commonsLangVersion>3.8.1</commonsLangVersion>
     <junitVersion>4.12</junitVersion>
     <mockitoVersion>2.21.0</mockitoVersion>
     <plexusVersion>1.7.1</plexusVersion>
