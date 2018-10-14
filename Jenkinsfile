@@ -78,8 +78,8 @@ for (String os in runITsOses) {
                 stage("${stageLabel}") {
                     // on Windows, need a short path or we hit 256 character limit for paths
                     // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-                    // will not trample each other
-                    dir(isUnix() ? 'test' : "/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                    // will not trample each other plus workaround for JENKINS-52657
+                    dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
                         checkout tests
                         if (isUnix()) {
