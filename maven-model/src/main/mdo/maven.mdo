@@ -1662,6 +1662,16 @@
           </description>
           <type>String</type>
         </field>
+        <field>
+          <name>id</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            The optional server id. The server id allows you to associate an Scm with a server entry in the settings.xml, where sensible information such as credentials can be stored in a more secure way.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -1676,6 +1686,57 @@
     public void setChildInheritAppendPath( boolean childInheritAppendPath )
     {
         this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * Return the hashCode.
+     *
+     * @return int
+     */
+    public int hashCode()
+    {
+        int result = java.util.Objects.hashCode( this.id );
+        result = result * 29 + java.util.Objects.hashCode( this.url );
+        result = result * 29 + java.util.Objects.hashCode( this.connection );
+        result = result * 29 + java.util.Objects.hashCode( this.developerConnection );
+        result = result * 29 + java.util.Objects.hashCode( this.tag );
+        result = result * 29 + java.util.Objects.hashCode( this.childInheritAppendPath );
+
+        return result;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * Return whether this equals the specified object obj.
+     *
+     * @return boolean
+     */
+    public boolean equals( Object obj )
+    {
+        if ( super.equals( obj ) || obj instanceof Scm )
+        {
+          Scm other = ( Scm ) obj;
+
+          return java.util.Objects.equals( this.id, other.id )
+                 && java.util.Objects.equals( this.url, other.url )
+                 && java.util.Objects.equals( this.connection, other.connection )
+                 && java.util.Objects.equals( this.developerConnection, other.developerConnection )
+                 && java.util.Objects.equals( this.tag, other.tag )
+                 && java.util.Objects.equals( this.childInheritAppendPath, other.childInheritAppendPath );
+        }
+
+        return false;
     }
             ]]>
           </code>

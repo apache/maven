@@ -1925,10 +1925,23 @@ public class ModelMerger
 
     protected void mergeScm( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
     {
+        mergeScm_Id( target, source, sourceDominant, context );
         mergeScm_Url( target, source, sourceDominant, context );
         mergeScm_Connection( target, source, sourceDominant, context );
         mergeScm_DeveloperConnection( target, source, sourceDominant, context );
         mergeScm_Tag( target, source, sourceDominant, context );
+    }
+
+    protected void mergeScm_Id( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getId() == null )
+            {
+                target.setId( src );
+            }
+        }
     }
 
     protected void mergeScm_Url( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )

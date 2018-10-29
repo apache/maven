@@ -32,7 +32,13 @@ public class ScmTest
 
     public void testHashCodeNullSafe()
     {
-        new Scm().hashCode();
+        assertEquals( 64186976, new Scm().hashCode() );
+        assertEquals( new Scm().hashCode(), new Scm().hashCode() );
+    }
+
+    public void testHashCodeReturnsExpectedValue()
+    {
+        assertEquals( -2102869462, this.createTestCase().hashCode() );
     }
 
     public void testEqualsNullSafe()
@@ -48,9 +54,25 @@ public class ScmTest
         assertTrue( thing.equals( thing ) );
     }
 
+    public void testEqualsSame()
+    {
+        assertTrue( this.createTestCase().equals( this.createTestCase() ) );
+    }
+
     public void testToStringNullSafe()
     {
         assertNotNull( new Scm().toString() );
     }
 
+    private Scm createTestCase()
+    {
+        Scm scm = new Scm();
+        scm.setId("id");
+        scm.setUrl("url");
+        scm.setConnection("connection");
+        scm.setDeveloperConnection("developerConnection");
+        scm.setChildInheritAppendPath(true);
+
+        return scm;
+    }
 }
