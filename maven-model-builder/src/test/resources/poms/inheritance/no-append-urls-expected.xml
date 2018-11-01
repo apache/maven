@@ -33,7 +33,7 @@ under the License.
   <artifactId>inheritance</artifactId>
   <version>11-SNAPSHOT</version>
   <name>Model urls inheritance test child</name>
-  <description>MNG-5951 child.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
+  <description>MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
 
   <!-- 5 inherited urls without anything added to parent -->
   <url>http://www.apache.org/path/to/parent/</url>

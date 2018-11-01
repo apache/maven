@@ -94,7 +94,7 @@ public class DefaultInheritanceAssemblerTest
     }
 
     /**
-     * MNG-5951 child.inherit.append.path="false" test
+     * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
      * @throws Exception
      */
     public void testNoAppendUrls()

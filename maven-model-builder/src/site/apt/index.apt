@@ -132,6 +132,14 @@ Maven Model Builder
   property is not inherited from a POM to its child: childs POM will use child artifact id if property is not
   set.
 
+  ** since Maven 3.6.1, inheritance can avoid appending any path to parent value by setting model attribute value to
+  <<<false>>> for each url:
+  <<<project/@child.project.url.inherit.append.path>>>,
+  <<<project/distributionManagement/site/@child.site.url.inherit.append.path>>>,
+  <<<project/scm/@child.scm.connection.inherit.append.path>>>,
+  <<<project/scm/@child.scm.developerConnection.inherit.append.path>>> and
+  <<<project/scm/@child.scm.url.inherit.append.path>>>.
+
   []
 
 * Model Interpolation

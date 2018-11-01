@@ -21,7 +21,7 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  child.inherit.append.path="false">
+  child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>inheritance</groupId>
@@ -29,7 +29,7 @@ under the License.
   <version>11-SNAPSHOT</version>
 
   <name>Model urls inheritance test parent</name>
-  <description>MNG-5951 child.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
+  <description>MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
 
   <modules>
     <module>../inheritance</module>
@@ -37,13 +37,15 @@ under the License.
 
   <!-- 5 urls in the pom to configure for not adding path -->
   <url>http://www.apache.org/path/to/parent/</url>
-  <scm child.inherit.append.path="false">
+  <scm child.scm.connection.inherit.append.path="false"
+       child.scm.developerConnection.inherit.append.path="false"
+       child.scm.url.inherit.append.path="false">
     <connection>scm:my-scm:http://domain.org/base</connection>
     <developerConnection>scm:my-scm:https://domain.org/base/</developerConnection>
     <url>https://domain.org/base</url>
   </scm>
   <distributionManagement>
-    <site child.inherit.append.path="false">
+    <site child.site.url.inherit.append.path="false">
       <url>scp://scp.domain.org/base/</url>
     </site>
   </distributionManagement>
