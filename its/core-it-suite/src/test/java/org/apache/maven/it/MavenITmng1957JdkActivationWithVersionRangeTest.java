@@ -59,8 +59,8 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty1" ) );
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty2" ) );
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty3" ) );
-        assertEquals( null, props.getProperty( "project.properties.jdkProperty4" ) );
-        assertEquals( null, props.getProperty( "project.properties.jdkProperty5" ) );
+        assertNull( props.getProperty( "project.properties.jdkProperty4" ) );
+        assertNull( props.getProperty( "project.properties.jdkProperty5" ) );
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty6" ) );
     }
 
