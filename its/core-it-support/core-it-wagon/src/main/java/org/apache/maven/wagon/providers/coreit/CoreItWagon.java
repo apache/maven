@@ -181,7 +181,7 @@ public class CoreItWagon
     public void openConnection()
         throws ConnectionException, AuthenticationException
     {
-        // TODO Auto-generated method stub
+        // ignore
 
     }
 

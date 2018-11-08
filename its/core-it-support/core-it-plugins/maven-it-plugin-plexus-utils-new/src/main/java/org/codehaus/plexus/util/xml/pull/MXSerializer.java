@@ -37,149 +37,112 @@ public class MXSerializer
     }
 
     public XmlSerializer attribute( String namespace, String name, String value )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void cdsect( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void comment( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void docdecl( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void endDocument()
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public XmlSerializer endTag( String namespace, String name )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void entityRef( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void flush()
-        throws IOException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public int getDepth()
     {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     public boolean getFeature( String name )
     {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public String getName()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getNamespace()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getPrefix( String namespace, boolean generatePrefix )
-        throws IllegalArgumentException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Object getProperty( String name )
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void ignorableWhitespace( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void processingInstruction( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void setFeature( String name, boolean state )
-        throws IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void setOutput( OutputStream os, String encoding )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void setPrefix( String prefix, String namespace )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void setProperty( String name, Object value )
-        throws IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public void startDocument( String encoding, Boolean standalone )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
-
+        // ignore
     }
 
     public XmlSerializer startTag( String namespace, String name )
-        throws IOException, IllegalArgumentException, IllegalStateException
+        throws IOException
     {
         output.write( name );
 
@@ -187,16 +150,12 @@ public class MXSerializer
     }
 
     public XmlSerializer text( String text )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public XmlSerializer text( char[] buf, int start, int len )
-        throws IOException, IllegalArgumentException, IllegalStateException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 }
