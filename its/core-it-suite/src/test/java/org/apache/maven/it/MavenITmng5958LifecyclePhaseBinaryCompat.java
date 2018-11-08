@@ -37,10 +37,10 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         }
         catch ( VerificationException e )
         {
-            // TODO There is no good way to test for Java 9+ in Verifier in order to add 'java.base/'
-            // to the string.
-            verifier.verifyTextInLog( "[ERROR] Internal error: java.lang.ClassCastException: "
-                + "org.apache.maven.lifecycle.mapping.LifecyclePhase cannot be cast to " );
+            // There is no good way to test for Java 9+ in Verifier in order to add 'java.base/' to the string.
+            // Java 11: Internal error: java.lang.ClassCastException: class org.apache.maven..
+            verifier.verifyTextInLog( "[ERROR] Internal error: java.lang.ClassCastException: " );
+            verifier.verifyTextInLog( "org.apache.maven.lifecycle.mapping.LifecyclePhase cannot be cast to " );
         }
         verifier.resetStreams();
     }
