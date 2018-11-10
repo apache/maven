@@ -162,7 +162,7 @@ public class CoreItWagon
 
         try
         {
-            File file = new File( "target/wagon.properties" ).getAbsoluteFile();
+            File file = new File( System.getProperty( "user.dir" ), "target/wagon.properties" ).getAbsoluteFile();
             file.getParentFile().mkdirs();
 
             try ( OutputStream os = new FileOutputStream( file ) )
