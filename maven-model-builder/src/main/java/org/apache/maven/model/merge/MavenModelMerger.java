@@ -46,6 +46,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
@@ -443,14 +444,32 @@ public class MavenModelMerger
         if ( src != null )
         {
             Site tgt = target.getSite();
-            if ( sourceDominant || tgt == null )
+            if ( sourceDominant || tgt == null || isSiteEmpty( tgt ) )
             {
-                tgt = new Site();
+                if ( tgt == null )
+                {
+                    tgt = new Site();
+                }
                 tgt.setLocation( "", src.getLocation( "" ) );
                 target.setSite( tgt );
                 mergeSite( tgt, src, sourceDominant, context );
             }
+            mergeSite_ChildSiteUrlInheritAppendPath( tgt, src, sourceDominant, context );
         }
+    }
+
+    @Override
+    protected void mergeSite( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        mergeSite_Id( target, source, sourceDominant, context );
+        mergeSite_Name( target, source, sourceDominant, context );
+        mergeSite_Url( target, source, sourceDominant, context );
+    }
+
+    protected boolean isSiteEmpty( Site site )
+    {
+        return StringUtils.isEmpty( site.getId() ) && StringUtils.isEmpty( site.getName() )
+            && StringUtils.isEmpty( site.getUrl() );
     }
 
     @Override
