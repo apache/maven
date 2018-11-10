@@ -29,6 +29,7 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,9 +42,8 @@ import java.util.Properties;
 
 /**
  * Shamelessly copied from ScpExternalWagon in this same project...
- *
- * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="coreit" instantiation-strategy="per-lookup"
  */
+@Component( role = org.apache.maven.wagon.Wagon.class,  hint = "coreit", instantiationStrategy = "per-lookup" )
 public class CoreItWagon
     extends AbstractWagon
 {

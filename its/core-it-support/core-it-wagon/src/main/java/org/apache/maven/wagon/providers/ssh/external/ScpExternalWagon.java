@@ -28,6 +28,7 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,9 +42,8 @@ import java.util.Properties;
 /**
  * NOTE: Plexus will only pick this correctly if the Class package and name are the same as that in core. This is
  * because the core component descriptor is read, but the class is read from the latter JAR.
- *
- * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="scpexe" instantiation-strategy="per-lookup"
  */
+@Component( role = org.apache.maven.wagon.Wagon.class,  hint = "scpexe", instantiationStrategy = "per-lookup" )
 public class ScpExternalWagon
     extends AbstractWagon
 {

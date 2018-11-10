@@ -19,15 +19,16 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * A stateful singleton.
  * 
- * @plexus.component role="org.apache.maven.plugin.coreit.Component" role-hint="default"
- * 
  * @author Benjamin Bentmann
  */
+@Component ( role = org.apache.maven.plugin.coreit.Component.class )
 public class DefaultComponent
-    implements Component
+    implements org.apache.maven.plugin.coreit.Component
 {
 
     private final String id;

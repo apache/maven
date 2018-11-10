@@ -19,15 +19,16 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * A dummy component whose role hint is not "default", yet should be used to satisfy an ordinary component requirement.
  * 
- * @plexus.component role="org.apache.maven.plugin.coreit.Component" role-hint="concrete"
- * 
  * @author Benjamin Bentmann
  */
+@Component ( role = org.apache.maven.plugin.coreit.Component.class, hint = "concrete" )
 public class ConcreteComponent
-    implements Component
+    implements org.apache.maven.plugin.coreit.Component
 {
 
     public String getId()

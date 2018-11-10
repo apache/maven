@@ -19,6 +19,7 @@ package org.apache.maven.its.plugins.plexuslifecycle;
  * under the License.
  */
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -28,12 +29,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 
 /**
  * @author Olivier Lamy
- * @plexus.component role="org.apache.maven.its.plugins.plexuslifecycle.FakeComponent" role-hint="default"
  */
+@Component ( role = org.apache.maven.its.plugins.plexuslifecycle.FakeComponent.class )
 public class DefaultFakeComponent
     implements FakeComponent, Contextualizable, Disposable, LogEnabled
 {
-    Logger logger;
+    private Logger logger;
 
     public void enableLogging( Logger logger )
     {

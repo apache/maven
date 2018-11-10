@@ -49,6 +49,10 @@ under the License.
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-beta-2</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
