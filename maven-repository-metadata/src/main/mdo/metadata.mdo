@@ -202,6 +202,30 @@ under the License.
                         changed = true;
                     }
                 }
+
+                for ( SnapshotVersion snapshotVersion : versioning.getSnapshotVersions() )
+                {
+                    boolean exists = false;
+
+                    for ( SnapshotVersion sv : v.getSnapshotVersions() )
+                    {
+                        if ( java.util.Objects.equals( snapshotVersion.getClassifier(), sv.getClassifier() ) &&
+                             java.util.Objects.equals( snapshotVersion.getExtension(), sv.getExtension() ) &&
+                             java.util.Objects.equals( snapshotVersion.getUpdated(), sv.getUpdated() ) &&
+                             java.util.Objects.equals( snapshotVersion.getVersion(), sv.getVersion() ) )
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        changed = true;
+                        v.getSnapshotVersions().add( snapshotVersion );
+                    }
+                }
+
             }
         }
         return changed;
