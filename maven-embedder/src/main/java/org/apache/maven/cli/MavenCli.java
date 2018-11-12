@@ -100,6 +100,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1630,7 +1631,7 @@ public class MavenCli
         }
         else
         {
-            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
+            return Paths.get( workingDirectory, file.getPath() ).normalize().toFile();
         }
     }
 
