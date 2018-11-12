@@ -184,7 +184,7 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             project's <code>child.project.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -198,8 +198,8 @@
             When childs inherit from project's url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
-            <br /><b>Since</b>: Maven 3.6.1
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1616,7 +1616,7 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.connection.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -1629,7 +1629,7 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.developerConnection.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -1648,7 +1648,7 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             scm's <code>child.scm.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -1662,8 +1662,8 @@
             When childs inherit from scm connection, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
-            <br /><b>Since</b>: Maven 3.6.1
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1676,8 +1676,8 @@
             When childs inherit from scm developer connection, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
-            <br /><b>Since</b>: Maven 3.6.1
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1690,8 +1690,8 @@
             When childs inherit from scm url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
-            <br /><b>Since</b>: Maven 3.6.1
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -2056,7 +2056,7 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             site's <code>child.site.url.inherit.append.path="false"</code>
             ]]>
           </description>
@@ -2070,8 +2070,8 @@
             When childs inherit from distribution management site url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
-            <br /><b>Since</b>: Maven 3.6.1
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -2328,8 +2328,8 @@
     }
 
     /**
-     * @param groupId
-     * @param artifactId
+     * @param groupId The group ID of the plugin in the repository
+     * @param artifactId The artifact ID of the reporting plugin in the repository
      * @return the key of the plugin, ie <code>groupId:artifactId</code>
      */
     public static String constructKey( String groupId, String artifactId )
@@ -2904,8 +2904,8 @@
     }
 
     /**
-     * @param groupId
-     * @param artifactId
+     * @param groupId The group ID of the plugin in the repository
+     * @param artifactId The artifact ID of the reporting plugin in the repository
      * @return the key of the report plugin, ie <code>groupId:artifactId</code>
      */
     public static String constructKey( String groupId, String artifactId )

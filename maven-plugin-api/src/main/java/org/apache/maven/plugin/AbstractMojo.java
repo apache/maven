@@ -35,8 +35,9 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  * There are also a number of attributes which can be used to control how and when the
  * <code>Mojo</code> is executed:
  * </p>
- * <table border="1" summary="mojo annotation attributes">
- *  <tr bgcolor="#CCCCCC">
+ * <table border="1">
+ *  <caption>mojo annotation attributes</caption>
+ *  <tr>
  *      <th>Descriptor Element</th>
  *      <th>Annotation</th>
  *      <th>Required?</th>
