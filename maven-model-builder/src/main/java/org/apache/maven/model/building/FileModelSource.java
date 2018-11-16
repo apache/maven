@@ -80,4 +80,27 @@ public class FileModelSource extends FileSource implements ModelSource2
     {
         return getFile().toURI();
     }
+
+    @Override
+    public boolean equals( Object obj ) 
+    {
+        if ( this == obj ) 
+        {
+            return true;
+        }
+        
+        if ( !( obj instanceof FileModelSource ) ) 
+        {
+            return false;
+        }
+        FileModelSource other = ( FileModelSource ) obj;
+        return getFile().equals( other.getFile() );
+    }
+
+    @Override
+    public int hashCode() 
+    {
+        return getFile().hashCode(); 
+    }
+
 }

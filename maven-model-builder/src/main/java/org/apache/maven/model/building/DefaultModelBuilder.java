@@ -852,10 +852,11 @@ public class DefaultModelBuilder
                 File pomFile = parentData.getModel().getPomFile();
                 if ( pomFile != null )
                 {
+                    FileModelSource pomSource = new FileModelSource( pomFile );
                     ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
 
                     if ( expectedParentSource == null || ( expectedParentSource instanceof ModelSource2
-                        && !pomFile.toURI().equals( ( (ModelSource2) expectedParentSource ).getLocationURI() ) ) )
+                        && !pomSource.equals(  expectedParentSource ) ) )
                     {
                         parentData = readParentExternally( childModel, request, problems );
                     }
