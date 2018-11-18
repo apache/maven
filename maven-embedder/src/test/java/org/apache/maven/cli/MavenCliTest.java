@@ -231,7 +231,7 @@ public class MavenCliTest
                             new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
         CliRequest request = new CliRequest(
             new String[]{ "-Drevision=8.1.0", "--file=-Dpom.xml", "\"-Dfoo=bar ", "\"-Dfoo2=bar two\"",
-                "\"-Dtest.prop=&x=y<>\"", "-Drevision=8.2.0" }, null );
+                "-Drevision=8.2.0" }, null );
 
         cli.initialize( request );
         // read .mvn/maven.config
@@ -243,8 +243,6 @@ public class MavenCliTest
 
         assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
         assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
-
-        assertEquals( "&x=y<>", request.getSystemProperties().getProperty( "test.prop" ) );
 
         assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
     }
