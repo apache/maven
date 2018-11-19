@@ -186,5 +186,14 @@ under the License.
         <jdkProperty6>PASSED</jdkProperty6>
       </properties>
     </profile>
+    <profile>
+      <id>test-6i</id>
+      <activation>
+        <jdk>[12,)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
   </profiles>
 </project>
