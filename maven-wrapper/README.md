@@ -38,7 +38,7 @@ of Maven specified in `.mvn/wrapper/maven-wrapper.properties` it will be downloa
 The wrapper should work on various operating systems including
 
 * Linux (numerous versions, tested on Ubuntu and CentOS)
-* OSX
+* OSX / macOS
 * Windows (various newer versions)
 * Solaris (10 and 11)
 
