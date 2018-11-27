@@ -28,6 +28,9 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.shared.utils.io.FileUtils;
+
+import com.google.common.io.Files;
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -126,4 +129,42 @@ public class ProjectBuilderTest
         assertEquals( 0, mavenProject.getArtifacts().size() );
     }
 
+    public void testReadModifiedPoms() throws Exception {
+        String initialValue = System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString( true ) );
+        // TODO a similar test should be created to test the dependency management (basically all usages
+        // of DefaultModelBuilder.getCache() are affected by MNG-6530
+        File tempDir = Files.createTempDir();
+        FileUtils.copyDirectoryStructure (new File( "src/test/resources/projects/grandchild-check"), tempDir );
+        try
+        {
+            MavenSession mavenSession = createMavenSession( null );
+            ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+            configuration.setRepositorySession( mavenSession.getRepositorySession() );
+            org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
+            File child = new File( tempDir, "child/pom.xml" );
+            // build project once
+            projectBuilder.build( child, configuration );
+            // modify parent
+            File parent = new File( tempDir, "pom.xml" );
+            String parentContent = FileUtils.fileRead( parent );
+            parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
+            		"<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
+            FileUtils.fileWrite( parent, "UTF-8", parentContent );
+            // re-build pom with modified parent
+            ProjectBuildingResult result = projectBuilder.build( child, configuration );
+            assertTrue( result.getProject().getProperties().containsKey( "addedProperty" ) );
+        }
+        finally
+        {
+            if ( initialValue == null )
+            {
+                System.clearProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY );
+            }
+            else
+            {
+                System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, initialValue );
+            }
+            FileUtils.deleteDirectory( tempDir );
+        }
+    }
 }
