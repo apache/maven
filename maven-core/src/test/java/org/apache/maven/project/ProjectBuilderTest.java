@@ -20,6 +20,8 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -30,6 +32,7 @@ import org.apache.maven.model.building.ModelSource;
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
 {
+    @Override
     protected String getProjectsDirectory()
     {
         return "src/test/projects/project-builder";
@@ -84,4 +87,43 @@ public class ProjectBuilderTest
             // this is expected
         }
     }
+
+    public void testResolveDependencies()
+        throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/basic-resolveDependencies.xml" );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        configuration.setResolveDependencies( true );
+
+        // single project build entry point
+        ProjectBuildingResult result = lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        assertEquals( 1, result.getProject().getArtifacts().size() );
+        // multi projects build entry point
+        List<ProjectBuildingResult> results = lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
+        assertEquals( 1, results.size() );
+        MavenProject mavenProject = results.get( 0 ).getProject();
+        assertEquals( 1, mavenProject.getArtifacts().size() );
+    }
+
+    public void testDontResolveDependencies()
+        throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/basic-resolveDependencies.xml" );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        configuration.setResolveDependencies( false );
+
+        // single project build entry point
+        ProjectBuildingResult result = lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        assertEquals( 0, result.getProject().getArtifacts().size() );
+        // multi projects build entry point
+        List<ProjectBuildingResult> results = lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
+        assertEquals( 1, results.size() );
+        MavenProject mavenProject = results.get( 0 ).getProject();
+        assertEquals( 0, mavenProject.getArtifacts().size() );
+    }
+
 }
