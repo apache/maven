@@ -27,6 +27,7 @@ import java.util.Properties;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
 
@@ -165,6 +166,34 @@ public class ProjectBuilderTest
                 System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, initialValue );
             }
             FileUtils.deleteDirectory( tempDir );
+        }
+    }
+
+    public void testReadErroneousMavenProjectContainsReference() throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/artifactMissingVersion.xml" ).getAbsoluteFile();
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
+        try {
+            projectBuilder.build( pomFile, configuration );
+        } catch ( ProjectBuildingException ex ) {
+            assertEquals( 1, ex.getResults().size() );
+            MavenProject project = ex.getResults().get(0).getProject();
+            assertNotNull( project );
+            assertEquals( "testArtifactMissingVersion", project.getArtifactId() );
+            assertEquals( pomFile, project.getFile() );
+        }
+        try {
+            projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
+        } catch ( ProjectBuildingException ex ) {
+        	assertEquals( 1, ex.getResults().size() );
+            MavenProject project = ex.getResults().get(0).getProject();
+            assertNotNull( project );
+            assertEquals( "testArtifactMissingVersion", project.getArtifactId() );
+            assertEquals( pomFile, project.getFile() );
         }
     }
 }
