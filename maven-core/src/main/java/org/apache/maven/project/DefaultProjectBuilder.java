@@ -182,8 +182,8 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.<String, MavenProject>emptyMap(), result,
-                             new HashMap<File, Boolean>(), projectBuildingRequest );
+                initProject( project, Collections.<String, MavenProject>emptyMap(), true,
+                             result, new HashMap<File, Boolean>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -429,6 +429,7 @@ public class DefaultProjectBuilder
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
         MavenProject project = new MavenProject();
+        project.setFile( pomFile );
 
         request.setPomFile( pomFile );
         request.setTwoPhaseBuilding( true );
@@ -445,12 +446,21 @@ public class DefaultProjectBuilder
         }
         catch ( ModelBuildingException e )
         {
-            results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
+            result = e.getResult();
+            if ( result == null || result.getEffectiveModel() == null )
+            {
+                 results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
-            return false;
+                 return false;
+            }
+            // validation error, continue project building and delay failing to help IDEs
+            // result.getProblems().addAll(e.getProblems()) ?
+            noErrors = false;
         }
 
         Model model = result.getEffectiveModel();
+        // first pass: build without building parent.
+        initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
 
         projectIndex.put( result.getModelIds().get( 0 ), project );
 
@@ -591,12 +601,13 @@ public class DefaultProjectBuilder
 
         for ( InterimResult interimResult : interimResults )
         {
+            MavenProject project = interimResult.listener.getProject();
             try
             {
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
-                MavenProject project = interimResult.listener.getProject();
-                initProject( project, projectIndex, result, profilesXmls, request );
+                // 2nd pass of initialization: resolve and build parent if necessary
+                initProject( project, projectIndex, true, result, profilesXmls, request );
 
                 List<MavenProject> modules = new ArrayList<>();
                 noErrors =
@@ -618,8 +629,16 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
-                                                               e.getProblems() ) );
+                DefaultProjectBuildingResult result = null;
+                if ( project == null )
+                {
+                    result = new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() );
+                }
+                else
+                {
+                    result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
+                }
+                results.add( result );
 
                 noErrors = false;
             }
@@ -629,7 +648,8 @@ public class DefaultProjectBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void initProject( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
+    private void initProject( MavenProject project, Map<String, MavenProject> projects,
+                              boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
         Model model = result.getEffectiveModel();
@@ -638,7 +658,7 @@ public class DefaultProjectBuilder
         project.setOriginalModel( result.getRawModel() );
         project.setFile( model.getPomFile() );
 
-        initParent( project, projects, result, projectBuildingRequest );
+        initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
 
         Artifact projectArtifact =
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
@@ -815,8 +835,8 @@ public class DefaultProjectBuilder
         }
     }
 
-    private void initParent( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
-                             ProjectBuildingRequest projectBuildingRequest )
+    private void initParent( MavenProject project, Map<String, MavenProject> projects, boolean buildParentIfNotExisting,
+                             ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
     {
         Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
                                 ? result.getRawModel( result.getModelIds().get( 1 ) )
@@ -835,7 +855,7 @@ public class DefaultProjectBuilder
             String parentModelId = result.getModelIds().get( 1 );
             File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
             MavenProject parent = projects.get( parentModelId );
-            if ( parent == null )
+            if ( parent == null && buildParentIfNotExisting )
             {
                 //
                 // At this point the DefaultModelBuildingListener has fired and it populates the
