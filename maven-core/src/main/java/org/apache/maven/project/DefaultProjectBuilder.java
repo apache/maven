@@ -583,6 +583,7 @@ public class DefaultProjectBuilder
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 MavenProject project = interimResult.listener.getProject();
+
                 initProject( project, projectIndex, result, profilesXmls, request );
 
                 List<MavenProject> modules = new ArrayList<>();
@@ -599,8 +600,18 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
-                                                               e.getProblems() ) );
+                DefaultProjectBuildingResult result = null;
+                if ( interimResult.listener.getProject() == null )
+                {
+                    result = new DefaultProjectBuildingResult(
+                            e.getModelId(), interimResult.pomFile, e.getProblems() );
+                }
+                else
+                {
+                    result = new DefaultProjectBuildingResult(
+                            interimResult.listener.getProject(), e.getProblems(), null );
+                }
+                results.add( result );
 
                 noErrors = false;
             }
