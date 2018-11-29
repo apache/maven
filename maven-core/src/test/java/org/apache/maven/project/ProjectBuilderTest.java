@@ -20,17 +20,20 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
 {
-    protected String getProjectsDirectory()
+    @Override
+	protected String getProjectsDirectory()
     {
         return "src/test/projects/project-builder";
     }
@@ -82,6 +85,28 @@ public class ProjectBuilderTest
         catch ( ProjectBuildingException e )
         {
             // this is expected
+        }
+    }
+
+    public void testReadErroneousMavenProjectContainsReference() throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/artifactMissingVersion.xml" );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
+        try {
+            projectBuilder.build( pomFile, configuration );
+        } catch ( ProjectBuildingException ex ) {
+            assertEquals( 1, ex.getResults().size() );
+            assertNotNull( ex.getResults().get(0).getProject() );
+        }
+        try {
+            projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
+        } catch ( ProjectBuildingException ex ) {
+            assertEquals( 1, ex.getResults().size() );
+            assertNotNull( ex.getResults().get(0).getProject() );
         }
     }
 }
