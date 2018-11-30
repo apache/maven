@@ -208,4 +208,30 @@ public class ProjectBuilderTest
             assertEquals( pomFile, project.getFile() );
         }
     }
+
+    public void testReadInvalidPom()
+        throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/badPom.xml" ).getAbsoluteFile();
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        org.apache.maven.project.ProjectBuilder projectBuilder =
+            lookup( org.apache.maven.project.ProjectBuilder.class );
+
+        // multi projects build entry point
+        try
+        {
+            projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
+        }
+        catch ( ProjectBuildingException ex )
+        {
+            assertEquals( 1, ex.getResults().size() );
+            MavenProject project = ex.getResults().get( 0 ).getProject();
+            assertNotNull( project );
+            assertNotSame( 0, ex.getResults().get( 0 ).getProblems().size() );
+        }
+    }
+
 }
