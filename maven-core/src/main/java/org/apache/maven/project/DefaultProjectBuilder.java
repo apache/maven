@@ -459,8 +459,16 @@ public class DefaultProjectBuilder
         }
 
         Model model = result.getEffectiveModel();
-        // first pass: build without building parent.
-        initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
+        try
+        {
+            // first pass: build without building parent.
+            initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
+        }
+        catch ( Exception e )
+        {
+            result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
+                  e ) );
+        }
 
         projectIndex.put( result.getModelIds().get( 0 ), project );
 
@@ -607,7 +615,15 @@ public class DefaultProjectBuilder
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 // 2nd pass of initialization: resolve and build parent if necessary
-                initProject( project, projectIndex, true, result, profilesXmls, request );
+                try
+                {
+                    initProject( project, projectIndex, true, result, profilesXmls, request );
+                }
+                catch ( Exception e )
+                {
+                    result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
+                            result.getEffectiveModel(), -1, -1, e ) );
+                }
 
                 List<MavenProject> modules = new ArrayList<>();
                 noErrors =
