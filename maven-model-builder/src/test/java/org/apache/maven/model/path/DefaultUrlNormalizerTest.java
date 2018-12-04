@@ -82,4 +82,36 @@ public class DefaultUrlNormalizerTest
                       normalize( "[fetch=]http://server.org/[push=]ssh://server.org/" ) );
     }
 
+    public void testNormalizeInputNotNullOutputNotNull()
+    {
+        final DefaultUrlNormalizer objectUnderTest = new DefaultUrlNormalizer();
+        final String url = "/..///";
+        final String retval = objectUnderTest.normalize(url);
+        assertEquals("/..///", retval);
+    }
+
+    public void testNormalizeInputNotNullOutputNotNull2()
+    {
+        final DefaultUrlNormalizer objectUnderTest = new DefaultUrlNormalizer();
+        final String url = "+++++/../";
+        final String retval = objectUnderTest.normalize(url);
+        assertEquals("+++++/../", retval);
+    }
+
+    public void testNormalizeInputNotNullOutputNotNull3()
+    {
+        final DefaultUrlNormalizer objectUnderTest = new DefaultUrlNormalizer();
+        final String url = "/..-........o/../..//////////////>>";
+        final String retval = objectUnderTest.normalize(url);
+        assertEquals("/..//////////////>>", retval);
+    }
+
+    public void testNormalizeInputNotNullOutputNotNull4()
+    {
+        final DefaultUrlNormalizer objectUnderTest = new DefaultUrlNormalizer();
+        final String url = "/..-........//../..//////////////>>";
+        final String retval = objectUnderTest.normalize(url);
+        assertEquals("/..//////////////>>", retval);
+    }
+
 }
