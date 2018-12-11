@@ -94,16 +94,15 @@ public class DefaultMavenProjectHelper
         attachArtifact( project, artifact );
     }
 
-    /**
-     * Add an attached artifact or replace the file for an existing artifact.
-     *
-     * @see MavenProject#addAttachedArtifact(org.apache.maven.artifact.Artifact)
-     * @param project project reference.
-     * @param artifact artifact to add or replace.
-     */
     public void attachArtifact( MavenProject project, Artifact artifact )
     {
+        final int size = project.getAttachedArtifacts().size();
         project.addAttachedArtifact( artifact );
+
+        if ( project.getAttachedArtifacts().size() == size && this.getLogger().isInfoEnabled() )
+        {
+            this.getLogger().info( String.format( "Replaced artifact %s.", artifact ) );
+        }
     }
 
     public void addResource( MavenProject project, String resourceDirectory, List<String> includes,

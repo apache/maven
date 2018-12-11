@@ -28,15 +28,8 @@ under the License.
   <artifactId>parent</artifactId>
   <version>11-SNAPSHOT</version>
 
-  <name>Model urls inheritance test parent</name>
-  <description>MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
+  <name>Model urls inheritance test parent, with special merge test for mergeSite_ChildSiteUrlInheritAppendPath</name>
 
-  <modules>
-    <module>../inheritance</module>
-  </modules>
-
-  <!-- 5 urls in the pom to configure for not adding path -->
-  <url>http://www.apache.org/path/to/parent/</url>
   <scm child.scm.connection.inherit.append.path="false"
        child.scm.developerConnection.inherit.append.path="false"
        child.scm.url.inherit.append.path="false">

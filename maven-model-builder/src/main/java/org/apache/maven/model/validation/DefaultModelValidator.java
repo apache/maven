@@ -546,21 +546,21 @@ public class DefaultModelValidator
                                                            List<Dependency> dependencies, String prefix,
                                                            ModelBuildingRequest request )
     {
-        // We only check for groupId/artifactId cause if there is another
-        // module with the same groupId/artifactId this will fail the build
+        // We only check for groupId/artifactId/version/classifier cause if there is another
+        // module with the same groupId/artifactId/version/classifier this will fail the build
         // earlier like "Project '...' is duplicated in the reactor.
-        // So it is sufficient to check only groupId/artifactId and not the
+        // So it is sufficient to check only groupId/artifactId/version/classifier and not the
         // packaging type.
         for ( Dependency dependency : dependencies )
         {
-            String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+            String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion()
+                    + ( dependency.getClassifier() != null ? ":" + dependency.getClassifier() : ""  );
             String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
             if ( key.equals( mKey ) )
             {
                 // This means a module which is build has a dependency which has the same
-                // groupId, artifactId and version coordinates. This is in consequence
-                // a self reference or in other words a circular reference which can not
-                // being resolved.
+                // groupId, artifactId, version and classifier coordinates. This is in consequence
+                // a self reference or in other words a circular reference which can not being resolved.
                 addViolation( problems, Severity.FATAL, Version.V31, prefix + " " + key, key, "is referencing itself.",
                               dependency );
 
@@ -605,14 +605,14 @@ public class DefaultModelValidator
     private void validateEffectiveModelAgainstDependency( String prefix, ModelProblemCollector problems, Model m,
                                                           Dependency d, ModelBuildingRequest request )
     {
-        String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion();
+        String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion()
+                + ( d.getClassifier() != null ? ":" + d.getClassifier() : ""  );
         String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
         if ( key.equals( mKey ) )
         {
             // This means a module which is build has a dependency which has the same
-            // groupId, artifactId and version coordinates. This is in consequence
-            // a self reference or in other words a circular reference which can not
-            // being resolved.
+            // groupId, artifactId, version and classifier coordinates. This is in consequence
+            // a self reference or in other words a circular reference which can not being resolved.
             addViolation( problems, Severity.FATAL, Version.V31, prefix + " " + key, key, "is referencing itself.", d );
 
         }

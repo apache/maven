@@ -94,13 +94,33 @@ public class DefaultInheritanceAssemblerTest
     }
 
     /**
-     * MNG-5951 child.inherit.append.path="false" test
+     * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
      * @throws Exception
      */
     public void testNoAppendUrls()
         throws Exception
     {
         testInheritance( "no-append-urls" );
+    }
+
+    /**
+     * MNG-5951 special case test: inherit with partial override
+     * @throws Exception
+     */
+    public void testNoAppendUrls2()
+        throws Exception
+    {
+        testInheritance( "no-append-urls2" );
+    }
+
+    /**
+     * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
+     * @throws Exception
+     */
+    public void testNoAppendUrls3()
+        throws Exception
+    {
+        testInheritance( "no-append-urls3" );
     }
 
     /**

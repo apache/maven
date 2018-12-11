@@ -21,7 +21,7 @@
 Apache Maven includes a number of components and libraries with separate 
 copyright notices and license terms. Your use of those components are 
 subject to the terms and conditions of the following licenses: 
-#
+##
 #set ( $apacheLicenseNames = [ "Apache License, Version 2.0", "The Apache Software License, Version 2.0",
     "ASLv2", "Apache Public License 2.0", "Apache 2.0" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )

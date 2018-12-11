@@ -184,21 +184,22 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            project's <code>child.project.url.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
         </field>
-        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
-          <name>childInheritAppendPath</name>
+        <field xml.attribute="true" xml.tagName="child.project.url.inherit.append.path">
+          <name>childProjectUrlInheritAppendPath</name>
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from project's url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -422,15 +423,17 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isChildInheritAppendPath()
+
+    public boolean isChildProjectUrlInheritAppendPath()
     {
-        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+        return ( childProjectUrlInheritAppendPath != null ) ? Boolean.parseBoolean( childProjectUrlInheritAppendPath ) : true;
     }
 
-    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    public void setChildProjectUrlInheritAppendPath( boolean childProjectUrlInheritAppendPath )
     {
-        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+        this.childProjectUrlInheritAppendPath = String.valueOf( childProjectUrlInheritAppendPath );
     }
+
             ]]>
           </code>
         </codeSegment>
@@ -1613,7 +1616,8 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property) 
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            scm's <code>child.scm.connection.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -1625,7 +1629,8 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            scm's <code>child.scm.developerConnection.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
@@ -1643,21 +1648,50 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            scm's <code>child.scm.url.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
         </field>
-        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
-          <name>childInheritAppendPath</name>
+        <field xml.attribute="true" xml.tagName="child.scm.connection.inherit.append.path">
+          <name>childScmConnectionInheritAppendPath</name>
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from scm connection, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="child.scm.developerConnection.inherit.append.path">
+          <name>childScmDeveloperConnectionInheritAppendPath</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            When childs inherit from scm developer connection, append path or not? Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="child.scm.url.inherit.append.path">
+          <name>childScmUrlInheritAppendPath</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            When childs inherit from scm url, append path or not? Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -1668,15 +1702,37 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isChildInheritAppendPath()
+
+    public boolean isChildScmConnectionInheritAppendPath()
     {
-        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+        return ( childScmConnectionInheritAppendPath != null ) ? Boolean.parseBoolean( childScmConnectionInheritAppendPath ) : true;
     }
 
-    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    public void setChildScmConnectionInheritAppendPath( boolean childScmConnectionInheritAppendPath )
     {
-        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+        this.childScmConnectionInheritAppendPath = String.valueOf( childScmConnectionInheritAppendPath );
     }
+
+    public boolean isChildScmDeveloperConnectionInheritAppendPath()
+    {
+        return ( childScmDeveloperConnectionInheritAppendPath != null ) ? Boolean.parseBoolean( childScmDeveloperConnectionInheritAppendPath ) : true;
+    }
+
+    public void setChildScmDeveloperConnectionInheritAppendPath( boolean childScmDeveloperConnectionInheritAppendPath )
+    {
+        this.childScmDeveloperConnectionInheritAppendPath = String.valueOf( childScmDeveloperConnectionInheritAppendPath );
+    }
+
+    public boolean isChildScmUrlInheritAppendPath()
+    {
+        return ( childScmUrlInheritAppendPath != null ) ? Boolean.parseBoolean( childScmUrlInheritAppendPath ) : true;
+    }
+
+    public void setChildScmUrlInheritAppendPath( boolean childScmUrlInheritAppendPath )
+    {
+        this.childScmUrlInheritAppendPath = String.valueOf( childScmUrlInheritAppendPath );
+    }
+
             ]]>
           </code>
         </codeSegment>
@@ -2000,21 +2056,22 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
-            <code>child.urls.inherit.append.path="false"</code>
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            site's <code>child.site.url.inherit.append.path="false"</code>
             ]]>
           </description>
           <type>String</type>
         </field>
-        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
-          <name>childInheritAppendPath</name>
+        <field xml.attribute="true" xml.tagName="child.site.url.inherit.append.path">
+          <name>childSiteUrlInheritAppendPath</name>
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from urls, append path or not?. Note: While the type
+            When childs inherit from distribution management site url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
-            <br /><b>Default value is</b>: <code>true</code>
+            <br><b>Default value is</b>: <code>true</code>
+            <br><b>Since</b>: Maven 3.6.1
             ]]>
           </description>
           <type>String</type>
@@ -2025,15 +2082,17 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-    public boolean isChildInheritAppendPath()
+
+    public boolean isChildSiteUrlInheritAppendPath()
     {
-        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+        return ( childSiteUrlInheritAppendPath != null ) ? Boolean.parseBoolean( childSiteUrlInheritAppendPath ) : true;
     }
 
-    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    public void setChildSiteUrlInheritAppendPath( boolean childSiteUrlInheritAppendPath )
     {
-        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+        this.childSiteUrlInheritAppendPath = String.valueOf( childSiteUrlInheritAppendPath );
     }
+
             ]]>
           </code>
         </codeSegment>
@@ -2269,8 +2328,8 @@
     }
 
     /**
-     * @param groupId
-     * @param artifactId
+     * @param groupId The group ID of the plugin in the repository
+     * @param artifactId The artifact ID of the reporting plugin in the repository
      * @return the key of the plugin, ie <code>groupId:artifactId</code>
      */
     public static String constructKey( String groupId, String artifactId )
@@ -2845,8 +2904,8 @@
     }
 
     /**
-     * @param groupId
-     * @param artifactId
+     * @param groupId The group ID of the plugin in the repository
+     * @param artifactId The artifact ID of the reporting plugin in the repository
      * @return the key of the report plugin, ie <code>groupId:artifactId</code>
      */
     public static String constructKey( String groupId, String artifactId )

@@ -384,7 +384,7 @@ public class MavenCli
                     }
                 }
 
-                mavenConfig = cliManager.parse( args.toArray( new String[args.size()] ) );
+                mavenConfig = cliManager.parse( args.toArray( new String[0] ) );
                 List<?> unrecongized = mavenConfig.getArgList();
                 if ( !unrecongized.isEmpty() )
                 {
@@ -1184,7 +1184,7 @@ public class MavenCli
                     sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
                 }
             }
-            sb.append( String.format( "\n" ) );
+            sb.append( "\n" );
             throw new Exception( sb.toString() );
         }
     }

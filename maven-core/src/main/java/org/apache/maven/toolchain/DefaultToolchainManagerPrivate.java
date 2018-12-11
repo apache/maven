@@ -69,7 +69,7 @@ public class DefaultToolchainManagerPrivate
             }
         }
 
-        return toRet.toArray( new ToolchainPrivate[toRet.size()] );
+        return toRet.toArray( new ToolchainPrivate[0] );
     }
 
     @Override

@@ -139,7 +139,7 @@ public class DefaultClasspathTransformation
 
             if ( exits != null && exits.size() > 0 )
             {
-                MetadataGraphEdge[] sortedExits = exits.toArray( new MetadataGraphEdge[exits.size()] );
+                MetadataGraphEdge[] sortedExits = exits.toArray( new MetadataGraphEdge[0] );
                 Arrays.sort( sortedExits
                         ,
                         new Comparator<MetadataGraphEdge>()

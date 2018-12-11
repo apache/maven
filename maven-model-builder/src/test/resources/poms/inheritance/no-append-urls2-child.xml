@@ -20,8 +20,7 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  child.project.url.inherit.append.path="false">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -30,24 +29,15 @@ under the License.
     <version>11-SNAPSHOT</version>
   </parent>
 
-  <groupId>inheritance</groupId>
-  <artifactId>inheritance</artifactId>
-  <version>11-SNAPSHOT</version>
+  <artifactId>inheritance</artifactId><!-- same as directory name -->
   <name>Model urls inheritance test child</name>
-  <description>MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" for each url to avoid automatic path addition when inheriting</description>
 
-  <!-- 5 inherited urls without anything added to parent -->
-  <url>http://www.apache.org/path/to/parent/</url>
-  <scm child.scm.connection.inherit.append.path="false"
-       child.scm.developerConnection.inherit.append.path="false"
-       child.scm.url.inherit.append.path="false">
-    <connection>scm:my-scm:http://domain.org/base</connection>
-    <developerConnection>scm:my-scm:https://domain.org/base/</developerConnection>
-    <url>https://domain.org/base</url>
+  <scm>
+    <url>https://domain.org/override</url><!-- check that this won't impact child.site.url.inherit.append.path attribute inheritance -->
   </scm>
   <distributionManagement>
-    <site child.site.url.inherit.append.path="false">
-      <url>scp://scp.domain.org/base/</url>
+    <site><!-- overriding 1 element will reset all elements, but not child.site.url.inherit.append.path attribute -->
+      <name>reset</name>
     </site>
   </distributionManagement>
 </project>

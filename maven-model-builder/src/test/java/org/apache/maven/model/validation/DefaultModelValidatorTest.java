@@ -729,6 +729,13 @@ public class DefaultModelValidatorTest
 
     }
 
+    public void testSelfReferencingDependencyWithClassifierInRawModel() throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/self-referencing-classifier.xml" );
+
+        assertViolations( result, 0, 0, 0 );
+    }
+
     public void testCiFriendlySha1()
         throws Exception
     {

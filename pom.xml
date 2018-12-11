@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.6.0-SNAPSHOT</version>
+  <version>3.6.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -57,7 +57,7 @@ under the License.
     <plexusVersion>1.7.1</plexusVersion>
     <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
     <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
-    <guiceVersion>4.2.0</guiceVersion>
+    <guiceVersion>4.2.1</guiceVersion>
     <sisuInjectVersion>0.3.3</sisuInjectVersion>
     <wagonVersion>3.2.0</wagonVersion>
     <securityDispatcherVersion>1.4</securityDispatcherVersion>
