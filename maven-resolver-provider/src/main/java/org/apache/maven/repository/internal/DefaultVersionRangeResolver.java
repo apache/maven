@@ -42,9 +42,6 @@ import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
-import org.eclipse.aether.spi.log.Logger;
-import org.eclipse.aether.spi.log.LoggerFactory;
-import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -75,9 +72,6 @@ public class DefaultVersionRangeResolver
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
-    @SuppressWarnings( "unused" )
-    private Logger logger = NullLoggerFactory.LOGGER;
-
     private MetadataResolver metadataResolver;
 
     private SyncContextFactory syncContextFactory;
@@ -91,32 +85,18 @@ public class DefaultVersionRangeResolver
 
     @Inject
     DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                                 RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+                                 RepositoryEventDispatcher repositoryEventDispatcher )
     {
         setMetadataResolver( metadataResolver );
         setSyncContextFactory( syncContextFactory );
-        setLoggerFactory( loggerFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
     }
 
     public void initService( ServiceLocator locator )
     {
-        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-    }
-
-    public DefaultVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
-    {
-        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
-        return this;
-    }
-
-    void setLogger( LoggerFactory loggerFactory )
-    {
-        // plexus support
-        setLoggerFactory( loggerFactory );
     }
 
     public DefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )

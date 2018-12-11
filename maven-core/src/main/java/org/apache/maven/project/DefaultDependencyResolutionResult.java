@@ -98,7 +98,10 @@ class DefaultDependencyResolutionResult
     public List<Exception> getResolutionErrors( Dependency dependency )
     {
         List<Exception> errors = resolutionErrors.get( dependency );
-        return ( errors != null ) ? errors : Collections.<Exception>emptyList();
+        return ( errors != null )
+                   ? Collections.unmodifiableList( errors )
+                   : Collections.<Exception>emptyList();
+
     }
 
     public void setResolutionErrors( Dependency dependency, List<Exception> errors )

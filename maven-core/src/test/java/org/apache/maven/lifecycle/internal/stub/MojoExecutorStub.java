@@ -50,10 +50,7 @@ public class MojoExecutorStub
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
-        for ( MojoExecution mojoExecution : mojoExecutions )
-        {
-            executions.add( mojoExecution );
-        }
+        executions.addAll(mojoExecutions);
     }
 
 

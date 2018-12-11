@@ -50,9 +50,6 @@ import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
-import org.eclipse.aether.spi.log.Logger;
-import org.eclipse.aether.spi.log.LoggerFactory;
-import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
 import javax.inject.Inject;
@@ -87,9 +84,6 @@ public class DefaultVersionResolver
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
-    @SuppressWarnings( "unused" )
-    private Logger logger = NullLoggerFactory.LOGGER;
-
     private MetadataResolver metadataResolver;
 
     private SyncContextFactory syncContextFactory;
@@ -103,32 +97,18 @@ public class DefaultVersionResolver
 
     @Inject
     DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                            RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+                            RepositoryEventDispatcher repositoryEventDispatcher )
     {
         setMetadataResolver( metadataResolver );
         setSyncContextFactory( syncContextFactory );
-        setLoggerFactory( loggerFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
     }
 
     public void initService( ServiceLocator locator )
     {
-        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-    }
-
-    public DefaultVersionResolver setLoggerFactory( LoggerFactory loggerFactory )
-    {
-        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
-        return this;
-    }
-
-    void setLogger( LoggerFactory loggerFactory )
-    {
-        // plexus support
-        setLoggerFactory( loggerFactory );
     }
 
     public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )

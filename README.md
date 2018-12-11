@@ -71,7 +71,7 @@ If you want to bootstrap Maven, you'll need:
 - Maven 3.0.5 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
 ```
-mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.5.x-SNAPSHOT" clean package
+mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.6.x-SNAPSHOT" clean package
 ```
 
 
@@ -83,7 +83,7 @@ mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.5.x-SNAPSHOT" clean 
 [build-tests]: https://img.shields.io/jenkins/t/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?style=flat-square
 [maven-home]: https://maven.apache.org/
 [maven-download]: https://maven.apache.org/download.cgi
-[users-list]: https://maven.apache.org/mail-lists.html
+[users-list]: https://maven.apache.org/mailing-lists.html
 [dev-ml-list]: https://www.mail-archive.com/dev@maven.apache.org/
 [code-style]: http://maven.apache.org/developers/conventions/code.html
 [core-it]: https://maven.apache.org/core-its/core-it-suite/

@@ -46,6 +46,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
@@ -53,7 +54,6 @@ import org.apache.maven.model.Site;
  *
  * @author Benjamin Bentmann
  */
-@SuppressWarnings( { "checkstyle:methodname" } )
 public class MavenModelMerger
     extends ModelMerger
 {
@@ -103,14 +103,14 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildProjectUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
 
     /*
-     * TODO Whether the merge continues recursively into an existing node or not could be an option for the generated
+     * TODO: Whether the merge continues recursively into an existing node or not could be an option for the generated
      * merger
      */
     @Override
@@ -267,7 +267,7 @@ public class MavenModelMerger
     }
 
     /*
-     * TODO The order of the merged list could be controlled by an attribute in the model association: target-first,
+     * TODO: The order of the merged list could be controlled by an attribute in the model association: target-first,
      * source-first, dominant-first, recessive-first
      */
     @Override
@@ -353,7 +353,7 @@ public class MavenModelMerger
     }
 
     /*
-     * TODO Whether duplicates should be removed looks like an option for the generated merger.
+     * TODO: Whether duplicates should be removed looks like an option for the generated merger.
      */
     @Override
     protected void mergeBuildBase_Filters( BuildBase target, BuildBase source, boolean sourceDominant,
@@ -444,14 +444,32 @@ public class MavenModelMerger
         if ( src != null )
         {
             Site tgt = target.getSite();
-            if ( sourceDominant || tgt == null )
+            if ( sourceDominant || tgt == null || isSiteEmpty( tgt ) )
             {
-                tgt = new Site();
+                if ( tgt == null )
+                {
+                    tgt = new Site();
+                }
                 tgt.setLocation( "", src.getLocation( "" ) );
                 target.setSite( tgt );
                 mergeSite( tgt, src, sourceDominant, context );
             }
+            mergeSite_ChildSiteUrlInheritAppendPath( tgt, src, sourceDominant, context );
         }
+    }
+
+    @Override
+    protected void mergeSite( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        mergeSite_Id( target, source, sourceDominant, context );
+        mergeSite_Name( target, source, sourceDominant, context );
+        mergeSite_Url( target, source, sourceDominant, context );
+    }
+
+    protected boolean isSiteEmpty( Site site )
+    {
+        return StringUtils.isEmpty( site.getId() ) && StringUtils.isEmpty( site.getName() )
+            && StringUtils.isEmpty( site.getUrl() );
     }
 
     @Override
@@ -467,7 +485,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildSiteUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -486,7 +504,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildScmUrlInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -505,7 +523,8 @@ public class MavenModelMerger
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( extrapolateChildUrl( src, context ) );
+                target.setConnection( extrapolateChildUrl( src, source.isChildScmConnectionInheritAppendPath(),
+                                                           context ) );
                 target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
@@ -525,7 +544,8 @@ public class MavenModelMerger
             }
             else if ( target.getDeveloperConnection() == null )
             {
-                target.setDeveloperConnection( extrapolateChildUrl( src, context ) );
+                String e = extrapolateChildUrl( src, source.isChildScmDeveloperConnectionInheritAppendPath(), context );
+                target.setDeveloperConnection( e );
                 target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
@@ -671,7 +691,7 @@ public class MavenModelMerger
         return exclusion.getGroupId() + ':' + exclusion.getArtifactId();
     }
 
-    protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
+    protected String extrapolateChildUrl( String parentUrl, boolean appendPath, Map<Object, Object> context )
     {
         return parentUrl;
     }

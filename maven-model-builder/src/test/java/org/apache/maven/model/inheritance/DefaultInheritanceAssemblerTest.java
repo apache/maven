@@ -21,21 +21,16 @@ package org.apache.maven.model.inheritance;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.codehaus.plexus.PlexusTestCase;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 
-import junit.framework.AssertionFailedError;
+import org.xmlunit.matchers.CompareMatcher;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Hervé Boutemy
@@ -66,7 +61,7 @@ public class DefaultInheritanceAssemblerTest
     }
 
     private Model getModel( String name )
-        throws ModelParseException, IOException
+        throws IOException
     {
         return reader.read( getPom( name ), null );
     }
@@ -80,7 +75,7 @@ public class DefaultInheritanceAssemblerTest
     /**
      * Check most classical urls inheritance: directory structure where parent POM in parent directory
      * and child directory == artifactId
-     * @throws Exception
+     * @throws IOException Model read problem
      */
     public void testUrls()
         throws Exception
@@ -90,22 +85,52 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * Flat directory structure: parent &amp; child POMs in sibling directories, child directory == artifactId.
-     * @throws Exception
+     * @throws IOException Model read problem
      */
     public void testFlatUrls()
-        throws Exception
+        throws IOException
     {
         testInheritance( "flat-urls" );
+    }
+
+    /**
+     * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
+     * @throws Exception
+     */
+    public void testNoAppendUrls()
+        throws Exception
+    {
+        testInheritance( "no-append-urls" );
+    }
+
+    /**
+     * MNG-5951 special case test: inherit with partial override
+     * @throws Exception
+     */
+    public void testNoAppendUrls2()
+        throws Exception
+    {
+        testInheritance( "no-append-urls2" );
+    }
+
+    /**
+     * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
+     * @throws Exception
+     */
+    public void testNoAppendUrls3()
+        throws Exception
+    {
+        testInheritance( "no-append-urls3" );
     }
 
     /**
      * Tricky case: flat directory structure, but child directory != artifactId.
      * Model interpolation does not give same result when calculated from build or from repo...
      * This is why MNG-5000 fix in code is marked as bad practice (uses file names)
-     * @throws Exception
+     * @throws IOException Model read problem
      */
     public void testFlatTrickyUrls()
-        throws Exception
+        throws IOException
     {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
@@ -115,46 +140,49 @@ public class DefaultInheritanceAssemblerTest
             testInheritance( "tricky-flat-artifactId-urls", false );
             //fail( "should have failed since module reference == artifactId != directory name" );
         }
-        catch ( AssertionFailedError afe )
+        catch ( AssertionError afe )
         {
             // expected failure: wrong relative path calculation
             assertTrue( afe.getMessage(),
-                        afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+                        afe.getMessage().contains(
+                                "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was " +
+                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ) );
         }
         // but ok from repo: local disk is ignored
         testInheritance( "tricky-flat-artifactId-urls", true );
 
         // parent references child with directory name (which is not artifact id)
-        // then relative path calculation will success during build from disk but failwhen calculated from repo
+        // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance( "tricky-flat-directory-urls", false );
         try
         {
             testInheritance( "tricky-flat-directory-urls", true );
             fail( "should have failed since module reference == directory name != artifactId" );
         }
-        catch ( AssertionFailedError afe )
+        catch ( AssertionError afe )
         {
             // expected failure
-            assertTrue( afe.getMessage(),
-                        afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+            assertTrue( afe.getMessage(), afe.getMessage().contains(
+                    "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
+                            "'http://www.apache.org/path/to/parent/child-artifact-id/'" ) );
         }
     }
 
     public void testWithEmptyUrl() 
-        throws Exception
+        throws IOException
     {
         	testInheritance( "empty-urls", false );
     }
     
     public void testInheritance( String baseName )
-        throws Exception
+        throws IOException
     {
         testInheritance( baseName, false );
         testInheritance( baseName, true );
     }
 
     public void testInheritance( String baseName, boolean fromRepo )
-        throws Exception
+        throws IOException
     {
         Model parent = getModel( baseName + "-parent" );
 
@@ -179,17 +207,12 @@ public class DefaultInheritanceAssemblerTest
 
         // check with getPom( baseName + "-expected" )
         File expected = getPom( baseName + "-expected" );
-        try ( Reader control = new InputStreamReader( new FileInputStream( expected ), StandardCharsets.UTF_8 );
-              Reader test = new InputStreamReader( new FileInputStream( actual ), StandardCharsets.UTF_8 ) )
-        {
-            XMLUnit.setIgnoreComments( true );
-            XMLUnit.setIgnoreWhitespace( true );
-            XMLAssert.assertXMLEqual( control, test );
-        }
-    }    
+
+        assertThat( actual, CompareMatcher.isIdenticalTo( expected ).ignoreComments().ignoreWhitespace() );
+    }
 
     public void testModulePathNotArtifactId()
-        throws Exception
+        throws IOException
     {
         Model parent = getModel( "module-path-not-artifactId-parent" );
 
@@ -205,12 +228,7 @@ public class DefaultInheritanceAssemblerTest
 
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom( "module-path-not-artifactId-expected" );
-        try ( Reader control = new InputStreamReader( new FileInputStream( expected ), StandardCharsets.UTF_8 );
-                        Reader test = new InputStreamReader( new FileInputStream( actual ), StandardCharsets.UTF_8 ) )
-        {
-            XMLUnit.setIgnoreComments( true );
-            XMLUnit.setIgnoreWhitespace( true );
-            XMLAssert.assertXMLEqual( control, test );
-        }
+
+        assertThat( actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace() );
     }
 }

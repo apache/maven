@@ -125,6 +125,7 @@ public class ModelMerger
     {
         mergeModelBase( target, source, sourceDominant, context );
 
+        mergeModel_ChildProjectUrlInheritAppendPath( target, source, sourceDominant, context );
         mergeModel_ModelVersion( target, source, sourceDominant, context );
         mergeModel_Parent( target, source, sourceDominant, context );
         mergeModel_GroupId( target, source, sourceDominant, context );
@@ -202,6 +203,21 @@ public class ModelMerger
             {
                 target.setArtifactId( src );
                 target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
+            }
+        }
+    }
+
+    protected void mergeModel_ChildProjectUrlInheritAppendPath( Model target, Model source, boolean sourceDominant,
+                                                                Map<Object, Object> context )
+    {
+        String src = source.getChildProjectUrlInheritAppendPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getChildProjectUrlInheritAppendPath() == null )
+            {
+                target.setChildProjectUrlInheritAppendPath( src );
+                target.setLocation( "child.project.url.inherit.append.path",
+                                    source.getLocation( "child.project.url.inherit.append.path" ) );
             }
         }
     }
@@ -876,9 +892,25 @@ public class ModelMerger
 
     protected void mergeSite( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
     {
+        mergeSite_ChildSiteUrlInheritAppendPath( target, source, sourceDominant, context );
         mergeSite_Id( target, source, sourceDominant, context );
         mergeSite_Name( target, source, sourceDominant, context );
         mergeSite_Url( target, source, sourceDominant, context );
+    }
+
+    protected void mergeSite_ChildSiteUrlInheritAppendPath( Site target, Site source, boolean sourceDominant,
+                                                            Map<Object, Object> context )
+    {
+        String src = source.getChildSiteUrlInheritAppendPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getChildSiteUrlInheritAppendPath() == null )
+            {
+                target.setChildSiteUrlInheritAppendPath( src );
+                target.setLocation( "child.site.url.inherit.append.path",
+                                    source.getLocation( "child.site.url.inherit.append.path" ) );
+            }
+        }
     }
 
     protected void mergeSite_Id( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
@@ -1925,10 +1957,59 @@ public class ModelMerger
 
     protected void mergeScm( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
     {
+        mergeScm_ChildScmConnectionInheritAppendPath( target, source, sourceDominant, context );
+        mergeScm_ChildScmDeveloperConnectionInheritAppendPath( target, source, sourceDominant, context );
+        mergeScm_ChildScmUrlInheritAppendPath( target, source, sourceDominant, context );
         mergeScm_Url( target, source, sourceDominant, context );
         mergeScm_Connection( target, source, sourceDominant, context );
         mergeScm_DeveloperConnection( target, source, sourceDominant, context );
         mergeScm_Tag( target, source, sourceDominant, context );
+    }
+
+    protected void mergeScm_ChildScmConnectionInheritAppendPath( Scm target, Scm source, boolean sourceDominant,
+                                                                 Map<Object, Object> context )
+    {
+        String src = source.getChildScmConnectionInheritAppendPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getChildScmConnectionInheritAppendPath() == null )
+            {
+                target.setChildScmConnectionInheritAppendPath( src );
+                target.setLocation( "child.scm.connection.inherit.append.path",
+                                    source.getLocation( "child.scm.connection.inherit.append.path" ) );
+            }
+        }
+    }
+
+    protected void mergeScm_ChildScmDeveloperConnectionInheritAppendPath( Scm target, Scm source,
+                                                                          boolean sourceDominant,
+                                                                          Map<Object, Object> context )
+    {
+        String src = source.getChildScmDeveloperConnectionInheritAppendPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getChildScmDeveloperConnectionInheritAppendPath() == null )
+            {
+                target.setChildScmDeveloperConnectionInheritAppendPath( src );
+                target.setLocation( "child.scm.developerConnection.inherit.append.path",
+                                    source.getLocation( "child.scm.developerConnection.inherit.append.path" ) );
+            }
+        }
+    }
+
+    protected void mergeScm_ChildScmUrlInheritAppendPath( Scm target, Scm source, boolean sourceDominant,
+                                                          Map<Object, Object> context )
+    {
+        String src = source.getChildScmUrlInheritAppendPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getChildScmUrlInheritAppendPath() == null )
+            {
+                target.setChildScmUrlInheritAppendPath( src );
+                target.setLocation( "child.scm.url.inherit.append.path",
+                                    source.getLocation( "child.scm.url.inherit.append.path" ) );
+            }
+        }
     }
 
     protected void mergeScm_Url( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )

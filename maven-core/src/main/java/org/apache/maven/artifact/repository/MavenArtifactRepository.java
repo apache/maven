@@ -215,7 +215,7 @@ public class MavenArtifactRepository
 
     /**
      * Return the protocol name.
-     * <br/>
+     * <br>
      * E.g: for input
      * <code>http://www.codehaus.org</code> this method will return <code>http</code>
      *
@@ -405,7 +405,7 @@ public class MavenArtifactRepository
     {
         if ( mirroredRepositories != null )
         {
-            this.mirroredRepositories = mirroredRepositories;
+            this.mirroredRepositories = Collections.unmodifiableList( mirroredRepositories );
         }
         else
         {

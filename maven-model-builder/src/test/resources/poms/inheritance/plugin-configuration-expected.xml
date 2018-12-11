@@ -34,9 +34,9 @@ under the License.
   <mailingLists>
     <mailingList>
       <name>parent</name>
-      <post>post@mailing.list.com</post>
       <subscribe>subscribe@mailing.list.com</subscribe>
       <unsubscribe>unsubscribe@mailing.list.com</unsubscribe>
+      <post>post@mailing.list.com</post>
     </mailingList>
   </mailingLists>
 

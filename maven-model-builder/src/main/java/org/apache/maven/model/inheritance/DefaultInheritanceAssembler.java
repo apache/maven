@@ -144,12 +144,13 @@ public class DefaultInheritanceAssembler
     {
 
         @Override
-        protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
+        protected String extrapolateChildUrl( String parentUrl, boolean appendPath, Map<Object, Object> context )
         {
             Object childDirectory = context.get( CHILD_DIRECTORY );
             Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
 
-            if ( StringUtils.isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null )
+            if ( StringUtils.isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null
+                || !appendPath )
             {
                 return parentUrl;
             }

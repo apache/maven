@@ -461,7 +461,7 @@ public class DefaultMavenPluginManager
                 it.remove();
             }
         }
-        return artifacts;
+        return Collections.unmodifiableList( artifacts );
     }
 
     private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )

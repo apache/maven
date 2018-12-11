@@ -115,7 +115,7 @@ public class CleanArgument
         }
         else
         {
-            cleanArgs = cleaned.toArray( new String[cleanedSz] );
+            cleanArgs = cleaned.toArray( new String[0] );
         }
 
         return cleanArgs;

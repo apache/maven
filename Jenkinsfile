@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.5.0'
+def buildMvn = '3.5.4'
 def runITsOses = ['linux', 'windows']
-def runITsJdks = ['7', '8', '9']
-def runITsMvn = '3.5.0'
+def runITsJdks = ['7', '8', '11']
+def runITsMvn = '3.5.4'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -78,8 +78,8 @@ for (String os in runITsOses) {
                 stage("${stageLabel}") {
                     // on Windows, need a short path or we hit 256 character limit for paths
                     // using EXECUTOR_NUMBER guarantees that concurrent builds on same agent
-                    // will not trample each other
-                    dir(isUnix() ? 'test' : "/mvn-it-${EXECUTOR_NUMBER}.tmp") {
+                    // will not trample each other plus workaround for JENKINS-52657
+                    dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
                         checkout tests
                         if (isUnix()) {
