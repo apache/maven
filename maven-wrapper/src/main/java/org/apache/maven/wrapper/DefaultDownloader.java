@@ -16,9 +16,21 @@
 
 package org.apache.maven.wrapper;
 
-import java.io.*;
+import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_PASSWORD;
+import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_USER;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * @author Hans Dockter
@@ -104,7 +116,7 @@ public class DefaultDownloader implements Downloader {
         return;
     }
     if (!"https".equals(address.getScheme())) {
-       Logger.info("WARNING Using HTTP Basic Authentication over an insecure connection to download the Gradle distribution. Please consider using HTTPS.");
+       Logger.info("WARNING Using HTTP Basic Authentication over an insecure connection to download the Maven distribution. Please consider using HTTPS.");
     }
     connection.setRequestProperty("Authorization", "Basic " + base64Encode(userInfo));
   }
@@ -132,14 +144,14 @@ public class DefaultDownloader implements Downloader {
               Method encodeMethod = loader.loadClass("javax.xml.bind.DatatypeConverter").getMethod("printBase64Binary", byte[].class);
               return (String) encodeMethod.invoke(null, new Object[]{userInfo.getBytes("UTF-8")});
           } catch (Exception java5OrEarlier) {
-              throw new RuntimeException("Downloading Gradle distributions with HTTP Basic Authentication is not supported on your JVM.", java5OrEarlier);
+              throw new RuntimeException("Downloading Maven   distributions with HTTP Basic Authentication is not supported on your JVM.", java5OrEarlier);
           }
       }
   }
 
   private String calculateUserInfo(URI uri) {
-    String username = System.getProperty("maven.wrapperUser");
-    String password = System.getProperty("maven.wrapperPassword");
+    String username = System.getenv(MVNW_USER);
+    String password = System.getenv(MVNW_PASSWORD);
     if (username != null && password != null) {
         return username + ':' + password;
     }
