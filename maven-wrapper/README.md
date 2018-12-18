@@ -104,6 +104,15 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
 
 [1]: https://github.com/takari/takari-maven-plugin
 
+## Specifying Maven Distribution Base Path
+
+This is a feature of Maven itself and the wrapper just happens to take it into
+account. Simply set `MAVEN_USER_HOME` to the desired path and the wrapper uses
+it as the base of the Maven distro installation.
+
+See https://www.lewuathe.com/maven-wrapper-home.html and
+https://github.com/takari/maven-wrapper/issues/17
+
 
 ## Developing and Releasing
 
