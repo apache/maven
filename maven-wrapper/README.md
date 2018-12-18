@@ -99,7 +99,7 @@ which works for any version except snapshots. Once you have a wrapper you can ch
 `distributionUrl` in `.mvn/wrapper/maven-wrapper.properties`, e.g.
 
 ```
-distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.4/apache-maven-3.5.4-bin.zip
 ```
 
 [1]: https://github.com/takari/takari-maven-plugin
@@ -122,3 +122,8 @@ For release
 - cut maven release with usual release plugin usage
 - update maven plugin to release version
 - release it as well
+
+Updating Maven version:
+
+- update URL in maven-wrapper/.mvn/wrapper/maven-wrapper.properties
+- updated maven parameter in takari-maven-plugin  WrapperMojo
