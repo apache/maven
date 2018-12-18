@@ -102,6 +102,19 @@ which works for any version except snapshots. Once you have a wrapper you can ch
 distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.4/apache-maven-3.5.4-bin.zip
 ```
 
+## Using Basic Authentication for Distribution download
+
+To download Maven from a location that requires Basic Authentication you have 2 options:
+
+1. Set the environment variables MVNW_USER and MVNW_PASSWORD
+
+    or
+
+2. add user and password to the distributionUrl like that:
+`distributionUrl=https://username:password@<yourserver>/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip`
+
+
+
 [1]: https://github.com/takari/takari-maven-plugin
 
 ## Specifying Maven Distribution Base Path
