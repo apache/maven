@@ -116,7 +116,7 @@ public class DefaultDownloader implements Downloader {
         return;
     }
     if (!"https".equals(address.getScheme())) {
-       Logger.info("WARNING Using HTTP Basic Authentication over an insecure connection to download the Maven distribution. Please consider using HTTPS.");
+       Logger.warn("WARNING Using HTTP Basic Authentication over an insecure connection to download the Maven distribution. Please consider using HTTPS.");
     }
     connection.setRequestProperty("Authorization", "Basic " + base64Encode(userInfo));
   }
@@ -144,7 +144,7 @@ public class DefaultDownloader implements Downloader {
               Method encodeMethod = loader.loadClass("javax.xml.bind.DatatypeConverter").getMethod("printBase64Binary", byte[].class);
               return (String) encodeMethod.invoke(null, new Object[]{userInfo.getBytes("UTF-8")});
           } catch (Exception java5OrEarlier) {
-              throw new RuntimeException("Downloading Maven   distributions with HTTP Basic Authentication is not supported on your JVM.", java5OrEarlier);
+              throw new RuntimeException("Downloading Maven distributions with HTTP Basic Authentication is not supported on your JVM.", java5OrEarlier);
           }
       }
   }
