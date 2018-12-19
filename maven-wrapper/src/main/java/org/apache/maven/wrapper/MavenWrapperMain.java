@@ -39,7 +39,6 @@ public class MavenWrapperMain {
   public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
   public static final String MVNW_USER = "MVNW_USER";
   public static final String MVNW_PASSWORD = "MVNW_PASSWORD";
-
   
   public static void main(String[] args) throws Exception {
     File wrapperJar = wrapperJar();
