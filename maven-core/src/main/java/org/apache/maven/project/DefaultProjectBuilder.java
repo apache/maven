@@ -438,106 +438,107 @@ public class DefaultProjectBuilder
             new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );
         request.setModelBuildingListener( listener );
 
+        ModelBuildingResult result;
         try
         {
-            ModelBuildingResult result = modelBuilder.build( request );
-
-            Model model = result.getEffectiveModel();
-
-            projectIndex.put( result.getModelIds().get( 0 ), project );
-
-            InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
-            interimResults.add( interimResult );
-
-            if ( recursive && !model.getModules().isEmpty() )
-            {
-                File basedir = pomFile.getParentFile();
-
-                List<File> moduleFiles = new ArrayList<>();
-
-                for ( String module : model.getModules() )
-                {
-                    if ( StringUtils.isEmpty( module ) )
-                    {
-                        continue;
-                    }
-
-                    module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
-
-                    File moduleFile = new File( basedir, module );
-
-                    if ( moduleFile.isDirectory() )
-                    {
-                        moduleFile = modelProcessor.locatePom( moduleFile );
-                    }
-
-                    if ( !moduleFile.isFile() )
-                    {
-                        ModelProblem problem =
-                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
-                                                     -1, null );
-                        result.getProblems().add( problem );
-
-                        noErrors = false;
-
-                        continue;
-                    }
-
-                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                    {
-                        // we don't canonicalize on unix to avoid interfering with symlinks
-                        try
-                        {
-                            moduleFile = moduleFile.getCanonicalFile();
-                        }
-                        catch ( IOException e )
-                        {
-                            moduleFile = moduleFile.getAbsoluteFile();
-                        }
-                    }
-                    else
-                    {
-                        moduleFile = new File( moduleFile.toURI().normalize() );
-                    }
-
-                    if ( aggregatorFiles.contains( moduleFile ) )
-                    {
-                        StringBuilder buffer = new StringBuilder( 256 );
-                        for ( File aggregatorFile : aggregatorFiles )
-                        {
-                            buffer.append( aggregatorFile ).append( " -> " );
-                        }
-                        buffer.append( moduleFile );
-
-                        ModelProblem problem =
-                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                     ModelProblem.Version.BASE, model, -1, -1, null );
-                        result.getProblems().add( problem );
-
-                        noErrors = false;
-
-                        continue;
-                    }
-
-                    moduleFiles.add( moduleFile );
-                }
-
-                interimResult.modules = new ArrayList<>();
-
-                if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                             recursive, config ) )
-                {
-                    noErrors = false;
-                }
-            }
+            result = modelBuilder.build( request );
         }
         catch ( ModelBuildingException e )
         {
             results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
-            noErrors = false;
+            return false;
+        }
+
+        Model model = result.getEffectiveModel();
+
+        projectIndex.put( result.getModelIds().get( 0 ), project );
+
+        InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
+        interimResults.add( interimResult );
+
+        if ( recursive && !model.getModules().isEmpty() )
+        {
+            File basedir = pomFile.getParentFile();
+
+            List<File> moduleFiles = new ArrayList<>();
+
+            for ( String module : model.getModules() )
+            {
+                if ( StringUtils.isEmpty( module ) )
+                {
+                    continue;
+                }
+
+                module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+
+                File moduleFile = new File( basedir, module );
+
+                if ( moduleFile.isDirectory() )
+                {
+                    moduleFile = modelProcessor.locatePom( moduleFile );
+                }
+
+                if ( !moduleFile.isFile() )
+                {
+                    ModelProblem problem =
+                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
+                                                 -1, null );
+                    result.getProblems().add( problem );
+
+                    noErrors = false;
+
+                    continue;
+                }
+
+                if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                {
+                    // we don't canonicalize on unix to avoid interfering with symlinks
+                    try
+                    {
+                        moduleFile = moduleFile.getCanonicalFile();
+                    }
+                    catch ( IOException e )
+                    {
+                        moduleFile = moduleFile.getAbsoluteFile();
+                    }
+                }
+                else
+                {
+                    moduleFile = new File( moduleFile.toURI().normalize() );
+                }
+
+                if ( aggregatorFiles.contains( moduleFile ) )
+                {
+                    StringBuilder buffer = new StringBuilder( 256 );
+                    for ( File aggregatorFile : aggregatorFiles )
+                    {
+                        buffer.append( aggregatorFile ).append( " -> " );
+                    }
+                    buffer.append( moduleFile );
+
+                    ModelProblem problem =
+                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                            + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
+                                                 ModelProblem.Version.BASE, model, -1, -1, null );
+                    result.getProblems().add( problem );
+
+                    noErrors = false;
+
+                    continue;
+                }
+
+                moduleFiles.add( moduleFile );
+            }
+
+            interimResult.modules = new ArrayList<>();
+
+            if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
+                         recursive, config ) )
+            {
+                noErrors = false;
+            }
         }
 
         return noErrors;
