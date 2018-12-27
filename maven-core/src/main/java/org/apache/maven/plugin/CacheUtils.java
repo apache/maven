@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -32,11 +33,19 @@ import org.apache.maven.model.Plugin;
 class CacheUtils
 {
 
+    /**
+     * @deprecated Use {@link Objects#equals(Object)}
+     */
+    @Deprecated
     public static <T> boolean eq( T s1, T s2 )
     {
         return s1 != null ? s1.equals( s2 ) : s2 == null;
     }
 
+    /**
+     * @deprecated Use {@link Objects#hashCode(Object)}
+     */
+    @Deprecated
     public static int hash( Object obj )
     {
         return obj != null ? obj.hashCode() : 0;
@@ -46,25 +55,25 @@ class CacheUtils
     {
         int hash = 17;
 
-        hash = hash * 31 + hash( plugin.getGroupId() );
-        hash = hash * 31 + hash( plugin.getArtifactId() );
-        hash = hash * 31 + hash( plugin.getVersion() );
+        hash = hash * 31 + Objects.hashCode( plugin.getGroupId() );
+        hash = hash * 31 + Objects.hashCode( plugin.getArtifactId() );
+        hash = hash * 31 + Objects.hashCode( plugin.getVersion() );
 
         hash = hash * 31 + ( plugin.isExtensions() ? 1 : 0 );
 
         for ( Dependency dependency : plugin.getDependencies() )
         {
-            hash = hash * 31 + hash( dependency.getGroupId() );
-            hash = hash * 31 + hash( dependency.getArtifactId() );
-            hash = hash * 31 + hash( dependency.getVersion() );
-            hash = hash * 31 + hash( dependency.getType() );
-            hash = hash * 31 + hash( dependency.getClassifier() );
-            hash = hash * 31 + hash( dependency.getScope() );
+            hash = hash * 31 + Objects.hashCode( dependency.getGroupId() );
+            hash = hash * 31 + Objects.hashCode( dependency.getArtifactId() );
+            hash = hash * 31 + Objects.hashCode( dependency.getVersion() );
+            hash = hash * 31 + Objects.hashCode( dependency.getType() );
+            hash = hash * 31 + Objects.hashCode( dependency.getClassifier() );
+            hash = hash * 31 + Objects.hashCode( dependency.getScope() );
 
             for ( Exclusion exclusion : dependency.getExclusions() )
             {
-                hash = hash * 31 + hash( exclusion.getGroupId() );
-                hash = hash * 31 + hash( exclusion.getArtifactId() );
+                hash = hash * 31 + Objects.hashCode( exclusion.getGroupId() );
+                hash = hash * 31 + Objects.hashCode( exclusion.getArtifactId() );
             }
         }
 
@@ -73,9 +82,9 @@ class CacheUtils
 
     public static boolean pluginEquals( Plugin a, Plugin b )
     {
-        return eq( a.getArtifactId(), b.getArtifactId() ) //
-            && eq( a.getGroupId(), b.getGroupId() ) //
-            && eq( a.getVersion(), b.getVersion() ) //
+        return Objects.equals( a.getArtifactId(), b.getArtifactId() ) //
+            && Objects.equals( a.getGroupId(), b.getGroupId() ) //
+            && Objects.equals( a.getVersion(), b.getVersion() ) //
             && a.isExtensions() == b.isExtensions() //
             && dependenciesEquals( a.getDependencies(), b.getDependencies() );
     }
@@ -95,12 +104,12 @@ class CacheUtils
             Dependency aD = aI.next();
             Dependency bD = bI.next();
 
-            boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
-                && eq( aD.getArtifactId(), bD.getArtifactId() ) //
-                && eq( aD.getVersion(), bD.getVersion() ) //
-                && eq( aD.getType(), bD.getType() ) //
-                && eq( aD.getClassifier(), bD.getClassifier() ) //
-                && eq( aD.getScope(), bD.getScope() );
+            boolean r = Objects.equals( aD.getGroupId(), bD.getGroupId() ) //
+                && Objects.equals( aD.getArtifactId(), bD.getArtifactId() ) //
+                && Objects.equals( aD.getVersion(), bD.getVersion() ) //
+                && Objects.equals( aD.getType(), bD.getType() ) //
+                && Objects.equals( aD.getClassifier(), bD.getClassifier() ) //
+                && Objects.equals( aD.getScope(), bD.getScope() );
 
             r &= exclusionsEquals( aD.getExclusions(), bD.getExclusions() );
 
@@ -128,8 +137,8 @@ class CacheUtils
             Exclusion aD = aI.next();
             Exclusion bD = bI.next();
 
-            boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
-                && eq( aD.getArtifactId(), bD.getArtifactId() );
+            boolean r = Objects.equals( aD.getGroupId(), bD.getGroupId() ) //
+                && Objects.equals( aD.getArtifactId(), bD.getArtifactId() );
 
             if ( !r )
             {
