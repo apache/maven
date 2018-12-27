@@ -637,78 +637,7 @@ public class DefaultProjectBuilder
         project.setOriginalModel( result.getRawModel() );
         project.setFile( model.getPomFile() );
 
-        Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
-                                ? result.getRawModel( result.getModelIds().get( 1 ) )
-                                : null;
-
-        if ( parentModel != null )
-        {
-            final String parentGroupId = inheritedGroupId( result, 1 );
-            final String parentVersion = inheritedVersion( result, 1 );
-
-            project.setParentArtifact( repositorySystem.createProjectArtifact( parentGroupId,
-                                                                               parentModel.getArtifactId(),
-                                                                               parentVersion ) );
-
-            // org.apache.maven.its.mng4834:parent:0.1
-            String parentModelId = result.getModelIds().get( 1 );
-            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
-            MavenProject parent = projects.get( parentModelId );
-            if ( parent == null )
-            {
-                //
-                // At this point the DefaultModelBuildingListener has fired and it populates the
-                // remote repositories with those found in the pom.xml, along with the existing externally
-                // defined repositories.
-                //
-                projectBuildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
-                if ( parentPomFile != null )
-                {
-                    project.setParentFile( parentPomFile );
-                    try
-                    {
-                        parent = build( parentPomFile, projectBuildingRequest ).getProject();
-                    }
-                    catch ( ProjectBuildingException e )
-                    {
-                        // MNG-4488 where let invalid parents slide on by
-                        if ( logger.isDebugEnabled() )
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId(), e );
-                        }
-                        else
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId() );
-                        }
-                    }
-                }
-                else
-                {
-                    Artifact parentArtifact = project.getParentArtifact();
-                    try
-                    {
-                        parent = build( parentArtifact, projectBuildingRequest ).getProject();
-                    }
-                    catch ( ProjectBuildingException e )
-                    {
-                        // MNG-4488 where let invalid parents slide on by
-                        if ( logger.isDebugEnabled() )
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId(), e );
-                        }
-                        else
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId() );
-                        }
-                    }
-                }
-            }
-            project.setParent( parent );
-        }
+        initParent( project, projects, result, projectBuildingRequest );
 
         Artifact projectArtifact =
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
@@ -882,6 +811,83 @@ public class DefaultProjectBuilder
                 throw new IllegalStateException( "Failed to create snapshot distribution repository for "
                     + project.getId(), e );
             }
+        }
+    }
+
+    private void initParent( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
+                             ProjectBuildingRequest projectBuildingRequest )
+    {
+        Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
+                                ? result.getRawModel( result.getModelIds().get( 1 ) )
+                                : null;
+
+        if ( parentModel != null )
+        {
+            final String parentGroupId = inheritedGroupId( result, 1 );
+            final String parentVersion = inheritedVersion( result, 1 );
+
+            project.setParentArtifact( repositorySystem.createProjectArtifact( parentGroupId,
+                                                                               parentModel.getArtifactId(),
+                                                                               parentVersion ) );
+
+            // org.apache.maven.its.mng4834:parent:0.1
+            String parentModelId = result.getModelIds().get( 1 );
+            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
+            MavenProject parent = projects.get( parentModelId );
+            if ( parent == null )
+            {
+                //
+                // At this point the DefaultModelBuildingListener has fired and it populates the
+                // remote repositories with those found in the pom.xml, along with the existing externally
+                // defined repositories.
+                //
+                projectBuildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+                if ( parentPomFile != null )
+                {
+                    project.setParentFile( parentPomFile );
+                    try
+                    {
+                        parent = build( parentPomFile, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        if ( logger.isDebugEnabled() )
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId(), e );
+                        }
+                        else
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId() );
+                        }
+                    }
+                }
+                else
+                {
+                    Artifact parentArtifact = project.getParentArtifact();
+                    try
+                    {
+                        parent = build( parentArtifact, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        if ( logger.isDebugEnabled() )
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId(), e );
+                        }
+                        else
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId() );
+                        }
+                    }
+                }
+            }
+            project.setParent( parent );
         }
     }
 
