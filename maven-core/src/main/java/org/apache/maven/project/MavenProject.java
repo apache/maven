@@ -1207,7 +1207,8 @@ public class MavenProject
         // disown the parent
 
         // copy fields
-        setFile( project.getFile() );
+        file = project.file;
+        basedir = project.basedir;
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
