@@ -26,7 +26,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -35,43 +35,43 @@ import org.apache.commons.cli.ParseException;
  */
 public class CLIManager
 {
-    public static final char ALTERNATE_POM_FILE = 'f';
+    public static final String ALTERNATE_POM_FILE = "f";
 
-    public static final char BATCH_MODE = 'B';
+    public static final String BATCH_MODE = "B";
 
-    public static final char SET_SYSTEM_PROPERTY = 'D';
+    public static final String SET_SYSTEM_PROPERTY = "D";
 
-    public static final char OFFLINE = 'o';
+    public static final String OFFLINE = "o";
 
-    public static final char QUIET = 'q';
+    public static final String QUIET = "q";
 
-    public static final char DEBUG = 'X';
+    public static final String DEBUG = "X";
 
-    public static final char ERRORS = 'e';
+    public static final String ERRORS = "e";
 
-    public static final char HELP = 'h';
+    public static final String HELP = "h";
 
-    public static final char VERSION = 'v';
+    public static final String VERSION = "v";
 
-    public static final char SHOW_VERSION = 'V';
+    public static final String SHOW_VERSION = "V";
 
-    public static final char NON_RECURSIVE = 'N';
+    public static final String NON_RECURSIVE = "N";
 
-    public static final char UPDATE_SNAPSHOTS = 'U';
+    public static final String UPDATE_SNAPSHOTS = "U";
 
-    public static final char ACTIVATE_PROFILES = 'P';
+    public static final String ACTIVATE_PROFILES = "P";
 
     public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
 
-    public static final char CHECKSUM_FAILURE_POLICY = 'C';
+    public static final String CHECKSUM_FAILURE_POLICY = "C";
 
-    public static final char CHECKSUM_WARNING_POLICY = 'c';
+    public static final String CHECKSUM_WARNING_POLICY = "c";
 
-    public static final char ALTERNATE_USER_SETTINGS = 's';
+    public static final String ALTERNATE_USER_SETTINGS = "s";
 
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
-    public static final char ALTERNATE_USER_TOOLCHAINS = 't';
+    public static final String ALTERNATE_USER_TOOLCHAINS = "t";
 
     public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
 
@@ -107,45 +107,45 @@ public class CLIManager
     public CLIManager()
     {
         options = new Options();
-        options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
-        options.addOption( OptionBuilder.withLongOpt( "file" ).hasArg().withDescription( "Force the use of an alternate POM file (or directory with pom.xml)" ).create( ALTERNATE_POM_FILE ) );
-        options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
-        options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
-        options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create( VERSION ) );
-        options.addOption( OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create( QUIET ) );
-        options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create( DEBUG ) );
-        options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create( ERRORS ) );
-        options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription( "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
-        options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription( "Forces a check for missing releases and updated snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
-        options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription( "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
-        options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode (disables output color)" ).create( BATCH_MODE ) );
-        options.addOption( OptionBuilder.withLongOpt( "no-snapshot-updates" ).withDescription( "Suppress SNAPSHOT updates" ).create( SUPRESS_SNAPSHOT_UPDATES ) );
-        options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
-        options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
-        options.addOption( OptionBuilder.withLongOpt( "settings" ).withDescription( "Alternate path for the user settings file" ).hasArg().create( ALTERNATE_USER_SETTINGS ) );
-        options.addOption( OptionBuilder.withLongOpt( "global-settings" ).withDescription( "Alternate path for the global settings file" ).hasArg().create( ALTERNATE_GLOBAL_SETTINGS ) );
-        options.addOption( OptionBuilder.withLongOpt( "toolchains" ).withDescription( "Alternate path for the user toolchains file" ).hasArg().create( ALTERNATE_USER_TOOLCHAINS ) );
-        options.addOption( OptionBuilder.withLongOpt( "global-toolchains" ).withDescription( "Alternate path for the global toolchains file" ).hasArg().create( ALTERNATE_GLOBAL_TOOLCHAINS ) );
-        options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription( "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
-        options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
-        options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
-        options.addOption( OptionBuilder.withLongOpt( "resume-from" ).hasArg().withDescription( "Resume reactor from specified project" ).create( RESUME_FROM ) );
-        options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path" ).hasArg().create( PROJECT_LIST ) );
-        options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription( "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
-        options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
-        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file where all build output will go (disables output color)" ).create( LOG_FILE ) );
-        options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
-        options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasOptionalArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
-        options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasOptionalArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
-        options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
-        options.addOption( OptionBuilder.withLongOpt( "legacy-local-repository" ).withDescription( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).create( LEGACY_LOCAL_REPOSITORY ) );
-        options.addOption( OptionBuilder.withLongOpt( "builder" ).hasArg().withDescription( "The id of the build strategy to use" ).create( BUILDER ) );
+        options.addOption( Option.builder( HELP ).longOpt( "help" ).desc( "Display help information" ).build() );
+        options.addOption( Option.builder( ALTERNATE_POM_FILE ).longOpt( "file" ).hasArg().desc( "Force the use of an alternate POM file (or directory with pom.xml)" ).build() );
+        options.addOption( Option.builder( SET_SYSTEM_PROPERTY ).longOpt( "define" ).hasArg().valueSeparator().desc( "Define a system property" ).build() );
+        options.addOption( Option.builder( OFFLINE ).longOpt( "offline" ).desc( "Work offline" ).build() );
+        options.addOption( Option.builder( VERSION ).longOpt( "version" ).desc( "Display version information" ).build() );
+        options.addOption( Option.builder( QUIET ).longOpt( "quiet" ).desc( "Quiet output - only show errors" ).build() );
+        options.addOption( Option.builder( DEBUG ).longOpt( "debug" ).desc( "Produce execution debug output" ).build() );
+        options.addOption( Option.builder( ERRORS ).longOpt( "errors" ).desc( "Produce execution error messages" ).build() );
+        options.addOption( Option.builder( NON_RECURSIVE ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects" ).build() );
+        options.addOption( Option.builder( UPDATE_SNAPSHOTS ).longOpt( "update-snapshots" ).desc( "Forces a check for missing releases and updated snapshots on remote repositories" ).build() );
+        options.addOption( Option.builder( ACTIVATE_PROFILES ).longOpt( "activate-profiles" ).desc( "Comma-delimited list of profiles to activate" ).hasArg().build() );
+        options.addOption( Option.builder( BATCH_MODE ).longOpt( "batch-mode" ).desc( "Run in non-interactive (batch) mode (disables output color)" ).build() );
+        options.addOption( Option.builder( SUPRESS_SNAPSHOT_UPDATES ).longOpt( "no-snapshot-updates" ).desc( "Suppress SNAPSHOT updates" ).build() );
+        options.addOption( Option.builder( CHECKSUM_FAILURE_POLICY ).longOpt( "strict-checksums" ).desc( "Fail the build if checksums don't match" ).build() );
+        options.addOption( Option.builder( CHECKSUM_WARNING_POLICY ).longOpt( "lax-checksums" ).desc( "Warn if checksums don't match" ).build() );
+        options.addOption( Option.builder( ALTERNATE_USER_SETTINGS ).longOpt( "settings" ).desc( "Alternate path for the user settings file" ).hasArg().build() );
+        options.addOption( Option.builder( ALTERNATE_GLOBAL_SETTINGS ).longOpt( "global-settings" ).desc( "Alternate path for the global settings file" ).hasArg().build() );
+        options.addOption( Option.builder( ALTERNATE_USER_TOOLCHAINS ).longOpt( "toolchains" ).desc( "Alternate path for the user toolchains file" ).hasArg().build() );
+        options.addOption( Option.builder( ALTERNATE_GLOBAL_TOOLCHAINS ).longOpt( "global-toolchains" ).desc( "Alternate path for the global toolchains file" ).hasArg().build() );
+        options.addOption( Option.builder( FAIL_FAST ).longOpt( "fail-fast" ).desc( "Stop at first failure in reactorized builds" ).build() );
+        options.addOption( Option.builder( FAIL_AT_END ).longOpt( "fail-at-end" ).desc( "Only fail the build afterwards; allow all non-impacted builds to continue" ).build() );
+        options.addOption( Option.builder( FAIL_NEVER ).longOpt( "fail-never" ).desc( "NEVER fail the build, regardless of project result" ).build() );
+        options.addOption( Option.builder( RESUME_FROM ).longOpt( "resume-from" ).hasArg().desc( "Resume reactor from specified project" ).build() );
+        options.addOption( Option.builder( PROJECT_LIST ).longOpt( "projects" ).desc( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path" ).hasArg().build() );
+        options.addOption( Option.builder( ALSO_MAKE ).longOpt( "also-make" ).desc( "If project list is specified, also build projects required by the list" ).build() );
+        options.addOption( Option.builder( ALSO_MAKE_DEPENDENTS ).longOpt( "also-make-dependents" ).desc( "If project list is specified, also build projects that depend on projects on the list" ).build() );
+        options.addOption( Option.builder( LOG_FILE ).longOpt( "log-file" ).hasArg().desc( "Log file where all build output will go (disables output color)" ).build() );
+        options.addOption( Option.builder( SHOW_VERSION ).longOpt( "show-version" ).desc( "Display version information WITHOUT stopping build" ).build() );
+        options.addOption( Option.builder( ENCRYPT_MASTER_PASSWORD ).longOpt( "encrypt-master-password" ).optionalArg( true ).desc( "Encrypt master security password" ).build() );
+        options.addOption( Option.builder( ENCRYPT_PASSWORD ).longOpt( "encrypt-password" ).optionalArg( true ).desc( "Encrypt server password" ).build() );
+        options.addOption( Option.builder( THREADS ).longOpt( "threads" ).hasArg().desc( "Thread count, for instance 2.0C where C is core multiplied" ).build() );
+        options.addOption( Option.builder( LEGACY_LOCAL_REPOSITORY ).longOpt( "legacy-local-repository" ).desc( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).build() );
+        options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
 
         // Adding this back in for compatibility with the verifier that hard codes this option.
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );
-        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "cpu" ) );
-        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "up" ) );
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npu" ) );
+        options.addOption( Option.builder( "npr" ).longOpt( "no-plugin-registry" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
+        options.addOption( Option.builder( "cpu" ).longOpt( "check-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
+        options.addOption( Option.builder( "up" ).longOpt( "update-plugins" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
+        options.addOption( Option.builder( "npu" ).longOpt( "no-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
     }
 
     public CommandLine parse( String[] args )
