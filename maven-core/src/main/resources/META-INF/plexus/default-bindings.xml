@@ -41,10 +41,10 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: pom-lifecycle -->
             <phases>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.4:install
+                org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: pom-lifecycle -->
