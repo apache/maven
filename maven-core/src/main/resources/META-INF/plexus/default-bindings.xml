@@ -111,28 +111,28 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: ejb-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
+                org.apache.maven.plugins:maven-resources-plugin:3.2.0:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
+                org.apache.maven.plugins:maven-resources-plugin:3.2.0:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.8.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-ejb-plugin:2.3:ejb
+                org.apache.maven.plugins:maven-ejb-plugin:3.1.0:ejb
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.4:install
+                org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: ejb-lifecycle -->
