@@ -17,7 +17,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest
 {
     public MavenITmng5965ParallelBuildMultipliesWorkTest()
     {
-        super( "[3.0,)" );
+        super( "[3.6.1-SNAPSHOT,)" );
     }
 
     public void testItShouldOnlyRunEachTaskOnce()
