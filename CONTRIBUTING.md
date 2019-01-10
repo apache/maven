@@ -32,7 +32,7 @@ Getting Started
 + Make sure you have a [JIRA account](https://issues.apache.org/jira/).
 + Make sure you have a [GitHub account](https://github.com/signup/free).
 + If you're planning to implement a new feature, it makes sense to discuss your changes 
-  on the [dev list](https://maven.apache.org/mail-lists.html) first. 
+  on the [dev list](https://maven.apache.org/mailing-lists.html) first.
   This way you can make sure you're not wasting your time on something that isn't 
   considered to be in Apache Maven's scope.
 + Submit a ticket for your issue, assuming one does not already exist.
@@ -85,7 +85,7 @@ Additional Resources
 + [Apache Maven Twitter Account](https://twitter.com/ASFMavenProject)
 + #Maven IRC channel on freenode.org
 
-[dev-ml-list]: https://maven.apache.org/mail-lists.html
+[dev-ml-list]: https://maven.apache.org/mailing-lists.html
 [code-style]: https://maven.apache.org/developers/conventions/code.html
 [cla]: https://www.apache.org/licenses/#clas
 [maven-wiki]: https://cwiki.apache.org/confluence/display/MAVEN/Index
