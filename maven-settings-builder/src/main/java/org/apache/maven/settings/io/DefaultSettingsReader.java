@@ -28,16 +28,19 @@ import java.util.Objects;
 
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Handles deserialization of settings from the default textual format.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsReader.class )
+@Named
+@Singleton
 public class DefaultSettingsReader
     implements SettingsReader
 {

@@ -31,13 +31,16 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Milos Kleint
  */
-@Component( role = SettingsValidator.class )
+@Named
+@Singleton
 public class DefaultSettingsValidator
     implements SettingsValidator
 {

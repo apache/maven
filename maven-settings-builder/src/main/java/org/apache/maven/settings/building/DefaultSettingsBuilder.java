@@ -36,31 +36,34 @@ import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
 import org.apache.maven.settings.validation.SettingsValidator;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsBuilder.class )
+@Named
+@Singleton
 public class DefaultSettingsBuilder
     implements SettingsBuilder
 {
 
-    @Requirement
+    @Inject
     private SettingsReader settingsReader;
 
-    @Requirement
+    @Inject
     private SettingsWriter settingsWriter;
 
-    @Requirement
+    @Inject
     private SettingsValidator settingsValidator;
 
     private MavenSettingsMerger settingsMerger = new MavenSettingsMerger();

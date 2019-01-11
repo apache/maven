@@ -29,15 +29,18 @@ import java.util.Objects;
 
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.WriterFactory;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Handles serialization of settings into the default textual format.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsWriter.class )
+@Named
+@Singleton
 public class DefaultSettingsWriter
     implements SettingsWriter
 {

@@ -27,23 +27,31 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Decrypts passwords in the settings.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsDecrypter.class )
+@Named
+@Singleton
 public class DefaultSettingsDecrypter
     implements SettingsDecrypter
 {
 
-    @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
+
+    @Inject
+    public DefaultSettingsDecrypter( final @Named( "maven" ) SecDispatcher securityDispatcher )
+    {
+        this.securityDispatcher = securityDispatcher;
+    }
 
     @Override
     public SettingsDecryptionResult decrypt( SettingsDecryptionRequest request )
