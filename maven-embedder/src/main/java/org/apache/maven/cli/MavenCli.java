@@ -596,7 +596,7 @@ public class MavenCli
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
 
-    private PlexusContainer container( CliRequest cliRequest )
+    PlexusContainer container( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.classWorld == null )
@@ -1201,7 +1201,7 @@ public class MavenCli
         }
     }
 
-    private void toolchains( CliRequest cliRequest )
+    void toolchains( CliRequest cliRequest )
         throws Exception
     {
         File userToolchainsFile;
@@ -1265,7 +1265,7 @@ public class MavenCli
 
         ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
 
-        eventSpyDispatcher.onEvent( toolchainsRequest );
+        eventSpyDispatcher.onEvent( toolchainsResult );
 
         executionRequestPopulator.populateFromToolchains( cliRequest.request,
                                                           toolchainsResult.getEffectiveToolchains() );
