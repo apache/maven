@@ -43,14 +43,18 @@ import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * SettingsXmlConfigurationProcessor
  */
-@Component( role = ConfigurationProcessor.class, hint = SettingsXmlConfigurationProcessor.HINT )
+@Named ( SettingsXmlConfigurationProcessor.HINT )
+@Singleton
 public class SettingsXmlConfigurationProcessor
     implements ConfigurationProcessor
 {
@@ -65,13 +69,12 @@ public class SettingsXmlConfigurationProcessor
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
         new File( System.getProperty( "maven.conf" ), "settings.xml" );
 
-    @Requirement
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
 
-    @Requirement
+    @Inject
     private SettingsBuilder settingsBuilder;
 
-    @Requirement
+    @Inject
     private SettingsDecrypter settingsDecrypter;
 
     @Override
@@ -132,9 +135,9 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        logger.debug( "Reading global settings from "
+        LOGGER.debug( "Reading global settings from "
             + getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from "
+        LOGGER.debug( "Reading user settings from "
             + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
@@ -146,16 +149,16 @@ public class SettingsXmlConfigurationProcessor
 
         populateFromSettings( request, settingsResult.getEffectiveSettings() );
 
-        if ( !settingsResult.getProblems().isEmpty() && logger.isWarnEnabled() )
+        if ( !settingsResult.getProblems().isEmpty() && LOGGER.isWarnEnabled() )
         {
-            logger.warn( "" );
-            logger.warn( "Some problems were encountered while building the effective settings" );
+            LOGGER.warn( "" );
+            LOGGER.warn( "Some problems were encountered while building the effective settings" );
 
             for ( SettingsProblem problem : settingsResult.getProblems() )
             {
-                logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                LOGGER.warn( problem.getMessage() + " @ " + problem.getLocation() );
             }
-            logger.warn( "" );
+            LOGGER.warn( "" );
         }
     }
 
