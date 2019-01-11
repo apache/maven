@@ -23,6 +23,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -43,14 +47,14 @@ import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SettingsXmlConfigurationProcessor
  */
-@Component( role = ConfigurationProcessor.class, hint = SettingsXmlConfigurationProcessor.HINT )
+@Named ( SettingsXmlConfigurationProcessor.HINT )
+@Singleton
 public class SettingsXmlConfigurationProcessor
     implements ConfigurationProcessor
 {
@@ -65,13 +69,12 @@ public class SettingsXmlConfigurationProcessor
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
         new File( System.getProperty( "maven.conf" ), "settings.xml" );
 
-    @Requirement
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
 
-    @Requirement
+    @Inject
     private SettingsBuilder settingsBuilder;
 
-    @Requirement
+    @Inject
     private SettingsDecrypter settingsDecrypter;
 
     @Override
@@ -132,10 +135,10 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        logger.debug( "Reading global settings from "
-            + getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from "
-            + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
+        logger.debug( "Reading global settings from {}",
+            getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+        logger.debug( "Reading user settings from {}",
+            getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -153,7 +156,7 @@ public class SettingsXmlConfigurationProcessor
 
             for ( SettingsProblem problem : settingsResult.getProblems() )
             {
-                logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                logger.warn( "{} @ {}", problem.getMessage(), problem.getLocation() );
             }
             logger.warn( "" );
         }
@@ -234,7 +237,7 @@ public class SettingsXmlConfigurationProcessor
                 {
                     try
                     {
-                        request.addRemoteRepository( 
+                        request.addRemoteRepository(
                             MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
@@ -242,20 +245,20 @@ public class SettingsXmlConfigurationProcessor
                         // do nothing for now
                     }
                 }
-                
+
                 List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
                 for ( Repository pluginRepository : pluginRepositories )
                 {
                     try
                     {
-                        request.addPluginArtifactRepository( 
+                        request.addPluginArtifactRepository(
                             MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
                         // do nothing for now
                     }
-                }                
+                }
             }
         }
         return request;

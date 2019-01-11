@@ -69,8 +69,8 @@ public class Slf4jMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        out.warn( event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
-            + resource.getRepositoryUrl() + resource.getResourceName() );
+        out.warn( "{} from {} for {}{}", event.getException().getMessage(), resource.getRepositoryId(),
+            resource.getRepositoryUrl(), resource.getResourceName() );
     }
 
     @Override

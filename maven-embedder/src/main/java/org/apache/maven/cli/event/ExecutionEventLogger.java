@@ -115,8 +115,8 @@ public class ExecutionEventLogger
             for ( MavenProject project : projects )
             {
                 int len = LINE_LENGTH - project.getName().length() - project.getPackaging().length() - 2;
-                logger.info( project.getName() + chars( ' ', ( len > 0 ) ? len : 1 ) + '[' + project.getPackaging()
-                    + ']' );
+                logger.info( "{}{}[{}]",
+                        project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging() );
             }
 
             totalProjects = projects.size();
@@ -267,9 +267,9 @@ public class ExecutionEventLogger
 
         String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
-        logger.info( "Total time:  " + formatDuration( time ) + wallClock );
+        logger.info( "Total time:  {}{}", formatDuration( time ), wallClock );
 
-        logger.info( "Finished at: " + formatTimestamp( finish ) );
+        logger.info( "Finished at: {}", formatTimestamp( finish ) );
     }
 
     @Override
@@ -345,8 +345,8 @@ public class ExecutionEventLogger
     {
         if ( logger.isWarnEnabled() )
         {
-            logger.warn( "Goal " + event.getMojoExecution().getGoal()
-                + " requires online mode for execution but Maven is currently offline, skipping" );
+            logger.warn( "Goal {} requires online mode for execution but Maven is currently offline, skipping",
+                    event.getMojoExecution().getGoal() );
         }
     }
 

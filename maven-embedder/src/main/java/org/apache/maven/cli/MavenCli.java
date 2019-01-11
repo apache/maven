@@ -569,7 +569,7 @@ public class MavenCli
 
         if ( slf4jLogger.isDebugEnabled() )
         {
-            slf4jLogger.debug( "Message scheme: " + ( MessageUtils.isColorEnabled() ? "color" : "plain" ) );
+            slf4jLogger.debug( "Message scheme: {}", ( MessageUtils.isColorEnabled() ? "color" : "plain" ) );
             if ( MessageUtils.isColorEnabled() )
             {
                 MessageBuilder buff = MessageUtils.buffer();
@@ -767,7 +767,7 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            slf4jLogger.warn( "Failed to read extensions descriptor " + extensionsFile + ": " + e.getMessage() );
+            slf4jLogger.warn( "Failed to read extensions descriptor {}: {}", extensionsFile, e.getMessage() );
         }
         return Collections.emptyList();
     }
@@ -795,11 +795,11 @@ public class MavenCli
 
             extRealm.setParentRealm( coreRealm );
 
-            slf4jLogger.debug( "Populating class realm " + extRealm.getId() );
+            slf4jLogger.debug( "Populating class realm {}", extRealm.getId() );
 
             for ( File file : extClassPath )
             {
-                slf4jLogger.debug( "  Included " + file );
+                slf4jLogger.debug( "  Included {}", file );
 
                 extRealm.addURL( file.toURI().toURL() );
             }
@@ -848,7 +848,7 @@ public class MavenCli
             {
                 File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                slf4jLogger.debug( "  Included " + file );
+                slf4jLogger.debug( "  Included {}", file );
 
                 jars.add( file );
             }
@@ -983,13 +983,13 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the "
-                    + buffer().strong( "-e" ) + " switch." );
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the {} switch.",
+                        buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the " + buffer().strong( "-X" )
-                    + " switch to enable full debug logging." );
+                slf4jLogger.error( "Re-run Maven using the {} switch to enable full debug logging.",
+                        buffer().strong( "-X" ) );
             }
 
             if ( !references.isEmpty() )
@@ -1000,7 +1000,7 @@ public class MavenCli
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
-                    slf4jLogger.error( buffer().strong( entry.getValue() ) + " " + entry.getKey() );
+                    slf4jLogger.error( "{} {}", buffer().strong( entry.getValue() ), entry.getKey() );
                 }
             }
 
@@ -1257,11 +1257,10 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
-        slf4jLogger.debug(
-            "Reading global toolchains from " + getLocation( toolchainsRequest.getGlobalToolchainsSource(),
-                                                             globalToolchainsFile ) );
-        slf4jLogger.debug( "Reading user toolchains from " + getLocation( toolchainsRequest.getUserToolchainsSource(),
-                                                                          userToolchainsFile ) );
+        slf4jLogger.debug( "Reading global toolchains from {}",
+                getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
+        slf4jLogger.debug( "Reading user toolchains from {}",
+                getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
 
         ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
 
@@ -1277,7 +1276,7 @@ public class MavenCli
 
             for ( Problem problem : toolchainsResult.getProblems() )
             {
-                slf4jLogger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                slf4jLogger.warn( "{} @ {}", problem.getMessage(), problem.getLocation() );
             }
 
             slf4jLogger.warn( "" );
@@ -1311,8 +1310,8 @@ public class MavenCli
         {
             if ( commandLine.hasOption( deprecatedOption ) )
             {
-                slf4jLogger.warn( "Command line option -" + deprecatedOption
-                                      + " is deprecated and will be removed in future Maven versions." );
+                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
+                        deprecatedOption );
             }
         }
 
