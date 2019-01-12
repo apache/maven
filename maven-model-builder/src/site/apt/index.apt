@@ -78,8 +78,8 @@ Maven Model Builder
    ({{{./xref/org/apache/maven/model/management/DefaultPluginManagementInjector.html}source}})
 
    ** <(optional)> lifecycle bindings injection: <<<LifecycleBindingsInjector>>> ({{{./apidocs/org/apache/maven/model/plugin/LifecycleBindingsInjector.html}javadoc}}),
-   with its <<<DefaultLifecycleBindingsInjector>>> implementation
-   ({{{./xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
+   with its <<<DefaultLifecycleBindingsInjector>>> implementation in maven-core
+   ({{{./maven-core/xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
    ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
 
