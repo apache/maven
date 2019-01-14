@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -219,6 +220,16 @@ public class ProjectBuilderTest
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
             lookup( org.apache.maven.project.ProjectBuilder.class );
+
+        // single project build entry point
+        try
+        {
+            projectBuilder.build( pomFile, configuration );
+        }
+        catch ( InvalidArtifactRTException iarte )
+        {
+            assertTrue( iarte.getMessage().contains( "The groupId cannot be empty." ) );
+        }
 
         // multi projects build entry point
         try

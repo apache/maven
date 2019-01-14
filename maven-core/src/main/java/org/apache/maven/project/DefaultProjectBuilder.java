@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
@@ -464,10 +465,10 @@ public class DefaultProjectBuilder
             // first pass: build without building parent.
             initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
         }
-        catch ( Exception e )
+        catch ( InvalidArtifactRTException iarte )
         {
             result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
-                  e ) );
+                  iarte ) );
         }
 
         projectIndex.put( result.getModelIds().get( 0 ), project );
@@ -619,10 +620,10 @@ public class DefaultProjectBuilder
                 {
                     initProject( project, projectIndex, true, result, profilesXmls, request );
                 }
-                catch ( Exception e )
+                catch ( InvalidArtifactRTException iarte )
                 {
                     result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
-                            result.getEffectiveModel(), -1, -1, e ) );
+                            result.getEffectiveModel(), -1, -1, iarte ) );
                 }
 
                 List<MavenProject> modules = new ArrayList<>();
