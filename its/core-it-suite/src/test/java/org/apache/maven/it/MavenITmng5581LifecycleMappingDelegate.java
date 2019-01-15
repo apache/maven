@@ -74,18 +74,18 @@ public class MavenITmng5581LifecycleMappingDelegate
     {
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 
-        boolean result = true;
+        boolean textFound = false;
         for ( String line : lines )
         {
             if ( line.contains( text ) )
             {
-                result = false;
+                textFound = true;
                 break;
             }
         }
-        if ( !result )
+        if ( textFound )
         {
-            throw new VerificationException( "Text not found in log: " + text );
+            throw new VerificationException( "Text found in log: " + text );
         }
     }
 

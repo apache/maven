@@ -43,5 +43,13 @@ under the License.
         <version>0.1</version>
       </extension>
     </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin><!-- avoid warning introduced in MNG-6562 that interferes with IT log check -->
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
