@@ -135,10 +135,10 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        LOGGER.debug( "Reading global settings from "
-            + getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        LOGGER.debug( "Reading user settings from "
-            + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
+        LOGGER.debug( "Reading global settings from {}",
+            getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+        LOGGER.debug( "Reading user settings from {}",
+            getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -156,7 +156,7 @@ public class SettingsXmlConfigurationProcessor
 
             for ( SettingsProblem problem : settingsResult.getProblems() )
             {
-                LOGGER.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                LOGGER.warn( "{} @ {}", problem.getMessage(), problem.getLocation() );
             }
             LOGGER.warn( "" );
         }
