@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.5.4'
+def buildMvn = '3.6.0'
 def runITsOses = ['linux', 'windows']
 def runITsJdks = ['7', '8', '11']
-def runITsMvn = '3.5.4'
+def runITsMvn = '3.6.0'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -117,6 +117,7 @@ parallel(runITsTasks)
 
 // JENKINS-34376 seems to make it hard to detect the aborted builds
 } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    echo "[FAILURE-002] FlowInterruptedException ${e}"
     // this ambiguous condition means a user probably aborted
     if (e.causes.size() == 0) {
         currentBuild.result = "ABORTED"
@@ -125,6 +126,7 @@ parallel(runITsTasks)
     }
     throw e
 } catch (hudson.AbortException e) {
+    echo "[FAILURE-003] AbortException ${e}"
     // this ambiguous condition means during a shell step, user probably aborted
     if (e.getMessage().contains('script returned exit code 143')) {
         currentBuild.result = "ABORTED"
@@ -133,9 +135,11 @@ parallel(runITsTasks)
     }
     throw e
 } catch (InterruptedException e) {
+    echo "[FAILURE-004] ${e}"
     currentBuild.result = "ABORTED"
     throw e
 } catch (Throwable e) {
+    echo "[FAILURE-001] ${e}"
     currentBuild.result = "FAILURE"
     throw e
 } finally {
