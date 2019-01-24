@@ -592,6 +592,15 @@ under the License.
 
   <profiles>
     <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>maven-default-plugins</module>
+      </modules>
+    </profile>
+    <profile>
       <id>apache-release</id>
       <build>
         <plugins>
@@ -609,6 +618,9 @@ under the License.
           </plugin>
         </plugins>
       </build>
+      <modules>
+        <module>maven-default-plugins</module>
+      </modules>
     </profile>
     <profile>
       <id>reporting</id>

@@ -1,0 +1,38 @@
+ -----
+ Apache Maven Default Plugins Parent POM
+ -----
+ Hervé Boutemy
+ -----
+ 2019-01-15
+ -----
+
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~   http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+~~ NOTE: For help with the syntax of this file, see:
+~~ https://maven.apache.org/doxia/references/apt-format.html
+
+Apache Maven Default Plugins Parent POM
+
+    This project consists of a POM that lock down plugins versions that are
+    referenced by Maven in {{{../maven-core/lifecycles.html}default lifecycle bindings}}
+    and {{{../maven-model-builder/super-pom.html}super-POM}}, and classical plugins.
+
+    It is expected to use this POM as parent POM for any project that does not want
+    to write down itself the list of plugins.
+
+    It also provides default UTF-8 encoding and compilation for Java 1.7.
