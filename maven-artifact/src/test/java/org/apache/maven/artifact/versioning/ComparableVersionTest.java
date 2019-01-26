@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.versioning;
 
+import junit.framework.TestCase;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,8 +22,6 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.util.Locale;
-
-import junit.framework.TestCase;
 
 /**
  * Test ComparableVersion.
@@ -199,6 +199,24 @@ public class ComparableVersionTest
         checkVersionsOrder( b, a ); // classical
         checkVersionsOrder( b, c ); // now b < c, but before MNG-5568, we had b > c
         checkVersionsOrder( a, c );
+    }
+
+    /**
+     * Test <a href="https://jira.apache.org/jira/browse/MNG-6572">MNG-6572</a> optimization.
+     */
+    public void testMng6572()
+    {
+        String a = "20190126.230843"; // resembles a SNAPSHOT
+        String b = "1234567890.12345"; // 10 digit number
+        String c = "123456789012345.1H.5-beta"; // 15 digit number
+        String d = "12345678901234567890.1H.5-beta"; // 20 digit number
+
+        checkVersionsOrder( a, b );
+        checkVersionsOrder( b, c );
+        checkVersionsOrder( a, c );
+        checkVersionsOrder( c, d );
+        checkVersionsOrder( b, d );
+        checkVersionsOrder( a, d );
     }
 
     public void testLocaleIndependent()
