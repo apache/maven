@@ -20,10 +20,10 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -498,7 +498,7 @@ public class ComparableVersion
 
         ListItem list = items;
 
-        LinkedList<Item> stack = new LinkedList<>();
+        ArrayDeque<Item> stack = new ArrayDeque<>();
         stack.push( list );
 
         boolean isDigit = false;

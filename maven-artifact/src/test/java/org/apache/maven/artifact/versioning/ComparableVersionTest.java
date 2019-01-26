@@ -1,7 +1,5 @@
 package org.apache.maven.artifact.versioning;
 
-import junit.framework.TestCase;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,6 +20,8 @@ import junit.framework.TestCase;
  */
 
 import java.util.Locale;
+
+import junit.framework.TestCase;
 
 /**
  * Test ComparableVersion.
