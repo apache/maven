@@ -85,6 +85,14 @@ public class ComparableVersionTest
         assertTrue( "expected " + v2 + ".equals( " + v1 + " )", c2.equals( c1 ) );
     }
 
+    private void checkVersionsArrayEqual( String[] array )
+    {
+        // compare against each other (including itself)
+        for ( int i = 0; i < array.length; ++i )
+            for ( int j = i; j < array.length; ++j )
+                checkVersionsEqual( array[i], array[j] );
+    }
+
     private void checkVersionsOrder( String v1, String v2 )
     {
         Comparable c1 = newComparable( v1 );
@@ -217,6 +225,70 @@ public class ComparableVersionTest
         checkVersionsOrder( c, d );
         checkVersionsOrder( b, d );
         checkVersionsOrder( a, d );
+    }
+
+    /**
+     * Test all versions are equal when starting with many leading zeroes regardless of string length
+     * (related to MNG-6572 optimization) 
+     */
+    public void testVersionEqualWithLeadingZeroes()
+    {
+        // versions with string lengths from 1 to 19
+        String[] arr = new String[] {
+            "0000000000000000001",
+            "000000000000000001",
+            "00000000000000001",
+            "0000000000000001",
+            "000000000000001",
+            "00000000000001",
+            "0000000000001",
+            "000000000001",
+            "00000000001",
+            "0000000001",
+            "000000001",
+            "00000001",
+            "0000001",
+            "000001",
+            "00001",
+            "0001",
+            "001",
+            "01",
+            "1"
+        };
+        
+        checkVersionsArrayEqual( arr );
+    }
+
+    /**
+     * Test all "0" versions are equal when starting with many leading zeroes regardless of string length
+     * (related to MNG-6572 optimization) 
+     */
+    public void testVersionZeroEqualWithLeadingZeroes()
+    {
+        // versions with string lengths from 1 to 19
+        String[] arr = new String[] {
+            "0000000000000000000",
+            "000000000000000000",
+            "00000000000000000",
+            "0000000000000000",
+            "000000000000000",
+            "00000000000000",
+            "0000000000000",
+            "000000000000",
+            "00000000000",
+            "0000000000",
+            "000000000",
+            "00000000",
+            "0000000",
+            "000000",
+            "00000",
+            "0000",
+            "000",
+            "00",
+            "0"
+        };
+        
+        checkVersionsArrayEqual( arr );
     }
 
     public void testLocaleIndependent()

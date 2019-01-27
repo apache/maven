@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * <p>
  * Generic implementation of version comparison.
@@ -129,12 +131,8 @@ public class ComparableVersion
                     return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
                 }
                 case LONG_ITEM:
-                {
-                    long itemValue = ( (LongItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
-                }
                 case BIGINTEGER_ITEM:
-                    return BigInteger.valueOf( value ).compareTo( ( (BigIntegerItem) item ).value );
+                    return -1;
 
                 case STRING_ITEM:
                     return 1; // 1.1 > 1-sp
@@ -186,17 +184,14 @@ public class ComparableVersion
             switch ( item.getType() )
             {
                 case INT_ITEM:
-                {
-                    int itemValue = ( (IntItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
-                }
+                    return 1;
                 case LONG_ITEM:
                 {
                     long itemValue = ( (LongItem) item ).value;
                     return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
                 }
                 case BIGINTEGER_ITEM:
-                    return BigInteger.valueOf( value ).compareTo( ( (BigIntegerItem) item ).value );
+                    return -1;
 
                 case STRING_ITEM:
                     return 1; // 1.1 > 1-sp
@@ -248,15 +243,8 @@ public class ComparableVersion
             switch ( item.getType() )
             {
                 case INT_ITEM:
-                {
-                    int itemValue = ( (IntItem) item ).value;
-                    return value.compareTo( BigInteger.valueOf( itemValue ) );
-                }
                 case LONG_ITEM:
-                {
-                    long itemValue = ( (LongItem) item ).value;
-                    return value.compareTo( BigInteger.valueOf( itemValue ) );
-                }
+                    return 1;
 
                 case BIGINTEGER_ITEM:
                     return value.compareTo( ( (BigIntegerItem) item ).value );
@@ -583,6 +571,7 @@ public class ComparableVersion
     {
         if ( isDigit )
         {
+            buf = stripLeadingZeroes( buf );
             if ( buf.length() <= 9 )
             {
                 // lower than 2^31
@@ -596,6 +585,14 @@ public class ComparableVersion
             return new BigIntegerItem( buf );
         }
         return new StringItem( buf, false );
+    }
+
+    private static String stripLeadingZeroes( String buf )
+    {
+        String strippedBuf = StringUtils.stripStart( buf, "0" );
+        if ( strippedBuf.isEmpty() )
+            return "0";
+        return strippedBuf;
     }
 
     public int compareTo( ComparableVersion o )
