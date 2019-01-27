@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -142,7 +143,7 @@ public class ComparableVersion
                     return 1; // 1.1 > 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -204,7 +205,7 @@ public class ComparableVersion
                     return 1; // 1.1 > 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -267,7 +268,7 @@ public class ComparableVersion
                     return 1; // 1.1 > 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -375,7 +376,7 @@ public class ComparableVersion
                     return -1; // 1.any < 1-1
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -463,7 +464,7 @@ public class ComparableVersion
                     return 0;
 
                 default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+                    throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -498,7 +499,7 @@ public class ComparableVersion
 
         ListItem list = items;
 
-        ArrayDeque<Item> stack = new ArrayDeque<>();
+        Deque<Item> stack = new ArrayDeque<>();
         stack.push( list );
 
         boolean isDigit = false;
