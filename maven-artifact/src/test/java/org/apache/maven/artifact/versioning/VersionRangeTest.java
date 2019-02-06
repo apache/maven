@@ -727,4 +727,23 @@ public class VersionRangeTest
     {
         // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" ) ) > 0 );
     }
+
+    public void testCache()
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "[1.0,1.2]" );
+        assertSame( range, VersionRange.createFromVersionSpec( "[1.0,1.2]" ) ); // same instance from spec cache
+
+        VersionRange spec = VersionRange.createFromVersionSpec( "1.0" );
+        assertSame( spec, VersionRange.createFromVersionSpec( "1.0" ) ); // same instance from spec cache
+        List<Restriction> restrictions = spec.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+
+        VersionRange version = VersionRange.createFromVersion( "1.0" );
+        assertSame( version, VersionRange.createFromVersion( "1.0" ) ); // same instance from version cache
+        restrictions = version.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 0, restrictions.size() );
+
+        assertFalse( "check !VersionRange.createFromVersionSpec(x).equals(VersionRange.createFromVersion(x))", spec.equals( version ) );
+    }
 }

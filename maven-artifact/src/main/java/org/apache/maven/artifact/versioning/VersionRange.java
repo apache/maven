@@ -35,8 +35,11 @@ import org.apache.maven.artifact.Artifact;
  */
 public class VersionRange
 {
-    private static final Map<String, VersionRange> CACHE =
+    private static final Map<String, VersionRange> CACHE_SPEC =
         Collections.<String, VersionRange>synchronizedMap( new WeakHashMap<String, VersionRange>() );
+
+    private static final Map<String, VersionRange> CACHE_VERSION =
+                    Collections.<String, VersionRange>synchronizedMap( new WeakHashMap<String, VersionRange>() );
 
     private final ArtifactVersion recommendedVersion;
 
@@ -107,7 +110,7 @@ public class VersionRange
             return null;
         }
 
-        VersionRange cached = CACHE.get( spec );
+        VersionRange cached = CACHE_SPEC.get( spec );
         if ( cached != null )
         {
             return cached;
@@ -176,7 +179,7 @@ public class VersionRange
         }
 
         cached = new VersionRange( version, restrictions );
-        CACHE.put( spec, cached );
+        CACHE_SPEC.put( spec, cached );
         return cached;
     }
 
@@ -236,11 +239,12 @@ public class VersionRange
 
     public static VersionRange createFromVersion( String version )
     {
-        VersionRange cached = CACHE.get( version );
+        VersionRange cached = CACHE_VERSION.get( version );
         if ( cached == null )
         {
             List<Restriction> restrictions = Collections.emptyList();
             cached = new VersionRange( new DefaultArtifactVersion( version ), restrictions );
+            CACHE_VERSION.put( version, cached );
         }
         return cached;
     }
