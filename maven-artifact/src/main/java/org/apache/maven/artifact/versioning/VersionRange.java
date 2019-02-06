@@ -241,7 +241,6 @@ public class VersionRange
         {
             List<Restriction> restrictions = Collections.emptyList();
             cached = new VersionRange( new DefaultArtifactVersion( version ), restrictions );
-            CACHE.put( version, cached );
         }
         return cached;
     }
