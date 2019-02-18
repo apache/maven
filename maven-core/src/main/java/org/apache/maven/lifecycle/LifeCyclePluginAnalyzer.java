@@ -20,6 +20,8 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.Set;
+
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
 /**
@@ -28,5 +30,31 @@ import org.apache.maven.model.Plugin;
  */
 public interface LifeCyclePluginAnalyzer
 {
-    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
+
+    /**
+     * @deprecated As of Maven 3.6.0, replaced by method {@link #getLifecycleModel(org.apache.maven.model.Model)}.
+     */
+    @Deprecated
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+        throws LifecycleMappingNotFoundException;
+
+    /**
+     * Gets the lifecycle {@code Model} for a given {@code Model}.
+     * <p>
+     * The lifecycle model for a given model is the list of default build plugins plus lifecycle plugin execution
+     * management.
+     * </p>
+     *
+     * @param model The {@code Model} to get the lifecycle {@code Model} for.
+     *
+     * @return The lifecycle {@code Model} for {@code model}.
+     *
+     * @throws NullPointerException if {@code model} is {@code null}.
+     * @throws LifecycleMappingNotFoundException if {@code model} declares an unsupported packaging.
+     *
+     * @since 3.6.0
+     */
+    Model getLifecycleModel( Model model )
+        throws LifecycleMappingNotFoundException;
+
 }

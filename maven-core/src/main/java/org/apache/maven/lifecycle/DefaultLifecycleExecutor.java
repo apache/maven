@@ -19,6 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -41,11 +46,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A facade that provides lifecycle services to components outside maven core.
@@ -88,19 +88,13 @@ public class DefaultLifecycleExecutor
     @Requirement
     private MojoDescriptorCreator mojoDescriptorCreator;
 
-    // These methods deal with construction intact Plugin object that look like they come from a standard
-    // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information
-    // together and this really shows the problem of constructing a sensible default configuration but
-    // it's all encapsulated here so it appears normalized to the POM builder.
-
-    // We are going to take the project packaging and find all plugin in the default lifecycle and create
-    // fully populated Plugin objects, including executions with goals and default configuration taken
-    // from the plugin.xml inside a plugin.
-    //
-    // TODO This whole method could probably removed by injecting lifeCyclePluginAnalyzer straight into client site.
-    // TODO But for some reason the whole plexus appcontext refuses to start when I try this.
-
+    /**
+     * @deprecated As of Maven 3.6.0, please use
+     * {@link LifeCyclePluginAnalyzer#getLifecycleModel(org.apache.maven.model.Model)}.
+     */
+    @Deprecated
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+        throws LifecycleMappingNotFoundException
     {
         return lifeCyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( packaging );
     }
