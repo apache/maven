@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.4.3 - Some Time Soon
+## Version 0.5.0 - Some Time Soon
 
 - update to Maven 3.6.0 as default
 - Use TLS 1.2 on Windows
@@ -12,6 +12,15 @@ The following provides most information at an easier glance.
 - Fix compile path for cygwin
   - see https://github.com/takari/maven-wrapper/pull/83
   - contributed by Dániel Kovács https://github.com/AFulgens
+- Fix for path with spaces on Windows 
+  - see https://github.com/takari/maven-wrapper/pull/101
+  - contributed by Paul Stöhr https://github.com/CiTuX
+- Support for authentication to corporate repository manager
+  - see https://github.com/takari/maven-wrapper/pull/96
+  - see https://github.com/takari/maven-wrapper/pull/86
+  - contributed by Sebastian Peters https://github.com/sepe81,
+    Sander Wartenberg https://github.com/sanderino666 and
+    Manfred Moser http://www.simpligility.com
 
 ## Version 0.4.2 - 2018-07-02
 
