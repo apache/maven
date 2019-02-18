@@ -83,9 +83,9 @@ download the file from the URL specified in
 download is attempted via curl, wget and, as last resort, by compiling the 
 `./mvn/wrapper/MavenWrapperDownloader.java` file and executing the resulting class.
 
-If your maven repository is password protected you can specify your username via the 
-environment variable `MVNW_WRAPPER_AUTH_USERNAME` and the password via the environment
-variable `MVNW_WRAPPER_AUTH_PASSWORD`.
+If your Maven repository is password protected you can specify your username via the 
+environment variable `MVNW_USERNAME` and the password via the environment
+variable `MVNW_PASSWORD`.
 
 ## Using a Different Version of Maven
 
@@ -106,7 +106,7 @@ distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-mav
 
 To download Maven from a location that requires Basic Authentication you have 2 options:
 
-1. Set the environment variables MVNW_USER and MVNW_PASSWORD
+1. Set the environment variables MVNW_USERNAME and MVNW_PASSWORD
 
     or
 
@@ -137,10 +137,11 @@ To test Maven wrapper usage:
 - use on test project with maven plugin version
 
 
+
 For release
 
-- make sure version in mvnw files and config files and pom files is new upcoming
-  release
+- make sure version in mvnw files, MavenWrapperDownloader.java and config files
+  and pom files is new upcoming release
 - cut maven release with usual release plugin usage
 - update maven plugin to release version
 - release it as well
