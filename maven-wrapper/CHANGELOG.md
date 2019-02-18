@@ -22,7 +22,8 @@ The following provides most information at an easier glance.
     Sander Wartenberg https://github.com/sanderino666 and
     Manfred Moser http://www.simpligility.com
 - Consistent license header across all Java source
-
+  - see https://github.com/takari/maven-wrapper/pull/105
+  - fixes https://github.com/takari/maven-wrapper/issues/104
   - contributed by Manfred Moser http://www.simpligility.com
 
 ## Version 0.4.2 - 2018-07-02
