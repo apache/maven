@@ -21,6 +21,9 @@ The following provides most information at an easier glance.
   - contributed by Sebastian Peters https://github.com/sepe81,
     Sander Wartenberg https://github.com/sanderino666 and
     Manfred Moser http://www.simpligility.com
+- Consistent license header across all Java source
+
+  - contributed by Manfred Moser http://www.simpligility.com
 
 ## Version 0.4.2 - 2018-07-02
 
