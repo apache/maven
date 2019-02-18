@@ -17,7 +17,7 @@
 package org.apache.maven.wrapper;
 
 import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_PASSWORD;
-import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_USER;
+import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_USERNAME;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -58,10 +58,10 @@ public class DefaultDownloader implements Downloader {
   }
   
   private void configureAuthentication() {
-    if (System.getProperty("MVNW_WRAPPER_AUTH_USERNAME") != null && System.getProperty("MVNW_WRAPPER_AUTH_PASSWORD") != null && System.getProperty("http.proxyUser") == null) {
+    if (System.getProperty("MVNW_USERNAME") != null && System.getProperty("MVNW_PASSWORD") != null && System.getProperty("http.proxyUser") == null) {
       Authenticator.setDefault(new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(System.getProperty("MVNW_WRAPPER_AUTH_USERNAME"), System.getProperty("MVNW_WRAPPER_AUTH_PASSWORD").toCharArray());
+                return new PasswordAuthentication(System.getProperty("MVNW_USERNAME"), System.getProperty("MVNW_PASSWORD").toCharArray());
             }
         });
     }
@@ -150,7 +150,7 @@ public class DefaultDownloader implements Downloader {
   }
 
   private String calculateUserInfo(URI uri) {
-    String username = System.getenv(MVNW_USER);
+    String username = System.getenv(MVNW_USERNAME);
     String password = System.getenv(MVNW_PASSWORD);
     if (username != null && password != null) {
         return username + ':' + password;

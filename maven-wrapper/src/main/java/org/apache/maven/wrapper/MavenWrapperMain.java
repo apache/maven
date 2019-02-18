@@ -37,7 +37,7 @@ public class MavenWrapperMain {
   public static final String MAVEN_USER_HOME_ENV_KEY = "MAVEN_USER_HOME";
 
   public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
-  public static final String MVNW_USER = "MVNW_USER";
+  public static final String MVNW_USERNAME = "MVNW_USERNAME";
   public static final String MVNW_PASSWORD = "MVNW_PASSWORD";
   
   public static void main(String[] args) throws Exception {
