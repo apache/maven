@@ -137,7 +137,7 @@ To test Maven wrapper usage:
 - use on test project with takari-maven-plugin version
 
 ```
-mvn -N io.takari:maven:wrapper:0.7.0-SNAPSHOT
+mvn -N io.takari:maven:0.7.0-SNAPSHOT:wrapper
 ```
 
 
