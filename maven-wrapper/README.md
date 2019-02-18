@@ -131,10 +131,14 @@ https://github.com/takari/maven-wrapper/issues/17
 
 To test Maven wrapper usage:
 
-- build the maven wrapper as snapshot version
-- update version in maven plugin
-- build maven plugin
-- use on test project with maven plugin version
+- build the maven-wrapper as snapshot version
+- update version in takari-maven-plugin
+- build takari-maven-plugin
+- use on test project with takari-maven-plugin version
+
+```
+mvn -N io.takari:maven:wrapper:0.7.0-SNAPSHOT
+```
 
 
 
