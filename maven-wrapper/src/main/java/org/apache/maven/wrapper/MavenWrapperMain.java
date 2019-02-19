@@ -38,7 +38,12 @@ public class MavenWrapperMain {
   public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
   public static final String MVNW_USERNAME = "MVNW_USERNAME";
   public static final String MVNW_PASSWORD = "MVNW_PASSWORD";
-  
+  public static final String MVNW_REPOURL = "MVNW_REPOURL";
+
+  public static final String MVN_VERSION = "3.6.0";
+  public static final String MVN_PATH =
+      "org/apache/maven/apache-maven/" + MVN_VERSION + "/apache-maven-"+ MVN_VERSION + "-bin.zip";
+
   public static void main(String[] args) throws Exception {
     File wrapperJar = wrapperJar();
     File propertiesFile = wrapperProperties(wrapperJar);
