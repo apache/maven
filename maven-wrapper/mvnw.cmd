@@ -130,6 +130,9 @@ FOR /F "tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-
 if exist %WRAPPER_JAR% (
     echo Found %WRAPPER_JAR%
 ) else (
+	if exist %MVNW_REPOURL% (
+	  SET DOWNLOAD_URL="%MVNW_REPOURL%/io/takari/maven-wrapper/0.4.2/maven-wrapper-0.4.2.jar"
+	)
     echo Couldn't find %WRAPPER_JAR%, downloading it ...
 	echo Downloading from: %DOWNLOAD_URL%
 	
