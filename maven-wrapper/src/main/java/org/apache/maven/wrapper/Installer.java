@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+
 /**
  * @author Hans Dockter
  */
@@ -48,7 +49,15 @@ public class Installer {
   }
 
   public File createDist(WrapperConfiguration configuration) throws Exception {
-    URI distributionUrl = configuration.getDistribution();
+    URI distributionUrl;
+    String mvnwRepoUrl = System.getenv(MavenWrapperMain.MVNW_REPOURL);
+    if (mvnwRepoUrl != null && !mvnwRepoUrl.isEmpty()) {
+      distributionUrl = new URI(mvnwRepoUrl + "/" + MavenWrapperMain.MVN_PATH);
+      Logger.info("Detected MVNW_REPOURL environment variable " + mvnwRepoUrl);
+    } else {
+      distributionUrl = configuration.getDistribution();
+    }
+    Logger.info("Downloading Maven binary from " + distributionUrl);
     boolean alwaysDownload = configuration.isAlwaysDownload();
     boolean alwaysUnpack = configuration.isAlwaysUnpack();
 

@@ -25,6 +25,13 @@ The following provides most information at an easier glance.
   - see https://github.com/takari/maven-wrapper/pull/105
   - fixes https://github.com/takari/maven-wrapper/issues/104
   - contributed by Manfred Moser http://www.simpligility.com
+- Support MVNW_REPOURL environment variable usage
+  -  during wrapper install and wrapper usage
+  - for wrapper and maven distro download
+  - in scripts and wrapper binary
+    - contributed by Manfred Moser http://www.simpligility.com
+
+Release performed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.4.2 - 2018-07-02
 
@@ -32,6 +39,8 @@ The following provides most information at an easier glance.
 - dependency updates
 - end of line in properties file
 - parent pom upgrade
+
+Release performed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.4.0 - 2018-02-19
 
@@ -43,6 +52,8 @@ The following provides most information at an easier glance.
   - and Manfred Moser - http://www.simpligility.com
 - Change URLs used to official Maven repo URL
   - done as part of above changes
+
+Release performed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.3.0 - 2017-10-25
 
