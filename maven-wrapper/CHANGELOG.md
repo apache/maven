@@ -3,7 +3,7 @@
 The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
 The following provides most information at an easier glance.
 
-## Version 0.5.0 - Some Time Soon
+## Version 0.5.0 - 2019-02-18
 
 - update to Maven 3.6.0 as default
 - Use TLS 1.2 on Windows
