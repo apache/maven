@@ -102,7 +102,7 @@ which works for any version except snapshots. Once you have a wrapper you can ch
 distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.4/apache-maven-3.5.4-bin.zip
 ```
 
-## Using Basic Authentication for Distribution download
+## Using Basic Authentication for Distribution Download
 
 To download Maven from a location that requires Basic Authentication you have 2 options:
 
@@ -126,6 +126,21 @@ it as the base of the Maven distro installation.
 See https://www.lewuathe.com/maven-wrapper-home.html and
 https://github.com/takari/maven-wrapper/issues/17
 
+## Using a Maven Repository Manager
+
+When using an internal Maven repository manager you have two options:
+
+1. Just set the correct URL to wrapper jar and Maven distro in
+  `maven-wrapper.properties` in your project
+2. Leave the default URL in the project pointing to Maven Central and set the
+  environment variable `MVNW_REPOURL` to your repo manager URL such as
+  `https://repo.example.com/central-repo-proxy`.
+
+If `MVNWW_REPOURL` is set during the wrapper installation with the
+takari-maven-plugin, the URL is used in the maven-wrapper.properties file.
+
+If not set, but your mirror URL in your settings.xml is configured, it will be
+used.
 
 ## Developing and Releasing
 
@@ -151,4 +166,5 @@ For release
 Updating Maven version:
 
 - update URL in maven-wrapper/.mvn/wrapper/maven-wrapper.properties
-- updated maven parameter in takari-maven-plugin  WrapperMojo
+- update URL in MavenWrapperMain
+- updated DEFAULT_MAVEN_VER parameter in takari-maven-plugin  WrapperMojo class
