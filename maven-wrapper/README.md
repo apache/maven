@@ -24,10 +24,10 @@ But now, with a Maven Wrapper setup, you can instruct users to run wrapper scrip
 $ ./mvnw clean install
 ```
 
-or
+or on Windows
 
 ```
-$ ./mvnw.cmd clean install
+$ mvnw.cmd clean install
 ```
 
 A normal Maven build will be executed with the one important change that if the user doesn't have the necessary version
