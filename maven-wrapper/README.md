@@ -136,7 +136,7 @@ When using an internal Maven repository manager you have two options:
   environment variable `MVNW_REPOURL` to your repo manager URL such as
   `https://repo.example.com/central-repo-proxy`.
 
-If `MVNWW_REPOURL` is set during the wrapper installation with the
+If `MVNW_REPOURL` is set during the wrapper installation with the
 takari-maven-plugin, the URL is used in the maven-wrapper.properties file.
 
 If not set, but your mirror URL in your settings.xml is configured, it will be
