@@ -1,14 +1,16 @@
 # Changelog
 
-The [git commit history](https://github.com/takari/maven-wrapper/commits/master) is the detailed source of all changes.
-The following provides most information at an easier glance.
+The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
+is the detailed source of all changes. The following provides most information
+at an easier glance.
 
 ## Version 0.5.1 - 2019-02-19
 
-- Coorected check for MVNW_REPOURL in mvnw.cmd
+- Corrected check for MVNW_REPOURL in mvnw.cmd
   - fixes https://github.com/takari/maven-wrapper/issues/106
   - see https://github.com/takari/maven-wrapper/pull/107
   - contributed by Manfred Moser http://www.simpligility.com
+
 Release performed by Manfred Moser - http://www.simpligility.com
 
 ## Version 0.5.0 - 2019-02-18
