@@ -4,6 +4,14 @@ The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
 is the detailed source of all changes. The following provides most information
 at an easier glance.
 
+## Version 0.5.2 - 2019-02-20
+
+- Re-applied TLS1.2 fix for Windows
+  - see https://github.com/takari/maven-wrapper/pull/108
+  - contributed by Ralph Schaer https://github.com/ralscha
+
+Release performed by Manfred Moser - http://www.simpligility.com
+
 ## Version 0.5.1 - 2019-02-19
 
 - Corrected check for MVNW_REPOURL in mvnw.cmd
