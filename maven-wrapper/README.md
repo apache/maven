@@ -63,7 +63,7 @@ Please check out the [changelog](./CHANGELOG.md) for more information about our 
 ## Verbose Mode
 
 The wrapper supports a verbose mode in which it outputs further information. It
-is activated by setting the MVNW_VERBOSE environment variable to `true`.
+is activated by setting the `MVNW_VERBOSE` environment variable to `true`.
 
 By default it is off.
 
