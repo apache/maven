@@ -63,6 +63,7 @@ under the License.
               <goal>xpp3-reader</goal>
               <goal>xpp3-extended-reader</goal>
               <goal>xpp3-writer</goal>
+              <goal>xpp3-extended-writer</goal>
             </goals>
           </execution>
         </executions>
