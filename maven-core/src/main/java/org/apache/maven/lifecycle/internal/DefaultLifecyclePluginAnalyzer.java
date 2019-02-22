@@ -25,6 +25,8 @@ import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecycleMojo;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.component.annotations.Component;
@@ -150,6 +152,13 @@ public class DefaultLifecyclePluginAnalyzer
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
     {
+        String modelId = "org.apache.maven:maven-core:" + this.getClass().getPackage().getImplementationVersion()
+            + ":default-lifecycle-bindings";
+        InputSource inputSource = new InputSource();
+        inputSource.setModelId( modelId );
+        InputLocation location = new InputLocation( -1, -1, inputSource );
+        location.setLocation( 0, location );
+
         List<LifecycleMojo> mojos = goals.getMojos();
         if ( mojos != null )
         {
@@ -166,11 +175,16 @@ public class DefaultLifecyclePluginAnalyzer
                             + "' from lifecycle mapping for phase " + phase );
                     continue;
                 }
-    
+
                 Plugin plugin = new Plugin();
                 plugin.setGroupId( gs.groupId );
                 plugin.setArtifactId( gs.artifactId );
                 plugin.setVersion( gs.version );
+
+                plugin.setLocation( "", location );
+                plugin.setLocation( "groupId", location );
+                plugin.setLocation( "artifactId", location );
+                plugin.setLocation( "version", location );
     
                 Plugin existing = plugins.get( plugin );
                 if ( existing != null )
@@ -178,6 +192,7 @@ public class DefaultLifecyclePluginAnalyzer
                     if ( existing.getVersion() == null )
                     {
                         existing.setVersion( plugin.getVersion() );
+                        existing.setLocation( "version", location );
                     }
                     plugin = existing;
                 }
@@ -191,6 +206,11 @@ public class DefaultLifecyclePluginAnalyzer
                 execution.setPhase( phase );
                 execution.setPriority( i - mojos.size() );
                 execution.getGoals().add( gs.goal );
+
+                execution.setLocation( "", location );
+                execution.setLocation( "id", location );
+                execution.setLocation( "phase", location );
+                execution.setLocation( "goals", location );
 
                 Xpp3Dom lifecycleConfiguration = mojo.getConfiguration();
                 if ( lifecycleConfiguration != null )

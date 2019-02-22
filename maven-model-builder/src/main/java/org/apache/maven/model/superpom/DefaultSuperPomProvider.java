@@ -74,7 +74,7 @@ public class DefaultSuperPomProvider
                 Map<String, Object> options = new HashMap<>();
                 options.put( "xml:4.0.0", "xml:4.0.0" );
 
-                String modelId = "org.apache.maven:model-builder:"
+                String modelId = "org.apache.maven:maven-model-builder:"
                     + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
                 InputSource inputSource = new InputSource();
                 inputSource.setModelId( modelId );
