@@ -90,6 +90,10 @@ public class ModelProblemUtils
         String artifactId = model.getArtifactId();
 
         String version = model.getVersion();
+        if ( version == null && model.getParent() != null )
+        {
+            version = model.getParent().getVersion();
+        }
         if ( version == null )
         {
             version = "[unknown-version]";
