@@ -20,6 +20,8 @@ package org.apache.maven.model.plugin;
  */
 
 import org.apache.maven.model.Build;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -45,6 +47,15 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultReportingConverter
     implements ReportingConverter
 {
+    private final InputLocation location;
+    {
+        String modelId = "org.apache.maven:maven-model-builder:"
+            + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
+        InputSource inputSource = new InputSource();
+        inputSource.setModelId( modelId );
+        location = new InputLocation( -1, -1, inputSource );
+        location.setLocation( 0, location );
+    }
 
     @Override
     public void convertReporting( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
@@ -62,6 +73,7 @@ public class DefaultReportingConverter
         {
             build = new Build();
             model.setBuild( build );
+            model.setLocation( "build", location );
         }
 
         Plugin sitePlugin = findSitePlugin( build );
@@ -70,6 +82,7 @@ public class DefaultReportingConverter
         {
             sitePlugin = new Plugin();
             sitePlugin.setArtifactId( "maven-site-plugin" );
+            sitePlugin.setLocation( "artifactId", location );
             PluginManagement pluginManagement = build.getPluginManagement();
             if ( pluginManagement == null )
             {
@@ -83,7 +96,7 @@ public class DefaultReportingConverter
 
         if ( configuration == null )
         {
-            configuration = new Xpp3Dom( "configuration" );
+            configuration = new Xpp3Dom( "configuration", location );
             sitePlugin.setConfiguration( configuration );
         }
 
@@ -102,10 +115,11 @@ public class DefaultReportingConverter
 
         if ( configuration.getChild( "outputDirectory" ) == null )
         {
-            addDom( configuration, "outputDirectory", reporting.getOutputDirectory() );
+            addDom( configuration, "outputDirectory", reporting.getOutputDirectory(),
+                    reporting.getLocation( "outputDirectory" ) );
         }
 
-        reportPlugins = new Xpp3Dom( "reportPlugins" );
+        reportPlugins = new Xpp3Dom( "reportPlugins", location );
         configuration.addChild( reportPlugins );
 
         boolean hasMavenProjectInfoReportsPlugin = false;
@@ -136,7 +150,7 @@ public class DefaultReportingConverter
 
         if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin )
         {
-            Xpp3Dom dom = new Xpp3Dom( "reportPlugin" );
+            Xpp3Dom dom = new Xpp3Dom( "reportPlugin", location );
 
             addDom( dom, "groupId", "org.apache.maven.plugins" );
             addDom( dom, "artifactId", "maven-project-info-reports-plugin" );
@@ -178,11 +192,11 @@ public class DefaultReportingConverter
 
     private Xpp3Dom convert( ReportPlugin plugin )
     {
-        Xpp3Dom dom = new Xpp3Dom( "reportPlugin" );
+        Xpp3Dom dom = new Xpp3Dom( "reportPlugin", plugin.getLocation( "" ) );
 
-        addDom( dom, "groupId", plugin.getGroupId() );
-        addDom( dom, "artifactId", plugin.getArtifactId() );
-        addDom( dom, "version", plugin.getVersion() );
+        addDom( dom, "groupId", plugin.getGroupId(), plugin.getLocation( "groupId" ) );
+        addDom( dom, "artifactId", plugin.getArtifactId(), plugin.getLocation( "artifactId" ) );
+        addDom( dom, "version", plugin.getVersion(), plugin.getLocation( "version" ) );
 
         Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
         if ( configuration != null )
@@ -193,7 +207,7 @@ public class DefaultReportingConverter
 
         if ( !plugin.getReportSets().isEmpty() )
         {
-            Xpp3Dom reportSets = new Xpp3Dom( "reportSets" );
+            Xpp3Dom reportSets = new Xpp3Dom( "reportSets", plugin.getLocation( "reportSets" ) );
             for ( ReportSet reportSet : plugin.getReportSets() )
             {
                 Xpp3Dom rs = convert( reportSet );
@@ -207,9 +221,10 @@ public class DefaultReportingConverter
 
     private Xpp3Dom convert( ReportSet reportSet )
     {
-        Xpp3Dom dom = new Xpp3Dom( "reportSet" );
+        Xpp3Dom dom = new Xpp3Dom( "reportSet", reportSet.getLocation( "" ) );
 
-        addDom( dom, "id", reportSet.getId() );
+        InputLocation idLocation = reportSet.getLocation( "id" );
+        addDom( dom, "id", reportSet.getId(), idLocation == null ? location : idLocation );
 
         Xpp3Dom configuration = (Xpp3Dom) reportSet.getConfiguration();
         if ( configuration != null )
@@ -220,10 +235,12 @@ public class DefaultReportingConverter
 
         if ( !reportSet.getReports().isEmpty() )
         {
-            Xpp3Dom reports = new Xpp3Dom( "reports" );
+            InputLocation location = reportSet.getLocation( "reports" );
+            Xpp3Dom reports = new Xpp3Dom( "reports", location );
+            int n = 0;
             for ( String report : reportSet.getReports() )
             {
-                addDom( reports, "report", report );
+                addDom( reports, "report", report, location.getLocation( n++ ) );
             }
             dom.addChild( reports );
         }
@@ -233,15 +250,20 @@ public class DefaultReportingConverter
 
     private void addDom( Xpp3Dom parent, String childName, String childValue )
     {
+        addDom( parent, childName, childValue, location );
+    }
+
+    private void addDom( Xpp3Dom parent, String childName, String childValue, InputLocation location )
+    {
         if ( StringUtils.isNotEmpty( childValue ) )
         {
-            parent.addChild( newDom( childName, childValue ) );
+            parent.addChild( newDom( childName, childValue, location ) );
         }
     }
 
-    private Xpp3Dom newDom( String name, String value )
+    private Xpp3Dom newDom( String name, String value, InputLocation location )
     {
-        Xpp3Dom dom = new Xpp3Dom( name );
+        Xpp3Dom dom = new Xpp3Dom( name, location );
         dom.setValue( value );
         return dom;
     }
