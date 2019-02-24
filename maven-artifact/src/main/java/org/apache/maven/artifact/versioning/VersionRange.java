@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -33,6 +35,12 @@ import org.apache.maven.artifact.Artifact;
  */
 public class VersionRange
 {
+    private static final Map<String, VersionRange> CACHE_SPEC =
+        Collections.<String, VersionRange>synchronizedMap( new WeakHashMap<String, VersionRange>() );
+
+    private static final Map<String, VersionRange> CACHE_VERSION =
+                    Collections.<String, VersionRange>synchronizedMap( new WeakHashMap<String, VersionRange>() );
+
     private final ArtifactVersion recommendedVersion;
 
     private final List<Restriction> restrictions;
@@ -54,6 +62,11 @@ public class VersionRange
         return restrictions;
     }
 
+    /**
+     * @deprecated VersionRange is immutable, cloning is not useful and even more an issue against the cache 
+     * @return a clone
+     */
+    @Deprecated
     public VersionRange cloneOf()
     {
         List<Restriction> copiedRestrictions = null;
@@ -95,6 +108,12 @@ public class VersionRange
         if ( spec == null )
         {
             return null;
+        }
+
+        VersionRange cached = CACHE_SPEC.get( spec );
+        if ( cached != null )
+        {
+            return cached;
         }
 
         List<Restriction> restrictions = new ArrayList<>();
@@ -159,7 +178,9 @@ public class VersionRange
             }
         }
 
-        return new VersionRange( version, restrictions );
+        cached = new VersionRange( version, restrictions );
+        CACHE_SPEC.put( spec, cached );
+        return cached;
     }
 
     private static Restriction parseRestriction( String spec )
@@ -218,8 +239,14 @@ public class VersionRange
 
     public static VersionRange createFromVersion( String version )
     {
-        List<Restriction> restrictions = Collections.emptyList();
-        return new VersionRange( new DefaultArtifactVersion( version ), restrictions );
+        VersionRange cached = CACHE_VERSION.get( version );
+        if ( cached == null )
+        {
+            List<Restriction> restrictions = Collections.emptyList();
+            cached = new VersionRange( new DefaultArtifactVersion( version ), restrictions );
+            CACHE_VERSION.put( version, cached );
+        }
+        return cached;
     }
 
     /**

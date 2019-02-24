@@ -80,7 +80,7 @@ public class DefaultLifecycleBindingsInjector
     }
 
     /**
-     *  The domain-specific model merger for the Maven POM
+     *  The domain-specific model merger for lifecycle bindings
      */
     protected static class LifecycleBindingsMerger
         extends MavenModelMerger
@@ -119,7 +119,7 @@ public class DefaultLifecycleBindingsInjector
                     merged.put( key, element );
                 }
 
-                Map<Object, Plugin> unmanaged = new LinkedHashMap<>();
+                Map<Object, Plugin> added = new LinkedHashMap<>();
 
                 for ( Plugin element : src )
                 {
@@ -132,11 +132,11 @@ public class DefaultLifecycleBindingsInjector
                     else
                     {
                         merged.put( key, element );
-                        unmanaged.put( key, element );
+                        added.put( key, element );
                     }
                 }
 
-                if ( !unmanaged.isEmpty() )
+                if ( !added.isEmpty() )
                 {
                     PluginManagement pluginMgmt = (PluginManagement) context.get( PLUGIN_MANAGEMENT );
                     if ( pluginMgmt != null )
@@ -144,11 +144,11 @@ public class DefaultLifecycleBindingsInjector
                         for ( Plugin managedPlugin : pluginMgmt.getPlugins() )
                         {
                             Object key = getPluginKey( managedPlugin );
-                            Plugin unmanagedPlugin = unmanaged.get( key );
-                            if ( unmanagedPlugin != null )
+                            Plugin addedPlugin = added.get( key );
+                            if ( addedPlugin != null )
                             {
                                 Plugin plugin = managedPlugin.clone();
-                                mergePlugin( plugin, unmanagedPlugin, sourceDominant, Collections.emptyMap() );
+                                mergePlugin( plugin, addedPlugin, sourceDominant, Collections.emptyMap() );
                                 merged.put( key, plugin );
                             }
                         }

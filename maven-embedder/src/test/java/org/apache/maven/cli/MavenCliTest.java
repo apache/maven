@@ -24,14 +24,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 import java.io.File;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.maven.Maven;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
+import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
+import org.codehaus.plexus.PlexusContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 public class MavenCliTest
 {
@@ -293,4 +303,32 @@ public class MavenCliTest
             // noop
         }
     }
+
+    /**
+     * Verifies MNG-6558
+     */
+    @Test
+    public void testToolchainsBuildingEvents() throws Exception {
+        final EventSpyDispatcher eventSpyDispatcherMock = mock(EventSpyDispatcher.class);
+        MavenCli customizedMavenCli = new MavenCli() {
+            @Override
+            protected void customizeContainer(PlexusContainer container) {
+                super.customizeContainer(container);
+                container.addComponent(eventSpyDispatcherMock, "org.apache.maven.eventspy.internal.EventSpyDispatcher");
+                container.addComponent(mock(Maven.class), "org.apache.maven.Maven");
+            }
+        };
+
+        CliRequest cliRequest = new CliRequest(new String[]{}, null);
+
+        customizedMavenCli.cli(cliRequest);
+        customizedMavenCli.logging(cliRequest);
+        customizedMavenCli.container(cliRequest);
+        customizedMavenCli.toolchains(cliRequest);
+
+        InOrder orderdEventSpyDispatcherMock = inOrder(eventSpyDispatcherMock);
+        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingRequest.class));
+        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingResult.class));
+    }
+
 }

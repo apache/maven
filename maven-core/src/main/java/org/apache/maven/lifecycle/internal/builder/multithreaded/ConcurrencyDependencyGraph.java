@@ -26,6 +26,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -61,12 +62,12 @@ public class ConcurrencyDependencyGraph
     /**
      * Gets all the builds that have no reactor-dependencies
      *
-     * @return A list of all the initial builds
+     * @return A set of all the initial builds
      */
 
     public List<MavenProject> getRootSchedulableBuilds()
     {
-        List<MavenProject> result = new ArrayList<>();
+        Set<MavenProject> result = new LinkedHashSet<>();
         for ( ProjectSegment projectBuild : projectBuilds )
         {
             if ( projectDependencyGraph.getUpstreamProjects( projectBuild.getProject(), false ).isEmpty() )
@@ -74,7 +75,7 @@ public class ConcurrencyDependencyGraph
                 result.add( projectBuild.getProject() );
             }
         }
-        return result;
+        return new ArrayList<>( result );
     }
 
     /**
