@@ -28,8 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -65,6 +64,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ComparableVersion
     implements Comparable<ComparableVersion>
 {
+    private static final Pattern STRIP_LEADING_ZEROES_REGEX = Pattern.compile( "^0+" );
+
     private static final int MAX_INTITEM_LENGTH = 9;
 
     private static final int MAX_LONGITEM_LENGTH = 18;
@@ -609,7 +610,7 @@ public class ComparableVersion
 
     private static String stripLeadingZeroes( String buf )
     {
-        String strippedBuf = StringUtils.stripStart( buf, "0" );
+        String strippedBuf = STRIP_LEADING_ZEROES_REGEX.matcher( buf ).replaceFirst( "" );
         if ( strippedBuf.isEmpty() )
         {
             return "0";
