@@ -65,6 +65,10 @@ import org.apache.commons.lang3.StringUtils;
 public class ComparableVersion
     implements Comparable<ComparableVersion>
 {
+    private static final int MAX_INTITEM_LENGTH = 9;
+
+    private static final int MAX_LONGITEM_LENGTH = 18;
+
     private String value;
 
     private String canonical;
@@ -106,16 +110,19 @@ public class ComparableVersion
             this.value = Integer.parseInt( str );
         }
 
+        @Override
         public int getType()
         {
             return INT_ITEM;
         }
 
+        @Override
         public boolean isNull()
         {
             return value == 0;
         }
 
+        @Override
         public int compareTo( Item item )
         {
             if ( item == null )
@@ -126,10 +133,8 @@ public class ComparableVersion
             switch ( item.getType() )
             {
                 case INT_ITEM:
-                {
                     int itemValue = ( (IntItem) item ).value;
                     return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
-                }
                 case LONG_ITEM:
                 case BIGINTEGER_ITEM:
                     return -1;
@@ -145,6 +150,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public String toString()
         {
             return Integer.toString( value );
@@ -164,16 +170,19 @@ public class ComparableVersion
             this.value = Long.parseLong( str );
         }
 
+        @Override
         public int getType()
         {
             return LONG_ITEM;
         }
 
+        @Override
         public boolean isNull()
         {
             return value == 0;
         }
 
+        @Override
         public int compareTo( Item item )
         {
             if ( item == null )
@@ -186,10 +195,8 @@ public class ComparableVersion
                 case INT_ITEM:
                     return 1;
                 case LONG_ITEM:
-                {
                     long itemValue = ( (LongItem) item ).value;
                     return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
-                }
                 case BIGINTEGER_ITEM:
                     return -1;
 
@@ -204,6 +211,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public String toString()
         {
             return Long.toString( value );
@@ -223,16 +231,19 @@ public class ComparableVersion
             this.value = new BigInteger( str );
         }
 
+        @Override
         public int getType()
         {
             return BIGINTEGER_ITEM;
         }
 
+        @Override
         public boolean isNull()
         {
             return BigInteger.ZERO.equals( value );
         }
 
+        @Override
         public int compareTo( Item item )
         {
             if ( item == null )
@@ -260,6 +271,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public String toString()
         {
             return value.toString();
@@ -289,7 +301,7 @@ public class ComparableVersion
          */
         private static final String RELEASE_VERSION_INDEX = String.valueOf( QUALIFIERS.indexOf( "" ) );
 
-        private String value;
+        private final String value;
 
         StringItem( String value, boolean followedByDigit )
         {
@@ -313,11 +325,13 @@ public class ComparableVersion
             this.value = ALIASES.getProperty( value , value );
         }
 
+        @Override
         public int getType()
         {
             return STRING_ITEM;
         }
 
+        @Override
         public boolean isNull()
         {
             return ( comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX ) == 0 );
@@ -343,6 +357,7 @@ public class ComparableVersion
             return i == -1 ? ( QUALIFIERS.size() + "-" + qualifier ) : String.valueOf( i );
         }
 
+        @Override
         public int compareTo( Item item )
         {
             if ( item == null )
@@ -368,6 +383,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public String toString()
         {
             return value;
@@ -382,11 +398,13 @@ public class ComparableVersion
         extends ArrayList<Item>
         implements Item
     {
+        @Override
         public int getType()
         {
             return LIST_ITEM;
         }
 
+        @Override
         public boolean isNull()
         {
             return ( size() == 0 );
@@ -410,6 +428,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public int compareTo( Item item )
         {
             if ( item == null )
@@ -456,6 +475,7 @@ public class ComparableVersion
             }
         }
 
+        @Override
         public String toString()
         {
             StringBuilder buffer = new StringBuilder();
@@ -572,12 +592,12 @@ public class ComparableVersion
         if ( isDigit )
         {
             buf = stripLeadingZeroes( buf );
-            if ( buf.length() <= 9 )
+            if ( buf.length() <= MAX_INTITEM_LENGTH )
             {
                 // lower than 2^31
                 return new IntItem( buf );
             }
-            else if ( buf.length() <= 18 )
+            else if ( buf.length() <= MAX_LONGITEM_LENGTH )
             {
                 // lower than 2^63
                 return new LongItem( buf );
@@ -591,15 +611,19 @@ public class ComparableVersion
     {
         String strippedBuf = StringUtils.stripStart( buf, "0" );
         if ( strippedBuf.isEmpty() )
+        {
             return "0";
+        }
         return strippedBuf;
     }
 
+    @Override
     public int compareTo( ComparableVersion o )
     {
         return items.compareTo( o.items );
     }
 
+    @Override
     public String toString()
     {
         return value;
@@ -610,11 +634,13 @@ public class ComparableVersion
         return canonical;
     }
 
+    @Override
     public boolean equals( Object o )
     {
         return ( o instanceof ComparableVersion ) && canonical.equals( ( (ComparableVersion) o ).canonical );
     }
 
+    @Override
     public int hashCode()
     {
         return canonical.hashCode();
