@@ -9,8 +9,12 @@ The easiest way to setup the Maven Wrapper for your project is to use the [Takar
 `wrapper` goal. To add or update all the necessary Maven Wrapper files to your project execute the following command:
 
 ```
-mvn -N io.takari:maven:wrapper
+mvn -N io.takari:maven:0.7.4:wrapper
 ```
+
+> Note: The default usage should be `mvn -N io.takari:maven:wrapper` but for some
+> users this seem to result in usage of an old version of the wrapper and therefore 
+> installation of older Maven defaults and so on.
 
 Normally you instruct users to run the `mvn` command like the following:
 
