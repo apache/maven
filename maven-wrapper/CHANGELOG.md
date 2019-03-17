@@ -4,6 +4,12 @@ The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
 is the detailed source of all changes. The following provides most information
 at an easier glance.
 
+## Version 0.5.4 - soonish
+
+- Adapt mvnw.cmd to also honour MVNW_VERBOSE
+  - see https://github.com/takari/maven-wrapper/pull/115
+  - contributed by Brian de Alwis https://github.com/briandealwis
+- Updated documentation to include plugin version
 
 ## Version 0.5.3 - 2019-02-25
 
