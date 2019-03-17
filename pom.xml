@@ -554,7 +554,7 @@ under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.15</version>
+        <version>1.17</version><!-- latest for Java 7 -->
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
