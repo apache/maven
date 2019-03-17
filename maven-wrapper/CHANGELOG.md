@@ -9,6 +9,10 @@ at an easier glance.
 - Adapt mvnw.cmd to also honour MVNW_VERBOSE
   - see https://github.com/takari/maven-wrapper/pull/115
   - contributed by Brian de Alwis https://github.com/briandealwis
+- Provide a 'standardized' way to retrieve CLI arguments
+  - same as mvn itself
+  - see https://github.com/takari/maven-wrapper/pull/113
+  - contributed by Guy Brand https://github.com/guylabs
 - Updated documentation to include plugin version
 
 ## Version 0.5.3 - 2019-02-25
