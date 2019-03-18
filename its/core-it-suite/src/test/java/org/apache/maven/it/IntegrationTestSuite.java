@@ -496,6 +496,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3477DependencyResolutionErrorMessageTest.class );
         suite.addTestSuite( MavenITmng3475BaseAlignedDirTest.class );
         suite.addTestSuite( MavenITmng3470StrictCheckumVerificationOfDependencyPomTest.class );
+		// Fails in a locked-down environment, see MNG-6613
         suite.addTestSuite( MavenITmng3461MirrorMatchingTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
