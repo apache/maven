@@ -44,6 +44,7 @@ under the License.
     <module>group-5</module>
     <module>group-6</module>
     <module>group-7</module>
+    <module>group-8</module>
   </modules>
 
   <properties>
