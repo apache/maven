@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng6506PackageAnnotationTest.class );
         suite.addTestSuite( MavenITmng6256SpecialCharsAlternatePOMLocation.class );
         suite.addTestSuite( MavenITmng6386BaseUriPropertyTest.class );
         suite.addTestSuite( MavenITmng6330RelativePath.class );
