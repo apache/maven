@@ -19,5 +19,5 @@
 # under the License.
 #
 
-mvn -Preporting site site:stage $@
-mvn scm-publish:publish-scm $@
+mvn -Preporting site site:stage "$@"
+mvn scm-publish:publish-scm "$@"
