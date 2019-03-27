@@ -150,6 +150,7 @@ used.
 
 To test Maven wrapper usage:
 
+- ensure you are building on a Unix filesystem with correct mounting for executable flag setting
 - build the maven-wrapper as snapshot version
 - update version in takari-maven-plugin
 - build takari-maven-plugin
