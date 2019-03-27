@@ -9,7 +9,7 @@ The easiest way to setup the Maven Wrapper for your project is to use the [Takar
 `wrapper` goal. To add or update all the necessary Maven Wrapper files to your project execute the following command:
 
 ```
-mvn -N io.takari:maven:0.7.4:wrapper
+mvn -N io.takari:maven:0.7.5:wrapper
 ```
 
 > Note: The default usage should be `mvn -N io.takari:maven:wrapper` but for some
@@ -96,7 +96,7 @@ variable `MVNW_PASSWORD`.
 To switch the version of Maven used to build a project you can initialize it using 
 
 ```
-mvn -N io.takari:maven:wrapper -Dmaven=3.3.3
+mvn -N io.takari:maven:0.7.5:wrapper -Dmaven=3.3.3
 ```
 
 which works for any version except snapshots. Once you have a wrapper you can change its version by setting the
@@ -157,7 +157,7 @@ To test Maven wrapper usage:
 - use on test project with takari-maven-plugin version
 
 ```
-mvn -N -X io.takari:maven:0.7.1-SNAPSHOT:wrapper
+mvn -N -X io.takari:maven:0.7.6-SNAPSHOT:wrapper
 ```
 
 For release
