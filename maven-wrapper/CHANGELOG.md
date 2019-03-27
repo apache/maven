@@ -4,7 +4,7 @@ The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
 is the detailed source of all changes. The following provides most information
 at an easier glance.
 
-## Version 0.5.4 - soonish
+## Version 0.5.4 - 2019-03-26
 
 - Adapt mvnw.cmd to also honour MVNW_VERBOSE
   - see https://github.com/takari/maven-wrapper/pull/115
