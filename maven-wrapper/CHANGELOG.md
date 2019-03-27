@@ -13,6 +13,9 @@ at an easier glance.
   - same as mvn itself
   - see https://github.com/takari/maven-wrapper/pull/113
   - contributed by Guy Brand https://github.com/guylabs
+- Ensure correct executable flag setting
+  - fixes https://github.com/takari/maven-wrapper/issues/78
+  - contributed by Manfred Moser - http://www.simpligility.com
 - Updated documentation to include plugin version
 
 ## Version 0.5.3 - 2019-02-25
