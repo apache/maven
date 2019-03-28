@@ -1426,7 +1426,7 @@ public class MavenCli
 
         TransferListener transferListener;
 
-        if ( quiet )
+        if ( quiet || cliRequest.commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
         {
             transferListener = new QuietMavenTransferListener();
         }
