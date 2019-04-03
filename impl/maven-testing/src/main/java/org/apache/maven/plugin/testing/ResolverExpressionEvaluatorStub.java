@@ -85,7 +85,7 @@ public class ResolverExpressionEvaluatorStub
         {
             return PlexusTestCase.getBasedir();
         }
-        else if ( expression.startsWith( "basedir" )|| expression.startsWith( "project.basedir" ) )
+        else if ( expression.startsWith( "basedir" ) || expression.startsWith( "project.basedir" ) )
         {
             int pathSeparator = expression.indexOf( "/" );
 

@@ -1,7 +1,5 @@
 package org.apache.maven.plugin.testing;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Static helpers to create and manipulate mojo execution configuration parameters

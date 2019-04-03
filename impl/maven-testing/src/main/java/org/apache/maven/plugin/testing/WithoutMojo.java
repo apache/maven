@@ -1,8 +1,5 @@
 package org.apache.maven.plugin.testing;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,6 +21,9 @@ import java.lang.annotation.Retention;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
@@ -32,9 +32,10 @@ import java.lang.annotation.Target;
  *
  * @author Mirko Friedenhagen
  */
-@Retention(RUNTIME)
+@Retention( RUNTIME )
 @Documented
-@Target(METHOD)
-public @interface WithoutMojo {
-    
+@Target( METHOD )
+public @interface WithoutMojo
+{
+
 }

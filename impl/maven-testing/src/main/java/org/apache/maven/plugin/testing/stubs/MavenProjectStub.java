@@ -1456,7 +1456,8 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#createArtifacts(org.apache.maven.artifact.factory.ArtifactFactory, java.lang.String, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String string, ArtifactFilter artifactFilter )
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String string,
+                                          ArtifactFilter artifactFilter )
     {
         return Collections.<Artifact>emptySet();
     }

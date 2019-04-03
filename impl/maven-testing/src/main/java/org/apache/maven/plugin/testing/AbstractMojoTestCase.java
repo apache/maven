@@ -478,7 +478,8 @@ public abstract class AbstractMojoTestCase
 
         if ( mojoDescriptor.getComponentConfigurator() != null )
         {
-            configurator = getContainer().lookup( ComponentConfigurator.class, mojoDescriptor.getComponentConfigurator() );
+            configurator =
+                getContainer().lookup( ComponentConfigurator.class, mojoDescriptor.getComponentConfigurator() );
         }        
         
         configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
@@ -512,13 +513,13 @@ public abstract class AbstractMojoTestCase
     protected MojoExecution newMojoExecution( String goal )
     {
         MojoDescriptor mojoDescriptor = mojoDescriptors.get( goal );
-        assertNotNull(String.format("The MojoDescriptor for the goal %s cannot be null.", goal),  mojoDescriptor );
+        assertNotNull( String.format( "The MojoDescriptor for the goal %s cannot be null.", goal ), mojoDescriptor );
         MojoExecution execution = new MojoExecution( mojoDescriptor );
         finalizeMojoConfiguration( execution );
         return execution;
     }
 
-    // copy&paste from org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator.finalizeMojoConfiguration(MojoExecution)
+    // copy&paste from o.a.m.l.i.DefaultLifecycleExecutionPlanCalculator.finalizeMojoConfiguration(MojoExecution)
     private void finalizeMojoConfiguration( MojoExecution mojoExecution )
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -529,7 +530,7 @@ public abstract class AbstractMojoTestCase
             executionConfiguration = new Xpp3Dom( "configuration" );
         }
 
-        Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert( mojoDescriptor );;
+        Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert( mojoDescriptor );
 
         Xpp3Dom finalConfiguration = new Xpp3Dom( "configuration" );
 
@@ -546,7 +547,8 @@ public abstract class AbstractMojoTestCase
 
                 Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
 
-                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
+                parameterConfiguration =
+                    Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
 
                 if ( parameterConfiguration != null )
                 {

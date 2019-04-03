@@ -64,10 +64,12 @@ public class MojoRule
     
     public MojoRule() 
     {
-        this( new AbstractMojoTestCase() {} );
+        this( new AbstractMojoTestCase()
+        {
+        } );
     }
 
-    public MojoRule(AbstractMojoTestCase testCase)
+    public MojoRule( AbstractMojoTestCase testCase )
     {
         this.testCase = testCase;
     }
@@ -291,28 +293,30 @@ public class MojoRule
     }
 
     @Override
-    public Statement apply(final Statement base, Description description) {
-        if (description.getAnnotation(WithoutMojo.class) != null) // skip.
+    public Statement apply( final Statement base, Description description )
+    {
+        if ( description.getAnnotation( WithoutMojo.class ) != null ) // skip.
         {
             return base;
         }
-        return new Statement() 
+        return new Statement()
         {
             @Override
-            public void evaluate() throws Throwable 
+            public void evaluate()
+                throws Throwable
             {
                 testCase.setUp();
                 before();
-                try 
+                try
                 {
                     base.evaluate();
-                } 
-                finally 
+                }
+                finally
                 {
                     after();
                 }
-            }            
-        };       
+            }
+        };
     }
 
     /**
