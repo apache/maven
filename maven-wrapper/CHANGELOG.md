@@ -4,6 +4,13 @@ The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
 is the detailed source of all changes. The following provides most information
 at an easier glance.
 
+## Version 0.5.5 or higher - Upcoming
+
+- Updated default URL to jar in MavenWrapperDownloader
+  - fixes https://github.com/takari/maven-wrapper/issues/118
+- Update to Maven 3.6.1
+  - To be done when released
+
 ## Version 0.5.4 - 2019-03-26
 
 - Adapt mvnw.cmd to also honour MVNW_VERBOSE
