@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.6.1-SNAPSHOT</version>
+  <version>3.6.1</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -98,7 +98,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>master</tag>
+    <tag>maven-3.6.1</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
