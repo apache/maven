@@ -209,10 +209,13 @@ public class DefaultExceptionHandler
                 {
                     Throwable cause2 = cause.getCause();
 
-                    if ( cause2 instanceof NoClassDefFoundError
-                        && cause2.getMessage().contains( "org/sonatype/aether/" ) )
+                    if ( cause2 instanceof NoClassDefFoundError )
                     {
-                        reference = "AetherClassNotFound";
+                        String message = cause2.getMessage();
+                        if ( message != null && message.contains( "org/sonatype/aether/" ) )
+                        {
+                            reference = "AetherClassNotFound";
+                        }
                     }
                 }
 
