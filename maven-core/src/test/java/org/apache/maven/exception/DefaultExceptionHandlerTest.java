@@ -22,15 +22,22 @@ package org.apache.maven.exception;
 import java.io.IOException;
 import java.net.ConnectException;
 
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import junit.framework.TestCase;
+import org.apache.maven.plugin.PluginContainerException;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:baerrach@apache.org">Barrie Treloar</a>
  */
 public class DefaultExceptionHandlerTest
-    extends TestCase
 {
     /**
      * Running Maven under JDK7 may cause connection issues because IPv6 is used by default.
@@ -42,11 +49,11 @@ public class DefaultExceptionHandlerTest
      * http://cwiki.apache.org/confluence/display/MAVEN/ConnectException
      * </p>
      */
+    @Test
     public void testJdk7ipv6()
     {
         ConnectException connEx = new ConnectException( "Connection refused: connect" );
-        IOException ioEx = new IOException( "Unable to establish loopback connection" );
-        ioEx.initCause( connEx );
+        IOException ioEx = new IOException( "Unable to establish loopback connection", connEx );
         MojoExecutionException mojoEx =
             new MojoExecutionException( "Error executing Jetty: Unable to establish loopback connection", ioEx );
 
@@ -56,5 +63,43 @@ public class DefaultExceptionHandlerTest
         String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/ConnectException";
         assertEquals( expectedReference, exceptionSummary.getReference() );
 
+    }
+
+    @Test
+    public void testHandleExceptionAetherClassNotFound()
+    {
+        Throwable cause2 = new NoClassDefFoundError( "org/sonatype/aether/RepositorySystem" );
+        Plugin plugin = new Plugin();
+        Exception cause = new PluginContainerException( plugin, null, null, cause2 );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor( pluginDescriptor );
+        MojoExecution mojoExecution = new MojoExecution(mojoDescriptor);
+        Throwable exception = new PluginExecutionException( mojoExecution, null, cause );
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException( exception );
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/AetherClassNotFound";
+        assertEquals( expectedReference, summary.getReference() );
+    }
+
+    @Test
+    public void testHandleExceptionNoClassDefFoundErrorNull()
+    {
+        Throwable cause2 = new NoClassDefFoundError();
+        Plugin plugin = new Plugin();
+        Exception cause = new PluginContainerException( plugin, null, null, cause2 );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor( pluginDescriptor );
+        MojoExecution mojoExecution = new MojoExecution(mojoDescriptor);
+        Throwable exception = new PluginExecutionException( mojoExecution, null, cause );
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException( exception );
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
+        assertEquals( expectedReference, summary.getReference() );
     }
 }
