@@ -43,7 +43,7 @@ public class PluginParameterException
     public PluginParameterException( MojoDescriptor mojo, List<Parameter> parameters )
     {
         super( mojo.getPluginDescriptor(), "The parameters " + format( parameters ) + " for goal "
-            + mojo.getRoleHint() + " are missing or invalid" );
+            + mojo.getRoleHint() + " are missing, read-only or invalid" );
 
         this.mojo = mojo;
 

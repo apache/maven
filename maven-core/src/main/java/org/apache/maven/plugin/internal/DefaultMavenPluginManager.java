@@ -627,6 +627,8 @@ public class DefaultMavenPluginManager
             logger.debug(
                 "Configuring mojo '" + mojoDescriptor.getId() + "' with " + configuratorId + " configurator -->" );
 
+            validateReadOnlyParameters( mojoDescriptor, configuration );
+
             configurator.configureComponent( mojo, configuration, expressionEvaluator, pluginRealm, validator );
 
             logger.debug( "-- end configuration --" );
@@ -719,7 +721,6 @@ public class DefaultMavenPluginManager
             {
                 continue;
             }
-
             Object value = null;
 
             PlexusConfiguration config = configuration.getChild( parameter.getName(), false );
@@ -742,11 +743,43 @@ public class DefaultMavenPluginManager
                         + configuration.getName() + "'";
                     throw new ComponentConfigurationException( configuration, msg, e );
                 }
+
             }
 
             if ( value == null && ( config == null || config.getChildCount() <= 0 ) )
             {
                 invalidParameters.add( parameter );
+            }
+        }
+
+        if ( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( mojoDescriptor, invalidParameters );
+        }
+    }
+
+    private void validateReadOnlyParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration configuration )
+            throws PluginParameterException
+    {
+        if ( mojoDescriptor.getParameters() == null )
+        {
+            return;
+        }
+
+        List<Parameter> invalidParameters = new ArrayList<>();
+
+        for ( Parameter parameter : mojoDescriptor.getParameters() )
+        {
+            PlexusConfiguration config = configuration.getChild( parameter.getName(), false );
+            if ( config != null && !parameter.isEditable() )
+            {
+                String value = config.getValue( null );
+                String defaultValue = config.getAttribute( "default-value", null );
+                if ( value != null && defaultValue != null && !Objects.equals( defaultValue, value ) )
+                {
+                    invalidParameters.add( parameter );
+                    logger.error( "Setting read-only parameter '" + parameter.getName() + "' to " + value );
+                }
             }
         }
 
