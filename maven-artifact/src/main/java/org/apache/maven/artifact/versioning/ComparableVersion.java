@@ -149,6 +149,30 @@ public class ComparableVersion
         }
 
         @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+
+            IntItem intItem = (IntItem) o;
+
+            return value == intItem.value;
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return value;
+        }
+
+        @Override
         public String toString()
         {
             return Integer.toString( value );
@@ -207,6 +231,30 @@ public class ComparableVersion
                 default:
                     throw new IllegalStateException( "invalid item: " + item.getClass() );
             }
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+
+            LongItem longItem = (LongItem) o;
+
+            return value == longItem.value;
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return (int) ( value ^ ( value >>> 32 ) );
         }
 
         @Override
@@ -270,6 +318,29 @@ public class ComparableVersion
         }
 
         @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+
+            BigIntegerItem that = (BigIntegerItem) o;
+
+            return value.equals( that.value );
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return value.hashCode();
+        }
+
         public String toString()
         {
             return value.toString();
@@ -382,6 +453,29 @@ public class ComparableVersion
         }
 
         @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+
+            StringItem that = (StringItem) o;
+
+            return value.equals( that.value );
+
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return value.hashCode();
+        }
+
         public String toString()
         {
             return value;
@@ -581,8 +675,6 @@ public class ComparableVersion
             list = (ListItem) stack.pop();
             list.normalize();
         }
-
-        canonical = items.toString();
     }
 
     private static Item parseItem( boolean isDigit, String buf )
@@ -636,19 +728,23 @@ public class ComparableVersion
 
     public String getCanonical()
     {
+        if ( canonical == null )
+        {
+            canonical = items.toString();
+        }
         return canonical;
     }
 
     @Override
     public boolean equals( Object o )
     {
-        return ( o instanceof ComparableVersion ) && canonical.equals( ( (ComparableVersion) o ).canonical );
+        return ( o instanceof ComparableVersion ) && items.equals( ( (ComparableVersion) o ).items );
     }
 
     @Override
     public int hashCode()
     {
-        return canonical.hashCode();
+        return items.hashCode();
     }
 
     // CHECKSTYLE_OFF: LineLength
