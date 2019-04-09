@@ -20,8 +20,8 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
-import java.util.NoSuchElementException;
+
+import static org.apache.commons.lang3.math.NumberUtils.isDigits;
 
 /**
  * Default implementation of artifact versioning.
@@ -128,18 +128,15 @@ public class DefaultArtifactVersion
 
         if ( part2 != null )
         {
-            try
+            if ( part2.length() == 1  || !part2.startsWith( "0" ) )
             {
-                if ( ( part2.length() == 1 ) || !part2.startsWith( "0" ) )
-                {
-                    buildNumber = Integer.valueOf( part2 );
-                }
-                else
+                buildNumber = tryParseInt( part2 );
+                if ( buildNumber == null )
                 {
                     qualifier = part2;
                 }
             }
-            catch ( NumberFormatException e )
+            else
             {
                 qualifier = part2;
             }
@@ -147,11 +144,8 @@ public class DefaultArtifactVersion
 
         if ( ( !part1.contains( "." ) ) && !part1.startsWith( "0" ) )
         {
-            try
-            {
-                majorVersion = Integer.valueOf( part1 );
-            }
-            catch ( NumberFormatException e )
+            majorVersion = tryParseInt( part1 );
+            if ( majorVersion == null )
             {
                 // qualifier is the whole version, including "-"
                 qualifier = version;
@@ -163,30 +157,42 @@ public class DefaultArtifactVersion
             boolean fallback = false;
 
             StringTokenizer tok = new StringTokenizer( part1, "." );
-            try
+            if ( tok.hasMoreTokens() )
             {
                 majorVersion = getNextIntegerToken( tok );
-                if ( tok.hasMoreTokens() )
-                {
-                    minorVersion = getNextIntegerToken( tok );
-                }
-                if ( tok.hasMoreTokens() )
-                {
-                    incrementalVersion = getNextIntegerToken( tok );
-                }
-                if ( tok.hasMoreTokens() )
-                {
-                    qualifier = tok.nextToken();
-                    fallback = Pattern.compile( "\\d+" ).matcher( qualifier ).matches();
-                }
-
-                // string tokenizer won't detect these and ignores them
-                if ( part1.contains( ".." ) || part1.startsWith( "." ) || part1.endsWith( "." ) )
+                if ( majorVersion == null )
                 {
                     fallback = true;
                 }
             }
-            catch ( NumberFormatException e )
+            else
+            {
+                fallback = true;
+            }
+            if ( tok.hasMoreTokens() )
+            {
+                minorVersion = getNextIntegerToken( tok );
+                if ( minorVersion == null )
+                {
+                    fallback = true;
+                }
+            }
+            if ( tok.hasMoreTokens() )
+            {
+                incrementalVersion = getNextIntegerToken( tok );
+                if ( incrementalVersion == null )
+                {
+                    fallback = true;
+                }
+            }
+            if ( tok.hasMoreTokens() )
+            {
+                qualifier = tok.nextToken();
+                fallback = isDigits( qualifier );
+            }
+
+            // string tokenizer won't detect these and ignores them
+            if ( part1.contains( ".." ) || part1.startsWith( "." ) || part1.endsWith( "." ) )
             {
                 fallback = true;
             }
@@ -205,18 +211,32 @@ public class DefaultArtifactVersion
 
     private static Integer getNextIntegerToken( StringTokenizer tok )
     {
+        String s = tok.nextToken();
+        if ( ( s.length() > 1 ) && s.startsWith( "0" ) )
+        {
+            return null;
+        }
+        return tryParseInt( s );
+    }
+
+    private static Integer tryParseInt( String s )
+    {
         try
         {
-            String s = tok.nextToken();
-            if ( ( s.length() > 1 ) && s.startsWith( "0" ) )
+            if ( !isDigits( s ) )
             {
-                throw new NumberFormatException( "Number part has a leading 0: '" + s + "'" );
+                return null;
             }
-            return Integer.valueOf( s );
+            long longValue = Long.parseLong( s );
+            if ( longValue > Integer.MAX_VALUE )
+            {
+                return null;
+            }
+            return (int) longValue;
         }
-        catch ( NoSuchElementException e )
+        catch ( NumberFormatException e )
         {
-            throw new NumberFormatException( "Number is invalid" );
+            return null;
         }
     }
 
