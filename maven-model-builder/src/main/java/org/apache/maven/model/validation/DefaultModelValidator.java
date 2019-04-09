@@ -73,10 +73,6 @@ public class DefaultModelValidator
                        AbstractStringBasedModelInterpolator.CHANGELIST_PROPERTY,
                        AbstractStringBasedModelInterpolator.SHA1_PROPERTY );
 
-    private static final Pattern ID_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.]+" );
-
-    private static final Pattern ID_WITH_WILDCARDS_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.?*]+" );
-
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
@@ -829,14 +825,33 @@ public class DefaultModelValidator
         }
         else
         {
-            boolean match = ID_REGEX.matcher( id ).matches();
-            if ( !match )
+            if ( !isValidId( id ) )
             {
                 addViolation( problems, severity, version, fieldName, sourceHint,
                               "with value '" + id + "' does not match a valid id pattern.", tracker );
+                return false;
             }
-            return match;
+            return true;
         }
+    }
+
+    private boolean isValidId( String id )
+    {
+        for ( int i = 0; i < id.length(); i++ )
+        {
+            char c = id.charAt( i );
+            if ( !isValidIdCharacter( c ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private boolean isValidIdCharacter( char c )
+    {
+        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.';
     }
 
     private boolean validateIdWithWildcards( String fieldName, ModelProblemCollector problems, Severity severity,
@@ -849,14 +864,32 @@ public class DefaultModelValidator
         }
         else
         {
-            boolean match = ID_WITH_WILDCARDS_REGEX.matcher( id ).matches();
-            if ( !match )
+            if ( !isValidIdWithWildCards( id ) )
             {
                 addViolation( problems, severity, version, fieldName, sourceHint,
                               "with value '" + id + "' does not match a valid id pattern.", tracker );
+                return false;
             }
-            return match;
+            return true;
         }
+    }
+
+    private boolean isValidIdWithWildCards( String id )
+    {
+        for ( int i = 0; i < id.length(); i++ )
+        {
+            char c = id.charAt( i );
+            if ( !isValidIdWithWildCardCharacter( c ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValidIdWithWildCardCharacter( char c )
+    {
+        return isValidIdCharacter( c ) || c == '?' || c == '*';
     }
 
     private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,
