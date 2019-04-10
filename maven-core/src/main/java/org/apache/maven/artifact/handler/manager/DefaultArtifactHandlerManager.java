@@ -39,11 +39,11 @@ public class DefaultArtifactHandlerManager
     @Requirement( role = ArtifactHandler.class )
     private Map<String, ArtifactHandler> artifactHandlers;
 
-    private Map<String, ArtifactHandler> unmanagedHandlers = new ConcurrentHashMap<>();
+    private Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
 
     public ArtifactHandler getArtifactHandler( String type )
     {
-        ArtifactHandler handler = unmanagedHandlers.get( type );
+        ArtifactHandler handler = allHandlers.get( type );
 
         if ( handler == null )
         {
@@ -53,6 +53,10 @@ public class DefaultArtifactHandlerManager
             {
                 handler = new DefaultArtifactHandler( type );
             }
+            else
+            {
+                allHandlers.put( type, handler );
+            }
         }
 
         return handler;
@@ -61,7 +65,7 @@ public class DefaultArtifactHandlerManager
     public void addHandlers( Map<String, ArtifactHandler> handlers )
     {
         // legacy support for maven-gpg-plugin:1.0
-        unmanagedHandlers.putAll( handlers );
+        allHandlers.putAll( handlers );
     }
 
     @Deprecated
