@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -55,6 +56,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -68,6 +70,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
@@ -77,6 +80,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
@@ -174,9 +178,21 @@ public class MavenMetadataSource
 
         Artifact relocatedArtifact = null;
 
-        //TODO Not even sure this is really required as the project will be cached in the builder, we'll see this
-        // is currently the biggest hotspot
-        if ( artifact instanceof ArtifactWithDependencies )
+        final WorkspaceReader workspace = legacySupport.getRepositorySession().getWorkspaceReader();
+        Model model = null;
+        if ( workspace instanceof MavenWorkspaceReader )
+        {
+            model = ( (MavenWorkspaceReader) workspace ).findModel( RepositoryUtils.toArtifact( artifact ) );
+        }
+
+        if ( model != null )
+        {
+            pomArtifact = artifact;
+            dependencies = model.getDependencies();
+            DependencyManagement dependencyManagement = model.getDependencyManagement();
+            managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
+        }
+        else if ( artifact instanceof ArtifactWithDependencies )
         {
             pomArtifact = artifact;
 
