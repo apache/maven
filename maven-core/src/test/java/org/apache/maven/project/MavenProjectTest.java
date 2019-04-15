@@ -185,7 +185,7 @@ public class MavenProjectTest
         projectToClone.setPomFile( new File( new File( f.getParentFile(), "target" ), "flattened.xml" ) );
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "POM file is preserved across clone", projectToClone.getFile(), clonedProject.getFile() );
-        assertEquals( "Base directory is preserved across clone", projectToClone.getBasedir(), clonedProject.getBasedir());
+        assertEquals( "Base directory is preserved across clone", projectToClone.getBasedir(), clonedProject.getBasedir() );
     }
 
     public void testUndefinedOutputDirectory()
