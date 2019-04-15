@@ -295,7 +295,7 @@ public interface ModelBuildingRequest
      * Sets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
      * project directory.
      *
-     * @param modelResolver The model resolver to use, may be {@code null}.
+     * @param modelResolver The model resolver to use, never {@code null}.
      * @return This request, never {@code null}.
      */
     ModelBuildingRequest setModelResolver( ModelResolver modelResolver );

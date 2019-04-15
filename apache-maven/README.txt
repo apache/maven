@@ -72,7 +72,7 @@
   Home Page:          https://maven.apache.org/
   Downloads:          https://maven.apache.org/download.html
   Release Notes:      https://maven.apache.org/docs/history.html
-  Mailing Lists:      https://maven.apache.org/mail-lists.html
+  Mailing Lists:      https://maven.apache.org/mailing-lists.html
   Source Code:        https://gitbox.apache.org/repos/asf/maven.git
   Issue Tracking:     https://issues.apache.org/jira/browse/MNG
   Wiki:               https://cwiki.apache.org/confluence/display/MAVEN/

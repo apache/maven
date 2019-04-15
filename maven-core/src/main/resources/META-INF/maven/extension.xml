@@ -120,6 +120,7 @@ under the License.
     <exportedPackage>org.slf4j.*</exportedPackage>
     <exportedPackage>org.slf4j.spi.*</exportedPackage>
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
+    <exportedPackage>org.slf4j.event.*</exportedPackage>
 
     <!-- JAnsi -->
     <exportedPackage>org.fusesource.jansi.*</exportedPackage>

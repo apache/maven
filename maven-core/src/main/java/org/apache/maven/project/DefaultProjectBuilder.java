@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
@@ -81,6 +82,9 @@ public class DefaultProjectBuilder
     implements ProjectBuilder
 {
 
+    public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
+            "maven.defaultProjectBuilder.disableGlobalModelCache";
+
     @Requirement
     private Logger logger;
 
@@ -115,14 +119,21 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null ) );
+        return build( pomFile, new FileModelSource( pomFile ),
+                new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
+    }
+
+    private boolean useGlobalModelCache()
+    {
+        return !Boolean.getBoolean( DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY );
     }
 
     @Override
     public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( null, modelSource, new InternalConfig( request, null ) );
+        return build( null, modelSource,
+                 new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -172,8 +183,8 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.<String, MavenProject>emptyMap(), result,
-                             new HashMap<File, Boolean>(), projectBuildingRequest );
+                initProject( project, Collections.<String, MavenProject>emptyMap(), true,
+                             result, new HashMap<File, Boolean>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -293,7 +304,7 @@ public class DefaultProjectBuilder
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
-        InternalConfig config = new InternalConfig( request, null );
+        InternalConfig config = new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null );
 
         boolean localProject;
 
@@ -355,7 +366,8 @@ public class DefaultProjectBuilder
 
         ReactorModelPool modelPool = new ReactorModelPool();
 
-        InternalConfig config = new InternalConfig( request, modelPool );
+        InternalConfig config = new InternalConfig( request, modelPool,
+                useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
 
         Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
@@ -418,6 +430,7 @@ public class DefaultProjectBuilder
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
         MavenProject project = new MavenProject();
+        project.setFile( pomFile );
 
         request.setPomFile( pomFile );
         request.setTwoPhaseBuilding( true );
@@ -427,106 +440,124 @@ public class DefaultProjectBuilder
             new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );
         request.setModelBuildingListener( listener );
 
+        ModelBuildingResult result;
         try
         {
-            ModelBuildingResult result = modelBuilder.build( request );
-
-            Model model = result.getEffectiveModel();
-
-            projectIndex.put( result.getModelIds().get( 0 ), project );
-
-            InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
-            interimResults.add( interimResult );
-
-            if ( recursive && !model.getModules().isEmpty() )
-            {
-                File basedir = pomFile.getParentFile();
-
-                List<File> moduleFiles = new ArrayList<>();
-
-                for ( String module : model.getModules() )
-                {
-                    if ( StringUtils.isEmpty( module ) )
-                    {
-                        continue;
-                    }
-
-                    module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
-
-                    File moduleFile = new File( basedir, module );
-
-                    if ( moduleFile.isDirectory() )
-                    {
-                        moduleFile = modelProcessor.locatePom( moduleFile );
-                    }
-
-                    if ( !moduleFile.isFile() )
-                    {
-                        ModelProblem problem =
-                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
-                                                     -1, null );
-                        result.getProblems().add( problem );
-
-                        noErrors = false;
-
-                        continue;
-                    }
-
-                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                    {
-                        // we don't canonicalize on unix to avoid interfering with symlinks
-                        try
-                        {
-                            moduleFile = moduleFile.getCanonicalFile();
-                        }
-                        catch ( IOException e )
-                        {
-                            moduleFile = moduleFile.getAbsoluteFile();
-                        }
-                    }
-                    else
-                    {
-                        moduleFile = new File( moduleFile.toURI().normalize() );
-                    }
-
-                    if ( aggregatorFiles.contains( moduleFile ) )
-                    {
-                        StringBuilder buffer = new StringBuilder( 256 );
-                        for ( File aggregatorFile : aggregatorFiles )
-                        {
-                            buffer.append( aggregatorFile ).append( " -> " );
-                        }
-                        buffer.append( moduleFile );
-
-                        ModelProblem problem =
-                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                     ModelProblem.Version.BASE, model, -1, -1, null );
-                        result.getProblems().add( problem );
-
-                        noErrors = false;
-
-                        continue;
-                    }
-
-                    moduleFiles.add( moduleFile );
-                }
-
-                interimResult.modules = new ArrayList<>();
-
-                if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                             recursive, config ) )
-                {
-                    noErrors = false;
-                }
-            }
+            result = modelBuilder.build( request );
         }
         catch ( ModelBuildingException e )
         {
-            results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
+            result = e.getResult();
+            if ( result == null || result.getEffectiveModel() == null )
+            {
+                 results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
+                 return false;
+            }
+            // validation error, continue project building and delay failing to help IDEs
+            // result.getProblems().addAll(e.getProblems()) ?
             noErrors = false;
+        }
+
+        Model model = result.getEffectiveModel();
+        try
+        {
+            // first pass: build without building parent.
+            initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
+        }
+        catch ( InvalidArtifactRTException iarte )
+        {
+            result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
+                  iarte ) );
+        }
+
+        projectIndex.put( result.getModelIds().get( 0 ), project );
+
+        InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
+        interimResults.add( interimResult );
+
+        if ( recursive && !model.getModules().isEmpty() )
+        {
+            File basedir = pomFile.getParentFile();
+
+            List<File> moduleFiles = new ArrayList<>();
+
+            for ( String module : model.getModules() )
+            {
+                if ( StringUtils.isEmpty( module ) )
+                {
+                    continue;
+                }
+
+                module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+
+                File moduleFile = new File( basedir, module );
+
+                if ( moduleFile.isDirectory() )
+                {
+                    moduleFile = modelProcessor.locatePom( moduleFile );
+                }
+
+                if ( !moduleFile.isFile() )
+                {
+                    ModelProblem problem =
+                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
+                                                 -1, null );
+                    result.getProblems().add( problem );
+
+                    noErrors = false;
+
+                    continue;
+                }
+
+                if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                {
+                    // we don't canonicalize on unix to avoid interfering with symlinks
+                    try
+                    {
+                        moduleFile = moduleFile.getCanonicalFile();
+                    }
+                    catch ( IOException e )
+                    {
+                        moduleFile = moduleFile.getAbsoluteFile();
+                    }
+                }
+                else
+                {
+                    moduleFile = new File( moduleFile.toURI().normalize() );
+                }
+
+                if ( aggregatorFiles.contains( moduleFile ) )
+                {
+                    StringBuilder buffer = new StringBuilder( 256 );
+                    for ( File aggregatorFile : aggregatorFiles )
+                    {
+                        buffer.append( aggregatorFile ).append( " -> " );
+                    }
+                    buffer.append( moduleFile );
+
+                    ModelProblem problem =
+                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                            + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
+                                                 ModelProblem.Version.BASE, model, -1, -1, null );
+                    result.getProblems().add( problem );
+
+                    noErrors = false;
+
+                    continue;
+                }
+
+                moduleFiles.add( moduleFile );
+            }
+
+            interimResult.modules = new ArrayList<>();
+
+            if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
+                         recursive, config ) )
+            {
+                noErrors = false;
+            }
         }
 
         return noErrors;
@@ -579,12 +610,21 @@ public class DefaultProjectBuilder
 
         for ( InterimResult interimResult : interimResults )
         {
+            MavenProject project = interimResult.listener.getProject();
             try
             {
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
-                MavenProject project = interimResult.listener.getProject();
-                initProject( project, projectIndex, result, profilesXmls, request );
+                // 2nd pass of initialization: resolve and build parent if necessary
+                try
+                {
+                    initProject( project, projectIndex, true, result, profilesXmls, request );
+                }
+                catch ( InvalidArtifactRTException iarte )
+                {
+                    result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
+                            result.getEffectiveModel(), -1, -1, iarte ) );
+                }
 
                 List<MavenProject> modules = new ArrayList<>();
                 noErrors =
@@ -606,8 +646,16 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
-                                                               e.getProblems() ) );
+                DefaultProjectBuildingResult result = null;
+                if ( project == null )
+                {
+                    result = new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() );
+                }
+                else
+                {
+                    result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
+                }
+                results.add( result );
 
                 noErrors = false;
             }
@@ -617,7 +665,8 @@ public class DefaultProjectBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void initProject( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
+    private void initProject( MavenProject project, Map<String, MavenProject> projects,
+                              boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
         Model model = result.getEffectiveModel();
@@ -626,78 +675,7 @@ public class DefaultProjectBuilder
         project.setOriginalModel( result.getRawModel() );
         project.setFile( model.getPomFile() );
 
-        Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
-                                ? result.getRawModel( result.getModelIds().get( 1 ) )
-                                : null;
-
-        if ( parentModel != null )
-        {
-            final String parentGroupId = inheritedGroupId( result, 1 );
-            final String parentVersion = inheritedVersion( result, 1 );
-
-            project.setParentArtifact( repositorySystem.createProjectArtifact( parentGroupId,
-                                                                               parentModel.getArtifactId(),
-                                                                               parentVersion ) );
-
-            // org.apache.maven.its.mng4834:parent:0.1
-            String parentModelId = result.getModelIds().get( 1 );
-            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
-            MavenProject parent = projects.get( parentModelId );
-            if ( parent == null )
-            {
-                //
-                // At this point the DefaultModelBuildingListener has fired and it populates the
-                // remote repositories with those found in the pom.xml, along with the existing externally
-                // defined repositories.
-                //
-                projectBuildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
-                if ( parentPomFile != null )
-                {
-                    project.setParentFile( parentPomFile );
-                    try
-                    {
-                        parent = build( parentPomFile, projectBuildingRequest ).getProject();
-                    }
-                    catch ( ProjectBuildingException e )
-                    {
-                        // MNG-4488 where let invalid parents slide on by
-                        if ( logger.isDebugEnabled() )
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId(), e );
-                        }
-                        else
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId() );
-                        }
-                    }
-                }
-                else
-                {
-                    Artifact parentArtifact = project.getParentArtifact();
-                    try
-                    {
-                        parent = build( parentArtifact, projectBuildingRequest ).getProject();
-                    }
-                    catch ( ProjectBuildingException e )
-                    {
-                        // MNG-4488 where let invalid parents slide on by
-                        if ( logger.isDebugEnabled() )
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId(), e );
-                        }
-                        else
-                        {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            logger.warn( "Failed to build parent project for " + project.getId() );
-                        }
-                    }
-                }
-            }
-            project.setParent( parent );
-        }
+        initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
 
         Artifact projectArtifact =
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
@@ -874,6 +852,83 @@ public class DefaultProjectBuilder
         }
     }
 
+    private void initParent( MavenProject project, Map<String, MavenProject> projects, boolean buildParentIfNotExisting,
+                             ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
+    {
+        Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
+                                ? result.getRawModel( result.getModelIds().get( 1 ) )
+                                : null;
+
+        if ( parentModel != null )
+        {
+            final String parentGroupId = inheritedGroupId( result, 1 );
+            final String parentVersion = inheritedVersion( result, 1 );
+
+            project.setParentArtifact( repositorySystem.createProjectArtifact( parentGroupId,
+                                                                               parentModel.getArtifactId(),
+                                                                               parentVersion ) );
+
+            // org.apache.maven.its.mng4834:parent:0.1
+            String parentModelId = result.getModelIds().get( 1 );
+            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
+            MavenProject parent = projects.get( parentModelId );
+            if ( parent == null && buildParentIfNotExisting )
+            {
+                //
+                // At this point the DefaultModelBuildingListener has fired and it populates the
+                // remote repositories with those found in the pom.xml, along with the existing externally
+                // defined repositories.
+                //
+                projectBuildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+                if ( parentPomFile != null )
+                {
+                    project.setParentFile( parentPomFile );
+                    try
+                    {
+                        parent = build( parentPomFile, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        if ( logger.isDebugEnabled() )
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId(), e );
+                        }
+                        else
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId() );
+                        }
+                    }
+                }
+                else
+                {
+                    Artifact parentArtifact = project.getParentArtifact();
+                    try
+                    {
+                        parent = build( parentArtifact, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        if ( logger.isDebugEnabled() )
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId(), e );
+                        }
+                        else
+                        {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            logger.warn( "Failed to build parent project for " + project.getId() );
+                        }
+                    }
+                }
+            }
+            project.setParent( parent );
+        }
+    }
+
     private static String inheritedGroupId( final ModelBuildingResult result, final int modelIndex )
     {
         String groupId = null;
@@ -951,11 +1006,11 @@ public class DefaultProjectBuilder
 
         private final ReactorModelCache modelCache;
 
-        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool )
+        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )
         {
             this.request = request;
             this.modelPool = modelPool;
-            this.modelCache = getModelCache();
+            this.modelCache = modelCache;
             session =
                 LegacyLocalRepositoryManager.overlay( request.getLocalRepository(), request.getRepositorySession(),
                                                       repoSystem );
