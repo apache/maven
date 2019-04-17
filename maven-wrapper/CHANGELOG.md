@@ -4,7 +4,7 @@ The [git commit history](https://github.com/takari/maven-wrapper/commits/master)
 is the detailed source of all changes. The following provides most information
 at an easier glance.
 
-## Version 0.5.5 or higher - Upcoming
+## Version 0.5.5 - 2019-04-16
 
 - Updated default URL to jar in MavenWrapperDownloader
   - fixes https://github.com/takari/maven-wrapper/issues/118
