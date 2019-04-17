@@ -9,7 +9,6 @@ at an easier glance.
 - Updated default URL to jar in MavenWrapperDownloader
   - fixes https://github.com/takari/maven-wrapper/issues/118
 - Update to Maven 3.6.1
-  - To be done when released
 
 ## Version 0.5.4 - 2019-03-26
 
