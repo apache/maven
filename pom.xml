@@ -548,6 +548,12 @@ under the License.
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+        <!-- TODO remove when upgrade to apache-22 parent pom -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
