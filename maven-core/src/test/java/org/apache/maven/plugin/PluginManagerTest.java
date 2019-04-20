@@ -214,28 +214,6 @@ public class PluginManagerTest
     public void testThatPluginDependencyThatHasSystemScopeIsResolved()
         throws Exception
     {
-        /*
-        File systemPath = new File( getBasedir(), "pom.xml" );
-
-        Plugin plugin = new PluginBuilder( "org.apache.maven", "project-test", "1.0" )
-            .addDependency( "org.apache.maven", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, systemPath.getAbsolutePath() )
-            .get();
-
-        MavenProject pluginProject = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
-            .addPlugin( plugin )
-            .addDependency( "junit", "junit", "3.8.1", Artifact.SCOPE_COMPILE )
-            .get();
-
-        // i'm making this artifact which is assumed to come from a pom in the metadata processor, then it tries to create a POM artifact
-        // and parse it for the dependencies and it blows up.
-        //
-        // we need to pass this through as is so it doesn't get parsed again.
-        Artifact pluginArtifact = new ProjectArtifact( pluginProject );
-
-        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );
-        System.out.println( artifacts );
-        */
-
         MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
         MavenProject project = session.getCurrentProject();
         Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
