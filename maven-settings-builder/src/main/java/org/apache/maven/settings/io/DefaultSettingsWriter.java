@@ -27,9 +27,11 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.WriterFactory;
 
 /**
@@ -37,7 +39,8 @@ import org.codehaus.plexus.util.WriterFactory;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsWriter.class )
+@Named
+@Singleton
 public class DefaultSettingsWriter
     implements SettingsWriter
 {

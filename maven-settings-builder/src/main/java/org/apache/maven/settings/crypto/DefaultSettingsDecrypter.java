@@ -22,13 +22,15 @@ package org.apache.maven.settings.crypto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
@@ -37,13 +39,18 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsDecrypter.class )
+@Named
+@Singleton
 public class DefaultSettingsDecrypter
     implements SettingsDecrypter
 {
+    private final SecDispatcher securityDispatcher;
 
-    @Requirement( hint = "maven" )
-    private SecDispatcher securityDispatcher;
+    @Inject
+    public DefaultSettingsDecrypter( @Named( "maven" ) SecDispatcher securityDispatcher )
+    {
+        this.securityDispatcher = securityDispatcher;
+    }
 
     @Override
     public SettingsDecryptionResult decrypt( SettingsDecryptionRequest request )

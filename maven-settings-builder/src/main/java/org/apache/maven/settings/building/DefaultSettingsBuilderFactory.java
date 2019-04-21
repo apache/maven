@@ -59,13 +59,8 @@ public class DefaultSettingsBuilderFactory
      */
     public DefaultSettingsBuilder newInstance()
     {
-        DefaultSettingsBuilder builder = new DefaultSettingsBuilder();
-
-        builder.setSettingsReader( newSettingsReader() );
-        builder.setSettingsWriter( newSettingsWriter() );
-        builder.setSettingsValidator( newSettingsValidator() );
-
-        return builder;
+        return new DefaultSettingsBuilder( newSettingsReader(),
+                newSettingsWriter(), newSettingsValidator() );
     }
 
 }

@@ -26,9 +26,11 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -37,7 +39,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsReader.class )
+@Named
+@Singleton
 public class DefaultSettingsReader
     implements SettingsReader
 {
