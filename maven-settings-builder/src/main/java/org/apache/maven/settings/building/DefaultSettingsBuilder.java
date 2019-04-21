@@ -27,6 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
 import org.apache.maven.settings.Settings;
@@ -36,8 +40,6 @@ import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
 import org.apache.maven.settings.validation.SettingsValidator;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
@@ -49,21 +51,29 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SettingsBuilder.class )
+@Named
+@Singleton
 public class DefaultSettingsBuilder
     implements SettingsBuilder
 {
 
-    @Requirement
     private SettingsReader settingsReader;
 
-    @Requirement
     private SettingsWriter settingsWriter;
 
-    @Requirement
     private SettingsValidator settingsValidator;
 
-    private MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
+    private final MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
+
+    @Inject
+    public DefaultSettingsBuilder( SettingsReader settingsReader,
+                                   SettingsWriter settingsWriter,
+                                   SettingsValidator settingsValidator )
+    {
+        this.settingsReader = settingsReader;
+        this.settingsWriter = settingsWriter;
+        this.settingsValidator = settingsValidator;
+    }
 
     public DefaultSettingsBuilder setSettingsReader( SettingsReader settingsReader )
     {
