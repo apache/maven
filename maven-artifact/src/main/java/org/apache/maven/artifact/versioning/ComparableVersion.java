@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * <p>
  * Generic implementation of version comparison.
@@ -609,12 +607,19 @@ public class ComparableVersion
 
     private static String stripLeadingZeroes( String buf )
     {
-        String strippedBuf = StringUtils.stripStart( buf, "0" );
-        if ( strippedBuf.isEmpty() )
+        if ( buf == null || buf.isEmpty() )
         {
             return "0";
         }
-        return strippedBuf;
+        for ( int i = 0; i < buf.length(); ++i )
+        {
+            char c = buf.charAt( i );
+            if ( c != '0' )
+            {
+                return buf.substring( i );
+            }
+        }
+        return buf;
     }
 
     @Override
