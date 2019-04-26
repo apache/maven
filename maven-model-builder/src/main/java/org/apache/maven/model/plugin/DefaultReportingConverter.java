@@ -240,7 +240,7 @@ public class DefaultReportingConverter
             int n = 0;
             for ( String report : reportSet.getReports() )
             {
-                addDom( reports, "report", report, location.getLocation( n++ ) );
+                addDom( reports, "report", report, ( location == null ) ? null : location.getLocation( n++ ) );
             }
             dom.addChild( reports );
         }
