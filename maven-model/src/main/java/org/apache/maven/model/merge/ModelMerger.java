@@ -1475,6 +1475,24 @@ public class ModelMerger
             merged.addAll( tgt );
             merged.addAll( src );
             target.setReports( merged );
+
+            InputLocation sourceLocation = source.getLocation( "reports" );
+            if ( sourceLocation != null )
+            {
+                InputLocation targetLocation = target.getLocation( "reports" );
+                if ( targetLocation == null )
+                {
+                    target.setLocation( "reports", sourceLocation );
+                }
+                else
+                {
+                    for ( int i = 0; i < src.size(); i++ )
+                    {
+                        targetLocation.setLocation( Integer.valueOf( tgt.size() + i ),
+                                                    sourceLocation.getLocation( Integer.valueOf( i ) ) );
+                    }
+                }
+            }
         }
     }
 
