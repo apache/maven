@@ -221,12 +221,14 @@ public class DefaultArtifactVersion
 
     private static Integer tryParseInt( String s )
     {
+        // for performance, check digits instead of relying later on catching NumberFormatException
+        if ( !isDigits( s ) )
+        {
+            return null;
+        }
+
         try
         {
-            if ( !isDigits( s ) )
-            {
-                return null;
-            }
             long longValue = Long.parseLong( s );
             if ( longValue > Integer.MAX_VALUE )
             {
@@ -236,6 +238,7 @@ public class DefaultArtifactVersion
         }
         catch ( NumberFormatException e )
         {
+            // should never happen since checked isDigits(s) before 
             return null;
         }
     }
