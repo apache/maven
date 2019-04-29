@@ -47,7 +47,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExclusionArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -55,7 +55,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -394,14 +393,7 @@ public class MavenMetadataSource
 
         if ( !dependency.getExclusions().isEmpty() )
         {
-            List<String> exclusions = new ArrayList<>();
-
-            for ( Exclusion e : dependency.getExclusions() )
-            {
-                exclusions.add( e.getGroupId() + ':' + e.getArtifactId() );
-            }
-
-            effectiveFilter = new ExcludesArtifactFilter( exclusions );
+            effectiveFilter = new ExclusionArtifactFilter( dependency.getExclusions() );
 
             if ( inheritedFilter != null )
             {
