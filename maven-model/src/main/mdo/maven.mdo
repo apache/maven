@@ -195,7 +195,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from project's url, append path or not? Note: While the type
+            When children inherit from project's url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br><b>Default value is</b>: <code>true</code>
@@ -1659,7 +1659,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from scm connection, append path or not? Note: While the type
+            When children inherit from scm connection, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br><b>Default value is</b>: <code>true</code>
@@ -1673,7 +1673,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from scm developer connection, append path or not? Note: While the type
+            When children inherit from scm developer connection, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br><b>Default value is</b>: <code>true</code>
@@ -1687,7 +1687,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from scm url, append path or not? Note: While the type
+            When children inherit from scm url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br><b>Default value is</b>: <code>true</code>
@@ -2067,7 +2067,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When childs inherit from distribution management site url, append path or not? Note: While the type
+            When children inherit from distribution management site url, append path or not? Note: While the type
             of this field is <code>String</code> for technical reasons, the semantic type is actually
             <code>Boolean</code>
             <br><b>Default value is</b>: <code>true</code>
