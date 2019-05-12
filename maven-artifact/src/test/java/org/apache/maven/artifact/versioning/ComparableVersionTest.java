@@ -135,6 +135,7 @@ public class ComparableVersionTest
 
         // aliases
         checkVersionsEqual( "1ga", "1" );
+        checkVersionsEqual( "1release", "1" );
         checkVersionsEqual( "1final", "1" );
         checkVersionsEqual( "1cr", "1rc" );
 
@@ -150,6 +151,9 @@ public class ComparableVersionTest
         checkVersionsEqual( "1M", "1m" );
         checkVersionsEqual( "1Ga", "1" );
         checkVersionsEqual( "1GA", "1" );
+        checkVersionsEqual( "1RELEASE", "1" );
+        checkVersionsEqual( "1release", "1" );
+        checkVersionsEqual( "1RELeaSE", "1" );
         checkVersionsEqual( "1Final", "1" );
         checkVersionsEqual( "1FinaL", "1" );
         checkVersionsEqual( "1FINAL", "1" );
@@ -229,7 +233,7 @@ public class ComparableVersionTest
 
     /**
      * Test all versions are equal when starting with many leading zeroes regardless of string length
-     * (related to MNG-6572 optimization) 
+     * (related to MNG-6572 optimization)
      */
     public void testVersionEqualWithLeadingZeroes()
     {
@@ -255,13 +259,13 @@ public class ComparableVersionTest
             "01",
             "1"
         };
-        
+
         checkVersionsArrayEqual( arr );
     }
 
     /**
      * Test all "0" versions are equal when starting with many leading zeroes regardless of string length
-     * (related to MNG-6572 optimization) 
+     * (related to MNG-6572 optimization)
      */
     public void testVersionZeroEqualWithLeadingZeroes()
     {
@@ -287,7 +291,7 @@ public class ComparableVersionTest
             "00",
             "0"
         };
-        
+
         checkVersionsArrayEqual( arr );
     }
 

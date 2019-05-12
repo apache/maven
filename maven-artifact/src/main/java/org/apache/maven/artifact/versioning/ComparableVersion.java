@@ -33,7 +33,7 @@ import java.util.Properties;
  * <p>
  * Generic implementation of version comparison.
  * </p>
- * 
+ *
  * Features:
  * <ul>
  * <li>mixing of '<code>-</code>' (hyphen) and '<code>.</code>' (dot) separators,</li>
@@ -361,6 +361,7 @@ public class ComparableVersion
         {
             ALIASES.put( "ga", "" );
             ALIASES.put( "final", "" );
+            ALIASES.put( "release", "" );
             ALIASES.put( "cr", "rc" );
         }
 
