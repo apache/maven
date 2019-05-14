@@ -19,6 +19,27 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -32,32 +53,31 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
+import org.apache.maven.xml.filter.ConsumerPomXMLFilter;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
+import org.eclipse.aether.transform.FileTransformer;
+import org.eclipse.aether.transform.FileTransformerManager;
+import org.eclipse.aether.transform.TransformException;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @since 3.3.0
@@ -238,9 +258,80 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
+        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+        {
+            session.setFileTransformerManager( newFileTransformerManager() );
+        }
         return session;
     }
 
+    private FileTransformerManager newFileTransformerManager()
+    {
+        return new FileTransformerManager()
+        {
+            @Override
+            public Collection<FileTransformer> getTransformersForArtifact( Artifact artifact )
+            {
+                Collection<FileTransformer> transformers = new ArrayList<>();
+                if ( "pom".equals( artifact.getExtension() ) )
+                {
+                    final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+                    transformers.add( new FileTransformer()
+                    {
+                        @Override
+                        public InputStream transformData( File file )
+                            throws IOException, TransformException
+                        {
+                            try
+                            {
+                                final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
+                                final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
+                                
+                                final SAXSource transformSource =
+                                                new SAXSource( new ConsumerPomXMLFilter(), 
+                                                               new InputSource( new FileReader( file ) ) );
+                                
+                                final StreamResult result = new StreamResult( pipedOutputStream );
+                                
+                                final Runnable runnable = new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try ( PipedOutputStream out = pipedOutputStream )
+                                        {
+                                            transformerFactory.newTransformer().transform( transformSource, result );
+                                        }
+                                        catch ( TransformerException | IOException e )
+                                        {
+                                            throw new RuntimeException( e );
+                                        }
+                                    }
+                                };
+
+                                new Thread( runnable ).start();
+
+                                return pipedInputStream;
+                            }
+                            catch ( SAXException | ParserConfigurationException  e )
+                            {
+                                throw new TransformException( e );
+                            }
+                        }
+
+                        @Override
+                        public Artifact transformArtifact( Artifact artifact )
+                        {
+                            return artifact;
+                        }
+                    } );
+                }
+                return Collections.unmodifiableCollection( transformers );
+            }
+        };
+    }
+    
     private String getUserAgent()
     {
         return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "
