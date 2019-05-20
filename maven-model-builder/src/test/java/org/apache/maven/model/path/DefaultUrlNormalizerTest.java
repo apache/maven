@@ -82,4 +82,8 @@ public class DefaultUrlNormalizerTest
                       normalize( "[fetch=]http://server.org/[push=]ssh://server.org/" ) );
     }
 
+    public void testNormalizeInputWithNoParentDirectoriesToAscendTo()
+    {
+        assertEquals("a/../", normalize("a/../"));
+    }
 }
