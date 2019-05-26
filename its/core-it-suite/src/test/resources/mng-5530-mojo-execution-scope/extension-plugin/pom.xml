@@ -51,6 +51,12 @@ under the License.
       <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.2</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>mng-5530-mojo-execution-scope</groupId>

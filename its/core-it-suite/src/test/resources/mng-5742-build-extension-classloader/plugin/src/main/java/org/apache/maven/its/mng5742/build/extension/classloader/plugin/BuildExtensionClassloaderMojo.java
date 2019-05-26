@@ -24,17 +24,18 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal test
- */
+@Mojo( name = "test" )
 public class BuildExtensionClassloaderMojo
     extends AbstractMojo
 {
-    /** @component */
+    @Component
     private BuildExtensionClassloaderComponent component;
 
-    /** @parameter default-value="${project.basedir}" */
+    @Parameter( defaultValue = "${project.basedir}", readonly = true )
     private File basedir;
 
     public void execute()

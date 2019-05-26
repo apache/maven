@@ -23,14 +23,14 @@ import org.apache.maven.its.mng5530.mojoexecutionscope.extension.TestMojoExecuti
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
 
-/**
- * @goal test-session-scope
- */
+@Mojo( name = "test-session-scope" )
 public class TestSessionScopeMojo
     extends AbstractMojo
 {
-    /** @component */
+    @Component
     private TestMojoExecutionScopedComponent component;
 
     public void execute()

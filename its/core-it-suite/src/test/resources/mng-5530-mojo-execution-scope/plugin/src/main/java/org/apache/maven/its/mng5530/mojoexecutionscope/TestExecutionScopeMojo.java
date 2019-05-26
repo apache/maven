@@ -22,14 +22,14 @@ package org.apache.maven.its.mng5530.mojoexecutionscope;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
 
-/**
- * @goal test-execution-scope
- */
+@Mojo( name = "test-execution-scope" )
 public class TestExecutionScopeMojo
     extends AbstractMojo
 {
-    /** @component */
+    @Component
     private TestExecutionScopedComponent executionScopedComponent;
 
     public void execute()

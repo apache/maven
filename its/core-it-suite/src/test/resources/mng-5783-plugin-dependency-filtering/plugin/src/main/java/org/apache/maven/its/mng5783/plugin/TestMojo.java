@@ -29,17 +29,17 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal test
- */
+@Mojo( name = "test" )
 public class TestMojo
     extends AbstractMojo
 {
-    /** @parameter property="project.build.directory" */
-    private File outputDirectory;
+    @Parameter( defaultValue = "${project.build.directory}", readonly = true )
+    private File target;
 
-    /** @parameter property="plugin.artifacts" */
+    @Parameter( defaultValue = "${plugin.artifacts}", readonly = true )
     private List<Artifact> artifacts;
 
     public void execute()
@@ -47,7 +47,7 @@ public class TestMojo
     {
         try
         {
-            File file = new File( outputDirectory, "dependencies.txt" );
+            File file = new File( target, "dependencies.txt" );
             file.getParentFile().mkdirs();
             BufferedWriter w = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
             try
