@@ -38,6 +38,14 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         }
 
         def WORK_DIR=pwd()
+        def MAVEN_GOAL='verify'
+
+        stage('Configure deploy') {
+           when {
+               branch 'master'
+           }
+           MAVEN_GOAL='deploy -DdeployAtEnd=true'
+        }
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
@@ -51,7 +59,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 invokerPublisher(),
                 pipelineGraphPublisher()
             ]) {
-                sh "mvn clean verify -B -U -e -fae -V -Dmaven.test.failure.ignore=true"
+                sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true"
             }
             dir ('apache-maven/target') {
                 sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
