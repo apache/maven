@@ -42,7 +42,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
 
         stage('Configure deploy') {
            if (env.BRANCH_NAME == 'master'){
-               MAVEN_GOAL='deploy -DdeployAtEnd=true'
+               MAVEN_GOAL='deploy'
            }
         }
 
