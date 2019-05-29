@@ -41,7 +41,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         def MAVEN_GOAL='verify'
 
         stage('Configure deploy') {
-           if (env.BRANCH=='master'){
+           if (env.BRANCH_NAME == 'master'){
                MAVEN_GOAL='deploy -DdeployAtEnd=true'
            }
         }
