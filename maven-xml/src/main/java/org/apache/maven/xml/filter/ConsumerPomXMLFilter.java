@@ -31,6 +31,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 /**
  * XML Filter to transform pom.xml to consumer pom.
  * This often means stripping of build-specific information.
+ * When extra information is required during filtering it is probably a member of the BuildPomXMLFilter
  * 
  * This filter is used at 2 locations:
  * - {@link org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory} when publishing pom files.
@@ -43,15 +44,29 @@ public class ConsumerPomXMLFilter extends XMLFilterImpl
 {
     private final XMLFilter rootFilter;
 
-    public ConsumerPomXMLFilter() throws SAXException, ParserConfigurationException
+    // only for testing purpose
+    ConsumerPomXMLFilter() throws SAXException, ParserConfigurationException
     {
         this( SAXParserFactory.newInstance().newSAXParser().getXMLReader() );
     }
-
-    public ConsumerPomXMLFilter( XMLReader parent )
+    
+    // only for testing purpose
+    ConsumerPomXMLFilter( XMLReader parent )
     {
-        rootFilter = new BuildPomXMLFilter( parent );
+        this.rootFilter = new XMLFilterImpl( parent );
         
+        applyFilters();
+    }
+    
+    public ConsumerPomXMLFilter( BuildPomXMLFilter buildPomXMLFilter )
+    {
+        this.rootFilter = buildPomXMLFilter;
+        
+        applyFilters();
+    }
+    
+    private void applyFilters()
+    {
         // Ensure that xs:any elements aren't touched by next filters
         XMLFilter filter = new FastForwardFilter( rootFilter );
         

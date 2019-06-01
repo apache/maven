@@ -1,4 +1,4 @@
-package org.apache.maven.xml.filter;
+package org.apache.maven.xml;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,20 @@ package org.apache.maven.xml.filter;
  * under the License.
  */
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLFilterImpl;
-
 /**
- * Filter to adjust pom on filesystem before being processed for effective pom.
+ * Utility class for SAXEvents
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
-public class BuildPomXMLFilter extends XMLFilterImpl
+public final class SAXEventUtils
 {
-    public BuildPomXMLFilter()
+    private SAXEventUtils()
     {
-        super();
     }
-
-    public BuildPomXMLFilter( XMLReader parent )
-    {
-        super( parent );
-    }
-
     
+    public static String renameQName( String oldQName, String newLocalName )
+    {
+        return oldQName.replaceFirst( "[^:]+$", newLocalName );
+    }
 }

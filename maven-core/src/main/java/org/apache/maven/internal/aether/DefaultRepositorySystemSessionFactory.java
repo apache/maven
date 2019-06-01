@@ -34,7 +34,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -77,7 +76,6 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * @since 3.3.0
@@ -283,41 +281,34 @@ public class DefaultRepositorySystemSessionFactory
                         public InputStream transformData( File file )
                             throws IOException, TransformException
                         {
-                            try
+                            final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
+                            final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
+                            
+                            final SAXSource transformSource =
+                                            new SAXSource( new ConsumerPomXMLFilter( null /* @TODO bass BuildPomXMLFilter */ ), 
+                                                           new InputSource( new FileReader( file ) ) );
+                            
+                            final StreamResult result = new StreamResult( pipedOutputStream );
+                            
+                            final Runnable runnable = new Runnable()
                             {
-                                final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
-                                final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
-                                
-                                final SAXSource transformSource =
-                                                new SAXSource( new ConsumerPomXMLFilter(), 
-                                                               new InputSource( new FileReader( file ) ) );
-                                
-                                final StreamResult result = new StreamResult( pipedOutputStream );
-                                
-                                final Runnable runnable = new Runnable()
+                                @Override
+                                public void run()
                                 {
-                                    @Override
-                                    public void run()
+                                    try ( PipedOutputStream out = pipedOutputStream )
                                     {
-                                        try ( PipedOutputStream out = pipedOutputStream )
-                                        {
-                                            transformerFactory.newTransformer().transform( transformSource, result );
-                                        }
-                                        catch ( TransformerException | IOException e )
-                                        {
-                                            throw new RuntimeException( e );
-                                        }
+                                        transformerFactory.newTransformer().transform( transformSource, result );
                                     }
-                                };
+                                    catch ( TransformerException | IOException e )
+                                    {
+                                        throw new RuntimeException( e );
+                                    }
+                                }
+                            };
 
-                                new Thread( runnable ).start();
+                            new Thread( runnable ).start();
 
-                                return pipedInputStream;
-                            }
-                            catch ( SAXException | ParserConfigurationException  e )
-                            {
-                                throw new TransformException( e );
-                            }
+                            return pipedInputStream;
                         }
 
                         @Override

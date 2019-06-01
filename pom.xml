@@ -92,6 +92,7 @@ under the License.
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
+    <module>maven-xml</module>
   </modules>
 
   <scm>
@@ -227,6 +228,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-xml</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -442,6 +448,27 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-bytecode-version</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <enforceBytecodeVersion>
+                    <excludes>
+                      <exclude>org.apache.maven:maven-xml</exclude> <!-- Java 8 compatible -->
+                    </excludes>
+                  </enforceBytecodeVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>

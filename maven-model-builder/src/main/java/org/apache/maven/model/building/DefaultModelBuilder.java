@@ -549,6 +549,7 @@ public class DefaultModelBuilder
 
             try
             {
+                // RFS adjust inputstream
                 model = modelProcessor.read( modelSource.getInputStream(), options );
             }
             catch ( ModelParseException e )
@@ -733,10 +734,22 @@ public class DefaultModelBuilder
     private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
-        for ( int i = lineage.size() - 2; i >= 0; i-- )
+        for ( int i = lineage.size() - 2; i >= 1; i-- )
         {
             Model parent = lineage.get( i + 1 ).getModel();
             Model child = lineage.get( i ).getModel();
+            inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
+        }
+        
+        // re-read model from file
+        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+        {
+            throw new UnsupportedOperationException();
+        }
+        else
+        {
+            Model parent = lineage.get( 1 ).getModel();
+            Model child = lineage.get( 0 ).getModel();
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
     }
