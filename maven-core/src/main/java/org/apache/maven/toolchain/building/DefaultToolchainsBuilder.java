@@ -23,7 +23,6 @@ import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
 import org.apache.maven.building.Source;
-import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.io.ToolchainsReader;
 import org.apache.maven.toolchain.io.ToolchainsWriter;
@@ -55,12 +54,19 @@ import java.util.Map;
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
-    private MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
+    private MavenToolchainMerger toolchainsMerger;
 
-    private ToolchainsWriter toolchainsWriter = new DefaultToolchainsWriter();
+    private ToolchainsWriter toolchainsWriter;
+
+    private ToolchainsReader toolchainsReader;
 
     @Inject
-    private ToolchainsReader toolchainsReader;
+    public DefaultToolchainsBuilder( ToolchainsWriter toolchainsWriter, ToolchainsReader toolchainsReader )
+    {
+        this.toolchainsMerger = new MavenToolchainMerger();
+        this.toolchainsWriter = toolchainsWriter;
+        this.toolchainsReader = toolchainsReader;
+    }
 
     @Override
     public ToolchainsBuildingResult build( ToolchainsBuildingRequest request )

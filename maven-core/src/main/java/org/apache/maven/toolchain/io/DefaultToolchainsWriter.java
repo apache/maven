@@ -21,8 +21,9 @@ package org.apache.maven.toolchain.io;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -34,7 +35,8 @@ import java.util.Objects;
  * @author Mike Mol
  * @author Martin Kanters
  */
-@Component( role = ToolchainsWriter.class )
+@Named
+@Singleton
 public class DefaultToolchainsWriter implements ToolchainsWriter
 {
 

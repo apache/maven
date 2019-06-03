@@ -21,7 +21,9 @@ package org.apache.maven.toolchain.building;
 
 import org.apache.maven.building.StringSource;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
+import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
+import org.apache.maven.toolchain.io.ToolchainsWriter;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
@@ -29,9 +31,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,16 +48,16 @@ public class DefaultToolchainsBuilderTest
 {
     private static final String LS = System.getProperty( "line.separator" );
 
-    @Spy
     private DefaultToolchainsReader toolchainsReader;
 
-    @InjectMocks
-    private DefaultToolchainsBuilder toolchainBuilder = new DefaultToolchainsBuilder();
+    private DefaultToolchainsBuilder toolchainBuilder;
 
     @Before
     public void onSetup()
     {
-        MockitoAnnotations.initMocks( this );
+        toolchainsReader = Mockito.spy( DefaultToolchainsReader.class );
+        ToolchainsWriter toolchainsWriter = new DefaultToolchainsWriter();
+        toolchainBuilder = new DefaultToolchainsBuilder( toolchainsWriter, toolchainsReader );
 
         Map<String, String> envVarMap = new HashMap<>();
         envVarMap.put("testKey", "testValue");
