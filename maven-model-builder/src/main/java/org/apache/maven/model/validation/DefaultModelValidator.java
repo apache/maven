@@ -19,16 +19,6 @@ package org.apache.maven.model.validation;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
@@ -57,6 +47,16 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -122,8 +122,7 @@ public class DefaultModelValidator
             // models without a version starting with 3.4.
             validateStringNotEmpty( "modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m );
 
-            validateEnum( "modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), null, m,
-                          "4.0.0" );
+            validateModelVersion( problems, m.getModelVersion(), m, "4.0.0" );
 
             validateStringNoExpression( "groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m );
             if ( parent == null )
@@ -1039,6 +1038,83 @@ public class DefaultModelValidator
                       "must be one of " + values + " but is '" + string + "'.", tracker );
 
         return false;
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private boolean validateModelVersion( ModelProblemCollector problems, String string, InputLocationTracker tracker,
+                                          String... validVersions )
+    {
+        if ( string == null || string.length() <= 0 )
+        {
+            return true;
+        }
+
+        List<String> values = Arrays.asList( validVersions );
+
+        if ( values.contains( string ) )
+        {
+            return true;
+        }
+
+        boolean newerThanAll = true;
+        boolean olderThanAll = true;
+        for ( String validValue : validVersions )
+        {
+            final int comparison = compareModelVersions( validValue, string );
+            newerThanAll = newerThanAll && comparison < 0;
+            olderThanAll = olderThanAll && comparison > 0;
+        }
+
+        if ( newerThanAll )
+        {
+            addViolation( problems, Severity.FATAL, Version.V20, "modelVersion", null,
+                          "of '" + string + "' is newer than the versions supported by this version of Maven: " + values
+                              + ". Building this project requires a newer version of Maven.", tracker );
+
+        }
+        else if ( olderThanAll )
+        {
+            // note this will not be hit for Maven 1.x project.xml as it is an incompatible schema
+            addViolation( problems, Severity.FATAL, Version.V20, "modelVersion", null,
+                          "of '" + string + "' is older than the versions supported by this version of Maven: " + values
+                              + ". Building this project requires an older version of Maven.", tracker );
+
+        }
+        else
+        {
+            addViolation( problems, Severity.ERROR, Version.V20, "modelVersion", null,
+                          "must be one of " + values + " but is '" + string + "'.", tracker );
+        }
+
+        return false;
+    }
+
+    /**
+     * Compares two model versions.
+     *
+     * @param first the first version.
+     * @param second the second version.
+     * @return negative if the first version is newer than the second version, zero if they are the same or positive if
+     * the second version is the newer.
+     */
+    private static int compareModelVersions( String first, String second )
+    {
+        // we use a dedicated comparator because we control our model version scheme.
+        String[] firstSegments = StringUtils.split( first, "." );
+        String[] secondSegments = StringUtils.split( second, "." );
+        for ( int i = 0; i < Math.min( firstSegments.length, secondSegments.length ); i++ )
+        {
+            int result = Long.valueOf( firstSegments[i] ).compareTo( Long.valueOf( secondSegments[i] ) );
+            if ( result != 0 )
+            {
+                return result;
+            }
+        }
+        if ( firstSegments.length == secondSegments.length )
+        {
+            return 0;
+        }
+        return firstSegments.length > secondSegments.length ? -1 : 1;
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )

@@ -19,14 +19,14 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
@@ -110,6 +110,66 @@ public class DefaultMavenProjectBuilderTest
         assertEquals( 2, project.getBuildPlugins().get( 0 ).getDependencies().size() );
         assertEquals( 2, project.getBuildPlugins().get( 0 ).getExecutions().size() );
         assertEquals( "first", project.getBuildPlugins().get( 0 ).getExecutions().get( 0 ).getId() );
+    }
+
+    public void testFutureModelVersion()
+        throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/future-model-version-pom.xml" );
+
+        try
+        {
+            getProject( f1 );
+            fail( "Expected to fail for future versions" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
+        }
+    }
+
+    public void testPastModelVersion()
+        throws Exception
+    {
+        // a Maven 1.x pom will not even
+        // update the resource if we stop supporting modelVersion 4.0.0
+        File f1 = getTestFile( "src/test/resources/projects/past-model-version-pom.xml" );
+
+        try
+        {
+            getProject( f1 );
+            fail( "Expected to fail for past versions" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            assertContains( "Building this project requires an older version of Maven", e.getMessage() );
+        }
+    }
+
+    public void testFutureSchemaModelVersion()
+        throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/future-schema-model-version-pom.xml" );
+
+        try
+        {
+            getProject( f1 );
+            fail( "Expected to fail for future versions" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
+        }
+    }
+
+    private void assertContains( String expected, String actual )
+    {
+        if ( actual == null || !actual.contains( expected ) )
+        {
+            fail( "Expected: a string containing " + expected + "\nActual: " + ( actual == null
+                ? "null"
+                : "'" + actual + "'" ) );
+        }
     }
 
     public void testBuildStubModelForMissingRemotePom()
