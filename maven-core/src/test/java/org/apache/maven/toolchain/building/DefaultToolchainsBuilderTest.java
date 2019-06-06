@@ -23,7 +23,6 @@ import org.apache.maven.building.StringSource;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
-import org.apache.maven.toolchain.io.ToolchainsWriter;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
@@ -31,7 +30,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,16 +49,19 @@ public class DefaultToolchainsBuilderTest
 {
     private static final String LS = System.getProperty( "line.separator" );
 
+    @Spy
     private DefaultToolchainsReader toolchainsReader;
 
+    @Spy
+    private DefaultToolchainsWriter toolchainsWriter;
+
+    @InjectMocks
     private DefaultToolchainsBuilder toolchainBuilder;
 
     @Before
     public void onSetup()
     {
-        toolchainsReader = Mockito.spy( DefaultToolchainsReader.class );
-        ToolchainsWriter toolchainsWriter = new DefaultToolchainsWriter();
-        toolchainBuilder = new DefaultToolchainsBuilder( toolchainsWriter, toolchainsReader );
+        MockitoAnnotations.initMocks( this );
 
         Map<String, String> envVarMap = new HashMap<>();
         envVarMap.put("testKey", "testValue");
@@ -88,7 +92,7 @@ public class DefaultToolchainsBuilderTest
         toolchain.setType( "TYPE" );
         toolchain.addProvide( "key", "user_value" );
         userResult.addToolchain(  toolchain );
-        doReturn(userResult).doReturn(userResult).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
+        doReturn(userResult).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         assertNotNull( result.getEffectiveToolchains() );
