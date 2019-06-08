@@ -150,6 +150,12 @@ under the License.
     <contributor>
       <name>Fabiano Cipriano de Oliveira (MNG-6261)</name>
     </contributor>
+    <contributor>
+      <name>Mike Mol (MNG-6665)</name>
+    </contributor>
+    <contributor>
+      <name>Martin Kanters (MNG-6665)</name>
+    </contributor>
   </contributors>
 
   <!--bootstrap-start-comment-->

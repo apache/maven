@@ -19,24 +19,30 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
 import org.apache.maven.building.Source;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.io.ToolchainsReader;
+import org.apache.maven.toolchain.io.ToolchainsWriter;
 import org.apache.maven.toolchain.merge.MavenToolchainMerger;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.TrackableBase;
+import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -49,7 +55,10 @@ public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
     private MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
-    
+
+    @Inject
+    private ToolchainsWriter toolchainsWriter;
+
     @Inject
     private ToolchainsReader toolchainsReader;
 
@@ -66,14 +75,84 @@ public class DefaultToolchainsBuilder
         toolchainsMerger.merge( userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL );
         
         problems.setSource( "" );
-        
+
+        userToolchains = interpolate( userToolchains, problems );
+
         if ( hasErrors( problems.getProblems() ) )
         {
             throw new ToolchainsBuildingException( problems.getProblems() );
         }
-        
-        
+
+
         return new DefaultToolchainsBuildingResult( userToolchains, problems.getProblems() );
+    }
+
+    private PersistedToolchains interpolate( PersistedToolchains toolchains, ProblemCollector problems )
+    {
+
+        StringWriter stringWriter = new StringWriter( 1024 * 4 );
+        try
+        {
+            toolchainsWriter.write( stringWriter, null, toolchains );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "Failed to serialize toolchains to memory", e );
+        }
+
+        String serializedToolchains = stringWriter.toString();
+
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        try
+        {
+            interpolator.addValueSource( new EnvarBasedValueSource() );
+        }
+        catch ( IOException e )
+        {
+            problems.add( Problem.Severity.WARNING, "Failed to use environment variables for interpolation: "
+                    + e.getMessage(), -1, -1, e );
+        }
+
+        interpolator.addPostProcessor( new InterpolationPostProcessor()
+        {
+            @Override
+            public Object execute( String expression, Object value )
+            {
+                if ( value != null )
+                {
+                    // we're going to parse this back in as XML so we need to escape XML markup
+                    value = value.toString().replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" );
+                    return value;
+                }
+                return null;
+            }
+        } );
+
+        try
+        {
+            serializedToolchains = interpolator.interpolate( serializedToolchains );
+        }
+        catch ( InterpolationException e )
+        {
+            problems.add( Problem.Severity.ERROR, "Failed to interpolate toolchains: " + e.getMessage(), -1, -1, e );
+            return toolchains;
+        }
+
+        PersistedToolchains result;
+        try
+        {
+            Map<String, ?> options = Collections.singletonMap( ToolchainsReader.IS_STRICT, Boolean.FALSE );
+
+            result = toolchainsReader.read( new StringReader( serializedToolchains ), options );
+        }
+        catch ( IOException e )
+        {
+            problems.add( Problem.Severity.ERROR, "Failed to interpolate toolchains: " + e.getMessage(), -1, -1, e );
+            return toolchains;
+        }
+
+        return result;
     }
 
     private PersistedToolchains readToolchains( Source toolchainsSource, ToolchainsBuildingRequest request,
