@@ -19,7 +19,6 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
-import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
@@ -217,10 +216,6 @@ public class StringSearchModelInterpolator
             private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
             {
                 if ( Map.class.equals( fieldType ) && "locations".equals( field.getName() ) )
-                {
-                    return false;
-                }
-                if ( InputLocation.class.equals( fieldType ) )
                 {
                     return false;
                 }
