@@ -35,7 +35,6 @@ import org.eclipse.aether.impl.MetadataResolver;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.SyncContextFactory;
 import org.eclipse.aether.impl.VersionResolver;
-import org.eclipse.aether.internal.impl.CacheUtils;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.ArtifactRepository;
@@ -154,7 +153,7 @@ public class DefaultVersionResolver
                 Record record = (Record) obj;
                 result.setVersion( record.version );
                 result.setRepository(
-                    CacheUtils.getRepository( session, request.getRepositories(), record.repoClass, record.repoId ) );
+                    getRepository( session, request.getRepositories(), record.repoClass, record.repoId ) );
                 return result;
             }
         }
@@ -429,6 +428,34 @@ public class DefaultVersionResolver
         return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
     }
 
+    private ArtifactRepository getRepository( RepositorySystemSession session,
+                                              List<RemoteRepository> repositories, Class<?> repoClass,
+                                              String repoId )
+    {
+        if ( repoClass != null )
+        {
+            if ( WorkspaceRepository.class.isAssignableFrom( repoClass ) )
+            {
+                return session.getWorkspaceReader().getRepository();
+            }
+            else if ( LocalRepository.class.isAssignableFrom( repoClass ) )
+            {
+                return session.getLocalRepository();
+            }
+            else
+            {
+                for ( RemoteRepository repository : repositories )
+                {
+                    if ( repoId.equals( repository.getId() ) )
+                    {
+                        return repository;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private boolean isSafelyCacheable( RepositorySystemSession session, Artifact artifact )
     {
         /*
@@ -502,7 +529,8 @@ public class DefaultVersionResolver
             extension = artifact.getExtension();
             version = artifact.getVersion();
             localRepo = session.getLocalRepository().getBasedir();
-            workspace = CacheUtils.getWorkspace( session );
+            WorkspaceReader reader = session.getWorkspaceReader();
+            workspace = ( reader != null ) ? reader.getRepository() : null;
             repositories = new ArrayList<>( request.getRepositories().size() );
             boolean repoMan = false;
             for ( RemoteRepository repository : request.getRepositories() )
@@ -526,7 +554,7 @@ public class DefaultVersionResolver
             hash = hash * 31 + extension.hashCode();
             hash = hash * 31 + version.hashCode();
             hash = hash * 31 + localRepo.hashCode();
-            hash = hash * 31 + CacheUtils.repositoriesHashCode( repositories );
+            hash = hash * 31 + repositories.hashCode();
             hashCode = hash;
         }
 
@@ -546,8 +574,7 @@ public class DefaultVersionResolver
             return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId ) && classifier.equals(
                 that.classifier ) && extension.equals( that.extension ) && version.equals( that.version )
                 && context.equals( that.context ) && localRepo.equals( that.localRepo )
-                && CacheUtils.eq( workspace, that.workspace )
-                && CacheUtils.repositoriesEquals( repositories, that.repositories );
+                && Objects.equals( workspace, that.workspace ) && repositories.equals( that.repositories );
         }
 
         @Override
