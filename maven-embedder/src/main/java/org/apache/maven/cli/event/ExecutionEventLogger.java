@@ -115,7 +115,8 @@ public class ExecutionEventLogger
             for ( MavenProject project : projects )
             {
                 int len = LINE_LENGTH - project.getName().length() - project.getPackaging().length() - 2;
-                logger.info( "{}{}[{}]", project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging());
+                logger.info( "{}{}[{}]",
+                        project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging() );
             }
 
             totalProjects = projects.size();

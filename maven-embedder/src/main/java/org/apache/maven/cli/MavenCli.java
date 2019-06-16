@@ -1257,7 +1257,7 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
-        slf4jLogger.debug("Reading global toolchains from {}",
+        slf4jLogger.debug( "Reading global toolchains from {}",
                 getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
         slf4jLogger.debug( "Reading user toolchains from {}",
                 getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
