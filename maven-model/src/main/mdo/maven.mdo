@@ -1022,17 +1022,10 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The type of dependency. While it
-            usually represents the extension on the filename of the dependency,
-            that is not always the case. A type can be mapped to a different
-            extension and a classifier.
-            The type often corresponds to the packaging used, though this is also
-            not always the case.
+            The type of dependency, that will be mapped to a file extension, an optional classifier, and a few other attributes.
             Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code>
             and <code>test-jar</code>: see <a href="../maven-core/artifact-handlers.html">default
-            artifact handlers</a> for a list.
-            New types can be defined by plugins that set
-            <code>extensions</code> to <code>true</code>, so this is not a complete list.
+            artifact handlers</a> for a list. New types can be defined by extensions, so this is not a complete list.
             ]]>
           </description>
           <type>String</type>
