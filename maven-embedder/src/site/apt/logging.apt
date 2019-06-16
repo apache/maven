@@ -64,14 +64,14 @@ Maven Logging
 
 * Getting Logger Instance
 
- Plexus Logger and LoggerManager can be injected into component using JSR 300 annotations
+ Plexus Logger and LoggerManager can be injected into component using JSR 330 annotations
 
 +------+
-import org.codehaus.plexus.logging.Logger;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.codehaus.plexus.logging.Logger;
 
 @Named
 @Singleton
