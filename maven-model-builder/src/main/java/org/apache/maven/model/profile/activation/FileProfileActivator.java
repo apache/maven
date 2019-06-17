@@ -21,6 +21,10 @@ package org.apache.maven.model.profile.activation;
 
 import java.io.File;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
@@ -30,8 +34,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
@@ -49,12 +51,13 @@ import org.codehaus.plexus.util.StringUtils;
  * @see ActivationFile
  * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
  */
-@Component( role = ProfileActivator.class, hint = "file" )
+@Named( "file" )
+@Singleton
 public class FileProfileActivator
     implements ProfileActivator
 {
 
-    @Requirement
+    @Inject
     private PathTranslator pathTranslator;
 
     public FileProfileActivator setPathTranslator( PathTranslator pathTranslator )

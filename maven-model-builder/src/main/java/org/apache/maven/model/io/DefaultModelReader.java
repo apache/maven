@@ -27,11 +27,13 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -41,7 +43,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ModelReader.class )
+@Named
+@Singleton
 public class DefaultModelReader
     implements ModelReader
 {

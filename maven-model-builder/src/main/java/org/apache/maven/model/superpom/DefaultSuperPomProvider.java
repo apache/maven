@@ -24,18 +24,21 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = SuperPomProvider.class )
+@Named
+@Singleton
 public class DefaultSuperPomProvider
     implements SuperPomProvider
 {
@@ -45,7 +48,7 @@ public class DefaultSuperPomProvider
      */
     private Model superModel;
 
-    @Requirement
+    @Inject
     private ModelProcessor modelProcessor;
 
     public DefaultSuperPomProvider setModelProcessor( ModelProcessor modelProcessor )

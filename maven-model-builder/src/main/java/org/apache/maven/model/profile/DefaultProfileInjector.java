@@ -25,6 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
@@ -39,14 +42,14 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles profile injection into the model.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ProfileInjector.class )
+@Named
+@Singleton
 @SuppressWarnings( { "checkstyle:methodname" } )
 public class DefaultProfileInjector
     implements ProfileInjector

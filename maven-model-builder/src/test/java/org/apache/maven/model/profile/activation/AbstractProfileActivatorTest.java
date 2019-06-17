@@ -23,12 +23,13 @@ import java.util.Objects;
 
 import java.util.Properties;
 
+import javax.inject.Named;
+
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
@@ -49,7 +50,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     {
         this.activatorClass = Objects.requireNonNull( activatorClass, "activatorClass cannot be null" );;
 
-        roleHint = activatorClass.getAnnotation( Component.class ).hint();
+        roleHint = activatorClass.getAnnotation( Named.class ).value();
     }
 
     @Override

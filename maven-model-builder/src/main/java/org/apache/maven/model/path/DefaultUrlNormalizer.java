@@ -19,14 +19,16 @@ package org.apache.maven.model.path;
  * under the License.
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Normalizes a URL.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = UrlNormalizer.class )
+@Named
+@Singleton
 public class DefaultUrlNormalizer
     implements UrlNormalizer
 {

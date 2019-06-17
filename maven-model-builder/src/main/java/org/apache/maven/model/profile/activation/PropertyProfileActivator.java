@@ -19,6 +19,9 @@ package org.apache.maven.model.profile.activation;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
@@ -27,7 +30,6 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -36,7 +38,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Benjamin Bentmann
  * @see ActivationProperty
  */
-@Component( role = ProfileActivator.class, hint = "property" )
+@Named( "property" )
+@Singleton
 public class PropertyProfileActivator
     implements ProfileActivator
 {

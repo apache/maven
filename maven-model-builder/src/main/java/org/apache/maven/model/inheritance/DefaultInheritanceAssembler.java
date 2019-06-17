@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
@@ -36,7 +39,6 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -45,7 +47,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Benjamin Bentmann
  */
 @SuppressWarnings( { "checkstyle:methodname" } )
-@Component( role = InheritanceAssembler.class )
+@Named
+@Singleton
 public class DefaultInheritanceAssembler
     implements InheritanceAssembler
 {
