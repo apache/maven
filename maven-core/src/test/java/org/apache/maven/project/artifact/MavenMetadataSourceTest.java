@@ -21,7 +21,9 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {

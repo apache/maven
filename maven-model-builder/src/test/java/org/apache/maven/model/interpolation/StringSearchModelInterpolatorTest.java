@@ -48,7 +48,7 @@ public class StringSearchModelInterpolatorTest
         throws Exception
     {
         super.setUp();
-        interpolator = lookup( ModelInterpolator.class );
+        interpolator = new StringSearchModelInterpolator();
     }
 
 

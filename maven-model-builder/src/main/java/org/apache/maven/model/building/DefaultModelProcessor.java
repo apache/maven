@@ -25,24 +25,29 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.eclipse.sisu.Typed;
 
 /**
  * DefaultModelProcessor
  */
-@Component( role = ModelProcessor.class )
+@Named
+@Singleton
+@Typed( ModelProcessor.class )
 public class DefaultModelProcessor
     implements ModelProcessor
 {
 
-    @Requirement
+    @Inject
     private ModelLocator locator;
 
-    @Requirement
+    @Inject
     private ModelReader reader;
 
     public DefaultModelProcessor setModelLocator( ModelLocator locator )

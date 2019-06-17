@@ -25,6 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -34,7 +37,6 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles injection of plugin management into the model.
@@ -42,7 +44,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author Benjamin Bentmann
  */
 @SuppressWarnings( { "checkstyle:methodname" } )
-@Component( role = PluginManagementInjector.class )
+@Named
+@Singleton
 public class DefaultPluginManagementInjector
     implements PluginManagementInjector
 {

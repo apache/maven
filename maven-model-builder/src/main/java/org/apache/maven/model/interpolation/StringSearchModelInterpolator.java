@@ -26,7 +26,6 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -45,10 +44,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * StringSearchModelInterpolator
  */
-@Component( role = ModelInterpolator.class )
+@Named
+@Singleton
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {

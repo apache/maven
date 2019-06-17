@@ -28,15 +28,16 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+
+import junit.framework.TestCase;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
  * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
 public class CLIManagerDocumentationTest
-    extends PlexusTestCase
+    extends TestCase
 {
     private final static String LS = System.getProperty( "line.separator" );
 
@@ -100,7 +101,7 @@ public class CLIManagerDocumentationTest
     public void testOptionsAsHtml()
         throws IOException
     {
-        File options = getTestFile( "target/test-classes/options.html" );
+        File options = new File( "target/test-classes/options.html" );
         FileUtils.fileWrite( options, "UTF-8", getOptionsAsHtml() );
     }
 

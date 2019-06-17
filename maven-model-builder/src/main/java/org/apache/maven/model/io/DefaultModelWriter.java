@@ -27,9 +27,11 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.WriterFactory;
 
 /**
@@ -37,7 +39,8 @@ import org.codehaus.plexus.util.WriterFactory;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ModelWriter.class )
+@Named
+@Singleton
 public class DefaultModelWriter
     implements ModelWriter
 {

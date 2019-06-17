@@ -30,7 +30,8 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
-import org.codehaus.plexus.PlexusTestCase;
+
+import junit.framework.TestCase;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -45,7 +46,7 @@ import java.util.TimeZone;
  * @author jdcasey
  */
 public abstract class AbstractModelInterpolatorTest
-    extends PlexusTestCase
+    extends TestCase
 {
     private Properties context;
 
