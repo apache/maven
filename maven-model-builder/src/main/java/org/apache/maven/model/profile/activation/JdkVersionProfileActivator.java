@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -30,7 +33,6 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Determines profile activation based on the version of the current Java runtime.
@@ -38,7 +40,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author Benjamin Bentmann
  * @see Activation#getJdk()
  */
-@Component( role = ProfileActivator.class, hint = "jdk-version" )
+@Named( "jdk-version" )
+@Singleton
 public class JdkVersionProfileActivator
     implements ProfileActivator
 {

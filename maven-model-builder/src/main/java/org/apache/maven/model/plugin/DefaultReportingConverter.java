@@ -19,6 +19,9 @@ package org.apache.maven.model.plugin;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
@@ -33,7 +36,6 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -43,7 +45,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ReportingConverter.class )
+@Named
+@Singleton
 public class DefaultReportingConverter
     implements ReportingConverter
 {

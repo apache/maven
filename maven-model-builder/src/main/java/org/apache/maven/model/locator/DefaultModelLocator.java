@@ -21,14 +21,16 @@ package org.apache.maven.model.locator;
 
 import java.io.File;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Locates a POM file within a project base directory.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ModelLocator.class )
+@Named
+@Singleton
 public class DefaultModelLocator
     implements ModelLocator
 {

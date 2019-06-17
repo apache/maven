@@ -19,12 +19,14 @@ package org.apache.maven.model.profile.activation;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.Os;
 
 /**
@@ -33,7 +35,8 @@ import org.codehaus.plexus.util.Os;
  * @author Benjamin Bentmann
  * @see ActivationOS
  */
-@Component( role = ProfileActivator.class, hint = "os" )
+@Named( "os" )
+@Singleton
 public class OperatingSystemProfileActivator
     implements ProfileActivator
 {

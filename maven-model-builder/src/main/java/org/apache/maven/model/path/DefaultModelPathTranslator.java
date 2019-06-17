@@ -23,25 +23,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Resolves relative paths within a model against a specific base directory.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ModelPathTranslator.class )
+@Named
+@Singleton
 public class DefaultModelPathTranslator
     implements ModelPathTranslator
 {
 
-    @Requirement
+    @Inject
     private PathTranslator pathTranslator;
 
     public DefaultModelPathTranslator setPathTranslator( PathTranslator pathTranslator )
