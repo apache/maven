@@ -21,11 +21,14 @@ package org.apache.maven.model.inheritance;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.io.DefaultModelReader;
+import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
-import org.codehaus.plexus.PlexusTestCase;
 
 import org.xmlunit.matchers.CompareMatcher;
+
+import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +39,7 @@ import static org.junit.Assert.assertThat;
  * @author Hervé Boutemy
  */
 public class DefaultInheritanceAssemblerTest
-    extends PlexusTestCase
+    extends TestCase
 {
     private ModelReader reader;
 
@@ -50,14 +53,14 @@ public class DefaultInheritanceAssemblerTest
     {
         super.setUp();
 
-        reader = lookup( ModelReader.class );
-        writer = lookup( ModelWriter.class );
-        assembler = lookup( InheritanceAssembler.class );
+        reader = new DefaultModelReader();
+        writer = new DefaultModelWriter();
+        assembler = new DefaultInheritanceAssembler();
     }
 
     private File getPom( String name )
     {
-        return getTestFile( "src/test/resources/poms/inheritance/" + name + ".xml" );
+        return new File( "src/test/resources/poms/inheritance/" + name + ".xml" );
     }
 
     private Model getModel( String name )
@@ -201,7 +204,7 @@ public class DefaultInheritanceAssemblerTest
         assembler.assembleModelInheritance( child, parent, null, problems );
 
         // write baseName + "-actual"
-        File actual = getTestFile( "target/test-classes/poms/inheritance/" + baseName
+        File actual = new File( "target/test-classes/poms/inheritance/" + baseName
             + ( fromRepo ? "-build" : "-repo" ) + "-actual.xml" );
         writer.write( actual, null, child );
 
@@ -222,7 +225,7 @@ public class DefaultInheritanceAssemblerTest
 
         assembler.assembleModelInheritance( child, parent, null, problems );
 
-        File actual = getTestFile( "target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml" );
+        File actual = new File( "target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml" );
 
         writer.write( actual, null, child );
 

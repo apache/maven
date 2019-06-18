@@ -27,13 +27,14 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.PlexusTestCase;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public class DefaultModelValidatorTest
-    extends PlexusTestCase
+    extends TestCase
 {
 
     private ModelValidator validator;
@@ -94,7 +95,7 @@ public class DefaultModelValidatorTest
     {
         super.setUp();
 
-        validator = lookup( ModelValidator.class );
+        validator = new DefaultModelValidator();
     }
 
     @Override
