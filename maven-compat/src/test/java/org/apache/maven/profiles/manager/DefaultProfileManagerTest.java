@@ -27,16 +27,20 @@ import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
 
-    public void setUp()
-        throws Exception
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        super.setUp();
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     public void testShouldActivateDefaultProfile()

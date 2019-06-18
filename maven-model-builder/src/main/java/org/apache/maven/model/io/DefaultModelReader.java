@@ -37,6 +37,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.sisu.Typed;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
@@ -45,6 +46,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 @Named
 @Singleton
+@Typed( ModelReader.class )
 public class DefaultModelReader
     implements ModelReader
 {
