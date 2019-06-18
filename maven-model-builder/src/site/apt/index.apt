@@ -184,6 +184,8 @@ Maven Model Builder
 *----+------+------+
 | <<<maven.build.version>>> | The full build version of the current Maven execution <(since 3.0.4)>. For example, "<<<Apache Maven 3.2.2 (r01de14724cdef164cd33c7c8c2fe155faf9602da; 2013-02-19T14:51:28+01:00)>>>". | <<<$\{maven.build.version\}>>> |
 *----+------+------+
+| <<<maven.repo.local>>> | The repository on the local machine Maven shall use to store installed and downloaded artifacts (POMs, JARs, etc). | <<<$\{user.home\}/.m2/repository>>> |
+*----+------+------+
 | <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
  | | <<<$\{java.home\}>>> |
 *----+------+------+
