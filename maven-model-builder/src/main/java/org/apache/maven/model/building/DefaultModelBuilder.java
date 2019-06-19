@@ -59,10 +59,9 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.eclipse.sisu.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,65 +75,71 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = ModelBuilder.class )
+@Named
+@Singleton
 public class DefaultModelBuilder
     implements ModelBuilder
 {
-    @Requirement
+    @Inject
     private ModelProcessor modelProcessor;
 
-    @Requirement
+    @Inject
     private ModelValidator modelValidator;
 
-    @Requirement
+    @Inject
     private ModelNormalizer modelNormalizer;
 
-    @Requirement
+    @Inject
     private ModelInterpolator modelInterpolator;
 
-    @Requirement
+    @Inject
     private ModelPathTranslator modelPathTranslator;
 
-    @Requirement
+    @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
 
-    @Requirement
+    @Inject
     private SuperPomProvider superPomProvider;
 
-    @Requirement
+    @Inject
     private InheritanceAssembler inheritanceAssembler;
 
-    @Requirement
+    @Inject
     private ProfileSelector profileSelector;
 
-    @Requirement
+    @Inject
     private ProfileInjector profileInjector;
 
-    @Requirement
+    @Inject
     private PluginManagementInjector pluginManagementInjector;
 
-    @Requirement
+    @Inject
     private DependencyManagementInjector dependencyManagementInjector;
 
-    @Requirement
+    @Inject
     private DependencyManagementImporter dependencyManagementImporter;
 
-    @Requirement( optional = true )
+    @Inject
+    @Nullable
     private LifecycleBindingsInjector lifecycleBindingsInjector;
 
-    @Requirement
+    @Inject
     private PluginConfigurationExpander pluginConfigurationExpander;
 
-    @Requirement
+    @Inject
     private ReportConfigurationExpander reportConfigurationExpander;
 
-    @Requirement
+    @Inject
     private ReportingConverter reportingConverter;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
