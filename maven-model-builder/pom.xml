@@ -64,6 +64,10 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <scope>test</scope>
     </dependency>
