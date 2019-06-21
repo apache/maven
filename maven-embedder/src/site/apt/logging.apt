@@ -64,31 +64,8 @@ Maven Logging
 
 * Getting Logger Instance
 
- Plexus Logger and LoggerManager can be injected into component using JSR 330 annotations
-
-+------+
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.codehaus.plexus.logging.Logger;
-
-@Named
-@Singleton
-public class DefaultMyComponent
-    implements MyComponent
-{
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private LoggerManager loggerManager;
-}
-+------+
-
- Starting with Maven 3.1.0, SLF4J Logger can be used directly too, without Plexus. Of course, this will only work when run under
- Maven 3.1.0, then this technique can be used safely only in Maven core components or in plugins/component not requiring
- compatibility with previous Maven versions.
+ Starting with Maven 3.1.0, SLF4J Logger can be used directly. This technique can be used safely in Maven core
+ components or in plugins/component not requiring compatibility with previous Maven versions.
 
 +-----+
 import org.slf4j.Logger;
