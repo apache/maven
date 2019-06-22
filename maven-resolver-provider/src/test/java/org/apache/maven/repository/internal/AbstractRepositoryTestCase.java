@@ -44,7 +44,7 @@ public abstract class AbstractRepositoryTestCase
     {
         super.customizeContainerConfiguration( containerConfiguration );
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     @Override

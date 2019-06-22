@@ -60,7 +60,7 @@ public class PomConstructionWithSettingsTest
     {
         super.customizeContainerConfiguration( containerConfiguration );
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     protected void setUp()
