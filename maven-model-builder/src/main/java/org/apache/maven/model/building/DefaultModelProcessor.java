@@ -32,12 +32,14 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
+import org.eclipse.sisu.Typed;
 
 /**
  * DefaultModelProcessor
  */
 @Named
 @Singleton
+@Typed(ModelProcessor.class)
 public class DefaultModelProcessor
     implements ModelProcessor
 {
