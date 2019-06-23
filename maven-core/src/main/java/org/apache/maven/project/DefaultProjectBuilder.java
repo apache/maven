@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -62,8 +66,6 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -79,7 +81,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
 /**
  * DefaultProjectBuilder
  */
-@Component( role = ProjectBuilder.class )
+@Named
+@Singleton
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
@@ -87,28 +90,28 @@ public class DefaultProjectBuilder
     public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
             "maven.defaultProjectBuilder.disableGlobalModelCache";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private ModelBuilder modelBuilder;
 
-    @Requirement
+    @Inject
     private ModelProcessor modelProcessor;
 
-    @Requirement
+    @Inject
     private ProjectBuildingHelper projectBuildingHelper;
 
-    @Requirement
+    @Inject
     private MavenRepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private org.eclipse.aether.RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private RemoteRepositoryManager repositoryManager;
 
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver dependencyResolver;
 
     private final ReactorModelCache modelCache = new ReactorModelCache();

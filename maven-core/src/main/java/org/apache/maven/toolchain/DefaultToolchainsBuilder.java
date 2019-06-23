@@ -21,25 +21,28 @@ package org.apache.maven.toolchain;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import java.io.File;
 import java.io.Reader;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * @author Benjamin Bentmann
  * @deprecated instead use {@link org.apache.maven.toolchain.building.DefaultToolchainsBuilder}
  */
 @Deprecated
-@Component( role = ToolchainsBuilder.class, hint = "default" )
+@Named( "default" )
+@Singleton
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     public PersistedToolchains build( File userToolchainsFile )

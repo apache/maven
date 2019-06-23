@@ -22,6 +22,10 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -30,8 +34,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -39,19 +41,16 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (Extract class)
  */
-@Component( role = LifecyclePluginResolver.class )
+@Named
+@Singleton
 public class LifecyclePluginResolver
 {
-    @Requirement
-    private PluginVersionResolver pluginVersionResolver;
+    private final PluginVersionResolver pluginVersionResolver;
 
+    @Inject
     public LifecyclePluginResolver( PluginVersionResolver pluginVersionResolver )
     {
         this.pluginVersionResolver = pluginVersionResolver;
-    }
-
-    public LifecyclePluginResolver()
-    {
     }
 
     public void resolveMissingPluginVersions( MavenProject project, MavenSession session )

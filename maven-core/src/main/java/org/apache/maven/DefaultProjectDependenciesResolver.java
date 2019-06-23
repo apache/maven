@@ -26,6 +26,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -39,8 +43,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
@@ -48,15 +50,16 @@ import org.codehaus.plexus.component.annotations.Requirement;
  *
  */
 @Deprecated
-@Component( role = ProjectDependenciesResolver.class )
+@Named
+@Singleton
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
 
-    @Requirement
+    @Inject
     private RepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
 
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )

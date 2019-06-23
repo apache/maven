@@ -19,6 +19,14 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -31,13 +39,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * <p>
@@ -51,14 +53,15 @@ import java.util.List;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class)
  */
-@Component( role = LifecycleTaskSegmentCalculator.class )
+@Named
+@Singleton
 public class DefaultLifecycleTaskSegmentCalculator
     implements LifecycleTaskSegmentCalculator
 {
-    @Requirement
+    @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
 
-    @Requirement
+    @Inject
     private LifecyclePluginResolver lifecyclePluginResolver;
 
     public DefaultLifecycleTaskSegmentCalculator()

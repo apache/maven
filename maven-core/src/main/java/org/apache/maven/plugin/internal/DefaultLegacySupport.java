@@ -20,9 +20,12 @@ package org.apache.maven.plugin.internal;
  */
 
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
-import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -33,7 +36,8 @@ import org.eclipse.aether.RepositorySystemSession;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-@Component( role = LegacySupport.class )
+@Named
+@Singleton
 public class DefaultLegacySupport
     implements LegacySupport
 {

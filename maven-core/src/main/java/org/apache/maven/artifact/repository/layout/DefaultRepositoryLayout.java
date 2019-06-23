@@ -19,16 +19,19 @@ package org.apache.maven.artifact.repository.layout;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author jdcasey
  */
-@Component( role = ArtifactRepositoryLayout.class, hint = "default" )
+@Named( "default" )
+@Singleton
 public class DefaultRepositoryLayout
     implements ArtifactRepositoryLayout
 {
