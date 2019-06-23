@@ -19,6 +19,15 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -39,13 +48,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A facade that provides lifecycle services to components outside maven core.
@@ -56,27 +58,28 @@ import java.util.Set;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  */
-@Component( role = LifecycleExecutor.class )
+@Named
+@Singleton
 public class DefaultLifecycleExecutor
     implements LifecycleExecutor
 {
 
-    @Requirement
+    @Inject
     private LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
 
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
+    @Inject
     private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
 
-    @Requirement
+    @Inject
     private LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
 
-    @Requirement
+    @Inject
     private MojoExecutor mojoExecutor;
 
-    @Requirement
+    @Inject
     private LifecycleStarter lifecycleStarter;
 
 
@@ -85,7 +88,7 @@ public class DefaultLifecycleExecutor
         lifecycleStarter.execute( session );
     }
 
-    @Requirement
+    @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
 
     // These methods deal with construction intact Plugin object that look like they come from a standard

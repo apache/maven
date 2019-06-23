@@ -19,8 +19,6 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -33,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * @since 3.0
  * @author Jason van Zyl
@@ -40,17 +42,18 @@ import java.util.Set;
  */
 // TODO The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
 // wiring and reference and external source for the lifecycle configuration.
-@Component( role = DefaultLifecycles.class )
+@Named
+@Singleton
 public class DefaultLifecycles
 {
     public static final String[] STANDARD_LIFECYCLES = { "default", "clean", "site" };
 
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
-    @Requirement( role = Lifecycle.class )
+    @Inject
     private Map<String, Lifecycle> lifecycles;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     public DefaultLifecycles()

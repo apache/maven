@@ -21,6 +21,10 @@ package org.apache.maven.lifecycle.internal.builder.singlethreaded;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
@@ -29,20 +33,24 @@ import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.builder.Builder;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * <p>
  * A {@link Builder} encapsulates a strategy for building a set of Maven projects. The default strategy in Maven builds
  * the the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
  */
-@Component( role = Builder.class, hint = "singlethreaded" )
+@Named( "singlethreaded" )
+@Singleton
 public class SingleThreadedBuilder
     implements Builder
 {
-    @Requirement
-    private LifecycleModuleBuilder lifecycleModuleBuilder;
+    private final LifecycleModuleBuilder lifecycleModuleBuilder;
+
+    @Inject
+    public SingleThreadedBuilder( LifecycleModuleBuilder lifecycleModuleBuilder )
+    {
+        this.lifecycleModuleBuilder = lifecycleModuleBuilder;
+    }
 
     public void build( MavenSession session, ReactorContext reactorContext, ProjectBuildList projectBuilds,
                        List<TaskSegment> taskSegments, ReactorBuildStatus reactorBuildStatus )

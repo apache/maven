@@ -25,6 +25,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
@@ -35,7 +38,6 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /*
@@ -86,7 +88,8 @@ Plugins:
 /**
  * Transform an exception into useful end-user message.
  */
-@Component( role = ExceptionHandler.class )
+@Named
+@Singleton
 public class DefaultExceptionHandler
     implements ExceptionHandler
 {
