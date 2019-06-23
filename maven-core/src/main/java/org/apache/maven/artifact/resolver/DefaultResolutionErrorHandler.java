@@ -23,12 +23,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = ResolutionErrorHandler.class )
+@Named
+@Singleton
 public class DefaultResolutionErrorHandler
     implements ResolutionErrorHandler
 {

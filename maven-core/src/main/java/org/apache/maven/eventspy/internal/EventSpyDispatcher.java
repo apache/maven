@@ -22,10 +22,12 @@ package org.apache.maven.eventspy.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryListener;
 
@@ -33,16 +35,17 @@ import org.eclipse.aether.RepositoryListener;
  * Dispatches callbacks to all registered eventspies.
  * @since 3.0.2
  */
-@Component( role = EventSpyDispatcher.class )
+@Named
+@Singleton
 public class EventSpyDispatcher
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement( role = EventSpy.class )
     private List<EventSpy> eventSpies;
 
+    @Inject
     public void setEventSpies( List<EventSpy> eventSpies )
     {
         // make copy to get rid of needless overhead for dynamic lookups

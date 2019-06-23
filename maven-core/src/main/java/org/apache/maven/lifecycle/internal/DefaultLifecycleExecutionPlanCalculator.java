@@ -28,6 +28,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -53,8 +57,6 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -67,32 +69,34 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (Extract class)
  */
-@Component( role = LifecycleExecutionPlanCalculator.class )
+@Named
+@Singleton
 public class DefaultLifecycleExecutionPlanCalculator
     implements LifecycleExecutionPlanCalculator
 {
-    @Requirement
+    @Inject
     private PluginVersionResolver pluginVersionResolver;
 
-    @Requirement
+    @Inject
     private BuildPluginManager pluginManager;
 
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
+    @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
 
-    @Requirement
+    @Inject
     private LifecyclePluginResolver lifecyclePluginResolver;
 
-    @Requirement( hint = DefaultLifecycleMappingDelegate.HINT )
+    @Inject
+    @Named( DefaultLifecycleMappingDelegate.HINT )
     private LifecycleMappingDelegate standardDelegate;
 
-    @Requirement
+    @Inject
     private Map<String, LifecycleMappingDelegate> delegates;
 
-    @Requirement
+    @Inject
     private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
     @SuppressWarnings( { "UnusedDeclaration" } )

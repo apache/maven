@@ -22,26 +22,34 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.artifact.AttachedArtifact;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * DefaultMavenProjectHelper
  */
 @SuppressWarnings( "deprecation" )
-@Component( role = MavenProjectHelper.class )
+@Named
+@Singleton
 public class DefaultMavenProjectHelper
     extends AbstractLogEnabled
     implements MavenProjectHelper
 {
-    @Requirement
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final ArtifactHandlerManager artifactHandlerManager;
+
+    @Inject
+    public DefaultMavenProjectHelper( ArtifactHandlerManager artifactHandlerManager )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+    }
 
     public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier,
                                 File artifactFile )

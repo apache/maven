@@ -32,6 +32,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -76,8 +80,6 @@ import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
@@ -88,30 +90,31 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 /**
  * @author Jason van Zyl
  */
-@Component( role = ArtifactMetadataSource.class, hint = "maven" )
+@Named( "maven" )
+@Singleton
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
-    @Requirement
+    @Inject
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    @Requirement
+    @Inject
     private ArtifactFactory repositorySystem;
 
     //TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
     //@Requirement
     private ProjectBuilder projectBuilder;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private MavenMetadataCache cache;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     private void injectSession( MetadataResolutionRequest request )

@@ -19,6 +19,12 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -53,33 +59,30 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = PluginManager.class )
+@Named
+@Singleton
 public class DefaultPluginManager
     implements PluginManager
 {
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private MavenPluginManager pluginManager;
 
-    @Requirement
+    @Inject
     private PluginVersionResolver pluginVersionResolver;
 
-    @Requirement
+    @Inject
     private PluginPrefixResolver pluginPrefixResolver;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     public void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )

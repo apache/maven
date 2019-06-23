@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.LocalRepository;
@@ -41,7 +43,8 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
-@Component( role = PluginArtifactsCache.class )
+@Named
+@Singleton
 public class DefaultPluginArtifactsCache
     implements PluginArtifactsCache
 {

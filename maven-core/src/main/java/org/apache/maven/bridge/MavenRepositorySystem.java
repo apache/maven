@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -53,8 +57,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
@@ -65,14 +67,21 @@ import org.eclipse.aether.repository.RemoteRepository;
 /**
  * @author Jason van Zyl
  */
-@Component( role = MavenRepositorySystem.class, hint = "default" )
+@Named( "default" )
+@Singleton
 public class MavenRepositorySystem
 {
-    @Requirement
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final ArtifactHandlerManager artifactHandlerManager;
 
-    @Requirement( role = ArtifactRepositoryLayout.class )
-    private Map<String, ArtifactRepositoryLayout> layouts;
+    private final Map<String, ArtifactRepositoryLayout> layouts;
+
+    @Inject
+    public MavenRepositorySystem( ArtifactHandlerManager artifactHandlerManager,
+            Map<String, ArtifactRepositoryLayout> layouts )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.layouts = layouts;
+    }
 
     // DefaultProjectBuilder
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )

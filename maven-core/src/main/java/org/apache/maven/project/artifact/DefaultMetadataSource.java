@@ -19,8 +19,8 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This realizes the metadata source via the default hint to provide backward-compat with Maven 2.x whose Plexus version
@@ -29,7 +29,8 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ArtifactMetadataSource.class )
+@Named
+@Singleton
 public class DefaultMetadataSource
     extends MavenMetadataSource
 {
