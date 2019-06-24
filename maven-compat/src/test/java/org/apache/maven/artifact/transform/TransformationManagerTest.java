@@ -21,12 +21,22 @@ import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformat
 import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 /** @author Jason van Zyl */
 public class TransformationManagerTest
     extends PlexusTestCase
 {
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    }
+
     public void testTransformationManager()
         throws Exception
     {

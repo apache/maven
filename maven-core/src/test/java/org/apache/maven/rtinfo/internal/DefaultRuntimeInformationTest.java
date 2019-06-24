@@ -20,11 +20,22 @@ package org.apache.maven.rtinfo.internal;
  */
 
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class DefaultRuntimeInformationTest
     extends PlexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration(
+            ContainerConfiguration configuration)
+    {
+        super.customizeContainerConfiguration(configuration);
+        configuration.setAutoWiring(true);
+        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+    }
 
     public void testGetMavenVersion()
         throws Exception

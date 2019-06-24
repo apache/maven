@@ -24,6 +24,8 @@ import java.io.File;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 
@@ -31,6 +33,14 @@ public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
 {
     static final String dir = "projects/scope/";
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    }
 
     public void setUp()
         throws Exception
@@ -40,9 +50,6 @@ public class ProjectClasspathTest
         pomReader.setArtifactResolver( resolver );
 
         projectBuilder = lookup( ProjectBuilder.class, "classpath" );
-
-        // the metadata source looks up the default impl, so we have to trick it
-        getContainer().addComponent( projectBuilder, ProjectBuilder.class, "default" );
 
         repositorySystem = lookup( RepositorySystem.class );
     }
