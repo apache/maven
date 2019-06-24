@@ -17,7 +17,8 @@ package org.apache.maven.repository.metadata;
 
 import org.apache.maven.repository.metadata.GraphConflictResolutionPolicy;
 import org.apache.maven.repository.metadata.MetadataGraphEdge;
-import org.codehaus.plexus.PlexusTestCase;
+
+import junit.framework.TestCase;
 
 /**
  *
@@ -26,7 +27,7 @@ import org.codehaus.plexus.PlexusTestCase;
  */
 
 public class DefaultGraphConflictResolutionPolicyTest
-extends PlexusTestCase
+    extends TestCase
 {
 	GraphConflictResolutionPolicy policy;
 	MetadataGraphEdge e1;
@@ -37,7 +38,7 @@ extends PlexusTestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-    	policy = (GraphConflictResolutionPolicy) lookup( GraphConflictResolutionPolicy.ROLE, "default" );
+		policy = new DefaultGraphConflictResolutionPolicy();
     	e1 = new MetadataGraphEdge( "1.1", true, null, null, 2, 1 );
     	e2 = new MetadataGraphEdge( "1.2", true, null, null, 3, 2 );
     	e3 = new MetadataGraphEdge( "1.2", true, null, null, 2, 3 );

@@ -21,11 +21,21 @@ package org.apache.maven.artifact.factory;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class DefaultArtifactFactoryTest
     extends PlexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    }
 
     public void testPropagationOfSystemScopeRegardlessOfInheritedScope() throws Exception
     {

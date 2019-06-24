@@ -1,5 +1,8 @@
 package org.apache.maven.repository;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,12 +27,12 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author jdcasey
  */
-@Component(role=ArtifactRepositoryLayout.class, hint="legacy")
+@Named( "legacy" )
+@Singleton
 public class LegacyRepositoryLayout
     implements ArtifactRepositoryLayout
 {
