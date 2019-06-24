@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,6 +54,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Assists in populating an execution request for invocation of Maven.
  */
 @Named
+@Singleton
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {

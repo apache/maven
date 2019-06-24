@@ -23,16 +23,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import junit.framework.TestCase;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultBeanConfiguratorTest
-    extends PlexusTestCase
+    extends TestCase
 {
 
     private BeanConfigurator configurator;
@@ -43,7 +45,7 @@ public class DefaultBeanConfiguratorTest
     {
         super.setUp();
 
-        configurator = lookup( BeanConfigurator.class );
+        configurator = new DefaultBeanConfigurator();
     }
 
     @Override
