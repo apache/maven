@@ -56,15 +56,20 @@ public final class ArtifactUtils
     {
         Validate.notBlank( version, "version can neither be null, empty nor blank" );
 
-        Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
-        if ( m.matches() )
+        int lastHyphen = version.lastIndexOf( '-' );
+        if ( lastHyphen > 0 )
         {
-            return m.group( 1 ) + "-" + Artifact.SNAPSHOT_VERSION;
+            int prevHyphen = version.lastIndexOf( '-', lastHyphen - 1 );
+            if ( prevHyphen > 0 )
+            {
+                Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
+                if ( m.matches() )
+                {
+                    return m.group( 1 ) + "-" + Artifact.SNAPSHOT_VERSION;
+                }
+            }
         }
-        else
-        {
-            return version;
-        }
+        return version;
     }
 
     public static String versionlessKey( Artifact artifact )

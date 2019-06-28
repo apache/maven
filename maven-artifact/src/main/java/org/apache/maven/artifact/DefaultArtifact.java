@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -387,16 +386,7 @@ public class DefaultArtifact
 
     protected void setBaseVersionInternal( String baseVersion )
     {
-        Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
-
-        if ( m.matches() )
-        {
-            this.baseVersion = m.group( 1 ) + "-" + SNAPSHOT_VERSION;
-        }
-        else
-        {
-            this.baseVersion = baseVersion;
-        }
+        this.baseVersion = ArtifactUtils.toSnapshotVersion( baseVersion );
     }
 
     public int compareTo( Artifact a )
