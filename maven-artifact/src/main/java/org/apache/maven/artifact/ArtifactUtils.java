@@ -54,7 +54,7 @@ public final class ArtifactUtils
 
     public static String toSnapshotVersion( String version )
     {
-        Validate.notBlank( version, "version can neither be null, empty nor blank" );
+        notBlank( version, "version can neither be null, empty nor blank" );
 
         int lastHyphen = version.lastIndexOf( '-' );
         if ( lastHyphen > 0 )
@@ -79,8 +79,8 @@ public final class ArtifactUtils
 
     public static String versionlessKey( String groupId, String artifactId )
     {
-        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
-        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+        notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
 
         return groupId + ":" + artifactId;
     }
@@ -92,11 +92,20 @@ public final class ArtifactUtils
 
     public static String key( String groupId, String artifactId, String version )
     {
-        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
-        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
-        Validate.notBlank( version, "version can neither be null, empty nor blank" );
+        notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+        notBlank( version, "version can neither be null, empty nor blank" );
 
         return groupId + ":" + artifactId + ":" + version;
+    }
+
+    private static void notBlank( String str, String message )
+    {
+        int c = str != null ? str.charAt( 0 ) : 0;
+        if ( ( c < '0' || c > '9' ) && ( c < 'a' || c > 'z' ) )
+        {
+            Validate.notBlank( str, message );
+        }
     }
 
     public static Map<String, Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
