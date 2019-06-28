@@ -295,11 +295,11 @@ public class DefaultModelValidatorTest
 
         assertEquals( "'repositories.repository.id' is missing.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'repositories.repository[null].url' is missing.", result.getErrors().get( 1 ) );
+        assertEquals( "'repositories.repository.[null].url' is missing.", result.getErrors().get( 1 ) );
 
         assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getErrors().get( 2 ) );
 
-        assertEquals( "'pluginRepositories.pluginRepository[null].url' is missing.", result.getErrors().get( 3 ) );
+        assertEquals( "'pluginRepositories.pluginRepository.[null].url' is missing.", result.getErrors().get( 3 ) );
     }
 
     public void testMissingResourceDirectory()
@@ -735,7 +735,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 1, 0, 0 );
 
-        assertEquals( "'dependencies.dependency com.example.group:testinvalidpom:0.0.1-SNAPSHOT' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.",
+        assertEquals( "'dependencies.dependency[com.example.group:testinvalidpom:0.0.1-SNAPSHOT]' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.",
                       result.getFatals().get( 0 ) );
 
     }
