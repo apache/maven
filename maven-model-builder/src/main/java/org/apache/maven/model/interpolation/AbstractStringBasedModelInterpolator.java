@@ -31,16 +31,11 @@ import javax.inject.Inject;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
-import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
 import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
@@ -93,14 +88,8 @@ public abstract class AbstractStringBasedModelInterpolator
     @Inject
     private UrlNormalizer urlNormalizer;
 
-    private Interpolator interpolator;
-
-    private RecursionInterceptor recursionInterceptor;
-
     public AbstractStringBasedModelInterpolator()
     {
-        interpolator = createInterpolator();
-        recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
     }
 
     public AbstractStringBasedModelInterpolator setPathTranslator( PathTranslator pathTranslator )
@@ -218,75 +207,9 @@ public abstract class AbstractStringBasedModelInterpolator
         return processors;
     }
 
-    protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,
-                                          List<? extends InterpolationPostProcessor> postProcessors,
-                                          ModelProblemCollector problems )
+    protected RecursionInterceptor createRecursionInterceptor()
     {
-        if ( !src.contains( "${" ) )
-        {
-            return src;
-        }
-
-        String result = src;
-        synchronized ( this )
-        {
-
-            for ( ValueSource vs : valueSources )
-            {
-                interpolator.addValueSource( vs );
-            }
-
-            for ( InterpolationPostProcessor postProcessor : postProcessors )
-            {
-                interpolator.addPostProcessor( postProcessor );
-            }
-
-            try
-            {
-                try
-                {
-                    result = interpolator.interpolate( result, recursionInterceptor );
-                }
-                catch ( InterpolationException e )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( e.getMessage() ).setException( e ) );
-                }
-
-                interpolator.clearFeedback();
-            }
-            finally
-            {
-                for ( ValueSource vs : valueSources )
-                {
-                    interpolator.removeValuesSource( vs );
-                }
-
-                for ( InterpolationPostProcessor postProcessor : postProcessors )
-                {
-                    interpolator.removePostProcessor( postProcessor );
-                }
-            }
-        }
-
-        return result;
-    }
-
-    protected RecursionInterceptor getRecursionInterceptor()
-    {
-        return recursionInterceptor;
-    }
-
-    protected void setRecursionInterceptor( RecursionInterceptor recursionInterceptor )
-    {
-        this.recursionInterceptor = recursionInterceptor;
-    }
-
-    protected abstract Interpolator createInterpolator();
-
-    protected final Interpolator getInterpolator()
-    {
-        return interpolator;
+        return new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
     }
 
 }
