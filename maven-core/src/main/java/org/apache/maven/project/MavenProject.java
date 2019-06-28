@@ -1304,7 +1304,7 @@ public class MavenProject
 
         if ( project.getManagedVersionMap() != null )
         {
-            setManagedVersionMap( new HashMap<>( project.getManagedVersionMap() ) );
+            setManagedVersionMap( project.getManagedVersionMap() );
         }
 
         lifecyclePhases.addAll( project.lifecyclePhases );

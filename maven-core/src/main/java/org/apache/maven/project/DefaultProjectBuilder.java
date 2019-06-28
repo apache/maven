@@ -21,8 +21,10 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -780,21 +782,69 @@ public class DefaultProjectBuilder
         Map<String, Artifact> map = null;
         if ( repositorySystem != null )
         {
-            DependencyManagement dependencyManagement = project.getDependencyManagement();
+            final DependencyManagement dependencyManagement = project.getDependencyManagement();
             if ( ( dependencyManagement != null ) && ( ( dependencyManagement.getDependencies() ) != null )
                 && ( dependencyManagement.getDependencies().size() > 0 ) )
             {
-                map = new HashMap<>();
-                for ( Dependency d : dependencyManagement.getDependencies() )
+                map = new AbstractMap<String, Artifact>()
                 {
-                    Artifact artifact = repositorySystem.createDependencyArtifact( d );
+                    HashMap<String, Artifact> delegate;
 
-                    if ( artifact != null )
+                    @Override
+                    public Set<Entry<String, Artifact>> entrySet()
                     {
-                        map.put( d.getManagementKey(), artifact );
+                        return Collections.unmodifiableSet( compute().entrySet() );
                     }
-                }
-                map = Collections.unmodifiableMap( map );
+
+                    @Override
+                    public Set<String> keySet()
+                    {
+                        return Collections.unmodifiableSet( compute().keySet() );
+                    }
+
+                    @Override
+                    public Collection<Artifact> values()
+                    {
+                        return Collections.unmodifiableCollection( compute().values() );
+                    }
+
+                    @Override
+                    public boolean containsValue( Object value )
+                    {
+                        return compute().containsValue( value );
+                    }
+
+                    @Override
+                    public boolean containsKey( Object key )
+                    {
+                        return compute().containsKey( key );
+                    }
+
+                    @Override
+                    public Artifact get( Object key )
+                    {
+                        return compute().get( key );
+                    }
+
+                    HashMap<String, Artifact> compute()
+                    {
+                        if ( delegate == null )
+                        {
+                            delegate = new HashMap<>();
+                            for ( Dependency d : dependencyManagement.getDependencies() )
+                            {
+                                Artifact artifact = repositorySystem.createDependencyArtifact( d );
+
+                                if ( artifact != null )
+                                {
+                                    delegate.put( d.getManagementKey(), artifact );
+                                }
+                            }
+                        }
+
+                        return delegate;
+                    }
+                };
             }
             else
             {
