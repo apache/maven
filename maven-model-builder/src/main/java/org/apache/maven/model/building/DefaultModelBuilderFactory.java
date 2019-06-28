@@ -25,7 +25,7 @@ import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
-import org.apache.maven.model.interpolation.StringSearchModelInterpolator;
+import org.apache.maven.model.interpolation.StringVisitorModelInterpolator;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.DefaultModelLocator;
@@ -126,7 +126,7 @@ public class DefaultModelBuilderFactory
     {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringSearchModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( normalizer );
+        return new StringVisitorModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( normalizer );
     }
 
     protected ModelValidator newModelValidator()
