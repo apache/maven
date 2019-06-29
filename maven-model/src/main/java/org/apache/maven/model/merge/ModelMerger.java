@@ -19,8 +19,11 @@ package org.apache.maven.model.merge;
  * under the License.
  */
 
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -2761,29 +2764,152 @@ public class ModelMerger
         {
             return tgt;
         }
-        if ( tgt.isEmpty() )
+
+        MergingList<T> list;
+        if ( tgt instanceof MergingList )
         {
-            return new ArrayList<>( src );
+            list = (MergingList<T>) tgt;
+        }
+        else
+        {
+            list = new MergingList<>( computer, src.size() + tgt.size() );
+            list.mergeAll( tgt, true );
         }
 
-        int size = src.size() + tgt.size();
-        Map<Object, T> merged = new LinkedHashMap<Object, T>( size * 2 );
+        list.mergeAll( src, sourceDominant );
+        return list;
+    }
 
-        for ( T element : tgt )
+    /**
+     * Merging list
+     * @param <V>
+     */
+    public static class MergingList<V> extends AbstractList<V>
+    {
+        private final KeyComputer<V> keyComputer;
+        private Map<Object, V> map;
+        private List<V> list;
+
+        public MergingList( KeyComputer<V> keyComputer, int initialCapacity )
         {
-            Object key = computer.key( element );
-            merged.put( key, element );
+            this.map = new LinkedHashMap<>( initialCapacity );
+            this.keyComputer = keyComputer;
         }
 
-        for ( T element : src )
+        @Override
+        public Iterator<V> iterator()
         {
-            Object key = computer.key( element );
-            if ( sourceDominant || !merged.containsKey( key ) )
+            if ( map != null )
             {
-                merged.put( key, element );
+                return map.values().iterator();
+            }
+            else
+            {
+                return list.iterator();
             }
         }
-        return new ArrayList<T>( merged.values() );
+
+        public void mergeAll( Collection<V> vs, boolean dominant )
+        {
+            if ( map == null )
+            {
+                map = new LinkedHashMap<>( list.size() + vs.size() );
+                for ( V v : list )
+                {
+                    map.put( keyComputer.key( v ), v );
+                }
+                list = null;
+            }
+            if ( vs instanceof MergingList && ( (MergingList) vs ).map != null )
+            {
+                for ( Map.Entry<Object, V> e : ( (MergingList<V>) vs ).map.entrySet() )
+                {
+                    if ( dominant )
+                    {
+                        map.put( e.getKey(), e.getValue() );
+                    }
+                    else
+                    {
+                        // map.putIfAbsent( key, v )
+                        if ( !map.containsKey( e.getKey() ) )
+                        {
+                            map.put( e.getKey(), e.getValue() );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for ( V v : vs )
+                {
+                    Object key = keyComputer.key( v );
+                    if ( dominant )
+                    {
+                        map.put( key, v );
+                    }
+                    else
+                    {
+                        // map.putIfAbsent( key, v )
+                        if ( !map.containsKey( key ) )
+                        {
+                            map.put( key, v );
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean contains( Object o )
+        {
+            if ( map != null )
+            {
+                return map.containsValue( o );
+            }
+            else
+            {
+                return list.contains( o );
+            }
+        }
+
+        private List<V> asList()
+        {
+            if ( list == null )
+            {
+                list = new ArrayList<>( map.values() );
+                map = null;
+            }
+            return list;
+        }
+
+        public void add( int index, V element )
+        {
+            asList().add( index, element );
+        }
+
+        public V remove( int index )
+        {
+            return asList().remove( index );
+        }
+
+        @Override
+        public V get( int index )
+        {
+            return asList().get( index );
+        }
+
+        @Override
+        public int size()
+        {
+            if ( map != null )
+            {
+                return map.size();
+            }
+            else
+            {
+                return list.size();
+            }
+        }
     }
 
 }
