@@ -1234,6 +1234,7 @@ public class StringVisitorModelInterpolator
                 if ( org != val )
                 {
                     dependency.setGroupId( val );
+                    dependency.clearManagementKey();
                 }
                 // ArtifactId
                 org = dependency.getArtifactId();
@@ -1241,6 +1242,7 @@ public class StringVisitorModelInterpolator
                 if ( org != val )
                 {
                     dependency.setArtifactId( val );
+                    dependency.clearManagementKey();
                 }
                 // Version
                 org = dependency.getVersion();
@@ -1255,6 +1257,7 @@ public class StringVisitorModelInterpolator
                 if ( org != val )
                 {
                     dependency.setType( val );
+                    dependency.clearManagementKey();
                 }
                 // Classifier
                 org = dependency.getClassifier();
@@ -1262,6 +1265,7 @@ public class StringVisitorModelInterpolator
                 if ( org != val )
                 {
                     dependency.setClassifier( val );
+                    dependency.clearManagementKey();
                 }
                 // Scope
                 org = dependency.getScope();

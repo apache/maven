@@ -1153,6 +1153,14 @@
         }
         return managementKey;
     }
+
+    /**
+     * Clears the management key in case one field has been modified.
+     */
+    public void clearManagementKey()
+    {
+        managementKey = null;
+    }
             ]]>
           </code>
         </codeSegment>
