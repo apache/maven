@@ -2618,13 +2618,23 @@ public class ModelMerger
         return exclusion;
     }
 
-    interface KeyComputer<T>
+    /**
+     * Use to compute keys for data structures
+     * @param <T>
+     */
+    protected interface KeyComputer<T>
     {
         Object key( T t );
     }
 
-    class DependencyKeyComputer implements KeyComputer<Dependency>
+    /**
+     * KeyComputer for Dependency
+     */
+    protected class DependencyKeyComputer implements KeyComputer<Dependency>
     {
+        public DependencyKeyComputer()
+        {
+        }
         @Override
         public Object key( Dependency dependency )
         {
@@ -2632,8 +2642,14 @@ public class ModelMerger
         }
     }
 
-    class LicenseKeyComputer implements KeyComputer<License>
+    /**
+     * KeyComputer for License
+     */
+    protected class LicenseKeyComputer implements KeyComputer<License>
     {
+        public LicenseKeyComputer()
+        {
+        }
         @Override
         public Object key( License license )
         {
@@ -2641,8 +2657,14 @@ public class ModelMerger
         }
     }
 
-    class MailingListKeyComputer implements KeyComputer<MailingList>
+    /**
+     * KeyComputer for MailingList
+     */
+    protected class MailingListKeyComputer implements KeyComputer<MailingList>
     {
+        public MailingListKeyComputer()
+        {
+        }
         @Override
         public Object key( MailingList mailingList )
         {
@@ -2650,8 +2672,14 @@ public class ModelMerger
         }
     }
 
-    class DeveloperKeyComputer implements KeyComputer<Developer>
+    /**
+     * KeyComputer for Developer
+     */
+    protected class DeveloperKeyComputer implements KeyComputer<Developer>
     {
+        public DeveloperKeyComputer()
+        {
+        }
         @Override
         public Object key( Developer developer )
         {
@@ -2659,8 +2687,14 @@ public class ModelMerger
         }
     }
 
-    class ContributorKeyComputer implements KeyComputer<Contributor>
+    /**
+     * KeyComputer for Contributor
+     */
+    protected class ContributorKeyComputer implements KeyComputer<Contributor>
     {
+        public ContributorKeyComputer()
+        {
+        }
         @Override
         public Object key( Contributor contributor )
         {
@@ -2668,8 +2702,14 @@ public class ModelMerger
         }
     }
 
-    class ProfileKeyComputer implements KeyComputer<Profile>
+    /**
+     * KeyComputer for Profile
+     */
+    protected class ProfileKeyComputer implements KeyComputer<Profile>
     {
+        public ProfileKeyComputer()
+        {
+        }
         @Override
         public Object key( Profile profile )
         {
@@ -2677,8 +2717,14 @@ public class ModelMerger
         }
     }
 
-    class RepositoryKeyComputer implements KeyComputer<Repository>
+    /**
+     * KeyComputer for Repository
+     */
+    protected class RepositoryKeyComputer implements KeyComputer<Repository>
     {
+        public RepositoryKeyComputer()
+        {
+        }
         @Override
         public Object key( Repository repository )
         {
@@ -2686,8 +2732,14 @@ public class ModelMerger
         }
     }
 
-    class ReportPluginKeyComputer implements KeyComputer<ReportPlugin>
+    /**
+     * KeyComputer for ReportPlugin
+     */
+    protected class ReportPluginKeyComputer implements KeyComputer<ReportPlugin>
     {
+        public ReportPluginKeyComputer()
+        {
+        }
         @Override
         public Object key( ReportPlugin plugin )
         {
@@ -2695,8 +2747,14 @@ public class ModelMerger
         }
     }
 
-    class PluginKeyComputer implements KeyComputer<Plugin>
+    /**
+     * KeyComputer for Plugin
+     */
+    protected class PluginKeyComputer implements KeyComputer<Plugin>
     {
+        public PluginKeyComputer()
+        {
+        }
         @Override
         public Object key( Plugin plugin )
         {
@@ -2704,8 +2762,14 @@ public class ModelMerger
         }
     }
 
-    class ReportSetKeyComputer implements KeyComputer<ReportSet>
+    /**
+     * KeyComputer for ReportSet
+     */
+    protected class ReportSetKeyComputer implements KeyComputer<ReportSet>
     {
+        public ReportSetKeyComputer()
+        {
+        }
         @Override
         public Object key( ReportSet reportSet )
         {
@@ -2713,8 +2777,14 @@ public class ModelMerger
         }
     }
 
-    class NotifierKeyComputer implements KeyComputer<Notifier>
+    /**
+     * KeyComputer for Notifier
+     */
+    protected class NotifierKeyComputer implements KeyComputer<Notifier>
     {
+        public NotifierKeyComputer()
+        {
+        }
         @Override
         public Object key( Notifier notifier )
         {
@@ -2722,8 +2792,14 @@ public class ModelMerger
         }
     }
 
-    class ExtensionKeyComputer implements KeyComputer<Extension>
+    /**
+     * KeyComputer for Extension
+     */
+    protected class ExtensionKeyComputer implements KeyComputer<Extension>
     {
+        public ExtensionKeyComputer()
+        {
+        }
         @Override
         public Object key( Extension extension )
         {
@@ -2731,8 +2807,14 @@ public class ModelMerger
         }
     }
 
-    class ResourceKeyComputer implements KeyComputer<Resource>
+    /**
+     * KeyComputer for Resource
+     */
+    protected class ResourceKeyComputer implements KeyComputer<Resource>
     {
+        public ResourceKeyComputer()
+        {
+        }
         @Override
         public Object key( Resource resource )
         {
@@ -2740,8 +2822,14 @@ public class ModelMerger
         }
     }
 
-    class ExecutionKeyComputer implements KeyComputer<PluginExecution>
+    /**
+     * KeyComputer for PluginExecution
+     */
+    protected class ExecutionKeyComputer implements KeyComputer<PluginExecution>
     {
+        public ExecutionKeyComputer()
+        {
+        }
         @Override
         public Object key( PluginExecution pluginExecution )
         {
@@ -2749,8 +2837,14 @@ public class ModelMerger
         }
     }
 
-    class ExclusionKeyComputer implements KeyComputer<Exclusion>
+    /**
+     * KeyComputer for Exclusion
+     */
+    protected class ExclusionKeyComputer implements KeyComputer<Exclusion>
     {
+        public ExclusionKeyComputer()
+        {
+        }
         @Override
         public Object key( Exclusion exclusion )
         {
@@ -2758,7 +2852,10 @@ public class ModelMerger
         }
     }
 
-    static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
+    /**
+     * Merge two lists
+     */
+    protected static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
     {
         if ( src.isEmpty() )
         {
@@ -2784,13 +2881,13 @@ public class ModelMerger
      * Merging list
      * @param <V>
      */
-    public static class MergingList<V> extends AbstractList<V>
+    private static class MergingList<V> extends AbstractList<V>
     {
         private final KeyComputer<V> keyComputer;
         private Map<Object, V> map;
         private List<V> list;
 
-        public MergingList( KeyComputer<V> keyComputer, int initialCapacity )
+        MergingList( KeyComputer<V> keyComputer, int initialCapacity )
         {
             this.map = new LinkedHashMap<>( initialCapacity );
             this.keyComputer = keyComputer;
