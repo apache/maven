@@ -2628,6 +2628,15 @@ public class ModelMerger
     }
 
     /**
+     * Remapping function
+     * @param <T>
+     */
+    protected interface Remapping<T>
+    {
+        T merge( T u, T v );
+    }
+
+    /**
      * KeyComputer for Dependency
      */
     protected class DependencyKeyComputer implements KeyComputer<Dependency>
@@ -2853,9 +2862,34 @@ public class ModelMerger
     }
 
     /**
+     * Return the second value if <code>sourceDominant</code> is true, the first one otherwise.
+     * @param <T>
+     */
+    protected static class SourceDominant<T> implements Remapping<T>
+    {
+        private final boolean sourceDominant;
+
+        public SourceDominant( boolean sourceDominant )
+        {
+            this.sourceDominant = sourceDominant;
+        }
+
+        @Override
+        public T merge( T u, T v )
+        {
+            return sourceDominant ? v : u;
+        }
+    }
+
+    /**
      * Merge two lists
      */
     protected static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
+    {
+        return merge( tgt, src, computer, new SourceDominant<T>( sourceDominant ) );
+    }
+
+    protected static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, Remapping<T> remapping )
     {
         if ( src.isEmpty() )
         {
@@ -2870,10 +2904,10 @@ public class ModelMerger
         else
         {
             list = new MergingList<>( computer, src.size() + tgt.size() );
-            list.mergeAll( tgt, true );
+            list.mergeAll( tgt, new SourceDominant<T>( true ) );
         }
 
-        list.mergeAll( src, sourceDominant );
+        list.mergeAll( src, remapping );
         return list;
     }
 
@@ -2906,7 +2940,7 @@ public class ModelMerger
             }
         }
 
-        public void mergeAll( Collection<V> vs, boolean dominant )
+        public void mergeAll( Collection<V> vs, Remapping<V> remapping )
         {
             if ( map == null )
             {
@@ -2921,17 +2955,17 @@ public class ModelMerger
             {
                 for ( Map.Entry<Object, V> e : ( (MergingList<V>) vs ).map.entrySet() )
                 {
-                    if ( dominant )
+                    Object key = e.getKey();
+                    V oldValue = map.get( key );
+                    // JDK8: this should be a call to map.merge( key, v, remapping )
+                    V newValue = ( oldValue == null ) ? e.getValue() : remapping.merge( oldValue, e.getValue() );
+                    if ( newValue == null )
                     {
-                        map.put( e.getKey(), e.getValue() );
+                        remove( key );
                     }
-                    else
+                    else if ( newValue != oldValue )
                     {
-                        // map.putIfAbsent( key, v )
-                        if ( !map.containsKey( e.getKey() ) )
-                        {
-                            map.put( e.getKey(), e.getValue() );
-                        }
+                        map.put( key, newValue );
                     }
                 }
             }
@@ -2940,17 +2974,16 @@ public class ModelMerger
                 for ( V v : vs )
                 {
                     Object key = keyComputer.key( v );
-                    if ( dominant )
+                    // JDK8: this should be a call to map.merge( key, v, remapping )
+                    V oldValue = map.get( key );
+                    V newValue = ( oldValue == null ) ? v : remapping.merge( oldValue, v );
+                    if ( newValue == null )
                     {
-                        map.put( key, v );
+                        remove( key );
                     }
                     else
                     {
-                        // map.putIfAbsent( key, v )
-                        if ( !map.containsKey( key ) )
-                        {
-                            map.put( key, v );
-                        }
+                        map.put( key, newValue );
                     }
                 }
             }
