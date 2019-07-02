@@ -102,7 +102,7 @@ public class StringVisitorModelInterpolator
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
 
-        new ModelVisitor( innerInterpolator, problems ).visit( model );
+        new ModelVisitor( innerInterpolator ).visit( model );
 
         return model;
     }
@@ -151,20 +151,17 @@ public class StringVisitorModelInterpolator
         };
     }
 
+    @SuppressWarnings( "StringEquality" )
     private static final class ModelVisitor
     {
         private final InnerInterpolator interpolator;
 
-        private final ModelProblemCollector problems;
-
-        ModelVisitor( InnerInterpolator interpolator, ModelProblemCollector problems )
+        ModelVisitor( InnerInterpolator interpolator )
         {
             this.interpolator = interpolator;
-
-            this.problems = problems;
         }
 
-        public void visit( Model model )
+        void visit( Model model )
         {
             if ( model != null )
             {
