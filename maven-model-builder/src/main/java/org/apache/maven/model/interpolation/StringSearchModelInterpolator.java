@@ -62,9 +62,7 @@ public class StringSearchModelInterpolator
         new ConcurrentHashMap<>( 80, 0.75f, 2 );
     // Empirical data from 3.x, actual =40
 
-    private static final Map<Class<?>, Map<String, Field>> FIELDS_CACHE = new HashMap<>();
-
-    interface InnerInterpolator
+    private interface InnerInterpolator
     {
         String interpolate( String value );
     }
