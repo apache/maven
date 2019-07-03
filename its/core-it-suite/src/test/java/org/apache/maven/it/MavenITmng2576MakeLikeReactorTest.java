@@ -232,7 +232,7 @@ public class MavenITmng2576MakeLikeReactorTest
     }
 
     /**
-     * Verify that the project list can also specify aritfact ids.
+     * Verify that the project list can also specify artifact ids.
      */
     public void testitMatchesByArtifactId()
         throws Exception

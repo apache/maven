@@ -58,6 +58,10 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest
         catch( VerificationException e )
         {
             // expected, should fail
+            String msg = e.getMessage();
+
+            assertTrue( "Failure should be due to unknown packaging", msg.contains( "Unknown packaging: it-packaging" ));
+            assertTrue( "Failure should be due to sub-b project", msg.contains( "The project org.apache.maven.its.mng4385:sub-b:0.1" ));
         }
         verifier.resetStreams();
     }

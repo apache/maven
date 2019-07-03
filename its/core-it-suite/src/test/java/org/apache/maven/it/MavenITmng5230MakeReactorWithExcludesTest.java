@@ -231,7 +231,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     }
 
     /**
-     * Verify that the project list exclude can also specify aritfact ids.
+     * Verify that the project list exclude can also specify artifact ids.
      */
     public void testitMatchesByArtifactIdExclude()
         throws Exception

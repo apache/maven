@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test Plugin :: Packaging</name>
   <description>
-    A test plugin that defines a custom aritfact handler ("it-artifact") and a new packaging type ("it-packaging").
+    A test plugin that defines a custom artifact handler ("it-artifact") and a new packaging type ("it-packaging").
   </description>
   <inceptionYear>2006</inceptionYear>
 
