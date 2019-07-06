@@ -240,11 +240,6 @@ under the License.
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guiceVersion}</version>
         <classifier>no_aop</classifier>
       </dependency>
       <dependency>
