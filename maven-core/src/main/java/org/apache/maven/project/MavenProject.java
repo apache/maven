@@ -304,6 +304,10 @@ public class MavenProject
                 {
                     path = file.getAbsolutePath();
                 }
+                else if ( ".".equals( path ) )
+                {
+                    path = getBasedir().getAbsolutePath();
+                }
                 else
                 {
                     path = new File( getBasedir(), path ).getAbsolutePath();

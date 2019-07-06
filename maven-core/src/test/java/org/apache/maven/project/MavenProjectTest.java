@@ -187,6 +187,19 @@ public class MavenProjectTest
         assertNoNulls( p.getTestClasspathElements() );
     }
 
+    public void testAddDotFile()
+    {
+        MavenProject project = new MavenProject();
+
+        File basedir = new File( System.getProperty( "java.io.tmpdir" ) );
+        project.setFile( new File( basedir, "file" ) );
+
+        project.addCompileSourceRoot( basedir.getAbsolutePath() );
+        project.addCompileSourceRoot( "." );
+
+        assertEquals( 1, project.getCompileSourceRoots().size() );
+    }
+
     private void assertNoNulls( List<String> elements )
     {
         assertFalse( elements.contains( null ) );
