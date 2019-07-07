@@ -19,45 +19,31 @@ package org.apache.maven.model.path;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultUrlNormalizerTest
-    extends TestCase
 {
 
-    private UrlNormalizer normalizer;
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        normalizer = new DefaultUrlNormalizer();
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        normalizer = null;
-
-        super.tearDown();
-    }
+    private UrlNormalizer normalizer = new DefaultUrlNormalizer();
 
     private String normalize( String url )
     {
         return normalizer.normalize( url );
     }
 
+    @Test
     public void testNullSafe()
     {
         assertNull( normalize( null ) );
     }
 
+    @Test
     public void testTrailingSlash()
     {
         assertEquals( "", normalize( "" ) );
@@ -65,6 +51,7 @@ public class DefaultUrlNormalizerTest
         assertEquals( "http://server.org/dir/", normalize( "http://server.org/dir/" ) );
     }
 
+    @Test
     public void testRemovalOfParentRefs()
     {
         assertEquals( "http://server.org/child", normalize( "http://server.org/parent/../child" ) );
@@ -74,6 +61,7 @@ public class DefaultUrlNormalizerTest
         assertEquals( "http://server.org/child", normalize( "http://server.org/parent//../child" ) );
     }
 
+    @Test
     public void testPreservationOfDoubleSlashes()
     {
         assertEquals( "scm:hg:ssh://localhost//home/user", normalize( "scm:hg:ssh://localhost//home/user" ) );
@@ -82,8 +70,15 @@ public class DefaultUrlNormalizerTest
                       normalize( "[fetch=]http://server.org/[push=]ssh://server.org/" ) );
     }
 
-    public void testNormalizeInputWithNoParentDirectoriesToAscendTo()
+    @Test
+    public void relativeUriReferenceLeftUnaffectedWithNoParentDirectoryToAscendTo()
     {
-        assertEquals("a/../", normalize("a/../"));
+        assertEquals( "/../", normalize("/../" ) );
+    }
+
+    @Test
+    public void parentDirectoryRemovedFromRelativeUriReference()
+    {
+        assertEquals( "", normalize( "a/../" ) );
     }
 }

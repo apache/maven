@@ -55,9 +55,12 @@ public class DefaultUrlNormalizer
                 parent = result.lastIndexOf( '/', parent );
                 if ( parent < 0 )
                 {
-                    break;
+                    result = result.substring( idx + 4);
                 }
-                result = result.substring( 0, parent ) + result.substring( idx + 3 );
+                else
+                {
+                    result = result.substring( 0, parent ) + result.substring( idx + 3 );
+                }
             }
         }
 
