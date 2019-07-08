@@ -71,14 +71,20 @@ public class DefaultUrlNormalizerTest
     }
 
     @Test
-    public void relativeUriReferenceLeftUnaffectedWithNoParentDirectoryToAscendTo()
+    public void absolutePathTraversalPastRootIsOmitted()
     {
-        assertEquals( "/../", normalize("/../" ) );
+        assertEquals( "/", normalize("/../" ) );
     }
 
     @Test
     public void parentDirectoryRemovedFromRelativeUriReference()
     {
         assertEquals( "", normalize( "a/../" ) );
+    }
+
+    @Test
+    public void leadingParentDirectoryNotRemovedFromRelativeUriReference()
+    {
+        assertEquals( "../", normalize( "../" ) );
     }
 }
