@@ -157,9 +157,9 @@ public class DefaultModelValidator
                                            "dependencyManagement.dependencies.dependency", EMPTY, request );
             }
 
-            validateRawRepositories( problems, m.getRepositories(), "repositories.repository", EMPTY, request );
+            validateRawRepositories( problems, m.getRepositories(), "repositories.repository.", EMPTY, request );
 
-            validateRawRepositories( problems, m.getPluginRepositories(), "pluginRepositories.pluginRepository",
+            validateRawRepositories( problems, m.getPluginRepositories(), "pluginRepositories.pluginRepository.",
                                      EMPTY, request );
 
             Build build = m.getBuild();
@@ -179,7 +179,7 @@ public class DefaultModelValidator
 
             for ( Profile profile : m.getProfiles() )
             {
-                String prefix = "profiles.profile[" + profile.getId() + "]";
+                String prefix = "profiles.profile[" + profile.getId() + "].";
 
                 if ( !profileIds.add( profile.getId() ) )
                 {
@@ -188,32 +188,32 @@ public class DefaultModelValidator
                 }
 
                 validate30RawProfileActivation( problems, profile.getActivation(), profile.getId(),
-                                                prefix, ".activation", request );
+                                                prefix, "activation", request );
 
-                validate20RawDependencies( problems, profile.getDependencies(), prefix, ".dependencies.dependency",
+                validate20RawDependencies( problems, profile.getDependencies(), prefix, "dependencies.dependency",
                                            request );
 
                 if ( profile.getDependencyManagement() != null )
                 {
                     validate20RawDependencies( problems, profile.getDependencyManagement().getDependencies(),
-                                               prefix, ".dependencyManagement.dependencies.dependency", request );
+                                               prefix, "dependencyManagement.dependencies.dependency", request );
                 }
 
-                validateRawRepositories( problems, profile.getRepositories(), prefix, ".repositories.repository",
+                validateRawRepositories( problems, profile.getRepositories(), prefix, "repositories.repository",
                                          request );
 
                 validateRawRepositories( problems, profile.getPluginRepositories(),
-                                         prefix, ".pluginRepositories.pluginRepository", request );
+                                         prefix, "pluginRepositories.pluginRepository", request );
 
                 BuildBase buildBase = profile.getBuild();
                 if ( buildBase != null )
                 {
-                    validate20RawPlugins( problems, buildBase.getPlugins(), prefix, ".plugins.plugin", request );
+                    validate20RawPlugins( problems, buildBase.getPlugins(), prefix, "plugins.plugin", request );
 
                     PluginManagement mgmt = buildBase.getPluginManagement();
                     if ( mgmt != null )
                     {
-                        validate20RawPlugins( problems, mgmt.getPlugins(), prefix, ".pluginManagement.plugins.plugin",
+                        validate20RawPlugins( problems, mgmt.getPlugins(), prefix, "pluginManagement.plugins.plugin",
                                               request );
                     }
                 }
@@ -535,7 +535,7 @@ public class DefaultModelValidator
                         + StringUtils.defaultString( dependency.getVersion(), "(?)" );
                 }
 
-                addViolation( problems, errOn31, Version.V20, prefix + ".(groupId:artifactId:type:classifier)", null,
+                addViolation( problems, errOn31, Version.V20, prefix + prefix2 + ".(groupId:artifactId:type:classifier)", null,
                               "must be unique: " + key + " -> " + msg, dependency );
             }
             else
@@ -748,10 +748,10 @@ public class DefaultModelValidator
 
         for ( Repository repository : repositories )
         {
-            validateStringNotEmpty( prefix, ".id", problems, Severity.ERROR, Version.V20, repository.getId(),
+            validateStringNotEmpty( prefix, prefix2, ".id", problems, Severity.ERROR, Version.V20, repository.getId(),
                                     null, repository );
 
-            validateStringNotEmpty( prefix, "[" + repository.getId() + "].url", problems, Severity.ERROR, Version.V20,
+            validateStringNotEmpty( prefix, prefix2, "[" + repository.getId() + "].url", problems, Severity.ERROR, Version.V20,
                                     repository.getUrl(), null, repository );
 
             String key = repository.getId();
@@ -975,6 +975,34 @@ public class DefaultModelValidator
      * </ul>
      */
     @SuppressWarnings( "checkstyle:parameternumber" )
+    private boolean validateStringNotEmpty( String prefix, String prefix2, String fieldName, ModelProblemCollector problems,
+                                            Severity severity, Version version, String string, String sourceHint,
+                                            InputLocationTracker tracker )
+    {
+        if ( !validateNotNull( prefix, prefix2, fieldName, problems, severity, version, string, sourceHint, tracker ) )
+        {
+            return false;
+        }
+
+        if ( string.length() > 0 )
+        {
+            return true;
+        }
+
+        addViolation( problems, severity, version, prefix + prefix2 + fieldName, sourceHint, "is missing.", tracker );
+
+        return false;
+    }
+
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string != null</code>
+     * <li><code>string.length > 0</code>
+     * </ul>
+     */
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean validateStringNotEmpty( String prefix, String fieldName, ModelProblemCollector problems,
                                             Severity severity, Version version, String string, String sourceHint,
                                             InputLocationTracker tracker )
@@ -1011,6 +1039,27 @@ public class DefaultModelValidator
         }
 
         addViolation( problems, severity, version, prefix + fieldName, sourceHint, "is missing.", tracker );
+
+        return false;
+    }
+
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string != null</code>
+     * </ul>
+     */
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private boolean validateNotNull( String prefix, String prefix2, String fieldName, ModelProblemCollector problems,
+                                     Severity severity, Version version, Object object, String sourceHint, InputLocationTracker tracker )
+    {
+        if ( object != null )
+        {
+            return true;
+        }
+
+        addViolation( problems, severity, version, prefix + prefix2 + fieldName, sourceHint, "is missing.", tracker );
 
         return false;
     }
