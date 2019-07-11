@@ -106,7 +106,7 @@ public final class MavenRepositorySystemUtils
         DependencyGraphTransformer transformer =
             new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
                                   new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-        new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
+        transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
         session.setDependencyGraphTransformer( transformer );
 
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
@@ -127,7 +127,7 @@ public final class MavenRepositorySystemUtils
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
         final Properties systemProperties = new Properties();
-        
+
         // MNG-5670 guard against ConcurrentModificationException
         // MNG-6053 guard against key without value
         Properties sysProp = System.getProperties();
