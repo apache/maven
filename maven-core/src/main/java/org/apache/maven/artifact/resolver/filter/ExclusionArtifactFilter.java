@@ -19,13 +19,13 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
 
+import java.util.List;
+
 /**
- *  Filter to exclude from a list of artifact patterns.
+ * Filter to exclude from a list of artifact patterns.
  */
 public class ExclusionArtifactFilter implements ArtifactFilter
 {
@@ -41,8 +41,20 @@ public class ExclusionArtifactFilter implements ArtifactFilter
     {
         for ( Exclusion exclusion : exclusions )
         {
-            if ( exclusion.getGroupId().equals( artifact.getGroupId() )
-                    && exclusion.getArtifactId().equals( artifact.getArtifactId() ) )
+            if ( "*".equals( exclusion.getGroupId() ) && "*".equals( exclusion.getArtifactId() ) )
+            {
+                return false;
+            }
+            if ( "*".equals( exclusion.getGroupId() ) )
+            {
+                return !exclusion.getArtifactId().equals( artifact.getArtifactId() );
+            }
+            if ( "*".equals( exclusion.getArtifactId() ) )
+            {
+                return !exclusion.getGroupId().equals( artifact.getGroupId() );
+            }
+            if ( exclusion.getGroupId().equals( artifact.getGroupId() ) && exclusion.getArtifactId().equals(
+                    artifact.getArtifactId() ) )
             {
                 return false;
             }
