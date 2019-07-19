@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -242,6 +243,59 @@ public class ProjectBuilderTest
             MavenProject project = ex.getResults().get( 0 ).getProject();
             assertNotNull( project );
             assertNotSame( 0, ex.getResults().get( 0 ).getProblems().size() );
+        }
+    }
+
+    public void testReadParentAndChildWithRegularVersionSetParentFile()
+            throws Exception
+    {
+        List<File> toRead = new ArrayList<>( 2 );
+        File parentPom = getProject( "MNG-6723" );
+        toRead.add( parentPom );
+        toRead.add( new File( parentPom.getParentFile(), "child/pom.xml" ) );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        org.apache.maven.project.ProjectBuilder projectBuilder =
+            lookup( org.apache.maven.project.ProjectBuilder.class );
+
+        // read poms separately
+        boolean parentFileWasFoundOnChild = false;
+        for ( File file : toRead ) {
+            List<ProjectBuildingResult> results = projectBuilder.build( Collections.singletonList( file ), false, configuration );
+            assertResultShowNoError( results );
+            MavenProject project = findChildProject( results );
+            if ( project != null ) {
+                assertEquals( parentPom, project.getParentFile() );
+                parentFileWasFoundOnChild = true;
+            }
+        }
+        assertTrue( parentFileWasFoundOnChild );
+
+        // read projects together
+        List<ProjectBuildingResult> results = projectBuilder.build( toRead, false, configuration );
+        assertResultShowNoError( results );
+        assertEquals( parentPom , findChildProject( results ).getParentFile() );
+        Collections.reverse( toRead );
+        results = projectBuilder.build( toRead, false, configuration );
+        assertResultShowNoError( results );
+        assertEquals( parentPom , findChildProject( results ).getParentFile() );
+    }
+
+    private MavenProject findChildProject(List<ProjectBuildingResult> results) {
+        for ( ProjectBuildingResult result : results ) {
+            if ( result.getPomFile().getParentFile().getName().equals( "child" ) ) {
+                return result.getProject();
+            }
+        }
+        return null;
+    }
+
+	private void assertResultShowNoError(List<ProjectBuildingResult> results) {
+        for ( ProjectBuildingResult result : results ) {
+            assertTrue( result.getProblems().isEmpty() );
+            assertNotNull( result.getProject() );
         }
     }
 
