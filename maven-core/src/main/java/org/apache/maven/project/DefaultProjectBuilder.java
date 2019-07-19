@@ -976,6 +976,10 @@ public class DefaultProjectBuilder
                 }
             }
             project.setParent( parent );
+            if ( project.getParentFile() == null && parent != null )
+            {
+                project.setParentFile( parent.getFile() );
+            }
         }
     }
 
