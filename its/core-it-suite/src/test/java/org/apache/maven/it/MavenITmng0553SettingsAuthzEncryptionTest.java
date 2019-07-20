@@ -124,6 +124,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         setUserHome( verifier, new File( testDir, "userhome" ) );
+        verifier.addCliOption( "--show-version" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
@@ -195,6 +196,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
+        verifier.addCliOption( "--show-version" );
         verifier.addCliOption( "--encrypt-password" );
         verifier.addCliOption( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );
