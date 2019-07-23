@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.BuildThreadFactory;
@@ -114,6 +114,9 @@ public class MultiThreadedBuilder
             }
 
         }
+
+        executor.shutdown();
+        executor.awaitTermination( Long.MAX_VALUE, TimeUnit.MILLISECONDS );
     }
 
     private void multiThreadedProjectTaskSegmentBuild( ConcurrencyDependencyGraph analyzer,
@@ -170,21 +173,6 @@ public class MultiThreadedBuilder
                 // TODO MNG-5766 changes likely made this redundant
                 rootSession.getResult().addException( e );
                 break;
-            }
-        }
-
-        // cancel outstanding builds (if any) - this can happen if an exception is thrown in above block
-
-        Future<ProjectSegment> unprocessed;
-        while ( ( unprocessed = service.poll() ) != null )
-        {
-            try
-            {
-                unprocessed.get();
-            }
-            catch ( InterruptedException | ExecutionException e )
-            {
-                throw new RuntimeException( e );
             }
         }
     }
