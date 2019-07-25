@@ -100,6 +100,8 @@ public class DefaultProjectBuildingRequest
         setProject( request.getProject() );
         setResolveDependencies( request.isResolveDependencies() );
         setValidationLevel( request.getValidationLevel() );
+        setResolveVersionRanges( request.isResolveVersionRanges() );
+        setRepositoryMerging( request.getRepositoryMerging() );
     }
 
     public MavenProject getProject()
