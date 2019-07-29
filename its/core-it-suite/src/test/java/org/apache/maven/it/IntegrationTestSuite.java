@@ -57,6 +57,7 @@ public class IntegrationTestSuite
 
             out.println( "Running integration tests for Maven " + mavenVersion );
             out.println( "\tusing Maven executable: " + executable );
+            out.println( "\twith verifier.forkMode: " + System.getProperty( "verifier.forkMode", "not defined == fork" ) );
 
             System.setProperty( "maven.version", mavenVersion );
 
