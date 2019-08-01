@@ -136,6 +136,7 @@ under the License.
           <configuration>
             <environmentVariables>
               <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
+              <JAVA_TOOL_OPTIONS></JAVA_TOOL_OPTIONS>
             </environmentVariables>
           </configuration>
         </plugin>
