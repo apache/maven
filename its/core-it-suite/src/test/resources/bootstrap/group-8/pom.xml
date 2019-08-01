@@ -99,5 +99,10 @@ under the License.
       <artifactId>surefire-junit4</artifactId>
       <version>2.12.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.5.5</version>
+    </dependency>
   </dependencies>
 </project>
