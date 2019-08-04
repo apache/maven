@@ -35,6 +35,7 @@ under the License.
       <item name="Introduction" href="index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
       <item name="License" href="http://www.apache.org/licenses/"/>
+      <item name="Bootstrap" href="core-it-suite/bootstrap.html"/>
     </menu>
 
     <menu ref="modules"/>

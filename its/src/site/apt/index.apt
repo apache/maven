@@ -40,15 +40,17 @@ Maven Core ITs
 
 * Core ITs and dependencies
 
- A good IT does not depend on external repos like central, it uses dedicated test plugins and test repositories.
- The default <<<settings.xml>>> used by ITs helps to enforce this by pointing central at <<<file:target/null>>>,
+ A good IT does not depend on external repos like Central, it uses dedicated test plugins and test repositories.
+ The {{{https://github.com/apache/maven-integration-testing/blob/master/core-it-suite/src/test/resources-filtered/settings.xml}default <<<settings.xml>>>}}
+ used by ITs helps to enforce this by pointing <<<central>>> at <<<file:target/null>>>,
  which obviously can't resolve anything. This setup using a file-based dummy repo also helps execution time,
  because this repo produces (expected) <<<404>>>s much faster than a HTTP-based repo.
 
- The one place where access to central is desired is in the <<<MavenITBootstrapTest>>>
+ The one place where access to Central is desired is in the <<<MavenITBootstrapTest>>>
  ({{{./core-it-suite/xref-test/org/apache/maven/it/MavenITBootstrapTest.html}src}},
  {{{./core-it-suite/testapidocs/org/apache/maven/it/MavenITBootstrapTest.html}javadoc}}),
- which doesn't really test anything but just primes the local repo with any artifacts the ITs will need.
+ which doesn't really test anything but just primes the local repo with any artifacts the ITs will need:
+ you can see {{{./core-it-suite/bootstrap.html}here}} the list of plugins and artifacts that are fetched during bootstrap.
 
  So some care needs to be taken when introducing new dependencies into the ITs themselves or the support plugins.
  Many times the failures that we encounter are discrepancies between actual artifact consumption required and

@@ -28,8 +28,8 @@
 
 Maven Core Integration Tests Bootstrap
 
-  Core IT Bootstrapping downloads from central repository every dependency (artifacts, plugins) required to let
-  ITs run without downloading anything later:
+  Core IT Bootstrapping downloads from Central repository every dependency (artifacts, plugins) required to let
+  ITs run without downloading anything later (see {{{../}Core ITs and dependencies}} rationale):
 
 %{toc|section=1|fromDepth=2}
 
