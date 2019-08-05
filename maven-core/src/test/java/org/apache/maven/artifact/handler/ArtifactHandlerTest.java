@@ -42,7 +42,7 @@ public class ArtifactHandlerTest
             {
                 String[] cols = line.split( "\\|\\|" );
                 String[] expected =
-                    new String[] { "", "type", "extension", "packaging", "classifier", "language", "added to classpath",
+                    new String[] { "", "type", "classifier", "extension", "packaging", "language", "added to classpath",
                         "includesDependencies", "" };
 
                 int i = 0;
@@ -56,9 +56,9 @@ public class ArtifactHandlerTest
                 String[] cols = line.split( "\\|" );
 
                 String type = trimApt( cols[1] );
-                String extension = trimApt( cols[2], type );
-                String packaging = trimApt( cols[3], type );
-                String classifier = trimApt( cols[4] );
+                String classifier = trimApt( cols[2] );
+                String extension = trimApt( cols[3], type );
+                String packaging = trimApt( cols[4], type );
                 String language = trimApt( cols[5] );
                 String addedToClasspath = trimApt( cols[6] );
                 String includesDependencies = trimApt( cols[7] );
