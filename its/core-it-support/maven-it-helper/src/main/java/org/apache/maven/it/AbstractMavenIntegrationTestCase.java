@@ -43,11 +43,6 @@ public abstract class AbstractMavenIntegrationTestCase
     extends TestCase
 {
     /**
-     * Skips using ".mavenrc" on the system. For more information, see 'MAVEN_SKIP_RC' in $MAVEN_DIST/bin/mvn.
-     */
-    private static final boolean MAVEN_SKIP_RC = isMavenSkipRc();
-
-    /**
      * Save System.out for progress reports etc.
      */
     private static PrintStream out = System.out;
@@ -500,11 +495,6 @@ public abstract class AbstractMavenIntegrationTestCase
     {
         Verifier verifier = new Verifier( basedir, debug );
 
-        if ( MAVEN_SKIP_RC )
-        {
-            verifier.setEnvironmentVariable( "MAVEN_SKIP_RC", "1" );
-        }
-
         verifier.setAutoclean( false );
 
         if ( settings != null )
@@ -610,22 +600,5 @@ public abstract class AbstractMavenIntegrationTestCase
         throws IOException
     {
         assertCanonicalFileEquals( null, new File( expected ), new File( actual ) );
-    }
-
-    private static boolean isMavenSkipRc()
-    {
-        boolean skipRc = Boolean.getBoolean( "maven.skip.rc" );
-
-        if ( skipRc )
-        {
-            System.out.println( "SKIPPED - Skipped '.mavenrc'!" );
-        }
-        else
-        {
-            System.out.println( "In order to disable '.mavenrc' set the system property 'maven.skip.rc', i.e. "
-                    + "'mvn -Dmaven.skip.rc=true -P run-its verify'." );
-        }
-
-        return skipRc;
     }
 }

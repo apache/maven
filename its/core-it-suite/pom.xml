@@ -193,10 +193,6 @@ under the License.
               <name>maven.it.global-settings.dir</name>
               <value>${project.build.testOutputDirectory}</value>
             </property>
-            <property>
-              <name>maven.skip.rc</name>
-              <value>${maven.skip.rc}</value>
-            </property>
           </systemProperties>
         </configuration>
       </plugin>
