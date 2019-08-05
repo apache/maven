@@ -250,7 +250,13 @@ public class StringSearchModelInterpolator
 
             private boolean isQualifiedForInterpolation( Class<?> cls )
             {
-                return !cls.getName().startsWith( "java" );
+                Package pkg = cls.getPackage();
+                if ( pkg == null )
+                {
+                    return true;
+                }
+                String pkgName = pkg.getName();
+                return !pkgName.startsWith( "java." ) && !pkgName.startsWith( "javax." );
             }
 
             private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
@@ -278,33 +284,37 @@ public class StringSearchModelInterpolator
                 this.isQualifiedForInterpolation = isQualifiedForInterpolation( clazz );
                 this.isArray = clazz.isArray();
                 List<CacheField> fields = new ArrayList<>();
-                for ( Field currentField : clazz.getDeclaredFields() )
+                if ( isQualifiedForInterpolation )
                 {
-                    Class<?> type = currentField.getType();
-                    if ( isQualifiedForInterpolation( currentField, type ) )
+                    for ( Field currentField : clazz.getDeclaredFields() )
                     {
-                        if ( String.class == type )
+                        Class<?> type = currentField.getType();
+                        if ( isQualifiedForInterpolation( currentField, type ) )
                         {
-                            if ( !Modifier.isFinal( currentField.getModifiers() ) )
+                            if ( String.class == type )
                             {
-                                fields.add( new StringField( currentField ) );
+                                if ( !Modifier.isFinal( currentField.getModifiers() ) )
+                                {
+                                    fields.add( new StringField( currentField ) );
+                                }
                             }
-                        }
-                        else if ( List.class.isAssignableFrom( type ) )
-                        {
-                            fields.add( new ListField( currentField ) );
-                        }
-                        else if ( Collection.class.isAssignableFrom( type ) )
-                        {
-                            throw new RuntimeException( "We dont interpolate into collections, use a list instead" );
-                        }
-                        else if ( Map.class.isAssignableFrom( type ) )
-                        {
-                            fields.add( new MapField( currentField ) );
-                        }
-                        else
-                        {
-                            fields.add( new ObjectField( currentField ) );
+                            else if ( List.class.isAssignableFrom( type ) )
+                            {
+                                fields.add( new ListField( currentField ) );
+                            }
+                            else if ( Collection.class.isAssignableFrom( type ) )
+                            {
+                                throw new RuntimeException(
+                                        "We dont interpolate into collections, use a list instead" );
+                            }
+                            else if ( Map.class.isAssignableFrom( type ) )
+                            {
+                                fields.add( new MapField( currentField ) );
+                            }
+                            else
+                            {
+                                fields.add( new ObjectField( currentField ) );
+                            }
                         }
                     }
                 }

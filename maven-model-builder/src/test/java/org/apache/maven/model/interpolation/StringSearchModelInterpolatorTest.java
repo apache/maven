@@ -33,6 +33,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.powermock.reflect.Whitebox.getField;
+import static org.powermock.reflect.Whitebox.getInternalState;
+
 /**
  * @author jdcasey
  * @author Benjamin Bentmann
@@ -337,6 +343,100 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value4", ( (String[]) obj.values.get( "key2" ) )[1] );
     }
 
+    public void testInterpolateObjectWithPomFile()
+            throws Exception
+    {
+        Model model = new Model();
+        model.setPomFile( new File( System.getProperty( "user.dir" ), "pom.xml" ) );
+        File baseDir = model.getProjectDirectory();
+
+        Properties p = new Properties();
+
+        Map<String, String> values = new HashMap<>();
+        values.put( "key", "${project.basedir}" + File.separator + "target" );
+
+        ObjectWithMapField obj = new ObjectWithMapField( values );
+
+        StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
+
+        ModelBuildingRequest config = createModelBuildingRequest( p );
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
+        assertProblemFree( collector );
+
+        assertThat( baseDir.getCanonicalPath(), is( System.getProperty( "user.dir" ) ) );
+        assertThat( obj.values.size(), is( 1 ) );
+        assertThat( (String) obj.values.get( "key" ), is( anyOf(
+                is( System.getProperty( "user.dir" ) + File.separator + "target" ),
+                // TODO why MVN adds dot /./ in paths???
+                is( System.getProperty( "user.dir" ) + File.separator + '.' + File.separator + "target" )
+        ) ) );
+    }
+
+    public void testNotInterpolateObjectWithFile()
+            throws Exception
+    {
+        Model model = new Model();
+
+        File baseDir = new File( System.getProperty( "user.dir" ) );
+
+        Properties p = new Properties();
+
+        ObjectWithNotInterpolatedFile obj = new ObjectWithNotInterpolatedFile( baseDir );
+
+        StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
+
+        ModelBuildingRequest config = createModelBuildingRequest( p );
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
+        assertProblemFree( collector );
+
+        //noinspection unchecked
+        Map<Class<?>, ?> cache =
+                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
+                        .get( null );
+
+        Object objCacheItem = cache.get( Object.class );
+        Object fileCacheItem = cache.get( File.class );
+
+        assertNotNull( objCacheItem );
+        assertNotNull( fileCacheItem );
+
+        assertThat( ( (Object[]) getInternalState( objCacheItem, "fields" ) ).length, is( 0 ) );
+        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+    }
+
+    public void testNotInterpolateFile()
+            throws Exception
+    {
+        Model model = new Model();
+
+        File baseDir = new File( System.getProperty( "user.dir" ) );
+
+        Properties p = new Properties();
+
+        StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
+
+        ModelBuildingRequest config = createModelBuildingRequest( p );
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        interpolator.interpolateObject( baseDir, model, new File( "." ), config, collector );
+        assertProblemFree( collector );
+
+        //noinspection unchecked
+        Map<Class<?>, ?> cache =
+                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
+                        .get( null );
+
+        Object fileCacheItem = cache.get( File.class );
+
+        assertNotNull( fileCacheItem );
+
+        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+    }
+
 
     public void testConcurrentInterpolation()
         throws Exception
@@ -429,6 +529,16 @@ public class StringSearchModelInterpolatorTest
         public ObjectWithMapField( Map<?, ?> values )
         {
             this.values = values;
+        }
+    }
+
+    private static final class ObjectWithNotInterpolatedFile
+    {
+        private final File f;
+
+        ObjectWithNotInterpolatedFile( File f )
+        {
+            this.f = f;
         }
     }
 
