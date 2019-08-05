@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class ExclusionArtifactFilter implements ArtifactFilter
 {
+    private static final String WILDCARD = "*";
+
     private final List<Exclusion> exclusions;
 
     public ExclusionArtifactFilter( List<Exclusion> exclusions )
@@ -41,15 +43,15 @@ public class ExclusionArtifactFilter implements ArtifactFilter
     {
         for ( Exclusion exclusion : exclusions )
         {
-            if ( "*".equals( exclusion.getGroupId() ) && "*".equals( exclusion.getArtifactId() ) )
+            if ( WILDCARD.equals( exclusion.getGroupId() ) && WILDCARD.equals( exclusion.getArtifactId() ) )
             {
                 return false;
             }
-            if ( "*".equals( exclusion.getGroupId() ) )
+            if ( WILDCARD.equals( exclusion.getGroupId() ) )
             {
                 return !exclusion.getArtifactId().equals( artifact.getArtifactId() );
             }
-            if ( "*".equals( exclusion.getArtifactId() ) )
+            if ( WILDCARD.equals( exclusion.getArtifactId() ) )
             {
                 return !exclusion.getGroupId().equals( artifact.getGroupId() );
             }
