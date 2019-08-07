@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.handler.DefaultHandler;
@@ -241,7 +242,17 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         Server server = new Server( 0 );
         server.setHandler( handlerList );
+        Connector connector = server.getConnectors()[0];
+        connector.setHost( "localhost" );
         server.start();
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
@@ -258,7 +269,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
                 assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
+            filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-it" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
@@ -288,6 +299,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         {
             verifier.resetStreams();
             server.stop();
+            server.join();
         }
     }
 
