@@ -20,13 +20,10 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
@@ -47,7 +44,6 @@ import org.mortbay.jetty.security.SecurityHandler;
 public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
     extends AbstractMavenIntegrationTestCase
 {
-
     private Server server;
 
     private int port;
@@ -59,15 +55,13 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
         super( "[2.0.3,3.0-alpha-3),[3.0-alpha-6,)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         Handler repoHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -109,22 +103,28 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
-
+        System.out.println( "Bound server socket to the port " + port );
         deployed = false;
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -151,5 +151,4 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
 
         assertTrue( deployed );
     }
-
 }

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
@@ -54,7 +53,8 @@ public class MavenITmng4068AuthenticatedMirrorTest
         super( ALL_MAVEN_VERSIONS );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
         super.setUp();
@@ -89,20 +89,27 @@ public class MavenITmng4068AuthenticatedMirrorTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**

@@ -43,41 +43,46 @@ import org.mortbay.jetty.handler.AbstractHandler;
 public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
     extends AbstractMavenIntegrationTestCase
 {
-
     private File testDir;
 
     private Server server;
 
-    int httpPort;
+    private int httpPort;
 
     public MavenITmng5280SettingsProfilesRepositoriesOrderTest()
     {
         super( "[3.1-A,)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5280" );
 
         server = new Server( 0 );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         httpPort = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + httpPort );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -133,12 +138,12 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         assertTrue( pluginRepoHandler.pluginRequestedFromRepo1Last );
     }
 
-    private class RepoHandler
+    private static final class RepoHandler
         extends AbstractHandler
     {
-        boolean artifactRequestedFromRepo1Last = false;
+        private volatile boolean artifactRequestedFromRepo1Last;
 
-        boolean artifactRequestedFromRepo2 = false;
+        private volatile boolean artifactRequestedFromRepo2;
 
         public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
             throws IOException
@@ -193,9 +198,9 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
     private class PluginRepoHandler
         extends AbstractHandler
     {
-        boolean pluginRequestedFromRepo1Last = false;
+        private volatile boolean pluginRequestedFromRepo1Last;
 
-        boolean pluginRequestedFromRepo2 = false;
+        private volatile boolean pluginRequestedFromRepo2;
 
         public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
             throws IOException

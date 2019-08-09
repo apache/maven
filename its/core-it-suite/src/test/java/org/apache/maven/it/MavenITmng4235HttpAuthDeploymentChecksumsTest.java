@@ -54,25 +54,23 @@ import java.util.Properties;
 public class MavenITmng4235HttpAuthDeploymentChecksumsTest
     extends AbstractMavenIntegrationTestCase
 {
-
     private File testDir;
 
     private Server server;
 
     private int port;
 
-    RepoHandler repoHandler = new RepoHandler();
+    private final RepoHandler repoHandler = new RepoHandler();
 
     public MavenITmng4235HttpAuthDeploymentChecksumsTest()
     {
         super( "[2.0.5,2.2.0),(2.2.0,)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4235" );
 
         repoHandler.setResourceBase( testDir.getAbsolutePath() );
@@ -102,20 +100,27 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -165,7 +170,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
     {
         String actualHash = ItUtils.calcHash( new File( verifier.getBasedir(), dataFile ), algo );
 
-        String expectedHash = verifier.loadLines( dataFile + hashExt, "UTF-8" ).get( 0 ).toString().trim();
+        String expectedHash = verifier.loadLines( dataFile + hashExt, "UTF-8" ).get( 0 ).trim();
 
         assertTrue( "expected=" + expectedHash + ", actual=" + actualHash,
                     expectedHash.equalsIgnoreCase( actualHash ) );

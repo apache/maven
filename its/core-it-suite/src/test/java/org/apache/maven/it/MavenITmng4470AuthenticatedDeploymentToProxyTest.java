@@ -33,14 +33,12 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4470">MNG-4470</a>.
@@ -51,29 +49,26 @@ import java.util.List;
 public class MavenITmng4470AuthenticatedDeploymentToProxyTest
     extends AbstractMavenIntegrationTestCase
 {
-
     private Server server;
 
     private int port;
 
     private volatile boolean deployed;
 
-    List<DeployedResource> deployedResources = new ArrayList<>();
+    private final Deque<DeployedResource> deployedResources = new ConcurrentLinkedDeque<>();
 
     public MavenITmng4470AuthenticatedDeploymentToProxyTest()
     {
         super( "[2.0.3,3.0-alpha-1),[3.0-alpha-6,)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         Handler proxyHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -105,9 +100,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
         Handler repoHandler = new AbstractHandler()
         {
-
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -159,22 +152,28 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
-
+        System.out.println( "Bound server socket to the port " + port );
         deployed = false;
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -198,9 +197,6 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
     private void testit( String project )
         throws Exception
     {
-
-        deployedResources = new ArrayList<>();
-
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4470/" + project );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -224,5 +220,4 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
         assertTrue( deployed );
     }
-
 }

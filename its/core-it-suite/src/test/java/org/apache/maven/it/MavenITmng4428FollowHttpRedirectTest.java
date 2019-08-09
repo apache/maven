@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -129,10 +128,18 @@ public class MavenITmng4428FollowHttpRedirectTest
         Connector from = server.getConnectors()[ fromHttp ? 0 : 1 ];
         Connector to = server.getConnectors()[ toHttp ? 0 : 1 ];
         server.setHandler( new RedirectHandler( toHttp ? "http" : "https", relativeLocation ? null : to ) );
-        server.start();
 
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4428" );
             verifier.deleteDirectory( "target" );
@@ -152,6 +159,7 @@ public class MavenITmng4428FollowHttpRedirectTest
         finally
         {
             server.stop();
+            server.join();
         }
 
         List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
@@ -175,7 +183,7 @@ public class MavenITmng4428FollowHttpRedirectTest
 
         private final Connector connector;
 
-        public RedirectHandler( String protocol, Connector connector )
+        RedirectHandler( String protocol, Connector connector )
         {
             this.protocol = protocol;
             this.connector = connector;

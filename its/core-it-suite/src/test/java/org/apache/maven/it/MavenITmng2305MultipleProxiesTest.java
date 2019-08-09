@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -75,12 +74,23 @@ public class MavenITmng2305MultipleProxiesTest
         server.addConnector( newHttpsConnector( storePath, storePwd, keyPwd ) );
         server.setHandler( new RepoHandler() );
         server.start();
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         int httpPort = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to HTTP port " + httpPort );
         int httpsPort = server.getConnectors()[1].getLocalPort();
+        System.out.println( "Bound server socket to HTTPS port " + httpsPort );
 
         TunnelingProxyServer proxy = new TunnelingProxyServer( 0, "localhost", httpsPort, "https.mngit:443" );
         proxy.start();
         int proxyPort = proxy.getPort();
+        System.out.println( "Bound server socket to the proxy port " + proxyPort );
 
         try
         {
@@ -159,7 +169,5 @@ public class MavenITmng2305MultipleProxiesTest
 
             ( (Request) request ).setHandled( true );
         }
-
     }
-
 }

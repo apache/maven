@@ -50,7 +50,8 @@ public class MavenITmng5175WagonHttpTest
         super( "[3.0.4,)" ); // 3.0.4+
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
         Handler handler = new AbstractHandler()
@@ -78,19 +79,26 @@ public class MavenITmng5175WagonHttpTest
         server = new Server( 0 );
         server.setHandler( handler );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
-        super.tearDown();
-
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
     }
 
@@ -118,9 +126,5 @@ public class MavenITmng5175WagonHttpTest
 
         verifier.verifyTextInLog( "Read timed out" );
         verifier.resetStreams();
-
-
     }
-
-
 }

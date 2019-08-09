@@ -25,16 +25,16 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.Deque;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4326">MNG-4326</a>.
@@ -68,12 +68,12 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        final List<String> uris = new ArrayList<>();
+        final Deque<String> uris = new ConcurrentLinkedDeque<>();
 
         Handler repoHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
+                throws IOException
             {
                 PrintWriter writer = response.getWriter();
 
@@ -131,15 +131,25 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
 
         Server server = new Server( 0 );
         server.setHandler( repoHandler );
-        server.start();
 
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+            int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
             // test 1: resolve snapshot, just built local copy should suppress daily remote update check
             verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
             verifier.setAutoclean( false );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
+            filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
@@ -175,5 +185,4 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             server.stop();
         }
     }
-
 }

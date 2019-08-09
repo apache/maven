@@ -19,19 +19,17 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Properties;
-
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
+
+import java.io.File;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4991">MNG-4991</a>.
@@ -63,7 +61,6 @@ public class MavenITmng4991NonProxyHostsTest
 
         Server server = new Server( 0 );
         server.setHandler( handlers );
-        server.start();
 
         /*
          * NOTE: To guard against automatic fallback to direct connection when the proxy is unreachable, we set up
@@ -71,11 +68,30 @@ public class MavenITmng4991NonProxyHostsTest
          */
         Server proxy = new Server( 0 );
         proxy.setHandler( new DefaultHandler() );
-        proxy.start();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+
+            proxy.start();
+            while ( !proxy.isRunning() || !proxy.isStarted() )
+            {
+                if ( proxy.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4991" );
@@ -94,11 +110,12 @@ public class MavenITmng4991NonProxyHostsTest
             verifier.resetStreams();
             server.stop();
             proxy.stop();
+            server.join();
+            proxy.join();
         }
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
 
         assertTrue( compile.toString(), compile.contains( "dep-0.1.jar" ) );
     }
-
 }

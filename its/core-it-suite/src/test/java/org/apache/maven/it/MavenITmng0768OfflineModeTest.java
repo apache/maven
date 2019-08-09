@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -30,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -67,7 +65,7 @@ public class MavenITmng0768OfflineModeTest
         Handler repoHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
+                throws IOException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -101,11 +99,22 @@ public class MavenITmng0768OfflineModeTest
 
         Server server = new Server( 0 );
         server.setHandler( repoHandler );
-        server.start();
-        int port = server.getConnectors()[0].getLocalPort();
 
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+
+            int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
+
             {
                 // phase 1: run build in online mode to fill local repo
                 Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -172,7 +181,7 @@ public class MavenITmng0768OfflineModeTest
         finally
         {
             server.stop();
+            server.join();
         }
     }
-
 }

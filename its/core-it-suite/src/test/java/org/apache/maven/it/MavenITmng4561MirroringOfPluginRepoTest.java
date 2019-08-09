@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -86,14 +85,24 @@ public class MavenITmng4561MirroringOfPluginRepoTest
         server.setHandler( handlerList );
         server.start();
 
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
-            Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+            int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4561" );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
+            filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
@@ -108,7 +117,7 @@ public class MavenITmng4561MirroringOfPluginRepoTest
         finally
         {
             server.stop();
+            server.join();
         }
     }
-
 }

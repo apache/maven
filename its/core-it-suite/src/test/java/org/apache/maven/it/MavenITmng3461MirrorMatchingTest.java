@@ -19,14 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -87,7 +85,7 @@ public class MavenITmng3461MirrorMatchingTest
         Handler repoHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
+                throws IOException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -117,11 +115,21 @@ public class MavenITmng3461MirrorMatchingTest
 
         Server server = new Server( 0 );
         server.setHandler( repoHandler );
-        server.start();
 
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+
             int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
 
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
@@ -137,6 +145,7 @@ public class MavenITmng3461MirrorMatchingTest
         finally
         {
             server.stop();
+            server.join();
         }
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
@@ -166,5 +175,4 @@ public class MavenITmng3461MirrorMatchingTest
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
     }
-
 }

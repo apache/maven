@@ -20,22 +20,21 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.handler.HandlerList;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4781">MNG-4781</a>.
@@ -45,14 +44,13 @@ import org.mortbay.jetty.handler.HandlerList;
 public class MavenITmng4781DeploymentToNexusStagingRepoTest
     extends AbstractMavenIntegrationTestCase
 {
-
     private Server server;
 
     private int port;
 
-    private List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
+    private final Deque<String> requestedUris = new ConcurrentLinkedDeque<>();
 
-    private List<String> deployedUris = Collections.synchronizedList( new ArrayList<String>() );
+    private final Deque<String> deployedUris = new ConcurrentLinkedDeque<>();
 
     public MavenITmng4781DeploymentToNexusStagingRepoTest()
     {
@@ -62,15 +60,11 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         Handler repoHandler = new AbstractHandler()
         {
-
-            private boolean putSeen;
+            private volatile boolean putSeen;
 
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -100,8 +94,16 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
     protected void tearDown()
@@ -110,13 +112,11 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
 
         requestedUris.clear();
         deployedUris.clear();
-
-        super.tearDown();
     }
 
     /**
@@ -137,15 +137,9 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertTrue( deployedUris.toString(), 
-            deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar" ) );
-        assertTrue( deployedUris.toString(), 
-            deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.pom" ) );
-        assertTrue( deployedUris.toString(), 
-            deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
-
-        assertTrue( requestedUris.toString(), 
-            deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
+        assertThat( deployedUris, hasItem( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar" ) );
+        assertThat( deployedUris, hasItem( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.pom" ) );
+        assertThat( deployedUris, hasItem( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
+        assertThat( requestedUris, hasItem( "/repo/org/apache/maven/its/mng4781/release/maven-metadata.xml" ) );
     }
-
 }

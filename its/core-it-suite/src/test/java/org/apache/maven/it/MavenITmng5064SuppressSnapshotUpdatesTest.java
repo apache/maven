@@ -19,17 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -69,7 +66,6 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
         AbstractHandler logHandler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
             {
                 if ( request.getRequestURI().startsWith( "/repo/" ) )
                 {
@@ -93,11 +89,21 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+            int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng5064" );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
+            filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-nsu" );
             verifier.addCliOption( "-s" );
@@ -125,7 +131,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
         {
             verifier.resetStreams();
             server.stop();
+            server.join();
         }
     }
-
 }

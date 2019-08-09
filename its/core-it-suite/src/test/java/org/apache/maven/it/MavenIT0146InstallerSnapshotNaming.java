@@ -34,11 +34,9 @@ import java.util.Properties;
 public class MavenIT0146InstallerSnapshotNaming
     extends AbstractMavenIntegrationTestCase
 {
-
     private Server server;
 
     private int port;
-
 
     private final File testDir;
 
@@ -49,10 +47,10 @@ public class MavenIT0146InstallerSnapshotNaming
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0146" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
         HandlerList handlers = new HandlerList();
@@ -61,28 +59,30 @@ public class MavenIT0146InstallerSnapshotNaming
         server = new Server( 0 );
         server.setHandler( handlers );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
-
+        System.out.println( "Bound server socket to the port " + port );
     }
 
 
+    @Override
     protected void tearDown()
         throws Exception
     {
-        super.tearDown();
-
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
     }
 
-    /**
-     *
-     */
     public void testitRemoteDownloadTimestampedName()
         throws Exception
     {
@@ -109,14 +109,12 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
-
     }
 
 
     public void testitNonTimestampedNameWithInstalledSNAPSHOT()
         throws Exception
     {
-
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
         verifier.addCliOption( "-f" );
@@ -150,6 +148,5 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
-
     }
 }

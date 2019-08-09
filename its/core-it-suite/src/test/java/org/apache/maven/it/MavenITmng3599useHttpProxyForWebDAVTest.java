@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -64,13 +63,14 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         super( "(2.0.9,3.3.9)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
         Handler handler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
+                throws IOException
             {
                 System.out.println( "Got request for URL: '" + request.getRequestURL() + "'" );
                 System.out.flush();
@@ -115,19 +115,26 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         server = new Server( 0 );
         server.setHandler( handler );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
-        super.tearDown();
-
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
     }
 

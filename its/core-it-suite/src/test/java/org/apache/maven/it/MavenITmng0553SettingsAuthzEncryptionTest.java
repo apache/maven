@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -56,11 +55,10 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         super( "[2.1.0,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0553" );
 
         Constraint constraint = new Constraint();
@@ -91,20 +89,27 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
         if ( server != null )
         {
             server.stop();
-            server = null;
+            server.join();
         }
-
-        super.tearDown();
     }
 
     /**
@@ -232,5 +237,4 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
             verifier.setEnvironmentVariable( "MAVEN_OPTS", "\"-Duser.home=" + path + "\"" );
         }
     }
-
 }

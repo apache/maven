@@ -23,11 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
@@ -55,13 +53,14 @@ public class MavenITmng3652UserAgentHeaderTest
         super( "[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,)" ); // 2.1.0-M1+
     }
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
         Handler handler = new AbstractHandler()
         {
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
+                throws IOException
             {
                 System.out.println( "Handling URL: '" + request.getRequestURL() + "'" );
                 
@@ -83,19 +82,26 @@ public class MavenITmng3652UserAgentHeaderTest
         server = new Server( 0 );
         server.setHandler( handler );
         server.start();
-
+        while ( !server.isRunning() || !server.isStarted() )
+        {
+            if ( server.isFailed() )
+            {
+                fail( "Couldn't bind the server socket to a free port!" );
+            }
+            Thread.sleep( 100L );
+        }
         port = server.getConnectors()[0].getLocalPort();
+        System.out.println( "Bound server socket to the port " + port );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
-        super.tearDown();
-
         if ( server != null)
         {
             server.stop();
-            server = null;
+            server.join();
         }
     }
 
@@ -135,10 +141,10 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
-        String javaVersion = (String) lines.get( 1 );
-        String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
-        String artifactVersion = (String) lines.get( 4 );
+        String mavenVersion = getMavenUAVersion( lines.get( 0 ) );
+        String javaVersion = lines.get( 1 );
+        String os = lines.get( 2 ) + " " + lines.get( 3 );
+        String artifactVersion = lines.get( 4 );
 
         if ( matchesVersionRange( "(,3.0-beta-3)" ) )
         {
@@ -184,10 +190,10 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
-        String javaVersion = (String) lines.get( 1 );
-        String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
-        String artifactVersion = (String) lines.get( 4 );
+        String mavenVersion = getMavenUAVersion( lines.get( 0 ) );
+        String javaVersion = lines.get( 1 );
+        String os = lines.get( 2 ) + " " + lines.get( 3 );
+        String artifactVersion = lines.get( 4 );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -238,10 +244,10 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
-        String javaVersion = (String) lines.get( 1 );
-        String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
-        String artifactVersion = (String) lines.get( 4 );
+        String mavenVersion = getMavenUAVersion( lines.get( 0 ) );
+        String javaVersion = lines.get( 1 );
+        String os = lines.get( 2 ) + " " + lines.get( 3 );
+        String artifactVersion = lines.get( 4 );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );

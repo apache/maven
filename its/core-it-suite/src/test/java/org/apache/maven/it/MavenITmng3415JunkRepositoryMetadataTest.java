@@ -30,9 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
@@ -158,7 +158,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        final List<String> requestUris = new ArrayList<>();
+        final Deque<String> requestUris = new ConcurrentLinkedDeque<>();
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -176,11 +176,21 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         Server server = new Server( 0 );
         server.setHandler( repoHandler );
-        server.start();
 
         try
         {
+            server.start();
+            while ( !server.isRunning() || !server.isStarted() )
+            {
+                if ( server.isFailed() )
+                {
+                    fail( "Couldn't bind the server socket to a free port!" );
+                }
+                Thread.sleep( 100L );
+            }
+
             int port = server.getConnectors()[0].getLocalPort();
+            System.out.println( "Bound server socket to the port " + port );
 
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.put( "@protocol@", "http" );
@@ -225,11 +235,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         finally
         {
             server.stop();
+            server.join();
         }
     }
 
     private void assertMetadataMissing( Verifier verifier )
-        throws IOException
     {
         File metadata = getMetadataFile( verifier );
 
@@ -238,7 +248,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     }
 
     private void setupDummyDependency( Verifier verifier, File testDir, boolean resetUpdateInterval )
-        throws VerificationException, IOException
+        throws IOException
     {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
@@ -258,7 +268,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     }
 
     private File getMetadataFile( Verifier verifier )
-        throws IOException
     {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
@@ -291,5 +300,4 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         return new File( verifier.getArtifactMetadataPath( gid, aid, version, name ) );
     }
-
 }
