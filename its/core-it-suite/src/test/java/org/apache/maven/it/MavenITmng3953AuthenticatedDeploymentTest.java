@@ -19,21 +19,27 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
+import org.apache.maven.it.util.ResourceExtractor;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Password;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 
-import org.apache.maven.it.util.ResourceExtractor;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
+import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
+import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
+import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3953">MNG-3953</a>.
@@ -61,7 +67,9 @@ public class MavenITmng3953AuthenticatedDeploymentTest
     {
         Handler repoHandler = new AbstractHandler()
         {
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            @Override
+            public void handle( String target, Request baseRequest, HttpServletRequest request,
+                                HttpServletResponse response )
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -88,30 +96,27 @@ public class MavenITmng3953AuthenticatedDeploymentTest
         constraintMapping.setConstraint( constraint );
         constraintMapping.setPathSpec( "/*" );
 
-        HashUserRealm userRealm = new HashUserRealm( "TestRealm" );
-        userRealm.put( "testuser", "testtest" );
-        userRealm.addUserToRole( "testuser", "deployer" );
+        HashLoginService userRealm = new HashLoginService( "TestRealm" );
+        userRealm.putUser( "testuser", new Password( "testtest" ), new String[] { "deployer" } );
 
-        SecurityHandler securityHandler = new SecurityHandler();
-        securityHandler.setUserRealm( userRealm );
+        server = new Server( 0 );
+        ServletContextHandler ctx = new ServletContextHandler( server, "/", SESSIONS | SECURITY );
+        ConstraintSecurityHandler securityHandler = (ConstraintSecurityHandler) ctx.getSecurityHandler();
+        securityHandler.setLoginService( userRealm );
+        securityHandler.setAuthMethod( __BASIC_AUTH );
         securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler( securityHandler );
         handlerList.addHandler( repoHandler );
 
-        server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-        while ( !server.isRunning() || !server.isStarted() )
+        if ( server.isFailed() )
         {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        port = server.getConnectors()[0].getLocalPort();
+        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to the port " + port );
         deployed = false;
     }

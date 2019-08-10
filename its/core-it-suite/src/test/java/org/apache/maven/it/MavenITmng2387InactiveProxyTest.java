@@ -19,16 +19,17 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.util.Properties;
-
-import org.apache.maven.it.util.ResourceExtractor;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2387">MNG-2387</a>.
@@ -69,15 +70,11 @@ public class MavenITmng2387InactiveProxyTest
         server = new Server( 0 );
         server.setHandler( handlers );
         server.start();
-        while ( !server.isRunning() || !server.isStarted() )
+        if ( server.isFailed() )
         {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        port = server.getConnectors()[0].getLocalPort();
+        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to the HTTP port " + port );
 
         resourceHandler = new ResourceHandler();
@@ -89,15 +86,11 @@ public class MavenITmng2387InactiveProxyTest
         proxyServer = new Server( 0 );
         proxyServer.setHandler( handlers );
         proxyServer.start();
-        while ( !proxyServer.isRunning() || !proxyServer.isStarted() )
+        if ( proxyServer.isFailed() )
         {
-            if ( proxyServer.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        proxyPort = proxyServer.getConnectors()[0].getLocalPort();
+        proxyPort = ( (NetworkConnector) proxyServer.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to the HTTPS port " + port );
     }
 

@@ -5,6 +5,8 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -66,21 +68,20 @@ public class HttpServer
 
     public int port()
     {
-        return ( (ServerConnector) server.getConnectors()[0] ).getLocalPort();
+        return ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
     }
 
     private Server server( int port )
     {
-
         QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setMaxThreads( 500 );
         Server server = new Server( threadPool );
+        server.setConnectors( new Connector[]{ new ServerConnector( server ) } );
         server.addBean( new ScheduledExecutorScheduler() );
 
-        ServerConnector http = new ServerConnector( server );
-        http.setPort( port );
-        http.setIdleTimeout( 30000 );
-        server.addConnector( http );
+        ServerConnector connector = (ServerConnector) server.getConnectors()[0];
+        connector.setIdleTimeout( 30_000L );
+        connector.setPort( port );
 
         StreamSourceHandler handler = new StreamSourceHandler( source );
 

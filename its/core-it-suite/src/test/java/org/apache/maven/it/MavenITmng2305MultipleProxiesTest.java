@@ -30,11 +30,18 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.security.SslSocketConnector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+
+import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2305">MNG-2305</a>.
@@ -71,20 +78,16 @@ public class MavenITmng2305MultipleProxiesTest
         String keyPwd = "key-passwd";
 
         Server server = new Server( 0 );
-        server.addConnector( newHttpsConnector( storePath, storePwd, keyPwd ) );
+        addHttpsConnector( server, storePath, storePwd, keyPwd );
         server.setHandler( new RepoHandler() );
         server.start();
-        while ( !server.isRunning() || !server.isStarted() )
+        if ( server.isFailed() )
         {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        int httpPort = server.getConnectors()[0].getLocalPort();
+        int httpPort = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to HTTP port " + httpPort );
-        int httpsPort = server.getConnectors()[1].getLocalPort();
+        int httpsPort = ( (NetworkConnector) server.getConnectors()[1] ).getLocalPort();
         System.out.println( "Bound server socket to HTTPS port " + httpsPort );
 
         TunnelingProxyServer proxy = new TunnelingProxyServer( 0, "localhost", httpsPort, "https.mngit:443" );
@@ -115,6 +118,7 @@ public class MavenITmng2305MultipleProxiesTest
         {
             proxy.stop();
             server.stop();
+            server.join();
         }
 
         List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
@@ -122,20 +126,25 @@ public class MavenITmng2305MultipleProxiesTest
         assertTrue( cp.toString(), cp.contains( "https-0.1.jar" ) );
     }
 
-    private Connector newHttpsConnector( String keystore, String storepwd, String keypwd )
+    private void addHttpsConnector( Server server, String keyStorePath, String keyStorePassword, String keyPassword )
     {
-        SslSocketConnector connector = new SslSocketConnector();
-        connector.setPort( 0 );
-        connector.setKeystore( keystore );
-        connector.setPassword( storepwd );
-        connector.setKeyPassword( keypwd );
-        return connector;
+        SslContextFactory sslContextFactory = new SslContextFactory( keyStorePath );
+        sslContextFactory.setKeyStorePassword( keyStorePassword );
+        sslContextFactory.setKeyManagerPassword( keyPassword );
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setSecureScheme( "https" );
+        HttpConfiguration httpsConfiguration = new HttpConfiguration( httpConfiguration );
+        httpsConfiguration.addCustomizer( new SecureRequestCustomizer() );
+        ServerConnector httpsConnector = new ServerConnector( server,
+                new SslConnectionFactory( sslContextFactory, HTTP_1_1.asString() ),
+                new HttpConnectionFactory( httpsConfiguration ) );
+        server.addConnector( httpsConnector );
     }
 
     static class RepoHandler extends AbstractHandler
     {
-
-        public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+        public void handle( String target, Request baseRequest, HttpServletRequest request,
+                            HttpServletResponse response )
             throws IOException
         {
             PrintWriter writer = response.getWriter();

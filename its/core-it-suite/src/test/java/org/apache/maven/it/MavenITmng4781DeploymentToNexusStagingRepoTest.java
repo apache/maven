@@ -19,19 +19,19 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import org.apache.maven.it.util.ResourceExtractor;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.maven.it.util.ResourceExtractor;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.HandlerList;
+import java.io.File;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +64,8 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         {
             private volatile boolean putSeen;
 
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            @Override
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
             {
                 System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
@@ -94,15 +95,11 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-        while ( !server.isRunning() || !server.isStarted() )
+        if ( server.isFailed() )
         {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        port = server.getConnectors()[0].getLocalPort();
+        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to the port " + port );
     }
 

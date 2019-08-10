@@ -20,11 +20,12 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.util.ResourceExtractor;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -73,31 +74,25 @@ public class MavenITmng4991NonProxyHostsTest
         try
         {
             server.start();
-            while ( !server.isRunning() || !server.isStarted() )
+            if ( server.isFailed() )
             {
-                if ( server.isFailed() )
-                {
-                    fail( "Couldn't bind the server socket to a free port!" );
-                }
-                Thread.sleep( 100L );
+                fail( "Couldn't bind the server socket to a free port!" );
             }
 
             proxy.start();
-            while ( !proxy.isRunning() || !proxy.isStarted() )
+            if ( proxy.isFailed() )
             {
-                if ( proxy.isFailed() )
-                {
-                    fail( "Couldn't bind the server socket to a free port!" );
-                }
-                Thread.sleep( 100L );
+                fail( "Couldn't bind the server socket to a free port!" );
             }
 
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4991" );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
-            filterProps.setProperty( "@proxyPort@", Integer.toString( proxy.getConnectors()[0].getLocalPort() ) );
+            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
+            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            int proxyPort = ( (NetworkConnector) proxy.getConnectors()[0] ).getLocalPort();
+            filterProps.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
             filterProps.setProperty( "@localhost@", InetAddress.getLocalHost().getCanonicalHostName() );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );

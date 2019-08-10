@@ -20,21 +20,21 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.util.ResourceExtractor;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4500">MNG-4500</a>.
@@ -66,7 +66,9 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
 
         AbstractHandler logHandler = new AbstractHandler()
         {
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            @Override
+            public void handle( String target, Request baseRequest, HttpServletRequest request,
+                                HttpServletResponse response )
             {
                 requestedUris.add( request.getRequestURI() );
             }
@@ -87,15 +89,11 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
         try
         {
             server.start();
-            while ( !server.isRunning() || !server.isStarted() )
+            if ( server.isFailed() )
             {
-                if ( server.isFailed() )
-                {
-                    fail( "Couldn't bind the server socket to a free port!" );
-                }
-                Thread.sleep( 100L );
+                fail( "Couldn't bind the server socket to a free port!" );
             }
-            int port = server.getConnectors()[0].getLocalPort();
+            int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
             System.out.println( "Bound server socket to the port " + port );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );

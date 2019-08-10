@@ -22,28 +22,34 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
-import org.mortbay.jetty.HttpMethods;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.resource.Resource;
-import org.mortbay.util.IO;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Password;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.util.Deque;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
+import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
+import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4235">MNG-4235</a>.
@@ -84,13 +90,14 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         constraintMapping.setConstraint( constraint );
         constraintMapping.setPathSpec( "/*" );
 
-        HashUserRealm userRealm = new HashUserRealm( "TestRealm" );
-        userRealm.put( "testuser", "testpass" );
-        userRealm.addUserToRole( "testuser", "deployer" );
+        HashLoginService userRealm = new HashLoginService( "TestRealm" );
+        userRealm.putUser( "testuser", new Password( "testpass" ), new String[] { "deployer" } );
 
-        SecurityHandler securityHandler = new SecurityHandler();
-        securityHandler.setUserRealm( userRealm );
-        securityHandler.setConstraintMappings( new ConstraintMapping[]{ constraintMapping } );
+        ServletContextHandler ctx = new ServletContextHandler( server, "/", SESSIONS | SECURITY );
+        ConstraintSecurityHandler securityHandler = (ConstraintSecurityHandler) ctx.getSecurityHandler();
+        securityHandler.setLoginService( userRealm );
+        securityHandler.setAuthMethod( __BASIC_AUTH );
+        securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler( securityHandler );
@@ -100,15 +107,11 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         server = new Server( 0 );
         server.setHandler( handlerList );
         server.start();
-        while ( !server.isRunning() || !server.isStarted() )
+        if ( server.isFailed() )
         {
-            if ( server.isFailed() )
-            {
-                fail( "Couldn't bind the server socket to a free port!" );
-            }
-            Thread.sleep( 100L );
+            fail( "Couldn't bind the server socket to a free port!" );
         }
-        port = server.getConnectors()[0].getLocalPort();
+        port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
         System.out.println( "Bound server socket to the port " + port );
     }
 
@@ -176,18 +179,18 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
                     expectedHash.equalsIgnoreCase( actualHash ) );
     }
 
-
-    public static class RepoHandler
-        extends ResourceHandler
+    private static class RepoHandler
+            extends ResourceHandler
     {
-        List<DeployedResource> deployedResources = new ArrayList<>();
+        private final Deque<DeployedResource> deployedResources = new ConcurrentLinkedDeque<>();
 
-        public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+        @Override
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException
         {
             System.out.println( request.getMethod() + " " + request.getRequestURI() );
 
-            if ( HttpMethods.PUT.equals( request.getMethod() ) )
+            if ( "PUT".equals( request.getMethod() ) )
             {
                 Resource resource = getResource( request );
 
@@ -198,12 +201,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
                     dir.mkdirs();
                 }
 
-                request.getContentLength();
-
-                try ( OutputStream os = resource.getOutputStream() )
-                {
-                    IO.copy( request.getInputStream(), os );
-                }
+                Files.copy( request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING );
 
                 DeployedResource deployedResource = new DeployedResource();
 
@@ -220,10 +218,8 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
             }
             else
             {
-                super.handle( target, request, response, dispatch );
+                super.handle( target, baseRequest, request, response );
             }
         }
     }
-
-
 }

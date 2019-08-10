@@ -162,6 +162,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5230MakeReactorWithExcludesTest.class );
         suite.addTestSuite( MavenITmng5224InjectedSettings.class );
         suite.addTestSuite( MavenITmng5214DontMapWsdlToJar.class );
+        suite.addTestSuite( MavenITmng5175WagonHttpTest.class );
         suite.addTestSuite( MavenITmng5137ReactorResolutionInForkedBuildTest.class );
         suite.addTestSuite( MavenITmng5135AggregatorDepResolutionModuleExtensionTest.class );
         suite.addTestSuite( MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest.class );
@@ -663,6 +664,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0249ResolveDepsFromReactorTest.class );
         suite.addTestSuite( MavenITmng0187CollectedProjectsTest.class );
         suite.addTestSuite( MavenITmng0095ReactorFailureBehaviorTest.class );
+        suite.addTestSuite( MavenIT0146InstallerSnapshotNaming.class );
         suite.addTestSuite( MavenIT0145ReactorWithIncludesExcludesTest.class );
         suite.addTestSuite( MavenIT0144LifecycleExecutionOrderTest.class );
         suite.addTestSuite( MavenIT0143TransitiveDependencyScopesTest.class );
