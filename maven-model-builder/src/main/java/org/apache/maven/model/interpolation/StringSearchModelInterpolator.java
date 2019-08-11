@@ -143,9 +143,7 @@ public class StringSearchModelInterpolator
         {
             this.interpolationTargets = new LinkedList<>();
             interpolationTargets.add( target );
-
             this.interpolator = interpolator;
-
             this.problems = problems;
         }
 
@@ -303,7 +301,7 @@ public class StringSearchModelInterpolator
                 this.fields = fields.toArray( new CacheField[0] );
             }
 
-            public void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
+            void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
             {
                 for ( CacheField field : fields )
                 {
@@ -399,12 +397,9 @@ public class StringSearchModelInterpolator
                     return;
                 }
 
-                int size = c.size();
-                Object value;
-                for ( int i = 0; i < size; i++ )
+                for ( int i = 0, size = c.size(); i < size; i++ )
                 {
-
-                    value = c.get( i );
+                    Object value = c.get( i );
 
                     if ( value != null )
                     {
