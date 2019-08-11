@@ -57,7 +57,6 @@ import javax.inject.Singleton;
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
-
     private static final Map<Class<?>, InterpolateObjectAction.CacheItem> CACHED_ENTRIES =
         new ConcurrentHashMap<>( 80, 0.75f, 2 );
     // Empirical data from 3.x, actual =40
@@ -72,23 +71,19 @@ public class StringSearchModelInterpolator
                                    ModelProblemCollector problems )
     {
         interpolateObject( model, model, projectDir, config, problems );
-
         return model;
     }
 
-    protected void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
-                                      final ModelProblemCollector problems )
+    void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
+                            ModelProblemCollector problems )
     {
         List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
-        List<? extends InterpolationPostProcessor> postProcessors =
-            createPostProcessors( model, projectDir, config );
+        List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
 
-        PrivilegedAction<Object> action;
-        action = new InterpolateObjectAction( obj, valueSources, postProcessors, innerInterpolator, problems );
+        PrivilegedAction<Object> action = new InterpolateObjectAction( obj, innerInterpolator, problems );
         AccessController.doPrivileged( action );
-
     }
 
     private InnerInterpolator createInterpolator( List<? extends ValueSource> valueSources,
@@ -138,24 +133,14 @@ public class StringSearchModelInterpolator
     private static final class InterpolateObjectAction
         implements PrivilegedAction<Object>
     {
-
         private final LinkedList<Object> interpolationTargets;
 
         private final InnerInterpolator interpolator;
 
-        private final List<? extends ValueSource> valueSources;
-
-        private final List<? extends InterpolationPostProcessor> postProcessors;
-
         private final ModelProblemCollector problems;
 
-        InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
-                                 List<? extends InterpolationPostProcessor> postProcessors,
-                                 InnerInterpolator interpolator, ModelProblemCollector problems )
+        InterpolateObjectAction( Object target, InnerInterpolator interpolator, ModelProblemCollector problems )
         {
-            this.valueSources = valueSources;
-            this.postProcessors = postProcessors;
-
             this.interpolationTargets = new LinkedList<>();
             interpolationTargets.add( target );
 
@@ -173,10 +158,8 @@ public class StringSearchModelInterpolator
 
                 traverseObjectWithParents( obj.getClass(), obj );
             }
-
             return null;
         }
-
 
         private String interpolate( String value )
         {
@@ -202,7 +185,6 @@ public class StringSearchModelInterpolator
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
         }
-
 
         private CacheItem getCacheEntry( Class<?> cls )
         {
@@ -319,7 +301,6 @@ public class StringSearchModelInterpolator
                     }
                 }
                 this.fields = fields.toArray( new CacheField[0] );
-
             }
 
             public void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
@@ -330,7 +311,7 @@ public class StringSearchModelInterpolator
                 }
             }
 
-            public boolean isArray()
+            boolean isArray()
             {
                 return isArray;
             }
@@ -338,7 +319,7 @@ public class StringSearchModelInterpolator
 
         abstract static class CacheField
         {
-            protected final Field field;
+            final Field field;
 
             CacheField( Field field )
             {
@@ -543,7 +524,5 @@ public class StringSearchModelInterpolator
                 }
             }
         }
-
     }
-
 }
