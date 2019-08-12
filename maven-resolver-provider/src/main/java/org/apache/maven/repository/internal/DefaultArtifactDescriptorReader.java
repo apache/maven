@@ -68,6 +68,7 @@ import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.eclipse.aether.transfer.ArtifactTransferException;
 
 /**
  * @author Benjamin Bentmann
@@ -243,9 +244,10 @@ public class DefaultArtifactDescriptorReader
             }
             catch ( ArtifactResolutionException e )
             {
-                if ( e.getCause() instanceof ArtifactNotFoundException )
+                Throwable cause = e.getCause();
+                if ( cause instanceof ArtifactTransferException )
                 {
-                    missingDescriptor( session, trace, a, (Exception) e.getCause() );
+                    missingDescriptor( session, trace, a, (Exception) cause );
                     if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
                     {
                         return null;
