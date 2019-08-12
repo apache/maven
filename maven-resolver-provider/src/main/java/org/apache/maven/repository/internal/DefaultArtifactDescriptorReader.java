@@ -247,7 +247,7 @@ public class DefaultArtifactDescriptorReader
                 Throwable cause = e.getCause();
                 if ( cause instanceof ArtifactNotFoundException || cause instanceof ArtifactTransferException )
                 {
-                    missingDescriptor( session, trace, a, (Exception) cause);
+                    missingDescriptor( session, trace, a, (Exception) cause );
                     if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
                     {
                         return null;
