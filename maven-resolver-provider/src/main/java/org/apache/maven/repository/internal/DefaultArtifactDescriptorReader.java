@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.net.UnknownHostException;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -170,7 +171,16 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 pomArtifact = resolveResult.getArtifact();
                 result.setRepository(resolveResult.getRepository());
             } catch (ArtifactResolutionException e) {
-                if (e.getCause() instanceof ArtifactNotFoundException) {
+                boolean respectIgnoreMissing = e.getCause() instanceof ArtifactNotFoundException;
+                for (Throwable cause = e.getCause(); cause != null && !respectIgnoreMissing; cause = cause.getCause()) {
+                    // When the artifact is unavailable and a repository has retired, then respect IGNORE_MISSING.
+                    // Maven cannot tell whether the artifact was in the retired repository or not.
+                    if (cause instanceof UnknownHostException) {
+                        respectIgnoreMissing = true;
+                    }
+                }
+
+                if (respectIgnoreMissing) {
                     missingDescriptor(session, trace, a, (Exception) e.getCause());
                     if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_MISSING) != 0) {
                         return null;
