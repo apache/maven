@@ -211,7 +211,7 @@ public class DefaultSettingsValidatorTest
         validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
         assertContains( problems.messages.get( 0 ), "'proxies.proxy.id' must be unique"
-            + " but found duplicate proxy with id " + null);
+            + " but found duplicate proxy with id " + id);
 
     }
 
