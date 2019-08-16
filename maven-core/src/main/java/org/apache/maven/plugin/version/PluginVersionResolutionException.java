@@ -82,29 +82,29 @@ public class PluginVersionResolutionException
 
     private static String format( LocalRepository localRepository, List<RemoteRepository> remoteRepositories )
     {
-        String repos = "[";
+        StringBuilder repos = new StringBuilder("[");
 
         if ( localRepository != null )
         {
-            repos += localRepository.getId() + " (" + localRepository.getBasedir() + ")";
+            repos.append(localRepository.getId()).append(" (").append(localRepository.getBasedir()).append(")");
         }
 
         if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
             for ( RemoteRepository repository : remoteRepositories )
             {
-                repos += ", ";
+                repos.append(", ");
 
                 if ( repository != null )
                 {
-                    repos += repository.getId() + " (" + repository.getUrl() + ")";
+                    repos.append(repository.getId()).append(" (").append(repository.getUrl()).append(")");
                 }
             }
         }
 
-        repos += "]";
+        repos.append("]");
 
-        return repos;
+        return repos.toString();
     }
 
 }

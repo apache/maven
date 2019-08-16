@@ -360,15 +360,15 @@ public class DefaultModelBuilder
             }
             else if ( !parentIds.add( parentData.getId() ) )
             {
-                String message = "The parents form a cycle: ";
+                StringBuilder message = new StringBuilder("The parents form a cycle: ");
                 for ( String modelId : parentIds )
                 {
-                    message += modelId + " -> ";
+                    message.append(modelId).append(" -> ");
                 }
-                message += parentData.getId();
+                message.append(parentData.getId());
 
                 problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE )
-                    .setMessage( message ) );
+                    .setMessage(message.toString()) );
 
                 throw problems.newModelBuildingException();
             }

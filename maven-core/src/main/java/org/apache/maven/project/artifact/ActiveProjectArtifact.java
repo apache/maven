@@ -392,12 +392,8 @@ public class ActiveProjectArtifact
         {
             return false;
         }
-        else if ( a.getClassifier() == null ? getClassifier() != null : !a.getClassifier().equals( getClassifier() ) )
-        {
-            return false;
-        }
+        else return a.getClassifier() == null ? getClassifier() == null : a.getClassifier().equals(getClassifier());
 
-        return true;
     }
 
 }
