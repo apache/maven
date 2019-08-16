@@ -202,7 +202,7 @@ public class DefaultSettingsValidatorTest
         Settings settings = new Settings();
         Proxy proxy = new Proxy();
         String id = null;
-        proxy.setId(null);
+        proxy.setId(id);
         proxy.setHost("www.example.com");
         settings.addProxy( proxy );
         settings.addProxy( proxy );
