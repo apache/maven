@@ -97,7 +97,7 @@ public final class ModelUtils
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
                 if ( !handleAsInheritance || ( parentInherited == null )
-                    || Boolean.valueOf( parentInherited ) )
+                    || Boolean.parseBoolean( parentInherited ) )
                 {
                     Plugin childPlugin = childPlugins.get( parentPlugin.getKey() );
 

@@ -190,7 +190,7 @@ public class MojoDescriptorCreator
             plugin.setArtifactId( tok.nextToken() );
             goal = tok.nextToken();
         }
-        else if ( numTokens <= 2 )
+        else
         {
             // We have a prefix and goal
             //
