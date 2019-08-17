@@ -337,7 +337,7 @@ public class MavenCli
                     "-D%s system property is not set.", MULTIMODULE_PROJECT_DIRECTORY );
                 throw new ExitException( 1 );
             }
-            File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
+            File basedir = new File( basedirProperty );
             try
             {
                 cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
@@ -764,7 +764,7 @@ public class MavenCli
 
                 MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
 
-                request = populateRequest( cliRequest, request );
+                populateRequest( cliRequest, request );
 
                 request = executionRequestPopulator.populateDefaults( request );
 
