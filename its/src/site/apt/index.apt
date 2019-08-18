@@ -54,4 +54,10 @@ Maven Core ITs
 
  So some care needs to be taken when introducing new dependencies into the ITs themselves or the support plugins.
  Many times the failures that we encounter are discrepancies between actual artifact consumption required and
- what is populated during bootstraping.
+ what is populated during bootstrapping. When forgetting, typical failures will give following traces in log:
+
+-------
+[INFO] Downloading from central: file:target/null/...
+...
+[ERROR] Failed to execute goal ... (...) on project ...: ... Could not find artifact ... in central (file:target/null) -> [Help 1]
+-------
