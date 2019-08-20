@@ -2622,7 +2622,7 @@ public class ModelMerger
      * Use to compute keys for data structures
      * @param <T>
      */
-    protected interface KeyComputer<T>
+    private interface KeyComputer<T>
     {
         Object key( T t );
     }
@@ -2631,7 +2631,7 @@ public class ModelMerger
      * Remapping function
      * @param <T>
      */
-    protected interface Remapping<T>
+    private interface Remapping<T>
     {
         T merge( T u, T v );
     }
@@ -2639,11 +2639,8 @@ public class ModelMerger
     /**
      * KeyComputer for Dependency
      */
-    protected class DependencyKeyComputer implements KeyComputer<Dependency>
+    private final class DependencyKeyComputer implements KeyComputer<Dependency>
     {
-        public DependencyKeyComputer()
-        {
-        }
         @Override
         public Object key( Dependency dependency )
         {
@@ -2654,11 +2651,8 @@ public class ModelMerger
     /**
      * KeyComputer for License
      */
-    protected class LicenseKeyComputer implements KeyComputer<License>
+    private class LicenseKeyComputer implements KeyComputer<License>
     {
-        public LicenseKeyComputer()
-        {
-        }
         @Override
         public Object key( License license )
         {
@@ -2669,11 +2663,8 @@ public class ModelMerger
     /**
      * KeyComputer for MailingList
      */
-    protected class MailingListKeyComputer implements KeyComputer<MailingList>
+    private class MailingListKeyComputer implements KeyComputer<MailingList>
     {
-        public MailingListKeyComputer()
-        {
-        }
         @Override
         public Object key( MailingList mailingList )
         {
@@ -2684,11 +2675,8 @@ public class ModelMerger
     /**
      * KeyComputer for Developer
      */
-    protected class DeveloperKeyComputer implements KeyComputer<Developer>
+    private class DeveloperKeyComputer implements KeyComputer<Developer>
     {
-        public DeveloperKeyComputer()
-        {
-        }
         @Override
         public Object key( Developer developer )
         {
@@ -2699,11 +2687,8 @@ public class ModelMerger
     /**
      * KeyComputer for Contributor
      */
-    protected class ContributorKeyComputer implements KeyComputer<Contributor>
+    private class ContributorKeyComputer implements KeyComputer<Contributor>
     {
-        public ContributorKeyComputer()
-        {
-        }
         @Override
         public Object key( Contributor contributor )
         {
@@ -2714,11 +2699,8 @@ public class ModelMerger
     /**
      * KeyComputer for Profile
      */
-    protected class ProfileKeyComputer implements KeyComputer<Profile>
+    private class ProfileKeyComputer implements KeyComputer<Profile>
     {
-        public ProfileKeyComputer()
-        {
-        }
         @Override
         public Object key( Profile profile )
         {
@@ -2729,11 +2711,8 @@ public class ModelMerger
     /**
      * KeyComputer for Repository
      */
-    protected class RepositoryKeyComputer implements KeyComputer<Repository>
+    private class RepositoryKeyComputer implements KeyComputer<Repository>
     {
-        public RepositoryKeyComputer()
-        {
-        }
         @Override
         public Object key( Repository repository )
         {
@@ -2744,11 +2723,8 @@ public class ModelMerger
     /**
      * KeyComputer for ReportPlugin
      */
-    protected class ReportPluginKeyComputer implements KeyComputer<ReportPlugin>
+    private class ReportPluginKeyComputer implements KeyComputer<ReportPlugin>
     {
-        public ReportPluginKeyComputer()
-        {
-        }
         @Override
         public Object key( ReportPlugin plugin )
         {
@@ -2759,11 +2735,8 @@ public class ModelMerger
     /**
      * KeyComputer for Plugin
      */
-    protected class PluginKeyComputer implements KeyComputer<Plugin>
+    private class PluginKeyComputer implements KeyComputer<Plugin>
     {
-        public PluginKeyComputer()
-        {
-        }
         @Override
         public Object key( Plugin plugin )
         {
@@ -2774,11 +2747,8 @@ public class ModelMerger
     /**
      * KeyComputer for ReportSet
      */
-    protected class ReportSetKeyComputer implements KeyComputer<ReportSet>
+    private class ReportSetKeyComputer implements KeyComputer<ReportSet>
     {
-        public ReportSetKeyComputer()
-        {
-        }
         @Override
         public Object key( ReportSet reportSet )
         {
@@ -2789,11 +2759,8 @@ public class ModelMerger
     /**
      * KeyComputer for Notifier
      */
-    protected class NotifierKeyComputer implements KeyComputer<Notifier>
+    private class NotifierKeyComputer implements KeyComputer<Notifier>
     {
-        public NotifierKeyComputer()
-        {
-        }
         @Override
         public Object key( Notifier notifier )
         {
@@ -2804,11 +2771,8 @@ public class ModelMerger
     /**
      * KeyComputer for Extension
      */
-    protected class ExtensionKeyComputer implements KeyComputer<Extension>
+    private class ExtensionKeyComputer implements KeyComputer<Extension>
     {
-        public ExtensionKeyComputer()
-        {
-        }
         @Override
         public Object key( Extension extension )
         {
@@ -2819,11 +2783,8 @@ public class ModelMerger
     /**
      * KeyComputer for Resource
      */
-    protected class ResourceKeyComputer implements KeyComputer<Resource>
+    private class ResourceKeyComputer implements KeyComputer<Resource>
     {
-        public ResourceKeyComputer()
-        {
-        }
         @Override
         public Object key( Resource resource )
         {
@@ -2834,11 +2795,8 @@ public class ModelMerger
     /**
      * KeyComputer for PluginExecution
      */
-    protected class ExecutionKeyComputer implements KeyComputer<PluginExecution>
+    private class ExecutionKeyComputer implements KeyComputer<PluginExecution>
     {
-        public ExecutionKeyComputer()
-        {
-        }
         @Override
         public Object key( PluginExecution pluginExecution )
         {
@@ -2849,11 +2807,8 @@ public class ModelMerger
     /**
      * KeyComputer for Exclusion
      */
-    protected class ExclusionKeyComputer implements KeyComputer<Exclusion>
+    private class ExclusionKeyComputer implements KeyComputer<Exclusion>
     {
-        public ExclusionKeyComputer()
-        {
-        }
         @Override
         public Object key( Exclusion exclusion )
         {
@@ -2865,11 +2820,11 @@ public class ModelMerger
      * Return the second value if <code>sourceDominant</code> is true, the first one otherwise.
      * @param <T>
      */
-    protected static class SourceDominant<T> implements Remapping<T>
+    private static class SourceDominant<T> implements Remapping<T>
     {
         private final boolean sourceDominant;
 
-        public SourceDominant( boolean sourceDominant )
+        SourceDominant( boolean sourceDominant )
         {
             this.sourceDominant = sourceDominant;
         }
@@ -2884,12 +2839,12 @@ public class ModelMerger
     /**
      * Merge two lists
      */
-    protected static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
+    private static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
     {
         return merge( tgt, src, computer, new SourceDominant<T>( sourceDominant ) );
     }
 
-    protected static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, Remapping<T> remapping )
+    private static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, Remapping<T> remapping )
     {
         if ( src.isEmpty() )
         {
@@ -2940,7 +2895,7 @@ public class ModelMerger
             }
         }
 
-        public void mergeAll( Collection<V> vs, Remapping<V> remapping )
+        void mergeAll( Collection<V> vs, Remapping<V> remapping )
         {
             if ( map == null )
             {
@@ -3012,11 +2967,13 @@ public class ModelMerger
             return list;
         }
 
+        @Override
         public void add( int index, V element )
         {
             asList().add( index, element );
         }
 
+        @Override
         public V remove( int index )
         {
             return asList().remove( index );
@@ -3041,5 +2998,4 @@ public class ModelMerger
             }
         }
     }
-
 }
