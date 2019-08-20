@@ -21,6 +21,8 @@ package org.apache.maven.xml.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import javax.xml.parsers.SAXParserFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +32,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     
     @Before
     public void setup() throws Exception {
-        filter = new ConsumerPomXMLFilter();
+        filter = new ConsumerPomXMLFilterFactory(){}.get( new BuildPomXMLFilter( SAXParserFactory.newInstance().newSAXParser().getXMLReader()  ) );
     }
     
     @Test

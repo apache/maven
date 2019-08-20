@@ -306,4 +306,20 @@ public class ProjectBuilderTest
         }
     }
 
+    public void testBuildProperties()
+            throws Exception
+    {
+        File file = new File( getProject( "MNG-6716" ).getParentFile(), "project/pom.xml" );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        configuration.setResolveDependencies( true );
+        List<ProjectBuildingResult> result = projectBuilder.build( Collections.singletonList(file), true, configuration );
+        MavenProject project = result.get(0).getProject();
+        // verify a few typical parameters are not duplicated
+        assertEquals( 1, project.getTestCompileSourceRoots().size() );
+        assertEquals( 1, project.getCompileSourceRoots().size() );
+        assertEquals( 1, project.getMailingLists().size() );
+        assertEquals( 1, project.getResources().size() );
+    }
 }

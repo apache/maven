@@ -88,6 +88,11 @@ under the License.
       <artifactId>xmlunit-matchers</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-reflect</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

@@ -52,6 +52,8 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
+import org.apache.maven.xml.filter.BuildPomXMLFilter;
+import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.filter.ConsumerPomXMLFilter;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
@@ -76,6 +78,9 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * @since 3.3.0
@@ -110,7 +115,7 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
-
+    
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -284,8 +289,18 @@ public class DefaultRepositorySystemSessionFactory
                             final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
                             final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
                             
+                            XMLReader parent;
+                            try
+                            {
+                                parent = XMLReaderFactory.createXMLReader();
+                            }
+                            catch ( SAXException e )
+                            {
+                                throw new TransformException( "Failed to create XMLReader", e );
+                            }
+                            
                             final SAXSource transformSource =
-                                            new SAXSource( new ConsumerPomXMLFilter( null /* @TODO bass BuildPomXMLFilter */ ), 
+                                            new SAXSource( new ConsumerPomXMLFilter( new B ), 
                                                            new InputSource( new FileReader( file ) ) );
                             
                             final StreamResult result = new StreamResult( pipedOutputStream );

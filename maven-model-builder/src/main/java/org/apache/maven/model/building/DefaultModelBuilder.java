@@ -19,6 +19,34 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.xml.crypto.dsig.TransformException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -59,28 +87,12 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.xml.filter.BuildPomXMLFilter;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * @author Benjamin Bentmann
@@ -744,7 +756,19 @@ public class DefaultModelBuilder
         // re-read model from file
         if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
         {
-            throw new UnsupportedOperationException();
+            try
+            {
+                // TODO: parent might be part of reactor... better read all lineage items like this?
+                Model parent = lineage.get( 1 ).getModel();
+                Model child = lineage.get( 0 ).getModel(); 
+                // modelProcessor.read( lineage.get( 0 ).getSource().getInputStream(), null );
+                inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
+            }
+            finally
+//            catch ( IOException e )
+            {
+                // this is second read, should not happen
+            }
         }
         else
         {
@@ -752,6 +776,51 @@ public class DefaultModelBuilder
             Model child = lineage.get( 0 ).getModel();
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
+    }
+    
+    private InputStream transformData( InputStream inputStream )
+                    throws IOException, TransformException
+    {
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        
+        final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
+        final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
+        
+        XMLReader parent;
+        try
+        {
+            parent = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+        }
+        catch ( SAXException | ParserConfigurationException e )
+        {
+            throw new TransformException( "Failed to create XMLReader", e );
+        }
+        
+        final SAXSource transformSource =
+                        new SAXSource( new BuildPomXMLFilter( parent ), 
+                                       new org.xml.sax.InputSource( inputStream ) );
+        
+        final StreamResult result = new StreamResult( pipedOutputStream );
+        
+        final Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try ( PipedOutputStream out = pipedOutputStream )
+                {
+                    transformerFactory.newTransformer().transform( transformSource, result );
+                }
+                catch ( TransformerException | IOException e )
+                {
+                    throw new RuntimeException( e );
+                }
+            }
+        };
+
+        new Thread( runnable ).start();
+
+        return pipedInputStream;
     }
 
     private Map<String, Activation> getProfileActivations( Model model, boolean clone )

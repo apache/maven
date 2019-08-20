@@ -57,7 +57,6 @@ import javax.inject.Singleton;
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
-
     private static final Map<Class<?>, InterpolateObjectAction.CacheItem> CACHED_ENTRIES =
         new ConcurrentHashMap<>( 80, 0.75f, 2 );
     // Empirical data from 3.x, actual =40
@@ -72,23 +71,19 @@ public class StringSearchModelInterpolator
                                    ModelProblemCollector problems )
     {
         interpolateObject( model, model, projectDir, config, problems );
-
         return model;
     }
 
-    protected void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
-                                      final ModelProblemCollector problems )
+    void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
+                            ModelProblemCollector problems )
     {
         List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
-        List<? extends InterpolationPostProcessor> postProcessors =
-            createPostProcessors( model, projectDir, config );
+        List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
 
-        PrivilegedAction<Object> action;
-        action = new InterpolateObjectAction( obj, valueSources, postProcessors, innerInterpolator, problems );
+        PrivilegedAction<Object> action = new InterpolateObjectAction( obj, innerInterpolator, problems );
         AccessController.doPrivileged( action );
-
     }
 
     private InnerInterpolator createInterpolator( List<? extends ValueSource> valueSources,
@@ -138,29 +133,17 @@ public class StringSearchModelInterpolator
     private static final class InterpolateObjectAction
         implements PrivilegedAction<Object>
     {
-
         private final LinkedList<Object> interpolationTargets;
 
         private final InnerInterpolator interpolator;
 
-        private final List<? extends ValueSource> valueSources;
-
-        private final List<? extends InterpolationPostProcessor> postProcessors;
-
         private final ModelProblemCollector problems;
 
-        InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
-                                 List<? extends InterpolationPostProcessor> postProcessors,
-                                 InnerInterpolator interpolator, ModelProblemCollector problems )
+        InterpolateObjectAction( Object target, InnerInterpolator interpolator, ModelProblemCollector problems )
         {
-            this.valueSources = valueSources;
-            this.postProcessors = postProcessors;
-
             this.interpolationTargets = new LinkedList<>();
             interpolationTargets.add( target );
-
             this.interpolator = interpolator;
-
             this.problems = problems;
         }
 
@@ -173,10 +156,8 @@ public class StringSearchModelInterpolator
 
                 traverseObjectWithParents( obj.getClass(), obj );
             }
-
             return null;
         }
-
 
         private String interpolate( String value )
         {
@@ -202,7 +183,6 @@ public class StringSearchModelInterpolator
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
         }
-
 
         private CacheItem getCacheEntry( Class<?> cls )
         {
@@ -250,7 +230,13 @@ public class StringSearchModelInterpolator
 
             private boolean isQualifiedForInterpolation( Class<?> cls )
             {
-                return !cls.getName().startsWith( "java" );
+                Package pkg = cls.getPackage();
+                if ( pkg == null )
+                {
+                    return true;
+                }
+                String pkgName = pkg.getName();
+                return !pkgName.startsWith( "java." ) && !pkgName.startsWith( "javax." );
             }
 
             private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
@@ -278,41 +264,44 @@ public class StringSearchModelInterpolator
                 this.isQualifiedForInterpolation = isQualifiedForInterpolation( clazz );
                 this.isArray = clazz.isArray();
                 List<CacheField> fields = new ArrayList<>();
-                for ( Field currentField : clazz.getDeclaredFields() )
+                if ( isQualifiedForInterpolation )
                 {
-                    Class<?> type = currentField.getType();
-                    if ( isQualifiedForInterpolation( currentField, type ) )
+                    for ( Field currentField : clazz.getDeclaredFields() )
                     {
-                        if ( String.class == type )
+                        Class<?> type = currentField.getType();
+                        if ( isQualifiedForInterpolation( currentField, type ) )
                         {
-                            if ( !Modifier.isFinal( currentField.getModifiers() ) )
+                            if ( String.class == type )
                             {
-                                fields.add( new StringField( currentField ) );
+                                if ( !Modifier.isFinal( currentField.getModifiers() ) )
+                                {
+                                    fields.add( new StringField( currentField ) );
+                                }
                             }
-                        }
-                        else if ( List.class.isAssignableFrom( type ) )
-                        {
-                            fields.add( new ListField( currentField ) );
-                        }
-                        else if ( Collection.class.isAssignableFrom( type ) )
-                        {
-                            throw new RuntimeException( "We dont interpolate into collections, use a list instead" );
-                        }
-                        else if ( Map.class.isAssignableFrom( type ) )
-                        {
-                            fields.add( new MapField( currentField ) );
-                        }
-                        else
-                        {
-                            fields.add( new ObjectField( currentField ) );
+                            else if ( List.class.isAssignableFrom( type ) )
+                            {
+                                fields.add( new ListField( currentField ) );
+                            }
+                            else if ( Collection.class.isAssignableFrom( type ) )
+                            {
+                                throw new RuntimeException(
+                                        "We dont interpolate into collections, use a list instead" );
+                            }
+                            else if ( Map.class.isAssignableFrom( type ) )
+                            {
+                                fields.add( new MapField( currentField ) );
+                            }
+                            else
+                            {
+                                fields.add( new ObjectField( currentField ) );
+                            }
                         }
                     }
                 }
                 this.fields = fields.toArray( new CacheField[0] );
-
             }
 
-            public void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
+            void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
             {
                 for ( CacheField field : fields )
                 {
@@ -320,7 +309,7 @@ public class StringSearchModelInterpolator
                 }
             }
 
-            public boolean isArray()
+            boolean isArray()
             {
                 return isArray;
             }
@@ -328,7 +317,7 @@ public class StringSearchModelInterpolator
 
         abstract static class CacheField
         {
-            protected final Field field;
+            final Field field;
 
             CacheField( Field field )
             {
@@ -408,12 +397,9 @@ public class StringSearchModelInterpolator
                     return;
                 }
 
-                int size = c.size();
-                Object value;
-                for ( int i = 0; i < size; i++ )
+                for ( int i = 0, size = c.size(); i < size; i++ )
                 {
-
-                    value = c.get( i );
+                    Object value = c.get( i );
 
                     if ( value != null )
                     {
@@ -533,7 +519,5 @@ public class StringSearchModelInterpolator
                 }
             }
         }
-
     }
-
 }

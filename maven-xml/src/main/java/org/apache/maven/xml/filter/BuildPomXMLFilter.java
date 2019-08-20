@@ -1,5 +1,7 @@
 package org.apache.maven.xml.filter;
 
+import org.xml.sax.XMLFilter;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,17 +21,30 @@ package org.apache.maven.xml.filter;
  * under the License.
  */
 
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
  * Filter to adjust pom on filesystem before being processed for effective pom.
+ * There should only be 1 BuildPomXMLFilter, so the same is being used by both
+ * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
+ * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
+ * 
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public class BuildPomXMLFilter extends XMLFilterImpl
+public class BuildPomXMLFilter extends XMLFilterImpl 
 {
+    private XMLFilter rootFilter;
     
+    BuildPomXMLFilter()
+    {
+        super();
+    }
 
-    
+    BuildPomXMLFilter( XMLReader parent )
+    {
+        super( parent );
+    }
 }
