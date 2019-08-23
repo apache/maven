@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>31</version>
+    <version>33</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -52,6 +52,10 @@ under the License.
     <system>Jenkins</system>
     <url>https://builds.apache.org/job/maven-box/job/maven/</url>
   </ciManagement>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.apache.org/jira/browse/MNG</url>
+  </issueManagement>
   <distributionManagement>
     <site>
       <id>apache.website</id>
@@ -101,7 +105,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.7</version>
             <configuration>
               <dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- waiting for MPIR-267 -->
               <!-- pin down urls to to avoid interpolated values from the modules, waiting for  MPIR-290 -->

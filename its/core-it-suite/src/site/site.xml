@@ -22,8 +22,6 @@ under the License.
 <project xmlns="https://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd">
 
-  <edit>${project.scm.url}</edit>
-
   <body>
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>

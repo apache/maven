@@ -31,7 +31,7 @@ under the License.
 
   <artifactId>core-it-suite</artifactId>
 
-  <name>Maven ITs</name>
+  <name>Maven Core ITs suite</name>
   <description>The effective Maven Integration Tests suite.</description>
 
   <!--
