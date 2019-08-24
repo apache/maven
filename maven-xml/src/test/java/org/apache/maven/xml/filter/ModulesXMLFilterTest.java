@@ -21,23 +21,35 @@ package org.apache.maven.xml.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import javax.xml.parsers.SAXParserFactory;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 
 	private ModulesXMLFilter filter;
+
+	@Override
+	protected XMLFilter getFilter()
+	{
+	    return new ModulesXMLFilter();
+	}
 	
 	@Before
-	public void setup() {
-		filter = new ModulesXMLFilter();
+	public void setup() throws Exception {
+        XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+        filter = new ModulesXMLFilter( xmlReader );
+        filter.setFeature( "http://xml.org/sax/features/namespaces", true );
 	}
 	
 	@Test
 	public void testEmptyModules() throws Exception {
 		String input = "<project><modules/></project>";
         String expected = "<project/>";
-        String actual = transform( input, filter );
+        String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
 	}
 
@@ -48,7 +60,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 				+ "<module>../cd</module>"
 				+ "</modules></project>";
 		String expected = "<project/>";
-		String actual = transform( input, filter );
+		String actual = transform( input );
 		assertThat( actual ).and( expected ).areIdentical();
 	}
 	
@@ -56,7 +68,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     public void testNoModules() throws Exception {
         String input = "<project><name>NAME</name></project>";
         String expected = input;
-        String actual = transform( input, filter );
+        String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
     }
 }

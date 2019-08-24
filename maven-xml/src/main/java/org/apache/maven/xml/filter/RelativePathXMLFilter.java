@@ -57,6 +57,7 @@ class RelativePathXMLFilter
     public void startElement( String uri, String localName, String qName, Attributes atts )
         throws SAXException
     {
+        
         if ( relativePathStatus == -1 && "relativePath".equals( localName ) )
         {
             relativePathStatus = 1;

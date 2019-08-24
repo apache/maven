@@ -1,7 +1,5 @@
 package org.apache.maven.xml.filter;
 
-import java.io.Reader;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,10 +19,13 @@ import java.io.Reader;
  * under the License.
  */
 
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -35,34 +36,32 @@ import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
-public class AbstractXMLFilterTests
+public abstract class AbstractXMLFilterTests
 {
-
     public AbstractXMLFilterTests()
     {
         super();
     }
+    
+    protected abstract XMLFilter getFilter() throws TransformerException, SAXException, ParserConfigurationException;
+    
 
-    protected String transform( String input, XMLFilter filter )
-        throws TransformerException, SAXException
+    protected String transform( String input )
+        throws TransformerException, SAXException, ParserConfigurationException
     {
-        return transform( new StringReader( input ), filter );
+        return transform( new StringReader( input ) );
     }
     
-    protected String transform( Reader input, XMLFilter filter )
-        throws TransformerException, SAXException
+    protected String transform( Reader input )
+        throws TransformerException, SAXException, ParserConfigurationException
     {
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-
-        XMLFilter parent = filter;
-        while ( parent.getParent() instanceof XMLFilter )
+        XMLFilter filter = getFilter();
+        if( filter.getParent() == null )
         {
-            parent = (XMLFilter) parent.getParent();
+            filter.setParent( SAXParserFactory.newInstance().newSAXParser().getXMLReader() );
+            filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         }
-        parent.setParent( reader );
 
         Writer writer = new StringWriter();
         StreamResult result = new StreamResult( writer );

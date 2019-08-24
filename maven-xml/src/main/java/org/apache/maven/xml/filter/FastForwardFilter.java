@@ -34,7 +34,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * Should be used in case of a DOM that should not be effected by other filters, even though the elements match 
  * 
  * @author Robert Scholte
- * @since 4.0.0
+ * @since 3.7.0
  */
 class FastForwardFilter extends XMLFilterImpl
 {

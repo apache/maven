@@ -21,18 +21,56 @@ package org.apache.maven.xml.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-import javax.xml.parsers.SAXParserFactory;
+import java.util.Optional;
 
-import org.junit.Before;
+import javax.inject.Provider;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Test;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLFilter;
 
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
-    private ConsumerPomXMLFilter filter;
-    
-    @Before
-    public void setup() throws Exception {
-        filter = new ConsumerPomXMLFilterFactory(){}.get( new BuildPomXMLFilter( SAXParserFactory.newInstance().newSAXParser().getXMLReader()  ) );
+    @Override
+    protected XMLFilter getFilter() throws SAXException, ParserConfigurationException
+    {
+        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory()
+        {
+            @Override
+            protected Optional<String> getSha1()
+            {
+                return Optional.empty();
+            }
+            
+            @Override
+            protected Optional<String> getRevision()
+            {
+                return Optional.empty();
+            }
+            
+            @Override
+            protected Optional<String> getChangelist()
+            {
+                return Optional.of( "CL" );
+            }
+        };
+        
+        Provider<BuildPomXMLFilterFactory> provider = new Provider<BuildPomXMLFilterFactory>()
+        {
+
+            @Override
+            public BuildPomXMLFilterFactory get()
+            {
+                return buildPomXMLFilterFactory;
+            }
+        };
+        
+        XMLFilter filter = new ConsumerPomXMLFilterFactory( provider )
+        {
+        }.get( "G", "A" );
+        filter.setFeature( "http://xml.org/sax/features/namespaces", true );
+        return filter;
     }
     
     @Test
@@ -59,8 +97,57 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
                         + "  </parent>\n"
                         + "  <artifactId>PROJECT</artifactId>\n"
                         + "</project>";
-        String actual = transform( input, filter );
+        String actual = transform( input );
         assertThat( actual ).and( expected ).ignoreWhitespace().areIdentical();
     }
+    
+    @Test
+    public void testMe() throws Exception {
+        String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" \r\n" + 
+            "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" + 
+            "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 \r\n" + 
+            "                             http://maven.apache.org/maven-v4_0_0.xsd\">\r\n" + 
+            "  <modelVersion>4.0.0</modelVersion>\r\n" + 
+            "  <groupId>org.sonatype.mavenbook.multispring</groupId>\r\n" + 
+            "  <artifactId>parent</artifactId>\r\n" + 
+            "  <version>0.9-${changelist}-SNAPSHOT</version>\r\n" + 
+            "  <packaging>pom</packaging>\r\n" + 
+            "  <name>Multi-Spring Chapter Parent Project</name>\r\n" + 
+            "  <modules>\r\n" + 
+            "    <module>simple-parent</module>\r\n" + 
+            "  </modules>\r\n" + 
+            "  \r\n" + 
+            "  <pluginRepositories>\r\n" + 
+            "    <pluginRepository>\r\n" + 
+            "      <id>apache.snapshots</id>\r\n" + 
+            "      <url>http://repository.apache.org/snapshots/</url>\r\n" + 
+            "    </pluginRepository>\r\n" + 
+            "  </pluginRepositories>\r\n" + 
+            "</project>";
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" \r\n" + 
+            "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" + 
+            "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 \r\n" + 
+            "                             http://maven.apache.org/maven-v4_0_0.xsd\">\r\n" + 
+            "  <modelVersion>4.0.0</modelVersion>\r\n" + 
+            "  <groupId>org.sonatype.mavenbook.multispring</groupId>\r\n" + 
+            "  <artifactId>parent</artifactId>\r\n" + 
+            "  <version>0.9-CL-SNAPSHOT</version>\r\n" + 
+            "  <packaging>pom</packaging>\r\n" + 
+            "  <name>Multi-Spring Chapter Parent Project</name>\r\n" + 
+            "  \r\n" + 
+            "  <pluginRepositories>\r\n" + 
+            "    <pluginRepository>\r\n" + 
+            "      <id>apache.snapshots</id>\r\n" + 
+            "      <url>http://repository.apache.org/snapshots/</url>\r\n" + 
+            "    </pluginRepository>\r\n" + 
+            "  </pluginRepositories>\r\n" + 
+            "</project>";
+        String actual = transform( input );
+        assertThat( actual ).and( expected ).ignoreWhitespace().areIdentical();
+    }
+    
+    
 
 }

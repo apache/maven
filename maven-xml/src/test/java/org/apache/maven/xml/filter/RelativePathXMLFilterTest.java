@@ -1,7 +1,5 @@
 package org.apache.maven.xml.filter;
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,16 +19,17 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
  * under the License.
  */
 
-import org.junit.Before;
+import static org.xmlunit.assertj.XmlAssert.assertThat;
+
 import org.junit.Test;
+import org.xml.sax.XMLFilter;
 
 public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
 {
-    private RelativePathXMLFilter filter;
-    
-    @Before
-    public void setup() {
-        filter = new RelativePathXMLFilter();
+    @Override
+    protected XMLFilter getFilter()
+    {
+        return new RelativePathXMLFilter();
     }
     
     @Test
@@ -54,7 +53,65 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
                            + "  </parent>\n"
                            + "  <artifactId>PROJECT</artifactId>\n"
                            + "</project>";
-           String actual = transform( input, filter );
+           String actual = transform( input );
+           assertThat( actual ).and( expected ).areIdentical();
+    }
+    
+    @Test
+    public void testRelativePathNS() throws Exception
+    {
+        String input = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" + 
+            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+            "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                        + "  <parent>\n"
+                        + "    <groupId>GROUPID</groupId>\n"
+                        + "    <artifactId>PARENT</artifactId>\n"
+                        + "    <version>VERSION</version>\n"
+                        + "    <relativePath>../pom.xml</relativePath>\n"
+                        + "  </parent>\n"
+                        + "  <artifactId>PROJECT</artifactId>\n"
+                        + "</project>";
+           String expected = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" + 
+               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+               "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                           + "  <parent>\n"
+                           + "    <groupId>GROUPID</groupId>\n"
+                           + "    <artifactId>PARENT</artifactId>\n"
+                           + "    <version>VERSION</version>\n"
+                           + "    <relativePath/>\n"
+                           + "  </parent>\n"
+                           + "  <artifactId>PROJECT</artifactId>\n"
+                           + "</project>";
+           String actual = transform( input );
+           assertThat( actual ).and( expected ).areIdentical();
+    }
+    
+    @Test
+    public void testRelativePathPasNS() throws Exception
+    {
+        String input = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" + 
+            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+            "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                        + "  <p:parent>\n"
+                        + "    <p:groupId>GROUPID</p:groupId>\n"
+                        + "    <p:artifactId>PARENT</p:artifactId>\n"
+                        + "    <p:version>VERSION</p:version>\n"
+                        + "    <p:relativePath>../pom.xml</p:relativePath>\n"
+                        + "  </p:parent>\n"
+                        + "  <p:artifactId>PROJECT</p:artifactId>\n"
+                        + "</p:project>";
+           String expected = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" + 
+               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+               "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
+                           + "  <p:parent>\n"
+                           + "    <p:groupId>GROUPID</p:groupId>\n"
+                           + "    <p:artifactId>PARENT</p:artifactId>\n"
+                           + "    <p:version>VERSION</p:version>\n"
+                           + "    <p:relativePath/>\n"
+                           + "  </p:parent>\n"
+                           + "  <p:artifactId>PROJECT</p:artifactId>\n"
+                           + "</p:project>";
+           String actual = transform( input );
            assertThat( actual ).and( expected ).areIdentical();
     }
 

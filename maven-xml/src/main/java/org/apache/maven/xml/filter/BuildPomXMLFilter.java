@@ -1,7 +1,5 @@
 package org.apache.maven.xml.filter;
 
-import org.xml.sax.XMLFilter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -36,8 +34,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
  */
 public class BuildPomXMLFilter extends XMLFilterImpl 
 {
-    private XMLFilter rootFilter;
-    
     BuildPomXMLFilter()
     {
         super();
@@ -46,5 +42,14 @@ public class BuildPomXMLFilter extends XMLFilterImpl
     BuildPomXMLFilter( XMLReader parent )
     {
         super( parent );
+    }
+    
+    @Override
+    public final void setParent( XMLReader parent )
+    {
+        if ( getParent() == null )
+        {
+            super.setParent( parent );
+        }
     }
 }

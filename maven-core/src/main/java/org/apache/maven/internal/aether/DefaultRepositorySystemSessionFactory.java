@@ -34,6 +34,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -52,9 +53,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.maven.xml.filter.BuildPomXMLFilter;
-import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.filter.ConsumerPomXMLFilter;
+import org.apache.maven.xml.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -79,8 +78,6 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * @since 3.3.0
@@ -115,6 +112,9 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
+    
+    @Inject
+    private ConsumerPomXMLFilterFactory consumerPomXMLFilterFactory;
     
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
@@ -273,7 +273,7 @@ public class DefaultRepositorySystemSessionFactory
         return new FileTransformerManager()
         {
             @Override
-            public Collection<FileTransformer> getTransformersForArtifact( Artifact artifact )
+            public Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact )
             {
                 Collection<FileTransformer> transformers = new ArrayList<>();
                 if ( "pom".equals( artifact.getExtension() ) )
@@ -286,22 +286,23 @@ public class DefaultRepositorySystemSessionFactory
                         public InputStream transformData( File file )
                             throws IOException, TransformException
                         {
+                            System.out.println( "transforming " + file.getAbsolutePath() );
                             final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
                             final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
                             
-                            XMLReader parent;
+                            final SAXSource transformSource;
                             try
                             {
-                                parent = XMLReaderFactory.createXMLReader();
+                                transformSource =
+                                    new SAXSource( consumerPomXMLFilterFactory.get( artifact.getGroupId(),
+                                                                                    artifact.getArtifactId() ),
+                                                   new InputSource( new FileReader( file ) ) );
                             }
-                            catch ( SAXException e )
-                            {
-                                throw new TransformException( "Failed to create XMLReader", e );
+                            catch ( SAXException | ParserConfigurationException e )
+                            {   
+                                e.printStackTrace();
+                                throw new TransformException( "Failed to create a consumerPomXMLFilter", e );
                             }
-                            
-                            final SAXSource transformSource =
-                                            new SAXSource( new ConsumerPomXMLFilter( new B ), 
-                                                           new InputSource( new FileReader( file ) ) );
                             
                             final StreamResult result = new StreamResult( pipedOutputStream );
                             
@@ -316,6 +317,7 @@ public class DefaultRepositorySystemSessionFactory
                                     }
                                     catch ( TransformerException | IOException e )
                                     {
+                                        e.printStackTrace();
                                         throw new RuntimeException( e );
                                     }
                                 }

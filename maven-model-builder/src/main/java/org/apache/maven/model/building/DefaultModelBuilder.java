@@ -39,10 +39,10 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -87,12 +87,11 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.xml.filter.BuildPomXMLFilter;
+import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * @author Benjamin Bentmann
@@ -153,6 +152,9 @@ public class DefaultModelBuilder
 
     @Inject
     private ReportingConverter reportingConverter;
+    
+    @Inject
+    private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory; 
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -561,7 +563,6 @@ public class DefaultModelBuilder
 
             try
             {
-                // RFS adjust inputstream
                 model = modelProcessor.read( modelSource.getInputStream(), options );
             }
             catch ( ModelParseException e )
@@ -760,14 +761,19 @@ public class DefaultModelBuilder
             {
                 // TODO: parent might be part of reactor... better read all lineage items like this?
                 Model parent = lineage.get( 1 ).getModel();
-                Model child = lineage.get( 0 ).getModel(); 
-                // modelProcessor.read( lineage.get( 0 ).getSource().getInputStream(), null );
+                
+                Model child = modelProcessor.read( transformData( lineage.get( 0 ) ), null );
                 inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
+
+                // sync pomfile, is transient
+                child.setPomFile( lineage.get( 0 ).getModel().getPomFile() );
+                // overwrite child
+                lineage.get( 0 ).setModel( child );
             }
-            finally
-//            catch ( IOException e )
+            catch ( IOException | TransformException | SAXException | ParserConfigurationException e )
             {
                 // this is second read, should not happen
+                e.printStackTrace();
             }
         }
         else
@@ -778,27 +784,17 @@ public class DefaultModelBuilder
         }
     }
     
-    private InputStream transformData( InputStream inputStream )
-                    throws IOException, TransformException
+    private InputStream transformData( ModelData modelData )
+                    throws IOException, TransformException, SAXException, ParserConfigurationException
     {
         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
         final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
         
-        XMLReader parent;
-        try
-        {
-            parent = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-        }
-        catch ( SAXException | ParserConfigurationException e )
-        {
-            throw new TransformException( "Failed to create XMLReader", e );
-        }
-        
         final SAXSource transformSource =
-                        new SAXSource( new BuildPomXMLFilter( parent ), 
-                                       new org.xml.sax.InputSource( inputStream ) );
+            new SAXSource( buildPomXMLFilterFactory.get().get( modelData.getGroupId(), modelData.getArtifactId() ),
+                           new org.xml.sax.InputSource( modelData.getSource().getInputStream() ) );
         
         final StreamResult result = new StreamResult( pipedOutputStream );
         
