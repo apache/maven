@@ -34,6 +34,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -114,7 +115,8 @@ public class DefaultRepositorySystemSessionFactory
     MavenRepositorySystem mavenRepositorySystem;
     
     @Inject
-    private ConsumerPomXMLFilterFactory consumerPomXMLFilterFactory;
+    @Nullable
+    private Provider<ConsumerPomXMLFilterFactory> consumerPomXMLFilterFactory;
     
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
@@ -286,7 +288,6 @@ public class DefaultRepositorySystemSessionFactory
                         public InputStream transformData( File file )
                             throws IOException, TransformException
                         {
-                            System.out.println( "transforming " + file.getAbsolutePath() );
                             final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
                             final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
                             
@@ -294,8 +295,7 @@ public class DefaultRepositorySystemSessionFactory
                             try
                             {
                                 transformSource =
-                                    new SAXSource( consumerPomXMLFilterFactory.get( artifact.getGroupId(),
-                                                                                    artifact.getArtifactId() ),
+                                    new SAXSource( consumerPomXMLFilterFactory.get().get( file.toPath() ),
                                                    new InputSource( new FileReader( file ) ) );
                             }
                             catch ( SAXException | ParserConfigurationException e )

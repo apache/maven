@@ -19,7 +19,9 @@ package org.apache.maven.xml.filter;
  * under the License.
  */
 
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -35,23 +37,31 @@ import org.xml.sax.XMLReader;
  */
 public abstract class BuildPomXMLFilterFactory
 {
-    public final BuildPomXMLFilter get( String groupId, String artifactId )
+    public final BuildPomXMLFilter get( Path projectFile )
         throws SAXException, ParserConfigurationException
     {
-        CiFriendlyXMLFilter filter = new CiFriendlyXMLFilter();
-        getChangelist().ifPresent( filter::setChangelist  );
-        getRevision().ifPresent( filter::setRevision );
-        getSha1().ifPresent( filter::setSha1 );
+        XMLReader parent = getParent();
         
-        if ( filter.isSet() )
+        if ( getRelativePathMapper() != null )
         {
-            filter.setParent( getParent() );
-            return new BuildPomXMLFilter( filter );
+            ParentXMLFilter parentFilter = new ParentXMLFilter( getRelativePathMapper() );
+            parentFilter.setProjectPath( projectFile.getParent() );
+            parentFilter.setParent( parent );
+            parent = parentFilter;
         }
-        else
+        
+        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter();
+        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
+        getRevision().ifPresent( ciFriendlyFilter::setRevision );
+        getSha1().ifPresent( ciFriendlyFilter::setSha1 );
+        
+        if ( ciFriendlyFilter.isSet() )
         {
-            return new BuildPomXMLFilter( getParent() );
+            ciFriendlyFilter.setParent( parent );
+            parent = ciFriendlyFilter;
         }
+        
+        return new BuildPomXMLFilter( parent );
     }
     
     protected XMLReader getParent() throws SAXException, ParserConfigurationException 
@@ -67,4 +77,9 @@ public abstract class BuildPomXMLFilterFactory
     protected abstract Optional<String> getRevision();
     
     protected abstract Optional<String> getSha1();
+    
+    /**
+     * @return the mapper or {@code null} if relativePaths don't need to be mapped
+     */
+    protected abstract Function<Path, Optional<RelativeProject>> getRelativePathMapper();
 }

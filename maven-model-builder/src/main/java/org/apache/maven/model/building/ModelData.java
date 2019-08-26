@@ -45,6 +45,8 @@ class ModelData
     private String artifactId;
 
     private String version;
+    
+    private boolean external = true;
 
     /**
      * Creates a new container for the specified model.
@@ -200,6 +202,25 @@ class ModelData
     }
 
     /**
+     * 
+     * @return {@code false} if model is part of reactor, otherwise {@code true}
+     */
+    public boolean isExternal()
+    {
+        return external;
+    }
+    
+    /**
+     * Set to {@code false} if model is part of reactor, otherwise {@code true}
+     * 
+     * @param external
+     */
+    public void setExternal( boolean external )
+    {
+        this.external = external;
+    }
+    
+    /**
      * Gets the effective identifier of the model in the form {@code <groupId>:<artifactId>:<version>}.
      *
      * @return The effective identifier of the model, never {@code null}.
@@ -212,7 +233,7 @@ class ModelData
 
         return buffer.toString();
     }
-
+    
     @Override
     public String toString()
     {

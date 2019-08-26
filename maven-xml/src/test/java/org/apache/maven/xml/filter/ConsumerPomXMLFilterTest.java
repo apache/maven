@@ -21,7 +21,10 @@ package org.apache.maven.xml.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,6 +57,12 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             {
                 return Optional.of( "CL" );
             }
+            
+            @Override
+            protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+            {
+                return null;
+            }
         };
         
         Provider<BuildPomXMLFilterFactory> provider = new Provider<BuildPomXMLFilterFactory>()
@@ -68,7 +77,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
         
         XMLFilter filter = new ConsumerPomXMLFilterFactory( provider )
         {
-        }.get( "G", "A" );
+        }.get( Paths.get( "pom.xml" ) );
         filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         return filter;
     }

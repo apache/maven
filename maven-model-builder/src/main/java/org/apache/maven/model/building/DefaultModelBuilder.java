@@ -51,6 +51,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.building.FileSource;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -154,7 +155,12 @@ public class DefaultModelBuilder
     private ReportingConverter reportingConverter;
     
     @Inject
+    @Nullable
     private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory; 
+    
+    @Inject
+    @Nullable
+    private ModelCacheManager modelCacheManager;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -294,7 +300,11 @@ public class DefaultModelBuilder
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
-
+        if ( modelCacheManager != null && request.getPomFile() != null )
+        {
+            modelCacheManager.put( request.getPomFile().toPath(), inputModel ); 
+        }
+        
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -755,7 +765,7 @@ public class DefaultModelBuilder
         }
         
         // re-read model from file
-        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) && !lineage.get( 0 ).isExternal() )
         {
             try
             {
@@ -791,9 +801,12 @@ public class DefaultModelBuilder
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
         final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
+
+        // Should always be FileSource for reactor poms
+        FileSource source = (FileSource) modelData.getSource();
         
         final SAXSource transformSource =
-            new SAXSource( buildPomXMLFilterFactory.get().get( modelData.getGroupId(), modelData.getArtifactId() ),
+            new SAXSource( buildPomXMLFilterFactory.get().get( source.getFile().toPath() ),
                            new org.xml.sax.InputSource( modelData.getSource().getInputStream() ) );
         
         final StreamResult result = new StreamResult( pipedOutputStream );
@@ -1103,6 +1116,8 @@ public class DefaultModelBuilder
          */
 
         ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
+        
+        parentData.setExternal( false );
 
         return parentData;
     }
@@ -1219,6 +1234,8 @@ public class DefaultModelBuilder
 
         ModelData parentData = new ModelData( modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(),
                                               parent.getVersion() );
+
+        parentData.setExternal( true );
 
         return parentData;
     }

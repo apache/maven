@@ -19,16 +19,20 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
+
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-//import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelCacheManager;
 import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
+import org.apache.maven.xml.filter.RelativeProject;
 
 /**
  * 
@@ -37,10 +41,12 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
  */
 @Named
 @Singleton
-@IgnoreJRERequirement( )
 public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
 {
     private MavenSession session;
+    
+    @Inject
+    private ModelCacheManager rawModelCache; 
     
     @Inject
     public DefaultBuildPomXMLFilterFactory( MavenSession session )
@@ -66,4 +72,26 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
         return Optional.ofNullable( session.getUserProperties().getProperty( "sha1" ) );
     }
 
+    @Override
+    protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+    {
+        return p -> Optional.ofNullable( rawModelCache.get( p ) ).map( m -> toRelativeProject( m ) );
+    }
+
+    private RelativeProject toRelativeProject( final Model m )
+    {
+        String groupId = m.getGroupId();
+        if ( groupId == null && m.getParent() != null )
+        {
+            groupId = m.getParent().getGroupId();
+        }
+
+        String version = m.getVersion();
+        if ( version == null && m.getParent() != null )
+        {
+            version = m.getParent().getVersion();
+        }
+
+        return new RelativeProject( groupId, m.getArtifactId(), version );
+    }
 }

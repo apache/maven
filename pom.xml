@@ -47,8 +47,8 @@ under the License.
 
   <properties>
     <maven.version>3.0.5</maven.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
     <commonsLangVersion>3.8.1</commonsLangVersion>
@@ -455,27 +455,6 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>enforce-bytecode-version</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <configuration>
-                <rules>
-                  <enforceBytecodeVersion>
-                    <excludes>
-                      <exclude>org.apache.maven:maven-xml</exclude> <!-- Java 8 compatible -->
-                    </excludes>
-                  </enforceBytecodeVersion>
-                </rules>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>${plexusVersion}</version>
@@ -604,7 +583,7 @@ under the License.
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>

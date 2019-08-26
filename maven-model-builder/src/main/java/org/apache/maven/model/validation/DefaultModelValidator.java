@@ -98,8 +98,12 @@ public class DefaultModelValidator
             validateStringNotEmpty( "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(),
                                     parent );
 
-            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
-                                    parent );
+            // resolvedModel will assign version based on relativePath
+            if ( !Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+            {
+                validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
+                                        parent );
+            }
 
             if ( equals( parent.getGroupId(), m.getGroupId() ) && equals( parent.getArtifactId(), m.getArtifactId() ) )
             {

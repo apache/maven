@@ -46,22 +46,38 @@ public abstract class AbstractXMLFilterTests
     
     protected abstract XMLFilter getFilter() throws TransformerException, SAXException, ParserConfigurationException;
     
+    private void setParent( XMLFilter filter ) throws SAXException, ParserConfigurationException
+    {
+        if( filter.getParent() == null )
+        {
+            filter.setParent( SAXParserFactory.newInstance().newSAXParser().getXMLReader() );
+            filter.setFeature( "http://xml.org/sax/features/namespaces", true );
+        }
+    }
 
     protected String transform( String input )
         throws TransformerException, SAXException, ParserConfigurationException
     {
         return transform( new StringReader( input ) );
     }
-    
-    protected String transform( Reader input )
-        throws TransformerException, SAXException, ParserConfigurationException
+
+    protected String transform( Reader input ) throws TransformerException, SAXException, ParserConfigurationException
     {
         XMLFilter filter = getFilter();
-        if( filter.getParent() == null )
-        {
-            filter.setParent( SAXParserFactory.newInstance().newSAXParser().getXMLReader() );
-            filter.setFeature( "http://xml.org/sax/features/namespaces", true );
-        }
+        setParent( filter );
+        return transform( input, filter );
+    }
+    
+    protected String transform( String input, XMLFilter filter ) 
+        throws TransformerException, SAXException, ParserConfigurationException
+    {
+        setParent( filter );
+        return transform( new StringReader( input ), filter );
+    }
+
+    protected String transform( Reader input, XMLFilter filter )
+        throws TransformerException, SAXException, ParserConfigurationException
+    {
 
         Writer writer = new StringWriter();
         StreamResult result = new StreamResult( writer );

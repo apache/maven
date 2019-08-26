@@ -19,6 +19,8 @@ package org.apache.maven.xml.filter;
  * under the License.
  */
 
+import java.nio.file.Path;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,10 +49,10 @@ public abstract class ConsumerPomXMLFilterFactory
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
     
-    public final ConsumerPomXMLFilter get( String groupId, String artifactId )
+    public final ConsumerPomXMLFilter get( Path projectPath )
         throws SAXException, ParserConfigurationException
     {
-        XMLFilter parent = buildPomXMLFilterFactory.get().get( groupId, artifactId );
+        XMLFilter parent = buildPomXMLFilterFactory.get().get( projectPath );
         
         // Ensure that xs:any elements aren't touched by next filters
         XMLReader filter = new FastForwardFilter( parent );
