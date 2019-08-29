@@ -63,6 +63,12 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             {
                 return null;
             }
+            
+            @Override
+            protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+            {
+                return null;
+            }
         };
         
         Provider<BuildPomXMLFilterFactory> provider = new Provider<BuildPomXMLFilterFactory>()

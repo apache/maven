@@ -19,26 +19,25 @@ package org.apache.maven.xml.filter;
  * under the License.
  */
 
+import java.util.Objects;
+
 /**
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public class RelativeProject
+public class DependencyKey
 {
     private final String groupId;
     
     private final String artifactId;
-    
-    private final String version;
-    
-    public RelativeProject( String groupId, String artifactId, String version )
+
+    public DependencyKey( String groupId, String artifactId )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
-        this.version = version;
     }
-
+ 
     public String getGroupId()
     {
         return groupId;
@@ -48,9 +47,42 @@ public class RelativeProject
     {
         return artifactId;
     }
-    
-    public String getVersion()
+
+    @Override
+    public int hashCode()
     {
-        return version;
+        return Objects.hash( artifactId, groupId );
     }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj ) 
+        {
+            return true;
+        }
+        if ( obj == null )
+        {
+            return false;
+        }
+        if ( getClass() != obj.getClass() )
+        {
+            return false;
+        }
+        
+        DependencyKey other = (DependencyKey) obj;
+        
+        if ( !Objects.equals( artifactId, other.artifactId ) )
+        {
+            return false;
+        }
+        if ( !Objects.equals( groupId, other.groupId ) )
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    
 }

@@ -22,6 +22,7 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.xml.filter.DependencyKey;
 
 /**
  * Registers models for usage later on
@@ -34,5 +35,7 @@ public interface ModelCacheManager
     void put( Path p, Model t );
     
     Model get( Path p );
+    
+    Model get( DependencyKey k );
 
 }

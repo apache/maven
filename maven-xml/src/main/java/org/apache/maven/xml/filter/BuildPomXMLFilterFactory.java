@@ -41,7 +41,15 @@ public abstract class BuildPomXMLFilterFactory
         throws SAXException, ParserConfigurationException
     {
         XMLReader parent = getParent();
-        
+
+        if ( getDependencyKeyToVersionMapper() != null )
+        {
+            ReactorDependencyXMLFilter reactorDependencyXMLFilter =
+                new ReactorDependencyXMLFilter( getDependencyKeyToVersionMapper() );
+            reactorDependencyXMLFilter.setParent( parent );
+            parent = reactorDependencyXMLFilter;
+        }
+
         if ( getRelativePathMapper() != null )
         {
             ParentXMLFilter parentFilter = new ParentXMLFilter( getRelativePathMapper() );
@@ -60,7 +68,7 @@ public abstract class BuildPomXMLFilterFactory
             ciFriendlyFilter.setParent( parent );
             parent = ciFriendlyFilter;
         }
-        
+
         return new BuildPomXMLFilter( parent );
     }
     
@@ -82,4 +90,6 @@ public abstract class BuildPomXMLFilterFactory
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */
     protected abstract Function<Path, Optional<RelativeProject>> getRelativePathMapper();
+    
+    protected abstract Function<DependencyKey, String> getDependencyKeyToVersionMapper();
 }

@@ -46,8 +46,6 @@ class ModelData
 
     private String version;
     
-    private boolean external = true;
-
     /**
      * Creates a new container for the specified model.
      *
@@ -201,25 +199,6 @@ class ModelData
         this.version = version;
     }
 
-    /**
-     * 
-     * @return {@code false} if model is part of reactor, otherwise {@code true}
-     */
-    public boolean isExternal()
-    {
-        return external;
-    }
-    
-    /**
-     * Set to {@code false} if model is part of reactor, otherwise {@code true}
-     * 
-     * @param external
-     */
-    public void setExternal( boolean external )
-    {
-        this.external = external;
-    }
-    
     /**
      * Gets the effective identifier of the model in the form {@code <groupId>:<artifactId>:<version>}.
      *

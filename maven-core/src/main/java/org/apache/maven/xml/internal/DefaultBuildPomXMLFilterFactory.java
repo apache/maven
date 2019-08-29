@@ -32,6 +32,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelCacheManager;
 import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
+import org.apache.maven.xml.filter.DependencyKey;
 import org.apache.maven.xml.filter.RelativeProject;
 
 /**
@@ -77,6 +78,14 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
     {
         return p -> Optional.ofNullable( rawModelCache.get( p ) ).map( m -> toRelativeProject( m ) );
     }
+    
+    @Override
+    protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+    {
+        return k -> Optional.ofNullable( rawModelCache.get( k ) )
+                            .map( m -> toVersion( m ) )
+                            .orElse( null );
+    }
 
     private RelativeProject toRelativeProject( final Model m )
     {
@@ -93,5 +102,16 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
         }
 
         return new RelativeProject( groupId, m.getArtifactId(), version );
+    }
+    
+    private String toVersion( final Model m )
+    {
+        String version = m.getVersion();
+        if ( version == null && m.getParent() != null )
+        {
+            version = m.getParent().getVersion();
+        }
+
+        return version;
     }
 }

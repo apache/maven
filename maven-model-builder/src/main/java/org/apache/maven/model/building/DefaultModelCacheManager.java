@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.xml.filter.DependencyKey;
 
 /**
  * 
@@ -38,18 +39,36 @@ import org.apache.maven.model.Model;
 @Singleton
 public class DefaultModelCacheManager implements ModelCacheManager
 {
-    private static final Map<Path, Model> RAWMODELCACHE = Collections.synchronizedMap( new HashMap<Path, Model>() );
+    private static final Map<Path, Model> MODELCACHE = Collections.synchronizedMap( new HashMap<Path, Model>() );
+    
+    private static final Map<DependencyKey, Model> DEPKEYMODELCACHE =
+        Collections.synchronizedMap( new HashMap<DependencyKey, Model>() );
     
     @Override
-    public void put( Path p, Model t )
+    public void put( Path p, Model m )
     {
-        RAWMODELCACHE.put( p, t );
+        MODELCACHE.put( p, m );
+        
+        String groupId = m.getGroupId();
+        if ( groupId == null && m.getParent() != null )
+        {
+            groupId = m.getParent().getGroupId();
+        }
+        
+        String artifactId = m.getArtifactId();
+        DEPKEYMODELCACHE.put( new DependencyKey( groupId, artifactId ), m );
     }
 
     @Override
     public Model get( Path p )
     {
-        return RAWMODELCACHE.get( p );
+        return MODELCACHE.get( p );
+    }
+
+    @Override
+    public Model get( DependencyKey k )
+    {
+        return DEPKEYMODELCACHE.get( k );
     }
 
 }

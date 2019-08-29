@@ -164,6 +164,7 @@ public class DefaultProjectBuilder
                 request.setModelBuildingListener( listener );
 
                 request.setPomFile( pomFile );
+                request.setTransformPom( true );
                 request.setModelSource( modelSource );
                 request.setLocationTracking( true );
 
@@ -437,6 +438,7 @@ public class DefaultProjectBuilder
         request.setPomFile( pomFile );
         request.setTwoPhaseBuilding( true );
         request.setLocationTracking( true );
+        request.setTransformPom( true );
 
         DefaultModelBuildingListener listener =
             new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );

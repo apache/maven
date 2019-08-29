@@ -334,5 +334,8 @@ public interface ModelBuildingRequest
     WorkspaceModelResolver getWorkspaceModelResolver();
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
-
+    
+    boolean isTransformPom();
+    
+    ModelBuildingRequest setTransformPom( boolean transform );
 }

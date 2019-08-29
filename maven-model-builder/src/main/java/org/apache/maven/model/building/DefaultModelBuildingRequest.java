@@ -72,6 +72,8 @@ public class DefaultModelBuildingRequest
     private ModelCache modelCache;
 
     private WorkspaceModelResolver workspaceResolver;
+    
+    private boolean transformPom;
 
     /**
      * Creates an empty request.
@@ -101,6 +103,7 @@ public class DefaultModelBuildingRequest
         setModelResolver( request.getModelResolver() );
         setModelBuildingListener( request.getModelBuildingListener() );
         setModelCache( request.getModelCache() );
+        setTransformPom( request.isTransformPom() );
     }
 
     @Override
@@ -405,6 +408,19 @@ public class DefaultModelBuildingRequest
     public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
     {
         this.workspaceResolver = workspaceResolver;
+        return this;
+    }
+    
+    @Override
+    public boolean isTransformPom()
+    {
+        return transformPom;
+    }
+    
+    @Override
+    public ModelBuildingRequest setTransformPom( boolean transformPom )
+    {
+        this.transformPom = transformPom;
         return this;
     }
 

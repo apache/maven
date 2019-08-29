@@ -47,7 +47,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 class ParentXMLFilter
     extends XMLFilterImpl
 {
-    private boolean parsingParent = false;
+    private boolean parsingParent;
 
     // states
     private String state;

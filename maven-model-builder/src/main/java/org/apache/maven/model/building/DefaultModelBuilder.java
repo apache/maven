@@ -300,10 +300,6 @@ public class DefaultModelBuilder
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
-        if ( modelCacheManager != null && request.getPomFile() != null )
-        {
-            modelCacheManager.put( request.getPomFile().toPath(), inputModel ); 
-        }
         
         problems.setRootModel( inputModel );
 
@@ -439,6 +435,11 @@ public class DefaultModelBuilder
         resultData.setVersion( resultModel.getVersion() );
 
         result.setEffectiveModel( resultModel );
+        
+        if ( modelCacheManager != null && request.getPomFile() != null )
+        {
+            modelCacheManager.put( request.getPomFile().toPath(), resultModel ); 
+        }
 
         for ( ModelData currentData : lineage )
         {
@@ -765,7 +766,7 @@ public class DefaultModelBuilder
         }
         
         // re-read model from file
-        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) && !lineage.get( 0 ).isExternal() )
+        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) && request.isTransformPom() )
         {
             try
             {
@@ -804,6 +805,8 @@ public class DefaultModelBuilder
 
         // Should always be FileSource for reactor poms
         FileSource source = (FileSource) modelData.getSource();
+        
+        System.out.println( "transforming " + source.getFile() );
         
         final SAXSource transformSource =
             new SAXSource( buildPomXMLFilterFactory.get().get( source.getFile().toPath() ),
@@ -1116,8 +1119,6 @@ public class DefaultModelBuilder
          */
 
         ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
-        
-        parentData.setExternal( false );
 
         return parentData;
     }
@@ -1234,8 +1235,6 @@ public class DefaultModelBuilder
 
         ModelData parentData = new ModelData( modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(),
                                               parent.getVersion() );
-
-        parentData.setExternal( true );
 
         return parentData;
     }
