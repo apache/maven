@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -113,6 +114,27 @@ public class RepositoryUtils
                                     Collection<? extends DependencyNode> nodes, List<String> trail,
                                     DependencyFilter filter )
     {
+        Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth =
+            new TreeMap<Integer, List<org.apache.maven.artifact.Artifact>>();
+
+        ArrayList<org.apache.maven.artifact.Artifact> firstLevelArtifacts =
+            new ArrayList<org.apache.maven.artifact.Artifact>( nodes.size() );
+        // we know there are at least direct dependencies
+        artifactsByDepth.put( 1, firstLevelArtifacts );
+
+        toArtifacts( artifactsByDepth, 1, nodes, trail, filter );
+
+        // list of artifacts ordered by depth level
+        for ( List<org.apache.maven.artifact.Artifact> artifactsInDepth : artifactsByDepth.values() )
+        {
+            artifacts.addAll( artifactsInDepth );
+        }
+    }
+
+    private static void toArtifacts( Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth,
+                                     int currentDepth, Collection<? extends DependencyNode> nodes, List<String> trail,
+                                     DependencyFilter filter )
+    {
         for ( DependencyNode node : nodes )
         {
             org.apache.maven.artifact.Artifact artifact = toArtifact( node.getDependency() );
@@ -124,10 +146,18 @@ public class RepositoryUtils
             if ( filter == null || filter.accept( node, Collections.emptyList() ) )
             {
                 artifact.setDependencyTrail( nodeTrail );
-                artifacts.add( artifact );
+
+                // add artifact in the list of the current depth
+                List<org.apache.maven.artifact.Artifact> artifactsCurrentDepth = artifactsByDepth.get( currentDepth );
+                if ( artifactsCurrentDepth == null )
+                {
+                    artifactsCurrentDepth = new ArrayList<org.apache.maven.artifact.Artifact>();
+                    artifactsByDepth.put( currentDepth, artifactsCurrentDepth );
+                }
+                artifactsCurrentDepth.add( artifact );
             }
 
-            toArtifacts( artifacts, node.getChildren(), nodeTrail, filter );
+            toArtifacts( artifactsByDepth, currentDepth + 1, node.getChildren(), nodeTrail, filter );
         }
     }
 
