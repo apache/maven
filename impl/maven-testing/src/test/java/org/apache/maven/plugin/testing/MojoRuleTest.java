@@ -33,7 +33,6 @@ import org.junit.Test;
 
 /**
  * @author Mirko Friedenhagen
- * @version $Id$
  */
 public class MojoRuleTest
     
@@ -121,9 +120,9 @@ public class MojoRuleTest
 
         mojo = (SimpleMojo) rule.configureMojo( mojo, pluginConfiguration );
 
-        assertEquals( "valueOne", (String) rule.getVariableValueFromObject( mojo, "keyOne" ) );
+        assertEquals( "valueOne", rule.getVariableValueFromObject( mojo, "keyOne" ) );
 
-        assertEquals( "valueTwo", (String) rule.getVariableValueFromObject( mojo, "keyTwo" ) );
+        assertEquals( "valueTwo", rule.getVariableValueFromObject( mojo, "keyTwo" ) );
     }
 
     /**
@@ -139,9 +138,9 @@ public class MojoRuleTest
 
         Map<String, Object> map = rule.getVariablesAndValuesFromObject( mojo );
 
-        assertEquals( "valueOne", (String) map.get( "keyOne" ) );
+        assertEquals( "valueOne", map.get( "keyOne" ) );
 
-        assertEquals( "valueTwo", (String) map.get( "keyTwo" ) );
+        assertEquals( "valueTwo", map.get( "keyTwo" ) );
     }
 
     /**
@@ -157,7 +156,7 @@ public class MojoRuleTest
 
         rule.setVariableValueToObject( mojo, "keyOne", "myValueOne" );
 
-        assertEquals( "myValueOne", (String) rule.getVariableValueFromObject( mojo, "keyOne" ) );
+        assertEquals( "myValueOne", rule.getVariableValueFromObject( mojo, "keyOne" ) );
 
     }
 

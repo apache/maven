@@ -68,7 +68,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * useful as a stub though.
  *
  * @author jesse
- * @version $Id$
  */
 public class MavenProjectStub
     extends MavenProject
@@ -222,6 +221,7 @@ public class MavenProjectStub
      * @return an empty String
      * @throws IOException if any
      */
+    @Override
     public String getModulePathAdjustment( MavenProject mavenProject )
         throws IOException
     {
@@ -229,30 +229,35 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public Artifact getArtifact()
     {
         return artifact;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setArtifact( Artifact artifact )
     {
         this.artifact = artifact;
     }
 
     /** {@inheritDoc} */
+    @Override
     public Model getModel()
     {
         return model;
     }
 
     /** {@inheritDoc} */
+    @Override
     public MavenProject getParent()
     {
         return parent;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setParent( MavenProject mavenProject )
     {
         this.parent = mavenProject;
@@ -263,6 +268,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setRemoteArtifactRepositories(java.util.List)
      */
+    @Override
     public void setRemoteArtifactRepositories( List<ArtifactRepository> list )
     {
         // nop
@@ -273,12 +279,14 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getRemoteArtifactRepositories()
      */
+    @Override
     public List<ArtifactRepository> getRemoteArtifactRepositories()
     {
         return Collections.<ArtifactRepository>emptyList();
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean hasParent()
     {
         if ( parent != null )
@@ -290,18 +298,21 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getFile()
     {
         return file;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setFile( File file )
     {
         this.file = file;
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getBasedir()
     {
         return new File( PlexusTestCase.getBasedir() );
@@ -312,6 +323,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setDependencies(java.util.List)
      */
+    @Override
     public void setDependencies( List<Dependency> list )
     {
         // nop
@@ -322,6 +334,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDependencies()
      */
+    @Override
     public List<Dependency> getDependencies()
     {
         return Collections.<Dependency>emptyList();
@@ -332,17 +345,19 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDependencyManagement()
      */
+    @Override
     public DependencyManagement getDependencyManagement()
     {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void addCompileSourceRoot( String string )
     {
         if ( compileSourceRoots == null )
         {
-            compileSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
+            compileSourceRoots = new ArrayList<>( Collections.singletonList( string ) );
         }
         else
         {
@@ -351,11 +366,12 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public void addScriptSourceRoot( String string )
     {
         if ( scriptSourceRoots == null )
         {
-            scriptSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
+            scriptSourceRoots = new ArrayList<>( Collections.singletonList( string ) );
         }
         else
         {
@@ -364,11 +380,12 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public void addTestCompileSourceRoot( String string )
     {
         if ( testCompileSourceRoots == null )
         {
-            testCompileSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
+            testCompileSourceRoots = new ArrayList<>( Collections.singletonList( string ) );
         }
         else
         {
@@ -377,24 +394,28 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getCompileSourceRoots()
     {
         return compileSourceRoots;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getScriptSourceRoots()
     {
         return scriptSourceRoots;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getTestCompileSourceRoots()
     {
         return testCompileSourceRoots;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getCompileClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -410,18 +431,21 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Artifact> getCompileArtifacts()
     {
         return compileArtifacts;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Dependency> getCompileDependencies()
     {
         return compileDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -429,18 +453,21 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Artifact> getTestArtifacts()
     {
         return testArtifacts;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Dependency> getTestDependencies()
     {
         return testDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getRuntimeClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -448,18 +475,21 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Artifact> getRuntimeArtifacts()
     {
         return runtimeArtifacts;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Dependency> getRuntimeDependencies()
     {
         return runtimeDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -467,6 +497,7 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Artifact> getSystemArtifacts()
     {
         return systemArtifacts;
@@ -483,6 +514,7 @@ public class MavenProjectStub
     /**
      * @param attachedArtifacts
      */
+    @Override
     public void setAttachedArtifacts( List<Artifact> attachedArtifacts )
     {
         this.attachedArtifacts = attachedArtifacts;
@@ -491,6 +523,7 @@ public class MavenProjectStub
     /**
      * @param compileSourceRoots
      */
+    @Override
     public void setCompileSourceRoots( List<String> compileSourceRoots )
     {
         this.compileSourceRoots = compileSourceRoots;
@@ -499,6 +532,7 @@ public class MavenProjectStub
     /**
      * @param testCompileSourceRoots
      */
+    @Override
     public void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
     {
         this.testCompileSourceRoots = testCompileSourceRoots;
@@ -507,6 +541,7 @@ public class MavenProjectStub
     /**
      * @param scriptSourceRoots
      */
+    @Override
     public void setScriptSourceRoots( List<String> scriptSourceRoots )
     {
         this.scriptSourceRoots = scriptSourceRoots;
@@ -635,24 +670,28 @@ public class MavenProjectStub
     /**
      * @param model
      */
+    @Override
     public void setModel( Model model )
     {
         this.model = model;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Dependency> getSystemDependencies()
     {
         return systemDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setModelVersion( String string )
     {
         this.modelVersion = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getModelVersion()
     {
         return modelVersion;
@@ -663,90 +702,105 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getId()
      */
+    @Override
     public String getId()
     {
         return "";
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setGroupId( String string )
     {
         this.groupId = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getGroupId()
     {
         return groupId;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setArtifactId( String string )
     {
         this.artifactId = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getArtifactId()
     {
         return artifactId;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setName( String string )
     {
         this.name = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName()
     {
         return name;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setVersion( String string )
     {
         this.version = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getVersion()
     {
         return version;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getPackaging()
     {
         return packaging;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setPackaging( String string )
     {
         this.packaging = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setInceptionYear( String string )
     {
         this.inceptionYear = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getInceptionYear()
     {
         return inceptionYear;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setUrl( String string )
     {
         this.url = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getUrl()
     {
         return url;
@@ -757,6 +811,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPrerequisites()
      */
+    @Override
     public Prerequisites getPrerequisites()
     {
         return null;
@@ -767,6 +822,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setIssueManagement(org.apache.maven.model.IssueManagement)
      */
+    @Override
     public void setIssueManagement( IssueManagement issueManagement )
     {
         // nop
@@ -777,6 +833,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getCiManagement()
      */
+    @Override
     public CiManagement getCiManagement()
     {
         return null;
@@ -787,6 +844,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setCiManagement(org.apache.maven.model.CiManagement)
      */
+    @Override
     public void setCiManagement( CiManagement ciManagement )
     {
         // nop
@@ -797,6 +855,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getIssueManagement()
      */
+    @Override
     public IssueManagement getIssueManagement()
     {
         return null;
@@ -807,6 +866,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setDistributionManagement(org.apache.maven.model.DistributionManagement)
      */
+    @Override
     public void setDistributionManagement( DistributionManagement distributionManagement )
     {
         // nop
@@ -817,18 +877,21 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDistributionManagement()
      */
+    @Override
     public DistributionManagement getDistributionManagement()
     {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setDescription( String string )
     {
         this.description = string;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getDescription()
     {
         return description;
@@ -839,6 +902,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setOrganization(org.apache.maven.model.Organization)
      */
+    @Override
     public void setOrganization( Organization organization )
     {
         // nop
@@ -849,6 +913,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getOrganization()
      */
+    @Override
     public Organization getOrganization()
     {
         return null;
@@ -859,6 +924,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setScm(org.apache.maven.model.Scm)
      */
+    @Override
     public void setScm( Scm scm )
     {
         // nop
@@ -869,6 +935,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getScm()
      */
+    @Override
     public Scm getScm()
     {
         return null;
@@ -879,6 +946,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setMailingLists(java.util.List)
      */
+    @Override
     public void setMailingLists( List<MailingList> list )
     {
         // nop
@@ -889,6 +957,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getMailingLists()
      */
+    @Override
     public List<MailingList> getMailingLists()
     {
         return Collections.<MailingList>emptyList();
@@ -899,6 +968,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addMailingList(org.apache.maven.model.MailingList)
      */
+    @Override
     public void addMailingList( MailingList mailingList )
     {
         // nop
@@ -909,6 +979,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setDevelopers(java.util.List)
      */
+    @Override
     public void setDevelopers( List<Developer> list )
     {
         // nop
@@ -919,6 +990,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDevelopers()
      */
+    @Override
     public List<Developer> getDevelopers()
     {
         return Collections.<Developer>emptyList();
@@ -929,6 +1001,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addDeveloper(org.apache.maven.model.Developer)
      */
+    @Override
     public void addDeveloper( Developer developer )
     {
         // nop
@@ -939,6 +1012,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setContributors(java.util.List)
      */
+    @Override
     public void setContributors( List<Contributor> list )
     {
         // nop
@@ -949,6 +1023,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getContributors()
      */
+    @Override
     public List<Contributor> getContributors()
     {
         return Collections.<Contributor>emptyList();
@@ -959,18 +1034,21 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addContributor(org.apache.maven.model.Contributor)
      */
+    @Override
     public void addContributor( Contributor contributor )
     {
         // nop
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setBuild( Build build )
     {
         this.build = build;
     }
 
     /** {@inheritDoc} */
+    @Override
     public Build getBuild()
     {
         return build;
@@ -981,6 +1059,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getResources()
      */
+    @Override
     public List<Resource> getResources()
     {
         return Collections.<Resource>emptyList();
@@ -991,6 +1070,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getTestResources()
      */
+    @Override
     public List<Resource> getTestResources()
     {
         return Collections.<Resource>emptyList();
@@ -1001,6 +1081,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addResource(org.apache.maven.model.Resource)
      */
+    @Override
     public void addResource( Resource resource )
     {
         // nop
@@ -1011,6 +1092,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addTestResource(org.apache.maven.model.Resource)
      */
+    @Override
     public void addTestResource( Resource resource )
     {
         // nop
@@ -1021,6 +1103,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setReporting(org.apache.maven.model.Reporting)
      */
+    @Override
     public void setReporting( Reporting reporting )
     {
         // nop
@@ -1031,18 +1114,21 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReporting()
      */
+    @Override
     public Reporting getReporting()
     {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setLicenses( List<License> licenses )
     {
         this.licenses = licenses;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<License> getLicenses()
     {
         return licenses;
@@ -1053,6 +1139,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addLicense(org.apache.maven.model.License)
      */
+    @Override
     public void addLicense( License license )
     {
         // nop
@@ -1063,6 +1150,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setArtifacts(java.util.Set)
      */
+    @Override
     public void setArtifacts( Set<Artifact> set )
     {
         // nop
@@ -1073,6 +1161,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getArtifacts()
      */
+    @Override
     public Set<Artifact> getArtifacts()
     {
         return Collections.<Artifact>emptySet();
@@ -1083,6 +1172,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getArtifactMap()
      */
+    @Override
     public Map<String, Artifact> getArtifactMap()
     {
         return Collections.<String, Artifact>emptyMap();
@@ -1093,6 +1183,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setPluginArtifacts(java.util.Set)
      */
+    @Override
     public void setPluginArtifacts( Set<Artifact> set )
     {
         // nop
@@ -1103,6 +1194,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginArtifacts()
      */
+    @Override
     public Set<Artifact> getPluginArtifacts()
     {
         return Collections.<Artifact>emptySet();
@@ -1113,6 +1205,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginArtifactMap()
      */
+    @Override
     public Map<String, Artifact> getPluginArtifactMap()
     {
         return Collections.<String, Artifact>emptyMap();
@@ -1123,6 +1216,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setReportArtifacts(java.util.Set)
      */
+    @Override
     public void setReportArtifacts( Set<Artifact> set )
     {
         // nop
@@ -1133,6 +1227,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportArtifacts()
      */
+    @Override
     public Set<Artifact> getReportArtifacts()
     {
         return Collections.<Artifact>emptySet();
@@ -1143,6 +1238,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportArtifactMap()
      */
+    @Override
     public Map<String, Artifact> getReportArtifactMap()
     {
         return Collections.<String, Artifact>emptyMap();
@@ -1153,6 +1249,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setExtensionArtifacts(java.util.Set)
      */
+    @Override
     public void setExtensionArtifacts( Set<Artifact> set )
     {
         // nop
@@ -1163,6 +1260,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getExtensionArtifacts()
      */
+    @Override
     public Set<Artifact> getExtensionArtifacts()
     {
         return Collections.<Artifact>emptySet();
@@ -1173,6 +1271,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getExtensionArtifactMap()
      */
+    @Override
     public Map<String, Artifact> getExtensionArtifactMap()
     {
         return Collections.<String, Artifact>emptyMap();
@@ -1183,6 +1282,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setParentArtifact(org.apache.maven.artifact.Artifact)
      */
+    @Override
     public void setParentArtifact( Artifact artifact )
     {
         // nop
@@ -1193,6 +1293,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getParentArtifact()
      */
+    @Override
     public Artifact getParentArtifact()
     {
         return null;
@@ -1203,6 +1304,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getRepositories()
      */
+    @Override
     public List<Repository> getRepositories()
     {
         return Collections.<Repository>emptyList();
@@ -1213,6 +1315,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportPlugins()
      */
+    @Override
     public List<ReportPlugin> getReportPlugins()
     {
         return Collections.<ReportPlugin>emptyList();
@@ -1223,6 +1326,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getBuildPlugins()
      */
+    @Override
     public List<Plugin> getBuildPlugins()
     {
         return Collections.<Plugin>emptyList();
@@ -1233,6 +1337,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getModules()
      */
+    @Override
     public List<String> getModules()
     {
         return Collections.<String>emptyList();
@@ -1243,6 +1348,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginManagement()
      */
+    @Override
     public PluginManagement getPluginManagement()
     {
         return null;
@@ -1269,24 +1375,28 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<MavenProject> getCollectedProjects()
     {
         return collectedProjects;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setCollectedProjects( List<MavenProject> list )
     {
         this.collectedProjects = list;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setPluginArtifactRepositories( List<ArtifactRepository> list )
     {
         this.pluginArtifactRepositories = list;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<ArtifactRepository> getPluginArtifactRepositories()
     {
         return pluginArtifactRepositories;
@@ -1297,6 +1407,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDistributionManagementArtifactRepository()
      */
+    @Override
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
         return null;
@@ -1307,29 +1418,33 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginRepositories()
      */
+    @Override
     public List<Repository> getPluginRepositories()
     {
         return Collections.<Repository>emptyList();
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setActiveProfiles( List<Profile> list )
     {
         activeProfiles = list;
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Profile> getActiveProfiles()
     {
         return activeProfiles;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void addAttachedArtifact( Artifact artifact )
     {
         if ( attachedArtifacts == null )
         {
-            this.attachedArtifacts = new ArrayList<Artifact>( Collections.singletonList( artifact ) );
+            this.attachedArtifacts = new ArrayList<>( Collections.singletonList( artifact ) );
         }
         else
         {
@@ -1338,6 +1453,7 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<Artifact> getAttachedArtifacts()
     {
         return attachedArtifacts;
@@ -1348,6 +1464,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getGoalConfiguration(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
+    @Override
     public Xpp3Dom getGoalConfiguration( String string, String string1, String string2, String string3 )
     {
         return null;
@@ -1358,6 +1475,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportConfiguration(java.lang.String, java.lang.String, java.lang.String)
      */
+    @Override
     public Xpp3Dom getReportConfiguration( String string, String string1, String string2 )
     {
         return null;
@@ -1368,6 +1486,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getExecutionProject()
      */
+    @Override
     public MavenProject getExecutionProject()
     {
         return null;
@@ -1378,6 +1497,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setExecutionProject(org.apache.maven.project.MavenProject)
      */
+    @Override
     public void setExecutionProject( MavenProject mavenProject )
     {
         // nop
@@ -1388,6 +1508,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#writeModel(java.io.Writer)
      */
+    @Override
     public void writeModel( Writer writer )
         throws IOException
     {
@@ -1399,6 +1520,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#writeOriginalModel(java.io.Writer)
      */
+    @Override
     public void writeOriginalModel( Writer writer )
         throws IOException
     {
@@ -1406,36 +1528,42 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public Set<Artifact> getDependencyArtifacts()
     {
         return dependencyArtifacts;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setDependencyArtifacts( Set<Artifact> set )
     {
         this.dependencyArtifacts = set;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setReleaseArtifactRepository( ArtifactRepository artifactRepository )
     {
         this.releaseArtifactRepository = artifactRepository;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setSnapshotArtifactRepository( ArtifactRepository artifactRepository )
     {
         this.snapshotArtifactRepository = artifactRepository;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setOriginalModel( Model model )
     {
         this.originalModel = model;
     }
 
     /** {@inheritDoc} */
+    @Override
     public Model getOriginalModel()
     {
         return originalModel;
@@ -1446,6 +1574,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getBuildExtensions()
      */
+    @Override
     public List<Extension> getBuildExtensions()
     {
         return Collections.<Extension>emptyList();
@@ -1456,6 +1585,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#createArtifacts(org.apache.maven.artifact.factory.ArtifactFactory, java.lang.String, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
+    @Override
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String string,
                                           ArtifactFilter artifactFilter )
     {
@@ -1467,6 +1597,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#addProjectReference(org.apache.maven.project.MavenProject)
      */
+    @Override
     public void addProjectReference( MavenProject mavenProject )
     {
         // nop
@@ -1477,6 +1608,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#attachArtifact(java.lang.String, java.lang.String, java.io.File)
      */
+    @Override
     public void attachArtifact( String string, String string1, File file )
     {
         // nop
@@ -1487,6 +1619,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getProperties()
      */
+    @Override
     public Properties getProperties()
     {
         return new Properties();
@@ -1497,6 +1630,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getFilters()
      */
+    @Override
     public List<String> getFilters()
     {
         return Collections.<String>emptyList();
@@ -1507,24 +1641,28 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getProjectReferences()
      */
+    @Override
     public Map<String, MavenProject> getProjectReferences()
     {
         return Collections.<String, MavenProject>emptyMap();
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean isExecutionRoot()
     {
         return executionRoot;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setExecutionRoot( boolean b )
     {
         this.executionRoot = b;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getDefaultGoal()
     {
         return defaultGoal;
@@ -1535,6 +1673,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#replaceWithActiveArtifact(org.apache.maven.artifact.Artifact)
      */
+    @Override
     public Artifact replaceWithActiveArtifact( Artifact artifact )
     {
         return null;

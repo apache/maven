@@ -28,7 +28,6 @@ import java.util.Map;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class MojoTestCaseTest
     extends AbstractMojoTestCase
@@ -40,6 +39,7 @@ public class MojoTestCaseTest
     private PlexusConfiguration pluginConfiguration;
 
     /** {@inheritDoc} */
+    @Override
     protected void setUp()
         throws Exception
     {

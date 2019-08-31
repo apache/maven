@@ -31,12 +31,12 @@ import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
  * Stub for {@link ExpressionEvaluator}
  *
  * @author jesse
- * @version $Id$
  */
 public class ResolverExpressionEvaluatorStub
     implements ExpressionEvaluator
 {
     /** {@inheritDoc} */
+    @Override
     public Object evaluate( String expr )
         throws ExpressionEvaluationException
     {
@@ -122,6 +122,7 @@ public class ResolverExpressionEvaluatorStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public File alignToBaseDirectory( File file )
     {
         if ( file.getAbsolutePath().startsWith( PlexusTestCase.getBasedir() ) )

@@ -33,7 +33,6 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
  */
 public class StubArtifactRepository
     implements ArtifactRepository
@@ -54,6 +53,7 @@ public class StubArtifactRepository
      * @return the <code>artifactId</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOf(org.apache.maven.artifact.Artifact)
      */
+    @Override
     public String pathOf( Artifact artifact )
     {
         return artifact.getId();
@@ -63,6 +63,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOfRemoteRepositoryMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata)
      */
+    @Override
     public String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata )
     {
         return null;
@@ -72,6 +73,7 @@ public class StubArtifactRepository
      * @return the filename of this metadata on the local repository.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOfLocalRepositoryMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata, org.apache.maven.artifact.repository.ArtifactRepository)
      */
+    @Override
     public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
     {
         return metadata.getLocalFilename( repository );
@@ -81,6 +83,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getUrl()
      */
+    @Override
     public String getUrl()
     {
         return null;
@@ -90,6 +93,7 @@ public class StubArtifactRepository
      * @return <code>basedir</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getBasedir()
      */
+    @Override
     public String getBasedir()
     {
         return baseDir;
@@ -99,6 +103,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getProtocol()
      */
+    @Override
     public String getProtocol()
     {
         return null;
@@ -108,6 +113,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getId()
      */
+    @Override
     public String getId()
     {
         return null;
@@ -117,6 +123,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getSnapshots()
      */
+    @Override
     public ArtifactRepositoryPolicy getSnapshots()
     {
         return null;
@@ -126,6 +133,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getReleases()
      */
+    @Override
     public ArtifactRepositoryPolicy getReleases()
     {
         return null;
@@ -135,6 +143,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getLayout()
      */
+    @Override
     public ArtifactRepositoryLayout getLayout()
     {
         return null;
@@ -144,6 +153,7 @@ public class StubArtifactRepository
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getKey()
      */
+    @Override
     public String getKey()
     {
         return null;
@@ -153,6 +163,7 @@ public class StubArtifactRepository
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#isUniqueVersion()
      */
+    @Override
     public boolean isUniqueVersion()
     {
         return false;
@@ -163,6 +174,7 @@ public class StubArtifactRepository
      *
      * @see org.apache.maven.artifact.repository.ArtifactRepository#setBlacklisted(boolean)
      */
+    @Override
     public void setBlacklisted( boolean blackListed )
     {
         // nop
@@ -172,77 +184,92 @@ public class StubArtifactRepository
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.repository.ArtifactRepository#isBlacklisted()
      */
+    @Override
     public boolean isBlacklisted()
     {
         return false;
     }
 
+    @Override
     public Artifact find( Artifact artifact )
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public Authentication getAuthentication()
     {
         return null;
     }
 
+    @Override
     public Proxy getProxy()
     {
         return null;
     }
 
+    @Override
     public void setAuthentication( Authentication authentication )
     {
 
     }
 
+    @Override
     public void setId( String id )
     {
 
     }
 
+    @Override
     public void setLayout( ArtifactRepositoryLayout layout )
     {
 
     }
 
+    @Override
     public void setProxy( Proxy proxy )
     {
 
     }
 
+    @Override
     public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
     {
 
     }
 
+    @Override
     public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
     {
 
     }
 
+    @Override
     public void setUrl( String url )
     {
 
     }
 
+    @Override
     public List<String> findVersions( Artifact artifact )
     {
         return Collections.emptyList();
     }
 
+    @Override
     public boolean isProjectAware()
     {
         return false;
     }
 
+    @Override
     public List<ArtifactRepository> getMirroredRepositories()
     {
-        return new ArrayList<ArtifactRepository>( 0 );
+        return new ArrayList<>( 0 );
     }
 
+    @Override
     public void setMirroredRepositories( List<ArtifactRepository> artifactRepositories )
     {
         // no op

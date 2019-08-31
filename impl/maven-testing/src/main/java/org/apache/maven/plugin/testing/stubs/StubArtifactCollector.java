@@ -36,7 +36,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
  */
 public class StubArtifactCollector
     implements ArtifactCollector
@@ -49,6 +48,7 @@ public class StubArtifactCollector
         super();
     }
 
+    @Override
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map managedVersions, ArtifactResolutionRequest repositoryRequest,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
@@ -58,6 +58,7 @@ public class StubArtifactCollector
         return new ArtifactResolutionResult();
     }
 
+    @Override
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
@@ -68,6 +69,7 @@ public class StubArtifactCollector
         return new ArtifactResolutionResult();
     }
 
+    @Override
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
@@ -77,6 +79,7 @@ public class StubArtifactCollector
         return new ArtifactResolutionResult();
     }
 
+    @Override
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,

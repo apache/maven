@@ -34,6 +34,7 @@ public class ParametersMojo
 
     public String withPropertyAndDefault;
 
+    @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {

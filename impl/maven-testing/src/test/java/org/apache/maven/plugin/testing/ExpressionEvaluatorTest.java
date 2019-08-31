@@ -28,7 +28,6 @@ import java.io.StringReader;
 
 /**
  * @author Edwin Punzalan
- * @version $Id$
  */
 public class ExpressionEvaluatorTest
     extends AbstractMojoTestCase
@@ -38,6 +37,7 @@ public class ExpressionEvaluatorTest
     private PlexusConfiguration pluginConfiguration;
 
     /** {@inheritDoc} */
+    @Override
     protected void setUp()
         throws Exception
     {

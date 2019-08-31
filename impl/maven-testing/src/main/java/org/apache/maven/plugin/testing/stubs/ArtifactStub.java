@@ -36,7 +36,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * Stub class for {@link Artifact} testing.
  *
  * @author jesse
- * @version $Id$
  */
 public class ArtifactStub
     implements Artifact
@@ -62,42 +61,49 @@ public class ArtifactStub
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
+    @Override
     public int compareTo( Artifact artifact )
     {
         return 0;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getGroupId()
     {
         return groupId;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getArtifactId()
     {
         return artifactId;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getVersion()
     {
         return version;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setVersion( String version )
     {
         this.version = version;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getScope()
     {
         return scope;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getType()
     {
         return type;
@@ -114,24 +120,28 @@ public class ArtifactStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getClassifier()
     {
         return classifier;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean hasClassifier()
     {
         return classifier != null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getFile()
     {
         return file;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setFile( File file )
     {
         this.file = file;
@@ -141,6 +151,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getBaseVersion()
      */
+    @Override
     public String getBaseVersion()
     {
         return null;
@@ -151,6 +162,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setBaseVersion(java.lang.String)
      */
+    @Override
     public void setBaseVersion( String string )
     {
         // nop
@@ -160,6 +172,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getId()
      */
+    @Override
     public String getId()
     {
         return null;
@@ -169,6 +182,7 @@ public class ArtifactStub
      * @return <code>groupId:artifactId:type:classifier</code>.
      * @see org.apache.maven.artifact.Artifact#getDependencyConflictId()
      */
+    @Override
     public String getDependencyConflictId()
     {
         StringBuffer buffer = new StringBuffer();
@@ -186,6 +200,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#addMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata)
      */
+    @Override
     public void addMetadata( ArtifactMetadata artifactMetadata )
     {
         // nop
@@ -195,18 +210,21 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getMetadataList()
      */
+    @Override
     public Collection<ArtifactMetadata> getMetadataList()
     {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRepository( ArtifactRepository artifactRepository )
     {
         this.artifactRepository = artifactRepository;
     }
 
     /** {@inheritDoc} */
+    @Override
     public ArtifactRepository getRepository()
     {
         return artifactRepository;
@@ -217,6 +235,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#updateVersion(java.lang.String, org.apache.maven.artifact.repository.ArtifactRepository)
      */
+    @Override
     public void updateVersion( String string, ArtifactRepository artifactRepository )
     {
         // nop
@@ -226,6 +245,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getDownloadUrl()
      */
+    @Override
     public String getDownloadUrl()
     {
         return null;
@@ -236,6 +256,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setDownloadUrl(java.lang.String)
      */
+    @Override
     public void setDownloadUrl( String string )
     {
         // nop
@@ -245,6 +266,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getDependencyFilter()
      */
+    @Override
     public ArtifactFilter getDependencyFilter()
     {
         return null;
@@ -255,6 +277,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setDependencyFilter(org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
+    @Override
     public void setDependencyFilter( ArtifactFilter artifactFilter )
     {
         // nop
@@ -264,6 +287,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getArtifactHandler()
      */
+    @Override
     public ArtifactHandler getArtifactHandler()
     {
         return null;
@@ -273,6 +297,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getDependencyTrail()
      */
+    @Override
     public List<String> getDependencyTrail()
     {
         return null;
@@ -283,12 +308,14 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setDependencyTrail(java.util.List)
      */
+    @Override
     public void setDependencyTrail( List<String> list )
     {
         // nop
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setScope( String scope )
     {
         this.scope = scope;
@@ -298,6 +325,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getVersionRange()
      */
+    @Override
     public VersionRange getVersionRange()
     {
         return null;
@@ -308,6 +336,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setVersionRange(org.apache.maven.artifact.versioning.VersionRange)
      */
+    @Override
     public void setVersionRange( VersionRange versionRange )
     {
         // nop
@@ -318,18 +347,21 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#selectVersion(java.lang.String)
      */
+    @Override
     public void selectVersion( String string )
     {
         // nop
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setGroupId( String groupId )
     {
         this.groupId = groupId;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setArtifactId( String artifactId )
     {
         this.artifactId = artifactId;
@@ -339,6 +371,7 @@ public class ArtifactStub
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.Artifact#isSnapshot()
      */
+    @Override
     public boolean isSnapshot()
     {
         return Artifact.VERSION_FILE_PATTERN.matcher( getVersion() ).matches()
@@ -350,6 +383,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setResolved(boolean)
      */
+    @Override
     public void setResolved( boolean b )
     {
         // nop
@@ -359,6 +393,7 @@ public class ArtifactStub
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.Artifact#isResolved()
      */
+    @Override
     public boolean isResolved()
     {
         return false;
@@ -369,6 +404,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setResolvedVersion(java.lang.String)
      */
+    @Override
     public void setResolvedVersion( String string )
     {
         // nop
@@ -379,6 +415,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setArtifactHandler(org.apache.maven.artifact.handler.ArtifactHandler)
      */
+    @Override
     public void setArtifactHandler( ArtifactHandler artifactHandler )
     {
         // nop
@@ -388,6 +425,7 @@ public class ArtifactStub
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.Artifact#isRelease()
      */
+    @Override
     public boolean isRelease()
     {
         return !isSnapshot();
@@ -398,6 +436,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setRelease(boolean)
      */
+    @Override
     public void setRelease( boolean b )
     {
         // nop
@@ -407,6 +446,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getAvailableVersions()
      */
+    @Override
     public List<ArtifactVersion> getAvailableVersions()
     {
         return null;
@@ -417,6 +457,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setAvailableVersions(java.util.List)
      */
+    @Override
     public void setAvailableVersions( List<ArtifactVersion> list )
     {
         // nop
@@ -426,6 +467,7 @@ public class ArtifactStub
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.Artifact#isOptional()
      */
+    @Override
     public boolean isOptional()
     {
         return false;
@@ -436,6 +478,7 @@ public class ArtifactStub
      *
      * @param b
      */
+    @Override
     public void setOptional( boolean b )
     {
         // nop
@@ -445,6 +488,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getSelectedVersion()
      */
+    @Override
     public ArtifactVersion getSelectedVersion()
         throws OverConstrainedVersionException
     {
@@ -455,6 +499,7 @@ public class ArtifactStub
      * @return <code>false</code>.
      * @see org.apache.maven.artifact.Artifact#isSelectedVersionKnown()
      */
+    @Override
     public boolean isSelectedVersionKnown()
         throws OverConstrainedVersionException
     {
@@ -464,6 +509,7 @@ public class ArtifactStub
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer();

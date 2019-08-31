@@ -25,7 +25,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  * Minimal artifact handler used by the stub factory to create unpackable archives.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
  */
 public class DefaultArtifactHandlerStub
     implements ArtifactHandler
@@ -70,6 +69,7 @@ public class DefaultArtifactHandlerStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getExtension()
     {
         if ( extension == null )
@@ -88,12 +88,14 @@ public class DefaultArtifactHandlerStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getClassifier()
     {
         return classifier;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getDirectory()
     {
         if ( directory == null )
@@ -104,6 +106,7 @@ public class DefaultArtifactHandlerStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getPackaging()
     {
         if ( packaging == null )
@@ -114,12 +117,14 @@ public class DefaultArtifactHandlerStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean isIncludesDependencies()
     {
         return includesDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getLanguage()
     {
         if ( language == null )
@@ -131,6 +136,7 @@ public class DefaultArtifactHandlerStub
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean isAddedToClasspath()
     {
         return addedToClasspath;

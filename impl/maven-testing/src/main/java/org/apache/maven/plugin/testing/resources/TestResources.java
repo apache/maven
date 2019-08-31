@@ -116,7 +116,7 @@ public class TestResources
         scanner.addDefaultExcludes();
         scanner.scan();
 
-        Set<String> actual = new TreeSet<String>();
+        Set<String> actual = new TreeSet<>();
         for ( String path : scanner.getIncludedFiles() )
         {
             actual.add( path );
@@ -129,7 +129,7 @@ public class TestResources
             }
         }
 
-        Set<String> expected = new TreeSet<String>();
+        Set<String> expected = new TreeSet<>();
         if ( expectedPaths != null )
         {
             for ( String path : expectedPaths )

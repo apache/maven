@@ -47,7 +47,6 @@ import org.codehaus.plexus.util.StringUtils;
  * plugins that need to simulate artifacts for unit tests.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
  */
 public class ArtifactStubFactory
 {
@@ -352,7 +351,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getReleaseAndSnapshotArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( getReleaseArtifact() );
         set.add( getSnapshotArtifact() );
         return set;
@@ -366,7 +365,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getScopedArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "g", "compile", "1.0", Artifact.SCOPE_COMPILE ) );
         set.add( createArtifact( "g", "provided", "1.0", Artifact.SCOPE_PROVIDED ) );
         set.add( createArtifact( "g", "test", "1.0", Artifact.SCOPE_TEST ) );
@@ -383,7 +382,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getTypedArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "war", null ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", null ) );
         set.add( createArtifact( "g", "c", "1.0", Artifact.SCOPE_COMPILE, "sources", null ) );
@@ -400,7 +399,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getClassifiedArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "jar", "one" ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", "two" ) );
         set.add( createArtifact( "g", "c", "1.0", Artifact.SCOPE_COMPILE, "jar", "three" ) );
@@ -416,7 +415,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getTypedArchiveArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "war", null ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", null ) );
         set.add( createArtifact( "g", "d", "1.0", Artifact.SCOPE_COMPILE, "zip", null ) );
@@ -432,7 +431,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getArtifactArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "g", "one", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "g", "two", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "g", "three", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
@@ -449,7 +448,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getGroupIdArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.add( createArtifact( "one", "group-one", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "two", "group-two", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "three", "group-three", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
@@ -467,7 +466,7 @@ public class ArtifactStubFactory
     public Set<Artifact> getMixedArtifacts()
         throws IOException
     {
-        Set<Artifact> set = new HashSet<Artifact>();
+        Set<Artifact> set = new HashSet<>();
         set.addAll( getTypedArtifacts() );
         set.addAll( getScopedArtifacts() );
         set.addAll( getReleaseAndSnapshotArtifacts() );

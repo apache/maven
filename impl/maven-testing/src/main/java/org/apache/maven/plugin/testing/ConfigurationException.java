@@ -23,7 +23,6 @@ package org.apache.maven.plugin.testing;
  * ConfigurationException
  *
  * @author jesse
- * @version $Id$
  */
 public class ConfigurationException
     extends Exception

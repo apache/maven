@@ -24,7 +24,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class SimpleMojo
     extends AbstractMojo
@@ -43,6 +42,7 @@ public class SimpleMojo
         return keyTwo;
     }
 
+    @Override
     public void execute()
         throws MojoExecutionException
     {

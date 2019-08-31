@@ -73,7 +73,6 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -94,7 +93,6 @@ import com.google.inject.Module;
  * descriptor and make this entirely declarative!
  *
  * @author jesse
- * @version $Id$
  */
 public abstract class AbstractMojoTestCase
     extends PlexusTestCase
@@ -105,8 +103,8 @@ public abstract class AbstractMojoTestCase
     {
         DefaultArtifactVersion version = null;
         String path = "/META-INF/maven/org.apache.maven/maven-core/pom.properties";
-        InputStream is = AbstractMojoTestCase.class.getResourceAsStream( path );
-        try
+        
+        try ( InputStream is = AbstractMojoTestCase.class.getResourceAsStream( path ) )
         {
             Properties properties = new Properties();
             if ( is != null )
@@ -123,10 +121,6 @@ public abstract class AbstractMojoTestCase
         {
             // odd, where did this come from
         }
-        finally
-        {
-            IOUtil.close( is );
-        }
         MAVEN_VERSION = version;
     }
 
@@ -142,7 +136,7 @@ public abstract class AbstractMojoTestCase
      * to either the project stub or into the mojo directly with injection...not sure yet though.
      */
     //private MavenProjectBuilder projectBuilder;
-
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -174,7 +168,7 @@ public abstract class AbstractMojoTestCase
             getContainer().addComponentDescriptor( desc );
         }
 
-        mojoDescriptors = new HashMap<String, MojoDescriptor>();
+        mojoDescriptors = new HashMap<>();
         for ( MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos() )
         {
             mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
@@ -254,12 +248,13 @@ public abstract class AbstractMojoTestCase
         return "META-INF/maven/plugin.xml";
     }
 
+    @Override
     protected void setupContainer()
     {
         ContainerConfiguration cc = setupContainerConfiguration();
         try
         {
-            List<Module> modules = new ArrayList<Module>();
+            List<Module> modules = new ArrayList<>();
             addGuiceModules( modules );
             container = new DefaultPlexusContainer( cc, modules.toArray( new Module[modules.size()] ) );
         }
@@ -291,6 +286,7 @@ public abstract class AbstractMojoTestCase
         return cc;
     }
     
+    @Override
     protected PlexusContainer getContainer()
     {
         if ( container == null )
@@ -407,9 +403,9 @@ public abstract class AbstractMojoTestCase
 
         // pluginkey = groupId : artifactId : version : goal
 
-        Mojo mojo = (Mojo) lookup( Mojo.ROLE, groupId + ":" + artifactId + ":" + version + ":" + goal );
+        Mojo mojo = lookup( Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal );
 
-        LoggerManager loggerManager = (LoggerManager) getContainer().lookup( LoggerManager.class );
+        LoggerManager loggerManager = getContainer().lookup( LoggerManager.class );
         
         Log mojoLogger = new DefaultLog( loggerManager.getLoggerForComponent( Mojo.ROLE ) );
 
@@ -722,7 +718,7 @@ public abstract class AbstractMojoTestCase
     protected Map<String, Object> getVariablesAndValuesFromObject( Class<?> clazz, Object object )
         throws IllegalAccessException
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         Field[] fields = clazz.getDeclaredFields();
 

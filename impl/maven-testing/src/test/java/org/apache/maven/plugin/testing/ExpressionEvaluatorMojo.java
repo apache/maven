@@ -27,7 +27,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Edwin Punzalan
- * @version $Id$
  */
 public class ExpressionEvaluatorMojo
     extends AbstractMojo
@@ -39,6 +38,7 @@ public class ExpressionEvaluatorMojo
     private String workdir;
 
     /** {@inheritDoc} */
+    @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {

@@ -27,7 +27,6 @@ import org.codehaus.plexus.logging.Logger;
  * to turn off logs during testing where they aren't desired.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
  */
 public class SilentLog
     implements Log, Logger
@@ -36,6 +35,7 @@ public class SilentLog
      * @return <code>false</code>
      * @see org.apache.maven.plugin.logging.Log#isDebugEnabled()
      */
+    @Override
     public boolean isDebugEnabled()
     {
         return false;
@@ -46,6 +46,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence)
      */
+    @Override
     public void debug( CharSequence content )
     {
         // nop
@@ -56,6 +57,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence, java.lang.Throwable)
      */
+    @Override
     public void debug( CharSequence content, Throwable error )
     {
         // nop
@@ -66,6 +68,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#debug(java.lang.Throwable)
      */
+    @Override
     public void debug( Throwable error )
     {
         // nop
@@ -75,6 +78,7 @@ public class SilentLog
      * @return <code>false</code>
      * @see org.apache.maven.plugin.logging.Log#isInfoEnabled()
      */
+    @Override
     public boolean isInfoEnabled()
     {
         return false;
@@ -85,6 +89,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#info(java.lang.CharSequence)
      */
+    @Override
     public void info( CharSequence content )
     {
         // nop
@@ -95,6 +100,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#info(java.lang.CharSequence, java.lang.Throwable)
      */
+    @Override
     public void info( CharSequence content, Throwable error )
     {
         // nop
@@ -105,6 +111,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#info(java.lang.Throwable)
      */
+    @Override
     public void info( Throwable error )
     {
         // nop
@@ -115,6 +122,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#isWarnEnabled()
      */
+    @Override
     public boolean isWarnEnabled()
     {
         // nop
@@ -126,6 +134,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#warn(java.lang.CharSequence)
      */
+    @Override
     public void warn( CharSequence content )
     {
         // nop
@@ -136,6 +145,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#warn(java.lang.CharSequence, java.lang.Throwable)
      */
+    @Override
     public void warn( CharSequence content, Throwable error )
     {
         // nop
@@ -146,6 +156,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#warn(java.lang.Throwable)
      */
+    @Override
     public void warn( Throwable error )
     {
         // nop
@@ -155,6 +166,7 @@ public class SilentLog
      * @return <code>false</code>
      * @see org.apache.maven.plugin.logging.Log#isErrorEnabled()
      */
+    @Override
     public boolean isErrorEnabled()
     {
         return false;
@@ -165,6 +177,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#error(java.lang.CharSequence)
      */
+    @Override
     public void error( CharSequence content )
     {
         // nop
@@ -175,6 +188,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#error(java.lang.CharSequence, java.lang.Throwable)
      */
+    @Override
     public void error( CharSequence content, Throwable error )
     {
         // nop
@@ -185,6 +199,7 @@ public class SilentLog
      *
      * @see org.apache.maven.plugin.logging.Log#error(java.lang.Throwable)
      */
+    @Override
     public void error( Throwable error )
     {
         // nop
@@ -195,6 +210,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#debug(java.lang.String)
      */
+    @Override
     public void debug( String message )
     {
         // nop
@@ -205,6 +221,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#debug(java.lang.String, java.lang.Throwable)
      */
+    @Override
     public void debug( String message, Throwable throwable )
     {
         // nop
@@ -215,6 +232,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#info(java.lang.String)
      */
+    @Override
     public void info( String message )
     {
         // nop
@@ -225,6 +243,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#info(java.lang.String, java.lang.Throwable)
      */
+    @Override
     public void info( String message, Throwable throwable )
     {
         // nop
@@ -235,6 +254,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#warn(java.lang.String)
      */
+    @Override
     public void warn( String message )
     {
         // nop
@@ -245,6 +265,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#warn(java.lang.String, java.lang.Throwable)
      */
+    @Override
     public void warn( String message, Throwable throwable )
     {
         // nop
@@ -255,6 +276,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#error(java.lang.String)
      */
+    @Override
     public void error( String message )
     {
         // nop
@@ -265,6 +287,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#error(java.lang.String, java.lang.Throwable)
      */
+    @Override
     public void error( String message, Throwable throwable )
     {
         // nop
@@ -275,6 +298,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#fatalError(java.lang.String)
      */
+    @Override
     public void fatalError( String message )
     {
         // nop
@@ -285,6 +309,7 @@ public class SilentLog
      *
      * @see org.codehaus.plexus.logging.Logger#fatalError(java.lang.String, java.lang.Throwable)
      */
+    @Override
     public void fatalError( String message, Throwable throwable )
     {
         // nop
@@ -294,6 +319,7 @@ public class SilentLog
      * @return <code>false</code>
      * @see org.codehaus.plexus.logging.Logger#isFatalErrorEnabled()
      */
+    @Override
     public boolean isFatalErrorEnabled()
     {
         return false;
@@ -303,6 +329,7 @@ public class SilentLog
      * @return <code>null</code>
      * @see org.codehaus.plexus.logging.Logger#getChildLogger(java.lang.String)
      */
+    @Override
     public Logger getChildLogger( String name )
     {
         return null;
@@ -312,6 +339,7 @@ public class SilentLog
      * @return <code>0</code>
      * @see org.codehaus.plexus.logging.Logger#getThreshold()
      */
+    @Override
     public int getThreshold()
     {
         return 0;
@@ -321,11 +349,13 @@ public class SilentLog
      * @return <code>null</code>
      * @see org.codehaus.plexus.logging.Logger#getName()
      */
+    @Override
     public String getName()
     {
         return null;
     }
 
+    @Override
     public void setThreshold( int threshold )
     {
         // TODO Auto-generated method stub

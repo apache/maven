@@ -54,7 +54,6 @@ import org.junit.runners.model.Statement;
  * {@link WithoutMojo} to prevent the rule from firing.
  *
  * @author Mirko Friedenhagen
- * @version $Id$
  * @since 2.2
  */
 public class MojoRule
