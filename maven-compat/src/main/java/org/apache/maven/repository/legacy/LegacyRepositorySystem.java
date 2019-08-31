@@ -296,7 +296,7 @@ public class LegacyRepositorySystem
             url = "file://" + url.substring( "file:".length() );
         }
 
-        // So now we have an url of the form file://<path>
+        // So now we have a url of the form file://<path>
 
         // We want to eliminate any relative path nonsense and lock down the path so we
         // need to fully resolve it before any sub-modules use the path. This can happen
