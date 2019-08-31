@@ -114,11 +114,9 @@ public class RepositoryUtils
                                     Collection<? extends DependencyNode> nodes, List<String> trail,
                                     DependencyFilter filter )
     {
-        Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth =
-            new TreeMap<Integer, List<org.apache.maven.artifact.Artifact>>();
+        Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth = new TreeMap<>();
 
-        ArrayList<org.apache.maven.artifact.Artifact> firstLevelArtifacts =
-            new ArrayList<org.apache.maven.artifact.Artifact>( nodes.size() );
+        List<org.apache.maven.artifact.Artifact> firstLevelArtifacts = new ArrayList<>( nodes.size() );
         // we know there are at least direct dependencies
         artifactsByDepth.put( 1, firstLevelArtifacts );
 
@@ -151,7 +149,7 @@ public class RepositoryUtils
                 List<org.apache.maven.artifact.Artifact> artifactsCurrentDepth = artifactsByDepth.get( currentDepth );
                 if ( artifactsCurrentDepth == null )
                 {
-                    artifactsCurrentDepth = new ArrayList<org.apache.maven.artifact.Artifact>();
+                    artifactsCurrentDepth = new ArrayList<>();
                     artifactsByDepth.put( currentDepth, artifactsCurrentDepth );
                 }
                 artifactsCurrentDepth.add( artifact );
