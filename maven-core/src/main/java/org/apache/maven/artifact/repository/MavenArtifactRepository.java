@@ -22,6 +22,7 @@ package org.apache.maven.artifact.repository;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -353,7 +354,7 @@ public class MavenArtifactRepository
 
     protected static <T> boolean eq( T s1, T s2 )
     {
-        return s1 != null ? s1.equals( s2 ) : s2 == null;
+        return Objects.equals(s1, s2);
     }
 
     public Authentication getAuthentication()

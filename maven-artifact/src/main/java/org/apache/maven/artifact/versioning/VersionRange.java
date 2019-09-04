@@ -19,12 +19,7 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -593,11 +588,9 @@ public class VersionRange
         VersionRange other = (VersionRange) obj;
 
         boolean equals =
-            recommendedVersion == other.recommendedVersion
-                || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
+                Objects.equals(recommendedVersion, other.recommendedVersion);
         equals &=
-            restrictions == other.restrictions
-                || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
+                Objects.equals(restrictions, other.restrictions);
         return equals;
     }
 

@@ -22,15 +22,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -1061,7 +1053,7 @@ public class MavenProject
 
     private static <T> boolean eq( T s1, T s2 )
     {
-        return ( s1 != null ) ? s1.equals( s2 ) : s2 == null;
+        return Objects.equals(s1, s2);
     }
 
     @Override
