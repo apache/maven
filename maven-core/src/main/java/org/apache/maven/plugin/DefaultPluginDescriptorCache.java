@@ -19,7 +19,11 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.ArtifactUtils;

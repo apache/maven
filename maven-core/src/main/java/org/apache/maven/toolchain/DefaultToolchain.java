@@ -19,7 +19,11 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Objects;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;

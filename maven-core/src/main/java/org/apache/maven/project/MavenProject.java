@@ -22,7 +22,16 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;

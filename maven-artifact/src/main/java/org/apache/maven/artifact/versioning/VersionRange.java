@@ -19,7 +19,13 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
 
