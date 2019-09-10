@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Objects;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
@@ -137,7 +138,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
         DefaultToolchain other = (DefaultToolchain) obj;
 
-        if ( type == null ? other.type != null : !type.equals( other.type ) )
+        if (!Objects.equals(type, other.type))
         {
             return false;
         }
@@ -145,7 +146,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
         Properties thisProvides = this.getModel().getProvides();
         Properties otherProvides = other.getModel().getProvides();
 
-        if ( thisProvides == null ? otherProvides != null : !thisProvides.equals( otherProvides ) )
+        if (!Objects.equals(thisProvides, otherProvides))
         {
             return false;
         }

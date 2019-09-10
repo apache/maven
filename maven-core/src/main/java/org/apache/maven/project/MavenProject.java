@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -1061,7 +1062,7 @@ public class MavenProject
 
     private static <T> boolean eq( T s1, T s2 )
     {
-        return ( s1 != null ) ? s1.equals( s2 ) : s2 == null;
+        return Objects.equals(s1, s2);
     }
 
     @Override
