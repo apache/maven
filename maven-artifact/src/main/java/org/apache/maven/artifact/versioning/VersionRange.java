@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -592,13 +593,8 @@ public class VersionRange
         }
         VersionRange other = (VersionRange) obj;
 
-        boolean equals =
-            recommendedVersion == other.recommendedVersion
-                || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
-        equals &=
-            restrictions == other.restrictions
-                || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
-        return equals;
+        return Objects.equals( recommendedVersion, other.recommendedVersion )
+            && Objects.equals( restrictions, other.restrictions );
     }
 
     public int hashCode()

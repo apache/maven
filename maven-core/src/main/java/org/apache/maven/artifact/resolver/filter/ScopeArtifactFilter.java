@@ -19,6 +19,8 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
+import java.util.Objects;
+
 /**
  * Filter to only retain objects in the given artifactScope or better.
  *
@@ -67,12 +69,7 @@ public class ScopeArtifactFilter
 
         ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
 
-        return equals( scope, other.scope );
-    }
-
-    private static <T> boolean equals( T str1, T str2 )
-    {
-        return str1 != null ? str1.equals( str2 ) : str2 == null;
+        return Objects.equals( scope, other.scope );
     }
 
 }

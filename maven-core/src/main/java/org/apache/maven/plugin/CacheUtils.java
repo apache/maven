@@ -39,7 +39,7 @@ class CacheUtils
     @Deprecated
     public static <T> boolean eq( T s1, T s2 )
     {
-        return s1 != null ? s1.equals( s2 ) : s2 == null;
+        return Objects.equals( s1, s2 );
     }
 
     /**

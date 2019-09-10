@@ -24,6 +24,7 @@ import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -118,6 +119,38 @@ public class ExclusionArtifactFilterTest
         exclusion.setArtifactId( "*" );
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter( Collections.singletonList( exclusion ) );
 
+        assertThat( filter.include( artifact ), is( false ) );
+    }
+    
+    @Test
+    public void testMultipleExclusionsExcludeArtifactIdWildcard()
+    {
+        Exclusion exclusion1 = new Exclusion();
+        exclusion1.setGroupId( "org.apache.groovy" );
+        exclusion1.setArtifactId( "*" );
+        
+        Exclusion exclusion2 = new Exclusion();
+        exclusion2.setGroupId( "org.apache.maven" );
+        exclusion2.setArtifactId( "maven-core" );
+        
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter( Arrays.asList( exclusion1, exclusion2 ) );
+        
+        assertThat( filter.include( artifact ), is( false ) );
+    }
+    
+    @Test
+    public void testMultipleExclusionsExcludeGroupIdWildcard()
+    {
+        Exclusion exclusion1 = new Exclusion();
+        exclusion1.setGroupId( "*" );
+        exclusion1.setArtifactId( "maven-model" );
+        
+        Exclusion exclusion2 = new Exclusion();
+        exclusion2.setGroupId( "org.apache.maven" );
+        exclusion2.setArtifactId( "maven-core" );
+        
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter( Arrays.asList( exclusion1, exclusion2 ) );
+        
         assertThat( filter.include( artifact ), is( false ) );
     }
 }

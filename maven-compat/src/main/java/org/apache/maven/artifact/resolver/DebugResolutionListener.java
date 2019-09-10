@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -69,7 +70,7 @@ public class DebugResolutionListener
         String omittedVersion = omitted.getVersion();
         String keptVersion = kept.getVersion();
 
-        if ( omittedVersion != null ? !omittedVersion.equals( keptVersion ) : keptVersion != null )
+        if ( !Objects.equals( omittedVersion, keptVersion ) )
         {
             logger.debug( indent + omitted + " (removed - nearer found: " + keptVersion + ")" );
         }

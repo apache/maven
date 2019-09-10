@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -1055,13 +1056,9 @@ public class MavenProject
 
         MavenProject that = (MavenProject) other;
 
-        return eq( getArtifactId(), that.getArtifactId() ) && eq( getGroupId(), that.getGroupId() )
-            && eq( getVersion(), that.getVersion() );
-    }
-
-    private static <T> boolean eq( T s1, T s2 )
-    {
-        return ( s1 != null ) ? s1.equals( s2 ) : s2 == null;
+        return Objects.equals( getArtifactId(), that.getArtifactId() )
+            && Objects.equals( getGroupId(), that.getGroupId() ) 
+            && Objects.equals( getVersion(), that.getVersion() );
     }
 
     @Override

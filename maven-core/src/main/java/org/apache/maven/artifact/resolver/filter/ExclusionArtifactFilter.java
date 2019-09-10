@@ -47,16 +47,18 @@ public class ExclusionArtifactFilter implements ArtifactFilter
             {
                 return false;
             }
-            if ( WILDCARD.equals( exclusion.getGroupId() ) )
+            if ( WILDCARD.equals( exclusion.getGroupId() )
+                && exclusion.getArtifactId().equals( artifact.getArtifactId() ) )
             {
-                return !exclusion.getArtifactId().equals( artifact.getArtifactId() );
+                return false;
             }
-            if ( WILDCARD.equals( exclusion.getArtifactId() ) )
+            if ( WILDCARD.equals( exclusion.getArtifactId() )
+                && exclusion.getGroupId().equals( artifact.getGroupId() ) )
             {
-                return !exclusion.getGroupId().equals( artifact.getGroupId() );
+                return false;
             }
-            if ( exclusion.getGroupId().equals( artifact.getGroupId() ) && exclusion.getArtifactId().equals(
-                    artifact.getArtifactId() ) )
+            if ( exclusion.getGroupId().equals( artifact.getGroupId() )
+                && exclusion.getArtifactId().equals( artifact.getArtifactId() ) )
             {
                 return false;
             }

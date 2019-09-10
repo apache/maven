@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.Artifact;
@@ -132,13 +133,13 @@ public class DefaultMavenMetadataCache
             return true;
         }
 
-        return eq( a1.getGroupId(), a2.getGroupId() )
-            && eq( a1.getArtifactId(), a2.getArtifactId() )
-            && eq( a1.getType(), a2.getType() )
-            && eq( a1.getVersion(), a2.getVersion() )
-            && eq( a1.getClassifier(), a2.getClassifier() )
-            && eq( a1.getScope(), a2.getScope() )
-            && eq( a1.getDependencyFilter(), a2.getDependencyFilter() )
+        return Objects.equals( a1.getGroupId(), a2.getGroupId() )
+            && Objects.equals( a1.getArtifactId(), a2.getArtifactId() )
+            && Objects.equals( a1.getType(), a2.getType() )
+            && Objects.equals( a1.getVersion(), a2.getVersion() )
+            && Objects.equals( a1.getClassifier(), a2.getClassifier() )
+            && Objects.equals( a1.getScope(), a2.getScope() )
+            && Objects.equals( a1.getDependencyFilter(), a2.getDependencyFilter() )
             && a1.isOptional() == a2.isOptional();
     }
 
@@ -166,7 +167,8 @@ public class DefaultMavenMetadataCache
             return true;
         }
 
-        return eq( r1.getId(), r2.getId() ) && eq( r1.getUrl(), r2.getUrl() )
+        return Objects.equals( r1.getId(), r2.getId() )
+            && Objects.equals( r1.getUrl(), r2.getUrl() )
             && repositoryPolicyEquals( r1.getReleases(), r2.getReleases() )
             && repositoryPolicyEquals( r1.getSnapshots(), r2.getSnapshots() );
     }
@@ -178,7 +180,7 @@ public class DefaultMavenMetadataCache
             return true;
         }
 
-        return p1.isEnabled() == p2.isEnabled() && eq( p1.getUpdatePolicy(), p2.getUpdatePolicy() );
+        return p1.isEnabled() == p2.isEnabled() && Objects.equals( p1.getUpdatePolicy(), p2.getUpdatePolicy() );
     }
 
     private static boolean repositoriesEquals( List<ArtifactRepository> r1, List<ArtifactRepository> r2 )
@@ -197,11 +199,6 @@ public class DefaultMavenMetadataCache
         }
 
         return true;
-    }
-
-    private static <T> boolean eq( T s1, T s2 )
-    {
-        return s1 != null ? s1.equals( s2 ) : s2 == null;
     }
 
     /**
