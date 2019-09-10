@@ -194,9 +194,11 @@ public class DefaultPluginDescriptorCache
 
             CacheKey that = (CacheKey) obj;
 
-            return eq( this.artifactId, that.artifactId ) && eq( this.groupId, that.groupId )
-                && eq( this.version, that.version ) && eq( this.localRepo, that.localRepo )
-                && eq( this.workspace, that.workspace )
+            return Objects.equals( this.artifactId, that.artifactId ) 
+                && Objects.equals( this.groupId, that.groupId )
+                && Objects.equals( this.version, that.version ) 
+                && Objects.equals( this.localRepo, that.localRepo )
+                && Objects.equals( this.workspace, that.workspace )
                 && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories );
         }
 
@@ -209,11 +211,6 @@ public class DefaultPluginDescriptorCache
         private static int hash( Object obj )
         {
             return obj != null ? obj.hashCode() : 0;
-        }
-
-        private static <T> boolean eq( T s1, T s2 )
-        {
-            return Objects.equals(s1, s2);
         }
 
     }

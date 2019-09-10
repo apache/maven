@@ -69,12 +69,7 @@ public class ScopeArtifactFilter
 
         ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
 
-        return equals( scope, other.scope );
-    }
-
-    private static <T> boolean equals( T str1, T str2 )
-    {
-        return Objects.equals(str1, str2);
+        return Objects.equals( scope, other.scope );
     }
 
 }

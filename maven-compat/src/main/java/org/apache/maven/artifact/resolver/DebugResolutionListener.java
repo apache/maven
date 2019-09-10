@@ -70,7 +70,7 @@ public class DebugResolutionListener
         String omittedVersion = omitted.getVersion();
         String keptVersion = kept.getVersion();
 
-        if (!Objects.equals(omittedVersion, keptVersion))
+        if ( !Objects.equals( omittedVersion, keptVersion ) )
         {
             logger.debug( indent + omitted + " (removed - nearer found: " + keptVersion + ")" );
         }

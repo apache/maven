@@ -1056,13 +1056,9 @@ public class MavenProject
 
         MavenProject that = (MavenProject) other;
 
-        return eq( getArtifactId(), that.getArtifactId() ) && eq( getGroupId(), that.getGroupId() )
-            && eq( getVersion(), that.getVersion() );
-    }
-
-    private static <T> boolean eq( T s1, T s2 )
-    {
-        return Objects.equals(s1, s2);
+        return Objects.equals( getArtifactId(), that.getArtifactId() )
+            && Objects.equals( getGroupId(), that.getGroupId() ) 
+            && Objects.equals( getVersion(), that.getVersion() );
     }
 
     @Override

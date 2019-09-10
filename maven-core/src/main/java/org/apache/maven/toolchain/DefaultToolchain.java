@@ -138,7 +138,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
         DefaultToolchain other = (DefaultToolchain) obj;
 
-        if (!Objects.equals(type, other.type))
+        if ( !Objects.equals( type, other.type ) )
         {
             return false;
         }
@@ -146,12 +146,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
         Properties thisProvides = this.getModel().getProvides();
         Properties otherProvides = other.getModel().getProvides();
 
-        if (!Objects.equals(thisProvides, otherProvides))
-        {
-            return false;
-        }
-
-        return true;
+        return Objects.equals( thisProvides, otherProvides );
     }
 
     @Override

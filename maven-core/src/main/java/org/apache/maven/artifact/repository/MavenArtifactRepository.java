@@ -354,7 +354,7 @@ public class MavenArtifactRepository
 
     protected static <T> boolean eq( T s1, T s2 )
     {
-        return Objects.equals(s1, s2);
+        return Objects.equals( s1, s2 );
     }
 
     public Authentication getAuthentication()

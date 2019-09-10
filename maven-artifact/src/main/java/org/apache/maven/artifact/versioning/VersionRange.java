@@ -593,11 +593,8 @@ public class VersionRange
         }
         VersionRange other = (VersionRange) obj;
 
-        boolean equals =
-                Objects.equals(recommendedVersion, other.recommendedVersion);
-        equals &=
-                Objects.equals(restrictions, other.restrictions);
-        return equals;
+        return Objects.equals( recommendedVersion, other.recommendedVersion )
+            && Objects.equals( restrictions, other.restrictions );
     }
 
     public int hashCode()
