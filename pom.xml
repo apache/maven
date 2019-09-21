@@ -54,11 +54,11 @@ under the License.
     <commonsLangVersion>3.8.1</commonsLangVersion>
     <junitVersion>4.12</junitVersion>
     <mockitoVersion>2.21.0</mockitoVersion>
-    <plexusVersion>2.0.0</plexusVersion>
+    <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
     <plexusUtilsVersion>3.2.1</plexusUtilsVersion>
     <guiceVersion>4.2.1</guiceVersion>
-    <sisuInjectVersion>0.3.3</sisuInjectVersion>
+    <sisuInjectVersion>0.3.4</sisuInjectVersion>
     <wagonVersion>3.3.3</wagonVersion>
     <securityDispatcherVersion>1.4</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
@@ -76,6 +76,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
+    <project.build.outputTimestamp>2019-11-07T12:32:18Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
@@ -454,6 +455,22 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+        <!-- TODO remove source/jar/assembly versions when parent upgraded to 34 -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
@@ -566,12 +583,6 @@ under the License.
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
-        </plugin>
-        <!-- TODO remove when upgrade to apache-22 parent pom -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.1.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
