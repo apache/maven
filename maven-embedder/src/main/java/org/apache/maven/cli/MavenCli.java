@@ -58,6 +58,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -541,6 +542,17 @@ public class MavenCli
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.FAIL_LEVEL ) )
+        {
+            String logLevelToBreakOn = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_LEVEL );
+
+            if ( slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory )
+            {
+                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).breakOnLogsOfLevel( logLevelToBreakOn );
+                slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelToBreakOn );
+            }
+        }
     }
 
     private void version( CliRequest cliRequest )
@@ -1342,6 +1354,8 @@ public class MavenCli
         // this is the default behavior.
         String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
 
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+
         if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
         {
             recursive = false;
@@ -1650,7 +1664,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
             String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
+            
             if ( defStrs != null )
             {
                 for ( String defStr : defStrs )

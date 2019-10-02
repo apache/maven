@@ -77,6 +77,8 @@ public class CLIManager
 
     public static final String FAIL_FAST = "ff";
 
+    public static final String FAIL_LEVEL = "fl";
+
     public static final String FAIL_AT_END = "fae";
 
     public static final String FAIL_NEVER = "fn";
@@ -128,6 +130,7 @@ public class CLIManager
         options.addOption( Option.builder( ALTERNATE_GLOBAL_SETTINGS ).longOpt( "global-settings" ).desc( "Alternate path for the global settings file" ).hasArg().build() );
         options.addOption( Option.builder( Character.toString( ALTERNATE_USER_TOOLCHAINS ) ).longOpt( "toolchains" ).desc( "Alternate path for the user toolchains file" ).hasArg().build() );
         options.addOption( Option.builder( ALTERNATE_GLOBAL_TOOLCHAINS ).longOpt( "global-toolchains" ).desc( "Alternate path for the global toolchains file" ).hasArg().build() );
+        options.addOption( Option.builder( FAIL_LEVEL ).longOpt( "fail-level" ).desc( "Configure which level of logging should cause the build to fail" ).hasArgs().build() );
         options.addOption( Option.builder( FAIL_FAST ).longOpt( "fail-fast" ).desc( "Stop at first failure in reactorized builds" ).build() );
         options.addOption( Option.builder( FAIL_AT_END ).longOpt( "fail-at-end" ).desc( "Only fail the build afterwards; allow all non-impacted builds to continue" ).build() );
         options.addOption( Option.builder( FAIL_NEVER ).longOpt( "fail-never" ).desc( "NEVER fail the build, regardless of project result" ).build() );

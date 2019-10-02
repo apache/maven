@@ -1,4 +1,4 @@
-package org.slf4j.impl;
+package org.apache.maven.logwrapper;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,29 +19,14 @@ package org.slf4j.impl;
  * under the License.
  */
 
-import org.slf4j.Logger;
+import org.slf4j.ILoggerFactory;
 
 /**
- * MavenSimpleLoggerFactory
+ * Wrapper for creating loggers which can have a log level threshold.
  */
-public class MavenSimpleLoggerFactory
-    extends SimpleLoggerFactory
+public interface MavenSlf4jWrapperFactory extends ILoggerFactory
 {
-    /**
-     * Return an appropriate {@link MavenSimpleLogger} instance by name.
-     */
-    public Logger getLogger( String name )
-    {
-        Logger simpleLogger = loggerMap.get( name );
-        if ( simpleLogger != null )
-        {
-            return simpleLogger;
-        }
-        else
-        {
-            Logger newInstance = new MavenSimpleLogger( name );
-            Logger oldInstance = loggerMap.putIfAbsent( name, newInstance );
-            return oldInstance == null ? newInstance : oldInstance;
-        }
-    }
+    boolean threwLogsOfBreakingLevel();
+
+    void breakOnLogsOfLevel( String logLevelToBreakOn );
 }
