@@ -24,8 +24,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.maven.xml.Factories;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -74,12 +74,13 @@ public abstract class BuildPomXMLFilterFactory
     
     protected XMLReader getParent() throws SAXException, ParserConfigurationException 
     {
-        XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+        XMLReader xmlReader = Factories.newXMLReader();
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
         return xmlReader;
     }
     
-    // For CIFriendly
+    // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
+    
     protected abstract Optional<String> getChangelist();
         
     protected abstract Optional<String> getRevision();

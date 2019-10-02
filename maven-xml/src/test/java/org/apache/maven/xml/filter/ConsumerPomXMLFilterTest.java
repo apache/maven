@@ -119,10 +119,10 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     @Test
     public void testMe() throws Exception {
         String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
-            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" \r\n" + 
-            "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" + 
-            "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 \r\n" + 
-            "                             http://maven.apache.org/maven-v4_0_0.xsd\">\r\n" + 
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n" +
+            "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" +
+            "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0\r\n" +
+            "                           http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n" + 
             "  <modelVersion>4.0.0</modelVersion>\r\n" + 
             "  <groupId>org.sonatype.mavenbook.multispring</groupId>\r\n" + 
             "  <artifactId>parent</artifactId>\r\n" + 
@@ -141,10 +141,10 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             "  </pluginRepositories>\r\n" + 
             "</project>";
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" + 
-            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" \r\n" + 
-            "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" + 
-            "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 \r\n" + 
-            "                             http://maven.apache.org/maven-v4_0_0.xsd\">\r\n" + 
+            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n" +
+            "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n" +
+            "       xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0\r\n" +
+            "                           http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n" + 
             "  <modelVersion>4.0.0</modelVersion>\r\n" + 
             "  <groupId>org.sonatype.mavenbook.multispring</groupId>\r\n" + 
             "  <artifactId>parent</artifactId>\r\n" + 

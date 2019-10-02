@@ -19,25 +19,29 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
+import static org.apache.commons.lang3.reflect.FieldUtils.*;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.powermock.reflect.Whitebox.getField;
-import static org.powermock.reflect.Whitebox.getInternalState;
 
 /**
  * @author jdcasey
@@ -395,8 +399,7 @@ public class StringSearchModelInterpolatorTest
 
         //noinspection unchecked
         Map<Class<?>, ?> cache =
-                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
-                        .get( null );
+            (Map<Class<?>, ?>) readStaticField( StringSearchModelInterpolator.class, "CACHED_ENTRIES", true );
 
         Object objCacheItem = cache.get( Object.class );
         Object fileCacheItem = cache.get( File.class );
@@ -404,8 +407,8 @@ public class StringSearchModelInterpolatorTest
         assertNotNull( objCacheItem );
         assertNotNull( fileCacheItem );
 
-        assertThat( ( (Object[]) getInternalState( objCacheItem, "fields" ) ).length, is( 0 ) );
-        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+        assertThat( ( (Object[]) readField( objCacheItem, "fields", true ) ).length, is( 0 ) );
+        assertThat( ( (Object[]) readField( fileCacheItem, "fields", true ) ).length, is( 0 ) );
     }
 
     public void testNotInterpolateFile()
@@ -427,14 +430,13 @@ public class StringSearchModelInterpolatorTest
 
         //noinspection unchecked
         Map<Class<?>, ?> cache =
-                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
-                        .get( null );
+            (Map<Class<?>, ?>) readStaticField( StringSearchModelInterpolator.class, "CACHED_ENTRIES", true );
 
         Object fileCacheItem = cache.get( File.class );
 
         assertNotNull( fileCacheItem );
 
-        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+        assertThat( ( (Object[]) readField( fileCacheItem, "fields", true ) ).length, is( 0 ) );
     }
 
 

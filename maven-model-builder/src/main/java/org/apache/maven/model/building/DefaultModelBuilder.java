@@ -36,12 +36,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.xml.crypto.dsig.TransformException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -88,6 +91,7 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -770,7 +774,6 @@ public class DefaultModelBuilder
         {
             try
             {
-                // TODO: parent might be part of reactor... better read all lineage items like this?
                 Model parent = lineage.get( 1 ).getModel();
                 
                 Model child = modelProcessor.read( transformData( lineage.get( 0 ) ), null );
@@ -781,10 +784,9 @@ public class DefaultModelBuilder
                 // overwrite child
                 lineage.get( 0 ).setModel( child );
             }
-            catch ( IOException | TransformException | SAXException | ParserConfigurationException e )
+            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
             {
-                // this is second read, should not happen
-                e.printStackTrace();
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
             }
         }
         else
@@ -796,9 +798,9 @@ public class DefaultModelBuilder
     }
     
     private InputStream transformData( ModelData modelData )
-                    throws IOException, TransformException, SAXException, ParserConfigurationException
+                    throws IOException, TransformerException, SAXException, ParserConfigurationException
     {
-        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final TransformerFactory transformerFactory = Factories.newTransformerFactory() ;
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
         final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
@@ -806,7 +808,7 @@ public class DefaultModelBuilder
         // Should always be FileSource for reactor poms
         FileSource source = (FileSource) modelData.getSource();
         
-        System.out.println( "transforming " + source.getFile() );
+        // System.out.println( "transforming " + source.getFile() );
         
         final SAXSource transformSource =
             new SAXSource( buildPomXMLFilterFactory.get().get( source.getFile().toPath() ),
@@ -814,23 +816,24 @@ public class DefaultModelBuilder
         
         final StreamResult result = new StreamResult( pipedOutputStream );
         
-        final Runnable runnable = new Runnable()
+        final Callable<Void> callable = () ->
         {
-            @Override
-            public void run()
+            try ( PipedOutputStream out = pipedOutputStream )
             {
-                try ( PipedOutputStream out = pipedOutputStream )
-                {
-                    transformerFactory.newTransformer().transform( transformSource, result );
-                }
-                catch ( TransformerException | IOException e )
-                {
-                    throw new RuntimeException( e );
-                }
+                transformerFactory.newTransformer().transform( transformSource, result );
             }
+            return null;
         };
 
-        new Thread( runnable ).start();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        try
+        {
+            executorService.submit( callable ).get();
+        }
+        catch ( InterruptedException | ExecutionException e )
+        {
+            throw new TransformerException( "Failed to transform pom", e );
+        }
 
         return pipedInputStream;
     }

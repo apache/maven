@@ -43,6 +43,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * </p>
  * 
  * @author Robert Scholte
+ * @since 3.7.0
  */
 class ParentXMLFilter
     extends XMLFilterImpl

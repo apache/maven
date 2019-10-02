@@ -104,7 +104,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
         return new RelativeProject( groupId, m.getArtifactId(), version );
     }
     
-    private String toVersion( final Model m )
+    private static String toVersion( final Model m )
     {
         String version = m.getVersion();
         if ( version == null && m.getParent() != null )

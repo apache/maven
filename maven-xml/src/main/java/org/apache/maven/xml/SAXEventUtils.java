@@ -23,7 +23,7 @@ package org.apache.maven.xml;
  * Utility class for SAXEvents
  * 
  * @author Robert Scholte
- * @since 4.0.0
+ * @since 3.7.0
  */
 public final class SAXEventUtils
 {
@@ -31,6 +31,13 @@ public final class SAXEventUtils
     {
     }
     
+    /**
+     * Returns the newLocalName prefixed with the namespace of the oldQName if present 
+     * 
+     * @param oldQName the QName, used for its namespace
+     * @param newLocalName the preferred localName
+     * @return the new QName
+     */
     public static String renameQName( String oldQName, String newLocalName )
     {
         return oldQName.replaceFirst( "[^:]+$", newLocalName );

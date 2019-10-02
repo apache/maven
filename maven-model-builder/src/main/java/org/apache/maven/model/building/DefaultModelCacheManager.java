@@ -20,9 +20,8 @@ package org.apache.maven.model.building;
  */
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,15 +38,14 @@ import org.apache.maven.xml.filter.DependencyKey;
 @Singleton
 public class DefaultModelCacheManager implements ModelCacheManager
 {
-    private static final Map<Path, Model> MODELCACHE = Collections.synchronizedMap( new HashMap<Path, Model>() );
+    private final Map<Path, Model> modelCache = new ConcurrentHashMap<>();
     
-    private static final Map<DependencyKey, Model> DEPKEYMODELCACHE =
-        Collections.synchronizedMap( new HashMap<DependencyKey, Model>() );
+    private final Map<DependencyKey, Model> depKeyModelCache = new ConcurrentHashMap<>();
     
     @Override
     public void put( Path p, Model m )
     {
-        MODELCACHE.put( p, m );
+        modelCache.put( p, m );
         
         String groupId = m.getGroupId();
         if ( groupId == null && m.getParent() != null )
@@ -56,19 +54,19 @@ public class DefaultModelCacheManager implements ModelCacheManager
         }
         
         String artifactId = m.getArtifactId();
-        DEPKEYMODELCACHE.put( new DependencyKey( groupId, artifactId ), m );
+        depKeyModelCache.put( new DependencyKey( groupId, artifactId ), m );
     }
 
     @Override
     public Model get( Path p )
     {
-        return MODELCACHE.get( p );
+        return modelCache.get( p );
     }
 
     @Override
     public Model get( DependencyKey k )
     {
-        return DEPKEYMODELCACHE.get( k );
+        return depKeyModelCache.get( k );
     }
 
 }

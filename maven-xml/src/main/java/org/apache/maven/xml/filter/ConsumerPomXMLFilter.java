@@ -27,9 +27,8 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * This often means stripping of build-specific information.
  * When extra information is required during filtering it is probably a member of the BuildPomXMLFilter
  * 
- * This filter is used at 2 locations:
+ * This filter is used at 1 locations:
  * - {@link org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory} when publishing pom files.
- * - TODO ???Class when a reactor module is used as dependency. This ensures consistency of dependency handling
  * 
  * @author Robert Scholte
  * @since 3.7.0

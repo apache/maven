@@ -30,7 +30,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * Will apply the version if the dependency is part of the reactor
  * 
  * @author Robert Scholte
- * @since 4.0.0
+ * @since 3.7.0
  */
 public class ReactorDependencyXMLFilter extends XMLFilterImpl
 {

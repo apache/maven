@@ -67,7 +67,6 @@ under the License.
     <resolverVersion>1.4.1</resolverVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
     <xmlunitVersion>2.6.2</xmlunitVersion>
-    <powermockVersion>1.7.4</powermockVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
@@ -430,11 +429,6 @@ under the License.
         <artifactId>xmlunit-matchers</artifactId>
         <version>${xmlunitVersion}</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.powermock</groupId>
-        <artifactId>powermock-reflect</artifactId>
-        <version>${powermockVersion}</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->

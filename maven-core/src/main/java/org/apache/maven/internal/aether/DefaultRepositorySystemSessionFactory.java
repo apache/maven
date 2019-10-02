@@ -31,12 +31,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -54,6 +57,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
+import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
@@ -280,7 +284,7 @@ public class DefaultRepositorySystemSessionFactory
                 Collection<FileTransformer> transformers = new ArrayList<>();
                 if ( "pom".equals( artifact.getExtension() ) )
                 {
-                    final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                    final TransformerFactory transformerFactory = Factories.newTransformerFactory();
 
                     transformers.add( new FileTransformer()
                     {
@@ -300,30 +304,29 @@ public class DefaultRepositorySystemSessionFactory
                             }
                             catch ( SAXException | ParserConfigurationException e )
                             {   
-                                e.printStackTrace();
                                 throw new TransformException( "Failed to create a consumerPomXMLFilter", e );
                             }
                             
                             final StreamResult result = new StreamResult( pipedOutputStream );
                             
-                            final Runnable runnable = new Runnable()
+                            final Callable<Void> callable = () ->
                             {
-                                @Override
-                                public void run()
+                                try ( PipedOutputStream out = pipedOutputStream )
                                 {
-                                    try ( PipedOutputStream out = pipedOutputStream )
-                                    {
-                                        transformerFactory.newTransformer().transform( transformSource, result );
-                                    }
-                                    catch ( TransformerException | IOException e )
-                                    {
-                                        e.printStackTrace();
-                                        throw new RuntimeException( e );
-                                    }
+                                    transformerFactory.newTransformer().transform( transformSource, result );
                                 }
+                                return null;
                             };
 
-                            new Thread( runnable ).start();
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            try
+                            {
+                                executorService.submit( callable ).get();
+                            }
+                            catch ( InterruptedException | ExecutionException e )
+                            {
+                                throw new TransformException( "Failed to transform pom", e );
+                            }
 
                             return pipedInputStream;
                         }

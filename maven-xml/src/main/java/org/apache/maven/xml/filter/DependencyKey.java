@@ -31,11 +31,15 @@ public class DependencyKey
     private final String groupId;
     
     private final String artifactId;
+    
+    private final int hashCode;
 
     public DependencyKey( String groupId, String artifactId )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
+        
+        this.hashCode = Objects.hash( artifactId, groupId );
     }
  
     public String getGroupId()
@@ -51,7 +55,7 @@ public class DependencyKey
     @Override
     public int hashCode()
     {
-        return Objects.hash( artifactId, groupId );
+        return hashCode;
     }
 
     @Override

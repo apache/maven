@@ -25,7 +25,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -33,6 +32,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.maven.xml.Factories;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
@@ -50,7 +50,7 @@ public abstract class AbstractXMLFilterTests
     {
         if( filter.getParent() == null )
         {
-            filter.setParent( SAXParserFactory.newInstance().newSAXParser().getXMLReader() );
+            filter.setParent( Factories.newXMLReader() );
             filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         }
     }
@@ -82,7 +82,7 @@ public abstract class AbstractXMLFilterTests
         Writer writer = new StringWriter();
         StreamResult result = new StreamResult( writer );
 
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = Factories.newTransformerFactory();
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
 

@@ -27,7 +27,7 @@ import org.xml.sax.Locator;
  * Factory for SAXEvents
  * 
  * @author Robert Scholte
- * @since 4.0.0
+ * @since 3.7.0
  */
 public final class SAXEventFactory
 {
