@@ -31,9 +31,8 @@ under the License.
   <artifactId>maven-slf4j-wrapper</artifactId>
 
   <name>Maven SLF4J Wrapper</name>
-  <!-- TODO: Fill in a more detailed description.. -->
   <description>
-    Maven SLF4J Wrapper.
+    This modules provides an ILoggerFactory interface which avoids a cyclic dependency between maven-embedder and maven-slf4j-provider.
   </description>
 
   <dependencies>
