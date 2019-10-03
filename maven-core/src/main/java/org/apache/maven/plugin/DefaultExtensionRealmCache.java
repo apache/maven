@@ -41,6 +41,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 public class DefaultExtensionRealmCache
     implements ExtensionRealmCache, Disposable
 {
+
+    private static final ConcurrentHashMap<String, FileInfo> FILE_INFO_CACHE = new ConcurrentHashMap<>( 512 );
+
     /**
      * CacheKey
      */
@@ -48,34 +51,36 @@ public class DefaultExtensionRealmCache
         implements Key
     {
 
-        private final List<File> files;
-
-        private final List<Long> timestamps;
-
-        private final List<Long> sizes;
-
-        private final List<String> ids;
+        private final List<FileInfo> files;
 
         private final int hashCode;
 
         public CacheKey( List<Artifact> extensionArtifacts )
         {
             this.files = new ArrayList<>( extensionArtifacts.size() );
-            this.timestamps = new ArrayList<>( extensionArtifacts.size() );
-            this.sizes = new ArrayList<>( extensionArtifacts.size() );
-            this.ids = new ArrayList<>( extensionArtifacts.size() );
 
             for ( Artifact artifact : extensionArtifacts )
             {
-                File file = artifact.getFile();
-                files.add( file );
-                timestamps.add( ( file != null ) ? Long.valueOf( file.lastModified() ) : Long.valueOf( 0 ) );
-                sizes.add( ( file != null ) ? Long.valueOf( file.length() ) : Long.valueOf( 0 ) );
-                ids.add( artifact.getVersion() );
+                String artifactKey = getArtifactKey( artifact );
+                FileInfo fileInfo = FILE_INFO_CACHE.get( artifactKey );
+                if ( fileInfo == null )
+                {
+                    File file = artifact.getFile();
+                    long lastModified = file != null ? file.lastModified() : 0;
+                    long size = file != null ? file.length() : 0;
+                    fileInfo = new FileInfo( file, lastModified, size, artifact.getVersion() );
+                    FILE_INFO_CACHE.putIfAbsent( artifactKey, fileInfo );
+                }
+                files.add( fileInfo );
             }
 
-            this.hashCode =
-                31 * files.hashCode() + 31 * ids.hashCode() + 31 * timestamps.hashCode() + 31 * sizes.hashCode();
+            this.hashCode = files.hashCode();
+        }
+
+        private String getArtifactKey( Artifact artifact )
+        {
+            return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion()
+                    + ( artifact.hasClassifier() ? ":" + artifact.getClassifier() : "" ) + ":" + artifact.getType();
         }
 
         @Override
@@ -99,8 +104,7 @@ public class DefaultExtensionRealmCache
 
             CacheKey other = (CacheKey) o;
 
-            return ids.equals( other.ids ) && files.equals( other.files ) && timestamps.equals( other.timestamps )
-                && sizes.equals( other.sizes );
+            return files.equals( other.files );
         }
 
         @Override
@@ -167,4 +171,47 @@ public class DefaultExtensionRealmCache
         flush();
     }
 
+    private static class FileInfo
+    {
+        private final File file;
+        private final Long lastModified;
+        private final Long size;
+        private final String version;
+
+        FileInfo( File file, long lastModified, long size, String version )
+        {
+            this.file = file;
+            this.lastModified = lastModified;
+            this.size = size;
+            this.version = version;
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+            FileInfo fileInfo = (FileInfo) o;
+            return Objects.equals( file, fileInfo.file ) && lastModified.equals( fileInfo.lastModified ) && size.equals(
+                    fileInfo.size ) && Objects.equals( version, fileInfo.version );
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash( file, lastModified, size, version );
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.valueOf( file );
+        }
+    }
 }
