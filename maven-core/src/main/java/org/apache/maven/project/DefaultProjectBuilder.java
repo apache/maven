@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinTask;
 
+import com.google.common.collect.Sets;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -75,6 +77,10 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.synchronizedList;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * DefaultProjectBuilder
@@ -186,7 +192,7 @@ public class DefaultProjectBuilder
                 modelProblems = result.getProblems();
 
                 initProject( project, Collections.emptyMap(), true,
-                             result, new HashMap<>(), projectBuildingRequest );
+                        result, new ConcurrentHashMap<>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -204,7 +210,7 @@ public class DefaultProjectBuilder
 
             if ( error != null )
             {
-                ProjectBuildingException e = new ProjectBuildingException( Arrays.asList( result ) );
+                ProjectBuildingException e = new ProjectBuildingException( Collections.singletonList( result ) );
                 e.initCause( error );
                 throw e;
             }
@@ -362,20 +368,27 @@ public class DefaultProjectBuilder
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        List<ProjectBuildingResult> results = new ArrayList<>();
+        List<ProjectBuildingResult> results = synchronizedList( new ArrayList<>( 512 ) );
 
-        List<InterimResult> interimResults = new ArrayList<>();
+        List<InterimResult> interimResults = synchronizedList( new ArrayList<>( 512 ) );
 
         ReactorModelPool modelPool = new ReactorModelPool();
 
         InternalConfig config = new InternalConfig( request, modelPool,
                 useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
 
-        Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
+        Map<String, MavenProject> projectIndex = new ConcurrentHashMap<>( 512 );
 
+        long phase1Start = currentTimeMillis();
+        Set<File> aggregatorFiles = Sets.newConcurrentHashSet();
         boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
-                   config );
+                build( results, interimResults, projectIndex, pomFiles, aggregatorFiles, true, recursive,
+                config );
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Graph build phase 1 completed in " + ( currentTimeMillis() - phase1Start ) + " millis." );
+        }
 
         populateReactorModelPool( modelPool, interimResults );
 
@@ -383,9 +396,15 @@ public class DefaultProjectBuilder
 
         try
         {
-            noErrors =
-                build( results, new ArrayList<>(), projectIndex, interimResults, request,
-                        new HashMap<>(), config.session ) && noErrors;
+            long phase2Start = currentTimeMillis();
+
+            noErrors &= build( results, synchronizedList( new ArrayList<>() ), projectIndex, interimResults,
+                    request, new ConcurrentHashMap<>(), config.session );
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug(
+                        "Graph build phase 2 completed in " + ( currentTimeMillis() - phase2Start ) + " millis." );
+            }
         }
         finally
         {
@@ -407,19 +426,60 @@ public class DefaultProjectBuilder
     {
         boolean noErrors = true;
 
-        for ( File pomFile : pomFiles )
+        if ( ForkJoinTask.inForkJoinPool() )
         {
-            aggregatorFiles.add( pomFile );
-
-            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config ) )
+            List<ForkJoinTask<Boolean>> tasks = new ArrayList<>( pomFiles.size() );
+            for ( File pomFile : pomFiles )
             {
-                noErrors = false;
+                aggregatorFiles.add( pomFile );
+                ForkJoinTask<Boolean> forked = forkBuild( results, interimResults, projectIndex, pomFile,
+                        aggregatorFiles, isRoot, recursive, config );
+                tasks.add( forked );
             }
 
-            aggregatorFiles.remove( pomFile );
+            for ( ForkJoinTask<Boolean> task : tasks )
+            {
+                noErrors &= task.join();
+            }
+        }
+        else
+        {
+            for ( File pomFile : pomFiles )
+            {
+                aggregatorFiles.add( pomFile );
+
+                if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive,
+                        config ) )
+                {
+                    noErrors = false;
+                }
+
+                aggregatorFiles.remove( pomFile );
+            }
         }
 
         return noErrors;
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private ForkJoinTask<Boolean> forkBuild( final List<ProjectBuildingResult> results,
+                                             final List<InterimResult> interimResults,
+                                             final Map<String, MavenProject> projectIndex,
+                                             final File pomFile, final Set<File> aggregatorFiles, final boolean isRoot,
+                                             final boolean recursive, final InternalConfig config )
+    {
+        return ForkJoinTask.getPool().submit( () ->
+        {
+            try
+            {
+                return build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive,
+                        config );
+            }
+            finally
+            {
+                aggregatorFiles.remove( pomFile );
+            }
+        } );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
@@ -553,10 +613,8 @@ public class DefaultProjectBuilder
                 moduleFiles.add( moduleFile );
             }
 
-            interimResult.modules = new ArrayList<>();
-
-            if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                         recursive, config ) )
+            if ( !build( results, interimResult.modules, projectIndex, unmodifiableList( moduleFiles ), aggregatorFiles,
+                    false, recursive, config ) )
             {
                 noErrors = false;
             }
@@ -568,17 +626,17 @@ public class DefaultProjectBuilder
     static class InterimResult
     {
 
-        File pomFile;
+        final File pomFile;
 
-        ModelBuildingRequest request;
+        final ModelBuildingRequest request;
 
-        ModelBuildingResult result;
+        final ModelBuildingResult result;
 
-        DefaultModelBuildingListener listener;
+        final DefaultModelBuildingListener listener;
 
-        boolean root;
+        final boolean root;
 
-        List<InterimResult> modules = Collections.emptyList();
+        final List<InterimResult> modules = Collections.synchronizedList( new ArrayList<>() );
 
         InterimResult( File pomFile, ModelBuildingRequest request, ModelBuildingResult result,
                        DefaultModelBuildingListener listener, boolean root )
@@ -603,6 +661,7 @@ public class DefaultProjectBuilder
         }
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
                            Map<String, MavenProject> projectIndex, List<InterimResult> interimResults,
                            ProjectBuildingRequest request, Map<File, Boolean> profilesXmls,
@@ -610,59 +669,100 @@ public class DefaultProjectBuilder
     {
         boolean noErrors = true;
 
-        for ( InterimResult interimResult : interimResults )
+        if ( ForkJoinTask.inForkJoinPool() )
         {
-            MavenProject project = interimResult.listener.getProject();
-            try
+            List<ForkJoinTask<Boolean>> tasks = new ArrayList<>( interimResults.size() );
+            for ( InterimResult interimResult : interimResults )
             {
-                ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
-
-                // 2nd pass of initialization: resolve and build parent if necessary
-                try
-                {
-                    initProject( project, projectIndex, true, result, profilesXmls, request );
-                }
-                catch ( InvalidArtifactRTException iarte )
-                {
-                    result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
-                            result.getEffectiveModel(), -1, -1, iarte ) );
-                }
-
-                List<MavenProject> modules = new ArrayList<>();
-                noErrors =
-                    build( results, modules, projectIndex, interimResult.modules, request, profilesXmls, session )
-                    && noErrors;
-
-                projects.addAll( modules );
-                projects.add( project );
-
-                project.setExecutionRoot( interimResult.root );
-                project.setCollectedProjects( modules );
-                DependencyResolutionResult resolutionResult = null;
-                if ( request.isResolveDependencies() )
-                {
-                    resolutionResult = resolveDependencies( project, session );
-                }
-
-                results.add( new DefaultProjectBuildingResult( project, result.getProblems(), resolutionResult ) );
+                ForkJoinTask<Boolean> forked = forkBuild( results, projects, projectIndex, request, profilesXmls,
+                        session, interimResult );
+                tasks.add( forked );
             }
-            catch ( ModelBuildingException e )
-            {
-                DefaultProjectBuildingResult result = null;
-                if ( project == null )
-                {
-                    result = new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() );
-                }
-                else
-                {
-                    result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
-                }
-                results.add( result );
 
-                noErrors = false;
+            for ( ForkJoinTask<Boolean> task : tasks )
+            {
+                noErrors &= task.join();
+            }
+        }
+        else
+        {
+            for ( InterimResult interimResult : interimResults )
+            {
+                noErrors &= build( results, projects, projectIndex, request, profilesXmls, session,
+                        interimResult );
             }
         }
 
+        return noErrors;
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private ForkJoinTask<Boolean> forkBuild( final List<ProjectBuildingResult> results,
+                                             final List<MavenProject> projects,
+                                             final Map<String, MavenProject> projectIndex,
+                                             final ProjectBuildingRequest request,
+                                             final Map<File, Boolean> profilesXmls,
+                                             final RepositorySystemSession session,
+                                             final InterimResult interimResult )
+    {
+        return ForkJoinTask.getPool().submit(
+                () -> build( results, projects, projectIndex, request, profilesXmls, session, interimResult ) );
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
+                           Map<String, MavenProject> projectIndex, ProjectBuildingRequest request,
+                           Map<File, Boolean> profilesXmls, RepositorySystemSession session,
+                           InterimResult interimResult )
+    {
+        MavenProject project = interimResult.listener.getProject();
+        boolean noErrors;
+        try
+        {
+            ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
+
+            // 2nd pass of initialization: resolve and build parent if necessary
+            try
+            {
+                initProject( project, projectIndex, true, result, profilesXmls, request );
+            }
+            catch ( InvalidArtifactRTException iarte )
+            {
+                result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
+                        result.getEffectiveModel(), -1, -1, iarte ) );
+            }
+
+            List<MavenProject> modules = synchronizedList( new ArrayList<>() );
+            noErrors = build( results, modules, projectIndex, interimResult.modules, request, profilesXmls, session );
+
+            projects.addAll( modules );
+            projects.add( project );
+
+            project.setExecutionRoot( interimResult.root );
+            project.setCollectedProjects( modules );
+            DependencyResolutionResult resolutionResult = null;
+            if ( request.isResolveDependencies() )
+            {
+                resolutionResult = resolveDependencies( project, session );
+            }
+
+            results.add( new DefaultProjectBuildingResult( project, result.getProblems(), resolutionResult ) );
+        }
+        catch ( ModelBuildingException e )
+        {
+            DefaultProjectBuildingResult result;
+            if ( project == null )
+            {
+                result = new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() );
+            }
+            else
+            {
+                result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
+            }
+            results.add( result );
+
+            noErrors = false;
+        }
         return noErrors;
     }
 
@@ -862,11 +962,11 @@ public class DefaultProjectBuilder
                 DeploymentRepository r = project.getDistributionManagement().getRepository();
                 if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
                 {
-                    ArtifactRepository repo = repositorySystem.buildArtifactRepository( r );
+                    ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository( r );
                     repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     project.setReleaseArtifactRepository( repo );
                 }
             }
@@ -886,11 +986,11 @@ public class DefaultProjectBuilder
                 DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
                 if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
                 {
-                    ArtifactRepository repo = repositorySystem.buildArtifactRepository( r );
+                    ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository( r );
                     repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     project.setSnapshotArtifactRepository( repo );
                 }
             }

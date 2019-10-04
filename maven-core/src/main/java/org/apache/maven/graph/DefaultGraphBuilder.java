@@ -21,7 +21,6 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +28,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
@@ -401,18 +402,42 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
+        List<File> files = Collections.singletonList( request.getPom().getAbsoluteFile() );
         collectProjects( projects, files, request );
         return projects;
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-        throws ProjectBuildingException
+    private void collectProjects( List<MavenProject> projects, final List<File> files,
+                                  final MavenExecutionRequest request ) throws ProjectBuildingException
     {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
+        final ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
-                                                                    projectBuildingRequest );
+        long start = System.currentTimeMillis();
+
+        List<ProjectBuildingResult> results;
+        if ( request.getDegreeOfConcurrency() <= 1 || Boolean.getBoolean( "maven.concurrentGraph.disable" ) )
+        {
+            results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+        }
+        else
+        {
+            ForkJoinPool fjp = new ForkJoinPool( request.getDegreeOfConcurrency() );
+            try
+            {
+
+                results = fjp.invoke( ForkJoinTask.adapt(
+                        () -> projectBuilder.build( files, request.isRecursive(), projectBuildingRequest ) ) );
+            }
+            finally
+            {
+                fjp.shutdown();
+            }
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Project graph built in " + ( System.currentTimeMillis() - start ) + " millis." );
+        }
 
         boolean problems = false;
 
