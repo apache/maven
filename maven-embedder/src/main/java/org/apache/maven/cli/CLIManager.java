@@ -22,8 +22,6 @@ package org.apache.maven.cli;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -153,12 +151,7 @@ public class CLIManager
     public CommandLineWrapper parse( String[] args )
         throws ParseException
     {
-        // We need to eat any quotes surrounding arguments...
-        String[] cleanArgs = CleanArgument.cleanArgs( args );
-
-        CommandLineParser parser = new GnuParser();
-
-        return new CommandLineWrapper( parser.parse( options, cleanArgs ) );
+        return CommandLineWrapper.parse( options, args );
     }
 
     public void displayHelp( PrintStream stdout )

@@ -20,8 +20,6 @@ package org.apache.maven.cli;
  */
 
 import com.google.inject.AbstractModule;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
@@ -407,7 +405,7 @@ public class MavenCli
             }
             else
             {
-                cliRequest.commandLine = cliMerge( cliManager.parse( cliRequest.args ), mavenConfig );
+                cliRequest.commandLine = cliManager.parse( cliRequest.args ).mergeMavenConfig( mavenConfig );
             }
         }
         catch ( ParseException e )
@@ -428,45 +426,6 @@ public class MavenCli
             System.out.println( CLIReportingUtils.showVersion() );
             throw new ExitException( 0 );
         }
-    }
-
-    private CommandLineWrapper cliMerge( CommandLineWrapper mavenArgs, CommandLineWrapper mavenConfig )
-    {
-        CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
-
-        // the args are easy, cli first then config file
-        for ( String arg : mavenArgs.getArgs() )
-        {
-            commandLineBuilder.addArg( arg );
-        }
-        for ( String arg : mavenConfig.getArgs() )
-        {
-            commandLineBuilder.addArg( arg );
-        }
-
-        // now add all options, except for -D with cli first then config file
-        List<Option> setPropertyOptions = new ArrayList<>();
-        for ( Option opt : mavenArgs.getOptions() )
-        {
-            if ( String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ).equals( opt.getOpt() ) )
-            {
-                setPropertyOptions.add( opt );
-            }
-            else
-            {
-                commandLineBuilder.addOption( opt );
-            }
-        }
-        for ( Option opt : mavenConfig.getOptions() )
-        {
-            commandLineBuilder.addOption( opt );
-        }
-        // finally add the CLI system properties
-        for ( Option opt : setPropertyOptions )
-        {
-            commandLineBuilder.addOption( opt );
-        }
-        return new CommandLineWrapper( commandLineBuilder.build() );
     }
 
     /**

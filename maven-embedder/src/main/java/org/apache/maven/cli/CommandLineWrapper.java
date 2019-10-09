@@ -20,15 +20,69 @@ package org.apache.maven.cli;
  */
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandLineWrapper
 {
     private CommandLine commandLine;
 
-    CommandLineWrapper( CommandLine commandLine )
+    static CommandLineWrapper parse( Options options, String[] args ) throws ParseException
+    {
+        // We need to eat any quotes surrounding arguments...
+        String[] cleanArgs = CleanArgument.cleanArgs( args );
+
+        CommandLineParser parser = new GnuParser();
+
+        return new CommandLineWrapper( parser.parse( options, cleanArgs ) );
+    }
+
+    CommandLineWrapper mergeMavenConfig( CommandLineWrapper mavenConfig )
+    {
+        CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
+
+        // the args are easy, cli first then config file
+        for ( String arg : this.getArgs() )
+        {
+            commandLineBuilder.addArg( arg );
+        }
+        for ( String arg : mavenConfig.getArgs() )
+        {
+            commandLineBuilder.addArg( arg );
+        }
+
+        // now add all options, except for -D with cli first then config file
+        List<Option> setPropertyOptions = new ArrayList<>();
+        for ( Option opt : this.getOptions() )
+        {
+            if ( String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ).equals( opt.getOpt() ) )
+            {
+                setPropertyOptions.add( opt );
+            }
+            else
+            {
+                commandLineBuilder.addOption( opt );
+            }
+        }
+        for ( Option opt : mavenConfig.getOptions() )
+        {
+            commandLineBuilder.addOption( opt );
+        }
+        // finally add the CLI system properties
+        for ( Option opt : setPropertyOptions )
+        {
+            commandLineBuilder.addOption( opt );
+        }
+        return new CommandLineWrapper( commandLineBuilder.build() );
+    }
+
+    private CommandLineWrapper( CommandLine commandLine )
     {
         this.commandLine = commandLine;
     }
