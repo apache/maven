@@ -27,12 +27,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.Source;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CliRequest;
+import org.apache.maven.cli.CommandLineWrapper;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.Mirror;
@@ -81,7 +81,7 @@ public class SettingsXmlConfigurationProcessor
     public void process( CliRequest cliRequest )
         throws Exception
     {
-        CommandLine commandLine = cliRequest.getCommandLine();
+        CommandLineWrapper commandLine = cliRequest.getCommandLine();
         String workingDirectory = cliRequest.getWorkingDirectory();
         MavenExecutionRequest request = cliRequest.getRequest();
 

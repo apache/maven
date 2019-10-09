@@ -369,7 +369,7 @@ public class MavenCli
         CLIManager cliManager = new CLIManager();
 
         List<String> args = new ArrayList<>();
-        CommandLine mavenConfig = null;
+        CommandLineWrapper mavenConfig = null;
         try
         {
             File configFile = new File( cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG );
@@ -430,7 +430,7 @@ public class MavenCli
         }
     }
 
-    private CommandLine cliMerge( CommandLine mavenArgs, CommandLine mavenConfig )
+    private CommandLineWrapper cliMerge( CommandLineWrapper mavenArgs, CommandLineWrapper mavenConfig )
     {
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
 
@@ -466,7 +466,7 @@ public class MavenCli
         {
             commandLineBuilder.addOption( opt );
         }
-        return commandLineBuilder.build();
+        return new CommandLineWrapper( commandLineBuilder.build() );
     }
 
     /**
@@ -1300,7 +1300,7 @@ public class MavenCli
     @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
-        CommandLine commandLine = cliRequest.commandLine;
+        CommandLineWrapper commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
         boolean showErrors = cliRequest.showErrors;
@@ -1637,7 +1637,7 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
+    static void populateProperties( CommandLineWrapper commandLine, Properties systemProperties, Properties userProperties )
     {
         EnvironmentUtils.addEnvVars( systemProperties );
 

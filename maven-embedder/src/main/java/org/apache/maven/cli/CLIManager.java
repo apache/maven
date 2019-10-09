@@ -22,7 +22,6 @@ package org.apache.maven.cli;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -151,7 +150,7 @@ public class CLIManager
         options.addOption( Option.builder( "npu" ).longOpt( "no-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
     }
 
-    public CommandLine parse( String[] args )
+    public CommandLineWrapper parse( String[] args )
         throws ParseException
     {
         // We need to eat any quotes surrounding arguments...
@@ -159,7 +158,7 @@ public class CLIManager
 
         CommandLineParser parser = new GnuParser();
 
-        return parser.parse( options, cleanArgs );
+        return new CommandLineWrapper( parser.parse( options, cleanArgs ) );
     }
 
     public void displayHelp( PrintStream stdout )

@@ -22,7 +22,6 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -34,7 +33,7 @@ public class CliRequest
 {
     String[] args;
 
-    CommandLine commandLine;
+    CommandLineWrapper commandLine;
 
     ClassWorld classWorld;
 
@@ -66,7 +65,7 @@ public class CliRequest
         return args;
     }
 
-    public CommandLine getCommandLine()
+    public CommandLineWrapper getCommandLine()
     {
         return commandLine;
     }

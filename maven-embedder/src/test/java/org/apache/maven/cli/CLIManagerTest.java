@@ -23,7 +23,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.cli.CommandLine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +40,7 @@ public class CLIManagerTest
     public void spacedOptions()
         throws Exception
     {
-        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
+        CommandLineWrapper cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
         assertTrue( cmdLine.hasOption( CLIManager.DEBUG ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x=1" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "y=2" ) );
