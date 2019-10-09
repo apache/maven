@@ -50,6 +50,8 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.maven.cli.ResolveFile.resolveFile;
+
 /**
  * SettingsXmlConfigurationProcessor
  */
@@ -271,26 +273,5 @@ public class SettingsXmlConfigurationProcessor
             return source.getLocation();
         }
         return defaultLocation;
-    }
-
-    static File resolveFile( File file, String workingDirectory )
-    {
-        if ( file == null )
-        {
-            return null;
-        }
-        else if ( file.isAbsolute() )
-        {
-            return file;
-        }
-        else if ( file.getPath().startsWith( File.separator ) )
-        {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        }
-        else
-        {
-            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
-        }
     }
 }

@@ -111,6 +111,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
@@ -1569,27 +1570,6 @@ public class MavenCli
     {
         int procs = Runtime.getRuntime().availableProcessors();
         return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
-    }
-
-    static File resolveFile( File file, String workingDirectory )
-    {
-        if ( file == null )
-        {
-            return null;
-        }
-        else if ( file.isAbsolute() )
-        {
-            return file;
-        }
-        else if ( file.getPath().startsWith( File.separator ) )
-        {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        }
-        else
-        {
-            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
-        }
     }
 
     // ----------------------------------------------------------------------
