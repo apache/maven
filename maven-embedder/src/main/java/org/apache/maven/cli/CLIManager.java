@@ -32,6 +32,10 @@ import org.apache.commons.cli.ParseException;
  */
 public class CLIManager
 {
+    /**
+     * All command-line options with file paths
+     * as arguments
+     */
     public enum FileOption
     {
         ALTERNATE_POM_FILE( "f" ),

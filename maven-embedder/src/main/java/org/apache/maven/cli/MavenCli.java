@@ -383,7 +383,8 @@ public class MavenCli
                     }
                 }
 
-                mavenConfig = cliManager.parse( cliRequest.multiModuleProjectDirectory.getPath(), args.toArray( new String[0] ) );
+                mavenConfig = cliManager.parse( cliRequest.multiModuleProjectDirectory.getPath(),
+                        args.toArray( new String[0] ) );
                 List<?> unrecongized = mavenConfig.getArgList();
                 if ( !unrecongized.isEmpty() )
                 {
@@ -406,7 +407,8 @@ public class MavenCli
             }
             else
             {
-                cliRequest.commandLine = cliManager.parse( cliRequest.workingDirectory, cliRequest.args ).mergeMavenConfig( mavenConfig );
+                cliRequest.commandLine = cliManager.parse( cliRequest.workingDirectory,
+                        cliRequest.args ).mergeMavenConfig( mavenConfig );
             }
         }
         catch ( ParseException e )
@@ -1561,7 +1563,9 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties( CommandLineWrapper commandLine, Properties systemProperties, Properties userProperties )
+    static void populateProperties( CommandLineWrapper commandLine,
+                                    Properties systemProperties,
+                                    Properties userProperties )
     {
         EnvironmentUtils.addEnvVars( systemProperties );
 
