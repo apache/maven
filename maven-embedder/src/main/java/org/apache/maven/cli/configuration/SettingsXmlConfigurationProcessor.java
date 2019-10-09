@@ -50,8 +50,6 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.maven.cli.ResolveFile.resolveFile;
-
 /**
  * SettingsXmlConfigurationProcessor
  */
@@ -87,13 +85,10 @@ public class SettingsXmlConfigurationProcessor
         String workingDirectory = cliRequest.getWorkingDirectory();
         MavenExecutionRequest request = cliRequest.getRequest();
 
-        File userSettingsFile;
+        File userSettingsFile = commandLine.getFile( CLIManager.FileOption.ALTERNATE_USER_SETTINGS );
 
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
+        if ( userSettingsFile != null )
         {
-            userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = resolveFile( userSettingsFile, workingDirectory );
-
             if ( !userSettingsFile.isFile() )
             {
                 throw new FileNotFoundException( "The specified user settings file does not exist: "
@@ -105,13 +100,10 @@ public class SettingsXmlConfigurationProcessor
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
-        File globalSettingsFile;
+        File globalSettingsFile = commandLine.getFile( CLIManager.FileOption.ALTERNATE_GLOBAL_SETTINGS );
 
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
+        if ( globalSettingsFile != null )
         {
-            globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = resolveFile( globalSettingsFile, workingDirectory );
-
             if ( !globalSettingsFile.isFile() )
             {
                 throw new FileNotFoundException( "The specified global settings file does not exist: "

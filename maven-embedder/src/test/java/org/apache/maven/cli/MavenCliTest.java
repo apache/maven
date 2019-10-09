@@ -244,7 +244,7 @@ public class MavenCliTest
         assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
         assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
 
-        assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
+        assertEquals( "-Dpom.xml", request.getCommandLine().getFile( CLIManager.FileOption.ALTERNATE_POM_FILE ).getName() );
     }
 
     @Test

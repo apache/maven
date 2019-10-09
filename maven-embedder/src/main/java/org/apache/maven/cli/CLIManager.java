@@ -32,7 +32,27 @@ import org.apache.commons.cli.ParseException;
  */
 public class CLIManager
 {
-    public static final char ALTERNATE_POM_FILE = 'f';
+    public enum FileOption
+    {
+        ALTERNATE_POM_FILE( "f" ),
+        ALTERNATE_USER_SETTINGS( "s" ),
+        ALTERNATE_GLOBAL_SETTINGS( "gs" ),
+        ALTERNATE_USER_TOOLCHAINS( "t" ),
+        ALTERNATE_GLOBAL_TOOLCHAINS( "gt" ),
+        LOG_FILE( "l" );
+
+        private final String opt;
+
+        FileOption( String opt )
+        {
+            this.opt = opt;
+        }
+
+        String getOpt()
+        {
+            return opt;
+        }
+    }
 
     public static final char BATCH_MODE = 'B';
 
@@ -64,14 +84,6 @@ public class CLIManager
 
     public static final char CHECKSUM_WARNING_POLICY = 'c';
 
-    public static final char ALTERNATE_USER_SETTINGS = 's';
-
-    public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
-
-    public static final char ALTERNATE_USER_TOOLCHAINS = 't';
-
-    public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
-
     public static final String FAIL_FAST = "ff";
 
     public static final String FAIL_AT_END = "fae";
@@ -85,8 +97,6 @@ public class CLIManager
     public static final String ALSO_MAKE = "am";
 
     public static final String ALSO_MAKE_DEPENDENTS = "amd";
-
-    public static final String LOG_FILE = "l";
 
     public static final String ENCRYPT_MASTER_PASSWORD = "emp";
 
@@ -107,7 +117,7 @@ public class CLIManager
     {
         options = new Options();
         options.addOption( Option.builder( Character.toString( HELP ) ).longOpt( "help" ).desc( "Display help information" ).build() );
-        options.addOption( Option.builder( Character.toString( ALTERNATE_POM_FILE ) ).longOpt( "file" ).hasArg().desc( "Force the use of an alternate POM file (or directory with pom.xml)" ).build() );
+        options.addOption( Option.builder( FileOption.ALTERNATE_POM_FILE.getOpt() ).longOpt( "file" ).hasArg().desc( "Force the use of an alternate POM file (or directory with pom.xml)" ).build() );
         options.addOption( Option.builder( Character.toString( SET_SYSTEM_PROPERTY ) ).longOpt( "define" ).hasArg().desc( "Define a system property" ).build() );
         options.addOption( Option.builder( Character.toString( OFFLINE ) ).longOpt( "offline" ).desc( "Work offline" ).build() );
         options.addOption( Option.builder( Character.toString( VERSION ) ).longOpt( "version" ).desc( "Display version information" ).build() );
@@ -121,10 +131,10 @@ public class CLIManager
         options.addOption( Option.builder( SUPRESS_SNAPSHOT_UPDATES ).longOpt( "no-snapshot-updates" ).desc( "Suppress SNAPSHOT updates" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_FAILURE_POLICY ) ).longOpt( "strict-checksums" ).desc( "Fail the build if checksums don't match" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_WARNING_POLICY ) ).longOpt( "lax-checksums" ).desc( "Warn if checksums don't match" ).build() );
-        options.addOption( Option.builder( Character.toString( ALTERNATE_USER_SETTINGS ) ).longOpt( "settings" ).desc( "Alternate path for the user settings file" ).hasArg().build() );
-        options.addOption( Option.builder( ALTERNATE_GLOBAL_SETTINGS ).longOpt( "global-settings" ).desc( "Alternate path for the global settings file" ).hasArg().build() );
-        options.addOption( Option.builder( Character.toString( ALTERNATE_USER_TOOLCHAINS ) ).longOpt( "toolchains" ).desc( "Alternate path for the user toolchains file" ).hasArg().build() );
-        options.addOption( Option.builder( ALTERNATE_GLOBAL_TOOLCHAINS ).longOpt( "global-toolchains" ).desc( "Alternate path for the global toolchains file" ).hasArg().build() );
+        options.addOption( Option.builder( FileOption.ALTERNATE_USER_SETTINGS.getOpt() ).longOpt( "settings" ).desc( "Alternate path for the user settings file" ).hasArg().build() );
+        options.addOption( Option.builder( FileOption.ALTERNATE_GLOBAL_SETTINGS.getOpt() ).longOpt( "global-settings" ).desc( "Alternate path for the global settings file" ).hasArg().build() );
+        options.addOption( Option.builder( FileOption.ALTERNATE_USER_TOOLCHAINS.getOpt() ).longOpt( "toolchains" ).desc( "Alternate path for the user toolchains file" ).hasArg().build() );
+        options.addOption( Option.builder( FileOption.ALTERNATE_GLOBAL_TOOLCHAINS.getOpt() ).longOpt( "global-toolchains" ).desc( "Alternate path for the global toolchains file" ).hasArg().build() );
         options.addOption( Option.builder( FAIL_FAST ).longOpt( "fail-fast" ).desc( "Stop at first failure in reactorized builds" ).build() );
         options.addOption( Option.builder( FAIL_AT_END ).longOpt( "fail-at-end" ).desc( "Only fail the build afterwards; allow all non-impacted builds to continue" ).build() );
         options.addOption( Option.builder( FAIL_NEVER ).longOpt( "fail-never" ).desc( "NEVER fail the build, regardless of project result" ).build() );
@@ -132,7 +142,7 @@ public class CLIManager
         options.addOption( Option.builder( PROJECT_LIST ).longOpt( "projects" ).desc( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path" ).hasArg().build() );
         options.addOption( Option.builder( ALSO_MAKE ).longOpt( "also-make" ).desc( "If project list is specified, also build projects required by the list" ).build() );
         options.addOption( Option.builder( ALSO_MAKE_DEPENDENTS ).longOpt( "also-make-dependents" ).desc( "If project list is specified, also build projects that depend on projects on the list" ).build() );
-        options.addOption( Option.builder( LOG_FILE ).longOpt( "log-file" ).hasArg().desc( "Log file where all build output will go (disables output color)" ).build() );
+        options.addOption( Option.builder( FileOption.LOG_FILE.getOpt() ).longOpt( "log-file" ).hasArg().desc( "Log file where all build output will go (disables output color)" ).build() );
         options.addOption( Option.builder( Character.toString( SHOW_VERSION ) ).longOpt( "show-version" ).desc( "Display version information WITHOUT stopping build" ).build() );
         options.addOption( Option.builder( ENCRYPT_MASTER_PASSWORD ).longOpt( "encrypt-master-password" ).hasArg().optionalArg( true ).desc( "Encrypt master security password" ).build() );
         options.addOption( Option.builder( ENCRYPT_PASSWORD ).longOpt( "encrypt-password" ).hasArg().optionalArg( true ).desc( "Encrypt server password" ).build() );
@@ -148,10 +158,10 @@ public class CLIManager
         options.addOption( Option.builder( "npu" ).longOpt( "no-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
     }
 
-    public CommandLineWrapper parse( String[] args )
+    public CommandLineWrapper parse( String baseDirectory, String[] args )
         throws ParseException
     {
-        return CommandLineWrapper.parse( options, args );
+        return CommandLineWrapper.parse( options, baseDirectory, args );
     }
 
     public void displayHelp( PrintStream stdout )

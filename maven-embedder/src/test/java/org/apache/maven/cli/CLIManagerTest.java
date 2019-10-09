@@ -40,7 +40,9 @@ public class CLIManagerTest
     public void spacedOptions()
         throws Exception
     {
-        CommandLineWrapper cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
+        // specify null as baseDirectory to ensure that it's not used here
+        // (because there are no file options)
+        CommandLineWrapper cmdLine = cliManager.parse( null, "-X -Dx=1 -D y=2 test".split( " " ) );
         assertTrue( cmdLine.hasOption( CLIManager.DEBUG ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x=1" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "y=2" ) );

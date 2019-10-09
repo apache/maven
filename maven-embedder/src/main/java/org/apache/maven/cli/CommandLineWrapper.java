@@ -26,21 +26,45 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class CommandLineWrapper
 {
     private CommandLine commandLine;
+    private Map<CLIManager.FileOption, List<File>> fileOptions = new EnumMap<>( CLIManager.FileOption.class );
 
-    static CommandLineWrapper parse( Options options, String[] args ) throws ParseException
+    static CommandLineWrapper parse( Options options, String baseDirectory, String[] args ) throws ParseException
     {
         // We need to eat any quotes surrounding arguments...
         String[] cleanArgs = CleanArgument.cleanArgs( args );
 
         CommandLineParser parser = new GnuParser();
 
-        return new CommandLineWrapper( parser.parse( options, cleanArgs ) );
+        CommandLineWrapper commandLine = new CommandLineWrapper( parser.parse( options, cleanArgs ) );
+        commandLine.resolveFiles( baseDirectory );
+
+        return commandLine;
+    }
+
+    private void resolveFiles( String baseDirectory )
+    {
+        for ( CLIManager.FileOption fileOption : CLIManager.FileOption.values() )
+        {
+            if ( !commandLine.hasOption( fileOption.getOpt() ) )
+            {
+                continue;
+            }
+            List<File> files = new ArrayList<>();
+            for ( String name : commandLine.getOptionValues( fileOption.getOpt() ) )
+            {
+                files.add( ResolveFile.resolveFile( new File( name ), baseDirectory ) );
+            }
+            fileOptions.put( fileOption, files );
+        }
     }
 
     CommandLineWrapper mergeMavenConfig( CommandLineWrapper mavenConfig )
@@ -79,7 +103,20 @@ public class CommandLineWrapper
         {
             commandLineBuilder.addOption( opt );
         }
-        return new CommandLineWrapper( commandLineBuilder.build() );
+        CommandLineWrapper commandLine = new CommandLineWrapper( commandLineBuilder.build() );
+        commandLine.fileOptions.putAll( this.fileOptions );
+        for ( Map.Entry<CLIManager.FileOption, List<File>> configEntry : mavenConfig.fileOptions.entrySet() )
+        {
+            if ( commandLine.fileOptions.containsKey( configEntry.getKey() ) )
+            {
+                commandLine.fileOptions.get( configEntry.getKey() ).addAll( configEntry.getValue() );
+            }
+            else
+            {
+                commandLine.fileOptions.put( configEntry.getKey(), configEntry.getValue() );
+            }
+        }
+        return commandLine;
     }
 
     private CommandLineWrapper( CommandLine commandLine )
@@ -110,6 +147,22 @@ public class CommandLineWrapper
     public boolean hasOption( String opt )
     {
         return commandLine.hasOption( opt );
+    }
+
+    public boolean hasOption( CLIManager.FileOption fileOption )
+    {
+        return fileOptions.containsKey( fileOption );
+    }
+
+    public File getFile( CLIManager.FileOption fileOption )
+    {
+        List<File> files = fileOptions.get( fileOption );
+        return files == null ? null : files.get( 0 );
+    }
+
+    public List<File> getFiles( CLIManager.FileOption fileOption )
+    {
+        return fileOptions.get( fileOption );
     }
 
     public String getOptionValue( char opt )
