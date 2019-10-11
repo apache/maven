@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -53,6 +54,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
@@ -191,6 +193,10 @@ public class MavenMetadataSource
             dependencies = model.getDependencies();
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
+            MavenSession session = legacySupport.getSession();
+            MavenProject project = session.getProjectMap().get(
+                ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() ) );
+            pomRepositories = project.getRemoteArtifactRepositories();
         }
         else if ( artifact instanceof ArtifactWithDependencies )
         {
