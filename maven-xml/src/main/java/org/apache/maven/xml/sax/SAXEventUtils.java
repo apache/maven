@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.xml.sax;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,27 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
-
 /**
+ * Utility class for SAXEvents
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-@Named
-@Singleton
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public final class SAXEventUtils
 {
-
+    private SAXEventUtils()
+    {
+    }
+    
+    /**
+     * Returns the newLocalName prefixed with the namespace of the oldQName if present 
+     * 
+     * @param oldQName the QName, used for its namespace
+     * @param newLocalName the preferred localName
+     * @return the new QName
+     */
+    public static String renameQName( String oldQName, String newLocalName )
+    {
+        return oldQName.replaceFirst( "[^:]+$", newLocalName );
+    }
 }

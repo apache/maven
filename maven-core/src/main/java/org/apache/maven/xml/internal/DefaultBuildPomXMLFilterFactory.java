@@ -31,9 +31,9 @@ import javax.inject.Singleton;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelCacheManager;
-import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.filter.DependencyKey;
-import org.apache.maven.xml.filter.RelativeProject;
+import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
+import org.apache.maven.xml.sax.filter.DependencyKey;
+import org.apache.maven.xml.sax.filter.RelativeProject;
 
 /**
  * 
@@ -87,7 +87,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
                             .orElse( null );
     }
 
-    private RelativeProject toRelativeProject( final Model m )
+    private static RelativeProject toRelativeProject( final Model m )
     {
         String groupId = m.getGroupId();
         if ( groupId == null && m.getParent() != null )

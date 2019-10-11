@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.xml.sax.filter;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,37 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
+import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
+ * Filter to adjust pom on filesystem before being processed for effective pom.
+ * There should only be 1 BuildPomXMLFilter, so the same is being used by both
+ * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
+ * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
+ * 
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-@Named
-@Singleton
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public class BuildPomXMLFilter extends AbstractSAXFilter 
 {
+    BuildPomXMLFilter()
+    {
+        super();
+    }
 
+    <T extends XMLReader & LexicalHandler> BuildPomXMLFilter( T parent )
+    {
+        super( parent );
+    }
+    
+    @Override
+    public final void setParent( XMLReader parent )
+    {
+        if ( getParent() == null )
+        {
+            super.setParent( parent );
+        }
+    }
 }

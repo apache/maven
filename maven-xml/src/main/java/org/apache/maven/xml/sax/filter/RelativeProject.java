@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.xml.sax.filter;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,38 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
-
 /**
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-@Named
-@Singleton
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public class RelativeProject
 {
+    private final String groupId;
+    
+    private final String artifactId;
+    
+    private final String version;
+    
+    public RelativeProject( String groupId, String artifactId, String version )
+    {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+    }
 
+    public String getGroupId()
+    {
+        return groupId;
+    }
+    
+    public String getArtifactId()
+    {
+        return artifactId;
+    }
+    
+    public String getVersion()
+    {
+        return version;
+    }
 }

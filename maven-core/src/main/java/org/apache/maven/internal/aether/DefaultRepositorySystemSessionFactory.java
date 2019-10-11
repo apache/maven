@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -58,7 +59,7 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.apache.maven.xml.Factories;
-import org.apache.maven.xml.filter.ConsumerPomXMLFilterFactory;
+import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -302,7 +303,7 @@ public class DefaultRepositorySystemSessionFactory
                                     new SAXSource( consumerPomXMLFilterFactory.get().get( file.toPath() ),
                                                    new InputSource( new FileReader( file ) ) );
                             }
-                            catch ( SAXException | ParserConfigurationException e )
+                            catch ( SAXException | ParserConfigurationException | TransformerConfigurationException e )
                             {   
                                 throw new TransformException( "Failed to create a consumerPomXMLFilter", e );
                             }

@@ -92,7 +92,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.apache.maven.xml.Factories;
-import org.apache.maven.xml.filter.BuildPomXMLFilterFactory;
+import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;

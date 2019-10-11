@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.xml.filter.DependencyKey;
+import org.apache.maven.xml.sax.filter.DependencyKey;
 
 /**
  * Registers models for usage later on

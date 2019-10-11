@@ -27,7 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.xml.filter.DependencyKey;
+import org.apache.maven.xml.sax.filter.DependencyKey;
 
 /**
  * 

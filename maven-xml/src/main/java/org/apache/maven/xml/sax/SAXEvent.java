@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.xml.sax;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,16 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
+import org.xml.sax.SAXException;
 
 /**
+ * Command pattern to gather events which can be executed later on.
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-@Named
-@Singleton
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+@FunctionalInterface
+public interface SAXEvent
 {
-
+    void execute() throws SAXException;
 }

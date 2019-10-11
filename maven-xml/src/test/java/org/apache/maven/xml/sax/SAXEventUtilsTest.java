@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.xml.sax;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,25 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import static org.junit.Assert.assertThat;
 
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
+import org.apache.maven.xml.sax.SAXEventUtils;
 
-/**
- * 
- * @author Robert Scholte
- * @since 3.7.0
- */
-@Named
-@Singleton
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+import static org.hamcrest.CoreMatchers.is;
+
+import org.junit.Test;
+
+public class SAXEventUtilsTest
 {
+    @Test
+    public void replaceWithNamespace()
+    {
+        assertThat( SAXEventUtils.renameQName( "org:bar", "com" ), is( "org:com" ) );
+    }
 
+    @Test
+    public void replaceWithoutNamespace()
+    {
+        assertThat( SAXEventUtils.renameQName( "bar", "com" ), is( "com" ) );
+    }
 }
