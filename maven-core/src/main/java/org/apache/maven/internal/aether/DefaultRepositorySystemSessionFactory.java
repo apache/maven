@@ -50,6 +50,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.feature.Features;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -268,7 +269,7 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
-        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+        if ( Features.buildConsumer().isActive() )
         {
             session.setFileTransformerManager( newFileTransformerManager() );
         }

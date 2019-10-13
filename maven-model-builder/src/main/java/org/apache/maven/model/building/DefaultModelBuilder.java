@@ -55,6 +55,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.FileSource;
+import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -770,7 +771,7 @@ public class DefaultModelBuilder
         }
         
         // re-read model from file
-        if ( Boolean.getBoolean( "maven.experimental.buildconsumer" ) && request.isTransformPom() )
+        if ( Features.buildConsumer().isActive() && request.isTransformPom() )
         {
             try
             {

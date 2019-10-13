@@ -19,6 +19,7 @@ package org.apache.maven.model.validation;
  * under the License.
  */
 
+import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
@@ -99,7 +100,7 @@ public class DefaultModelValidator
                                     parent );
 
             // resolvedModel will assign version based on relativePath
-            if ( !Boolean.getBoolean( "maven.experimental.buildconsumer" ) )
+            if ( !Features.buildConsumer().isActive() )
             {
                 validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
                                         parent );
