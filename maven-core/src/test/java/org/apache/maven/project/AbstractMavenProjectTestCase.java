@@ -86,9 +86,7 @@ public abstract class AbstractMavenProjectTestCase
     @Override
     protected String getCustomConfigurationName()
     {
-        String name = AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
-        System.out.println( name );
-        return name;
+        return AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
     }
 
     // ----------------------------------------------------------------------

@@ -19,6 +19,10 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -76,9 +80,9 @@ public class ExtensionDescriptorBuilderTest
 
         assertNotNull( ed );
         assertNotNull( ed.getExportedPackages() );
-        assertTrue( ed.getExportedPackages().isEmpty() );
+        assertThat( ed.getExportedPackages(), is( empty() ) );
         assertNotNull( ed.getExportedArtifacts() );
-        assertTrue( ed.getExportedArtifacts().isEmpty() );
+        assertThat( ed.getExportedArtifacts(), is( empty() ) );
     }
 
     public void testCompleteDescriptor()

@@ -19,11 +19,13 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -32,7 +34,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test sorting projects by dependencies.
@@ -40,8 +44,9 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class ProjectSorterTest
-    extends TestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private Parent createParent( MavenProject project )
     {
@@ -104,8 +109,9 @@ public class ProjectSorterTest
         return new MavenProject( model );
     }
 
+    @Test
     public void testShouldNotFailWhenPluginDepReferencesCurrentProject()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MavenProject project = createProject( "group", "artifact", "1.0" );
 
@@ -122,8 +128,9 @@ public class ProjectSorterTest
         new ProjectSorter( Collections.singletonList( project ) );
     }
 
+    @Test
     public void testShouldNotFailWhenManagedPluginDepReferencesCurrentProject()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MavenProject project = createProject( "group", "artifact", "1.0" );
 
@@ -144,8 +151,9 @@ public class ProjectSorterTest
         new ProjectSorter( Collections.singletonList( project ) );
     }
 
+    @Test
     public void testShouldNotFailWhenProjectReferencesNonExistentProject()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MavenProject project = createProject( "group", "artifact", "1.0" );
 
@@ -158,8 +166,9 @@ public class ProjectSorterTest
         new ProjectSorter( Collections.singletonList( project ) );
     }
 
+    @Test
     public void testMatchingArtifactIdsDifferentGroupIds()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject( "groupId1", "artifactId", "1.0" );
@@ -174,8 +183,9 @@ public class ProjectSorterTest
         assertEquals( project1, projects.get( 1 ) );
     }
 
+    @Test
     public void testMatchingGroupIdsDifferentArtifactIds()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject( "groupId", "artifactId1", "1.0" );
@@ -190,29 +200,25 @@ public class ProjectSorterTest
         assertEquals( project1, projects.get( 1 ) );
     }
 
+    @Test
     public void testMatchingIdsAndVersions()
-        throws CycleDetectedException
+        throws Exception
     {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );
         projects.add( project1 );
         MavenProject project2 = createProject( "groupId", "artifactId", "1.0" );
         projects.add( project2 );
+        
+        expectedException.expect( DuplicateProjectException.class );
+        expectedException.reportMissingExceptionWithMessage( "Duplicate projects should fail" );
 
-        try
-        {
-            projects = new ProjectSorter( projects ).getSortedProjects();
-            fail( "Duplicate projects should fail" );
-        }
-        catch ( DuplicateProjectException e )
-        {
-            // expected
-            assertTrue( true );
-        }
+        new ProjectSorter( projects ).getSortedProjects();
     }
 
+    @Test
     public void testMatchingIdsAndDifferentVersions()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );
@@ -225,6 +231,7 @@ public class ProjectSorterTest
         assertEquals( project2, projects.get( 1 ) );
     }
 
+    @Test
     public void testPluginDependenciesInfluenceSorting()
         throws Exception
     {
@@ -261,13 +268,14 @@ public class ProjectSorterTest
         assertEquals( parentProject, projects.get( 0 ) );
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertTrue( projects.contains( pluginProject ) );
-        assertTrue( projects.contains( pluginLevelDepProject ) );
+        assertThat( projects, hasItem( pluginProject ) );
+        assertThat( projects, hasItem( pluginLevelDepProject ) );
 
         // the declaring project MUST be listed after the plugin and its plugin-level dep, though.
         assertEquals( declaringProject, projects.get( 3 ) );
     }
 
+    @Test
     public void testPluginDependenciesInfluenceSorting_DeclarationInParent()
         throws Exception
     {
@@ -296,15 +304,14 @@ public class ProjectSorterTest
 
         projects = new ProjectSorter( projects ).getSortedProjects();
 
-        System.out.println( projects );
-
         assertEquals( parentProject, projects.get( 0 ) );
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertTrue( projects.contains( pluginProject ) );
-        assertTrue( projects.contains( pluginLevelDepProject ) );
+        assertThat( projects, hasItem( pluginProject ) );
+        assertThat( projects, hasItem( pluginLevelDepProject ) );
     }
 
+    @Test
     public void testPluginVersionsAreConsidered()
         throws Exception
     {
@@ -320,10 +327,11 @@ public class ProjectSorterTest
 
         projects = new ProjectSorter( projects ).getSortedProjects();
 
-        assertTrue( projects.contains( pluginProjectA ) );
-        assertTrue( projects.contains( pluginProjectB ) );
+        assertThat( projects, hasItem( pluginProjectA ) );
+        assertThat( projects, hasItem( pluginProjectB ) );
     }
 
+    @Test
     public void testDependencyPrecedesProjectThatUsesSpecificDependencyVersion()
         throws Exception
     {
@@ -342,6 +350,7 @@ public class ProjectSorterTest
         assertEquals( usingProject, projects.get( 1 ) );
     }
 
+    @Test
     public void testDependencyPrecedesProjectThatUsesUnresolvedDependencyVersion()
         throws Exception
     {
