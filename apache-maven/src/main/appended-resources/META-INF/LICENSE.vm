@@ -46,6 +46,9 @@ subject to the terms and conditions of the following licenses:
 #*    *##if ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##end
+#*    *##if ( $project.url.startsWith( "http://www.eclipse.org/sisu/" ) )
+#*      *##set ( $project.url = 'https://www.eclipse.org/sisu/' )
+#*    *##end
 #*    *##if ( $includeLicense )
 #*      *##if ( $url || $spdx )
 #*        *##set ( $licFile = 'lib/' + $artId + '.license' )
@@ -56,7 +59,10 @@ subject to the terms and conditions of the following licenses:
 #*        *##end
 #*      *##end
 
-- $project.name#if ( $project.url ) ($project.url)#end $project.artifact
+- lib/${project.artifact.artifactId}-${project.artifact.version}.jar: $project.artifact.toString().replace( ':eclipse-plugin:', ':jar:' )
+    $project.name
+    #if ( $project.url )Project URL: ${project.url}#end
+
     License: $license.name#if ( $spdx ) ($spdx)#end#if ( $url )  $url ($licFile)#end
 
 #*    *##end
