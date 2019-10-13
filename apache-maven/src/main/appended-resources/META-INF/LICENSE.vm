@@ -33,9 +33,8 @@ subject to the terms and conditions of the following licenses:
 #*    *##set ( $spdx = false )
 #*    *##set ( $includeLicense = true )
 #*    *###
-#*    *##if ( ( $project.artifact.toString() == "org.checkerframework:checker-compat-qual:jar:2.0.0" )
-              && ( $url == "http://www.gnu.org/software/classpath/license.html" ) )
-#*      *### checkerframework is MIT for qual: https://github.com/typetools/checker-framework/blob/master/LICENSE.txt
+#*    *##if ( $project.artifact.artifactId == "jcl-over-slf4j" )
+#*      *### jcl-over-slf4j is Apache 2.0, even if its pom says MIT
 #*      *##set ( $includeLicense = false )
 #*    *##end
 #*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
