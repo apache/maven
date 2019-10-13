@@ -15,24 +15,29 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
-import junit.framework.TestCase;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.Test;
 
 /**
  * @author Kristian Rosenvold
  */
 public class ProjectBuildListTest
-    extends TestCase
 {
-
+    @Test
     public void testGetByTaskSegment()
         throws Exception
     {
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList( session );
         TaskSegment taskSegment = projectBuildList.get( 0 ).getTaskSegment();
-        assertTrue( "This test assumes there are at least 6 elements in projectBuilds", projectBuildList.size() >= 6 );
+        assertThat( "This test assumes there are at least 6 elements in projectBuilds", 
+                    projectBuildList.size(), is( greaterThanOrEqualTo( 6 ) ) );
 
         final ProjectBuildList byTaskSegment = projectBuildList.getByTaskSegment( taskSegment );
         assertEquals( projectBuildList.size(),

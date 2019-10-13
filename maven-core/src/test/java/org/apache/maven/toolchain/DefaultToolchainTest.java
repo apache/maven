@@ -19,6 +19,14 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.verify;
+
+import java.io.InputStream;
+import java.util.Collections;
+
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -28,14 +36,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.io.InputStream;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
 
 public class DefaultToolchainTest
 {
@@ -141,10 +141,10 @@ public class DefaultToolchainTest
             DefaultToolchain tc1 = new DefaultJavaToolChain( jdks.getToolchains().get( 0 ), null );
             DefaultToolchain tc2 = new DefaultJavaToolChain( jdksExtra.getToolchains().get( 0 ), null );
 
-            assertTrue( tc1.equals( tc1 ) );
-            assertFalse( tc1.equals( tc2 ) );
-            assertFalse( tc2.equals( tc1 ) );
-            assertTrue( tc2.equals( tc2 ) );
+            assertEquals( tc1, tc1 );
+            assertNotEquals( tc1, tc2 );
+            assertNotEquals( tc2, tc1 );
+            assertEquals( tc2, tc2 );
         }
     }
 }
