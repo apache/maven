@@ -1,5 +1,7 @@
 package org.apache.maven.xml.sax.filter;
 
+import java.util.ArrayDeque;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,8 +23,10 @@ package org.apache.maven.xml.sax.filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.maven.xml.sax.SAXEvent;
 import org.apache.maven.xml.sax.SAXEventFactory;
@@ -40,7 +44,7 @@ import org.xml.sax.ext.LexicalHandler;
  */
 abstract class AbstractEventXMLFilter extends AbstractSAXFilter
 {
-    private List<SAXEvent> saxEvents = new ArrayList<>();
+    private Queue<SAXEvent> saxEvents = new ArrayDeque<>();
     
     private SAXEventFactory eventFactory;
     
@@ -138,9 +142,9 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         }
         
         // not with streams due to checked SAXException
-        for ( SAXEvent saxEvent : saxEvents )
+        while( !saxEvents.isEmpty() )
         {
-            saxEvent.execute();
+            saxEvents.poll().execute();
         }
     }
     

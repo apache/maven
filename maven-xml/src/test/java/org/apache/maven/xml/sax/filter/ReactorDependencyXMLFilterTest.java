@@ -106,4 +106,42 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests
         assertThat( actual ).and( expected ).ignoreWhitespace().areIdentical();
     }
 
+    @Test
+    public void multipleDependencies() throws Exception {
+        String input = "<project>\n" + 
+            "  <modelVersion>4.0.0</modelVersion>\n" + 
+            "    <groupId>tests.project</groupId>\n" + 
+            "    <artifactId>duplicate-plugin-defs-merged</artifactId>\n" + 
+            "    <version>1</version>\n" + 
+            "    <build>\n" + 
+            "      <plugins>\n" + 
+            "        <plugin>\n" + 
+            "          <artifactId>maven-compiler-plugin</artifactId>\n" + 
+            "          <dependencies>\n" + 
+            "            <dependency>\n" + 
+            "              <groupId>group</groupId>\n" + 
+            "              <artifactId>first</artifactId>\n" + 
+            "              <version>1</version>\n" + 
+            "            </dependency>\n" + 
+            "          </dependencies>\n" + 
+            "        </plugin>\n" + 
+            "        <plugin>\n" + 
+            "          <artifactId>maven-compiler-plugin</artifactId>\n" + 
+            "          <dependencies>\n" + 
+            "            <dependency>\n" + 
+            "              <groupId>group</groupId>\n" + 
+            "              <artifactId>second</artifactId>\n" + 
+            "              <version>1</version>\n" + 
+            "            </dependency>\n" + 
+            "          </dependencies>\n" + 
+            "        </plugin>\n" + 
+            "      </plugins>\n" + 
+            "    </build>\n" + 
+            "</project>";
+        String expected = input;
+        
+        String actual = transform( input );
+        
+        assertThat( actual ).and( expected ).areIdentical();
+    }
 }
