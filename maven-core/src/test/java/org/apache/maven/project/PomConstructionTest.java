@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -32,19 +33,21 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import static org.junit.Assert.assertNotEquals;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -58,6 +61,8 @@ public class PomConstructionTest
     private DefaultProjectBuilder projectBuilder;
 
     private RepositorySystem repositorySystem;
+    
+    private SessionScope sessionScope;
 
     private File testDirectory;
 
@@ -76,6 +81,8 @@ public class PomConstructionTest
         new File( getBasedir(), BASE_MIXIN_DIR );
         projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
         repositorySystem = lookup( RepositorySystem.class );
+        sessionScope = lookup( SessionScope.class );
+        sessionScope.enter();
     }
 
     @Override
@@ -83,6 +90,7 @@ public class PomConstructionTest
         throws Exception
     {
         projectBuilder = null;
+        sessionScope.exit();
 
         super.tearDown();
     }
@@ -1873,6 +1881,10 @@ public class PomConstructionTest
         LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
         repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
         config.setRepositorySession( repoSession );
+        
+        sessionScope.seed( MavenSession.class, new MavenSession( getContainer(), 
+                                                                 config.getRepositorySession(),
+                                                                 new DefaultMavenExecutionRequest(), null ) );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }

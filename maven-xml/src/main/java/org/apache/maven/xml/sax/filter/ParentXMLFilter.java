@@ -34,6 +34,8 @@ import org.xml.sax.SAXException;
  * <p>
  * Transforms relativePath to version.
  * We could decide to simply allow {@code <parent/>}, but let's require the GA for now for checking
+ * This filter does NOT remove the relativePath (which is done by {@link RelativePathXMLFilter}, it will only 
+ * optionally include the version based on the path 
  * </p>
  * 
  * @author Robert Scholte
@@ -86,12 +88,6 @@ class ParentXMLFilter
     protected String getState()
     {
         return state;
-    }
-
-    @Override
-    protected boolean acceptEvent( String eventState )
-    {
-        return  !( "relativePath".equals( eventState ) && resolvedParent.isPresent() );
     }
     
     @Override

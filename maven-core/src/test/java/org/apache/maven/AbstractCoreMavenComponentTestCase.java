@@ -44,10 +44,10 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -56,11 +56,11 @@ import org.eclipse.aether.repository.LocalRepository;
 public abstract class AbstractCoreMavenComponentTestCase
     extends PlexusTestCase
 {
-    @Requirement
     protected RepositorySystem repositorySystem;
 
-    @Requirement
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
+
+    protected SessionScope sessionScope;
 
     protected void setUp()
         throws Exception
@@ -144,9 +144,17 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setRemoteRepositories( request.getRemoteRepositories() )
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
             .setSystemProperties( executionProperties );
+        initRepoSession( configuration );
 
+        MavenSession session =
+                        new MavenSession( getContainer(), configuration.getRepositorySession(), request,
+                                          new DefaultMavenExecutionResult() );
+        sessionScope = lookup( SessionScope.class );
+
+        sessionScope.enter();
+        sessionScope.seed( MavenSession.class, session );
+        
         List<MavenProject> projects = new ArrayList<>();
-
         if ( pom != null )
         {
             MavenProject project = projectBuilder.build( pom, configuration ).getProject();
@@ -172,15 +180,9 @@ public abstract class AbstractCoreMavenComponentTestCase
             project.setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
             projects.add( project );
         }
-
-        initRepoSession( configuration );
-
-        MavenSession session =
-            new MavenSession( getContainer(), configuration.getRepositorySession(), request,
-                              new DefaultMavenExecutionResult() );
         session.setProjects( projects );
         session.setAllProjects( session.getProjects() );
-
+        
         return session;
     }
 

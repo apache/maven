@@ -37,6 +37,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 import com.google.common.io.Files;
@@ -75,8 +76,15 @@ public class ProjectBuilderTest
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         ModelSource modelSource = new FileModelSource( pomFile );
+        
+        SessionScope sessionScope = lookup( SessionScope.class );
+        sessionScope.enter();
+        sessionScope.seed( MavenSession.class, mavenSession );
+        
         ProjectBuildingResult result =
             lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
+
+        sessionScope.exit();
 
         assertNotNull( result.getProject().getParentFile() );
     }

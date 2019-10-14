@@ -99,6 +99,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
         String expected = "<parent>"
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
+                        + "<relativePath>RELATIVEPATH</relativePath>"
                         + "<version>1.0.0</version>"
                         + "</parent>";
 
@@ -137,6 +138,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
         String expected = "<parent>"
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
+                        + "<relativePath>RELATIVEPATH</relativePath>"
                         + "<version>1.0.0</version>"
                         + "</parent>";
 
@@ -156,6 +158,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
         String expected = "<relativePath:parent xmlns:relativePath=\"relativePath\">"
                         + "<relativePath:groupId>GROUPID</relativePath:groupId>"
                         + "<relativePath:artifactId>ARTIFACTID</relativePath:artifactId>"
+                        + "<relativePath:relativePath>RELATIVEPATH</relativePath:relativePath>"
                         + "<relativePath:version>1.0.0</relativePath:version>"
                         + "</relativePath:parent>";
 

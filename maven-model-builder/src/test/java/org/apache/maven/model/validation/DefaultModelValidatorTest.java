@@ -22,6 +22,7 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.maven.feature.Features;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -415,11 +416,18 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "incomplete-parent.xml" );
 
-        assertViolations( result, 3, 0, 0 );
+        if ( Features.buildConsumer().isActive() )
+        {
+            assertViolations( result, 2, 0, 0 );
+        }
+        else
+        {
+            assertViolations( result, 3, 0, 0 );
+            assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
+        }
 
         assertTrue( result.getFatals().get( 0 ).contains( "parent.groupId" ) );
         assertTrue( result.getFatals().get( 1 ).contains( "parent.artifactId" ) );
-        assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
     }
 
     public void testHardCodedSystemPath()

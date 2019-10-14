@@ -31,7 +31,7 @@ public final class Features
     {
     }
     
-    private static final Feature BUILDCONSUMER = new Feature( "maven.experimental.buildconsumer", "false" );
+    private static final Feature BUILDCONSUMER = new Feature( "maven.experimental.buildconsumer", "true" );
     
     public static Feature buildConsumer()
     {

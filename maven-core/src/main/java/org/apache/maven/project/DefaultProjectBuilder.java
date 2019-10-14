@@ -164,7 +164,7 @@ public class DefaultProjectBuilder
                 request.setModelBuildingListener( listener );
 
                 request.setPomFile( pomFile );
-                request.setTransformPom( true );
+                request.setTransformPom( pomFile != null );
                 request.setModelSource( modelSource );
                 request.setLocationTracking( true );
 

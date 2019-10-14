@@ -23,6 +23,8 @@ import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
@@ -36,10 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,7 +52,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.building.FileSource;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -304,6 +301,20 @@ public class DefaultModelBuilder
         if ( inputModel == null )
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+
+            if ( Features.buildConsumer().isActive() && request.isTransformPom() )
+            {
+                try
+                {
+                    inputModel = modelProcessor.read( transformData( request.getPomFile() ), null );
+
+                    inputModel.setPomFile( request.getPomFile() );
+                }
+                catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
+                }
+            }
         }
         
         problems.setRootModel( inputModel );
@@ -763,78 +774,80 @@ public class DefaultModelBuilder
     private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
-        for ( int i = lineage.size() - 2; i >= 1; i-- )
+        for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
             Model parent = lineage.get( i + 1 ).getModel();
             Model child = lineage.get( i ).getModel();
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
-        
-        // re-read model from file
-        if ( Features.buildConsumer().isActive() && request.isTransformPom() )
-        {
-            try
-            {
-                Model parent = lineage.get( 1 ).getModel();
-                
-                Model child = modelProcessor.read( transformData( lineage.get( 0 ) ), null );
-                inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
-
-                // sync pomfile, is transient
-                child.setPomFile( lineage.get( 0 ).getModel().getPomFile() );
-                // overwrite child
-                lineage.get( 0 ).setModel( child );
-            }
-            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
-            }
-        }
-        else
-        {
-            Model parent = lineage.get( 1 ).getModel();
-            Model child = lineage.get( 0 ).getModel();
-            inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
-        }
     }
     
-    private InputStream transformData( ModelData modelData )
+    private InputStream transformData( File pomFile )
                     throws IOException, TransformerException, SAXException, ParserConfigurationException
     {
+//        return modelData.getSource().getInputStream();
         final TransformerFactory transformerFactory = Factories.newTransformerFactory() ;
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
         final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
 
         // Should always be FileSource for reactor poms
-        FileSource source = (FileSource) modelData.getSource();
+//        FileSource source = (FileSource) modelData.getSource();
         
-        // System.out.println( "transforming " + source.getFile() );
+//         System.out.println( "transforming " + source.getFile() );
         
         final SAXSource transformSource =
-            new SAXSource( buildPomXMLFilterFactory.get().get( source.getFile().toPath() ),
-                           new org.xml.sax.InputSource( modelData.getSource().getInputStream() ) );
-        
-        final StreamResult result = new StreamResult( pipedOutputStream );
-        
-        final Callable<Void> callable = () ->
+            new SAXSource( buildPomXMLFilterFactory.get().get( pomFile.toPath() ),
+                           new org.xml.sax.InputSource( new FileInputStream( pomFile ) ) );
+
+        FilterOutputStream fos = new FilterOutputStream( pipedOutputStream )
         {
-            try ( PipedOutputStream out = pipedOutputStream )
+            @Override
+            public void write( byte[] b, int off, int len )
+                throws IOException
             {
-                transformerFactory.newTransformer().transform( transformSource, result );
+                System.out.write( b, off, len );
+                super.write( b, off, len );
+            }  
+        }
+        ;
+        final StreamResult result = new StreamResult( fos );
+        
+////        final Callable<Void> callable = () ->
+////        {
+////            try ( PipedOutputStream out = pipedOutputStream )
+////            {
+////                transformerFactory.newTransformer().transform( transformSource, result );
+////            }
+////            return null;
+////        };
+////
+////        ExecutorService executorService = Executors.newSingleThreadExecutor();
+////        try
+////        {
+////            executorService.submit( callable ).get();
+////        }
+////        catch ( InterruptedException | ExecutionException e )
+////        {
+////            throw new TransformerException( "Failed to transform pom", e );
+////        }
+        final Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try ( PipedOutputStream out = pipedOutputStream )
+                {
+                    transformerFactory.newTransformer().transform( transformSource, result );
+                }
+                catch ( TransformerException | IOException e )
+                {
+                    throw new RuntimeException( e );
+                }
             }
-            return null;
         };
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        try
-        {
-            executorService.submit( callable ).get();
-        }
-        catch ( InterruptedException | ExecutionException e )
-        {
-            throw new TransformerException( "Failed to transform pom", e );
-        }
+        new Thread( runnable ).start();
 
         return pipedInputStream;
     }
