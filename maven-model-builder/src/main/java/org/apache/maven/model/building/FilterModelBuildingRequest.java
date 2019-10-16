@@ -281,17 +281,4 @@ class FilterModelBuildingRequest
         request.setWorkspaceModelResolver( workspaceResolver );
         return this;
     }
-
-    @Override
-    public boolean isTransformPom()
-    {
-        return request.isTransformPom();
-    }
-
-    @Override
-    public ModelBuildingRequest setTransformPom( boolean transform )
-    {
-        request.setTransformPom( transform );
-        return this;
-    }
 }

@@ -27,8 +27,10 @@ import java.io.FileInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -91,6 +93,7 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
+import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
@@ -156,13 +159,17 @@ public class DefaultModelBuilder
     @Inject
     private ReportingConverter reportingConverter;
     
+    // Using provider so MavenSession can be used in the constructor
     @Inject
-    @Nullable
     private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory; 
     
     @Inject
     @Nullable
     private ModelCacheManager modelCacheManager;
+    
+    @Inject
+    @Nullable
+    private BuildPomXMLFilterListener xmlFilterListener;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -265,6 +272,12 @@ public class DefaultModelBuilder
         this.reportingConverter = reportingConverter;
         return this;
     }
+    
+    public DefaultModelBuilder setBuildPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
+    {
+        this.buildPomXMLFilterFactory = () -> buildPomXMLFilterFactory;
+        return this;
+    }
 
     @SuppressWarnings( "checkstyle:methodlength" )
     @Override
@@ -302,11 +315,11 @@ public class DefaultModelBuilder
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
-            if ( Features.buildConsumer().isActive() && request.isTransformPom() )
+            if ( Features.buildConsumer().isActive() && request.getPomFile() != null )
             {
                 try
                 {
-                    inputModel = modelProcessor.read( transformData( request.getPomFile() ), null );
+                    inputModel = modelProcessor.read( transformData( request.getPomFile().toPath() ), null );
 
                     inputModel.setPomFile( request.getPomFile() );
                 }
@@ -782,36 +795,41 @@ public class DefaultModelBuilder
         }
     }
     
-    private InputStream transformData( File pomFile )
+    private InputStream transformData( final Path pomFile )
                     throws IOException, TransformerException, SAXException, ParserConfigurationException
     {
-//        return modelData.getSource().getInputStream();
         final TransformerFactory transformerFactory = Factories.newTransformerFactory() ;
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
         final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
 
         // Should always be FileSource for reactor poms
-//        FileSource source = (FileSource) modelData.getSource();
-        
-//         System.out.println( "transforming " + source.getFile() );
+        // System.out.println( "transforming " + pomFile );
         
         final SAXSource transformSource =
-            new SAXSource( buildPomXMLFilterFactory.get().get( pomFile.toPath() ),
-                           new org.xml.sax.InputSource( new FileInputStream( pomFile ) ) );
+            new SAXSource( buildPomXMLFilterFactory.get().get( pomFile ),
+                           new org.xml.sax.InputSource( new FileInputStream( pomFile.toFile() ) ) );
 
-        FilterOutputStream fos = new FilterOutputStream( pipedOutputStream )
+        OutputStream out;
+        if ( xmlFilterListener != null )
         {
-            @Override
-            public void write( byte[] b, int off, int len )
-                throws IOException
+            out = new FilterOutputStream( pipedOutputStream )
             {
-                System.out.write( b, off, len );
-                super.write( b, off, len );
-            }  
+                @Override
+                public void write( byte[] b, int off, int len )
+                    throws IOException
+                {
+                    super.write( b, off, len );
+                    xmlFilterListener.write( pomFile, b, off, len );
+                }  
+            };
         }
-        ;
-        final StreamResult result = new StreamResult( fos );
+        else
+        {
+            out = pipedOutputStream;
+        }
+
+        final StreamResult result = new StreamResult( out );
         
 ////        final Callable<Void> callable = () ->
 ////        {

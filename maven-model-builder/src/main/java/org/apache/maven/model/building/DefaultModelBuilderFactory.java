@@ -64,6 +64,7 @@ import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
@@ -225,6 +226,7 @@ public class DefaultModelBuilderFactory
         modelBuilder.setPluginConfigurationExpander( newPluginConfigurationExpander() );
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
+        modelBuilder.setBuildPomXMLFilterFactory( new BuildPomXMLFilterFactory() );
 
         return modelBuilder;
     }

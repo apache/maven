@@ -41,7 +41,7 @@ import org.xml.sax.ext.LexicalHandler;
  * 
  * @since 3.7.0
  */
-public abstract class BuildPomXMLFilterFactory
+public class BuildPomXMLFilterFactory
 {
     public final BuildPomXMLFilter get( Path projectFile )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
@@ -83,14 +83,14 @@ public abstract class BuildPomXMLFilterFactory
         return new BuildPomXMLFilter( parent );
     }
     
-    protected XMLReader getXMLReader() throws SAXException, ParserConfigurationException 
+    private XMLReader getXMLReader() throws SAXException, ParserConfigurationException 
     {
         XMLReader xmlReader = Factories.newXMLReader();
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
         return xmlReader;
     }
     
-    protected LexicalHandler getLexicalHander() throws TransformerConfigurationException 
+    private LexicalHandler getLexicalHander() throws TransformerConfigurationException 
     {
         TransformerFactory transformerFactory = Factories.newTransformerFactory();
         if ( transformerFactory instanceof SAXTransformerFactory )
@@ -104,16 +104,31 @@ public abstract class BuildPomXMLFilterFactory
     
     // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
     
-    protected abstract Optional<String> getChangelist();
+    protected Optional<String> getChangelist()
+    {
+        return Optional.empty();
+    }
         
-    protected abstract Optional<String> getRevision();
+    protected Optional<String> getRevision()
+    {
+        return Optional.empty();
+    }
     
-    protected abstract Optional<String> getSha1();
+    protected Optional<String> getSha1()
+    {
+        return Optional.empty();
+    }
     
     /**
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */
-    protected abstract Function<Path, Optional<RelativeProject>> getRelativePathMapper();
+    protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+    {
+        return null;
+    }
     
-    protected abstract Function<DependencyKey, String> getDependencyKeyToVersionMapper();
+    protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+    {
+        return null;
+    }
 }

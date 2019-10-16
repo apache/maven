@@ -19,6 +19,8 @@ package org.apache.maven.xml.sax;
  * under the License.
  */
 
+import java.util.regex.Pattern;
+
 /**
  * Utility class for SAXEvents
  * 
@@ -27,6 +29,8 @@ package org.apache.maven.xml.sax;
  */
 public final class SAXEventUtils
 {
+    private static final Pattern PATTERN = Pattern.compile( "[^:]+$" );
+    
     private SAXEventUtils()
     {
     }
@@ -40,6 +44,6 @@ public final class SAXEventUtils
      */
     public static String renameQName( String oldQName, String newLocalName )
     {
-        return oldQName.replaceFirst( "[^:]+$", newLocalName );
+        return PATTERN.matcher( oldQName ).replaceFirst( newLocalName );
     }
 }

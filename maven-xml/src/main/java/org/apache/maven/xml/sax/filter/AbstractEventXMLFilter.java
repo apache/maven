@@ -60,14 +60,6 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         return true;
     }
     
-//    protected final void applyCharacters() throws SAXException
-//    {
-//        if ( characters != null )
-//        {
-//            processEvent( characters );
-//        }
-//    }
-    
     AbstractEventXMLFilter()
     {
         super();

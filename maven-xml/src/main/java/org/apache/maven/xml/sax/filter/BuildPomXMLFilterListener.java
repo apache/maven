@@ -19,40 +19,22 @@ package org.apache.maven.xml.sax.filter;
  * under the License.
  */
 
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
+import java.nio.file.Path;
 
 /**
- * Filter to adjust pom on filesystem before being processed for effective pom.
- * There should only be 1 BuildPomXMLFilter, so the same is being used by both
- * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
- * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
- * 
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public class BuildPomXMLFilter extends AbstractSAXFilter 
+public interface BuildPomXMLFilterListener
 {
-    BuildPomXMLFilter()
-    {
-        super();
-    }
-
-    <T extends XMLReader & LexicalHandler> BuildPomXMLFilter( T parent )
-    {
-        super( parent );
-    }
-    
     /**
-     * Don't allow overwriting parent
+     * Captures the result of the XML transformation
+     * 
+     * @param pomFile the original to being transformed
+     * @param b the byte array
+     * @param off the offset
+     * @param len the length
      */
-    @Override
-    public final void setParent( XMLReader parent )
-    {
-        if ( getParent() == null )
-        {
-            super.setParent( parent );
-        }
-    }
+    void write( Path pomFile, byte[] b, int off, int len );
 }
