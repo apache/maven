@@ -31,8 +31,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,6 +39,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -311,24 +310,18 @@ public class DefaultRepositorySystemSessionFactory
                             
                             final StreamResult result = new StreamResult( pipedOutputStream );
                             
-                            final Callable<Void> callable = () ->
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            executorService.execute( () -> 
                             {
                                 try ( PipedOutputStream out = pipedOutputStream )
                                 {
                                     transformerFactory.newTransformer().transform( transformSource, result );
                                 }
-                                return null;
-                            };
-
-                            ExecutorService executorService = Executors.newSingleThreadExecutor();
-                            try
-                            {
-                                executorService.submit( callable ).get();
-                            }
-                            catch ( InterruptedException | ExecutionException e )
-                            {
-                                throw new TransformException( "Failed to transform pom", e );
-                            }
+                                catch ( TransformerException | IOException e )
+                                {
+                                    throw new RuntimeException( e );
+                                }
+                            } );
 
                             return pipedInputStream;
                         }
