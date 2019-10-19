@@ -35,9 +35,31 @@ import org.apache.maven.model.locator.ModelLocator;
 import org.eclipse.sisu.Typed;
 
 /**
- * DefaultModelProcessor
+ *
+ * Note: uses @Typed to limit the types it is available for injection to just ModelProcessor.
+ *
+ * This is because the ModelProcessor interface extends ModelLocator and ModelReader. If we
+ * made this component available under all its interfaces then it could end up being injected
+ * into itself leading to a stack overflow.
+ *
+ * A side-effect of using @Typed is that it translates to explicit bindings in the container.
+ * So instead of binding the component under a 'wildcard' key it is now bound with an explicit
+ * key. Since this is a default component this will be a plain binding of ModelProcessor to
+ * this implementation type, ie. no hint/name.
+ *
+ * This leads to a second side-effect in that any @Inject request for just ModelProcessor in
+ * the same injector is immediately matched to this explicit binding, which means extensions
+ * cannot override this binding. This is because the lookup is always short-circuited in this
+ * specific situation (plain @Inject request, and plain explicit binding for the same type.)
+ *
+ * The simplest solution is to use a custom @Named here so it isn't bound under the plain key.
+ * This is only necessary for default components using @Typed that want to support overriding.
+ *
+ * As a non-default component this now gets a negative priority relative to other implementations
+ * of the same interface. Since we want to allow overriding this doesn't matter in this case.
+ * (if it did we could add @Priority of 0 to match the priority given to default components.)
  */
-@Named
+@Named( "core-default" )
 @Singleton
 @Typed( ModelProcessor.class )
 public class DefaultModelProcessor
