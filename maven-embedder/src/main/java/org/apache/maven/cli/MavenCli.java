@@ -435,12 +435,10 @@ public class MavenCli
     {
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
 
-        // the args are easy, cli first then config file
+        // This condition is enforced in the cli() method right before the invocation of cliMerge().
+        assert mavenConfig.getArgList().isEmpty();
+
         for ( String arg : mavenArgs.getArgs() )
-        {
-            commandLineBuilder.addArg( arg );
-        }
-        for ( String arg : mavenConfig.getArgs() )
         {
             commandLineBuilder.addArg( arg );
         }
