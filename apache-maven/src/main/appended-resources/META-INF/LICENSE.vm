@@ -22,50 +22,60 @@ Apache Maven includes a number of components and libraries with separate
 copyright notices and license terms. Your use of those components are 
 subject to the terms and conditions of the following licenses: 
 ##
-#set ( $apacheLicenseNames = [ "Apache License, Version 2.0", "The Apache Software License, Version 2.0",
-    "ASLv2", "Apache Public License 2.0", "Apache 2.0" ] )
+#set ( $apacheMavenGroupIds = [ "org.apache.maven", "org.apache.maven.wagon", "org.apache.maven.resolver",
+                                "org.apache.maven.shared" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses)
-#*  *##if ( !$apacheLicenseNames.contains( $license.name ) )
-#*    *##set ( $artId = $project.artifact.artifactId )
-#*    *##set ( $url = $license.url )
-#*    *##set ( $spdx = false )
-#*    *##set ( $includeLicense = true )
+#*  *##set ( $groupId = $project.artifact.groupId )
+#*  *##set ( $directory = 'lib' )
+#*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) )
+#*    *### advertise about each non-Maven dependency
 #*    *###
-#*    *##if ( $project.artifact.artifactId == "jcl-over-slf4j" )
-#*      *### jcl-over-slf4j is Apache 2.0, even if its pom says MIT
-#*      *##set ( $includeLicense = false )
-#*    *##end
+#*    *### infer SPDX license code
 #*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
 #*      *##set ( $spdx = 'CDDL-1.0' )
-#*    *##end
-#*    *##if ( $MITLicenseNames.contains( $license.name ) )
+#*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'MIT' )
-#*    *##end
-#*    *##if ( $license.name == "Eclipse Public License, Version 1.0" )
+#*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )
+#*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
+#*      *##set ( $spdx = 'ASL-2.0' )
+#*    *##else
+#*      *### unrecognized license will require analysis to know obligations
+#*      *##set ( $spdx = 'unrecognized' )
 #*    *##end
+#*    *###
+#*    *### fix project urls that are wrong in pom
 #*    *##if ( $project.url.startsWith( "http://www.eclipse.org/sisu/" ) )
 #*      *##set ( $project.url = 'https://www.eclipse.org/sisu/' )
+#*    *##elseif ( $project.url.startsWith( "https://github.com/google/guava/" ) )
+#*      *##set ( $project.url = 'https://github.com/google/guava/' )
+#*    *##elseif ( $project.url.startsWith( "https://github.com/google/guice/" ) )
+#*      *##set ( $project.url = 'https://github.com/google/guice/' )
 #*    *##end
-#*    *##if ( $includeLicense )
-#*      *##if ( $url || $spdx )
-#*        *##set ( $licFile = 'lib/' + $artId + '.license' )
-#*        *##if ( $spdx )
-#*          *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}.txt", "licenses/${licFile}" ) )
-#*        *##else
-#*          *##set ( $downloaded = $locator.getResourceAsFile( $url, "licenses/${licFile}" ) )
-#*        *##end
-#*      *##end
+#*    *###
+#*    *### Classworlds is in boot directory, not in lib
+#*    *##if ( $project.artifact.artifactId == "plexus-classworlds" )
+#*      *##set ( $directory = 'boot' )
+#*    *##end
+#*    *###
+#*    *### copy license file to lib/$artifactId.license
+#*    *##set ( $licFile = $directory + '/' + $project.artifact.artifactId + '.license' )
+#*    *##if ( $spdx == "MIT" )
+#*      *### MIT license contains date and copyright that makes the file specific to each artifact
+#*      *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}-${project.artifact.artifactId}-${project.artifact.version}.txt", "licenses/${licFile}" ) )
+#*    *##else
+#*      *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}.txt", "licenses/${licFile}" ) )
+#*    *##end
+#*    *### add dependency info to output
 
-- lib/${project.artifact.artifactId}-${project.artifact.version}.jar: $project.artifact.toString().replace( ':eclipse-plugin:', ':jar:' )
+- $directory/${project.artifact.artifactId}-${project.artifact.version}.jar: $project.artifact.toString().replace( ':eclipse-plugin:', ':jar:' )
     $project.name
     #if ( $project.url )Project URL: ${project.url}#end
 
-    License: $license.name#if ( $spdx ) ($spdx)#end#if ( $url )  $url ($licFile)#end
+    License: $license.name#if ( $spdx ) ($spdx)#end  $license.url ($licFile)
 
-#*    *##end
 #*  *##end
 #**##end
 #end
