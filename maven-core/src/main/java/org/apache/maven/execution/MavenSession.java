@@ -75,6 +75,8 @@ public class MavenSession
 
     private boolean parallel;
 
+    private boolean problems;
+
     private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
 
@@ -260,6 +262,18 @@ public class MavenSession
     public void setParallel( boolean parallel )
     {
         this.parallel = parallel;
+    }
+
+    /**
+     * This indicates whether there were any problems detected when building Maven model.
+     * @return true if there were problems, false otherwise
+     */
+    public boolean isProblems() {
+        return problems;
+    }
+
+    public void setProblems(boolean problems) {
+        this.problems = problems;
     }
 
     public RepositorySystemSession getRepositorySession()
