@@ -403,7 +403,7 @@ public class DefaultGraphBuilder
 
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
         final boolean problems = collectProjects( projects, files, request );
-        session.setProblems(problems);
+        session.setProblems( problems );
         return projects;
     }
 

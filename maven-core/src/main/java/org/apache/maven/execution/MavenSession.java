@@ -268,11 +268,13 @@ public class MavenSession
      * This indicates whether there were any problems detected when building Maven model.
      * @return true if there were problems, false otherwise
      */
-    public boolean isProblems() {
+    public boolean isProblems()
+    {
         return problems;
     }
 
-    public void setProblems(boolean problems) {
+    public void setProblems( boolean problems )
+    {
         this.problems = problems;
     }
 
