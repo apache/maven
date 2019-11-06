@@ -80,6 +80,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * StringVisitorModelInterpolator
+ * 
+ * @since 3.6.2
  */
 @Named
 @Singleton
