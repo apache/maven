@@ -36,4 +36,4 @@ Maven Model
 
    * A {{{./maven.html}Descriptor Reference}}
 
-   * An XSD {{{http://maven.apache.org/xsd/maven-v3_0_0.xsd}for Maven 1.1}} and {{{http://maven.apache.org/xsd/maven-4.0.0.xsd}for Maven 2.0}}.
+   * An XSD {{{https://maven.apache.org/xsd/maven-v3_0_0.xsd}for Maven 1.1}} and {{{https://maven.apache.org/xsd/maven-4.0.0.xsd}for Maven 2.0}}.
