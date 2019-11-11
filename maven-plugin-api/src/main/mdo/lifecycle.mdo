@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.0.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.0.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://codehaus-plexus.github.io/MODELLO/1.8.0 https://codehaus-plexus.github.io/modello/xsd/modello-1.8.0.xsd"
   xml.namespace="http://maven.apache.org/LIFECYCLE/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/lifecycle-${version}.xsd">
   <id>lifecycle-mappings</id>
@@ -79,12 +79,28 @@ under the License.
       <version>1.0.0</version>
       <description>A phase mapping definition.</description>
       <fields>
-        <field>
+        <field java.getter="false">
           <name>id</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
           <description>The ID of this phase, e.g., &lt;code&gt;generate-sources&lt;/code&gt;.</description>
+        </field>
+        <field xml.attribute="true">
+          <name>executionPoint</name>
+          <required>false</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue><![CDATA[]]></defaultValue>
+          <description><![CDATA[If specified, identifies this phase as a dynamic phase to decorate the specified phase id, e.g. <code>after</code> or <code>before</code>.]]></description>
+        </field>
+        <field xml.attribute="true">
+          <name>priority</name>
+          <required>false</required>
+          <version>1.0.0</version>
+          <type>int</type>
+          <defaultValue>0</defaultValue>
+          <description>If specified, identifies a within phase prioritization of executions.</description>
         </field>
         <field>
           <name>executions</name>
@@ -102,6 +118,46 @@ under the License.
           <description>Configuration to pass to all goals run in this phase.</description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    /**
+     * Get the ID of this phase, e.g.,
+     * <code>generate-sources</code>.
+     *
+     * @return String
+     */
+    public String getRawId()
+    {
+        return id;
+    }
+
+    /**
+     * Get the effective ID of this phase, e.g.,
+     * <code>generate-sources</code> or <code>after:integration-test[1000]</code>.
+     *
+     * @return String
+     */
+    public String getId()
+    {
+        if ( executionPoint == null )
+        {
+            if ( priority == 0 )
+            {
+                return id;
+            }
+            return id + '[' + priority + ']';
+        }
+        if ( priority == 0 )
+        {
+            return executionPoint + ':' + id;
+        }
+        return executionPoint + ':' + id + '[' + priority + ']';
+    }
+]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Execution</name>

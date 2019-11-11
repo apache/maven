@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,9 +144,50 @@ public class MojoExecutor
 
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        for ( MojoExecution mojoExecution : mojoExecutions )
+        Iterator<MojoExecution> iterator = mojoExecutions.iterator();
+        try
         {
-            execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
+            while ( iterator.hasNext() )
+            {
+                MojoExecution mojoExecution = iterator.next();
+                execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
+            }
+        }
+        catch ( LifecycleExecutionException failure )
+        {
+            // run any post: executions for the current phase
+            while ( iterator.hasNext() )
+            {
+                MojoExecution mojoExecution = iterator.next();
+                String lifecyclePhase = mojoExecution.getLifecyclePhase();
+                if ( lifecyclePhase == null )
+                {
+                    // we have reached an execution that is not bound to a phase, thus there is no post: for last
+                    // executed phase
+                    break;
+                }
+                if ( phaseRecorder.isDifferentPhase( mojoExecution ) )
+                {
+                    // this is a different phase from the last executed phase, thus no more post:
+                    break;
+                }
+                PhaseId phaseId = PhaseId.of( lifecyclePhase );
+                if ( phaseId.executionPoint() != PhaseExecutionPoint.AFTER )
+                {
+                    // only interested in post: executions
+                    continue;
+                }
+                try
+                {
+                    execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
+                }
+                catch ( LifecycleExecutionException postFailure )
+                {
+                    // failures are tagged as suppressed
+                    failure.addSuppressed( postFailure );
+                }
+            }
+            throw failure;
         }
     }
 
@@ -209,8 +251,7 @@ public class MojoExecutor
             {
                 pluginManager.executeMojo( session, mojoExecution );
             }
-            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
-                | MojoExecutionException e )
+            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException | MojoExecutionException e )
             {
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
             }

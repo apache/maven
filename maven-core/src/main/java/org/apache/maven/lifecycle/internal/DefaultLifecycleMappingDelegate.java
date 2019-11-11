@@ -19,12 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -41,6 +35,12 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build execution plan given {@link Lifecycle} and
@@ -67,7 +67,7 @@ public class DefaultLifecycleMappingDelegate
          */
 
         Map<String, Map<Integer, List<MojoExecution>>> mappings =
-            new LinkedHashMap<>();
+            new TreeMap<>( new PhaseComparator( lifecycle.getPhases() ) );
 
         for ( String phase : lifecycle.getPhases() )
         {
@@ -96,7 +96,8 @@ public class DefaultLifecycleMappingDelegate
                 // to examine the phase it is associated to.
                 if ( execution.getPhase() != null )
                 {
-                    Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( execution.getPhase() );
+                    Map<Integer, List<MojoExecution>> phaseBindings =
+                        getPhaseBindings( mappings, execution.getPhase() );
                     if ( phaseBindings != null )
                     {
                         for ( String goal : execution.getGoals() )
@@ -116,7 +117,8 @@ public class DefaultLifecycleMappingDelegate
                             pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
                                                              session.getRepositorySession() );
 
-                        Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( mojoDescriptor.getPhase() );
+                        Map<Integer, List<MojoExecution>> phaseBindings =
+                            getPhaseBindings( mappings, mojoDescriptor.getPhase() );
                         if ( phaseBindings != null )
                         {
                             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
@@ -144,6 +146,24 @@ public class DefaultLifecycleMappingDelegate
 
         return lifecycleMappings;
 
+    }
+
+    private Map<Integer, List<MojoExecution>> getPhaseBindings( Map<String, Map<Integer, List<MojoExecution>>> mappings,
+                                                                String phase )
+    {
+        Map<Integer, List<MojoExecution>> result = mappings.get( phase );
+        if ( result == null )
+        {
+            // check if this is related to an phase in the plan (pre/post or different priority)
+            PhaseId id = PhaseId.of( phase );
+            if ( mappings.containsKey( id.phase() ) )
+            {
+                // lazy add the phases we need
+                result = new TreeMap<>();
+                mappings.put( phase, result );
+            }
+        }
+        return result;
     }
 
     private void addMojoExecution( Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,

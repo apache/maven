@@ -24,9 +24,10 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * @since 3.0
+ *
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
+ * @since 3.0
  */
 public class PhaseRecorder
 {
@@ -45,14 +46,15 @@ public class PhaseRecorder
 
         if ( lifecyclePhase != null )
         {
+            PhaseId phaseId = PhaseId.of( lifecyclePhase );
             if ( lastLifecyclePhase == null )
             {
-                lastLifecyclePhase = lifecyclePhase;
+                lastLifecyclePhase = phaseId.phase();
             }
-            else if ( !lifecyclePhase.equals( lastLifecyclePhase ) )
+            else if ( !phaseId.phase().equals( lastLifecyclePhase ) )
             {
                 project.addLifecyclePhase( lastLifecyclePhase );
-                lastLifecyclePhase = lifecyclePhase;
+                lastLifecyclePhase = phaseId.phase();
             }
         }
 
@@ -69,7 +71,7 @@ public class PhaseRecorder
         {
             return lastLifecyclePhase != null;
         }
-        return !lifecyclePhase.equals( lastLifecyclePhase );
+        return !PhaseId.of( lifecyclePhase ).phase().equals( lastLifecyclePhase );
 
     }
 
