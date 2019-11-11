@@ -107,7 +107,7 @@ public class PhaseId
             int priorityEnd = phase.lastIndexOf( ']' );
             boolean havePriority;
             int priority;
-            if ( priorityEnd < phaseEnd + 1 )
+            if ( priorityEnd < phaseEnd + 1 || priorityEnd != phase.length() - 1 )
             {
                 priority = 0;
                 havePriority = false;
