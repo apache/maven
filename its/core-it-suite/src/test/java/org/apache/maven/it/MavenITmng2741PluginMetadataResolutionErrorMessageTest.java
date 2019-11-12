@@ -90,7 +90,11 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
                     foundCause = true;
                     break;
                 }
-
+                if ( line.matches( ".*Transfer failed for http://localhost:54312/repo/.*/maven-metadata.xml.*" ) )
+                {
+                    foundCause = true;
+                    break;
+                }
             }
             assertTrue( "Transfer error cause was not found : " +  sb.toString(), foundCause );
         }
