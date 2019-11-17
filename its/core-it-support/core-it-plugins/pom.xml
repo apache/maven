@@ -83,6 +83,7 @@ under the License.
     <module>mng5805-plugin</module>
     <module>mng5805-plugin-dep</module>
     <module>mng5958-extension</module>
+    <module>mng-6759-resolves-project-dependencies-plugin</module>
   </modules>
 
   <scm>
