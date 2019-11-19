@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.6.3</version>
+  <version>3.7.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -101,7 +101,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>maven-3.6.3</tag>
+    <tag>master</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
