@@ -86,7 +86,7 @@ public class DefaultLifecycleTaskSegmentCalculator
     public List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        PluginVersionResolutionException
+        PluginVersionResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException
     {
         List<TaskSegment> taskSegments = new ArrayList<>( tasks.size() );
 
@@ -94,24 +94,48 @@ public class DefaultLifecycleTaskSegmentCalculator
 
         for ( String task : tasks )
         {
+            PhaseId phaseId = PhaseId.of( task );
+            // if the priority is non-zero then you specified the priority on the CLI
+            if ( phaseId.priority() != 0 )
+            {
+                throw new LifecyclePhaseNotFoundException(
+                    "Dynamic phases such as \"" + task + "\" are only permitted as execution targets specified "
+                        + "inside the pom.xml. Try invoking the whole phase, i.e. \"" + phaseId.phase() + "\".", task );
+            }
             if ( isGoalSpecification( task ) )
             {
-                // "pluginPrefix:goal" or "groupId:artifactId[:version]:goal"
-
-                lifecyclePluginResolver.resolveMissingPluginVersions( session.getTopLevelProject(), session );
-
-                MojoDescriptor mojoDescriptor =
-                    mojoDescriptorCreator.getMojoDescriptor( task, session, session.getTopLevelProject() );
-
-                boolean aggregating = mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
-
-                if ( currentSegment == null || currentSegment.isAggregating() != aggregating )
+                try
                 {
-                    currentSegment = new TaskSegment( aggregating );
-                    taskSegments.add( currentSegment );
-                }
+                    // "pluginPrefix:goal" or "groupId:artifactId[:version]:goal"
 
-                currentSegment.getTasks().add( new GoalTask( task ) );
+                    lifecyclePluginResolver.resolveMissingPluginVersions( session.getTopLevelProject(), session );
+
+                    MojoDescriptor mojoDescriptor =
+                        mojoDescriptorCreator.getMojoDescriptor( task, session, session.getTopLevelProject() );
+
+                    boolean aggregating = mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
+
+                    if ( currentSegment == null || currentSegment.isAggregating() != aggregating )
+                    {
+                        currentSegment = new TaskSegment( aggregating );
+                        taskSegments.add( currentSegment );
+                    }
+
+                    currentSegment.getTasks().add( new GoalTask( task ) );
+                }
+                catch ( NoPluginFoundForPrefixException e )
+                {
+                    if ( phaseId.executionPoint() != PhaseExecutionPoint.AS && phaseId.phase().indexOf( ':' ) == -1 )
+                    {
+                        LifecyclePhaseNotFoundException lpnfe = new LifecyclePhaseNotFoundException(
+                            "Dynamic phases such as \"" + task + "\" are only permitted as execution targets specified "
+                                + "inside the pom.xml. Try invoking the whole phase, i.e. \"" + phaseId.phase() + "\".",
+                            task );
+                        lpnfe.addSuppressed( e );
+                        throw lpnfe;
+                    }
+                    throw e;
+                }
             }
             else
             {

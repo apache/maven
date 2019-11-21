@@ -30,7 +30,7 @@ public class PhaseId
     /**
      * Interned {@link PhaseId} instances.
      */
-    private static final Map<String, PhaseId> instances = new WeakHashMap<>();
+    private static final Map<String, PhaseId> INSTANCES = new WeakHashMap<>();
 
     /**
      * The execution point of this {@link PhaseId}.
@@ -55,11 +55,11 @@ public class PhaseId
      */
     public static synchronized PhaseId of( String phase )
     {
-        PhaseId result = instances.get( phase );
+        PhaseId result = INSTANCES.get( phase );
         if ( result == null )
         {
             result = new PhaseId( phase );
-            instances.put( phase, result );
+            INSTANCES.put( phase, result );
         }
         return result;
     }

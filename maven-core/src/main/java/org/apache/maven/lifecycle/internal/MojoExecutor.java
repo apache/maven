@@ -251,7 +251,8 @@ public class MojoExecutor
             {
                 pluginManager.executeMojo( session, mojoExecution );
             }
-            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException | MojoExecutionException e )
+            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
+                | MojoExecutionException e )
             {
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
             }

@@ -137,7 +137,7 @@ under the License.
      * Get the effective ID of this phase, e.g.,
      * <code>generate-sources</code> or <code>after:integration-test[1000]</code>.
      *
-     * @return String
+     * @return the effective ID of this phase
      */
     public String getId()
     {

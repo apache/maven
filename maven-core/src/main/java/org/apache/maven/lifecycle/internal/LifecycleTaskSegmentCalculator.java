@@ -54,7 +54,7 @@ public interface LifecycleTaskSegmentCalculator
     List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        PluginVersionResolutionException;
+        PluginVersionResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException;
 
     boolean requiresProject( MavenSession session );
 
