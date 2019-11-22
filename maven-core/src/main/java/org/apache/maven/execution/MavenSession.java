@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.feature.api.MavenFeatureContext;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -44,7 +45,7 @@ import org.eclipse.aether.RepositorySystemSession;
  * @author Jason van Zyl
  */
 public class MavenSession
-    implements Cloneable
+    implements Cloneable, MavenFeatureContext
 {
     private MavenExecutionRequest request;
 

@@ -84,6 +84,7 @@ under the License.
     <module>maven-plugin-api</module>
     <module>maven-builder-support</module>
     <module>maven-model</module>
+    <module>maven-feature</module>
     <module>maven-model-builder</module>
     <module>maven-core</module>
     <module>maven-settings</module>
@@ -95,6 +96,7 @@ under the License.
     <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
+    <module>maven-experiments</module>
     <module>apache-maven</module>
   </modules>
 
@@ -177,6 +179,16 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-experiments</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-feature</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

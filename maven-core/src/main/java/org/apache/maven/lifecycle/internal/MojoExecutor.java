@@ -24,6 +24,8 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.feature.api.MavenFeatures;
+import org.apache.maven.feature.spi.DefaultMavenFeatures;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -76,6 +78,9 @@ public class MojoExecutor
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    @Requirement
+    private MavenFeatures features;
 
     public MojoExecutor()
     {
@@ -142,7 +147,8 @@ public class MojoExecutor
     {
         DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
-        PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
+        boolean dynamicPhasesEnabled = features.enabled( session, DefaultMavenFeatures.DYNAMIC_PHASES );
+        PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject(), dynamicPhasesEnabled );
 
         Iterator<MojoExecution> iterator = mojoExecutions.iterator();
         try
@@ -155,6 +161,10 @@ public class MojoExecutor
         }
         catch ( LifecycleExecutionException failure )
         {
+            if ( !dynamicPhasesEnabled )
+            {
+                throw failure;
+            }
             // run any post: executions for the current phase
             while ( iterator.hasNext() )
             {

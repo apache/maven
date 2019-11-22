@@ -20,6 +20,8 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.feature.api.MavenFeatures;
+import org.apache.maven.feature.spi.DefaultMavenFeatures;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -45,11 +47,11 @@ import java.util.List;
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
- * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class)
+ * @since 3.0
  */
 @Component( role = LifecycleTaskSegmentCalculator.class )
 public class DefaultLifecycleTaskSegmentCalculator
@@ -60,6 +62,9 @@ public class DefaultLifecycleTaskSegmentCalculator
 
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
+
+    @Requirement
+    private MavenFeatures features;
 
     public DefaultLifecycleTaskSegmentCalculator()
     {
@@ -96,7 +101,7 @@ public class DefaultLifecycleTaskSegmentCalculator
         {
             PhaseId phaseId = PhaseId.of( task );
             // if the priority is non-zero then you specified the priority on the CLI
-            if ( phaseId.priority() != 0 )
+            if ( phaseId.priority() != 0 && features.enabled( session, DefaultMavenFeatures.DYNAMIC_PHASES ) )
             {
                 throw new LifecyclePhaseNotFoundException(
                     "Dynamic phases such as \"" + task + "\" are only permitted as execution targets specified "
@@ -125,7 +130,8 @@ public class DefaultLifecycleTaskSegmentCalculator
                 }
                 catch ( NoPluginFoundForPrefixException e )
                 {
-                    if ( phaseId.executionPoint() != PhaseExecutionPoint.AS && phaseId.phase().indexOf( ':' ) == -1 )
+                    if ( phaseId.executionPoint() != PhaseExecutionPoint.AS && phaseId.phase().indexOf( ':' ) == -1
+                        && features.enabled( session, DefaultMavenFeatures.DYNAMIC_PHASES ) )
                     {
                         LifecyclePhaseNotFoundException lpnfe = new LifecyclePhaseNotFoundException(
                             "Dynamic phases such as \"" + task + "\" are only permitted as execution targets specified "

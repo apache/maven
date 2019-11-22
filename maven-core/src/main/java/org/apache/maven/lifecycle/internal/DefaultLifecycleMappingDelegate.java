@@ -19,7 +19,15 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.feature.api.MavenFeatures;
+import org.apache.maven.feature.spi.DefaultMavenFeatures;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.model.Plugin;
@@ -36,12 +44,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  * Lifecycle mapping delegate component interface. Calculates project build execution plan given {@link Lifecycle} and
  * lifecycle phase. Standard lifecycles use plugin execution {@code <phase>} or mojo default lifecycle phase to
@@ -56,6 +58,9 @@ public class DefaultLifecycleMappingDelegate
     @Requirement
     private BuildPluginManager pluginManager;
 
+    @Requirement
+    private MavenFeatures features;
+
     public Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                         Lifecycle lifecycle, String lifecyclePhase )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -66,8 +71,12 @@ public class DefaultLifecycleMappingDelegate
          * is interested in, i.e. all phases up to and including the specified phase.
          */
 
+        boolean dynamicPhasesEnabled = features.enabled( session, DefaultMavenFeatures.DYNAMIC_PHASES );
+
         Map<String, Map<Integer, List<MojoExecution>>> mappings =
-            new TreeMap<>( new PhaseComparator( lifecycle.getPhases() ) );
+            dynamicPhasesEnabled
+                ? new TreeMap<String, Map<Integer, List<MojoExecution>>>( new PhaseComparator( lifecycle.getPhases() ) )
+                : new LinkedHashMap<String, Map<Integer, List<MojoExecution>>>();
 
         for ( String phase : lifecycle.getPhases() )
         {
@@ -97,7 +106,9 @@ public class DefaultLifecycleMappingDelegate
                 if ( execution.getPhase() != null )
                 {
                     Map<Integer, List<MojoExecution>> phaseBindings =
-                        getPhaseBindings( mappings, execution.getPhase() );
+                        dynamicPhasesEnabled
+                            ? getPhaseBindings( mappings, execution.getPhase() )
+                            : mappings.get( execution.getPhase() );
                     if ( phaseBindings != null )
                     {
                         for ( String goal : execution.getGoals() )
@@ -118,7 +129,9 @@ public class DefaultLifecycleMappingDelegate
                                                              session.getRepositorySession() );
 
                         Map<Integer, List<MojoExecution>> phaseBindings =
-                            getPhaseBindings( mappings, mojoDescriptor.getPhase() );
+                            dynamicPhasesEnabled
+                                ? getPhaseBindings( mappings, mojoDescriptor.getPhase() )
+                                : mappings.get( mojoDescriptor.getPhase() );
                         if ( phaseBindings != null )
                         {
                             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );

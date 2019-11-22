@@ -35,9 +35,12 @@ public class PhaseRecorder
 
     private final MavenProject project;
 
-    public PhaseRecorder( MavenProject project )
+    private final boolean dynamicPhasesEnabled;
+
+    public PhaseRecorder( MavenProject project, boolean dynamicPhasesEnabled )
     {
         this.project = project;
+        this.dynamicPhasesEnabled = dynamicPhasesEnabled;
     }
 
     public void observeExecution( MojoExecution mojoExecution )
@@ -46,15 +49,30 @@ public class PhaseRecorder
 
         if ( lifecyclePhase != null )
         {
-            PhaseId phaseId = PhaseId.of( lifecyclePhase );
-            if ( lastLifecyclePhase == null )
+            if ( dynamicPhasesEnabled )
             {
-                lastLifecyclePhase = phaseId.phase();
+                PhaseId phaseId = PhaseId.of( lifecyclePhase );
+                if ( lastLifecyclePhase == null )
+                {
+                    lastLifecyclePhase = phaseId.phase();
+                }
+                else if ( !phaseId.phase().equals( lastLifecyclePhase ) )
+                {
+                    project.addLifecyclePhase( lastLifecyclePhase );
+                    lastLifecyclePhase = phaseId.phase();
+                }
             }
-            else if ( !phaseId.phase().equals( lastLifecyclePhase ) )
+            else
             {
-                project.addLifecyclePhase( lastLifecyclePhase );
-                lastLifecyclePhase = phaseId.phase();
+                if ( lastLifecyclePhase == null )
+                {
+                    lastLifecyclePhase = lifecyclePhase;
+                }
+                else if ( !lifecyclePhase.equals( lastLifecyclePhase ) )
+                {
+                    project.addLifecyclePhase( lastLifecyclePhase );
+                    lastLifecyclePhase = lifecyclePhase;
+                }
             }
         }
 

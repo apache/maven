@@ -130,5 +130,16 @@ under the License.
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
     </component>
+
+    <component>
+      <role>org.apache.maven.feature.api.MavenFeatures</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.feature.spi.DefaultMavenFeatures</implementation>
+      <configuration>
+        <features>
+          <feature>dynamic-phases</feature>
+        </features>
+      </configuration>
+    </component>
   </components>
 </component-set>

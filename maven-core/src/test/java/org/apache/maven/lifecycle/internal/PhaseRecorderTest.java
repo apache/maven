@@ -30,7 +30,7 @@ import java.util.List;
 public class PhaseRecorderTest extends TestCase
 {
     public void testObserveExecution() throws Exception {
-        PhaseRecorder phaseRecorder = new PhaseRecorder( ProjectDependencyGraphStub.A);
+        PhaseRecorder phaseRecorder = new PhaseRecorder( ProjectDependencyGraphStub.A, false );
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
         final List<MojoExecution> executions = plan.getMojoExecutions();
 
