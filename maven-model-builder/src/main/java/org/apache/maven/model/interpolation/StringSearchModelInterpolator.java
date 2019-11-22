@@ -46,14 +46,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * StringSearchModelInterpolator
+ * @deprecated replaced by StringVisitorModelInterpolator (MNG-6697)
  */
-@Named
-@Singleton
+@Deprecated
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {

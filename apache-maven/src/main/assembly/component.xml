@@ -56,6 +56,13 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
+      <directory>target/licenses/boot</directory>
+      <outputDirectory>boot</outputDirectory>
+      <includes>
+        <include>**</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>target/dependency/META-INF/native</directory>
       <outputDirectory>lib/jansi-native</outputDirectory>
       <includes>
