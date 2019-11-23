@@ -32,10 +32,10 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.Maven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.feature.api.MavenFeatures;
-import org.apache.maven.feature.spi.DefaultMavenFeatures;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -49,8 +49,8 @@ public class MavenExperimentEnabler
     @Requirement
     private Logger log;
 
-    @Requirement( role = MavenFeatures.class, hint = "default", optional = true )
-    private MavenFeatures features;
+    @Requirement
+    private PlexusContainer container;
 
     private final Map<MavenSession, Void> startedSessions = new WeakHashMap<>();
 
@@ -112,27 +112,14 @@ public class MavenExperimentEnabler
         }
         try
         {
-            enableFeatures( session, targetVersion );
+            Helper.enableFeatures( session, targetVersion, this.container, this.topLevelProjectFile( session ) );
         }
-        catch ( LinkageError e )
+        catch ( LinkageError | ClassNotFoundException | ComponentLookupException e )
         {
             throw new MavenExecutionException(
                 "The project uses experimental features that require exactly Maven " + targetVersion,
                 topLevelProjectFile( session ) );
         }
-    }
-
-    private void enableFeatures( MavenSession session, String targetVersion )
-        throws MavenExecutionException
-    {
-        if ( !( features instanceof DefaultMavenFeatures ) )
-        {
-            throw new MavenExecutionException(
-                "This project uses experimental features that require exactly Maven " + targetVersion
-                    + ", cannot enable experimental features because feature flag component is not as expected (was: "
-                    + features + ")", topLevelProjectFile( session ) );
-        }
-        ( (DefaultMavenFeatures) features ).enable( session );
     }
 
     private File topLevelProjectFile( MavenSession session )
