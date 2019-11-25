@@ -89,6 +89,7 @@ under the License.
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
+    <module>maven-utils</module>
     <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
     <module>maven-slf4j-provider</module>
