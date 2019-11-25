@@ -314,20 +314,6 @@ public class DefaultModelBuilder
         if ( inputModel == null )
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
-
-            if ( Features.buildConsumer().isActive() && request.getPomFile() != null )
-            {
-                try
-                {
-                    inputModel = modelProcessor.read( transformData( request.getPomFile().toPath() ), null );
-
-                    inputModel.setPomFile( request.getPomFile() );
-                }
-                catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
-                }
-            }
         }
         
         problems.setRootModel( inputModel );
@@ -679,6 +665,20 @@ public class DefaultModelBuilder
         if ( hasFatalErrors( problems ) )
         {
             throw problems.newModelBuildingException();
+        }
+        
+        if ( Features.buildConsumer().isActive() && pomFile != null )
+        {
+            try
+            {
+                model = modelProcessor.read( transformData( pomFile.toPath() ), null );
+
+                model.setPomFile( pomFile );
+            }
+            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
+            }
         }
 
         return model;
