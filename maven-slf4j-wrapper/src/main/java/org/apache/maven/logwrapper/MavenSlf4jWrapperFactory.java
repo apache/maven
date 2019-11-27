@@ -26,7 +26,7 @@ import org.slf4j.ILoggerFactory;
  */
 public interface MavenSlf4jWrapperFactory extends ILoggerFactory
 {
-    boolean threwLogsOfBreakingLevel();
+    boolean isThresholdHit();
 
-    void breakOnLogsOfLevel( String logLevelToBreakOn );
+    void breakOnLogLevel( String logLevelToBreakOn );
 }

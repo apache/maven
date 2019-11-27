@@ -23,7 +23,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class MavenLoggerFactoryTest
 {
@@ -56,7 +61,7 @@ public class MavenLoggerFactoryTest
     public void createsFailLevelLogger()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
-        mavenLoggerFactory.breakOnLogsOfLevel( "WARN" );
+        mavenLoggerFactory.breakOnLogLevel( "WARN" );
 
         Logger logger = mavenLoggerFactory.getLogger( "Test" );
 
@@ -67,33 +72,33 @@ public class MavenLoggerFactoryTest
     public void reportsWhenFailLevelHasBeenHit()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
-        mavenLoggerFactory.breakOnLogsOfLevel( "ERROR" );
+        mavenLoggerFactory.breakOnLogLevel( "ERROR" );
 
         MavenFailLevelLogger logger = ( MavenFailLevelLogger ) mavenLoggerFactory.getLogger( "Test" );
-        assertFalse( mavenLoggerFactory.threwLogsOfBreakingLevel() );
+        assertFalse( mavenLoggerFactory.isThresholdHit() );
 
         logger.warn( "This should not hit the fail level" );
-        assertFalse( mavenLoggerFactory.threwLogsOfBreakingLevel() );
+        assertFalse( mavenLoggerFactory.isThresholdHit() );
 
         logger.error( "This should hit the fail level" );
-        assertTrue( mavenLoggerFactory.threwLogsOfBreakingLevel() );
+        assertTrue( mavenLoggerFactory.isThresholdHit() );
 
         logger.warn( "This should not reset the fail level" );
-        assertTrue( mavenLoggerFactory.threwLogsOfBreakingLevel() );
+        assertTrue( mavenLoggerFactory.isThresholdHit() );
     }
 
     @Test( expected = IllegalStateException.class )
     public void failLevelThresholdCanOnlyBeSetOnce()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
-        mavenLoggerFactory.breakOnLogsOfLevel( "WARN" );
-        mavenLoggerFactory.breakOnLogsOfLevel( "ERROR" );
+        mavenLoggerFactory.breakOnLogLevel( "WARN" );
+        mavenLoggerFactory.breakOnLogLevel( "ERROR" );
     }
 
     @Test( expected = IllegalArgumentException.class )
     public void onlyWarningOrHigherFailLevelsCanBeSet()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
-        mavenLoggerFactory.breakOnLogsOfLevel( "INFO" );
+        mavenLoggerFactory.breakOnLogLevel( "INFO" );
     }
 }

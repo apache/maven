@@ -138,7 +138,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 
             if ( iLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
-                if ( ( (MavenSlf4jWrapperFactory) iLoggerFactory ).threwLogsOfBreakingLevel() )
+                if ( ( (MavenSlf4jWrapperFactory) iLoggerFactory ).isThresholdHit() )
                 {
                     event.getSession().getResult().addException( new Exception(
                             "Build failed due to log statements with a higher severity than allowed. "

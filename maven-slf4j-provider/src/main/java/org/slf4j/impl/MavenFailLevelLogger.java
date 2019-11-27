@@ -27,12 +27,12 @@ import org.slf4j.event.Level;
  */
 public class MavenFailLevelLogger extends MavenSimpleLogger
 {
-    private final MavenFailLevelLoggerState failLevelLoggerState;
+    private final LogLevelRecorder logLevelRecorder;
 
-    MavenFailLevelLogger( String name, MavenFailLevelLoggerState failLevelLoggerState )
+    MavenFailLevelLogger( String name, LogLevelRecorder logLevelRecorder )
     {
         super( name );
-        this.failLevelLoggerState = failLevelLoggerState;
+        this.logLevelRecorder = logLevelRecorder;
     }
 
     /**
@@ -43,7 +43,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void warn( String msg )
     {
         super.warn( msg );
-        failLevelLoggerState.recordLogLevel( Level.WARN );
+        logLevelRecorder.record( Level.WARN );
     }
 
     /**
@@ -54,7 +54,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void warn( String format, Object arg )
     {
         super.warn( format, arg );
-        failLevelLoggerState.recordLogLevel( Level.WARN );
+        logLevelRecorder.record( Level.WARN );
     }
 
     /**
@@ -65,7 +65,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void warn( String format, Object arg1, Object arg2 )
     {
         super.warn( format, arg1, arg2 );
-        failLevelLoggerState.recordLogLevel( Level.WARN );
+        logLevelRecorder.record( Level.WARN );
     }
 
     /**
@@ -76,7 +76,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void warn( String format, Object... argArray )
     {
         super.warn( format, argArray );
-        failLevelLoggerState.recordLogLevel( Level.WARN );
+        logLevelRecorder.record( Level.WARN );
     }
 
     /** Log a message of level WARN, including an exception. */
@@ -84,7 +84,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void warn( String msg, Throwable t )
     {
         super.warn( msg, t );
-        failLevelLoggerState.recordLogLevel( Level.WARN );
+        logLevelRecorder.record( Level.WARN );
     }
 
     /**
@@ -95,7 +95,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void error( String msg )
     {
         super.error( msg );
-        failLevelLoggerState.recordLogLevel( Level.ERROR );
+        logLevelRecorder.record( Level.ERROR );
     }
 
     /**
@@ -106,7 +106,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void error( String format, Object arg )
     {
         super.error( format, arg );
-        failLevelLoggerState.recordLogLevel( Level.ERROR );
+        logLevelRecorder.record( Level.ERROR );
     }
 
     /**
@@ -117,7 +117,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void error( String format, Object arg1, Object arg2 )
     {
         super.error( format, arg1, arg2 );
-        failLevelLoggerState.recordLogLevel( Level.ERROR );
+        logLevelRecorder.record( Level.ERROR );
     }
 
     /**
@@ -128,7 +128,7 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void error( String format, Object... argArray )
     {
         super.error( format, argArray );
-        failLevelLoggerState.recordLogLevel( Level.ERROR );
+        logLevelRecorder.record( Level.ERROR );
     }
 
     /** Log a message of level ERROR, including an exception. */
@@ -136,6 +136,6 @@ public class MavenFailLevelLogger extends MavenSimpleLogger
     public void error( String msg, Throwable t )
     {
         super.error( msg, t );
-        failLevelLoggerState.recordLogLevel( Level.ERROR );
+        logLevelRecorder.record( Level.ERROR );
     }
 }

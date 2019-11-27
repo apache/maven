@@ -549,7 +549,7 @@ public class MavenCli
 
             if ( slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
-                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).breakOnLogsOfLevel( logLevelToBreakOn );
+                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).breakOnLogLevel( logLevelToBreakOn );
                 slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelToBreakOn );
             }
         }

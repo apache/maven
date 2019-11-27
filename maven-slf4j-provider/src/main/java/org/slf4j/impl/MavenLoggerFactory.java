@@ -28,12 +28,12 @@ import org.slf4j.event.Level;
  */
 public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory
 {
-    private MavenFailLevelLoggerState failLevelLoggerState = null;
+    private LogLevelRecorder logLevelRecorder = null;
 
     @Override
-    public void breakOnLogsOfLevel( String logLevelToBreakOn )
+    public void breakOnLogLevel( String logLevelToBreakOn )
     {
-        if ( failLevelLoggerState != null )
+        if ( logLevelRecorder != null )
         {
             throw new IllegalStateException( "Maven logger fail level has already been set." );
         }
@@ -44,15 +44,15 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
             throw new IllegalArgumentException( "Logging level thresholds can only be set to WARN or ERROR" );
         }
 
-        failLevelLoggerState = new MavenFailLevelLoggerState( level );
+        logLevelRecorder = new LogLevelRecorder( level );
     }
 
     @Override
-    public boolean threwLogsOfBreakingLevel()
+    public boolean isThresholdHit()
     {
-        if ( failLevelLoggerState != null )
+        if ( logLevelRecorder != null )
         {
-            return failLevelLoggerState.threwLogsOfBreakingLevel();
+            return logLevelRecorder.isThresholdHit();
         }
 
         return false;
@@ -79,13 +79,13 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
 
     private Logger getNewLoggingInstance( String name )
     {
-        if ( failLevelLoggerState == null )
+        if ( logLevelRecorder == null )
         {
             return new MavenSimpleLogger( name );
         }
         else
         {
-            return new MavenFailLevelLogger( name, failLevelLoggerState );
+            return new MavenFailLevelLogger( name, logLevelRecorder );
         }
     }
 }

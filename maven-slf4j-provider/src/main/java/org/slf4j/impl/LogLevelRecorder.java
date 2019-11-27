@@ -24,18 +24,18 @@ import org.slf4j.event.Level;
 /**
  * Responsible for keeping state of whether the threshold of the --fail-level flag has been hit.
  */
-class MavenFailLevelLoggerState
+class LogLevelRecorder
 {
     private final Level logThreshold;
     private boolean thresholdHit = false;
 
-    MavenFailLevelLoggerState( Level logLevel )
+    LogLevelRecorder( Level logLevel )
     {
         assert logLevel != null;
         this.logThreshold = logLevel;
     }
 
-    void recordLogLevel( Level logLevel )
+    void record( Level logLevel )
     {
         if ( !thresholdHit && logLevel.toInt() >= logThreshold.toInt() )
         {
@@ -43,7 +43,7 @@ class MavenFailLevelLoggerState
         }
     }
 
-    boolean threwLogsOfBreakingLevel()
+    boolean isThresholdHit()
     {
         return thresholdHit;
     }
