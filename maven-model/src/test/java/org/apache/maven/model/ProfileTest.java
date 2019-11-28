@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Profile}.
  *
  * @author Benjamin Bentmann
  */
-public class ProfileTest
+class ProfileTest implements ModelTestInterface< Profile >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Profile> createValue()
     {
-        new Profile().hashCode();
+        return Profile.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Profile().equals( null ) );
-
-        new Profile().equals( new Profile() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Profile thing = new Profile();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Profile().toString() );
-    }
-
 }

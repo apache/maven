@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code DeploymentRepository}.
  *
  * @author Benjamin Bentmann
  */
-public class DeploymentRepositoryTest
+class DeploymentRepositoryTest implements ModelTestInterface< DeploymentRepository >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<DeploymentRepository> createValue()
     {
-        new DeploymentRepository().hashCode();
+        return DeploymentRepository.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new DeploymentRepository().equals( null ) );
-
-        new DeploymentRepository().equals( new DeploymentRepository() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        DeploymentRepository thing = new DeploymentRepository();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new DeploymentRepository().toString() );
-    }
-
 }

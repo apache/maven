@@ -19,45 +19,19 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Scm}.
  *
  * @author Benjamin Bentmann
  */
-public class ScmTest
+class ScmTest implements ModelTestInterface< Scm >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Scm> createValue()
     {
-        new Scm().hashCode();
+        return Scm.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Scm().equals( null ) );
-
-        new Scm().equals( new Scm() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Scm thing = new Scm();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Scm().toString() );
-    }
-
 }
+
+

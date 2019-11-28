@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code IssueManagement}.
  *
  * @author Benjamin Bentmann
  */
-public class IssueManagementTest
+class IssueManagementTest implements ModelTestInterface< IssueManagement >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<IssueManagement> createValue()
     {
-        new IssueManagement().hashCode();
+        return IssueManagement.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new IssueManagement().equals( null ) );
-
-        new IssueManagement().equals( new IssueManagement() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        IssueManagement thing = new IssueManagement();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new IssueManagement().toString() );
-    }
-
 }

@@ -30,7 +30,7 @@ import java.util.function.Function;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
 
-public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
+class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
     protected XmlPullParser getFilter( XmlPullParser orgParser )

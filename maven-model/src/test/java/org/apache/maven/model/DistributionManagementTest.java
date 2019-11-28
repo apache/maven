@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code DistributionManagement}.
  *
  * @author Benjamin Bentmann
  */
-public class DistributionManagementTest
+class DistributionManagementTest implements ModelTestInterface< DistributionManagement >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<DistributionManagement> createValue()
     {
-        new DistributionManagement().hashCode();
+        return DistributionManagement.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new DistributionManagement().equals( null ) );
-
-        new DistributionManagement().equals( new DistributionManagement() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        DistributionManagement thing = new DistributionManagement();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new DistributionManagement().toString() );
-    }
-
 }

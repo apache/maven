@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code CiManagement}.
  *
  * @author Benjamin Bentmann
  */
-public class CiManagementTest
+class CiManagementTest implements ModelTestInterface< CiManagement >
 {
-
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<CiManagement> createValue()
     {
-        new CiManagement().hashCode();
+        return CiManagement.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new CiManagement().equals( null ) );
-
-        new CiManagement().equals( new CiManagement() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        CiManagement thing = new CiManagement();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new CiManagement().toString() );
-    }
-
 }
+

@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Extension}.
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionTest
+class ExtensionTest implements ModelTestInterface< Extension >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Extension> createValue()
     {
-        new Extension().hashCode();
+        return Extension.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Extension().equals( null ) );
-
-        new Extension().equals( new Extension() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Extension thing = new Extension();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Extension().toString() );
-    }
-
 }

@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code ActivationOS}.
  *
  * @author Benjamin Bentmann
  */
-public class ActivationOSTest
+class ActivationOSTest implements ModelTestInterface< ActivationOS >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<ActivationOS> createValue()
     {
-        new ActivationOS().hashCode();
+        return ActivationOS.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new ActivationOS().equals( null ) );
-
-        new ActivationOS().equals( new ActivationOS() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        ActivationOS thing = new ActivationOS();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new ActivationOS().toString() );
-    }
-
 }

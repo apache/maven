@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Exclusion}.
  *
  * @author Benjamin Bentmann
  */
-public class ExclusionTest
+class ExclusionTest implements ModelTestInterface< Exclusion >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Exclusion> createValue()
     {
-        new Exclusion().hashCode();
+        return Exclusion.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Exclusion().equals( null ) );
-
-        new Exclusion().equals( new Exclusion() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Exclusion thing = new Exclusion();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Exclusion().toString() );
-    }
-
 }

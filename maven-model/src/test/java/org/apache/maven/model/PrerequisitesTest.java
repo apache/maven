@@ -19,45 +19,16 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Prerequisites}.
  *
  * @author Benjamin Bentmann
  */
-public class PrerequisitesTest
+class PrerequisitesTest implements ModelTestInterface< Prerequisites >
 {
-
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Prerequisites> createValue()
     {
-        new Prerequisites().hashCode();
+        return Prerequisites.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Prerequisites().equals( null ) );
-
-        new Prerequisites().equals( new Prerequisites() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Prerequisites thing = new Prerequisites();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Prerequisites().toString() );
-    }
-
 }

@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code RepositoryPolicy}.
  *
  * @author Benjamin Bentmann
  */
-public class RepositoryPolicyTest
+class RepositoryPolicyTest implements ModelTestInterface< RepositoryPolicy >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<RepositoryPolicy> createValue()
     {
-        new RepositoryPolicy().hashCode();
+        return RepositoryPolicy.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new RepositoryPolicy().equals( null ) );
-
-        new RepositoryPolicy().equals( new RepositoryPolicy() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        RepositoryPolicy thing = new RepositoryPolicy();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new RepositoryPolicy().toString() );
-    }
-
 }

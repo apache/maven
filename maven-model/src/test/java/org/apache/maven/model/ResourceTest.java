@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Resource}.
  *
  * @author Benjamin Bentmann
  */
-public class ResourceTest
+class ResourceTest implements ModelTestInterface< Resource >
 {
-
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Resource> createValue()
     {
-        new Resource().hashCode();
+        return Resource.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Resource().equals( null ) );
-
-        new Resource().equals( new Resource() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Resource thing = new Resource();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Resource().toString() );
-    }
-
 }
+

@@ -19,45 +19,16 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Notifier}.
  *
  * @author Benjamin Bentmann
  */
-public class NotifierTest
+class NotifierTest implements ModelTestInterface< Notifier >
 {
-
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Notifier> createValue()
     {
-        new Notifier().hashCode();
+        return Notifier.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Notifier().equals( null ) );
-
-        new Notifier().equals( new Notifier() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Notifier thing = new Notifier();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Notifier().toString() );
-    }
-
 }

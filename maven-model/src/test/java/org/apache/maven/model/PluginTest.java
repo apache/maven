@@ -19,45 +19,16 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code Plugin}.
  *
  * @author Benjamin Bentmann
  */
-public class PluginTest
+class PluginTest implements ModelTestInterface< Plugin >
 {
-
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<Plugin> createValue()
     {
-        new Plugin().hashCode();
+        return Plugin.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Plugin().equals( null ) );
-
-        new Plugin().equals( new Plugin() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        Plugin thing = new Plugin();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Plugin().toString() );
-    }
-
 }

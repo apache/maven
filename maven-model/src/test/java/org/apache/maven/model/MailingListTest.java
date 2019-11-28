@@ -19,45 +19,17 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Tests {@code MailingList}.
  *
  * @author Benjamin Bentmann
  */
-public class MailingListTest
+class MailingListTest implements ModelTestInterface< MailingList >
 {
 
-    @Test
-    public void testHashCodeNullSafe()
+    @Override
+    public Class<MailingList> createValue()
     {
-        new MailingList().hashCode();
+        return MailingList.class;
     }
-
-    @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new MailingList().equals( null ) );
-
-        new MailingList().equals( new MailingList() );
-    }
-
-    @Test
-    public void testEqualsIdentity()
-    {
-        MailingList thing = new MailingList();
-        assertTrue( thing.equals( thing ) );
-    }
-
-    @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new MailingList().toString() );
-    }
-
 }
