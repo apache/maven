@@ -667,7 +667,7 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
         
-        if ( Features.buildConsumer().isActive() && pomFile != null )
+        if ( !hasModelErrors( problems ) && Features.buildConsumer().isActive() && pomFile != null )
         {
             try
             {
