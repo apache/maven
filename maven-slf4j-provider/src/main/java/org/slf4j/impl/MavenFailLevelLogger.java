@@ -19,6 +19,7 @@ package org.slf4j.impl;
  * under the License.
  */
 
+import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.slf4j.event.Level;
 
 /**

@@ -1,4 +1,4 @@
-package org.slf4j.impl;
+package org.apache.maven.logwrapper;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,18 +24,23 @@ import org.slf4j.event.Level;
 /**
  * Responsible for keeping state of whether the threshold of the --fail-level flag has been hit.
  */
-class LogLevelRecorder
+public class LogLevelRecorder
 {
     private final Level logThreshold;
     private boolean thresholdHit = false;
 
-    LogLevelRecorder( Level logLevel )
+    public LogLevelRecorder( String threshold )
     {
-        assert logLevel != null;
-        this.logThreshold = logLevel;
+        Level level = Level.valueOf( threshold );
+        if ( level.toInt() < Level.WARN.toInt() )
+        {
+            throw new IllegalArgumentException( "Logging level thresholds can only be set to WARN or ERROR" );
+        }
+
+        logThreshold = level;
     }
 
-    void record( Level logLevel )
+    public void record( Level logLevel )
     {
         if ( !thresholdHit && logLevel.toInt() >= logThreshold.toInt() )
         {
@@ -43,7 +48,7 @@ class LogLevelRecorder
         }
     }
 
-    boolean isThresholdHit()
+    public boolean isThresholdHit()
     {
         return thresholdHit;
     }

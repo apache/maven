@@ -33,6 +33,7 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -138,12 +139,14 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 
             if ( iLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
-                if ( ( (MavenSlf4jWrapperFactory) iLoggerFactory ).isThresholdHit() )
-                {
-                    event.getSession().getResult().addException( new Exception(
-                            "Build failed due to log statements with a higher severity than allowed. "
-                                    + "Fix the logged issues or remove flag --fail-level (-fl)." ) );
-                }
+                MavenSlf4jWrapperFactory loggerFactory = (MavenSlf4jWrapperFactory) iLoggerFactory;
+                loggerFactory.getLogLevelRecorder()
+                        .filter( LogLevelRecorder::isThresholdHit )
+                        .ifPresent(recorder ->
+                                event.getSession().getResult().addException( new Exception(
+                                        "Build failed due to log statements with a higher severity than allowed. "
+                                        + "Fix the logged issues or remove flag --fail-level (-fl)." ) )
+                );
             }
 
             logResult( event.getSession() );

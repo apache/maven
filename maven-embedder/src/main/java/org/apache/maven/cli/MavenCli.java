@@ -58,6 +58,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
@@ -545,12 +546,13 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.FAIL_LEVEL ) )
         {
-            String logLevelToBreakOn = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_LEVEL );
+            String logLevelThreshold = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_LEVEL );
 
             if ( slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
-                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).breakOnLogLevel( logLevelToBreakOn );
-                slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelToBreakOn );
+                LogLevelRecorder logLevelRecorder = new LogLevelRecorder( logLevelThreshold );
+                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).setLogLevelRecorder( logLevelRecorder );
+                slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelThreshold );
             }
         }
     }

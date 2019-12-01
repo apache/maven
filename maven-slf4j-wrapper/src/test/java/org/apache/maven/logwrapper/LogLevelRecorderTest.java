@@ -9,7 +9,7 @@ package org.apache.maven.logwrapper;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,15 +19,31 @@ package org.apache.maven.logwrapper;
  * under the License.
  */
 
-import org.slf4j.ILoggerFactory;
+import org.junit.Test;
+import org.slf4j.event.Level;
 
-import java.util.Optional;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Wrapper for creating loggers which can have a log level threshold.
- */
-public interface MavenSlf4jWrapperFactory extends ILoggerFactory
+public class LogLevelRecorderTest
 {
-    void setLogLevelRecorder( LogLevelRecorder logLevelRecorder );
-    Optional<LogLevelRecorder> getLogLevelRecorder();
+    @Test
+    public void createsLogLevelRecorder()
+    {
+        LogLevelRecorder logLevelRecorder = new LogLevelRecorder( "WARN" );
+        logLevelRecorder.record( Level.ERROR );
+
+        assertTrue( logLevelRecorder.isThresholdHit() );
+    }
+
+    @Test( expected = IllegalArgumentException.class )
+    public void failsOnLowerThanWarn ()
+    {
+        new LogLevelRecorder( "INFO" );
+    }
+
+    @Test( expected = IllegalArgumentException.class )
+    public void failsOnUnknownLogLevel ()
+    {
+        new LogLevelRecorder( "SEVERE" );
+    }
 }

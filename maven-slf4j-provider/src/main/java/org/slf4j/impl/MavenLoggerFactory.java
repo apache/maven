@@ -19,9 +19,11 @@ package org.slf4j.impl;
  * under the License.
  */
 
+import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.slf4j.Logger;
-import org.slf4j.event.Level;
+
+import java.util.Optional;
 
 /**
  * LogFactory for Maven which can create a simple logger or a one which, if set, fails the build on a threshold.
@@ -31,31 +33,20 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
     private LogLevelRecorder logLevelRecorder = null;
 
     @Override
-    public void breakOnLogLevel( String logLevelToBreakOn )
+    public void setLogLevelRecorder( LogLevelRecorder logLevelRecorder )
     {
-        if ( logLevelRecorder != null )
+        if ( this.logLevelRecorder != null )
         {
             throw new IllegalStateException( "Maven logger fail level has already been set." );
         }
 
-        Level level = Level.valueOf( logLevelToBreakOn );
-        if ( level.toInt() < Level.WARN.toInt() )
-        {
-            throw new IllegalArgumentException( "Logging level thresholds can only be set to WARN or ERROR" );
-        }
-
-        logLevelRecorder = new LogLevelRecorder( level );
+        this.logLevelRecorder = logLevelRecorder;
     }
 
     @Override
-    public boolean isThresholdHit()
+    public Optional<LogLevelRecorder> getLogLevelRecorder()
     {
-        if ( logLevelRecorder != null )
-        {
-            return logLevelRecorder.isThresholdHit();
-        }
-
-        return false;
+        return Optional.ofNullable( logLevelRecorder );
     }
 
     /**
