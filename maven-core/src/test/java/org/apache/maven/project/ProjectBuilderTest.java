@@ -19,6 +19,12 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,7 +161,7 @@ public class ProjectBuilderTest
             FileUtils.fileWrite( parent, "UTF-8", parentContent );
             // re-build pom with modified parent
             ProjectBuildingResult result = projectBuilder.build( child, configuration );
-            assertTrue( result.getProject().getProperties().containsKey( "addedProperty" ) );
+            assertThat( result.getProject().getProperties(), hasKey( (Object) "addedProperty" ) );
         }
         finally
         {
@@ -229,7 +235,7 @@ public class ProjectBuilderTest
         }
         catch ( InvalidArtifactRTException iarte )
         {
-            assertTrue( iarte.getMessage().contains( "The groupId cannot be empty." ) );
+            assertThat( iarte.getMessage(), containsString( "The groupId cannot be empty." ) );
         }
 
         // multi projects build entry point
@@ -301,7 +307,7 @@ public class ProjectBuilderTest
     {
         for ( ProjectBuildingResult result : results )
         {
-            assertTrue( result.getProblems().isEmpty() );
+            assertThat( result.getProblems(), is( empty() ) );
             assertNotNull( result.getProject() );
         }
     }

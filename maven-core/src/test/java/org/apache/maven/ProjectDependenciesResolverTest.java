@@ -15,6 +15,9 @@ package org.apache.maven;
  * the License.
  */
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -109,6 +112,6 @@ public class ProjectDependenciesResolverTest
         @SuppressWarnings( "deprecation" )
         List<Artifact> artifacts = project.getCompileArtifacts();
         assertEquals( 1, artifacts.size() );
-        assertTrue( artifacts.get( 0 ).getFile().getName().endsWith( "tools.jar" ) );
+        assertThat( artifacts.get( 0 ).getFile().getName(), endsWith( "tools.jar" ) );
     }
 }

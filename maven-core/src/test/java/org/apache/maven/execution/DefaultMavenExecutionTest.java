@@ -18,20 +18,23 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.project.MavenProject;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.apache.maven.project.MavenProject;
+import org.junit.Test;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultMavenExecutionTest
-    extends TestCase
 {
-
+    @Test
     public void testCopyDefault()
     {
         MavenExecutionRequest original = new DefaultMavenExecutionRequest();
@@ -40,13 +43,14 @@ public class DefaultMavenExecutionTest
         assertNotSame( copy, original );
     }
 
+    @Test
     public void testResultWithNullTopologicallySortedProjectsIsEmptyList()
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
         result.setTopologicallySortedProjects( null );
         List<MavenProject> projects = result.getTopologicallySortedProjects();
         assertNotNull( projects );
-        assertTrue( projects.isEmpty() );
+        assertThat( projects, is( empty() ) );
     }
 
 }

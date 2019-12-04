@@ -18,15 +18,17 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
@@ -287,7 +289,7 @@ public class DefaultMavenProjectBuilderTest
         catch ( final ProjectBuildingException e )
         {
             assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
         }
     }
 
@@ -310,7 +312,7 @@ public class DefaultMavenProjectBuilderTest
         catch ( final ProjectBuildingException e )
         {
             assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
         }
     }
 
@@ -352,7 +354,7 @@ public class DefaultMavenProjectBuilderTest
         catch ( final ProjectBuildingException e )
         {
             assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
         }
     }
 
@@ -375,7 +377,7 @@ public class DefaultMavenProjectBuilderTest
         catch ( final ProjectBuildingException e )
         {
             assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
         }
     }
 

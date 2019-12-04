@@ -19,6 +19,11 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -726,8 +731,8 @@ public class PomConstructionTest
         assertEquals( "parent", pom.getValue( "properties/parentArtifactId" ) );
         assertEquals( "1.0", pom.getValue( "properties/parentVersion" ) );
 
-        assertTrue( pom.getValue( "properties/projectBuildOut" ).toString().endsWith( "bin" ) );
-        assertTrue( pom.getValue( "properties/projectSiteOut" ).toString().endsWith( "doc" ) );
+        assertThat( pom.getValue( "properties/projectBuildOut" ).toString(), endsWith( "bin" ) );
+        assertThat( pom.getValue( "properties/projectSiteOut" ).toString(), endsWith( "doc" ) );
     }
 
     public void testInterpolationWithBasedirAlignedDirectories()
@@ -936,13 +941,13 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "merged-filter-order/sub" );
 
         assertEquals( 7, ( (List<?>) pom.getValue( "build/filters" ) ).size() );
-        assertTrue( pom.getValue( "build/filters[1]" ).toString().endsWith( "child-a.properties" ) );
-        assertTrue( pom.getValue( "build/filters[2]" ).toString().endsWith( "child-c.properties" ) );
-        assertTrue( pom.getValue( "build/filters[3]" ).toString().endsWith( "child-b.properties" ) );
-        assertTrue( pom.getValue( "build/filters[4]" ).toString().endsWith( "child-d.properties" ) );
-        assertTrue( pom.getValue( "build/filters[5]" ).toString().endsWith( "parent-c.properties" ) );
-        assertTrue( pom.getValue( "build/filters[6]" ).toString().endsWith( "parent-b.properties" ) );
-        assertTrue( pom.getValue( "build/filters[7]" ).toString().endsWith( "parent-d.properties" ) );
+        assertThat( pom.getValue( "build/filters[1]" ).toString(), endsWith( "child-a.properties" ) );
+        assertThat( pom.getValue( "build/filters[2]" ).toString(), endsWith( "child-c.properties" ) );
+        assertThat( pom.getValue( "build/filters[3]" ).toString(), endsWith( "child-b.properties" ) );
+        assertThat( pom.getValue( "build/filters[4]" ).toString(), endsWith( "child-d.properties" ) );
+        assertThat( pom.getValue( "build/filters[5]" ).toString(), endsWith( "parent-c.properties" ) );
+        assertThat( pom.getValue( "build/filters[6]" ).toString(), endsWith( "parent-b.properties" ) );
+        assertThat( pom.getValue( "build/filters[7]" ).toString(), endsWith( "parent-d.properties" ) );
     }
 
     /** MNG-4027*/
@@ -1097,7 +1102,7 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "baseuri-interpolation/pom.xml" );
         String prop1 = pom.getValue( "properties/prop1" ).toString();
         assertEquals( pom.getBasedir().toPath().toUri().toASCIIString(), prop1 );
-        assertTrue( prop1.startsWith( "file:///" ) );
+        assertThat( prop1, startsWith( "file:///" ) );
     }
 
     /* MNG-3811*/
@@ -1408,8 +1413,8 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "boolean-interpolation" );
-        assertTrue ((Boolean) pom.getValue( "repositories[1]/releases/enabled" ) );
-        assertTrue((Boolean) pom.getValue( "build/resources[1]/filtering" ) );
+        assertEquals(true, pom.getValue( "repositories[1]/releases/enabled" ) );
+        assertEquals(true, pom.getValue( "build/resources[1]/filtering" ) );
     }
 
 
@@ -1734,16 +1739,16 @@ public class PomConstructionTest
             Plugin plugin = plugins.get( i );
             if ( "maven-resources-plugin".equals( plugin.getArtifactId() ) )
             {
-                assertTrue( resourcesPlugin < 0 );
+                assertThat( resourcesPlugin, lessThan( 0 ) );
                 resourcesPlugin = i;
             }
             else if ( "maven-it-plugin-log-file".equals( plugin.getArtifactId() ) )
             {
-                assertTrue( customPlugin < 0 );
+                assertThat( customPlugin, lessThan( 0 ) );
                 customPlugin = i;
             }
         }
-        assertTrue( plugins.toString(), customPlugin == resourcesPlugin - 1 );
+        assertEquals( plugins.toString(), customPlugin, resourcesPlugin - 1 );
     }
 
     /** MNG-4415 */
