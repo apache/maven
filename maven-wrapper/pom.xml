@@ -7,7 +7,7 @@
   </parent>
   
   <artifactId>maven-wrapper</artifactId>
-  <version>0.5.6</version>
+  <version>0.5.7-SNAPSHOT</version>
   <packaging>provisio</packaging>
   <name>Maven Wrapper</name>
   <licenses>
@@ -72,8 +72,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <tag>maven-wrapper-0.5.6</tag>
-  </scm>
 </project>
