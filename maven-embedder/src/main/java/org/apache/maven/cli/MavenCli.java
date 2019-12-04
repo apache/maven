@@ -555,6 +555,12 @@ public class MavenCli
                 ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).setLogLevelRecorder( logLevelRecorder );
                 slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelThreshold );
             }
+            else
+            {
+                slf4jLogger.warn( "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
+                        + "The --fail-level flag will not take into effect.",
+                        MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName());
+            }
         }
     }
 
