@@ -40,7 +40,7 @@ public class MavenWrapperMain {
   public static final String MVNW_PASSWORD = "MVNW_PASSWORD";
   public static final String MVNW_REPOURL = "MVNW_REPOURL";
 
-  public static final String MVN_VERSION = "3.6.1";
+  public static final String MVN_VERSION = "3.6.3";
   public static final String MVN_PATH =
       "org/apache/maven/apache-maven/" + MVN_VERSION + "/apache-maven-"+ MVN_VERSION + "-bin.zip";
 
