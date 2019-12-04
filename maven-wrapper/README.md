@@ -14,7 +14,7 @@ The easiest way to setup the Maven Wrapper for your project is to use the
 the necessary Maven Wrapper files to your project execute the following command:
 
 ```bash
-mvn -N io.takari:maven:0.7.6:wrapper
+mvn -N io.takari:maven:0.7.7:wrapper
 ```
 
 > Note: The default usage should be `mvn -N io.takari:maven:wrapper` but for
@@ -66,7 +66,7 @@ For all those *nix operating systems, various shells should work including
 * zsh
 
 In terms of Apache Maven versions itself, the wrapper should work with any Maven
-3.x version and it defaults to the latest release - currently 3.6.1. We do NOT
+3.x version and it defaults to the latest release - currently 3.6.3. We do NOT
 plan to support the deprecated, EOL'ed Maven 2.x.
 
 The maven-wrapper itself is compiled to work with Java 5. The Takari Maven
@@ -113,7 +113,7 @@ To switch the version of Maven used to build a project you can initialize it
 using:
 
 ```bash
-mvn -N io.takari:maven:0.7.6:wrapper -Dmaven=3.3.3
+mvn -N io.takari:maven:0.7.7:wrapper -Dmaven=3.5.4
 ```
 
 which works for any version except snapshots. Once you have a wrapper you can
@@ -175,7 +175,7 @@ To test Maven wrapper usage:
 - use on test project with takari-maven-plugin version
 
 ```bash
-mvn -N -X io.takari:maven:0.7.6-SNAPSHOT:wrapper
+mvn -N -X io.takari:maven:0.7.7-SNAPSHOT:wrapper
 ```
 
 For release
