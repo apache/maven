@@ -558,7 +558,7 @@ public class MavenCli
             else
             {
                 slf4jLogger.warn( "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
-                        + "The --fail-level flag will not take into effect.",
+                        + "The --fail-level flag will not take effect.",
                         MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName());
             }
         }
