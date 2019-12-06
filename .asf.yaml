@@ -1,0 +1,7 @@
+github:
+  description: "Apache Maven core"
+  homepage: https://maven.apache.org/ref/current
+  labels:
+    - java
+    - build-management
+    - maven
