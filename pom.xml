@@ -556,6 +556,7 @@ under the License.
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
             <excludes>
+              <exclude>.asf.yaml</exclude>
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
