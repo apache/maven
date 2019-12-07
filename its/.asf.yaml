@@ -1,0 +1,8 @@
+# see https://s.apache.org/asfyaml
+github:
+  description: "Apache Maven core ITs"
+  homepage: https://maven.apache.org/core-its
+  labels:
+    - java
+    - build-management
+    - maven
