@@ -1,3 +1,4 @@
+# see https://s.apache.org/asfyaml
 github:
   description: "Apache Maven core"
   homepage: https://maven.apache.org/ref/current
