@@ -170,22 +170,6 @@ under the License.
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <exclude>src/main/resources/META-INF/MANIFEST.MF</exclude>
-              <exclude>src/test/*-projects/**</exclude>
-              <exclude>src/test/*-project/**</exclude>
-              <exclude>src/test/plugin-version-references/**</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
