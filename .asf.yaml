@@ -5,4 +5,5 @@ github:
   labels:
     - java
     - build-management
+    - apache-maven
     - maven
