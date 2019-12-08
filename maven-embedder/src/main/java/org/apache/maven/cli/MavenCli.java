@@ -545,9 +545,9 @@ public class MavenCli
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
 
-        if ( cliRequest.commandLine.hasOption( CLIManager.FAIL_LEVEL ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.FAIL_ON_SEVERITY ) )
         {
-            String logLevelThreshold = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_LEVEL );
+            String logLevelThreshold = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_ON_SEVERITY );
 
             if ( slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
@@ -558,7 +558,7 @@ public class MavenCli
             else
             {
                 slf4jLogger.warn( "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
-                        + "The --fail-level flag will not take effect.",
+                        + "The --fail-on-severity flag will not take effect.",
                         MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName());
             }
         }

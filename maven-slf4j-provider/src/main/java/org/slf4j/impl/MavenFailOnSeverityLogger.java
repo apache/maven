@@ -24,13 +24,13 @@ import org.slf4j.event.Level;
 
 /**
  * A proxy which enhances the MavenSimpleLogger with functionality to track whether a logging threshold is hit.
- * Currently only support WARN and ERROR states, since it's been used for the --fail-level flag.
+ * Currently only support WARN and ERROR states, since it's been used for the --fail-on-severity flag.
  */
-public class MavenFailLevelLogger extends MavenSimpleLogger
+public class MavenFailOnSeverityLogger extends MavenSimpleLogger
 {
     private final LogLevelRecorder logLevelRecorder;
 
-    MavenFailLevelLogger( String name, LogLevelRecorder logLevelRecorder )
+    MavenFailOnSeverityLogger( String name, LogLevelRecorder logLevelRecorder )
     {
         super( name );
         this.logLevelRecorder = logLevelRecorder;

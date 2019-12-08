@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 
 /**
- * LogFactory for Maven which can create a simple logger or a one which, if set, fails the build on a threshold.
+ * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
  */
 public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory
 {
@@ -37,7 +37,7 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
     {
         if ( this.logLevelRecorder != null )
         {
-            throw new IllegalStateException( "Maven logger fail level has already been set." );
+            throw new IllegalStateException( "LogLevelRecorder has already been set." );
         }
 
         this.logLevelRecorder = logLevelRecorder;
@@ -76,7 +76,7 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
         }
         else
         {
-            return new MavenFailLevelLogger( name, logLevelRecorder );
+            return new MavenFailOnSeverityLogger( name, logLevelRecorder );
         }
     }
 }
