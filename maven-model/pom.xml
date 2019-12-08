@@ -68,17 +68,6 @@ under the License.
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <!-- Exclude the navigation file for Maven 1 sites
-               as it interferes with the site generation. -->
-          <moduleExcludes>
-            <xdoc>navigation.xml</xdoc>
-          </moduleExcludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
