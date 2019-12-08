@@ -59,7 +59,7 @@ public class MavenLoggerFactoryTest
     }
 
     @Test
-    public void reportsWhenFailLevelHasBeenHit()
+    public void reportsWhenFailOnSeverityThresholdHasBeenHit()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
         mavenLoggerFactory.setLogLevelRecorder( new LogLevelRecorder( "ERROR" ) );
@@ -67,21 +67,21 @@ public class MavenLoggerFactoryTest
         assertTrue( mavenLoggerFactory.getLogLevelRecorder().isPresent() );
         LogLevelRecorder logLevelRecorder = mavenLoggerFactory.getLogLevelRecorder().get();
 
-        MavenFailLevelLogger logger = ( MavenFailLevelLogger ) mavenLoggerFactory.getLogger( "Test" );
+        MavenFailOnSeverityLogger logger = (MavenFailOnSeverityLogger) mavenLoggerFactory.getLogger( "Test" );
         assertFalse( logLevelRecorder.isThresholdHit() );
 
-        logger.warn( "This should not hit the fail level" );
+        logger.warn( "This should not hit the fail threshold" );
         assertFalse( logLevelRecorder.isThresholdHit() );
 
-        logger.error( "This should hit the fail level" );
+        logger.error( "This should hit the fail threshold" );
         assertTrue( logLevelRecorder.isThresholdHit() );
 
-        logger.warn( "This should not reset the fail level" );
+        logger.warn( "This should not reset the fail threshold" );
         assertTrue( logLevelRecorder.isThresholdHit() );
     }
 
     @Test( expected = IllegalStateException.class )
-    public void failLevelThresholdCanOnlyBeSetOnce()
+    public void failOnSeverityThresholdCanOnlyBeSetOnce()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
         mavenLoggerFactory.setLogLevelRecorder( new LogLevelRecorder( "WARN" ) );
