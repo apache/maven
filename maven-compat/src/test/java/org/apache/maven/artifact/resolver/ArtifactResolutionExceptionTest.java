@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 public class ArtifactResolutionExceptionTest
     extends TestCase
 {
-    private static final String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.lineSeparator();
 
     public void testMissingArtifactMessageFormat()
     {

@@ -54,7 +54,7 @@ public class UnsupportedSlf4jBindingConfiguration
         logger.warn( "The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding );
         logger.warn( "Maven supported bindings are:" );
 
-        String ls = System.getProperty( "line.separator" );
+        String ls = System.lineSeparator();
 
         for ( Map.Entry<URL, Set<Object>> entry : supported.entrySet() )
         {

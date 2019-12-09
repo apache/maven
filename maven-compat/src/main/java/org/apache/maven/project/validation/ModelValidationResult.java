@@ -30,7 +30,7 @@ public class ModelValidationResult
 {
 
     /** */
-    private static final String NEWLINE = System.getProperty( "line.separator" );
+    private static final String NEWLINE = System.lineSeparator();
 
     /** */
     private List<String> messages;

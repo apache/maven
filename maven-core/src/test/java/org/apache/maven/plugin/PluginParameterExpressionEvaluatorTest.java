@@ -53,7 +53,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 public class PluginParameterExpressionEvaluatorTest
     extends AbstractCoreMavenComponentTestCase
 {
-    private static final String FS = System.getProperty( "file.separator" );
+    private static final String FS = File.separator;
 
     private RepositorySystem factory;
 
