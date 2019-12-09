@@ -32,7 +32,7 @@ public class LogLevelRecorderTest
         LogLevelRecorder logLevelRecorder = new LogLevelRecorder( "WARN" );
         logLevelRecorder.record( Level.ERROR );
 
-        assertTrue( logLevelRecorder.isThresholdHit() );
+        assertTrue( logLevelRecorder.metThreshold() );
     }
 
     @Test( expected = IllegalArgumentException.class )

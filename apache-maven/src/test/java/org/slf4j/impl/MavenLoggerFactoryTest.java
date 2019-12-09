@@ -68,16 +68,16 @@ public class MavenLoggerFactoryTest
         LogLevelRecorder logLevelRecorder = mavenLoggerFactory.getLogLevelRecorder().get();
 
         MavenFailOnSeverityLogger logger = (MavenFailOnSeverityLogger) mavenLoggerFactory.getLogger( "Test" );
-        assertFalse( logLevelRecorder.isThresholdHit() );
+        assertFalse( logLevelRecorder.metThreshold() );
 
         logger.warn( "This should not hit the fail threshold" );
-        assertFalse( logLevelRecorder.isThresholdHit() );
+        assertFalse( logLevelRecorder.metThreshold() );
 
         logger.error( "This should hit the fail threshold" );
-        assertTrue( logLevelRecorder.isThresholdHit() );
+        assertTrue( logLevelRecorder.metThreshold() );
 
         logger.warn( "This should not reset the fail threshold" );
-        assertTrue( logLevelRecorder.isThresholdHit() );
+        assertTrue( logLevelRecorder.metThreshold() );
     }
 
     @Test( expected = IllegalStateException.class )

@@ -27,7 +27,7 @@ import org.slf4j.event.Level;
 public class LogLevelRecorder
 {
     private final Level logThreshold;
-    private boolean thresholdHit = false;
+    private boolean metThreshold = false;
 
     public LogLevelRecorder( String threshold )
     {
@@ -42,14 +42,14 @@ public class LogLevelRecorder
 
     public void record( Level logLevel )
     {
-        if ( !thresholdHit && logLevel.toInt() >= logThreshold.toInt() )
+        if ( !metThreshold && logLevel.toInt() >= logThreshold.toInt() )
         {
-            thresholdHit = true;
+            metThreshold = true;
         }
     }
 
-    public boolean isThresholdHit()
+    public boolean metThreshold()
     {
-        return thresholdHit;
+        return metThreshold;
     }
 }
