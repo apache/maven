@@ -47,7 +47,7 @@ import static org.mockito.Mockito.doThrow;
 
 public class DefaultToolchainsBuilderTest
 {
-    private static final String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.lineSeparator();
 
     @Spy
     private DefaultToolchainsReader toolchainsReader;

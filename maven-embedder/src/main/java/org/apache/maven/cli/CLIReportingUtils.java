@@ -55,7 +55,7 @@ public final class CLIReportingUtils
 
     public static String showVersion()
     {
-        final String ls = System.getProperty( "line.separator" );
+        final String ls = System.lineSeparator();
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder( 256 );
         version.append( buffer().strong( createMavenVersionString( properties ) ) ).append( ls );

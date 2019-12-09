@@ -30,7 +30,7 @@ public class ModelValidationResult
 {
 
     /** */
-    private static final String NEWLINE = System.getProperty( "line.separator" );
+    private static final String LS = System.lineSeparator();
 
     /** */
     private List<String> messages;
@@ -80,13 +80,13 @@ public class ModelValidationResult
 //        }
 //        else
 //        {
-//            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
+//            message.append( "There was " + messages.size() + " validation errors: " + LS );
 //        }
 //
         for ( int i = 0; i < messages.size(); i++ )
         {
             message.append( indentation ).append( '[' ).append( i ).append( "]  " ).append( messages.get( i ) ).append(
-                NEWLINE );
+                LS );
         }
 
         return message.toString();
