@@ -53,11 +53,11 @@ under the License.
     <commonsCliVersion>1.4</commonsCliVersion>
     <commonsLangVersion>3.8.1</commonsLangVersion>
     <junitVersion>4.12</junitVersion>
-    <mockitoVersion>2.21.0</mockitoVersion>
+    <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.2.1</plexusUtilsVersion>
-    <guiceVersion>4.2.1</guiceVersion>
+    <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
+    <guiceVersion>4.2.2</guiceVersion>
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
     <wagonVersion>3.3.4</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
@@ -562,6 +562,7 @@ under the License.
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
             <excludes>
+              <exclude>.asf.yaml</exclude>
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>

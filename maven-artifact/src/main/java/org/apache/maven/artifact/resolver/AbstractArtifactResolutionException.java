@@ -52,7 +52,7 @@ public class AbstractArtifactResolutionException
 
     private final String path;
 
-    static final String LS = System.getProperty( "line.separator" );
+    static final String LS = System.lineSeparator();
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     protected AbstractArtifactResolutionException( String message,
