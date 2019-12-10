@@ -559,7 +559,7 @@ public class MavenCli
             {
                 slf4jLogger.warn( "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
                         + "The --fail-on-severity flag will not take effect.",
-                        MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName());
+                        MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName() );
             }
         }
     }
