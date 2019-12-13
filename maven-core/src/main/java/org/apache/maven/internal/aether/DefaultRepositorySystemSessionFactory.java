@@ -20,7 +20,8 @@ package org.apache.maven.internal.aether;
  */
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
@@ -38,10 +39,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.RepositoryUtils;
@@ -59,6 +68,7 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.apache.maven.xml.Factories;
+import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
@@ -285,8 +295,9 @@ public class DefaultRepositorySystemSessionFactory
                 Collection<FileTransformer> transformers = new ArrayList<>();
                 if ( "pom".equals( artifact.getExtension() ) )
                 {
-                    final TransformerFactory transformerFactory = Factories.newTransformerFactory();
-
+                    final SAXTransformerFactory transformerFactory =
+                        (SAXTransformerFactory) Factories.newTransformerFactory();
+                    
                     transformers.add( new FileTransformer()
                     {
                         @Override
@@ -296,26 +307,33 @@ public class DefaultRepositorySystemSessionFactory
                             final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
                             final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
                             
+                            final TransformerHandler transformerHandler =
+                                getTransformerHandler( transformerFactory, file );
+                            
                             final SAXSource transformSource;
                             try
                             {
+                                AbstractSAXFilter filter = consumerPomXMLFilterFactory.get().get( file.toPath() );
+                                filter.setLexicalHandler( transformerHandler );
+                                
                                 transformSource =
-                                    new SAXSource( consumerPomXMLFilterFactory.get().get( file.toPath() ),
-                                                   new InputSource( new FileReader( file ) ) );
+                                    new SAXSource( filter, new InputSource( new FileInputStream( file ) ) );
                             }
                             catch ( SAXException | ParserConfigurationException | TransformerConfigurationException e )
                             {   
                                 throw new TransformException( "Failed to create a consumerPomXMLFilter", e );
                             }
                             
-                            final StreamResult result = new StreamResult( pipedOutputStream );
+                            transformerHandler.setResult( new StreamResult( pipedOutputStream ) );
+                            
+                            SAXResult transformResult = new SAXResult( transformerHandler );
                             
                             ExecutorService executorService = Executors.newSingleThreadExecutor();
                             executorService.execute( () -> 
                             {
                                 try ( PipedOutputStream out = pipedOutputStream )
                                 {
-                                    transformerFactory.newTransformer().transform( transformSource, result );
+                                    transformerFactory.newTransformer().transform( transformSource, transformResult );
                                 }
                                 catch ( TransformerException | IOException e )
                                 {
@@ -325,7 +343,7 @@ public class DefaultRepositorySystemSessionFactory
 
                             return pipedInputStream;
                         }
-
+                        
                         @Override
                         public Artifact transformArtifact( Artifact artifact )
                         {
@@ -337,6 +355,52 @@ public class DefaultRepositorySystemSessionFactory
             }
         };
     }
+    
+    private static TransformerHandler getTransformerHandler( SAXTransformerFactory transformerFactory,
+                                                      File file )
+        throws IOException, FileNotFoundException, TransformException
+    {
+        final TransformerHandler transformerHandler;
+        
+        // Keep same encoding+version
+        try ( FileInputStream input = new FileInputStream( file ) )
+        {
+            XMLStreamReader streamReader =
+                XMLInputFactory.newFactory().createXMLStreamReader( input );
+
+            transformerHandler = transformerFactory.newTransformerHandler();
+
+            final String encoding = streamReader.getCharacterEncodingScheme();
+            final String version = streamReader.getVersion();
+            
+            Transformer transformer = transformerHandler.getTransformer();
+            if ( encoding == null && version == null )
+            {
+                transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
+            }
+            else
+            {
+                transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
+
+                if ( encoding != null )
+                {
+                    transformer.setOutputProperty( OutputKeys.ENCODING, encoding );
+                }
+                if ( version != null )
+                {
+                    transformer.setOutputProperty( OutputKeys.VERSION, version );
+                }
+            }
+        }
+        catch ( XMLStreamException 
+                        | FactoryConfigurationError
+                        | TransformerConfigurationException e )
+        {
+            throw new TransformException( "Failed to detect XML encoding and version", e );
+        }
+        return transformerHandler;
+    }
+
     
     private String getUserAgent()
     {
