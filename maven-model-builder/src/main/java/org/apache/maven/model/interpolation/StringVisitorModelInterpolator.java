@@ -20,11 +20,7 @@ package org.apache.maven.model.interpolation;
  */
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -1424,7 +1420,7 @@ public class StringVisitorModelInterpolator
                     {
                         String value = (String) v;
                         String inter = interpolate( value );
-                        if ( value != inter )
+                        if ( value != inter && Objects.nonNull( inter ) )
                         {
                             entry.setValue( inter );
                         }
