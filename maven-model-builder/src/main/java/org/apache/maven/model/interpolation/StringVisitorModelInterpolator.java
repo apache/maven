@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 import javax.inject.Named;
@@ -1425,7 +1424,7 @@ public class StringVisitorModelInterpolator
                     {
                         String value = (String) v;
                         String inter = interpolate( value );
-                        if ( value != inter && Objects.nonNull( inter ) )
+                        if ( value != inter && inter != null )
                         {
                             entry.setValue( inter );
                         }
