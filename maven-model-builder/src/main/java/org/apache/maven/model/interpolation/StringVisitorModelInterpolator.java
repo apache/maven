@@ -20,7 +20,12 @@ package org.apache.maven.model.interpolation;
  */
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
