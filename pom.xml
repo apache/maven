@@ -323,12 +323,6 @@ under the License.
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
         <classifier>shaded</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
       <!-- this is included in Wagon Http
