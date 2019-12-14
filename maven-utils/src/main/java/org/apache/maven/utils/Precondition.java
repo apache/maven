@@ -56,14 +56,6 @@ public final class Precondition
         throw new IllegalArgumentException( message );
     }
 
-    public static boolean isBlank(String str, String message)
-    {
-        if ( str == null || str.trim().isEmpty() )
-        {
-            return true;
-        }
-        return true;
-    }
     /**
      * assert that the given {@code obj} is not {@code null}.
      *
@@ -167,13 +159,13 @@ public final class Precondition
         return integerValue;
     }
 
-    /**
-     * assert that the given {@code str} is not {@code null} and not {@code empty}.
-     *
-     * @param str     The str which should not be {@code null} and not be empty.
-     * @param message The message for the exception in case of {@code null}.
-     * @return The supplied object as convenient.
-     */
+//    /**
+//     * assert that the given {@code str} is not {@code null} and not {@code empty}.
+//     *
+//     * @param str     The str which should not be {@code null} and not be empty.
+//     * @param message The message for the exception in case of {@code null}.
+//     * @return The supplied object as convenient.
+//     */
 //    public static String requireNotEmpty(String str, String message)
 //    {
 //        requireNotNull( str, message );
@@ -183,6 +175,43 @@ public final class Precondition
 //        }
 //        return str;
 //    }
+
+
+    public static boolean isNotEmpty( String str )
+    {
+        return ( ( str != null ) && ( !str.isEmpty() ) );
+    }
+
+    public static boolean isNotBlank(final CharSequence cs) {
+        return !isBlank(cs);
+    }
+
+    public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isBlank(String str, String message)
+    {
+        if ( str == null || str.trim().isEmpty() )
+        {
+            return true;
+        }
+        return true;
+    }
+
+    public static boolean isEmpty(final CharSequence cs) {
+        return cs == null || cs.length() == 0;
+    }
+
 
 }
 

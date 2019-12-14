@@ -19,13 +19,12 @@ package org.apache.maven.configuration;
  * under the License.
  */
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.utils.Precondition;
 
 /**
  * A basic bean configuration request.
@@ -100,7 +99,7 @@ public class DefaultBeanConfigurationRequest
         Plugin plugin = findPlugin( model, pluginGroupId, pluginArtifactId );
         if ( plugin != null )
         {
-            if ( StringUtils.isNotEmpty( pluginExecutionId ) )
+            if ( Precondition.isNotEmpty( pluginExecutionId ) )
             {
                 for ( PluginExecution execution : plugin.getExecutions() )
                 {
@@ -121,8 +120,8 @@ public class DefaultBeanConfigurationRequest
 
     private Plugin findPlugin( Model model, String groupId, String artifactId )
     {
-        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
-        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+        Precondition.notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        Precondition.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
 
         if ( model != null )
         {
