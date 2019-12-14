@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.utils.Precondition;
 
 /**
  * ArtifactUtils
@@ -40,7 +40,7 @@ public final class ArtifactUtils
         if ( version != null )
         {
             if ( version.regionMatches( true, version.length() - Artifact.SNAPSHOT_VERSION.length(),
-                                        Artifact.SNAPSHOT_VERSION, 0, Artifact.SNAPSHOT_VERSION.length() ) )
+                    Artifact.SNAPSHOT_VERSION, 0, Artifact.SNAPSHOT_VERSION.length() ) )
             {
                 return true;
             }
@@ -104,7 +104,7 @@ public final class ArtifactUtils
         int c = str != null && str.length() > 0 ? str.charAt( 0 ) : 0;
         if ( ( c < '0' || c > '9' ) && ( c < 'a' || c > 'z' ) )
         {
-            Validate.notBlank( str, message );
+            Precondition.notBlank( str, message );
         }
     }
 
@@ -153,8 +153,8 @@ public final class ArtifactUtils
         }
 
         DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range,
-            artifact.getScope(), artifact.getType(), artifact.getClassifier(),
-            artifact.getArtifactHandler(), artifact.isOptional() );
+                artifact.getScope(), artifact.getType(), artifact.getClassifier(), artifact.getArtifactHandler(),
+                artifact.isOptional() );
         clone.setRelease( artifact.isRelease() );
         clone.setResolvedVersion( artifact.getVersion() );
         clone.setResolved( artifact.isResolved() );
@@ -173,7 +173,9 @@ public final class ArtifactUtils
         return clone;
     }
 
-    /** Returns <code>to</code> collection */
+    /**
+     * Returns <code>to</code> collection
+     */
     public static <T extends Collection<Artifact>> T copyArtifacts( Collection<Artifact> from, T to )
     {
         for ( Artifact artifact : from )

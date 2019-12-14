@@ -19,9 +19,9 @@ package org.apache.maven.utils;
  * under the License.
  */
 
-import org.apiguardian.api.API;
-
 import java.util.List;
+
+import org.apiguardian.api.API;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -30,7 +30,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  *
  * @author Karl Heinz Marbaise
  */
-@API( status = INTERNAL, since = "3.6.4" )
+@API( status = INTERNAL, since = "3.7.0" )
 public final class Precondition
 {
     private Precondition()
@@ -112,6 +112,35 @@ public final class Precondition
         if ( longValue <= 0 )
         {
             throw new IllegalArgumentException( message );
+        }
+        return longValue;
+    }
+
+    public static void isTrue( boolean expression, String message, final long value )
+    {
+        if ( !expression )
+        {
+            throw new IllegalArgumentException( String.format( message, Long.valueOf( value ) ) );
+        }
+    }
+
+    public static void isTrue( boolean expression, String message, final Object... values )
+    {
+        if ( !expression )
+        {
+            throw new IllegalArgumentException( String.format( message, values ) );
+        }
+    }
+
+    public static Long requireGreaterThanZero(Long longValue, String message, final long value) {
+        if ( longValue == null )
+        {
+            throw new IllegalArgumentException( String.format( message, value ) );
+        }
+
+        if ( longValue <= 0 )
+        {
+            throw new IllegalArgumentException( String.format( message, value ) );
         }
         return longValue;
     }

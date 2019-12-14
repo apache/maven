@@ -171,6 +171,10 @@ under the License.
       <artifactId>jansi</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
