@@ -20,13 +20,18 @@ package org.apache.maven.cli.transfer;
  */
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class FileSizeFormatTest
 {
@@ -41,175 +46,169 @@ class FileSizeFormatTest
                 "file size cannot be negative: -100" );
     }
 
-    @Test
-    void testSize()
+    @ParameterizedTest(name = "{index}: value''{0}'' expectedResult={1}")
+    @MethodSource
+    void verify_output_without_given_scale_unit(long value, String expectedAnswer)
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
-
-        long _0_bytes = 0L;
-        assertThat( format.format( _0_bytes ) ).isEqualTo( "0 B" );
-
-        long _5_bytes = 5L;
-        assertThat( format.format( _5_bytes ) ).isEqualTo( "5 B" );
-
-        long _10_bytes = 10L;
-        assertThat( format.format( _10_bytes ) ).isEqualTo( "10 B" );
-
-        long _15_bytes = 15L;
-        assertThat( format.format( _15_bytes ) ).isEqualTo( "15 B" );
-
-        long _999_bytes = 999L;
-        assertThat( format.format( _999_bytes ) ).isEqualTo( "999 B" );
-
-        long _1000_bytes = 1000L;
-        assertThat( format.format( _1000_bytes ) ).isEqualTo( "1.0 kB" );
-
-        long _5500_bytes = 5500L;
-        assertThat( format.format( _5500_bytes ) ).isEqualTo( "5.5 kB" );
-
-        long _10_kilobytes = 10L * 1000L;
-        assertThat( format.format( _10_kilobytes ) ).isEqualTo( "10 kB" );
-
-        long _15_kilobytes = 15L * 1000L;
-        assertThat( format.format( _15_kilobytes ) ).isEqualTo( "15 kB" );
-
-        long _999_kilobytes = 999L * 1000L;
-        assertThat( format.format( _999_kilobytes ) ).isEqualTo( "999 kB" );
-
-        long _1000_kilobytes = 1000L * 1000L;
-        assertThat( format.format( _1000_kilobytes ) ).isEqualTo( "1.0 MB" );
-
-        long _5500_kilobytes = 5500L * 1000L;
-        assertThat( format.format( _5500_kilobytes ) ).isEqualTo( "5.5 MB" );
-
-        long _10_megabytes = 10L * 1000L * 1000L;
-        assertThat( format.format( _10_megabytes ) ).isEqualTo( "10 MB" );
-
-        long _15_megabytes = 15L * 1000L * 1000L;
-        assertThat( format.format( _15_megabytes ) ).isEqualTo( "15 MB" );
-
-        long _999_megabytes = 999L * 1000L * 1000L;
-        assertThat( format.format( _999_megabytes ) ).isEqualTo( "999 MB" );
-
-        long _1000_megabytes = 1000L * 1000L * 1000L;
-        assertThat( format.format( _1000_megabytes ) ).isEqualTo( "1.0 GB" );
-
-        long _5500_megabytes = 5500L * 1000L * 1000L;
-        assertThat( format.format( _5500_megabytes ) ).isEqualTo( "5.5 GB" );
-
-        long _10_gigabytes = 10L * 1000L * 1000L * 1000L;
-        assertThat( format.format( _10_gigabytes ) ).isEqualTo( "10 GB" );
-
-        long _15_gigabytes = 15L * 1000L * 1000L * 1000L;
-        assertThat( format.format( _15_gigabytes ) ).isEqualTo( "15 GB" );
-
-        long _1000_gigabytes = 1000L * 1000L * 1000L * 1000L;
-        assertThat( format.format( _1000_gigabytes ) ).isEqualTo( "1000 GB" );
+        assertThat( format.format( value) ).isEqualTo( expectedAnswer );
     }
 
-    @Test
-    void testSizeWithSelectedScaleUnit()
+    static Stream<Arguments> verify_output_without_given_scale_unit() {
+        long _0_bytes = 0L;
+        long _5_bytes = 5L;
+        long _10_bytes = 10L;
+        long _15_bytes = 15L;
+        long _49_bytes = 49L;
+        long _50_bytes = 50L;
+        long _999_bytes = 999L;
+        long _1000_bytes = 1000L;
+        long _5500_bytes = 5500L;
+        long _10_kilobytes = 10L * 1000L;
+        long _15_kilobytes = 15L * 1000L;
+        long _49_kilobytes = 49L * 1000L;
+        long _50_kilobytes = 50L * 1000L;
+        long _999_kilobytes = 999L * 1000L;
+        long _1000_kilobytes = 1000L * 1000L;
+        long _5500_kilobytes = 5500L * 1000L;
+        long _10_megabytes = 10L * 1000L * 1000L;
+        long _15_megabytes = 15L * 1000L * 1000L;
+        long _49_megabytes = 49L * 1000L * 1000L;
+        long _50_megabytes = 50L * 1000L * 1000L;
+        long _999_megabytes = 999L * 1000L * 1000L;
+        long _1000_megabytes = 1000L * 1000L * 1000L;
+        long _5500_megabytes = 5500L * 1000L * 1000L;
+        long _10_gigabytes = 10L * 1000L * 1000L * 1000L;
+        long _15_gigabytes = 15L * 1000L * 1000L * 1000L;
+        long _1000_gigabytes = 1000L * 1000L * 1000L * 1000L;
+
+        return Stream.of(
+                arguments( _0_bytes, "0 B" ),
+                arguments( _5_bytes, "5 B" ),
+                arguments( _10_bytes, "10 B" ),
+                arguments( _15_bytes, "15 B" ),
+                arguments( _49_bytes, "49 B" ),
+                arguments( _50_bytes, "50 B" ),
+                arguments( _999_bytes, "999 B" ),
+                arguments( _1000_bytes, "1.0 kB" ),
+                arguments( _5500_bytes, "5.5 kB" ),
+                arguments( _10_kilobytes, "10 kB" ),
+                arguments( _15_kilobytes, "15 kB" ),
+                arguments( _49_kilobytes, "49 kB" ),
+                arguments( _50_kilobytes, "50 kB" ),
+                arguments( _999_kilobytes, "999 kB" ),
+                arguments( _1000_kilobytes, "1.0 MB" ),
+                arguments( _5500_kilobytes, "5.5 MB" ),
+                arguments( _10_megabytes, "10 MB" ),
+                arguments( _15_megabytes, "15 MB" ),
+                arguments( _49_megabytes, "49 MB" ),
+                arguments( _50_megabytes, "50 MB" ),
+                arguments( _999_megabytes, "999 MB" ),
+                arguments( _1000_megabytes, "1.0 GB" ),
+                arguments( _5500_megabytes, "5.5 GB" ),
+                arguments( _10_gigabytes, "10 GB" ),
+                arguments( _15_gigabytes, "15 GB" ),
+                arguments( _1000_gigabytes, "1000 GB" )
+
+        );
+    }
+
+    @ParameterizedTest(name = "{index}: value''{0}'' Scale={1} expectedResult={2}")
+    @MethodSource
+    void verify_output_with_given_scale_unit(long value, ScaleUnit scaleUnit, String expectedResult)
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
+        assertThat( format.format( value, scaleUnit ) ).isEqualTo( expectedResult );
+    }
 
+    static Stream<Arguments> verify_output_with_given_scale_unit() {
         long _0_bytes = 0L;
-        assertThat( format.format( _0_bytes ) ).isEqualTo( "0 B" );
-        assertThat( format.format( _0_bytes, ScaleUnit.BYTE ) ).isEqualTo( "0 B" );
-        assertThat( format.format( _0_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "0 kB" );
-        assertThat( format.format( _0_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _0_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _5_bytes = 5L;
-        assertThat( format.format( _5_bytes ) ).isEqualTo( "5 B" );
-        assertThat( format.format( _5_bytes, ScaleUnit.BYTE ) ).isEqualTo( "5 B" );
-        assertThat( format.format( _5_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "0 kB" );
-        assertThat( format.format( _5_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _5_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
-
         long _49_bytes = 49L;
-        assertThat( format.format( _49_bytes ) ).isEqualTo( "49 B" );
-        assertThat( format.format( _49_bytes, ScaleUnit.BYTE ) ).isEqualTo( "49 B" );
-        assertThat( format.format( _49_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "0 kB" );
-        assertThat( format.format( _49_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _49_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _50_bytes = 50L;
-        assertThat( format.format( _50_bytes ) ).isEqualTo( "50 B" );
-        assertThat( format.format( _50_bytes, ScaleUnit.BYTE ) ).isEqualTo( "50 B" );
-        assertThat( format.format( _50_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "0.1 kB" );
-        assertThat( format.format( _50_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _50_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _999_bytes = 999L;
-        assertThat( format.format( _999_bytes ) ).isEqualTo( "999 B" );
-        assertThat( format.format( _999_bytes, ScaleUnit.BYTE ) ).isEqualTo( "999 B" );
-        assertThat( format.format( _999_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "1.0 kB" );
-        assertThat( format.format( _999_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _999_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _1000_bytes = 1000L;
-        assertThat( format.format( _1000_bytes ) ).isEqualTo( "1.0 kB" );
-        assertThat( format.format( _1000_bytes, ScaleUnit.BYTE ) ).isEqualTo( "1000 B" );
-        assertThat( format.format( _1000_bytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "1.0 kB" );
-        assertThat( format.format( _1000_bytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _1000_bytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _49_kilobytes = 49L * 1000L;
-        assertThat( format.format( _49_kilobytes ) ).isEqualTo( "49 kB" );
-        assertThat( format.format( _49_kilobytes, ScaleUnit.BYTE ) ).isEqualTo( "49000 B" );
-        assertThat( format.format( _49_kilobytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "49 kB" );
-        assertThat( format.format( _49_kilobytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0 MB" );
-        assertThat( format.format( _49_kilobytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _50_kilobytes = 50L * 1000L;
-        assertThat( format.format( _50_kilobytes ) ).isEqualTo( "50 kB" );
-        assertThat( format.format( _50_kilobytes, ScaleUnit.BYTE ) ).isEqualTo( "50000 B" );
-        assertThat( format.format( _50_kilobytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "50 kB" );
-        assertThat( format.format( _50_kilobytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "0.1 MB" );
-        assertThat( format.format( _50_kilobytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _999_kilobytes = 999L * 1000L;
-        assertThat( format.format( _999_kilobytes ) ).isEqualTo( "999 kB" );
-        assertThat( format.format( _999_kilobytes, ScaleUnit.BYTE ) ).isEqualTo( "999000 B" );
-        assertThat( format.format( _999_kilobytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "999 kB" );
-        assertThat( format.format( _999_kilobytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "1.0 MB" );
-        assertThat( format.format( _999_kilobytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _1000_kilobytes = 1000L * 1000L;
-        assertThat( format.format( _1000_kilobytes ) ).isEqualTo( "1.0 MB" );
-        assertThat( format.format( _1000_kilobytes, ScaleUnit.BYTE ) ).isEqualTo( "1000000 B" );
-        assertThat( format.format( _1000_kilobytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "1000 kB" );
-        assertThat( format.format( _1000_kilobytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "1.0 MB" );
-        assertThat( format.format( _1000_kilobytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _49_megabytes = 49L * 1000L * 1000L;
-        assertThat( format.format( _49_megabytes ) ).isEqualTo( "49 MB" );
-        assertThat( format.format( _49_megabytes, ScaleUnit.BYTE ) ).isEqualTo( "49000000 B" );
-        assertThat( format.format( _49_megabytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "49000 kB" );
-        assertThat( format.format( _49_megabytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "49 MB" );
-        assertThat( format.format( _49_megabytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0 GB" );
-
         long _50_megabytes = 50L * 1000L * 1000L;
-        assertThat( format.format( _50_megabytes ) ).isEqualTo( "50 MB" );
-        assertThat( format.format( _50_megabytes, ScaleUnit.BYTE ) ).isEqualTo( "50000000 B" );
-        assertThat( format.format( _50_megabytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "50000 kB" );
-        assertThat( format.format( _50_megabytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "50 MB" );
-        assertThat( format.format( _50_megabytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "0.1 GB" );
-
         long _999_megabytes = 999L * 1000L * 1000L;
-        assertThat( format.format( _999_megabytes ) ).isEqualTo( "999 MB" );
-        assertThat( format.format( _999_megabytes, ScaleUnit.BYTE ) ).isEqualTo( "999000000 B" );
-        assertThat( format.format( _999_megabytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "999000 kB" );
-        assertThat( format.format( _999_megabytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "999 MB" );
-        assertThat( format.format( _999_megabytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "1.0 GB" );
-
         long _1000_megabytes = 1000L * 1000L * 1000L;
-        assertThat( format.format( _1000_megabytes ) ).isEqualTo( "1.0 GB" );
-        assertThat( format.format( _1000_megabytes, ScaleUnit.BYTE ) ).isEqualTo( "1000000000 B" );
-        assertThat( format.format( _1000_megabytes, ScaleUnit.KILOBYTE ) ).isEqualTo( "1000000 kB" );
-        assertThat( format.format( _1000_megabytes, ScaleUnit.MEGABYTE ) ).isEqualTo( "1000 MB" );
-        assertThat( format.format( _1000_megabytes, ScaleUnit.GIGABYTE ) ).isEqualTo( "1.0 GB" );
+
+        return Stream.of(
+                arguments( _0_bytes, ScaleUnit.BYTE, "0 B" ),
+                arguments( _0_bytes, ScaleUnit.KILOBYTE, "0 kB" ),
+                arguments( _0_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _0_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _5_bytes, ScaleUnit.BYTE, "5 B" ),
+                arguments( _5_bytes, ScaleUnit.KILOBYTE, "0 kB" ),
+                arguments( _5_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _5_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _49_bytes, ScaleUnit.BYTE, "49 B" ),
+                arguments( _49_bytes, ScaleUnit.KILOBYTE, "0 kB" ),
+                arguments( _49_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _49_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _50_bytes, ScaleUnit.BYTE, "50 B" ),
+                arguments( _50_bytes, ScaleUnit.KILOBYTE, "0.1 kB" ),
+                arguments( _50_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _50_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _999_bytes, ScaleUnit.BYTE, "999 B" ),
+                arguments( _999_bytes, ScaleUnit.KILOBYTE, "1.0 kB" ),
+                arguments( _999_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _999_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _1000_bytes, ScaleUnit.BYTE, "1000 B" ),
+                arguments( _1000_bytes, ScaleUnit.KILOBYTE, "1.0 kB" ),
+                arguments( _1000_bytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _1000_bytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _49_kilobytes, ScaleUnit.BYTE, "49000 B" ),
+                arguments( _49_kilobytes, ScaleUnit.KILOBYTE, "49 kB" ),
+                arguments( _49_kilobytes, ScaleUnit.MEGABYTE, "0 MB" ),
+                arguments( _49_kilobytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _50_kilobytes, ScaleUnit.BYTE, "50000 B" ),
+                arguments( _50_kilobytes, ScaleUnit.KILOBYTE, "50 kB" ),
+                arguments( _50_kilobytes, ScaleUnit.MEGABYTE, "0.1 MB" ),
+                arguments( _50_kilobytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _999_kilobytes, ScaleUnit.BYTE, "999000 B" ),
+                arguments( _999_kilobytes, ScaleUnit.KILOBYTE, "999 kB" ),
+                arguments( _999_kilobytes, ScaleUnit.MEGABYTE, "1.0 MB" ),
+                arguments( _999_kilobytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _1000_kilobytes, ScaleUnit.BYTE, "1000000 B" ),
+                arguments( _1000_kilobytes, ScaleUnit.KILOBYTE, "1000 kB" ),
+                arguments( _1000_kilobytes, ScaleUnit.MEGABYTE, "1.0 MB" ),
+                arguments( _1000_kilobytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _49_megabytes, ScaleUnit.BYTE, "49000000 B" ),
+                arguments( _49_megabytes, ScaleUnit.KILOBYTE, "49000 kB" ),
+                arguments( _49_megabytes, ScaleUnit.MEGABYTE, "49 MB" ),
+                arguments( _49_megabytes, ScaleUnit.GIGABYTE, "0 GB" ),
+
+                arguments( _50_megabytes, ScaleUnit.BYTE, "50000000 B" ),
+                arguments( _50_megabytes, ScaleUnit.KILOBYTE, "50000 kB" ),
+                arguments( _50_megabytes, ScaleUnit.MEGABYTE, "50 MB" ),
+                arguments( _50_megabytes, ScaleUnit.GIGABYTE, "0.1 GB" ),
+
+                arguments( _999_megabytes, ScaleUnit.BYTE, "999000000 B" ),
+                arguments( _999_megabytes, ScaleUnit.KILOBYTE, "999000 kB" ),
+                arguments( _999_megabytes, ScaleUnit.MEGABYTE, "999 MB" ),
+                arguments( _999_megabytes, ScaleUnit.GIGABYTE, "1.0 GB" ),
+
+                arguments( _1000_megabytes, ScaleUnit.BYTE, "1000000000 B" ),
+                arguments( _1000_megabytes, ScaleUnit.KILOBYTE, "1000000 kB" ),
+                arguments( _1000_megabytes, ScaleUnit.MEGABYTE, "1000 MB" ),
+                arguments( _1000_megabytes, ScaleUnit.GIGABYTE, "1.0 GB" )
+
+        );
     }
 
     @Test
