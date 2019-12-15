@@ -37,24 +37,6 @@ public final class Precondition
     {
         // no-op
     }
-/*
-    int c = str != null && str.length() > 0 ? str.charAt( 0 ) : 0;
-        if ( ( c < '0' || c > '9' ) && ( c < 'a' || c > 'z' ) )
-    {
-        Validate.notBlank( str, message );
-    }
-*/
-    public static boolean notBlank(String str, String message)
-    {
-        for ( int i = 0; i < str.length(); i++ )
-        {
-            if ( !Character.isWhitespace( str.charAt( i ) ) )
-            {
-                return false;
-            }
-        }
-        throw new IllegalArgumentException( message );
-    }
 
     /**
      * assert that the given {@code obj} is not {@code null}.
@@ -101,6 +83,20 @@ public final class Precondition
             throw new IllegalArgumentException( message );
         }
 
+        if ( longValue < 0 )
+        {
+            throw new IllegalArgumentException( message );
+        }
+        return longValue;
+    }
+
+    public static Long requireGreaterOrEqualZero(Long longValue, String message)
+    {
+        if ( longValue == null )
+        {
+            throw new IllegalArgumentException( message );
+        }
+
         if ( longValue <= 0 )
         {
             throw new IllegalArgumentException( message );
@@ -122,6 +118,19 @@ public final class Precondition
         {
             throw new IllegalArgumentException( String.format( message, values ) );
         }
+    }
+
+    public static Long greaterOrEqualToZero(Long currentValue, String message, final long value) {
+        if ( currentValue == null )
+        {
+            throw new IllegalArgumentException( String.format( message, value ) );
+        }
+
+        if ( currentValue < 0 )
+        {
+            throw new IllegalArgumentException( String.format( message, value ) );
+        }
+        return currentValue;
     }
 
     public static Long requireGreaterThanZero(Long longValue, String message, final long value) {
@@ -199,6 +208,19 @@ public final class Precondition
         return true;
     }
 
+    public static boolean notBlank(String str, String message)
+    {
+        for ( int i = 0; i < str.length(); i++ )
+        {
+            if ( !Character.isWhitespace( str.charAt( i ) ) )
+            {
+                return false;
+            }
+        }
+        throw new IllegalArgumentException( message );
+    }
+
+
     public static boolean isBlank(String str, String message)
     {
         if ( str == null || str.trim().isEmpty() )
@@ -210,6 +232,23 @@ public final class Precondition
 
     public static boolean isEmpty(final CharSequence cs) {
         return cs == null || cs.length() == 0;
+    }
+
+    public static boolean isDigits(final String str) {
+        return isNumeric(str);
+    }
+
+    public static boolean isNumeric(final CharSequence cs) {
+        if (isEmpty(cs)) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

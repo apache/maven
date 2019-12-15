@@ -19,33 +19,33 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Karl Heinz Marbaise
  */
-public class CleanArgumentTest
+class CleanArgumentTest
 {
     @Test
-    public void cleanArgsShouldRemoveWrongSurroundingQuotes()
+    void cleanArgsShouldRemoveWrongSurroundingQuotes()
     {
         String[] args = { "\"-Dfoo=bar", "\"-Dfoo2=bar two\"" };
         String[] cleanArgs = CleanArgument.cleanArgs( args );
-        assertEquals( args.length, cleanArgs.length );
-        assertEquals( "-Dfoo=bar", cleanArgs[0] );
-        assertEquals( "-Dfoo2=bar two", cleanArgs[1] );
+        assertThat( cleanArgs.length ).isEqualTo( args.length );
+        assertThat( cleanArgs[0] ).isEqualTo( "-Dfoo=bar" );
+        assertThat( cleanArgs[1] ).isEqualTo( "-Dfoo2=bar two" );
     }
 
     @Test
-    public void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes()
+    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes()
     {
         String information = "-Dinformation=\"The Information is important.\"";
         String[] args = { information };
         String[] cleanArgs = CleanArgument.cleanArgs( args );
-        assertEquals( args.length, cleanArgs.length );
-        assertEquals( information, cleanArgs[0] );
+        assertThat( cleanArgs.length ).isEqualTo( args.length );
+        assertThat( cleanArgs[0] ).isEqualTo( information );
     }
 
     @Test
@@ -54,8 +54,8 @@ public class CleanArgumentTest
         String information = "-Dinformation='The Information is important.'";
         String[] args = { information };
         String[] cleanArgs = CleanArgument.cleanArgs( args );
-        assertEquals( args.length, cleanArgs.length );
-        assertEquals( information, cleanArgs[0] );
+        assertThat( cleanArgs.length ).isEqualTo( args.length );
+        assertThat( cleanArgs[0] ).isEqualTo( information );
     }
 
 }

@@ -19,32 +19,30 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import org.apache.commons.cli.CommandLine;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.commons.cli.ParseException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class CLIManagerTest
+import static org.assertj.core.api.Assertions.assertThat;
+
+class CLIManagerTest
 {
     private CLIManager cliManager;
 
-    @Before
-    public void setup()
+    @BeforeEach
+    void beforeEach()
     {
         cliManager = new CLIManager();
     }
 
     @Test
-    public void spacedOptions()
-        throws Exception
+    void spacedOptions() throws ParseException
     {
         CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
-        assertTrue( cmdLine.hasOption( CLIManager.DEBUG ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x=1" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "y=2" ) );
+        assertThat( cmdLine.hasOption( CLIManager.DEBUG ) ).isTrue();
+        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0] ).isEqualTo( "x=1" );
+        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1] ).isEqualTo( "y=2" );
     }
 
 }

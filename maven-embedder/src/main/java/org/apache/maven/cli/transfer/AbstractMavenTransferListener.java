@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.commons.lang3.Validate;
+import org.apache.maven.utils.Precondition;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -33,20 +33,19 @@ import org.eclipse.aether.transfer.TransferResource;
 /**
  * AbstractMavenTransferListener
  */
-public abstract class AbstractMavenTransferListener
-    extends AbstractTransferListener
+public abstract class AbstractMavenTransferListener extends AbstractTransferListener
 {
 
     // CHECKSTYLE_OFF: LineLength
+
     /**
-     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
-     * (GB, MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10
-     * and <code>###0</code> for numbers between 10 and 1000+ by default.
+     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix (GB,
+     * MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10 and <code>###0</code> for numbers
+     * between 10 and 1000+ by default.
      *
      * @see <a href="https://en.wikipedia.org/wiki/Metric_prefix">https://en.wikipedia.org/wiki/Metric_prefix</a>
      * @see <a href="https://en.wikipedia.org/wiki/Binary_prefix">https://en.wikipedia.org/wiki/Binary_prefix</a>
-     * @see <a
-     *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
+     * @see <a href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
      */
     // CHECKSTYLE_ON: LineLength
     // TODO Move me to Maven Shared Utils
@@ -55,68 +54,67 @@ public abstract class AbstractMavenTransferListener
         enum ScaleUnit
         {
             BYTE
-            {
-                @Override
-                public long bytes()
-                {
-                    return 1L;
-                }
+                    {
+                        @Override
+                        public long bytes()
+                        {
+                            return 1L;
+                        }
 
-                @Override
-                public String symbol()
-                {
-                    return "B";
-                }
-            },
+                        @Override
+                        public String symbol()
+                        {
+                            return "B";
+                        }
+                    },
             KILOBYTE
-            {
-                @Override
-                public long bytes()
-                {
-                    return 1000L;
-                }
+                    {
+                        @Override
+                        public long bytes()
+                        {
+                            return 1000L;
+                        }
 
-                @Override
-                public String symbol()
-                {
-                    return "kB";
-                }
-            },
+                        @Override
+                        public String symbol()
+                        {
+                            return "kB";
+                        }
+                    },
             MEGABYTE
-            {
-                @Override
-                public long bytes()
-                {
-                    return KILOBYTE.bytes() * KILOBYTE.bytes();
-                }
+                    {
+                        @Override
+                        public long bytes()
+                        {
+                            return KILOBYTE.bytes() * KILOBYTE.bytes();
+                        }
 
-                @Override
-                public String symbol()
-                {
-                    return "MB";
-                }
-            },
+                        @Override
+                        public String symbol()
+                        {
+                            return "MB";
+                        }
+                    },
             GIGABYTE
-            {
-                @Override
-                public long bytes()
-                {
-                    return MEGABYTE.bytes() * KILOBYTE.bytes();
-                };
+                    {
+                        @Override
+                        public long bytes()
+                        {
+                            return MEGABYTE.bytes() * KILOBYTE.bytes();
+                        }
 
-                @Override
-                public String symbol()
-                {
-                    return "GB";
-                }
-            };
+                        ;
 
-            public abstract long bytes();
-            public abstract String symbol();
+                        @Override
+                        public String symbol()
+                        {
+                            return "GB";
+                        }
+                    };
 
             public static ScaleUnit getScaleUnit( long size )
             {
-                Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+                Precondition.greaterOrEqualToZero( size, "file size cannot be negative: %s", size );
 
                 if ( size >= GIGABYTE.bytes() )
                 {
@@ -135,6 +133,10 @@ public abstract class AbstractMavenTransferListener
                     return BYTE;
                 }
             }
+
+            public abstract long bytes();
+
+            public abstract String symbol();
         }
 
         private DecimalFormat smallFormat;
@@ -159,7 +161,7 @@ public abstract class AbstractMavenTransferListener
         @SuppressWarnings( "checkstyle:magicnumber" )
         public String format( long size, ScaleUnit unit, boolean omitSymbol )
         {
-            Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+            Precondition.greaterOrEqualToZero( size, "file size cannot be negative: %s", size );
 
             if ( unit == null )
             {
@@ -191,9 +193,10 @@ public abstract class AbstractMavenTransferListener
 
         public String formatProgress( long progressedSize, long size )
         {
-            Validate.isTrue( progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize );
-            Validate.isTrue( size < 0L || progressedSize <= size,
-                "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
+            Precondition.greaterOrEqualToZero( progressedSize, "progressed file size cannot be negative: %s",
+                    progressedSize );
+            Precondition.isTrue( size >= 0L && progressedSize <= size || size < 0L,
+                    "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
 
             if ( size >= 0L && progressedSize != size )
             {
@@ -233,13 +236,12 @@ public abstract class AbstractMavenTransferListener
     }
 
     @Override
-    public void transferCorrupted( TransferEvent event )
-        throws TransferCancelledException
+    public void transferCorrupted( TransferEvent event ) throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
         // TODO This needs to be colorized
-        out.println( "[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
-            + resource.getRepositoryUrl() + resource.getResourceName() );
+        out.println( "[WARNING] " + event.getException().getMessage() + " from " + resource
+                .getRepositoryId() + " for " + resource.getRepositoryUrl() + resource.getResourceName() );
     }
 
     @Override

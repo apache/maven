@@ -18,51 +18,49 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import java.io.File;
 import java.io.IOException;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assume.assumeTrue;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 /**
  * Test that validate the solution of MNG-6261 issue
- *
  */
-public class FileModelSourceTest
+class FileModelSourceTest
 {
 
     /**
      * Test of equals method, of class FileModelSource.
      */
     @Test
-    public void testEquals()
-            throws Exception 
+    void testEquals() throws Exception
     {
         File tempFile = createTempFile( "pomTest" );
         FileModelSource instance = new FileModelSource( tempFile );
 
-        assertFalse( instance.equals( null ) );
-        assertFalse( instance.equals( new Object() ) );
-        assertTrue( instance.equals( instance ) );
-        assertTrue( instance.equals( new FileModelSource( tempFile ) ) );
+        assertThat(instance.equals( null )).isFalse();
+        assertThat( instance.equals( new Object() ) ).isFalse();
+        assertThat( instance.equals( instance ) ).isTrue();
+        assertThat( instance.equals( new FileModelSource( tempFile ) ) ).isTrue();
     }
 
     @Test
-    public void testWindowsPaths() 
-            throws Exception 
+    @EnabledOnOs( WINDOWS )
+    void testWindowsPaths() throws Exception
     {
-        assumeTrue( SystemUtils.IS_OS_WINDOWS );
-
         File upperCaseFile = createTempFile( "TESTE" );
         String absolutePath = upperCaseFile.getAbsolutePath();
         File lowerCaseFile = new File( absolutePath.toLowerCase() );
-        
+
         FileModelSource upperCaseFileSouce = new FileModelSource( upperCaseFile );
         FileModelSource lowerCaseFileSouce = new FileModelSource( lowerCaseFile );
 
-        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );        
+        assertThat( upperCaseFileSouce.equals( lowerCaseFileSouce ) ).isTrue();
     }
 
     private File createTempFile( String name ) throws IOException

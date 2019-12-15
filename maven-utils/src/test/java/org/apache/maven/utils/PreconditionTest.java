@@ -22,14 +22,13 @@ package org.apache.maven.utils;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.utils.Precondition.notBlank;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class PreconditionTest
 {
     @Test
     void first()
     {
-        assertThatIllegalArgumentException()
-                .isThrownBy( () -> notBlank( "x", "Message" ) );
+        assertThatCode( () -> notBlank( "x", "Message" ) ).doesNotThrowAnyException();
     }
 }
