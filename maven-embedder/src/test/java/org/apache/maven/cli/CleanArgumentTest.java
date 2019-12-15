@@ -31,7 +31,7 @@ class CleanArgumentTest
     @Test
     void cleanArgsShouldRemoveWrongSurroundingQuotes()
     {
-        String[] args = { "\"-Dfoo=bar", "\"-Dfoo2=bar two\"" };
+        String[] args = {"\"-Dfoo=bar", "\"-Dfoo2=bar two\""};
         String[] cleanArgs = CleanArgument.cleanArgs( args );
         assertThat( cleanArgs.length ).isEqualTo( args.length );
         assertThat( cleanArgs[0] ).isEqualTo( "-Dfoo=bar" );
@@ -39,20 +39,20 @@ class CleanArgumentTest
     }
 
     @Test
-    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes()
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes()
     {
         String information = "-Dinformation=\"The Information is important.\"";
-        String[] args = { information };
+        String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs( args );
         assertThat( cleanArgs.length ).isEqualTo( args.length );
         assertThat( cleanArgs[0] ).isEqualTo( information );
     }
 
     @Test
-    public void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes()
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes()
     {
         String information = "-Dinformation='The Information is important.'";
-        String[] args = { information };
+        String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs( args );
         assertThat( cleanArgs.length ).isEqualTo( args.length );
         assertThat( cleanArgs[0] ).isEqualTo( information );
