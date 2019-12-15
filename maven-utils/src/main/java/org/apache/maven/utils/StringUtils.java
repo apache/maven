@@ -24,29 +24,40 @@ import org.apiguardian.api.API;
 import static org.apache.maven.utils.Precondition.isEmpty;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+/**
+ * @author Karl Heinz Marbaise
+ */
 @API( status = INTERNAL, since = "3.7.0" )
 public final class StringUtils
 {
+    public static final String EMPTY = "";
+    public static final int INDEX_NOT_FOUND = -1;
     private StringUtils()
     {
         // intentionally empty.
     }
 
-    public static final String EMPTY = "";
-    public static final int INDEX_NOT_FOUND = -1;
-
-    public static String substringAfterLast(final String str, final String separator) {
-        if ( isEmpty(str)) {
+    /**
+     * @param str The string.
+     * @param separator The separator.
+     * @return The substring.
+     */
+    public static String substringAfterLast( final String str, final String separator )
+    {
+        if ( isEmpty( str ) )
+        {
             return str;
         }
-        if (isEmpty(separator)) {
+        if ( isEmpty( separator ) )
+        {
             return EMPTY;
         }
-        final int pos = str.lastIndexOf(separator);
-        if (pos == INDEX_NOT_FOUND || pos == str.length() - separator.length()) {
+        final int pos = str.lastIndexOf( separator );
+        if ( pos == INDEX_NOT_FOUND || pos == str.length() - separator.length() )
+        {
             return EMPTY;
         }
-        return str.substring(pos + separator.length());
+        return str.substring( pos + separator.length() );
     }
 
 

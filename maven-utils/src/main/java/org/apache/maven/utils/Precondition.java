@@ -45,10 +45,12 @@ public final class Precondition
      * @param message The message will be part of the exception.
      * @return The supplied object as convenient.
      */
-    public static < T > T requireNotNull(T obj, String message)
+    public static <T> T requireNotNull( T obj, String message )
     {
         if ( obj == null )
+        {
             throw new IllegalArgumentException( message );
+        }
         return obj;
     }
 
@@ -59,7 +61,7 @@ public final class Precondition
      * @param message The message will be part of the exception.
      * @return The supplied object as convenient.
      */
-    public static < T > List< T > requireNotEmpty(List< T > obj, String message)
+    public static <T> List<T> requireNotEmpty( List<T> obj, String message )
     {
         if ( obj.isEmpty() )
         {
@@ -71,12 +73,11 @@ public final class Precondition
     /**
      * assert that the given {@code longValue} is greater than {@code 0}.
      *
-     * @param longValue The instance which should be not {@code null}
-     *                  and has to be greater than {@code 0}.
+     * @param longValue The instance which should be not {@code null} and has to be greater than {@code 0}.
      * @param message   The message will be part of the exception.
      * @return The supplied object as convenient.
      */
-    public static Long requireGreaterThanZero(Long longValue, String message)
+    public static Long requireGreaterThanZero( Long longValue, String message )
     {
         if ( longValue == null )
         {
@@ -90,7 +91,7 @@ public final class Precondition
         return longValue;
     }
 
-    public static Long requireGreaterOrEqualZero(Long longValue, String message)
+    public static Long requireGreaterOrEqualZero( Long longValue, String message )
     {
         if ( longValue == null )
         {
@@ -120,7 +121,8 @@ public final class Precondition
         }
     }
 
-    public static Long greaterOrEqualToZero(Long currentValue, String message, final long value) {
+    public static Long greaterOrEqualToZero( Long currentValue, String message, final long value )
+    {
         if ( currentValue == null )
         {
             throw new IllegalArgumentException( String.format( message, value ) );
@@ -133,7 +135,8 @@ public final class Precondition
         return currentValue;
     }
 
-    public static Long requireGreaterThanZero(Long longValue, String message, final long value) {
+    public static Long requireGreaterThanZero( Long longValue, String message, final long value )
+    {
         if ( longValue == null )
         {
             throw new IllegalArgumentException( String.format( message, value ) );
@@ -149,12 +152,11 @@ public final class Precondition
     /**
      * assert that the given {@code integerValue} is greater than {@code 0}.
      *
-     * @param integerValue The instance which should be not {@code null}
-     *                     and has to be greater than {@code 0}.
+     * @param integerValue The instance which should be not {@code null} and has to be greater than {@code 0}.
      * @param message      The message will be part of the exception.
      * @return The supplied object as convenient.
      */
-    public static Integer requireGreaterThanZero(Integer integerValue, String message)
+    public static Integer requireGreaterThanZero( Integer integerValue, String message )
     {
         if ( integerValue == null )
         {
@@ -168,22 +170,22 @@ public final class Precondition
         return integerValue;
     }
 
-//    /**
-//     * assert that the given {@code str} is not {@code null} and not {@code empty}.
-//     *
-//     * @param str     The str which should not be {@code null} and not be empty.
-//     * @param message The message for the exception in case of {@code null}.
-//     * @return The supplied object as convenient.
-//     */
-//    public static String requireNotEmpty(String str, String message)
-//    {
-//        requireNotNull( str, message );
-//        if ( StringUtils.isBlank( str ) )
-//        {
-//            throw new IllegalArgumentException( message );
-//        }
-//        return str;
-//    }
+    //    /**
+    //     * assert that the given {@code str} is not {@code null} and not {@code empty}.
+    //     *
+    //     * @param str     The str which should not be {@code null} and not be empty.
+    //     * @param message The message for the exception in case of {@code null}.
+    //     * @return The supplied object as convenient.
+    //     */
+    //    public static String requireNotEmpty(String str, String message)
+    //    {
+    //        requireNotNull( str, message );
+    //        if ( StringUtils.isBlank( str ) )
+    //        {
+    //            throw new IllegalArgumentException( message );
+    //        }
+    //        return str;
+    //    }
 
 
     public static boolean isNotEmpty( String str )
@@ -191,24 +193,28 @@ public final class Precondition
         return ( ( str != null ) && ( !str.isEmpty() ) );
     }
 
-    public static boolean isNotBlank(final CharSequence cs) {
-        return !isBlank(cs);
+    public static boolean isNotBlank( final CharSequence cs )
+    {
+        return !isBlank( cs );
     }
 
-    public static boolean isBlank(final CharSequence cs) {
-        int strLen;
-        if (cs == null || (strLen = cs.length()) == 0) {
+    public static boolean isBlank( final CharSequence cs )
+    {
+        if ( cs == null || ( cs.length() ) == 0 )
+        {
             return true;
         }
-        for (int i = 0; i < strLen; i++) {
-            if (!Character.isWhitespace(cs.charAt(i))) {
+        for ( int i = 0; i < cs.length(); i++ )
+        {
+            if ( !Character.isWhitespace( cs.charAt( i ) ) )
+            {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean notBlank(String str, String message)
+    public static boolean notBlank( String str, String message )
     {
         for ( int i = 0; i < str.length(); i++ )
         {
@@ -221,7 +227,7 @@ public final class Precondition
     }
 
 
-    public static boolean isBlank(String str, String message)
+    public static boolean isBlank( String str, String message )
     {
         if ( str == null || str.trim().isEmpty() )
         {
@@ -230,21 +236,27 @@ public final class Precondition
         return true;
     }
 
-    public static boolean isEmpty(final CharSequence cs) {
+    public static boolean isEmpty( final CharSequence cs )
+    {
         return cs == null || cs.length() == 0;
     }
 
-    public static boolean isDigits(final String str) {
-        return isNumeric(str);
+    public static boolean isDigits( final String str )
+    {
+        return isNumeric( str );
     }
 
-    public static boolean isNumeric(final CharSequence cs) {
-        if (isEmpty(cs)) {
+    public static boolean isNumeric( final CharSequence cs )
+    {
+        if ( isEmpty( cs ) )
+        {
             return false;
         }
         final int sz = cs.length();
-        for (int i = 0; i < sz; i++) {
-            if (!Character.isDigit(cs.charAt(i))) {
+        for ( int i = 0; i < sz; i++ )
+        {
+            if ( !Character.isDigit( cs.charAt( i ) ) )
+            {
                 return false;
             }
         }

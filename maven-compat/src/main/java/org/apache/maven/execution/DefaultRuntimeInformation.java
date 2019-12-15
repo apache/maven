@@ -34,8 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Deprecated
 @Component( role = RuntimeInformation.class )
-public class DefaultRuntimeInformation
-    implements RuntimeInformation, Initializable
+public class DefaultRuntimeInformation implements RuntimeInformation, Initializable
 {
 
     @Requirement
@@ -48,8 +47,7 @@ public class DefaultRuntimeInformation
         return applicationVersion;
     }
 
-    public void initialize()
-        throws InitializationException
+    public void initialize() throws InitializationException
     {
         String mavenVersion = rtInfo.getMavenVersion();
 

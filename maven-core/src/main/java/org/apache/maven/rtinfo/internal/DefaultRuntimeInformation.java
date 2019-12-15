@@ -69,7 +69,7 @@ public class DefaultRuntimeInformation
                 else
                 {
                     logger.warn(
-                        "Could not locate " + resource + " on classpath, Maven runtime information not available" );
+                            "Could not locate " + resource + " on classpath, Maven runtime information not available" );
                 }
             }
             catch ( IOException e )
@@ -120,7 +120,7 @@ public class DefaultRuntimeInformation
         try
         {
             String mavenVersion = getMavenVersion();
-            Precondition.isTrue(  Precondition.isNotEmpty( mavenVersion ), "Could not determine current Maven version" );
+            Precondition.isTrue( isNotEmpty( mavenVersion ), "Could not determine current Maven version" );
 
             current = versionScheme.parseVersion( mavenVersion );
         }
