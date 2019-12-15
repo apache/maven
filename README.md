@@ -52,7 +52,7 @@ Take a look into the [contribution guidelines](CONTRIBUTING.md).
 
 License
 -------
-This code is under the [Apache Licence v2][license]
+This code is under the [Apache License, Version 2.0][license]
 
 See the `NOTICE` file for required notices and attributions.
 
