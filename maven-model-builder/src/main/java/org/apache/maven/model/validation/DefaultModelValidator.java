@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -527,12 +528,12 @@ public class DefaultModelValidator
                 if ( equals( existing.getVersion(), dependency.getVersion() ) )
                 {
                     msg = "duplicate declaration of version "
-                        + StringUtils.defaultString( dependency.getVersion(), "(?)" );
+                        + Objects.toString( dependency.getVersion(), "(?)" );
                 }
                 else
                 {
-                    msg = "version " + StringUtils.defaultString( existing.getVersion(), "(?)" ) + " vs "
-                        + StringUtils.defaultString( dependency.getVersion(), "(?)" );
+                    msg = "version " + Objects.toString( existing.getVersion(), "(?)" ) + " vs "
+                        + Objects.toString( dependency.getVersion(), "(?)" );
                 }
 
                 addViolation( problems, errOn31, Version.V20, prefix + prefix2 + "(groupId:artifactId:type:classifier)",
