@@ -660,6 +660,10 @@ public class DefaultModelBuilder
         model.setPomFile( pomFile );
 
         problems.setSource( model );
+
+        modelValidator.validateFileModel( model, request, problems );
+        request.setFileModel( model );
+        
         modelValidator.validateRawModel( model, request, problems );
 
         if ( hasFatalErrors( problems ) )

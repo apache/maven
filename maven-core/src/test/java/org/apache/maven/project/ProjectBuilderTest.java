@@ -240,6 +240,7 @@ public class ProjectBuilderTest
         try
         {
             projectBuilder.build( pomFile, configuration );
+            fail();
         }
         catch ( InvalidArtifactRTException iarte )
         {
@@ -250,6 +251,7 @@ public class ProjectBuilderTest
         try
         {
             projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
+            fail();
         }
         catch ( ProjectBuildingException ex )
         {

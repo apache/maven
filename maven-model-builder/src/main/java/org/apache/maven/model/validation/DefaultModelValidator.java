@@ -88,7 +88,7 @@ public class DefaultModelValidator
     private final Set<String> validIds = new HashSet<>();
 
     @Override
-    public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void validateFileModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Parent parent = m.getParent();
         if ( parent != null )
@@ -98,13 +98,6 @@ public class DefaultModelValidator
 
             validateStringNotEmpty( "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(),
                                     parent );
-
-            // resolvedModel will assign version based on relativePath
-            if ( !Features.buildConsumer().isActive() )
-            {
-                validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
-                                        parent );
-            }
 
             if ( equals( parent.getGroupId(), m.getGroupId() ) && equals( parent.getArtifactId(), m.getArtifactId() ) )
             {
@@ -223,6 +216,28 @@ public class DefaultModelValidator
                     }
                 }
             }
+        }
+    }
+    
+    @Override
+    public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    {
+        Parent parent = m.getParent();
+        
+        if ( parent != null )
+        {
+            InputLocationTracker locationTracker;
+            if ( Features.buildConsumer().isActive() )
+            {
+                locationTracker = request.getFileModel().getParent();
+            }
+            else
+            {
+                locationTracker = parent;
+            }
+            
+            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
+                                    locationTracker );
         }
     }
 

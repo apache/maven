@@ -257,6 +257,19 @@ class FilterModelBuildingRequest
     }
 
     @Override
+    public Model getFileModel()
+    {
+        return request.getFileModel();
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        request.setFileModel( fileModel );
+        return this;
+    }
+    
+    @Override
     public Model getRawModel()
     {
         return request.getRawModel();

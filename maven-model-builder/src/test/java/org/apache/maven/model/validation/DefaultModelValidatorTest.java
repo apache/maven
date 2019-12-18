@@ -22,7 +22,6 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -65,10 +64,14 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
+        
+        Model model =  read( pom );
 
-        SimpleProblemCollector problems = new SimpleProblemCollector( read( pom ) );
+        SimpleProblemCollector problems = new SimpleProblemCollector( model );
+        
+        request.setFileModel( model );
 
-        validator.validateEffectiveModel( problems.getModel(), request, problems );
+        validator.validateEffectiveModel( model, request, problems );
 
         return problems;
     }
@@ -78,9 +81,15 @@ public class DefaultModelValidatorTest
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
-        SimpleProblemCollector problems = new SimpleProblemCollector( read( pom ) );
+        Model model = read( pom );
+        
+        SimpleProblemCollector problems = new SimpleProblemCollector( model );
 
-        validator.validateRawModel( problems.getModel(), request, problems );
+        validator.validateFileModel( model, request, problems );
+        
+        request.setFileModel( model );
+        
+        validator.validateRawModel( model, request, problems );
 
         return problems;
     }
@@ -416,18 +425,10 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "incomplete-parent.xml" );
 
-        if ( Features.buildConsumer().isActive() )
-        {
-            assertViolations( result, 2, 0, 0 );
-        }
-        else
-        {
-            assertViolations( result, 3, 0, 0 );
-            assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
-        }
-
+        assertViolations( result, 3, 0, 0 );
         assertTrue( result.getFatals().get( 0 ).contains( "parent.groupId" ) );
         assertTrue( result.getFatals().get( 1 ).contains( "parent.artifactId" ) );
+        assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
     }
 
     public void testHardCodedSystemPath()

@@ -38,6 +38,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
+    private transient Model fileModel;
 
     private Model rawModel;
 
@@ -382,6 +383,19 @@ public class DefaultModelBuildingRequest
         return this;
     }
 
+    @Override
+    public Model getFileModel()
+    {
+        return fileModel;
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        this.fileModel = fileModel;
+        return this;
+    }
+    
     @Override
     public Model getRawModel()
     {
