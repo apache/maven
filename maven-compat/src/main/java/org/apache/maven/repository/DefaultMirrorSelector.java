@@ -26,8 +26,8 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.shared.utils.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * DefaultMirrorSelector

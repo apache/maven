@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.maven.settings.IdentifiableBase;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 
 /**
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>

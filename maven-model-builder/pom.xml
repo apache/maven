@@ -34,9 +34,10 @@ under the License.
   <description>The effective model builder, with inheritance, profile activation, interpolation, ...</description>
 
   <dependencies>
+
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-shared-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

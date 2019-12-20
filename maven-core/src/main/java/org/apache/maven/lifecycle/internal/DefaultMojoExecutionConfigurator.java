@@ -29,8 +29,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.shared.utils.StringUtils;
+import org.apache.maven.shared.utils.xml.Xpp3Dom;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @since 3.3.1, MNG-5753

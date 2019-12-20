@@ -27,15 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.shared.utils.xml.Xpp3Dom;
+import org.apache.maven.shared.utils.xml.Xpp3DomBuilder;
+import org.apache.maven.shared.utils.xml.pull.XmlPullParserException;
 
 public class ModelUtilsTest
     extends TestCase
