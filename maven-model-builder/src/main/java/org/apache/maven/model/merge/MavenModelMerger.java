@@ -294,13 +294,13 @@ public class MavenModelMerger
 
             for ( Repository element : dominant )
             {
-                Object key = getRepositoryKey( element );
+                Object key = getRepositoryKey().apply( element );
                 merged.put( key, element );
             }
 
             for ( Repository element : recessive )
             {
-                Object key = getRepositoryKey( element );
+                Object key = getRepositoryKey().apply( element );
                 if ( !merged.containsKey( key ) )
                 {
                     merged.put( key, element );
@@ -335,13 +335,13 @@ public class MavenModelMerger
 
             for ( Repository element : dominant )
             {
-                Object key = getRepositoryKey( element );
+                Object key = getRepositoryKey().apply( element );
                 merged.put( key, element );
             }
 
             for ( Repository element : recessive )
             {
-                Object key = getRepositoryKey( element );
+                Object key = getRepositoryKey().apply( element );
                 if ( !merged.containsKey( key ) )
                 {
                     merged.put( key, element );
@@ -567,14 +567,14 @@ public class MavenModelMerger
                 if ( sourceDominant
                                 || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
                 {
-                    Object key = getPluginExecutionKey( element );
+                    Object key = getPluginExecutionKey().apply( element );
                     merged.put( key, element );
                 }
             }
 
             for ( PluginExecution element : tgt )
             {
-                Object key = getPluginExecutionKey( element );
+                Object key = getPluginExecutionKey().apply( element );
                 PluginExecution existing = merged.get( key );
                 if ( existing != null )
                 {
@@ -623,14 +623,14 @@ public class MavenModelMerger
             {
                 if ( sourceDominant || ( rset.getInherited() != null ? rset.isInherited() : source.isInherited() ) )
                 {
-                    Object key = getReportSetKey( rset );
+                    Object key = getReportSetKey().apply( rset );
                     merged.put( key, rset );
                 }
             }
 
             for ( ReportSet element : tgt )
             {
-                Object key = getReportSetKey( element );
+                Object key = getReportSetKey().apply( element );
                 ReportSet existing = merged.get( key );
                 if ( existing != null )
                 {
@@ -644,51 +644,51 @@ public class MavenModelMerger
     }
 
     @Override
-    protected Object getDependencyKey( Dependency dependency )
+    protected KeyComputer<Dependency> getDependencyKey()
     {
-        return dependency.getManagementKey();
+        return Dependency::getManagementKey;
     }
 
     @Override
-    protected Object getPluginKey( Plugin plugin )
+    protected KeyComputer<Plugin> getPluginKey()
     {
-        return plugin.getKey();
+        return Plugin::getKey;
     }
 
     @Override
-    protected Object getPluginExecutionKey( PluginExecution pluginExecution )
+    protected KeyComputer<PluginExecution> getPluginExecutionKey()
     {
-        return pluginExecution.getId();
+        return PluginExecution::getId;
     }
 
     @Override
-    protected Object getReportPluginKey( ReportPlugin reportPlugin )
+    protected KeyComputer<ReportPlugin> getReportPluginKey()
     {
-        return reportPlugin.getKey();
+        return ReportPlugin::getKey;
     }
 
     @Override
-    protected Object getReportSetKey( ReportSet reportSet )
+    protected KeyComputer<ReportSet> getReportSetKey()
     {
-        return reportSet.getId();
+        return ReportSet::getId;
     }
 
     @Override
-    protected Object getRepositoryBaseKey( RepositoryBase repositoryBase )
+    protected KeyComputer<RepositoryBase> getRepositoryBaseKey()
     {
-        return repositoryBase.getId();
+        return RepositoryBase::getId;
     }
 
     @Override
-    protected Object getExtensionKey( Extension extension )
+    protected KeyComputer<Extension> getExtensionKey()
     {
-        return extension.getGroupId() + ':' + extension.getArtifactId();
+        return e -> e.getGroupId() + ':' + e.getArtifactId();
     }
 
     @Override
-    protected Object getExclusionKey( Exclusion exclusion )
+    protected KeyComputer<Exclusion> getExclusionKey()
     {
-        return exclusion.getGroupId() + ':' + exclusion.getArtifactId();
+        return e -> e.getGroupId() + ':' + e.getArtifactId();
     }
 
     protected String extrapolateChildUrl( String parentUrl, boolean appendPath, Map<Object, Object> context )

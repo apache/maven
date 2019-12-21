@@ -52,17 +52,13 @@ Take a look into the [contribution guidelines](CONTRIBUTING.md).
 
 License
 -------
-This code is under the [Apache Licence v2][license]
+This code is under the [Apache License, Version 2.0, January 2004][license].
 
 See the `NOTICE` file for required notices and attributions.
 
 Donations
 ---------
 You like Apache Maven? Then [donate back to the ASF](https://www.apache.org/foundation/contributing.html) to support the development.
-
-License
--------
-[Apache License, Version 2.0, January 2004][license]
 
 Quick Build
 -------

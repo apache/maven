@@ -72,13 +72,13 @@ public class DefaultDependencyManagementInjector
 
                 for ( Dependency dependency : model.getDependencies() )
                 {
-                    Object key = getDependencyKey( dependency );
+                    Object key = getDependencyKey().apply( dependency );
                     dependencies.put( key, dependency );
                 }
 
                 for ( Dependency managedDependency : dependencyManagement.getDependencies() )
                 {
-                    Object key = getDependencyKey( managedDependency );
+                    Object key = getDependencyKey().apply( managedDependency );
                     Dependency dependency = dependencies.get( key );
                     if ( dependency != null )
                     {
