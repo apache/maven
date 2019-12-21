@@ -19,8 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -28,9 +26,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
+
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.

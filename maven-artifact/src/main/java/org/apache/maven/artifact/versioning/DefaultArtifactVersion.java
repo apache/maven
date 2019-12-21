@@ -21,7 +21,7 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.StringTokenizer;
 
-import static org.apache.commons.lang3.math.NumberUtils.isDigits;
+import org.apache.maven.utils.Precondition;
 
 /**
  * Default implementation of artifact versioning.
@@ -188,7 +188,7 @@ public class DefaultArtifactVersion
             if ( tok.hasMoreTokens() )
             {
                 qualifier = tok.nextToken();
-                fallback = isDigits( qualifier );
+                fallback = Precondition.isDigits( qualifier );
             }
 
             // string tokenizer won't detect these and ignores them
@@ -222,7 +222,7 @@ public class DefaultArtifactVersion
     private static Integer tryParseInt( String s )
     {
         // for performance, check digits instead of relying later on catching NumberFormatException
-        if ( !isDigits( s ) )
+        if ( !Precondition.isDigits( s ) )
         {
             return null;
         }

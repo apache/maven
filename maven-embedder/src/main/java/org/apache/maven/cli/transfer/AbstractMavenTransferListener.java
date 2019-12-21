@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.commons.lang3.Validate;
+import org.apache.maven.utils.Precondition;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -116,7 +116,7 @@ public abstract class AbstractMavenTransferListener
 
             public static ScaleUnit getScaleUnit( long size )
             {
-                Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+                Precondition.greaterOrEqualToZero(  size, "file size cannot be negative: %s", size );
 
                 if ( size >= GIGABYTE.bytes() )
                 {
@@ -159,7 +159,7 @@ public abstract class AbstractMavenTransferListener
         @SuppressWarnings( "checkstyle:magicnumber" )
         public String format( long size, ScaleUnit unit, boolean omitSymbol )
         {
-            Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+            Precondition.greaterOrEqualToZero( size, "file size cannot be negative: %s", size );
 
             if ( unit == null )
             {
@@ -191,9 +191,10 @@ public abstract class AbstractMavenTransferListener
 
         public String formatProgress( long progressedSize, long size )
         {
-            Validate.isTrue( progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize );
-            Validate.isTrue( size < 0L || progressedSize <= size,
-                "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
+            Precondition.greaterOrEqualToZero( progressedSize, "progressed file size cannot be negative: %s",
+                    progressedSize );
+            Precondition.isTrue( size >= 0L && progressedSize <= size || size < 0L,
+                    "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
 
             if ( size >= 0L && progressedSize != size )
             {

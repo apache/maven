@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.utils.Precondition;
 
 /**
  * ArtifactUtils
@@ -104,7 +104,7 @@ public final class ArtifactUtils
         int c = str != null && str.length() > 0 ? str.charAt( 0 ) : 0;
         if ( ( c < '0' || c > '9' ) && ( c < 'a' || c > 'z' ) )
         {
-            Validate.notBlank( str, message );
+            Precondition.notBlank( str, message );
         }
     }
 

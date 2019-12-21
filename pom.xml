@@ -51,7 +51,6 @@ under the License.
     <maven.compiler.target>1.8</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
-    <commonsLangVersion>3.8.1</commonsLangVersion>
     <junitVersion>4.13</junitVersion>
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
@@ -96,6 +95,7 @@ under the License.
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
+    <module>maven-utils</module>
   </modules>
 
   <scm>
@@ -244,6 +244,11 @@ under the License.
         <artifactId>maven-slf4j-wrapper</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
@@ -387,11 +392,6 @@ under the License.
         <version>${jxpathVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${commonsLangVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
@@ -435,6 +435,18 @@ under the License.
         <artifactId>hamcrest-library</artifactId>
         <version>2.2</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.14.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.6.0-M1</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
