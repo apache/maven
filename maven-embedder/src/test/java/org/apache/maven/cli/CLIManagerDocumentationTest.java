@@ -27,10 +27,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.cli.Option;
-import org.codehaus.plexus.util.FileUtils;
-
 import junit.framework.TestCase;
+import org.apache.commons.cli.Option;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code

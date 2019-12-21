@@ -21,11 +21,11 @@ package org.apache.maven.toolchain.java;
 
 import java.io.File;
 
+import org.apache.maven.shared.utils.Os;
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.Os;
 
 /**
  * JDK toolchain implementation.

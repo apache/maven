@@ -19,10 +19,6 @@ package org.apache.maven.cli.event;
  * under the License.
  */
 
-import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
-import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -38,11 +34,14 @@ import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.StringUtils;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
+import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * Logs execution events to logger, eventually user-supplied.

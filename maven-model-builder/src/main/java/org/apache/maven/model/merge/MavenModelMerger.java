@@ -46,7 +46,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 
 /**
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with

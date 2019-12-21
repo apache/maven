@@ -19,10 +19,6 @@ package org.apache.maven.usability.plugin;
  * under the License.
  */
 
-import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +30,10 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.shared.utils.ReaderFactory;
+import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * ExpressionDocumenter

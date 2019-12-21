@@ -26,8 +26,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.maven.shared.utils.Os;
 import org.apache.maven.utils.Precondition;
-import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;

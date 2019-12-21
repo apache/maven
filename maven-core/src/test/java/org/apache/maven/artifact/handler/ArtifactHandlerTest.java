@@ -22,8 +22,8 @@ package org.apache.maven.artifact.handler;
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.FileUtils;
 
 public class ArtifactHandlerTest
     extends PlexusTestCase

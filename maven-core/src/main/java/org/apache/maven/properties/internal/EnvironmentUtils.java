@@ -23,7 +23,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.shared.utils.Os;
+
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for

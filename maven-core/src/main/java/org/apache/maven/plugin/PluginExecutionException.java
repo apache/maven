@@ -21,7 +21,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 
 /**
  * Exception in the plugin manager.

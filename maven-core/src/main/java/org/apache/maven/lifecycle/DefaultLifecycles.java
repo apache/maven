@@ -20,7 +20,6 @@ package org.apache.maven.lifecycle;
  */
 
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +29,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.shared.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;

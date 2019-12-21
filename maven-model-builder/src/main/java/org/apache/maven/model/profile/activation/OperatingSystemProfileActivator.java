@@ -21,13 +21,12 @@ package org.apache.maven.model.profile.activation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.util.Os;
+import org.apache.maven.shared.utils.Os;
 
 /**
  * Determines profile activation based on the operating system of the current runtime platform.
