@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class CLIManagerDocumentationTest
     extends TestCase
 {
-    private final static String LS = System.getProperty( "line.separator" );
+    private final static String LS = System.lineSeparator();
 
     private static class OptionComparator
         implements Comparator<Option>

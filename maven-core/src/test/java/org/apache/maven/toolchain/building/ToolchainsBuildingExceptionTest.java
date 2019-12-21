@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class ToolchainsBuildingExceptionTest
 {
-    private static final String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.lineSeparator();
 
     @Test
     public void testNoProblems()

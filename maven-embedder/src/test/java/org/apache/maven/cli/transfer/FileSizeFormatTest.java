@@ -21,13 +21,11 @@ package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
 
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 public class FileSizeFormatTest {
 
@@ -136,10 +134,7 @@ public class FileSizeFormatTest {
         long _50_bytes = 50L;
         assertEquals( "50 B", format.format( _50_bytes ) );
         assertEquals( "50 B", format.format( _50_bytes, ScaleUnit.BYTE ) );
-        if ( SystemUtils.isJavaVersionAtLeast( JavaVersion.JAVA_1_8 ) )
-        {
-            assertEquals( "0.1 kB", format.format( _50_bytes, ScaleUnit.KILOBYTE ) );
-        }
+        assertEquals( "0.1 kB", format.format( _50_bytes, ScaleUnit.KILOBYTE ) );
         assertEquals( "0 MB", format.format( _50_bytes, ScaleUnit.MEGABYTE ) );
         assertEquals( "0 GB", format.format( _50_bytes, ScaleUnit.GIGABYTE ) );
 
@@ -168,10 +163,7 @@ public class FileSizeFormatTest {
         assertEquals( "50 kB", format.format( _50_kilobytes ) );
         assertEquals( "50000 B", format.format( _50_kilobytes, ScaleUnit.BYTE ) );
         assertEquals( "50 kB", format.format( _50_kilobytes, ScaleUnit.KILOBYTE ) );
-        if ( SystemUtils.isJavaVersionAtLeast( JavaVersion.JAVA_1_8 ) )
-        {
-            assertEquals( "0.1 MB", format.format( _50_kilobytes, ScaleUnit.MEGABYTE ) );
-        }
+        assertEquals( "0.1 MB", format.format( _50_kilobytes, ScaleUnit.MEGABYTE ) );
         assertEquals( "0 GB", format.format( _50_kilobytes, ScaleUnit.GIGABYTE ) );
 
         long _999_kilobytes = 999L * 1000L;
@@ -200,10 +192,7 @@ public class FileSizeFormatTest {
         assertEquals( "50000000 B", format.format( _50_megabytes, ScaleUnit.BYTE ) );
         assertEquals( "50000 kB", format.format( _50_megabytes, ScaleUnit.KILOBYTE ) );
         assertEquals( "50 MB", format.format( _50_megabytes, ScaleUnit.MEGABYTE ) );
-        if ( SystemUtils.isJavaVersionAtLeast( JavaVersion.JAVA_1_8 ) )
-        {
-            assertEquals( "0.1 GB", format.format( _50_megabytes, ScaleUnit.GIGABYTE ) );
-        }
+        assertEquals( "0.1 GB", format.format( _50_megabytes, ScaleUnit.GIGABYTE ) );
 
         long _999_megabytes = 999L * 1000L * 1000L;
         assertEquals( "999 MB", format.format( _999_megabytes ) );

@@ -68,60 +68,7 @@ under the License.
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <!-- Exclude the navigation file for Maven 1 sites
-               as it interferes with the site generation. -->
-          <moduleExcludes>
-            <xdoc>navigation.xml</xdoc>
-          </moduleExcludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>all-models</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.modello</groupId>
-            <artifactId>modello-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>v3</id>
-                <goals>
-                  <goal>java</goal>
-                  <goal>xpp3-writer</goal>
-                  <goal>xpp3-reader</goal>
-                  <goal>xsd</goal>
-                </goals>
-                <configuration>
-                  <version>3.0.0</version>
-                  <packageWithVersion>true</packageWithVersion>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-jar-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <classifier>all</classifier>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
