@@ -115,7 +115,7 @@ public class DefaultLifecycleBindingsInjector
 
                 for ( Plugin element : tgt )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     merged.put( key, element );
                 }
 
@@ -123,7 +123,7 @@ public class DefaultLifecycleBindingsInjector
 
                 for ( Plugin element : src )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     Plugin existing = merged.get( key );
                     if ( existing != null )
                     {
@@ -143,7 +143,7 @@ public class DefaultLifecycleBindingsInjector
                     {
                         for ( Plugin managedPlugin : pluginMgmt.getPlugins() )
                         {
-                            Object key = getPluginKey( managedPlugin );
+                            Object key = getPluginKey().apply( managedPlugin );
                             Plugin addedPlugin = added.get( key );
                             if ( addedPlugin != null )
                             {

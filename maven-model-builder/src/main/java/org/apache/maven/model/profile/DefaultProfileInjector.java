@@ -105,7 +105,7 @@ public class DefaultProfileInjector
 
                 for ( Plugin element : tgt )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     master.put( key, element );
                 }
 
@@ -113,7 +113,7 @@ public class DefaultProfileInjector
                 List<Plugin> pending = new ArrayList<>();
                 for ( Plugin element : src )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     Plugin existing = master.get( key );
                     if ( existing != null )
                     {
@@ -160,13 +160,13 @@ public class DefaultProfileInjector
 
                 for ( PluginExecution element : tgt )
                 {
-                    Object key = getPluginExecutionKey( element );
+                    Object key = getPluginExecutionKey().apply( element );
                     merged.put( key, element );
                 }
 
                 for ( PluginExecution element : src )
                 {
-                    Object key = getPluginExecutionKey( element );
+                    Object key = getPluginExecutionKey().apply( element );
                     PluginExecution existing = merged.get( key );
                     if ( existing != null )
                     {
@@ -195,13 +195,13 @@ public class DefaultProfileInjector
 
                 for ( ReportPlugin element : tgt )
                 {
-                    Object key = getReportPluginKey( element );
+                    Object key = getReportPluginKey().apply( element );
                     merged.put( key, element );
                 }
 
                 for ( ReportPlugin element : src )
                 {
-                    Object key = getReportPluginKey( element );
+                    Object key = getReportPluginKey().apply( element );
                     ReportPlugin existing = merged.get( key );
                     if ( existing == null )
                     {
@@ -229,13 +229,13 @@ public class DefaultProfileInjector
 
                 for ( ReportSet element : tgt )
                 {
-                    Object key = getReportSetKey( element );
+                    Object key = getReportSetKey().apply( element );
                     merged.put( key, element );
                 }
 
                 for ( ReportSet element : src )
                 {
-                    Object key = getReportSetKey( element );
+                    Object key = getReportSetKey().apply( element );
                     ReportSet existing = merged.get( key );
                     if ( existing != null )
                     {

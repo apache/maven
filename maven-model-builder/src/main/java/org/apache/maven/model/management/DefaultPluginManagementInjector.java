@@ -91,13 +91,13 @@ public class DefaultPluginManagementInjector
 
                 for ( Plugin element : src )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     managedPlugins.put( key, element );
                 }
 
                 for ( Plugin element : tgt )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     Plugin managedPlugin = managedPlugins.get( key );
                     if ( managedPlugin != null )
                     {
@@ -121,13 +121,13 @@ public class DefaultPluginManagementInjector
 
                 for ( PluginExecution element : src )
                 {
-                    Object key = getPluginExecutionKey( element );
+                    Object key = getPluginExecutionKey().apply( element );
                     merged.put( key, element.clone() );
                 }
 
                 for ( PluginExecution element : tgt )
                 {
-                    Object key = getPluginExecutionKey( element );
+                    Object key = getPluginExecutionKey().apply( element );
                     PluginExecution existing = merged.get( key );
                     if ( existing != null )
                     {

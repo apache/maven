@@ -257,7 +257,7 @@ public class DefaultInheritanceAssembler
                         plugin.setGroupId( null );
                         mergePlugin( plugin, element, sourceDominant, context );
 
-                        Object key = getPluginKey( element );
+                        Object key = getPluginKey().apply( element );
 
                         master.put( key, plugin );
                     }
@@ -267,7 +267,7 @@ public class DefaultInheritanceAssembler
                 List<Plugin> pending = new ArrayList<>();
                 for ( Plugin element : tgt )
                 {
-                    Object key = getPluginKey( element );
+                    Object key = getPluginKey().apply( element );
                     Plugin existing = master.get( key );
                     if ( existing != null )
                     {
@@ -331,7 +331,7 @@ public class DefaultInheritanceAssembler
 
                 for ( ReportPlugin element :  src )
                 {
-                    Object key = getReportPluginKey( element );
+                    Object key = getReportPluginKey().apply( element );
                     if ( element.isInherited() )
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
@@ -346,7 +346,7 @@ public class DefaultInheritanceAssembler
 
                 for ( ReportPlugin element : tgt )
                 {
-                    Object key = getReportPluginKey( element );
+                    Object key = getReportPluginKey().apply( element );
                     ReportPlugin existing = merged.get( key );
                     if ( existing != null )
                     {

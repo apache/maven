@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -327,28 +330,28 @@ public class ModelMerger
                                         Map<Object, Object> context )
     {
         target.setLicenses( merge( target.getLicenses(), source.getLicenses(),
-                                    sourceDominant, new LicenseKeyComputer() ) );
+                                    sourceDominant, getLicenseKey() ) );
     }
 
     protected void mergeModel_MailingLists( Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         target.setMailingLists( merge( target.getMailingLists(), source.getMailingLists(),
-                                       sourceDominant, new MailingListKeyComputer() ) );
+                                       sourceDominant, getMailingListKey() ) );
     }
 
     protected void mergeModel_Developers( Model target, Model source, boolean sourceDominant,
                                           Map<Object, Object> context )
     {
         target.setDevelopers( merge( target.getDevelopers(), source.getDevelopers(),
-                sourceDominant, new DeveloperKeyComputer() ) );
+                sourceDominant, getDeveloperKey() ) );
     }
 
     protected void mergeModel_Contributors( Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         target.setContributors( merge( target.getContributors(), source.getContributors(),
-                sourceDominant, new ContributorKeyComputer() ) );
+                sourceDominant, getContributorKey() ) );
     }
 
     protected void mergeModel_IssueManagement( Model target, Model source, boolean sourceDominant,
@@ -435,7 +438,7 @@ public class ModelMerger
                                         Map<Object, Object> context )
     {
         target.setProfiles( merge( target.getProfiles(), source.getProfiles(),
-                sourceDominant, new ProfileKeyComputer() ) );
+                sourceDominant, getProfileKey() ) );
     }
 
     protected void mergeModelBase( ModelBase target, ModelBase source, boolean sourceDominant,
@@ -454,36 +457,28 @@ public class ModelMerger
     protected void mergeModelBase_Modules( ModelBase target, ModelBase source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
-        List<String> src = source.getModules();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getModules();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setModules( merged );
-        }
+        target.setModules( merge( target.getModules(), source.getModules(), sourceDominant, e -> e ) );
     }
 
     protected void mergeModelBase_Dependencies( ModelBase target, ModelBase source, boolean sourceDominant,
                                                 Map<Object, Object> context )
     {
         target.setDependencies( merge( target.getDependencies(), source.getDependencies(),
-                sourceDominant, new DependencyKeyComputer() ) );
+                sourceDominant, getDependencyKey() ) );
     }
 
     protected void mergeModelBase_Repositories( ModelBase target, ModelBase source, boolean sourceDominant,
                                                 Map<Object, Object> context )
     {
         target.setRepositories( merge( target.getRepositories(), source.getRepositories(),
-                sourceDominant, new RepositoryKeyComputer() ) );
+                sourceDominant, getRepositoryKey() ) );
     }
 
     protected void mergeModelBase_PluginRepositories( ModelBase target, ModelBase source, boolean sourceDominant,
                                                       Map<Object, Object> context )
     {
         target.setPluginRepositories( merge( target.getPluginRepositories(), source.getPluginRepositories(),
-                sourceDominant, new RepositoryKeyComputer() ) );
+                sourceDominant, getRepositoryKey() ) );
     }
 
     protected void mergeModelBase_DistributionManagement( ModelBase target, ModelBase source, boolean sourceDominant,
@@ -1072,7 +1067,7 @@ public class ModelMerger
                                                Map<Object, Object> context )
     {
         target.setExclusions( merge( target.getExclusions(), source.getExclusions(),
-                sourceDominant, new ExclusionKeyComputer() ) );
+                sourceDominant, getExclusionKey() ) );
     }
 
     protected void mergeExclusion( Exclusion target, Exclusion source, boolean sourceDominant,
@@ -1150,7 +1145,7 @@ public class ModelMerger
                                            Map<Object, Object> context )
     {
         target.setPlugins( merge( target.getPlugins(), source.getPlugins(),
-                sourceDominant, new ReportPluginKeyComputer() ) );
+                sourceDominant, getReportPluginKey() ) );
     }
 
     protected void mergeReportPlugin( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
@@ -1209,7 +1204,7 @@ public class ModelMerger
                                                  Map<Object, Object> context )
     {
         target.setReportSets( merge( target.getReportSets(), source.getReportSets(),
-                sourceDominant, new ReportSetKeyComputer() ) );
+                sourceDominant, getReportSetKey() ) );
     }
 
     protected void mergeReportSet( ReportSet target, ReportSet source, boolean sourceDominant,
@@ -1276,7 +1271,7 @@ public class ModelMerger
                                                            boolean sourceDominant, Map<Object, Object> context )
     {
         target.setDependencies( merge( target.getDependencies(), source.getDependencies(),
-                                       sourceDominant, new DependencyKeyComputer() ) );
+                                       sourceDominant, getDependencyKey() ) );
     }
 
     protected void mergeParent( Parent target, Parent source, boolean sourceDominant, Map<Object, Object> context )
@@ -1872,7 +1867,7 @@ public class ModelMerger
                                                 Map<Object, Object> context )
     {
         target.setNotifiers( merge( target.getNotifiers(), source.getNotifiers(),
-                                    sourceDominant, new NotifierKeyComputer() ) );
+                                    sourceDominant, getNotifierKey() ) );
     }
 
     protected void mergeNotifier( Notifier target, Notifier source, boolean sourceDominant,
@@ -2071,7 +2066,7 @@ public class ModelMerger
                                           Map<Object, Object> context )
     {
         target.setExtensions( merge( target.getExtensions(), source.getExtensions(),
-                                     sourceDominant, new ExtensionKeyComputer() ) );
+                                     sourceDominant, getExtensionKey() ) );
     }
 
     protected void mergeExtension( Extension target, Extension source, boolean sourceDominant,
@@ -2196,14 +2191,14 @@ public class ModelMerger
                                              Map<Object, Object> context )
     {
         target.setResources( merge( target.getResources(), source.getResources(),
-                                    sourceDominant, new ResourceKeyComputer() ) );
+                                    sourceDominant, getResourceKey() ) );
     }
 
     protected void mergeBuildBase_TestResources( BuildBase target, BuildBase source, boolean sourceDominant,
                                                  Map<Object, Object> context )
     {
         target.setTestResources( merge( target.getTestResources(), source.getTestResources(),
-                                        sourceDominant, new ResourceKeyComputer() ) );
+                                        sourceDominant, getResourceKey() ) );
     }
 
     protected void mergePluginConfiguration( PluginConfiguration target, PluginConfiguration source,
@@ -2239,7 +2234,7 @@ public class ModelMerger
                                                  boolean sourceDominant, Map<Object, Object> context )
     {
         target.setPlugins( merge( target.getPlugins(), source.getPlugins(),
-                                  sourceDominant, new PluginKeyComputer() ) );
+                                  sourceDominant, getPluginKey() ) );
     }
 
     protected void mergePluginManagement( PluginManagement target, PluginManagement source, boolean sourceDominant,
@@ -2319,14 +2314,14 @@ public class ModelMerger
                                              Map<Object, Object> context )
     {
         target.setDependencies( merge( target.getDependencies(), source.getDependencies(),
-                                       sourceDominant, new DependencyKeyComputer() ) );
+                                       sourceDominant, getDependencyKey() ) );
     }
 
     protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
         target.setExecutions( merge( target.getExecutions(), source.getExecutions(),
-                                     sourceDominant, new ExecutionKeyComputer() ) );
+                                     sourceDominant, getPluginExecutionKey() ) );
     }
 
     protected void mergeConfigurationContainer( ConfigurationContainer target, ConfigurationContainer source,
@@ -2538,302 +2533,189 @@ public class ModelMerger
         // TODO
     }
 
+    @Deprecated
     protected Object getDependencyKey( Dependency dependency )
     {
         return dependency;
     }
 
+    @Deprecated
     protected Object getPluginKey( Plugin plugin )
     {
         return plugin;
     }
 
+    @Deprecated
     protected Object getPluginExecutionKey( PluginExecution pluginExecution )
     {
         return pluginExecution;
     }
 
+    @Deprecated
     protected Object getReportPluginKey( ReportPlugin reportPlugin )
     {
         return reportPlugin;
     }
 
+    @Deprecated
     protected Object getReportSetKey( ReportSet reportSet )
     {
         return reportSet;
     }
 
+    @Deprecated
     protected Object getLicenseKey( License license )
     {
         return license;
     }
 
+    @Deprecated
     protected Object getMailingListKey( MailingList mailingList )
     {
         return mailingList;
     }
 
+    @Deprecated
     protected Object getDeveloperKey( Developer developer )
     {
         return developer;
     }
 
+    @Deprecated
     protected Object getContributorKey( Contributor contributor )
     {
         return contributor;
     }
 
+    @Deprecated
     protected Object getProfileKey( Profile profile )
     {
         return profile;
     }
 
+    @Deprecated
     protected Object getRepositoryKey( Repository repository )
     {
         return getRepositoryBaseKey( repository );
     }
 
+    @Deprecated
     protected Object getRepositoryBaseKey( RepositoryBase repositoryBase )
     {
         return repositoryBase;
     }
 
+    @Deprecated
     protected Object getNotifierKey( Notifier notifier )
     {
         return notifier;
     }
 
+    @Deprecated
     protected Object getResourceKey( Resource resource )
     {
         return resource;
     }
 
+    @Deprecated
     protected Object getExtensionKey( Extension extension )
     {
         return extension;
     }
 
+    @Deprecated
     protected Object getExclusionKey( Exclusion exclusion )
     {
         return exclusion;
+    }
+    
+    protected KeyComputer<Dependency> getDependencyKey()
+    {
+        return d -> d;
+    }
+
+    protected KeyComputer<Plugin> getPluginKey()
+    {
+        return p -> p;
+    }
+
+    protected KeyComputer<PluginExecution> getPluginExecutionKey()
+    {
+        return e -> e;
+    }
+
+    protected KeyComputer<ReportPlugin> getReportPluginKey()
+    {
+        return p -> p;
+    }
+
+    protected KeyComputer<ReportSet> getReportSetKey()
+    {
+        return s -> s;
+    }
+
+    protected KeyComputer<License> getLicenseKey()
+    {
+        return l -> l;
+    }
+
+    protected KeyComputer<MailingList> getMailingListKey()
+    {
+        return l -> l;
+    }
+
+    protected KeyComputer<Developer> getDeveloperKey()
+    {
+        return d -> d;
+    }
+
+    protected KeyComputer<Contributor> getContributorKey()
+    {
+        return c -> c;
+    }
+
+    protected KeyComputer<Profile> getProfileKey()
+    {
+        return p -> p;
+    }
+
+    protected KeyComputer<Repository> getRepositoryKey()
+    {
+        return r -> r;
+    }
+
+    protected KeyComputer<RepositoryBase> getRepositoryBaseKey()
+    {
+        return r -> r;
+    }
+
+    protected KeyComputer<Notifier> getNotifierKey()
+    {
+        return n -> n;
+    }
+
+    protected KeyComputer<Resource> getResourceKey()
+    {
+        return r -> r;
+    }
+
+    protected KeyComputer<Extension> getExtensionKey()
+    {
+        return e -> e;
+    }
+
+    protected KeyComputer<Exclusion> getExclusionKey()
+    {
+        return e -> e;
     }
 
     /**
      * Use to compute keys for data structures
      * @param <T>
      */
-    private interface KeyComputer<T>
+    @FunctionalInterface
+    public interface KeyComputer<T> extends Function<T, Object>
     {
-        Object key( T t );
-    }
-
-    /**
-     * Remapping function
-     * @param <T>
-     */
-    private interface Remapping<T>
-    {
-        T merge( T u, T v );
-    }
-
-    /**
-     * KeyComputer for Dependency
-     */
-    private final class DependencyKeyComputer implements KeyComputer<Dependency>
-    {
-        @Override
-        public Object key( Dependency dependency )
-        {
-            return getDependencyKey( dependency );
-        }
-    }
-
-    /**
-     * KeyComputer for License
-     */
-    private class LicenseKeyComputer implements KeyComputer<License>
-    {
-        @Override
-        public Object key( License license )
-        {
-            return getLicenseKey( license );
-        }
-    }
-
-    /**
-     * KeyComputer for MailingList
-     */
-    private class MailingListKeyComputer implements KeyComputer<MailingList>
-    {
-        @Override
-        public Object key( MailingList mailingList )
-        {
-            return getMailingListKey( mailingList );
-        }
-    }
-
-    /**
-     * KeyComputer for Developer
-     */
-    private class DeveloperKeyComputer implements KeyComputer<Developer>
-    {
-        @Override
-        public Object key( Developer developer )
-        {
-            return getDeveloperKey( developer );
-        }
-    }
-
-    /**
-     * KeyComputer for Contributor
-     */
-    private class ContributorKeyComputer implements KeyComputer<Contributor>
-    {
-        @Override
-        public Object key( Contributor contributor )
-        {
-            return getContributorKey( contributor );
-        }
-    }
-
-    /**
-     * KeyComputer for Profile
-     */
-    private class ProfileKeyComputer implements KeyComputer<Profile>
-    {
-        @Override
-        public Object key( Profile profile )
-        {
-            return getProfileKey( profile );
-        }
-    }
-
-    /**
-     * KeyComputer for Repository
-     */
-    private class RepositoryKeyComputer implements KeyComputer<Repository>
-    {
-        @Override
-        public Object key( Repository repository )
-        {
-            return getRepositoryKey( repository );
-        }
-    }
-
-    /**
-     * KeyComputer for ReportPlugin
-     */
-    private class ReportPluginKeyComputer implements KeyComputer<ReportPlugin>
-    {
-        @Override
-        public Object key( ReportPlugin plugin )
-        {
-            return getReportPluginKey( plugin );
-        }
-    }
-
-    /**
-     * KeyComputer for Plugin
-     */
-    private class PluginKeyComputer implements KeyComputer<Plugin>
-    {
-        @Override
-        public Object key( Plugin plugin )
-        {
-            return getPluginKey( plugin );
-        }
-    }
-
-    /**
-     * KeyComputer for ReportSet
-     */
-    private class ReportSetKeyComputer implements KeyComputer<ReportSet>
-    {
-        @Override
-        public Object key( ReportSet reportSet )
-        {
-            return getReportSetKey( reportSet );
-        }
-    }
-
-    /**
-     * KeyComputer for Notifier
-     */
-    private class NotifierKeyComputer implements KeyComputer<Notifier>
-    {
-        @Override
-        public Object key( Notifier notifier )
-        {
-            return getNotifierKey( notifier );
-        }
-    }
-
-    /**
-     * KeyComputer for Extension
-     */
-    private class ExtensionKeyComputer implements KeyComputer<Extension>
-    {
-        @Override
-        public Object key( Extension extension )
-        {
-            return getExtensionKey( extension );
-        }
-    }
-
-    /**
-     * KeyComputer for Resource
-     */
-    private class ResourceKeyComputer implements KeyComputer<Resource>
-    {
-        @Override
-        public Object key( Resource resource )
-        {
-            return getResourceKey( resource );
-        }
-    }
-
-    /**
-     * KeyComputer for PluginExecution
-     */
-    private class ExecutionKeyComputer implements KeyComputer<PluginExecution>
-    {
-        @Override
-        public Object key( PluginExecution pluginExecution )
-        {
-            return getPluginExecutionKey( pluginExecution );
-        }
-    }
-
-    /**
-     * KeyComputer for Exclusion
-     */
-    private class ExclusionKeyComputer implements KeyComputer<Exclusion>
-    {
-        @Override
-        public Object key( Exclusion exclusion )
-        {
-            return getExclusionKey( exclusion );
-        }
-    }
-
-    /**
-     * Return the second value if <code>sourceDominant</code> is true, the first one otherwise.
-     * @param <T>
-     */
-    private static class SourceDominant<T> implements Remapping<T>
-    {
-        private final boolean sourceDominant;
-
-        SourceDominant( boolean sourceDominant )
-        {
-            this.sourceDominant = sourceDominant;
-        }
-
-        @Override
-        public T merge( T u, T v )
-        {
-            return sourceDominant ? v : u;
-        }
     }
 
     /**
@@ -2841,10 +2723,10 @@ public class ModelMerger
      */
     private static <T> List<T> merge( List<T> tgt, List<T> src, boolean sourceDominant, KeyComputer<T> computer )
     {
-        return merge( tgt, src, computer, new SourceDominant<T>( sourceDominant ) );
+        return merge( tgt, src, computer, ( t, s ) -> sourceDominant ? s : t );
     }
 
-    private static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, Remapping<T> remapping )
+    private static <T> List<T> merge( List<T> tgt, List<T> src, KeyComputer<T> computer, BinaryOperator<T> remapping )
     {
         if ( src.isEmpty() )
         {
@@ -2859,7 +2741,7 @@ public class ModelMerger
         else
         {
             list = new MergingList<>( computer, src.size() + tgt.size() );
-            list.mergeAll( tgt, new SourceDominant<T>( true ) );
+            list.mergeAll( tgt, ( t, s ) -> s );
         }
 
         list.mergeAll( src, remapping );
@@ -2895,51 +2777,34 @@ public class ModelMerger
             }
         }
 
-        void mergeAll( Collection<V> vs, Remapping<V> remapping )
+        void mergeAll( Collection<V> vs, BinaryOperator<V> remapping )
         {
             if ( map == null )
             {
-                map = new LinkedHashMap<>( list.size() + vs.size() );
-                for ( V v : list )
-                {
-                    map.put( keyComputer.key( v ), v );
-                }
+                map = list.stream().collect( Collectors.toMap( keyComputer, 
+                                                               Function.identity(), 
+                                                               null,
+                                                               LinkedHashMap::new ) );
+
                 list = null;
             }
-            if ( vs instanceof MergingList && ( (MergingList) vs ).map != null )
+
+            if ( vs instanceof MergingList && ( (MergingList<V>) vs ).map != null )
             {
                 for ( Map.Entry<Object, V> e : ( (MergingList<V>) vs ).map.entrySet() )
                 {
                     Object key = e.getKey();
-                    V oldValue = map.get( key );
-                    // JDK8: this should be a call to map.merge( key, v, remapping )
-                    V newValue = ( oldValue == null ) ? e.getValue() : remapping.merge( oldValue, e.getValue() );
-                    if ( newValue == null )
-                    {
-                        remove( key );
-                    }
-                    else if ( newValue != oldValue )
-                    {
-                        map.put( key, newValue );
-                    }
+                    V v = e.getValue();
+                    map.merge( key, v, remapping );
                 }
             }
             else
             {
                 for ( V v : vs )
                 {
-                    Object key = keyComputer.key( v );
-                    // JDK8: this should be a call to map.merge( key, v, remapping )
-                    V oldValue = map.get( key );
-                    V newValue = ( oldValue == null ) ? v : remapping.merge( oldValue, v );
-                    if ( newValue == null )
-                    {
-                        remove( key );
-                    }
-                    else
-                    {
-                        map.put( key, newValue );
-                    }
+                    Object key = keyComputer.apply( v );
+                    
+                    map.merge( key, v, remapping );
                 }
             }
         }
