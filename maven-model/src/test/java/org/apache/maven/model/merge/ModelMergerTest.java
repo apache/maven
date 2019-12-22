@@ -1,5 +1,8 @@
 package org.apache.maven.model.merge;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,17 +23,19 @@ package org.apache.maven.model.merge;
  */
 
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
 
 import java.util.Arrays;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.PatternSet;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Repository;
 import org.junit.Test;
 
@@ -132,6 +137,45 @@ public class ModelMergerTest
     }
 
     @Test
+    public void mergeSameExcludes()
+    {
+        PatternSet target = new PatternSet();
+        target.setExcludes( Arrays.asList( "first", "second", "third" ) );
+        PatternSet source = new PatternSet();
+        source.setExcludes( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergePatternSet_Excludes( target, source, true, null );
+
+        assertThat( target.getExcludes(), contains( "first", "second", "third" ) );
+    }
+
+    @Test
+    public void mergeSameFilters()
+    {
+        Build target = new Build();
+        target.setFilters( Arrays.asList( "first", "second", "third" ) );
+        Build source = new Build();
+        source.setFilters( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergeBuild( target, source, true, null );
+
+        assertThat( target.getFilters(), contains( "first", "second", "third" ) );
+    }
+
+    @Test
+    public void mergeSameGoals()
+    {
+        PluginExecution target = new PluginExecution();
+        target.setGoals( Arrays.asList( "first", "second", "third" ) );
+        PluginExecution source = new PluginExecution();
+        source.setGoals( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergePluginExecution( target, source, true, null );
+
+        assertThat( target.getGoals(), contains( "first", "second", "third" ) );
+    }
+
+    @Test
     public void mergeGroupId()
     {
         Model target = new Model();
@@ -164,7 +208,20 @@ public class ModelMergerTest
         modelMerger.merge( target, source, false, null );
         assertThat( target.getInceptionYear(), is( "TARGET" ) );
     }
-    
+
+    @Test
+    public void mergeSameIncludes()
+    {
+        PatternSet target = new PatternSet();
+        target.setIncludes( Arrays.asList( "first", "second", "third" ) );
+        PatternSet source = new PatternSet();
+        source.setIncludes( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergePatternSet_Includes( target, source, true, null );
+
+        assertThat( target.getIncludes(), contains( "first", "second", "third" ) );
+    }
+
     @Test
     public void mergeSameMailingLists()
     {
@@ -230,6 +287,19 @@ public class ModelMergerTest
     }
 
     @Test
+    public void mergeSameOtherArchives()
+    {
+        MailingList target = new MailingList();
+        target.setOtherArchives( Arrays.asList( "first", "second", "third" ) );
+        MailingList source = new MailingList();
+        source.setOtherArchives( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergeMailingList( target, source, true, null );
+
+        assertThat( target.getOtherArchives(), contains( "first", "second", "third" ) );
+    }
+
+    @Test
     public void mergePackaging()
     {
         Model target = new Model();
@@ -281,6 +351,19 @@ public class ModelMergerTest
     }
 
     @Test
+    public void mergeSameReports()
+    {
+        ReportSet target = new ReportSet();
+        target.setReports( Arrays.asList( "first", "second", "third" ) );
+        ReportSet source = new ReportSet();
+        source.setReports( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergeReportSet( target, source, true, null );
+
+        assertThat( target.getReports(), contains( "first", "second", "third" ) );
+    }
+
+    @Test
     public void mergeSameRepositories()
     {
         Repository repository = new Repository();
@@ -295,6 +378,19 @@ public class ModelMergerTest
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getRepositories(), contains( repository ) );
+    }
+
+    @Test
+    public void mergeSameRoles()
+    {
+        Contributor target = new Contributor();
+        target.setRoles( Arrays.asList( "first", "second", "third" ) );
+        Contributor source = new Contributor();
+        source.setRoles( Arrays.asList( "first", "second", "third" ) );
+
+        modelMerger.mergeContributor_Roles( target, source, true, null );
+
+        assertThat( target.getRoles(), contains( "first", "second", "third" ) );
     }
 
     @Test

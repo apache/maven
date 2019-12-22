@@ -1232,33 +1232,7 @@ public class ModelMerger
     protected void mergeReportSet_Reports( ReportSet target, ReportSet source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
-        List<String> src = source.getReports();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getReports();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setReports( merged );
-
-            InputLocation sourceLocation = source.getLocation( "reports" );
-            if ( sourceLocation != null )
-            {
-                InputLocation targetLocation = target.getLocation( "reports" );
-                if ( targetLocation == null )
-                {
-                    target.setLocation( "reports", sourceLocation );
-                }
-                else
-                {
-                    for ( int i = 0; i < src.size(); i++ )
-                    {
-                        targetLocation.setLocation( Integer.valueOf( tgt.size() + i ),
-                                                    sourceLocation.getLocation( Integer.valueOf( i ) ) );
-                    }
-                }
-            }
-        }
+        target.setReports( merge( target.getReports(), source.getReports(), sourceDominant, e -> e ) );
     }
 
     protected void mergeDependencyManagement( DependencyManagement target, DependencyManagement source,
@@ -1520,15 +1494,10 @@ public class ModelMerger
     protected void mergeMailingList_OtherArchives( MailingList target, MailingList source, boolean sourceDominant,
                                                    Map<Object, Object> context )
     {
-        List<String> src = source.getOtherArchives();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getOtherArchives();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setOtherArchives( merged );
-        }
+        target.setOtherArchives( merge( target.getOtherArchives(), 
+                                        source.getOtherArchives(), 
+                                        sourceDominant,
+                                        e -> e ) );
     }
 
     protected void mergeDeveloper( Developer target, Developer source, boolean sourceDominant,
@@ -1652,15 +1621,7 @@ public class ModelMerger
     protected void mergeContributor_Roles( Contributor target, Contributor source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
-        List<String> src = source.getRoles();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getRoles();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setRoles( merged );
-        }
+        target.setRoles( merge( target.getRoles(), source.getRoles(), sourceDominant, e -> e ) );
     }
 
     protected void mergeContributor_Properties( Contributor target, Contributor source, boolean sourceDominant,
@@ -2176,15 +2137,7 @@ public class ModelMerger
     protected void mergeBuildBase_Filters( BuildBase target, BuildBase source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
-        List<String> src = source.getFilters();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getFilters();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setFilters( merged );
-        }
+        target.setFilters( merge( target.getFilters(), source.getFilters(), sourceDominant, e -> e ) );
     }
 
     protected void mergeBuildBase_Resources( BuildBase target, BuildBase source, boolean sourceDominant,
@@ -2405,15 +2358,7 @@ public class ModelMerger
     protected void mergePluginExecution_Goals( PluginExecution target, PluginExecution source, boolean sourceDominant,
                                                Map<Object, Object> context )
     {
-        List<String> src = source.getGoals();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getGoals();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setGoals( merged );
-        }
+        target.setGoals( merge( target.getGoals(), source.getGoals(), sourceDominant, e -> e ) );
     }
 
     protected void mergeResource( Resource target, Resource source, boolean sourceDominant,
@@ -2496,29 +2441,13 @@ public class ModelMerger
     protected void mergePatternSet_Includes( PatternSet target, PatternSet source, boolean sourceDominant,
                                              Map<Object, Object> context )
     {
-        List<String> src = source.getIncludes();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getIncludes();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setIncludes( merged );
-        }
+        target.setIncludes( merge( target.getIncludes(), source.getIncludes(), sourceDominant, e -> e ) );
     }
 
     protected void mergePatternSet_Excludes( PatternSet target, PatternSet source, boolean sourceDominant,
                                              Map<Object, Object> context )
     {
-        List<String> src = source.getExcludes();
-        if ( !src.isEmpty() )
-        {
-            List<String> tgt = target.getExcludes();
-            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
-            merged.addAll( tgt );
-            merged.addAll( src );
-            target.setExcludes( merged );
-        }
+        target.setExcludes( merge( target.getExcludes(), source.getExcludes(), sourceDominant, e -> e ) );
     }
 
     protected void mergeProfile( Profile target, Profile source, boolean sourceDominant, Map<Object, Object> context )
