@@ -119,6 +119,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6223FindBasedir.class );
         suite.addTestSuite( MavenITmng6189SiteReportPluginsWarningTest.class );
         suite.addTestSuite( MavenITmng6127PluginExecutionConfigurationInterferenceTest.class );
+        suite.addTestSuite( MavenITmng6065FailOnSeverityTest.class );
         suite.addTestSuite( MavenITmng6057CheckReactorOrderTest.class );
         suite.addTestSuite( MavenITmng5895CIFriendlyUsageWithPropertyTest.class );
         suite.addTestSuite( MavenITmng6090CIFriendlyTest.class );
