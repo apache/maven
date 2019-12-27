@@ -1,4 +1,4 @@
-package org.slf4j.impl;
+package org.apache.maven.logwrapper;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.slf4j.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,29 +19,31 @@ package org.slf4j.impl;
  * under the License.
  */
 
-import org.slf4j.Logger;
+import org.junit.Test;
+import org.slf4j.event.Level;
 
-/**
- * MavenSimpleLoggerFactory
- */
-public class MavenSimpleLoggerFactory
-    extends SimpleLoggerFactory
+import static org.junit.Assert.assertTrue;
+
+public class LogLevelRecorderTest
 {
-    /**
-     * Return an appropriate {@link MavenSimpleLogger} instance by name.
-     */
-    public Logger getLogger( String name )
+    @Test
+    public void createsLogLevelRecorder()
     {
-        Logger simpleLogger = loggerMap.get( name );
-        if ( simpleLogger != null )
-        {
-            return simpleLogger;
-        }
-        else
-        {
-            Logger newInstance = new MavenSimpleLogger( name );
-            Logger oldInstance = loggerMap.putIfAbsent( name, newInstance );
-            return oldInstance == null ? newInstance : oldInstance;
-        }
+        LogLevelRecorder logLevelRecorder = new LogLevelRecorder( "WARN" );
+        logLevelRecorder.record( Level.ERROR );
+
+        assertTrue( logLevelRecorder.metThreshold() );
+    }
+
+    @Test( expected = IllegalArgumentException.class )
+    public void failsOnLowerThanWarn ()
+    {
+        new LogLevelRecorder( "INFO" );
+    }
+
+    @Test( expected = IllegalArgumentException.class )
+    public void failsOnUnknownLogLevel ()
+    {
+        new LogLevelRecorder( "SEVERE" );
     }
 }
