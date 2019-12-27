@@ -30,7 +30,7 @@ import java.util.Properties;
  * variation and not a duplicate of the test for MNG-2006.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng5000ChildPathAwareUrlInheritanceTest
     extends AbstractMavenIntegrationTestCase

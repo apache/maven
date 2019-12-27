@@ -31,7 +31,7 @@ import java.util.Properties;
  * Requires a component with a non-default role hint and dumps this hint to a properties file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal it
  * @phase initialize
  */

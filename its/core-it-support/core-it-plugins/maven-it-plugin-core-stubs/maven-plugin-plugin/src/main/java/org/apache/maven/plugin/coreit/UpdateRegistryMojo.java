@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase install
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class UpdateRegistryMojo
     extends AbstractMojo

@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2741">MNG-2741</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
     extends AbstractMavenIntegrationTestCase

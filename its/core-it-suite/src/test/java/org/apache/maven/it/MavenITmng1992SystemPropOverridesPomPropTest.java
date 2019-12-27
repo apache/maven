@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1992">MNG-1992</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng1992SystemPropOverridesPomPropTest
     extends AbstractMavenIntegrationTestCase

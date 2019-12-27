@@ -28,7 +28,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3951">MNG-3951</a>.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3951AbsolutePathsTest
     extends AbstractMavenIntegrationTestCase

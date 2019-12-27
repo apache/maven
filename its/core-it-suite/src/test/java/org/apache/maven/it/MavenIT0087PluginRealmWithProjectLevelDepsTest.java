@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1898">MNG-1898</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenIT0087PluginRealmWithProjectLevelDepsTest
     extends AbstractMavenIntegrationTestCase

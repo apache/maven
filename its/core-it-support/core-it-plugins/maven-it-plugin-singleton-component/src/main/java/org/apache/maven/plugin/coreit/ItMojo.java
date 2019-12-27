@@ -33,7 +33,7 @@ import java.util.Properties;
  * Requires a singleton component in various ways and dumps the ids to a properties file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal it
  * @phase initialize
  */

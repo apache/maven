@@ -38,7 +38,7 @@ import java.util.Set;
  * Collects user-specified artifacts. This mimics in part the Maven Assembly Plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal collect
  */
 public class CollectMojo

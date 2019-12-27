@@ -32,7 +32,7 @@ import org.apache.maven.project.MavenProject;
  * @phase package
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ReleaseMojo
     extends AbstractMojo

@@ -46,7 +46,7 @@ import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4428">MNG-4428</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4428FollowHttpRedirectTest
     extends AbstractMavenIntegrationTestCase

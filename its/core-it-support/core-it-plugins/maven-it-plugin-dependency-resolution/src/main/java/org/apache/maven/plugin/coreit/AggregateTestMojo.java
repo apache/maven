@@ -31,7 +31,7 @@ import java.util.List;
  * dependencies are dumped.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal aggregate-test
  * @requiresDependencyResolution test
  * @aggregator true

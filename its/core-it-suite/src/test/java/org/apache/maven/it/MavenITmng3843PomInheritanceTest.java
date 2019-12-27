@@ -30,7 +30,7 @@ import java.util.TreeSet;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3843">MNG-3843</a>.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3843PomInheritanceTest
     extends AbstractMavenIntegrationTestCase

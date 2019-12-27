@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase clean
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class CleanMojo
     extends AbstractMojo

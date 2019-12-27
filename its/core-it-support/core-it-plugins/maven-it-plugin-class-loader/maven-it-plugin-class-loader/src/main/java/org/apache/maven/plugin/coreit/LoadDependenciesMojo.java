@@ -36,7 +36,7 @@ import java.util.List;
  * @requiresDependencyResolution compile
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class LoadDependenciesMojo
     extends AbstractLoadMojo

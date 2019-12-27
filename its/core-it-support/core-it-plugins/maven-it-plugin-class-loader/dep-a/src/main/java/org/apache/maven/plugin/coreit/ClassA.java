@@ -23,7 +23,7 @@ package org.apache.maven.plugin.coreit;
  * A test class that is unique to this artifact.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ClassA
 {

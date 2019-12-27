@@ -37,7 +37,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5175">MNG-5175</a>.
  * test correct integration of wagon http: read time out configuration from settings.xml
  *
- * @version $Id$
+ *
  */
 public class MavenITmng5175WagonHttpTest
     extends AbstractMavenIntegrationTestCase

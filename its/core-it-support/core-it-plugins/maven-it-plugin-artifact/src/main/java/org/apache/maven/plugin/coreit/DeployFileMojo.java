@@ -38,7 +38,7 @@ import java.io.File;
  * @requiresProject false
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class DeployFileMojo
     extends AbstractMojo

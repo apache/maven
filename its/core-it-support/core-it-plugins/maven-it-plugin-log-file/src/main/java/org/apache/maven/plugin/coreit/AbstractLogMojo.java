@@ -33,7 +33,7 @@ import java.io.OutputStreamWriter;
  * Provides common services for the mojos of this plugin.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public abstract class AbstractLogMojo
     extends AbstractMojo

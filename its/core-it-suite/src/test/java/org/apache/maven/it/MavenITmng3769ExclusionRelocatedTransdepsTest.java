@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3769">MNG-3769</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng3769ExclusionRelocatedTransdepsTest
     extends AbstractMavenIntegrationTestCase

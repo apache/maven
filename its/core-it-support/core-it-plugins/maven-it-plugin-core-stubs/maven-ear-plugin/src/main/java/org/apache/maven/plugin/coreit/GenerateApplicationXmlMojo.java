@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase generate-resources
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class GenerateApplicationXmlMojo
     extends AbstractMojo

@@ -34,7 +34,7 @@ import java.io.File;
  * @phase package
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class AttachMojo
     extends AbstractMojo

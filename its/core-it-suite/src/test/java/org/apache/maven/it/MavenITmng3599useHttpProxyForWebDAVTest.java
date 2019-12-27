@@ -39,7 +39,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
  * 
  * @author Brett Porter
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng3599useHttpProxyForWebDAVTest
     extends AbstractMavenIntegrationTestCase

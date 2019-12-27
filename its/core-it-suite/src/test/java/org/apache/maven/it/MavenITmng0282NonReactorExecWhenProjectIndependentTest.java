@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-282">MNG-282</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
     extends AbstractMavenIntegrationTestCase

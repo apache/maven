@@ -30,7 +30,7 @@ import java.util.Properties;
  * <a href="https://issues.apache.org/jira/browse/MNG-4997">MNG-4997</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0674PluginParameterAliasTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2926">MNG-2926</a>
  * 
  * @author Brian Fox
- * @version $Id$
+ *
  */
 public class MavenITmng2926PluginPrefixOrderTest
     extends AbstractMavenIntegrationTestCase

@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4007">MNG-4007</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4007PlatformFileSeparatorTest
     extends AbstractMavenIntegrationTestCase

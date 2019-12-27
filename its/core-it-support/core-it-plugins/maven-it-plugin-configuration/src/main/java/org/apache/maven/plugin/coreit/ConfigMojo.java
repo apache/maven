@@ -36,7 +36,7 @@ import java.util.Set;
  * Dumps this mojo's configuration into a properties file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal config
  * @phase validate
  */

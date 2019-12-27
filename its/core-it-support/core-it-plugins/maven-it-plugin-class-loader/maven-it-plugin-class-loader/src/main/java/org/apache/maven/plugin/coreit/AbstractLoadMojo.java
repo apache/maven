@@ -37,7 +37,7 @@ import java.util.Properties;
  * Loads classes and/or resources from a class loader and records the results in a properties file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public abstract class AbstractLoadMojo
     extends AbstractMojo

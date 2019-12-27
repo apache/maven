@@ -38,7 +38,7 @@ import java.util.Properties;
  * @requiresReports true
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ListMojo
     extends AbstractMojo

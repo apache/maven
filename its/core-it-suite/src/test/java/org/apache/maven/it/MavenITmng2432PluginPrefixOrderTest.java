@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2432">MNG-2432</a>
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2432PluginPrefixOrderTest
     extends AbstractMavenIntegrationTestCase

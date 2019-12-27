@@ -35,7 +35,7 @@ import java.util.List;
  * org.apache.maven.its.mng3380.other:a:jar:1:compile
  * org.apache.maven.its.mng3380.other:b:jar:1:compile
  *
- * @version $Id$
+ *
  */
 public class MavenITmng3380ManagedRelocatedTransdepsTest
     extends AbstractMavenIntegrationTestCase

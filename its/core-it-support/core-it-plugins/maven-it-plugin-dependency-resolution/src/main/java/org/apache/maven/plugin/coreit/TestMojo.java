@@ -31,7 +31,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @requiresDependencyResolution test
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class TestMojo
     extends AbstractDependencyMojo

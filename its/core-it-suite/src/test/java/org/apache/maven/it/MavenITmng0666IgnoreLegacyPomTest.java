@@ -29,7 +29,7 @@ import java.util.List;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-666">MNG-666</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0666IgnoreLegacyPomTest
     extends AbstractMavenIntegrationTestCase

@@ -30,7 +30,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3877">MNG-3877</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3877BasedirAlignedModelTest
     extends AbstractMavenIntegrationTestCase

@@ -29,7 +29,7 @@ import java.util.Arrays;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2054">MNG-2054</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng2054PluginExecutionInheritanceTest
     extends AbstractMavenIntegrationTestCase

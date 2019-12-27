@@ -39,7 +39,7 @@ import java.util.Set;
  * Attempts to resolve a single artifact from dependencies, and logs the results for the Verifier to look at.
  *
  * @author bimargulies
- * @version $Id$
+ *
  * @goal resolve-one-dependency
  * @requiresDependencyResolution runtime
  */

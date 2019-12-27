@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2318">MNG-2318</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng2318LocalParentResolutionTest
     extends AbstractMavenIntegrationTestCase

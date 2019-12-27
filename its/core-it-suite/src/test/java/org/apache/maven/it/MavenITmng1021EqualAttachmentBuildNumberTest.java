@@ -27,7 +27,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1021">MNG-1021</a>.
  *
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng1021EqualAttachmentBuildNumberTest
     extends AbstractMavenIntegrationTestCase

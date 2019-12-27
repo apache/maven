@@ -31,7 +31,7 @@ import java.util.Collection;
  * too weak to prevent this issue.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2921ActiveAttachedArtifactsTest
     extends AbstractMavenIntegrationTestCase

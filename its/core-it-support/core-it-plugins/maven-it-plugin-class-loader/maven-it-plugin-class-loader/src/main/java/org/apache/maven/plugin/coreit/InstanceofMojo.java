@@ -34,7 +34,7 @@ import java.util.Properties;
  * loader. In other words, checks that types shared with the core realm are imported into the plugin realm.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal instanceof
  * @phase initialize
  */

@@ -40,7 +40,7 @@ import java.util.Properties;
  * @goal info
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class InfoReport
     extends AbstractMojo

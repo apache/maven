@@ -29,7 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @execute goal="test"
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ForkTestMojo
     extends AbstractMojo

@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * 
  * @author Mark Hobson
  * @author jdcasey
- * @version $Id$
+ *
  */
 public class MavenITmng3023ReactorDependencyResolutionTest
     extends AbstractMavenIntegrationTestCase

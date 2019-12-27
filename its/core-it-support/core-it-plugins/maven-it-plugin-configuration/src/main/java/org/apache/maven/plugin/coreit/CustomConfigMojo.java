@@ -36,7 +36,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @configurator coreit
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class CustomConfigMojo
     extends AbstractMojo

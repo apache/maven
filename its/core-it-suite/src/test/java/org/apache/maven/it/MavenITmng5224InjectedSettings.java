@@ -32,7 +32,7 @@ import java.util.List;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5224">MNG-5175</a>.
  * test correct injection of settings with profiles in ${settings} in mojo
  *
- * @version $Id$
+ *
  */
 public class MavenITmng5224InjectedSettings
     extends AbstractMavenIntegrationTestCase

@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4016">MNG-4016</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4016PrefixedPropertyInterpolationTest
     extends AbstractMavenIntegrationTestCase

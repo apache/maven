@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ExpressionUtilTest
     extends TestCase

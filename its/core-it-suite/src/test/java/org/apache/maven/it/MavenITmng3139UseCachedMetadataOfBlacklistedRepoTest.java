@@ -29,7 +29,7 @@ import java.util.Collections;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3139">MNG-3139</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
     extends AbstractMavenIntegrationTestCase

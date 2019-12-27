@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-848">MNG-848</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng0848SystemPropOverridesDefaultValueTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenIT0144LifecycleExecutionOrderTest
     extends AbstractMavenIntegrationTestCase

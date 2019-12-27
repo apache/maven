@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2309">MNG-2309</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2309ProfileInjectionOrderTest
     extends AbstractMavenIntegrationTestCase

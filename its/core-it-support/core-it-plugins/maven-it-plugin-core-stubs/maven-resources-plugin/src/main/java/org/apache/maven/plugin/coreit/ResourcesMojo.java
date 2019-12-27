@@ -33,7 +33,7 @@ import java.io.OutputStreamWriter;
  * Creates a text file in the project base directory.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal resources
  * @phase process-resources
  */

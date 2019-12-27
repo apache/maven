@@ -30,7 +30,7 @@ import java.util.List;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-823">MNG-823</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0823MojoContextPassingTest
     extends AbstractMavenIntegrationTestCase

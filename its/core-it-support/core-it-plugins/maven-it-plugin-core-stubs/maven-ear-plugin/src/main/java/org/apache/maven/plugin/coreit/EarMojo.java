@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase package
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class EarMojo
     extends AbstractMojo

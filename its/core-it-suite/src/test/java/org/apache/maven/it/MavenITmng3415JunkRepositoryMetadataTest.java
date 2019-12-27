@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
  *
- * @version $Id$
+ *
  */
 public class MavenITmng3415JunkRepositoryMetadataTest
     extends AbstractMavenIntegrationTestCase

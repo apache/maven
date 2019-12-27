@@ -30,7 +30,7 @@ import java.util.Collection;
  * Provides common code for the install and deploy mojos.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public abstract class AbstractRepoMojo
     extends AbstractMojo

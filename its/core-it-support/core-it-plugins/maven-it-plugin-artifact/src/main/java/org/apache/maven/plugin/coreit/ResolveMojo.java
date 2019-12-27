@@ -37,7 +37,7 @@ import java.util.Properties;
  * Resolves user-specified artifacts. This mimics in part the Maven Dependency Plugin and the Maven Surefire Plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal resolve
  */
 public class ResolveMojo

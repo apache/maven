@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2771">MNG-2771</a>
  * 
  * @author Mark Hobson
- * @version $Id$
+ *
  */
 public class MavenITmng2771PomExtensionComponentOverrideTest
     extends AbstractMavenIntegrationTestCase

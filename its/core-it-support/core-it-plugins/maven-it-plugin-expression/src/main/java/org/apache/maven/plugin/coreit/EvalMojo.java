@@ -54,7 +54,7 @@ import java.util.Properties;
  * <code>null</code>. For collections and arrays, the special index "*" can be used to iterate all elements.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal eval
  * @phase initialize
  */

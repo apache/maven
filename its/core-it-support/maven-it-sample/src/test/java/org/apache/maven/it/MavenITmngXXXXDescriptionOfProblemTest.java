@@ -37,7 +37,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * phases. See more information inline in the code.
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
+ *
  */
 public class MavenITmngXXXXDescriptionOfProblemTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-496">MNG-496</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0496IgnoreUnknownPluginParametersTest
     extends AbstractMavenIntegrationTestCase

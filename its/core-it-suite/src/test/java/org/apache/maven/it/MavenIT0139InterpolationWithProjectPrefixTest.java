@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenIT0139InterpolationWithProjectPrefixTest
     extends AbstractMavenIntegrationTestCase

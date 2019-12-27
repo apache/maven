@@ -40,7 +40,7 @@ import java.util.Properties;
  * Provides common services for all mojos of this plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public abstract class AbstractDependencyMojo
     extends AbstractMojo

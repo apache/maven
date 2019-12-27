@@ -36,7 +36,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal it
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class ItMojo
     extends AbstractMojo

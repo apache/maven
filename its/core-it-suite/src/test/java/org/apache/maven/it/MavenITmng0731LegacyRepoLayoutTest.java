@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-731">MNG-731</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0731LegacyRepoLayoutTest
     extends AbstractMavenIntegrationTestCase

@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2605">MNG-2605</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2605BogusProfileActivationTest
     extends AbstractMavenIntegrationTestCase

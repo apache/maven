@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4189">MNG-4189</a>.
  * 
- * @version $Id$
+ *
  * @author <a href="mailto:oching@apache.org">Maria Odea Ching</a>
  */
 public class MavenITmng4189UniqueVersionSnapshotTest

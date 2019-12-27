@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase compile
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class CompileMojo
     extends AbstractMojo

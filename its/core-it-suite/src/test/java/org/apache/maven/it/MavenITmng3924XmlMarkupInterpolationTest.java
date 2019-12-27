@@ -30,7 +30,7 @@ import java.util.Properties;
  * <a href="https://issues.apache.org/jira/browse/MNG-3662">MNG-3662</a>
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3924XmlMarkupInterpolationTest
     extends AbstractMavenIntegrationTestCase

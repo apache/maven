@@ -29,7 +29,7 @@ import java.util.List;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2871">MNG-2871</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2871PrePackageSubartifactResolutionTest
     extends AbstractMavenIntegrationTestCase

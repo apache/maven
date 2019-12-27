@@ -40,7 +40,7 @@ import java.util.Properties;
  * @phase validate
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class LookupWagonMojo
     extends AbstractMojo

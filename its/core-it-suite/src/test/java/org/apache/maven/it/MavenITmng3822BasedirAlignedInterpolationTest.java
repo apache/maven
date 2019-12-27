@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3822">MNG-3822</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3822BasedirAlignedInterpolationTest
     extends AbstractMavenIntegrationTestCase

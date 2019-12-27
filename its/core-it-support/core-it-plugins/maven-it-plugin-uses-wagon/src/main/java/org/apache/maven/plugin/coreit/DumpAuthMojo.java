@@ -35,7 +35,7 @@ import java.util.Properties;
  * Dumps the authentication info registered with the wagon manager for a server to a properties file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal dump-auth
  * @phase validate
  */

@@ -29,7 +29,7 @@ import java.util.Collection;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1233">MNG-1233</a>.
  * 
  * @author Brett Porter
- * @version $Id$
+ *
  */
 public class MavenITmng1233WarDepWithProvidedScopeTest
     extends AbstractMavenIntegrationTestCase

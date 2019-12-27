@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3441">MNG-3441</a>.
  *
- * @version $Id$
+ *
  */
 public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1349">MNG-1349</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng1349ChecksumFormatsTest
     extends AbstractMavenIntegrationTestCase

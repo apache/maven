@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4254">MNG-4254</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng4254SelectableWagonProvidersTest
     extends AbstractMavenIntegrationTestCase

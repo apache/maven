@@ -34,7 +34,7 @@ import java.util.Set;
  * Injects artifacts from the plugin into the dependency artifacts of the project.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal inject
  */
 public class InjectMojo

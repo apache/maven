@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3536">MNG-3536</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng3536AppendedAbsolutePathsTest
     extends AbstractMavenIntegrationTestCase

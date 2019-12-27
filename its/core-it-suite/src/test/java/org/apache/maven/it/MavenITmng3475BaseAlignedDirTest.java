@@ -31,7 +31,7 @@ import java.util.Properties;
  * <a href="https://issues.apache.org/jira/browse/MNG-1927">MNG-1927</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3475BaseAlignedDirTest
     extends AbstractMavenIntegrationTestCase

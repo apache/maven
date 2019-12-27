@@ -29,7 +29,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-836">MNG-836</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng0836PluginParentResolutionTest
     extends AbstractMavenIntegrationTestCase

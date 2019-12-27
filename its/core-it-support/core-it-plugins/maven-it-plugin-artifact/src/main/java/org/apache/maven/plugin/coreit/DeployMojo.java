@@ -28,7 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Deploys the project artifacts to the distribution repository. This is the essence of the Maven Deploy Plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal deploy
  * @phase deploy
  */

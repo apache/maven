@@ -29,7 +29,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3863">MNG-3863</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3863AutoPluginGroupIdTest
     extends AbstractMavenIntegrationTestCase

@@ -29,7 +29,7 @@ import java.io.File;
  * ITs run without downloading anything later.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITBootstrapTest
     extends AbstractMavenIntegrationTestCase

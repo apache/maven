@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1415">MNG-1415</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng1415QuotedSystemPropertiesTest
     extends AbstractMavenIntegrationTestCase

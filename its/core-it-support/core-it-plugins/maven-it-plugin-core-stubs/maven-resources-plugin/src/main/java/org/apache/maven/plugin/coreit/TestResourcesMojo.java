@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase process-test-resources
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class TestResourcesMojo
     extends AbstractMojo

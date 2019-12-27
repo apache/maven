@@ -30,7 +30,7 @@ import java.util.List;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4000">MNG-4000</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4000MultiPluginExecutionsTest
     extends AbstractMavenIntegrationTestCase

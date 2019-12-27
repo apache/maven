@@ -34,7 +34,7 @@ import java.io.IOException;
  * @phase site-deploy
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class DeployMojo
     extends AbstractMojo

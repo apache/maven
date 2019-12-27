@@ -30,7 +30,7 @@ import java.util.Properties;
  * <a href="https://issues.apache.org/jira/browse/MNG-160">MNG-160</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng0866EvaluateDefaultValueTest
     extends AbstractMavenIntegrationTestCase

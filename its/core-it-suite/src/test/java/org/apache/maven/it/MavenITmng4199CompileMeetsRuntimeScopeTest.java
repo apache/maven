@@ -30,7 +30,7 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4199">MNG-4199</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4199CompileMeetsRuntimeScopeTest
     extends AbstractMavenIntegrationTestCase

@@ -24,7 +24,7 @@ package org.apache.maven.plugin.coreit;
  * class (with different members) to check class path ordering of dependencies.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class SomeClass
 {

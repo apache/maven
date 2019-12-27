@@ -29,7 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @requiresDependencyCollection compile
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class CompileMojo
     extends AbstractDependencyMojo

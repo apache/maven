@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2136">MNG-2136</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng2136ActiveByDefaultProfileTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-612">MNG-612</a>.
  * 
  * @author Mark Hobson
- * @version $Id$
+ *
  */
 public class MavenITmng0612NewestConflictResolverTest
     extends AbstractMavenIntegrationTestCase

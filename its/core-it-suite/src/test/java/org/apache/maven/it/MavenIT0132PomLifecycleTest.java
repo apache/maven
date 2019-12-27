@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenIT0132PomLifecycleTest
     extends AbstractMavenIntegrationTestCase

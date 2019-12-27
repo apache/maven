@@ -31,7 +31,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Assists in handling properties.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 class PropertiesUtil
 {

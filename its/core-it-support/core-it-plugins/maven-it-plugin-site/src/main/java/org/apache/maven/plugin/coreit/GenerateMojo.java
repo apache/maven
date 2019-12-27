@@ -36,7 +36,7 @@ import java.util.Locale;
  * Generates the available/configured reports.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal generate
  * @phase site
  * @requiresReports true

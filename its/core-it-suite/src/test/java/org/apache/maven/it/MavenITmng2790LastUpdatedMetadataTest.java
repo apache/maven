@@ -31,7 +31,7 @@ import org.apache.maven.shared.utils.io.FileUtils;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2790">MNG-2790</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng2790LastUpdatedMetadataTest
     extends AbstractMavenIntegrationTestCase

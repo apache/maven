@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3220">MNG-3220</a>.
  *
- * @version $Id$
+ *
  */
 public class MavenITmng3220ImportScopeTest
     extends AbstractMavenIntegrationTestCase

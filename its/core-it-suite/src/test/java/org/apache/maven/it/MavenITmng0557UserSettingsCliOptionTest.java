@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-557">MNG-557</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng0557UserSettingsCliOptionTest
     extends AbstractMavenIntegrationTestCase

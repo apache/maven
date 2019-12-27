@@ -30,7 +30,7 @@ import java.text.SimpleDateFormat;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng2562TimestampTest
     extends AbstractMavenIntegrationTestCase

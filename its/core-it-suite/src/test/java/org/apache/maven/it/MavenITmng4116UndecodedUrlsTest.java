@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4116">MNG-4116</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4116UndecodedUrlsTest
     extends AbstractMavenIntegrationTestCase

@@ -28,7 +28,7 @@ import java.util.Arrays;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3372">MNG-3372</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng3372DirectInvocationOfPluginsTest
     extends AbstractMavenIntegrationTestCase

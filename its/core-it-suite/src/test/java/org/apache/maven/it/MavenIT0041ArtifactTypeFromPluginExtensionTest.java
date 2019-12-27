@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-598">MNG-598</a>.
  * 
  * @author Brett Porter
- * @version $Id$
+ *
  */
 public class MavenIT0041ArtifactTypeFromPluginExtensionTest
     extends AbstractMavenIntegrationTestCase

@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4129">MNG-4129</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4129PluginExecutionInheritanceTest
     extends AbstractMavenIntegrationTestCase

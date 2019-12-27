@@ -45,7 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4343">MNG-4343</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng4343MissingReleaseUpdatePolicyTest
     extends AbstractMavenIntegrationTestCase

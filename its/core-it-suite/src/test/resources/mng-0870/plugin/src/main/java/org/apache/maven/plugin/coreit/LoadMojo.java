@@ -35,7 +35,7 @@ import java.net.URL;
  * @phase validate
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class LoadMojo
     extends AbstractMojo

@@ -35,7 +35,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @phase validate
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class AppendConfigMojo
     extends AbstractMojo

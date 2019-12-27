@@ -30,7 +30,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @goal install-custom
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class InstallCustomMojo
     extends InstallMojo

@@ -28,7 +28,7 @@ import java.io.IOException;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4270">MNG-4270</a>.
  * 
  * @author John Casey
- * @version $Id$
+ *
  */
 public class MavenITmng4270ArtifactHandlersFromPluginDepsTest
     extends AbstractMavenIntegrationTestCase

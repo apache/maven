@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * Creates an empty file to prove this goal was executed.
  * 
- * @version $Id$
+ *
  * @goal touch
  */
 public class TouchMojo

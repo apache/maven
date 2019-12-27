@@ -31,7 +31,7 @@ import java.util.Map;
  * Assists in evaluating expressions.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 class ExpressionUtil
 {

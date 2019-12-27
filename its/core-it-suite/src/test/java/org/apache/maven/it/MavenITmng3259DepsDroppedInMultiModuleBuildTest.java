@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3259">MNG-3259</a>.
  * 
- * @version $Id$
+ *
  */
 public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
     extends AbstractMavenIntegrationTestCase

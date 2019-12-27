@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3970">MNG-3970</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3970DepResolutionFromProfileReposTest
     extends AbstractMavenIntegrationTestCase

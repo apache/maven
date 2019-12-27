@@ -28,7 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @phase initialize
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class LogStringMojo
     extends AbstractLogMojo

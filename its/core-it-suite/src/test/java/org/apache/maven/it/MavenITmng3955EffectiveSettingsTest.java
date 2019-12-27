@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3955">MNG-3955</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class MavenITmng3955EffectiveSettingsTest
     extends AbstractMavenIntegrationTestCase

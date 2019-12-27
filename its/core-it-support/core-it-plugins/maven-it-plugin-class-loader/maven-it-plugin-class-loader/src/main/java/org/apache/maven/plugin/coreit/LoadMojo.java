@@ -30,7 +30,7 @@ import java.io.File;
  * @phase initialize
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class LoadMojo
     extends AbstractLoadMojo

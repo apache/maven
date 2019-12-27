@@ -39,7 +39,7 @@ import java.util.Properties;
  * class loader it came from which is otherwise not accessible to a plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal load-resource
  * @phase validate
  */

@@ -28,7 +28,7 @@ import java.io.File;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1088">MNG-1088</a>.
  * 
  * @author Brett Porter
- * @version $Id$
+ *
  */
 public class MavenITmng1088ReactorPluginResolutionTest
     extends AbstractMavenIntegrationTestCase

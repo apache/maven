@@ -37,7 +37,7 @@ import java.util.Properties;
  * Assists in serializing primitives and beans into properties for later inspection/verification.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 class PropertyUtil
 {

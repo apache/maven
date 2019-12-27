@@ -25,7 +25,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Appends a separator line to the log file.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal log-separator
  * @phase initialize
  */

@@ -23,7 +23,7 @@ package org.apache.maven.plugin.coreit;
  * A bean to receive mojo configuration.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class Bean
 {

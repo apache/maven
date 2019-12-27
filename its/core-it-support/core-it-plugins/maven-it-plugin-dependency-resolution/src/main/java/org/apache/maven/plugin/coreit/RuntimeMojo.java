@@ -31,7 +31,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @requiresDependencyResolution runtime
  * 
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  */
 public class RuntimeMojo
     extends AbstractDependencyMojo

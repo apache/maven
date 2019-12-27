@@ -27,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Installs the project artifacts into the local repository. This is the essence of the Maven Install Plugin.
  *
  * @author Benjamin Bentmann
- * @version $Id$
+ *
  * @goal install
  * @phase install
  */
