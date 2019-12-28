@@ -46,7 +46,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-integration-testing.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-integration-testing.git</developerConnection>
-    <url>https://github.com/apache/maven-integration-testing/tree/${project.scm.tag}</url>
+      <url>https://github.com/apache/maven-integration-testing/</url>
   </scm>
   <ciManagement>
     <system>Jenkins</system>

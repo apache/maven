@@ -33,12 +33,6 @@ under the License.
 
   <name>Maven IT Plugin :: Class Loader :: Aggregator</name>
 
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support/core-it-plugins/maven-it-plugin-class-loader</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support/core-it-plugins/maven-it-plugin-class-loader</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-support/core-it-plugins/maven-it-plugin-class-loader</url>
-  </scm>
-
   <modules>
     <module>maven-it-plugin-class-loader</module>
     <module>dep-a</module>

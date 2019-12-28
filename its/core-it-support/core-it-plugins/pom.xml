@@ -86,12 +86,6 @@ under the License.
     <module>mng6759-plugin-resolves-project-dependencies</module>
   </modules>
 
-  <scm>
-    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-integration-testing.git</connection>
-    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-integration-testing.git</developerConnection>
-    <url>https://github.com/apache/maven-integration-testing/</url>
-  </scm>
-
   <distributionManagement>
     <repository>
       <id>maven.it</id>
