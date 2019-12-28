@@ -102,10 +102,6 @@ for (String os in runITsOses) {
                                 junitPublisher(ignoreAttachments: false)
                             ]) {
                                 String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
-                                if (stageId.endsWith('-jdk7')) {
-                                    // Java 7u80 has TLS 1.2 disabled by default: need to explicitly enable
-                                    cmd = "${cmd} -Dhttps.protocols=TLSv1.2"
-                                }
 
                                 if (isUnix()) {
                                     sh 'df -hT'
