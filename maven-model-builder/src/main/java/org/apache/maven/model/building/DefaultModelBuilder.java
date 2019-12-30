@@ -57,15 +57,21 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
@@ -75,6 +81,7 @@ import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
+import org.apache.maven.model.merge.ModelMerger;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
@@ -124,7 +131,7 @@ public class DefaultModelBuilder
 
     @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
-
+    
     @Inject
     private SuperPomProvider superPomProvider;
 
@@ -164,12 +171,13 @@ public class DefaultModelBuilder
     private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory; 
     
     @Inject
-    @Nullable
     private ModelCacheManager modelCacheManager;
     
     @Inject
     @Nullable
     private BuildPomXMLFilterListener xmlFilterListener;
+    
+    private ModelMerger modelMerger = new FileToRawModelMerger();
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -277,6 +285,11 @@ public class DefaultModelBuilder
     {
         this.buildPomXMLFilterFactory = () -> buildPomXMLFilterFactory;
         return this;
+    }
+    
+    public void setModelCacheManager( ModelCacheManager modelCacheManager )
+    {
+        this.modelCacheManager = modelCacheManager;
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -451,7 +464,7 @@ public class DefaultModelBuilder
 
         result.setEffectiveModel( resultModel );
         
-        if ( modelCacheManager != null && request.getPomFile() != null )
+        if ( request.getPomFile() != null )
         {
             modelCacheManager.put( request.getPomFile().toPath(), resultModel ); 
         }
@@ -664,25 +677,31 @@ public class DefaultModelBuilder
         modelValidator.validateFileModel( model, request, problems );
         request.setFileModel( model );
         
+        if ( Features.buildConsumer().isActive() && pomFile != null )
+        {
+            try
+            {
+                Model rawModel = modelProcessor.read( transformData( pomFile.toPath() ), null );
+
+                model.setPomFile( pomFile );
+                
+                // model with locationTrackers, required for proper feedback during validations
+                model = request.getFileModel().clone();
+                
+                // Apply enriched data
+                modelMerger.merge( model, rawModel, false, null );
+            }
+            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V37 ).setException( e ) );
+            }
+        }
+
         modelValidator.validateRawModel( model, request, problems );
 
         if ( hasFatalErrors( problems ) )
         {
             throw problems.newModelBuildingException();
-        }
-        
-        if ( !hasModelErrors( problems ) && Features.buildConsumer().isActive() && pomFile != null )
-        {
-            try
-            {
-                model = modelProcessor.read( transformData( pomFile.toPath() ), null );
-
-                model.setPomFile( pomFile );
-            }
-            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
-            }
         }
 
         return model;
@@ -1537,4 +1556,155 @@ public class DefaultModelBuilder
         }
     }
 
+    /**
+     * As long is Maven controls the BuildPomXMLFilter, the entities that need merging is known.
+     * All others can simply be copied from source to target to restore the locationTracker 
+     * 
+     * @author Robert Scholte
+     * @since 3.7.0
+     */
+    class FileToRawModelMerger extends ModelMerger
+    {
+        @Override
+        protected void mergeBuild_Extensions( Build target, Build source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+
+        @Override
+        protected void mergeBuildBase_Resources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeBuildBase_TestResources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeCiManagement_Notifiers( CiManagement target, CiManagement source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeDependencyManagement_Dependencies( DependencyManagement target, DependencyManagement source,
+                                                               boolean sourceDominant, Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
+                                                   Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Contributors( Model target, Model source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+        {
+            // don't merge
+        }
+
+        @Override
+        protected void mergeModel_Developers( Model target, Model source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_MailingLists( Model target, Model source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+        {
+            Iterator<Profile> sourceIterator = source.getProfiles().iterator();
+            target.getProfiles().stream().forEach( t -> mergeProfile( t, sourceIterator.next(), sourceDominant,
+                                                                      context ) );
+        }
+        
+        @Override
+        protected void mergeModelBase_Dependencies( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergeModelBase_PluginRepositories( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                          Map<Object, Object> context )
+        {
+            target.setPluginRepositories( source.getPluginRepositories() );
+        }
+        
+        @Override
+        protected void mergeModelBase_Repositories( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergePlugin_Dependencies( Plugin target, Plugin source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+        {
+            // don't merge
+        }
+
+        @Override
+        protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
+                                                     boolean sourceDominant, Map<Object, Object> context )
+        {
+            // don't merge
+        }
+    }
 }

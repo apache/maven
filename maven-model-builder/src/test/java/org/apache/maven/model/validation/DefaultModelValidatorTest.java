@@ -376,7 +376,7 @@ public class DefaultModelValidatorTest
     public void testDuplicateModule()
         throws Exception
     {
-        SimpleProblemCollector result = validate( "duplicate-module.xml" );
+        SimpleProblemCollector result = validateRaw( "duplicate-module.xml" );
 
         assertViolations( result, 0, 1, 0 );
 

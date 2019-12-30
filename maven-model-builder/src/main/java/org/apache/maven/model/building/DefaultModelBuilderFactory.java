@@ -227,6 +227,7 @@ public class DefaultModelBuilderFactory
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
         modelBuilder.setBuildPomXMLFilterFactory( new BuildPomXMLFilterFactory() );
+        modelBuilder.setModelCacheManager( new DefaultModelCacheManager() );
 
         return modelBuilder;
     }

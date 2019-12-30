@@ -19,7 +19,6 @@ package org.apache.maven.model.validation;
  * under the License.
  */
 
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
@@ -118,6 +117,17 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            Set<String> modules = new HashSet<>();
+            for ( int i = 0, n = m.getModules().size(); i < n; i++ )
+            {
+                String module = m.getModules().get( i );
+                if ( !modules.add( module ) )
+                {
+                    addViolation( problems, Severity.ERROR, Version.V20, "modules.module[" + i + "]", null,
+                                  "specifies duplicate child module " + module, m.getLocation( "modules" ) );
+                }
+            }
+
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
@@ -227,18 +237,8 @@ public class DefaultModelValidator
         
         if ( parent != null )
         {
-            InputLocationTracker locationTracker;
-            if ( Features.buildConsumer().isActive() )
-            {
-                locationTracker = request.getFileModel().getParent();
-            }
-            else
-            {
-                locationTracker = parent;
-            }
-            
             validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
-                                    locationTracker );
+                                    parent );
         }
     }
 
@@ -396,17 +396,6 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            Set<String> modules = new HashSet<>();
-            for ( int i = 0, n = m.getModules().size(); i < n; i++ )
-            {
-                String module = m.getModules().get( i );
-                if ( !modules.add( module ) )
-                {
-                    addViolation( problems, Severity.ERROR, Version.V20, "modules.module[" + i + "]", null,
-                                  "specifies duplicate child module " + module, m.getLocation( "modules" ) );
-                }
-            }
-
             Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
             validateBannedCharacters( EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m,
