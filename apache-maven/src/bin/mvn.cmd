@@ -156,7 +156,7 @@ goto endDetectBaseDir
 :baseDirNotFound
 if "_%EXEC_DIR:~-1%"=="_\" set "EXEC_DIR=%EXEC_DIR:~0,-1%"
 set "MAVEN_PROJECTBASEDIR=%EXEC_DIR%"
-cd "%EXEC_DIR%"
+cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
