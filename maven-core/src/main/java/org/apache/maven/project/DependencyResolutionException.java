@@ -26,7 +26,7 @@ public class DependencyResolutionException
     extends Exception
 {
 
-    private DependencyResolutionResult result;
+    private final transient DependencyResolutionResult result;
 
     public DependencyResolutionException( DependencyResolutionResult result, String message, Throwable cause )
     {
