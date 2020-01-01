@@ -570,6 +570,7 @@ public class MavenMetadataSource
                     configuration.setProcessPlugins( false );
                     configuration.setRepositoryMerging( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT );
                     configuration.setSystemProperties( getSystemProperties() );
+                    configuration.setUserProperties( new Properties() );
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
                     project = projectBuilder.build( pomArtifact, configuration ).getProject();
