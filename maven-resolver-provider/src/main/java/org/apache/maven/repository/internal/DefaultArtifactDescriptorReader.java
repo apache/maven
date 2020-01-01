@@ -275,7 +275,6 @@ public class DefaultArtifactDescriptorReader
                 modelRequest.setTwoPhaseBuilding( false );
                 modelRequest.setSystemProperties( toProperties( session.getUserProperties(),
                                                                 session.getSystemProperties() ) );
-                modelRequest.setUserProperties( toProperties( session.getUserProperties(), null ) );
                 modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
                                                                          request.getRequestContext(), artifactResolver,
