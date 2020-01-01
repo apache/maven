@@ -60,14 +60,10 @@ echo NB: JAVA_HOME should point to a JDK not a JRE >&2
 goto error
 
 :chkMHome
-set "MAVEN_HOME=%~dp0.."
-if not "%MAVEN_HOME%"=="" goto stripMHome
+set "MAVEN_HOME=%~dp0"
+set "MAVEN_HOME=%MAVEN_HOME:~0,-5%"
+if not "%MAVEN_HOME%"=="" goto checkMCmd
 goto error
-
-:stripMHome
-if not "_%MAVEN_HOME:~-1%"=="_\" goto checkMCmd
-set "MAVEN_HOME=%MAVEN_HOME:~0,-1%"
-goto stripMHome
 
 :checkMCmd
 if exist "%MAVEN_HOME%\bin\mvn.cmd" goto init
