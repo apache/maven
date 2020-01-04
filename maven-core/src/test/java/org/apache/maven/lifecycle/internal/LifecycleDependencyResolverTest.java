@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -64,14 +63,7 @@ public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentT
         Set<Artifact> reactorArtifacts = new HashSet<>( 3 );
         for ( MavenProject reactorProject : session.getProjects() )
         {
-            reactorProject.setArtifactFilter( new ArtifactFilter()
-            {
-                @Override
-                public boolean include( Artifact artifact )
-                {
-                    return true;
-                }
-            } );
+            reactorProject.setArtifactFilter(artifact -> true);
             resolver.resolveProjectDependencies( reactorProject, scopesToCollect, scopesToResolve, session, aggregating, reactorArtifacts );
             reactorArtifacts.add( reactorProject.getArtifact() );
         }

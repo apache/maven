@@ -89,26 +89,15 @@ public class DefaultBeanConfiguratorTest
 
         Xpp3Dom config = toConfig( "<file>${test}</file>" );
 
-        BeanConfigurationValuePreprocessor preprocessor = new BeanConfigurationValuePreprocessor()
-        {
-            public Object preprocessValue( String value, Class<?> type )
-                throws BeanConfigurationException
+        BeanConfigurationValuePreprocessor preprocessor = (value, type) -> {
+            if ( value != null && value.startsWith( "${" ) && value.endsWith( "}" ) )
             {
-                if ( value != null && value.startsWith( "${" ) && value.endsWith( "}" ) )
-                {
-                    return value.substring( 2, value.length() - 1 );
-                }
-                return value;
+                return value.substring( 2, value.length() - 1 );
             }
+            return value;
         };
 
-        BeanConfigurationPathTranslator translator = new BeanConfigurationPathTranslator()
-        {
-            public File translatePath( File path )
-            {
-                return new File( "base", path.getPath() ).getAbsoluteFile();
-            }
-        };
+        BeanConfigurationPathTranslator translator = path -> new File( "base", path.getPath() ).getAbsoluteFile();
 
         DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
         request.setBean( bean ).setConfiguration( config );

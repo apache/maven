@@ -459,19 +459,14 @@ public class StringSearchModelInterpolatorTest
         List<Future<SimpleProblemCollector>>  futures = new ArrayList<>();
         for ( int i = 0; i < numItems; i++ )
         {
-            Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>()
-            {
-                public SimpleProblemCollector call()
-                    throws Exception
-                {
-                    final ObjectWithMixedProtection obj = getValueList();
-                    final ModelBuildingRequest config = createModelBuildingRequest( p );
+            Callable<SimpleProblemCollector> future = () -> {
+                final ObjectWithMixedProtection obj = getValueList();
+                final ModelBuildingRequest config = createModelBuildingRequest( p );
 
-                    countDownLatch.await();
-                    final SimpleProblemCollector collector = new SimpleProblemCollector();
-                    interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-                    return collector;
-                }
+                countDownLatch.await();
+                final SimpleProblemCollector collector = new SimpleProblemCollector();
+                interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
+                return collector;
             };
             FutureTask<SimpleProblemCollector> task = new FutureTask<>( future );
             futures.add( task );

@@ -105,18 +105,12 @@ public class DefaultArtifactResolver
         int threads = Integer.getInteger( "maven.artifact.threads", 5 );
         if ( threads <= 1 )
         {
-            executor = new Executor()
-            {
-                public void execute( Runnable command )
-                {
-                    command.run();
-                }
-            };
+            executor = Runnable::run;
         }
         else
         {
             executor = new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS,
-                                               new LinkedBlockingQueue<Runnable>(), new DaemonThreadCreator() );
+                    new LinkedBlockingQueue<>(), new DaemonThreadCreator() );
         }
     }
 
@@ -259,7 +253,7 @@ public class DefaultArtifactResolver
                                                              ArtifactNotFoundException
     {
         return resolveTransitively(
-                artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
+                artifacts, originatingArtifact, Collections.emptyMap(), localRepository,
                                     remoteRepositories, source, filter );
 
     }
@@ -307,7 +301,7 @@ public class DefaultArtifactResolver
                                                              ArtifactNotFoundException
     {
         return resolveTransitively(
-                artifacts, originatingArtifact, Collections.<String, Artifact>emptyMap(), localRepository,
+                artifacts, originatingArtifact, Collections.emptyMap(), localRepository,
                                     remoteRepositories, source, null, listeners );
     }
 

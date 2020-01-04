@@ -36,7 +36,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -137,15 +136,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         List<Lifecycle> lifecycles = new ArrayList<>( defaultLifeCycles.getLifeCycles() );
 
-        Collections.sort( lifecycles, new Comparator<Lifecycle>()
-        {
-
-            public int compare( Lifecycle l1, Lifecycle l2 )
-            {
-                return l1.getId().compareTo( l2.getId() );
-            }
-
-        } );
+        lifecycles.sort( Comparator.comparing( Lifecycle::getId ) );
 
         return lifecycles;
     }

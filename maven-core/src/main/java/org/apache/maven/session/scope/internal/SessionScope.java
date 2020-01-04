@@ -49,12 +49,9 @@ public class SessionScope
         }
     }
 
-    private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
+    private static final Provider<Object> SEEDED_KEY_PROVIDER = () ->
     {
-        public Object get()
-        {
-            throw new IllegalStateException();
-        }
+        throw new IllegalStateException();
     };
 
     /**
@@ -134,35 +131,31 @@ public class SessionScope
 
     public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
     {
-        return new Provider<T>()
+        return () ->
         {
-            @SuppressWarnings( "unchecked" )
-            public T get()
+            LinkedList<ScopeState> stack = values.get();
+            if ( stack == null || stack.isEmpty() )
             {
-                LinkedList<ScopeState> stack = values.get();
-                if ( stack == null || stack.isEmpty() )
-                {
-                    throw new OutOfScopeException( "Cannot access " + key + " outside of a scoping block" );
-                }
-
-                ScopeState state = stack.getFirst();
-
-                Provider<?> seeded = state.seeded.get( key );
-
-                if ( seeded != null )
-                {
-                    return (T) seeded.get();
-                }
-
-                T provided = (T) state.provided.get( key );
-                if ( provided == null && unscoped != null )
-                {
-                    provided = unscoped.get();
-                    state.provided.put( key, provided );
-                }
-
-                return provided;
+                throw new OutOfScopeException( "Cannot access " + key + " outside of a scoping block" );
             }
+
+            ScopeState state = stack.getFirst();
+
+            Provider<?> seeded = state.seeded.get( key );
+
+            if ( seeded != null )
+            {
+                return (T) seeded.get();
+            }
+
+            T provided = (T) state.provided.get( key );
+            if ( provided == null && unscoped != null )
+            {
+                provided = unscoped.get();
+                state.provided.put( key, provided );
+            }
+
+            return provided;
         };
     }
 

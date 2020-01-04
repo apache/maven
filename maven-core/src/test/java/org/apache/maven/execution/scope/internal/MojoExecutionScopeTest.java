@@ -23,7 +23,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import junit.framework.TestCase;
 
 import com.google.inject.Key;
-import com.google.inject.Provider;
 
 public class MojoExecutionScopeTest
     extends TestCase
@@ -90,23 +89,9 @@ public class MojoExecutionScopeTest
                 afterExecutionFailure.incrementAndGet();
             }
         };
-        assertSame( instance, scope.scope( Key.get( Object.class ), new Provider<Object>()
-        {
-            @Override
-            public Object get()
-            {
-                return instance;
-            }
-        } ).get() );
+        assertSame( instance, scope.scope( Key.get( Object.class ), () -> instance).get() );
         assertSame( instance,
-                    scope.scope( Key.get( WeakMojoExecutionListener.class ), new Provider<WeakMojoExecutionListener>()
-                    {
-                        @Override
-                        public WeakMojoExecutionListener get()
-                        {
-                            return instance;
-                        }
-                    } ).get() );
+                    scope.scope( Key.get( WeakMojoExecutionListener.class ), () -> instance).get() );
 
         final MojoExecutionEvent event = new MojoExecutionEvent( null, null, null, null );
         scope.beforeMojoExecution( event );
