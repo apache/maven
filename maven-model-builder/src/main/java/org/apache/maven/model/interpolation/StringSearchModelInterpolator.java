@@ -99,31 +99,27 @@ public class StringSearchModelInterpolator
             interpolator.addPostProcessor( postProcessor );
         }
         final RecursionInterceptor recursionInterceptor = createRecursionInterceptor();
-        return new InnerInterpolator()
+        return value ->
         {
-            @Override
-            public String interpolate( String value )
+            if ( value != null && value.contains( "${" ) )
             {
-                if ( value != null && value.contains( "${" ) )
+                String c = cache.get( value );
+                if ( c == null )
                 {
-                    String c = cache.get( value );
-                    if ( c == null )
+                    try
                     {
-                        try
-                        {
-                            c = interpolator.interpolate( value, recursionInterceptor );
-                        }
-                        catch ( InterpolationException e )
-                        {
-                            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                                    .setMessage( e.getMessage() ).setException( e ) );
-                        }
-                        cache.put( value, c );
+                        c = interpolator.interpolate( value, recursionInterceptor );
                     }
-                    return c;
+                    catch ( InterpolationException e )
+                    {
+                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                                .setMessage( e.getMessage() ).setException( e ) );
+                    }
+                    cache.put( value, c );
                 }
-                return value;
+                return c;
             }
+            return value;
         };
     }
 

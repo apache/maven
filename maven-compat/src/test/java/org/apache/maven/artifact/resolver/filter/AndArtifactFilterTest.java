@@ -21,8 +21,6 @@ package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 
-import org.apache.maven.artifact.Artifact;
-
 import junit.framework.TestCase;
 
 /**
@@ -36,13 +34,7 @@ public class AndArtifactFilterTest
 
     private ArtifactFilter newSubFilter()
     {
-        return new ArtifactFilter()
-        {
-            public boolean include( Artifact artifact )
-            {
-                return false;
-            }
-        };
+        return artifact -> false;
     }
 
     public void testEquals()
