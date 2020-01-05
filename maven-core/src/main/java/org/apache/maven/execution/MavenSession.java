@@ -21,6 +21,8 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +81,7 @@ public class MavenSession
         new ConcurrentHashMap<>();
 
 
-    public void setProjects( List<MavenProject> projects )
+    public synchronized void setProjects( List<MavenProject> projects )
     {
         if ( !projects.isEmpty() )
         {
@@ -239,11 +241,38 @@ public class MavenSession
     {
         try
         {
-            return (MavenSession) super.clone();
+            MavenSession thisClone = (MavenSession) super.clone();
+            thisClone.setProjects( getProjectsClone() );
+
+            return thisClone;
         }
         catch ( CloneNotSupportedException e )
         {
             throw new RuntimeException( "Bug", e );
+        }
+    }
+
+    private synchronized List<MavenProject> getProjectsClone()
+    {
+        if ( projects == null )
+        {
+            return null;
+        }
+        else
+        {
+            if ( projects.isEmpty() )
+            {
+                return Collections.emptyList();
+            }
+            else
+            {
+                List<MavenProject> clonedProjects = new ArrayList<>( projects.size() );
+                for ( MavenProject project : projects )
+                {
+                    clonedProjects.add( project.clone() );
+                }
+                return clonedProjects;
+            }
         }
     }
 
@@ -302,7 +331,7 @@ public class MavenSession
     {
         return projectMap;
     }
-    
+
     @Deprecated
     public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
                          MavenExecutionRequest request, MavenExecutionResult result )
