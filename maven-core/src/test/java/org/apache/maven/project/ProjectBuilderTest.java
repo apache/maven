@@ -26,6 +26,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +41,6 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
 
-import com.google.common.io.Files;
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -142,19 +143,20 @@ public class ProjectBuilderTest
         String initialValue = System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString( true ) );
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
-        File tempDir = Files.createTempDir();
-        FileUtils.copyDirectoryStructure (new File( "src/test/resources/projects/grandchild-check"), tempDir );
+
+        Path tempDir = Files.createTempDirectory(null);
+        FileUtils.copyDirectoryStructure (new File( "src/test/resources/projects/grandchild-check"), tempDir.toFile() );
         try
         {
             MavenSession mavenSession = createMavenSession( null );
             ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
             configuration.setRepositorySession( mavenSession.getRepositorySession() );
             org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
-            File child = new File( tempDir, "child/pom.xml" );
+            File child = new File( tempDir.toFile(), "child/pom.xml" );
             // build project once
             projectBuilder.build( child, configuration );
             // modify parent
-            File parent = new File( tempDir, "pom.xml" );
+            File parent = new File( tempDir.toFile(), "pom.xml" );
             String parentContent = FileUtils.fileRead( parent );
             parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
             		"<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
@@ -173,7 +175,7 @@ public class ProjectBuilderTest
             {
                 System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, initialValue );
             }
-            FileUtils.deleteDirectory( tempDir );
+            FileUtils.deleteDirectory( tempDir.toFile() );
         }
     }
 
