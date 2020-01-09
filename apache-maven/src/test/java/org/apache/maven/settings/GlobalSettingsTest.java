@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.
@@ -44,7 +45,7 @@ public class GlobalSettingsTest
         File globalSettingsFile = new File( basedir, "src/conf/settings.xml" );
         assertTrue( globalSettingsFile.getAbsolutePath(), globalSettingsFile.isFile() );
 
-        try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), "UTF-8" ) )
+        try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8) )
         {
             new SettingsXpp3Reader().read( reader );
         }

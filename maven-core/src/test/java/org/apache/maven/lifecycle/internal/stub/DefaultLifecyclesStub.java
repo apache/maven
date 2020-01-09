@@ -47,7 +47,6 @@ public class DefaultLifecyclesStub
         List<String> stubSiteCycle =
             Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase() );
 
-        @SuppressWarnings( "unchecked" )
         Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
 
         Map<String, Lifecycle> lifeCycles = new HashMap<>();
