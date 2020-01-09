@@ -107,7 +107,7 @@ public class CLIManager
 
     protected Options options;
 
-    @SuppressWarnings( { "static-access", "checkstyle:linelength" } )
+    @SuppressWarnings( "checkstyle:linelength" )
     public CLIManager()
     {
         options = new Options();

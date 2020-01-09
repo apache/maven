@@ -22,6 +22,7 @@ package org.apache.maven.repository.legacy;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,14 +73,7 @@ public class StringWagon
             resource.setContentLength( content.length() );
             resource.setLastModified( System.currentTimeMillis() );
 
-            try
-            {
-                inputData.setInputStream( new ByteArrayInputStream( content.getBytes( "UTF-8" ) ) );
-            }
-            catch ( UnsupportedEncodingException e )
-            {
-                throw new Error( "broken JVM", e );
-            }
+            inputData.setInputStream( new ByteArrayInputStream( content.getBytes( StandardCharsets.UTF_8 ) ) );
         }
         else
         {

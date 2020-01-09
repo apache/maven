@@ -22,6 +22,7 @@ package org.apache.maven.building;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a source.
@@ -62,7 +63,7 @@ public class StringSource
     public InputStream getInputStream()
         throws IOException
     {
-        return new ByteArrayInputStream( content.getBytes( "UTF-8" ) );
+        return new ByteArrayInputStream( content.getBytes( StandardCharsets.UTF_8 ) );
     }
 
     @Override

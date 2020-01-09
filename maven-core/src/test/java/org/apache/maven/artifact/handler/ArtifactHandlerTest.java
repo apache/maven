@@ -33,7 +33,6 @@ public class ArtifactHandlerTest
     {
         File apt = getTestFile( "src/site/apt/artifact-handlers.apt" );
 
-        @SuppressWarnings( "unchecked" )
         List<String> lines = FileUtils.loadFile( apt );
 
         for ( String line : lines )

@@ -55,7 +55,6 @@ public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
     // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     public void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance )
     {
         // The build has been set but we want to step in here and fill in
@@ -307,7 +306,6 @@ public class DefaultModelInheritanceAssembler
     }
 
     // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     private void assembleDependencyManagementInheritance( Model child, Model parent )
     {
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
@@ -527,7 +525,6 @@ public class DefaultModelInheritanceAssembler
     }
 
     // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     private void assembleDependencyInheritance( Model child, Model parent )
     {
         Map<String, Dependency> depsMap = new LinkedHashMap<>();
