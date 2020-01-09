@@ -59,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -293,7 +294,7 @@ public abstract class AbstractArtifactComponentTestCase
         {
             artifactFile.getParentFile().mkdirs();
         }
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" ) )
+        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), StandardCharsets.ISO_8859_1) )
         {
             writer.write( artifact.getId() );
         }

@@ -72,7 +72,6 @@ class ProblemDetectingValueSource
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public List getFeedback()
     {
         return valueSource.getFeedback();
