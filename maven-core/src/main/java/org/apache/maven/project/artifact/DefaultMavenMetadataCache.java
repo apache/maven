@@ -220,14 +220,14 @@ public class DefaultMavenMetadataCache
         {
             this.pomArtifact = ArtifactUtils.copyArtifact( pomArtifact );
             this.relocatedArtifact = ArtifactUtils.copyArtifactSafe( relocatedArtifact );
-            this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<Artifact>() );
+            this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<>() );
             this.remoteRepositories = new ArrayList<>( remoteRepositories );
 
             this.managedVersions = managedVersions;
             if ( managedVersions != null )
             {
                 this.managedVersions =
-                    ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<String, Artifact>() );
+                    ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<>() );
             }
 
             File pomFile = pomArtifact.getFile();
@@ -310,11 +310,11 @@ public class DefaultMavenMetadataCache
             Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
             Artifact relocatedArtifact = ArtifactUtils.copyArtifactSafe( cacheRecord.getRelocatedArtifact() );
             Set<Artifact> artifacts =
-                ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<Artifact>() );
+                ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<>() );
             Map<String, Artifact> managedVersions = cacheRecord.getManagedVersions();
             if ( managedVersions != null )
             {
-                managedVersions = ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<String, Artifact>() );
+                managedVersions = ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<>() );
             }
             return new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions,
                                         cacheRecord.getRemoteRepositories() );

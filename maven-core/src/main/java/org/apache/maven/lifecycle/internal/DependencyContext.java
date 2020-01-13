@@ -62,8 +62,8 @@ public class DependencyContext
         this.project = project;
         scopesToCollectForCurrentProject = scopesToCollect;
         scopesToResolveForCurrentProject = scopesToResolve;
-        scopesToCollectForAggregatedProjects = Collections.synchronizedSet( new TreeSet<String>() );
-        scopesToResolveForAggregatedProjects = Collections.synchronizedSet( new TreeSet<String>() );
+        scopesToCollectForAggregatedProjects = Collections.synchronizedSet( new TreeSet<>() );
+        scopesToResolveForAggregatedProjects = Collections.synchronizedSet( new TreeSet<>() );
     }
 
     public MavenProject getProject()

@@ -22,7 +22,6 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -108,7 +107,7 @@ public class LifecycleModuleBuilder
             eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
             MavenExecutionPlan executionPlan =
-                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
+                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<>() );
             List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
 
             projectExecutionListener.beforeProjectLifecycleExecution( new ProjectExecutionEvent( session,

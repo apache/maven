@@ -78,7 +78,7 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 if ( !groupedToolchains.containsKey( model.getType() ) )
                 {
-                    groupedToolchains.put( model.getType(), new ArrayList<ToolchainModel>() );
+                    groupedToolchains.put( model.getType(), new ArrayList<>() );
                 }
 
                 groupedToolchains.get( model.getType() ).add( model );

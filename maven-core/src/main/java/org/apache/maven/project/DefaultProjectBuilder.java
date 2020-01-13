@@ -185,8 +185,8 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.<String, MavenProject>emptyMap(), true,
-                             result, new HashMap<File, Boolean>(), projectBuildingRequest );
+                initProject( project, Collections.emptyMap(), true,
+                             result, new HashMap<>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -374,7 +374,7 @@ public class DefaultProjectBuilder
         Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
         boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive,
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
                    config );
 
         populateReactorModelPool( modelPool, interimResults );
@@ -384,8 +384,8 @@ public class DefaultProjectBuilder
         try
         {
             noErrors =
-                build( results, new ArrayList<MavenProject>(), projectIndex, interimResults, request,
-                       new HashMap<File, Boolean>(), config.session ) && noErrors;
+                build( results, new ArrayList<>(), projectIndex, interimResults, request,
+                        new HashMap<>(), config.session ) && noErrors;
         }
         finally
         {
@@ -465,7 +465,7 @@ public class DefaultProjectBuilder
         try
         {
             // first pass: build without building parent.
-            initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
+            initProject( project, projectIndex, false, result, new HashMap<>( 0 ), config.request );
         }
         catch ( InvalidArtifactRTException iarte )
         {

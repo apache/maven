@@ -437,7 +437,7 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException
     {
-        return build( request, result, new LinkedHashSet<String>() );
+        return build( request, result, new LinkedHashSet<>() );
     }
 
     private ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result,
