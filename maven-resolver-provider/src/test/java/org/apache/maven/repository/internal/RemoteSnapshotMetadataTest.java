@@ -75,7 +75,7 @@ public class RemoteSnapshotMetadataTest
         String datePart = ts.replaceAll( "\\..*", "" );
 
         /* Allow for this test running across midnight */
-        Set<String> expected = new HashSet<String>( Arrays.asList( dateBefore, dateAfter ) );
+        Set<String> expected = new HashSet<>( Arrays.asList( dateBefore, dateAfter ) );
         assertTrue( "Expected " + datePart + " to be in " + expected,
                 expected.contains( datePart ) );
     }

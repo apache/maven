@@ -56,7 +56,7 @@ class FilteredProjectDependencyGraph
         this.projectDependencyGraph =
                 Objects.requireNonNull( projectDependencyGraph, "projectDependencyGraph cannot be null" );
 
-        this.whiteList = new IdentityHashMap<MavenProject, Object>();
+        this.whiteList = new IdentityHashMap<>();
 
         for ( MavenProject project : whiteList )
         {

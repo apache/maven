@@ -179,7 +179,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         finalizeMojoConfiguration( mojoExecution );
 
-        calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
+        calculateForkedExecutions( mojoExecution, session, project, new HashSet<>() );
     }
 
     public List<MojoExecution> calculateMojoExecutions( MavenSession session, MavenProject project, List<Object> tasks )
@@ -331,7 +331,7 @@ public class DefaultLifecycleExecutionPlanCalculator
         PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
-        calculateForkedExecutions( mojoExecution, session, session.getCurrentProject(), new HashSet<MojoDescriptor>() );
+        calculateForkedExecutions( mojoExecution, session, session.getCurrentProject(), new HashSet<>() );
     }
 
     private void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session, MavenProject project,

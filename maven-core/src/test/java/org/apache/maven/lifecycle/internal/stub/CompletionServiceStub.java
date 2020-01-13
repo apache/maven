@@ -33,7 +33,7 @@ public class CompletionServiceStub
     implements CompletionService<ProjectSegment>
 {
     List<FutureTask<ProjectSegment>> projectBuildFutureTasks =
-        Collections.synchronizedList( new ArrayList<FutureTask<ProjectSegment>>() );
+        Collections.synchronizedList(new ArrayList<>() );
 
     final boolean finishImmediately;
 

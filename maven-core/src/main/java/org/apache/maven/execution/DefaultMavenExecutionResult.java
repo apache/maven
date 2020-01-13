@@ -41,7 +41,7 @@ public class DefaultMavenExecutionResult
     private final List<Throwable> exceptions = new CopyOnWriteArrayList<>();
 
     private final Map<MavenProject, BuildSummary> buildSummaries =
-        Collections.synchronizedMap( new IdentityHashMap<MavenProject, BuildSummary>() );
+        Collections.synchronizedMap( new IdentityHashMap<>() );
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -65,7 +65,7 @@ public class DefaultMavenExecutionResult
     public List<MavenProject> getTopologicallySortedProjects()
     {
         return null == topologicallySortedProjects
-                   ? Collections.<MavenProject>emptyList()
+                   ? Collections.emptyList()
                    : Collections.unmodifiableList( topologicallySortedProjects );
 
     }

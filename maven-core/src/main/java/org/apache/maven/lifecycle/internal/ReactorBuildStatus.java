@@ -37,7 +37,7 @@ public class ReactorBuildStatus
 {
     private final ProjectDependencyGraph projectDependencyGraph;
 
-    private final Collection<String> blackListedProjects = Collections.synchronizedSet( new HashSet<String>() );
+    private final Collection<String> blackListedProjects = Collections.synchronizedSet( new HashSet<>() );
 
     private volatile boolean halted = false;
 

@@ -41,7 +41,7 @@ public class ConsoleMavenTransferListener
 {
 
     private Map<TransferResource, Long> transfers = Collections.synchronizedMap(
-                                                        new LinkedHashMap<TransferResource, Long>() );
+            new LinkedHashMap<>() );
 
     private boolean printResourceNames;
     private int lastLength;

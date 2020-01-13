@@ -175,7 +175,7 @@ public class MavenProject
 
     private DependencyFilter extensionDependencyFilter;
 
-    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
+    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<>() );
 
     public MavenProject()
     {
