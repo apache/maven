@@ -45,7 +45,7 @@ under the License.
   -->
   <repositories>
     <id>imaginary-repo</id>
-    <url>http://repository.imaginary/</url>
+    <url>https://repository.imaginary/</url>
   </repositories>
 
   <distributionManagement>

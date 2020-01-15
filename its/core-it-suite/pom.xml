@@ -72,7 +72,7 @@ under the License.
       use for the tests. -->
     <preparedMavenHome>${mavenHome}</preparedMavenHome>
     <!-- default properties used to filter the global settings -->
-    <maven.it.central>http://repo1.maven.org/maven2</maven.it.central>
+    <maven.it.central>https://repo1.maven.org/maven2</maven.it.central>
     <proxy.active>false</proxy.active>
     <proxy.host>localhost</proxy.host>
     <proxy.port>80</proxy.port>

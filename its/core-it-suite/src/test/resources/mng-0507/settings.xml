@@ -26,7 +26,7 @@ under the License.
       <repositories>
         <repository>
           <id>central</id>
-          <url>http://repo1.maven.org/maven2</url>
+          <url>https://repo1.maven.org/maven2</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
@@ -38,7 +38,7 @@ under the License.
       <pluginRepositories>
         <pluginRepository>
           <id>central</id>
-          <url>http://repo1.maven.org/maven2</url>
+          <url>https://repo1.maven.org/maven2</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>

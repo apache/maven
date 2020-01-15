@@ -112,21 +112,21 @@ under the License.
     <!-- duplicate repository id's (MNG-4193) -->
     <repository>
       <id>non-unique-id</id>
-      <url>http://repo1.maven.org</url>
+      <url>https://repo1.maven.org</url>
     </repository>
     <repository>
       <id>non-unique-id</id>
-      <url>http://repo2.maven.org</url>
+      <url>https://repo2.maven.org</url>
     </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>non-unique-id</id>
-      <url>http://repo1.maven.org</url>
+      <url>https://repo1.maven.org</url>
     </pluginRepository>
     <pluginRepository>
       <id>non-unique-id</id>
-      <url>http://repo2.maven.org</url>
+      <url>https://repo2.maven.org</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -171,21 +171,21 @@ under the License.
         <!-- duplicate repository id's (MNG-4193) -->
         <repository>
           <id>non-unique-id</id>
-          <url>http://repo1.maven.org</url>
+          <url>https://repo1.maven.org</url>
         </repository>
         <repository>
           <id>non-unique-id</id>
-          <url>http://repo2.maven.org</url>
+          <url>https://repo2.maven.org</url>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
           <id>non-unique-id</id>
-          <url>http://repo1.maven.org</url>
+          <url>https://repo1.maven.org</url>
         </pluginRepository>
         <pluginRepository>
           <id>non-unique-id</id>
-          <url>http://repo2.maven.org</url>
+          <url>https://repo2.maven.org</url>
         </pluginRepository>
       </pluginRepositories>
     </profile>
