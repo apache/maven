@@ -79,10 +79,10 @@ under the License.
         </exclusion>
       </exclusions>
     </dependency>
+    <!--  This is included in Wagon HTTP.
+          We are just making the dependency explicit
+          in order to ease license attribution -->
     <dependency>
-      <!-- this is included in Wagon Http
-           we are just making the dependency explicit
-           in order to ease license attribution -->
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
       <scope>runtime</scope>
