@@ -18,21 +18,21 @@
 ##
 
 
-Apache Maven includes a number of components and libraries with separate 
-copyright notices and license terms. Your use of those components are 
-subject to the terms and conditions of the following licenses: 
+Apache Maven includes a number of components and libraries with separate
+copyright notices and license terms. Your use of those components are
+subject to the terms and conditions of the following licenses:
 ##
 #set ( $apacheMavenGroupIds = [ "org.apache.maven", "org.apache.maven.wagon", "org.apache.maven.resolver",
                                 "org.apache.maven.shared" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
 #foreach ( $project in $projects )
-#**##foreach ( $license in $project.licenses)
+#**##foreach ( $license in $project.licenses )
 #*  *##set ( $groupId = $project.artifact.groupId )
 #*  *##set ( $directory = 'lib' )
 #*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) )
 #*    *### advertise about each non-Maven dependency
 #*    *###
-#*    *### infer SPDX license code
+#*    *### infer SPDX license id
 #*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
 #*      *##set ( $spdx = 'CDDL-1.0' )
 #*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
@@ -40,7 +40,7 @@ subject to the terms and conditions of the following licenses:
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
-#*      *##set ( $spdx = 'ASL-2.0' )
+#*      *##set ( $spdx = 'Apache-2.0' )
 #*    *##else
 #*      *### unrecognized license will require analysis to know obligations
 #*      *##set ( $spdx = 'unrecognized' )
@@ -68,13 +68,16 @@ subject to the terms and conditions of the following licenses:
 #*    *##else
 #*      *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}.txt", "licenses/${licFile}" ) )
 #*    *##end
+
 #*    *### add dependency info to output
 
 - $directory/${project.artifact.artifactId}-${project.artifact.version}.jar: $project.artifact.toString().replace( ':eclipse-plugin:', ':jar:' )
-    $project.name
+    Project: $project.name
     #if ( $project.url )Project URL: ${project.url}#end
 
-    License: $license.name#if ( $spdx ) ($spdx)#end  $license.url ($licFile)
+    License: $license.name#if ( $spdx ) ($spdx)#end
+
+    License URL: $license.url ($licFile)
 
 #*  *##end
 #**##end
