@@ -17,7 +17,6 @@ package org.apache.maven.lifecycle.internal;
 
 import junit.framework.TestCase;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
