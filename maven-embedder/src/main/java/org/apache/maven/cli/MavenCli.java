@@ -1613,7 +1613,7 @@ public class MavenCli
             }
             else
             {
-                request.setDegreeOfConcurrency( Integer.valueOf( threadConfiguration ) );
+                request.setDegreeOfConcurrency( Integer.parseInt( threadConfiguration ) );
             }
         }
 
@@ -1631,7 +1631,7 @@ public class MavenCli
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
     {
         int procs = Runtime.getRuntime().availableProcessors();
-        return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
+        return (int) ( Float.parseFloat( threadConfiguration.replace( "C", "" ) ) * procs );
     }
 
     // ----------------------------------------------------------------------

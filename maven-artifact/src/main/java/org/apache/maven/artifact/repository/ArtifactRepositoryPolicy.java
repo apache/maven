@@ -138,7 +138,7 @@ public class ArtifactRepositoryPolicy
         else if ( updatePolicy.startsWith( UPDATE_POLICY_INTERVAL ) )
         {
             String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
-            int minutes = Integer.valueOf( s );
+            int minutes = Integer.parseInt( s );
             Calendar cal = Calendar.getInstance();
             cal.add( Calendar.MINUTE, -minutes );
             if ( cal.getTime().after( lastModified ) )
@@ -212,7 +212,7 @@ public class ArtifactRepositoryPolicy
         else if ( policy != null && policy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
         {
             String s = policy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
-            return Integer.valueOf( s );
+            return Integer.parseInt( s );
         }
         else
         {
