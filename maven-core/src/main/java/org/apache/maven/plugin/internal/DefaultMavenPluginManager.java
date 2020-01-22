@@ -100,7 +100,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -453,14 +452,7 @@ public class DefaultMavenPluginManager
     {
         List<Artifact> artifacts = new ArrayList<>( nlg.getNodes().size() );
         RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
-        for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
-        {
-            Artifact artifact = it.next();
-            if ( artifact.getFile() == null )
-            {
-                it.remove();
-            }
-        }
+        artifacts.removeIf( artifact -> artifact.getFile() == null );
         return Collections.unmodifiableList( artifacts );
     }
 

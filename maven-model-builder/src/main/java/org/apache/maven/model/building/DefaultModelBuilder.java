@@ -924,7 +924,7 @@ public class DefaultModelBuilder
             catch ( UnresolvableModelException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ) //
-                .setMessage( e.getMessage().toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
+                .setMessage( e.getMessage() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
                 throw problems.newModelBuildingException();
             }
             if ( candidateModel == null )
@@ -1251,7 +1251,7 @@ public class DefaultModelBuilder
                     catch ( UnresolvableModelException e )
                     {
                         problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                            .setMessage( e.getMessage().toString() ).setException( e ) );
+                            .setMessage( e.getMessage() ).setException( e ) );
                         continue;
                     }
                 }

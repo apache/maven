@@ -21,7 +21,6 @@ package org.apache.maven.plugin.internal;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -61,14 +60,7 @@ class PluginDependencyResolutionListener
     {
         if ( !bannedArtifacts.isEmpty() && artifacts != null )
         {
-            for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
-            {
-                Artifact artifact = it.next();
-                if ( bannedArtifacts.containsKey( artifact ) )
-                {
-                    it.remove();
-                }
-            }
+            artifacts.removeIf( artifact -> bannedArtifacts.containsKey( artifact ) );
         }
     }
 

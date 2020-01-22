@@ -132,7 +132,7 @@ public class ComparableVersion
             {
                 case INT_ITEM:
                     int itemValue = ( (IntItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
+                    return Integer.compare( value, itemValue );
                 case LONG_ITEM:
                 case BIGINTEGER_ITEM:
                     return -1;
@@ -218,7 +218,7 @@ public class ComparableVersion
                     return 1;
                 case LONG_ITEM:
                     long itemValue = ( (LongItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
+                    return Long.compare( value, itemValue );
                 case BIGINTEGER_ITEM:
                     return -1;
 
@@ -787,7 +787,7 @@ public class ComparableVersion
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }
 
-            System.out.println( String.valueOf( i++ ) + ". " + version + " == " + c.getCanonical() );
+            System.out.println( ( i++ ) + ". " + version + " == " + c.getCanonical() );
 
             prev = c;
         }
