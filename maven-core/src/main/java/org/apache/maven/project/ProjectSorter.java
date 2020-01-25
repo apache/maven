@@ -99,12 +99,8 @@ public class ProjectSorter
 
             String projectKey = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            Map<String, Vertex> vertices = vertexMap.get( projectKey );
-            if ( vertices == null )
-            {
-                vertices = new HashMap<>( 2, 1 );
-                vertexMap.put( projectKey, vertices );
-            }
+            Map<String, Vertex> vertices = vertexMap.computeIfAbsent( projectKey, k -> new HashMap<>( 2, 1 ) );
+
             vertices.put( project.getVersion(), dag.addVertex( projectId ) );
         }
 

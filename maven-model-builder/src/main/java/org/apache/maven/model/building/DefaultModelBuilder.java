@@ -708,10 +708,7 @@ public class DefaultModelBuilder
                     for ( Plugin plugin : mgmt.getPlugins() )
                     {
                         String key = plugin.getKey();
-                        if ( managedVersions.get( key ) == null )
-                        {
-                            managedVersions.put( key, plugin.getVersion() );
-                        }
+                        managedVersions.computeIfAbsent( key, k -> plugin.getVersion() );
                     }
                 }
             }

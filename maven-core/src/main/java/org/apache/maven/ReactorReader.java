@@ -73,13 +73,7 @@ class ReactorReader
         {
             String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            List<MavenProject> projects = projectsByGA.get( key );
-
-            if ( projects == null )
-            {
-                projects = new ArrayList<>( 1 );
-                projectsByGA.put( key, projects );
-            }
+            List<MavenProject> projects = projectsByGA.computeIfAbsent( key, k -> new ArrayList<>( 1 ) );
 
             projects.add( project );
         }
