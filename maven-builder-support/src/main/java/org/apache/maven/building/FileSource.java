@@ -35,6 +35,8 @@ public class FileSource
 {
     private final File file;
 
+    private final int hashCode; 
+
     /**
      * Creates a new source backed by the specified file.
      *
@@ -43,6 +45,7 @@ public class FileSource
     public FileSource( File file )
     {
         this.file = Objects.requireNonNull( file, "file cannot be null" ).getAbsoluteFile();
+        this.hashCode = Objects.hash( file );
     }
 
     @Override
@@ -72,5 +75,33 @@ public class FileSource
     public String toString()
     {
         return getLocation();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+
+        if ( obj == null )
+        {
+            return false;
+        }
+
+        if ( !FileSource.class.equals( obj.getClass() ) )
+        {
+            return false;
+        }
+
+        FileSource other = (FileSource) obj;
+        return this.file.equals( other.file );
     }
 }

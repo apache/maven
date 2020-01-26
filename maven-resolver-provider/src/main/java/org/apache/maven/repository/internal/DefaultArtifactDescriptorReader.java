@@ -32,9 +32,9 @@ import javax.inject.Singleton;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -286,7 +286,10 @@ public class DefaultArtifactDescriptorReader
                 }
                 else
                 {
-                    modelRequest.setModelSource( new FileModelSource( pomArtifact.getFile() ) );
+                    modelRequest.setModelSource( new ArtifactModelSource( pomArtifact.getFile(),
+                                                                          pomArtifact.getGroupId(),
+                                                                          pomArtifact.getArtifactId(),
+                                                                          pomArtifact.getVersion() ) );
                 }
 
                 model = modelBuilder.build( modelRequest ).getEffectiveModel();

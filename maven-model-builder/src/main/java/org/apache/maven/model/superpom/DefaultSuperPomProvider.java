@@ -74,7 +74,7 @@ public class DefaultSuperPomProvider
 
             try
             {
-                Map<String, Object> options = new HashMap<>();
+                Map<String, Object> options = new HashMap<>( 2 );
                 options.put( "xml:4.0.0", "xml:4.0.0" );
 
                 String modelId = "org.apache.maven:maven-model-builder:"
