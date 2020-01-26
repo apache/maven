@@ -27,6 +27,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -35,13 +36,14 @@ import java.util.concurrent.FutureTask;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.powermock.reflect.Whitebox.getField;
-import static org.powermock.reflect.Whitebox.getInternalState;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
+ * StringSearchModelInterpolatorTest - not in use
+ *
  * @author jdcasey
  * @author Benjamin Bentmann
+ * @deprecated replaced by StringVisitorModelInterpolator (MNG-6697)
  */
 public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest
@@ -59,19 +61,16 @@ public class StringSearchModelInterpolatorTest
 
 
     protected ModelInterpolator createInterpolator( org.apache.maven.model.path.PathTranslator translator )
-        throws Exception
     {
         return this.interpolator;
     }
 
     protected ModelInterpolator createInterpolator()
-        throws Exception
     {
         return this.interpolator;
     }
 
     public void testInterpolateStringArray()
-        throws Exception
     {
         Model model = new Model();
 
@@ -101,7 +100,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringArrayField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -126,7 +124,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringListField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -153,7 +150,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringListFieldAndOneLiteralValue()
-        throws Exception
     {
         Model model = new Model();
 
@@ -180,7 +176,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithUnmodifiableStringListField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -204,7 +199,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringArrayListField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -235,7 +229,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringToStringMapField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -262,7 +255,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringToStringMapFieldAndOneLiteralValue()
-        throws Exception
     {
         Model model = new Model();
 
@@ -289,7 +281,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithUnmodifiableStringToStringMapField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -313,7 +304,6 @@ public class StringSearchModelInterpolatorTest
     }
 
     public void testInterpolateObjectWithStringToStringArrayMapField()
-        throws Exception
     {
         Model model = new Model();
 
@@ -393,10 +383,7 @@ public class StringSearchModelInterpolatorTest
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
         assertProblemFree( collector );
 
-        //noinspection unchecked
-        Map<Class<?>, ?> cache =
-                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
-                        .get( null );
+        Map<Class<?>, ?> cache = getCachedEntries();
 
         Object objCacheItem = cache.get( Object.class );
         Object fileCacheItem = cache.get( File.class );
@@ -404,8 +391,24 @@ public class StringSearchModelInterpolatorTest
         assertNotNull( objCacheItem );
         assertNotNull( fileCacheItem );
 
-        assertThat( ( (Object[]) getInternalState( objCacheItem, "fields" ) ).length, is( 0 ) );
-        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+        assertThat( readFieldsArray( objCacheItem ).length, is( 0 ) );
+        assertThat( readFieldsArray( fileCacheItem ).length, is( 0 ) );
+    }
+
+    private static Object[] readFieldsArray( Object o ) throws NoSuchFieldException, IllegalAccessException
+    {
+        assertNotNull( o );
+        Field field = o.getClass().getDeclaredField( "fields" );
+        field.setAccessible( true );
+        return (Object[]) field.get( o );
+    }
+
+    private static Map<Class<?>, ?> getCachedEntries() throws NoSuchFieldException, IllegalAccessException
+    {
+        Field field = StringSearchModelInterpolator.class.getDeclaredField( "CACHED_ENTRIES" );
+        field.setAccessible( true );
+        //noinspection unchecked
+        return (Map<Class<?>, ?>) field.get( null );
     }
 
     public void testNotInterpolateFile()
@@ -425,16 +428,13 @@ public class StringSearchModelInterpolatorTest
         interpolator.interpolateObject( baseDir, model, new File( "." ), config, collector );
         assertProblemFree( collector );
 
-        //noinspection unchecked
-        Map<Class<?>, ?> cache =
-                (Map<Class<?>, ?>) getField( StringSearchModelInterpolator.class, "CACHED_ENTRIES" )
-                        .get( null );
+        Map<Class<?>, ?> cache = getCachedEntries();
 
         Object fileCacheItem = cache.get( File.class );
 
         assertNotNull( fileCacheItem );
 
-        assertThat( ( (Object[]) getInternalState( fileCacheItem, "fields" ) ).length, is( 0 ) );
+        assertThat( readFieldsArray( fileCacheItem ).length, is( 0 ) );
     }
 
 
