@@ -20,6 +20,7 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * Resolve relative file path against the given base directory
@@ -43,7 +44,7 @@ public class ResolveFile
         }
         else
         {
-            return new File( baseDirectory, file.getPath() ).getAbsoluteFile();
+            return Paths.get( baseDirectory, file.getPath() ).normalize().toFile();
         }
     }
 }
