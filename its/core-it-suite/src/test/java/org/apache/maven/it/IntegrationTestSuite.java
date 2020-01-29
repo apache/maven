@@ -108,6 +108,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         suite.addTestSuite( MavenITmng5669ReadPomsOnce.class );
+        suite.addTestSuite( MavenITmng6071GetResourceWithCustomPom.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );
         suite.addTestSuite( MavenITmng6720FailFastTest.class );
         suite.addTestSuite( MavenITmng6506PackageAnnotationTest.class );
