@@ -13,3 +13,4 @@ bin
 jvz-*
 .flattened-pom.xml
 .checkstyle
+dependency-reduced-pom.xml

@@ -40,6 +40,7 @@ under the License.
     <module>core-it-support-artifacts</module>
     <module>maven-it-helper</module>
     <module>core-it-extension</module>
+    <module>core-it-javaagent</module>
   </modules>
 
   <!-- TODO this needs to be improved, right now it doesn't deploy to releases repo -->
