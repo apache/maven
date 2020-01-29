@@ -179,11 +179,7 @@ class ReactorReader
                 String type = artifact.getProperty( "type", "" );
                 if ( COMPILE_PHASE_TYPES.contains( type ) )
                 {
-                    File outputDirectory = new File( project.getBuild().getOutputDirectory() );
-                    if ( outputDirectory.exists() )
-                    {
-                        return outputDirectory;
-                    }
+                    return new File( project.getBuild().getOutputDirectory() );
                 }
             }
         }
