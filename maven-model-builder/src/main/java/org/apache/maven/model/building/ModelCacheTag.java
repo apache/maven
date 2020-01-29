@@ -129,4 +129,30 @@ interface ModelCacheTag<T>
 
     };
 
+    ModelCacheTag<Model> FILEMODEL = new ModelCacheTag<Model>() 
+    {
+        @Override
+        public String getName()
+        {
+            return "file-model";
+        }
+
+        @Override
+        public Class<Model> getType()
+        {
+            return Model.class;
+        }
+
+        @Override
+        public Model intoCache( Model data )
+        {
+            return ( data != null ) ? data.clone() : null;
+        }
+
+        @Override
+        public Model fromCache( Model data )
+        {
+            return intoCache( data );
+        }
+    };
 }
