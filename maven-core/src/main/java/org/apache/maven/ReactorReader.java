@@ -66,7 +66,12 @@ class ReactorReader
     @Inject
     ReactorReader( MavenSession session )
     {
-        projectsByGAV = session.getProjectMap();
+        this.projectsByGAV = new HashMap<>( session.getAllProjects().size() * 2 );
+        session.getAllProjects().forEach( project ->
+        {
+            String projectId = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+            this.projectsByGAV.put( projectId, project );
+        } );
 
         projectsByGA = new HashMap<>( projectsByGAV.size() * 2 );
         for ( MavenProject project : projectsByGAV.values() )
@@ -172,9 +177,13 @@ class ReactorReader
             else
             {
                 String type = artifact.getProperty( "type", "" );
-                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
+                if ( COMPILE_PHASE_TYPES.contains( type ) )
                 {
-                    return new File( project.getBuild().getOutputDirectory() );
+                    File outputDirectory = new File( project.getBuild().getOutputDirectory() );
+                    if ( outputDirectory.exists() )
+                    {
+                        return outputDirectory;
+                    }
                 }
             }
         }
