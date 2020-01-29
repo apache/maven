@@ -417,12 +417,12 @@ public class DefaultModelBuilder
 
         if ( request.getPomFile() != null )
         {
-            putCache( request.getModelCache(), new FileModelSource( request.getPomFile() ), ModelCacheTag.RAW,
+            intoCache( request.getModelCache(), new FileModelSource( request.getPomFile() ), ModelCacheTag.RAW,
                       resultData );
         }
         else
         {
-            putCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, resultData );
+            intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, resultData );
         }
 
         result.setEffectiveModel( resultModel );
@@ -646,7 +646,7 @@ public class DefaultModelBuilder
 
         if ( pomFile != null )
         {
-            putCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
+            intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
         }
 
         String groupId = getGroupId( model );
@@ -654,7 +654,7 @@ public class DefaultModelBuilder
         String version = getVersion( model );
 
         ModelData modelData = new ModelData( modelSource, model, groupId, artifactId, version );
-        putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
+        intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
 
         return model;
     }
@@ -665,7 +665,7 @@ public class DefaultModelBuilder
         if ( modelSource instanceof ArtifactModelSource )
         {
             ArtifactModelSource artifactModelSource = ( ArtifactModelSource ) modelSource;
-            ModelData modelData = getCache( cache, artifactModelSource.getGroupId(),
+            ModelData modelData = fromCache( cache, artifactModelSource.getGroupId(),
                                             artifactModelSource.getArtifactId(),
                                             artifactModelSource.getVersion(), ModelCacheTag.RAW );
             if ( modelData != null )
@@ -679,7 +679,7 @@ public class DefaultModelBuilder
         }
         else
         {
-            model = getCache( cache, modelSource, ModelCacheTag.FILEMODEL );
+            model = fromCache( cache, modelSource, ModelCacheTag.FILEMODEL );
             
             if ( model != null )
             {
@@ -942,7 +942,7 @@ public class DefaultModelBuilder
 
             if ( parentData == null )
             {
-                parentData = getCache( request.getModelCache(), 
+                parentData = fromCache( request.getModelCache(), 
                                        parent.getGroupId(), parent.getArtifactId(),
                                        parent.getVersion(), ModelCacheTag.RAW );
                 
@@ -951,7 +951,7 @@ public class DefaultModelBuilder
                 {
                     parentData = readParentExternally( childModel, request, problems );
                     
-                    putCache( request.getModelCache(), 
+                    intoCache( request.getModelCache(), 
                               parentData.getGroupId(), parentData.getArtifactId(),
                               parentData.getVersion(), ModelCacheTag.RAW, parentData );
                 }
@@ -1313,7 +1313,7 @@ public class DefaultModelBuilder
                 continue;
             }
 
-            DependencyManagement importMgmt = getCache( request.getModelCache(), groupId, artifactId, version,
+            DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
                                                         ModelCacheTag.IMPORT );
 
             if ( importMgmt == null )
@@ -1402,7 +1402,7 @@ public class DefaultModelBuilder
                     importMgmt = new DependencyManagement();
                 }
 
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
             }
 
             if ( importMgmts == null )
@@ -1418,7 +1418,7 @@ public class DefaultModelBuilder
         dependencyManagementImporter.importManagement( model, importMgmts, request, problems );
     }
 
-    private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,
+    private <T> void intoCache( ModelCache modelCache, String groupId, String artifactId, String version,
                                ModelCacheTag<T> tag, T data )
     {
         if ( modelCache != null )
@@ -1427,7 +1427,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private <T> void putCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data )
+    private <T> void intoCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data )
     {
         if ( modelCache != null )
         {
@@ -1435,7 +1435,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private <T> T getCache( ModelCache modelCache, String groupId, String artifactId, String version,
+    private <T> T fromCache( ModelCache modelCache, String groupId, String artifactId, String version,
                             ModelCacheTag<T> tag )
     {
         if ( modelCache != null )
@@ -1449,7 +1449,7 @@ public class DefaultModelBuilder
         return null;
     }
 
-    private <T> T getCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
+    private <T> T fromCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
     {
         if ( modelCache != null )
         {
