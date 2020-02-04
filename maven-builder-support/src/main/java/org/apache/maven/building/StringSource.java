@@ -22,6 +22,7 @@ package org.apache.maven.building;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a source.
@@ -31,10 +32,11 @@ import java.io.InputStream;
 public class StringSource
     implements Source
 {
+    private final String content;
 
-    private String content;
+    private final String location;
 
-    private String location;
+    private final int hashCode;
 
     /**
      * Creates a new source backed by the specified string.
@@ -56,13 +58,14 @@ public class StringSource
     {
         this.content = ( content != null ) ? content.toString() : "";
         this.location = ( location != null ) ? location : "(memory)";
+        this.hashCode = this.content.hashCode();
     }
 
     @Override
     public InputStream getInputStream()
         throws IOException
     {
-        return new ByteArrayInputStream( content.getBytes( "UTF-8" ) );
+        return new ByteArrayInputStream( content.getBytes( StandardCharsets.UTF_8 ) );
     }
 
     @Override
@@ -87,4 +90,31 @@ public class StringSource
         return getLocation();
     }
 
+    @Override
+    public int hashCode()
+    {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj ) 
+        {
+            return true;
+        }
+
+        if ( obj == null )
+        {
+            return false;
+        }
+
+        if ( !StringSource.class.equals( obj.getClass() ) )
+        {
+            return false;
+        }
+
+        StringSource other = (StringSource) obj;
+        return this.content.equals( other.content );
+    }
 }

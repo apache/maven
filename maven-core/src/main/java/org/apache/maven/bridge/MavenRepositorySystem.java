@@ -621,13 +621,7 @@ public class MavenRepositorySystem
         {
             String key = repository.getId();
 
-            List<ArtifactRepository> aliasedRepos = reposByKey.get( key );
-
-            if ( aliasedRepos == null )
-            {
-                aliasedRepos = new ArrayList<>();
-                reposByKey.put( key, aliasedRepos );
-            }
+            List<ArtifactRepository> aliasedRepos = reposByKey.computeIfAbsent( key, k -> new ArrayList<>() );
 
             aliasedRepos.add( repository );
         }

@@ -58,6 +58,8 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logwrapper.LogLevelRecorder;
+import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -335,7 +337,7 @@ public class MavenCli
                     "-D%s system property is not set.", MULTIMODULE_PROJECT_DIRECTORY );
                 throw new ExitException( 1 );
             }
-            File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
+            File basedir = new File( basedirProperty );
             try
             {
                 cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
@@ -542,6 +544,24 @@ public class MavenCli
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.FAIL_ON_SEVERITY ) )
+        {
+            String logLevelThreshold = cliRequest.commandLine.getOptionValue( CLIManager.FAIL_ON_SEVERITY );
+
+            if ( slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory )
+            {
+                LogLevelRecorder logLevelRecorder = new LogLevelRecorder( logLevelThreshold );
+                ( (MavenSlf4jWrapperFactory) slf4jLoggerFactory ).setLogLevelRecorder( logLevelRecorder );
+                slf4jLogger.info( "Enabled to break the build on log level {}.", logLevelThreshold );
+            }
+            else
+            {
+                slf4jLogger.warn( "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
+                        + "The --fail-on-severity flag will not take effect.",
+                        MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName() );
+            }
+        }
     }
 
     private void version( CliRequest cliRequest )
@@ -745,7 +765,7 @@ public class MavenCli
 
                 MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
 
-                request = populateRequest( cliRequest, request );
+                populateRequest( cliRequest, request );
 
                 request = executionRequestPopulator.populateDefaults( request );
 
@@ -1343,6 +1363,8 @@ public class MavenCli
         // this is the default behavior.
         String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
 
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+
         if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
         {
             recursive = false;
@@ -1592,7 +1614,7 @@ public class MavenCli
             }
             else
             {
-                request.setDegreeOfConcurrency( Integer.valueOf( threadConfiguration ) );
+                request.setDegreeOfConcurrency( Integer.parseInt( threadConfiguration ) );
             }
         }
 
@@ -1610,7 +1632,7 @@ public class MavenCli
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
     {
         int procs = Runtime.getRuntime().availableProcessors();
-        return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
+        return (int) ( Float.parseFloat( threadConfiguration.replace( "C", "" ) ) * procs );
     }
 
     // ----------------------------------------------------------------------

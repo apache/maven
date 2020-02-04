@@ -129,7 +129,7 @@ public class DefaultToolchainManager
             }
         }
 
-        return ( context != null ) ? context : new HashMap<String, Object>();
+        return ( context != null ) ? context : new HashMap<>();
     }
 
     public static final String getStorageKey( String type )

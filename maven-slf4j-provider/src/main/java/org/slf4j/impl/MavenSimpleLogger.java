@@ -19,18 +19,18 @@ package org.slf4j.impl;
  * under the License.
  */
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.level;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
 import java.io.PrintStream;
 
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+import static org.apache.maven.shared.utils.logging.MessageUtils.level;
+
 /**
- * Logger for Maven, that support colorization of levels and stacktraces.
- * This class implements 2 methods introduced in slf4j-simple provider local copy.
+ * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in
+ * slf4j-simple provider local copy.
+ *
  * @since 3.5.0
  */
-public class MavenSimpleLogger
-    extends SimpleLogger
+public class MavenSimpleLogger extends SimpleLogger
 {
     MavenSimpleLogger( String name )
     {
@@ -43,16 +43,16 @@ public class MavenSimpleLogger
         switch ( level )
         {
             case LOG_LEVEL_TRACE:
-                return level().debug( "TRACE" ).toString();
+                return level().debug( "TRACE" );
             case LOG_LEVEL_DEBUG:
-                return level().debug( "DEBUG" ).toString();
+                return level().debug( "DEBUG" );
             case LOG_LEVEL_INFO:
-                return level().info( "INFO" ).toString();
+                return level().info( "INFO" );
             case LOG_LEVEL_WARN:
-                return level().warning( "WARNING" ).toString();
+                return level().warning( "WARNING" );
             case LOG_LEVEL_ERROR:
             default:
-                return level().error( "ERROR" ).toString();
+                return level().error( "ERROR" );
         }
     }
 

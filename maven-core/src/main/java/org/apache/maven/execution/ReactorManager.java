@@ -70,23 +70,10 @@ public class ReactorManager
 
     public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
-        Map<String, Map> pluginContextsByKey = pluginContextsByProjectAndPluginKey.get( project.getId() );
+        Map<String, Map> pluginContextsByKey =
+            pluginContextsByProjectAndPluginKey.computeIfAbsent( project.getId(), k -> new HashMap<>() );
 
-        if ( pluginContextsByKey == null )
-        {
-            pluginContextsByKey = new HashMap<>();
-            pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
-        }
-
-        Map pluginContext = pluginContextsByKey.get( plugin.getPluginLookupKey() );
-
-        if ( pluginContext == null )
-        {
-            pluginContext = new HashMap<>();
-            pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
-        }
-
-        return pluginContext;
+        return pluginContextsByKey.computeIfAbsent( plugin.getPluginLookupKey(), k -> new HashMap<>() );
     }
 
     public void setFailureBehavior( String failureBehavior )

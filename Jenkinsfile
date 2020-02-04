@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.6.0'
+def buildMvn = '3.6.2'
 def runITsOses = ['linux', 'windows']
-def runITsJdks = ['8', '11','12', '13']
-def runITsMvn = '3.6.0'
+def runITsJdks = ['8', '11', '13', '14']
+def runITsMvn = '3.6.2'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -102,10 +102,6 @@ for (String os in runITsOses) {
                                 junitPublisher(ignoreAttachments: false)
                             ]) {
                                 String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/apache-maven-dist.zip -Dmaven.test.failure.ignore=true"
-                                if (stageId.endsWith('-jdk7')) {
-                                    // Java 7u80 has TLS 1.2 disabled by default: need to explicitly enable
-                                    cmd = "${cmd} -Dhttps.protocols=TLSv1.2"
-                                }
 
                                 if (isUnix()) {
                                     sh 'df -hT'

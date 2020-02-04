@@ -33,11 +33,14 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.logwrapper.LogLevelRecorder;
+import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Bentmann
  */
-public class ExecutionEventLogger
-    extends AbstractExecutionListener
+public class ExecutionEventLogger extends AbstractExecutionListener
 {
     private final Logger logger;
 
@@ -131,6 +133,20 @@ public class ExecutionEventLogger
             if ( event.getSession().getProjects().size() > 1 )
             {
                 logReactorSummary( event.getSession() );
+            }
+
+            ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
+
+            if ( iLoggerFactory instanceof MavenSlf4jWrapperFactory )
+            {
+                MavenSlf4jWrapperFactory loggerFactory = (MavenSlf4jWrapperFactory) iLoggerFactory;
+                loggerFactory.getLogLevelRecorder()
+                        .filter( LogLevelRecorder::metThreshold )
+                        .ifPresent( recorder ->
+                                event.getSession().getResult().addException( new Exception(
+                                        "Build failed due to log statements with a higher severity than allowed. "
+                                        + "Fix the logged issues or remove flag --fail-on-severity (-fos)." ) )
+                );
             }
 
             logResult( event.getSession() );
@@ -298,16 +314,16 @@ public class ExecutionEventLogger
 
             // -------< groupId:artifactId >-------
             String projectKey = project.getGroupId() + ':' + project.getArtifactId();
-            
-            final String preHeader  = "--< ";
+
+            final String preHeader = "--< ";
             final String postHeader = " >--";
 
             final int headerLen = preHeader.length() + projectKey.length() + postHeader.length();
 
             String prefix = chars( '-', Math.max( 0, ( LINE_LENGTH - headerLen ) / 2 ) ) + preHeader;
 
-            String suffix = postHeader
-                + chars( '-', Math.max( 0, LINE_LENGTH - headerLen - prefix.length() + preHeader.length() ) );
+            String suffix = postHeader + chars( '-',
+                    Math.max( 0, LINE_LENGTH - headerLen - prefix.length() + preHeader.length() ) );
 
             logger.info( buffer().strong( prefix ).project( projectKey ).strong( suffix ).toString() );
 

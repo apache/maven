@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
-import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
@@ -740,29 +739,29 @@ public class DefaultArtifactCollectorTest
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, null, source, filter,
-                                          Collections.<ResolutionListener>emptyList(), null );
+                                          Collections.emptyList(), null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          null, source, null, Collections.<ResolutionListener>emptyList(), null );
+                                          null, source, null, Collections.emptyList(), null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          null, source, filter, Collections.<ResolutionListener>emptyList(), null );
+                                          null, source, filter, Collections.emptyList(), null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
         throws ArtifactResolutionException
     {
-        Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
+        Map<String, Artifact> managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          managedVersions, null, null, source, null, Collections.<ResolutionListener>emptyList(), null );
+                                          managedVersions, null, null, source, null, Collections.emptyList(), null );
     }
 
     private ArtifactSpec createArtifactSpec( String id, String version )
@@ -868,7 +867,7 @@ public class DefaultArtifactCollectorTest
                 return new ResolutionGroup( artifact, createArtifacts( artifactFactory, a.dependencies,
                                                                        artifact.getScope(),
                                                                        artifact.getDependencyFilter() ),
-                                            Collections.EMPTY_LIST );
+                                            Collections.emptyList() );
             }
             catch ( InvalidVersionSpecificationException e )
             {
@@ -930,12 +929,7 @@ public class DefaultArtifactCollectorTest
             artifacts.put( getKey( spec.artifact ), spec );
 
             String key = spec.artifact.getDependencyConflictId();
-            List<ArtifactVersion> artifactVersions = versions.get( key );
-            if ( artifactVersions == null )
-            {
-                artifactVersions = new ArrayList<>();
-                versions.put( key, artifactVersions );
-            }
+            List<ArtifactVersion> artifactVersions = versions.computeIfAbsent( key, k -> new ArrayList<>() );
             if ( spec.artifact.getVersion() != null )
             {
                 artifactVersions.add( new DefaultArtifactVersion( spec.artifact.getVersion() ) );

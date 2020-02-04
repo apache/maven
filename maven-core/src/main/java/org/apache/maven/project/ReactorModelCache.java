@@ -19,9 +19,11 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,19 +35,33 @@ class ReactorModelCache
     implements ModelCache
 {
 
-    private final Map<CacheKey, Object> models = new ConcurrentHashMap<>( 256 );
+    private final Map<Object, Object> models = new ConcurrentHashMap<>( 256 );
 
+    @Override
     public Object get( String groupId, String artifactId, String version, String tag )
     {
-        return models.get( new CacheKey( groupId, artifactId, version, tag ) );
+        return models.get( new GavCacheKey( groupId, artifactId, version, tag ) );
     }
 
+    @Override
     public void put( String groupId, String artifactId, String version, String tag, Object data )
     {
-        models.put( new CacheKey( groupId, artifactId, version, tag ), data );
+        models.put( new GavCacheKey( groupId, artifactId, version, tag ), data );
     }
 
-    private static final class CacheKey
+    @Override
+    public Object get( Source source, String tag )
+    {
+        return models.get( new SourceCacheKey( source, tag ) );
+    }
+
+    @Override
+    public void put( Source source, String tag, Object data )
+    {
+        models.put( new SourceCacheKey( source, tag ), data );
+    }
+
+    private static final class GavCacheKey
     {
 
         private final String groupId;
@@ -58,7 +74,7 @@ class ReactorModelCache
 
         private final int hashCode;
 
-        CacheKey( String groupId, String artifactId, String version, String tag )
+        GavCacheKey( String groupId, String artifactId, String version, String tag )
         {
             this.groupId = ( groupId != null ) ? groupId : "";
             this.artifactId = ( artifactId != null ) ? artifactId : "";
@@ -81,12 +97,12 @@ class ReactorModelCache
                 return true;
             }
 
-            if ( !( obj instanceof CacheKey ) )
+            if ( !( obj instanceof GavCacheKey ) )
             {
                 return false;
             }
 
-            CacheKey that = (CacheKey) obj;
+            GavCacheKey that = (GavCacheKey) obj;
 
             return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
                 && version.equals( that.version ) && tag.equals( that.tag );
@@ -98,6 +114,54 @@ class ReactorModelCache
             return hashCode;
         }
 
+    }
+    
+    private static final class SourceCacheKey
+    {
+        private final Source source;
+        
+        private final String tag;
+        
+        private final int hashCode;
+
+        SourceCacheKey( Source source, String tag )
+        {
+            this.source = source;
+            this.tag = tag;
+            this.hashCode = Objects.hash( source, tag );
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals( Object obj )
+        {
+            if ( this == obj ) 
+            {
+                return true;
+            }
+            if ( !( obj instanceof SourceCacheKey ) )
+            {
+                return false;
+            }
+            
+            SourceCacheKey other = (SourceCacheKey) obj;
+            if ( !Objects.equals( this.source, other.source ) )
+            {
+                    return false;
+            }
+            
+            if ( !Objects.equals( this.tag, other.tag ) )
+            {
+                    return false;
+            }
+
+            return true;
+        }
     }
 
 }

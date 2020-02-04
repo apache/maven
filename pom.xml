@@ -52,10 +52,10 @@ under the License.
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
     <commonsLangVersion>3.8.1</commonsLangVersion>
-    <junitVersion>4.12</junitVersion>
+    <junitVersion>4.13</junitVersion>
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
-    <plexusInterpolationVersion>1.25</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
@@ -91,6 +91,7 @@ under the License.
     <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
     <module>maven-slf4j-provider</module>
+    <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
@@ -157,7 +158,13 @@ under the License.
       <name>Mike Mol (MNG-6665)</name>
     </contributor>
     <contributor>
-      <name>Martin Kanters (MNG-6665)</name>
+      <name>Martin Kanters (MNG-6665, MNG-6065)</name>
+    </contributor>
+    <contributor>
+      <name>Luc Klaassen (MNG-6065)</name>
+    </contributor>
+    <contributor>
+      <name>Wouter Aarts (MNG-6065)</name>
     </contributor>
   </contributors>
 
@@ -230,6 +237,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-slf4j-wrapper</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -452,7 +464,7 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.2.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

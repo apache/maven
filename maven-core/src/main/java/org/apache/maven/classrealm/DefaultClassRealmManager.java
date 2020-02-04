@@ -243,12 +243,11 @@ public class DefaultClassRealmManager
     {
         Objects.requireNonNull( plugin, "plugin cannot be null" );
 
-        ClassLoader parent = PARENT_CLASSLOADER;
-
         Map<String, ClassLoader> foreignImports =
             Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
 
-        return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
+        return createRealm( getKey( plugin, true ), RealmType.Extension, PARENT_CLASSLOADER, null,
+                foreignImports, artifacts );
     }
 
     private boolean isProvidedArtifact( Artifact artifact )

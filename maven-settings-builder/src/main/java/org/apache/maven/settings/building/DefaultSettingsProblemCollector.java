@@ -39,7 +39,7 @@ class DefaultSettingsProblemCollector
 
     DefaultSettingsProblemCollector( List<SettingsProblem> problems )
     {
-        this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
+        this.problems = ( problems != null ) ? problems : new ArrayList<>();
     }
 
     public List<SettingsProblem> getProblems()

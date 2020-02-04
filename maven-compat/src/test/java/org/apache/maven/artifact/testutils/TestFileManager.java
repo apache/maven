@@ -76,15 +76,7 @@ public class TestFileManager
     {
         callerInfo = new NullPointerException().getStackTrace()[2];
 
-        Runnable warning = new Runnable()
-        {
-
-            public void run()
-            {
-                maybeWarnAboutCleanUp();
-            }
-
-        };
+        Runnable warning = this::maybeWarnAboutCleanUp;
 
         cleanupWarning = new Thread( warning );
 

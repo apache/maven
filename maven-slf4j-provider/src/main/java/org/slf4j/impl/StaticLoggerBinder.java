@@ -40,7 +40,7 @@ public final class StaticLoggerBinder
     @SuppressWarnings( { "checkstyle:staticvariablename", "checkstyle:visibilitymodifier" } )
     public static String REQUESTED_API_VERSION = "1.7.25"; // !final
 
-    private static final String LOGGER_FACTORY_CLASS_STR = MavenSimpleLoggerFactory.class.getName();
+    private static final String LOGGER_FACTORY_CLASS_STR = MavenLoggerFactory.class.getName();
 
     /**
      * The unique instance of this class.
@@ -58,7 +58,7 @@ public final class StaticLoggerBinder
      */
     private StaticLoggerBinder()
     {
-        loggerFactory = new MavenSimpleLoggerFactory();
+        loggerFactory = new MavenLoggerFactory();
     }
 
     /**

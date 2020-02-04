@@ -149,13 +149,7 @@ public class DefaultLifecycleMappingDelegate
     private void addMojoExecution( Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,
                                    int priority )
     {
-        List<MojoExecution> mojoExecutions = phaseBindings.get( priority );
-
-        if ( mojoExecutions == null )
-        {
-            mojoExecutions = new ArrayList<>();
-            phaseBindings.put( priority, mojoExecutions );
-        }
+        List<MojoExecution> mojoExecutions = phaseBindings.computeIfAbsent( priority, k -> new ArrayList<>() );
 
         mojoExecutions.add( mojoExecution );
     }

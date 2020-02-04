@@ -54,8 +54,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
-    // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     public void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance )
     {
         // The build has been set but we want to step in here and fill in
@@ -306,8 +304,6 @@ public class DefaultModelInheritanceAssembler
         child.setProperties( props );
     }
 
-    // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     private void assembleDependencyManagementInheritance( Model child, Model parent )
     {
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
@@ -386,7 +382,7 @@ public class DefaultModelInheritanceAssembler
             {
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || ( parentInherited == null ) || Boolean.valueOf( parentInherited ) )
+                if ( !handleAsInheritance || ( parentInherited == null ) || Boolean.parseBoolean( parentInherited ) )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
@@ -474,7 +470,7 @@ public class DefaultModelInheritanceAssembler
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited );
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.parseBoolean( parentInherited );
 
         List<ReportSet> parentReportSets = parent.getReportSets();
 
@@ -526,8 +522,6 @@ public class DefaultModelInheritanceAssembler
 
     }
 
-    // TODO Remove this!
-    @SuppressWarnings( "unchecked" )
     private void assembleDependencyInheritance( Model child, Model parent )
     {
         Map<String, Dependency> depsMap = new LinkedHashMap<>();
