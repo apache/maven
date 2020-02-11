@@ -35,11 +35,11 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>one</id>
-      <url>http://repo1.maven.org/maven2</url>
+      <url>https://repo1.maven.org/maven2</url>
     </pluginRepository>
     <pluginRepository>
       <id>one</id>
-      <url>http://repository.codehaus.org/</url>
+      <url>https://repository.codehaus.org/</url>
     </pluginRepository>
   </pluginRepositories>
 </project>

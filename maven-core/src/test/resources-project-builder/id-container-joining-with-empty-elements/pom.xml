@@ -40,7 +40,7 @@ under the License.
   <repositories>
     <repository>
       <id>equal-repo-id</id>
-      <url>http://maven.apache.org/null</url>
+      <url>https://maven.apache.org/null</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

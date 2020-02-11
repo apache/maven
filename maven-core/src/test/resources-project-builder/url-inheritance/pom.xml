@@ -58,11 +58,11 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://parent.url/dist</url>
+      <url>https://parent.url/dist</url>
       <id>parent.distros</id>
     </repository>
     <snapshotRepository>
-      <url>http://parent.url/snaps</url>
+      <url>https://parent.url/snaps</url>
       <id>parent.snaps</id>
     </snapshotRepository>
     <site>

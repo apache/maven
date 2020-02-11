@@ -58,7 +58,7 @@ under the License.
     <repository>
       <id>maven-core-it</id>
       <name>child-dist-repo</name>
-      <url>http://dist.org/</url>
+      <url>https://dist.org/</url>
     </repository>
     <site>
       <id>maven-core-it</id>

@@ -124,12 +124,12 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://project.url/dist</url>
+      <url>https://project.url/dist</url>
       <id>project.distros</id>
       <name>distros</name>
     </repository>
     <snapshotRepository>
-      <url>http://project.url/snaps</url>
+      <url>https://project.url/snaps</url>
       <id>project.snaps</id>
       <name>snaps</name>
       <uniqueVersion>false</uniqueVersion>
@@ -194,7 +194,7 @@ under the License.
   <repositories>
     <repository>
       <id>project-remote-repo</id>
-      <url>http://project.url/remote</url>
+      <url>https://project.url/remote</url>
       <name>repo</name>
     </repository>
   </repositories>
