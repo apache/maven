@@ -183,7 +183,7 @@ class ReactorReader
             else
             {
                 String type = artifact.getProperty( "type", "" );
-                if ( COMPILE_PHASE_TYPES.contains( type ) )
+                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
