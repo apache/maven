@@ -157,12 +157,18 @@ class ReactorReader
         }
 
         Artifact projectArtifact = findMatchingArtifact( project, artifact );
+        File packagedArtifactFile = determinePreviouslyPackagedArtifactFile( project, projectArtifact );
 
         if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
         {
             return projectArtifact.getFile();
         }
-        else if ( !hasBeenPackaged( project ) )
+        // Check whether an earlier Maven run might have produced an artifact that is still on disk.
+        else if ( packagedArtifactFile != null && packagedArtifactFile.exists() )
+        {
+            return packagedArtifactFile;
+        }
+        else if ( !hasBeenPackagedDuringThisSession( project ) )
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
@@ -189,12 +195,23 @@ class ReactorReader
         return null;
     }
 
+    private File determinePreviouslyPackagedArtifactFile( MavenProject project, Artifact artifact )
+    {
+        if ( artifact == null )
+        {
+            return null;
+        }
+
+        String fileName = String.format( "%s.%s", project.getBuild().getFinalName(), artifact.getExtension() );
+        return new File( project.getBuild().getDirectory(), fileName );
+    }
+
     private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
     {
         return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
     }
 
-    private boolean hasBeenPackaged( MavenProject project )
+    private boolean hasBeenPackagedDuringThisSession( MavenProject project )
     {
         return project.hasLifecyclePhase( "package" ) || project.hasLifecyclePhase( "install" )
             || project.hasLifecyclePhase( "deploy" );
