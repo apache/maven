@@ -1088,7 +1088,7 @@ public class MavenCli
     {
         String buildDirectory = result.getProject().getBuild().getDirectory();
         File buildDirectoryFile = new File( buildDirectory );
-        boolean isBuildDirectoryPresent = ( !buildDirectoryFile.exists() && buildDirectoryFile.mkdirs() );
+        boolean isBuildDirectoryPresent = ( buildDirectoryFile.exists() || buildDirectoryFile.mkdirs() );
         if ( isBuildDirectoryPresent )
         {
             Path resumeFromCache = Paths.get( buildDirectory, "resume-from-cache" );
