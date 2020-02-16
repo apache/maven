@@ -308,13 +308,12 @@ public class DefaultGraphBuilder
                         .findFirst()
                         .map( mp -> mp.getBuild().getDirectory() )
                         .orElseThrow( () -> new MavenExecutionException(
-                                "Could not determine build directory for main pom", request.getPom() ) );
+                                "Could not determine build directory for root project", request.getPom() ) );
 
                 Path resumeFromCacheFile = Paths.get( buildDirectory, "resume-from-cache" );
                 try ( Stream<String> allLines = Files.lines( resumeFromCacheFile ) )
                 {
                     selector = allLines.findFirst().orElseThrow(
-                            // TODO - or should we not fail and fallback on all projects and warning log?
                             () -> new MavenExecutionException( "resume-from-cache file was empty", request.getPom() )
                     );
                 }

@@ -102,6 +102,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1027,10 +1029,13 @@ public class MavenCli
 
             if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
             {
+                String resumeFromProject = getResumeFrom( result.getTopologicallySortedProjects(), project );
+                boolean isCacheFileCreated = createResumeFromCacheFile( result, resumeFromProject );
+                String commandToResume = "mvn <args> -rf" + ( !isCacheFileCreated ? " " + resumeFromProject : "" );
+
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -rf "
-                    + getResumeFrom( result.getTopologicallySortedProjects(), project ) ).toString() );
+                slf4jLogger.error( buffer().a( "  " ).strong( commandToResume ).toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1077,6 +1082,33 @@ public class MavenCli
             }
         }
         return ":" + failedProject.getArtifactId();
+    }
+
+    private boolean createResumeFromCacheFile( MavenExecutionResult result, String resumeFromProject )
+    {
+        String buildDirectory = result.getProject().getBuild().getDirectory();
+        File buildDirectoryFile = new File( buildDirectory );
+        boolean isBuildDirectoryPresent = ( !buildDirectoryFile.exists() && buildDirectoryFile.mkdirs() );
+        if ( isBuildDirectoryPresent )
+        {
+            Path resumeFromCache = Paths.get( buildDirectory, "resume-from-cache" );
+            try
+            {
+                Files.write( resumeFromCache, resumeFromProject.getBytes() );
+                return true;
+            }
+            catch ( IOException e )
+            {
+                slf4jLogger.debug( "Failed writing last failed project to resume-from-cache file at: {}",
+                        resumeFromCache, e );
+                return false;
+            }
+        }
+        else
+        {
+            slf4jLogger.debug( "Failed creating build directory for root project to store resume-from-cache file" );
+            return false;
+        }
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
