@@ -328,15 +328,37 @@ public class DefaultMavenPluginManager
 
         if ( plugin.isExtensions() )
         {
-            setupPluginDescriptor( pluginDescriptor, session );
+            ExtensionRealmCache.CacheRecord extensionRecord;
+            try
+            {
+                RepositorySystemSession repositorySession = session.getRepositorySession();
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
+            }
+            catch ( PluginManagerException e )
+            {
+                // extensions realm is expected to be fully setup at this point
+                // any exception means a problem in maven code, not a user error
+                throw new IllegalStateException( e );
+            }
+
+            ClassRealm pluginRealm = extensionRecord.getRealm();
+            List<Artifact> pluginArtifacts = extensionRecord.getArtifacts();
+
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+            {
+                componentDescriptor.setRealm( pluginRealm );
+            }
+
+            pluginDescriptor.setClassRealm( pluginRealm );
+            pluginDescriptor.setArtifacts( pluginArtifacts );
         }
         else
         {
             Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
 
-            PluginRealmCache.Key cacheKey =
-                pluginRealmCache.createKey( plugin, parent, foreignImports, filter,
-                                            project.getRemotePluginRepositories(), session.getRepositorySession() );
+            PluginRealmCache.Key cacheKey = pluginRealmCache.createKey( plugin, parent, foreignImports, filter,
+                                                                        project.getRemotePluginRepositories(),
+                                                                        session.getRepositorySession() );
 
             PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
 
@@ -358,44 +380,6 @@ public class DefaultMavenPluginManager
             }
 
             pluginRealmCache.register( project, cacheKey, cacheRecord );
-        }
-    }
-
-    private void setupPluginDescriptor( PluginDescriptor pluginDescriptor, MavenSession session )
-    {
-        setupPluginDescriptor( pluginDescriptor,
-                               setupExtensionsRealmInternal( session.getCurrentProject(), pluginDescriptor.getPlugin(),
-                                                             session.getRepositorySession() ) );
-    }
-
-    private void setupPluginDescriptor( PluginDescriptor pluginDescriptor,
-                                        ExtensionRealmCache.CacheRecord extensionRecord )
-    {
-        setupComponentDescriptors( extensionRecord, pluginDescriptor.getComponents() );
-        pluginDescriptor.setClassRealm( extensionRecord.getRealm() );
-        pluginDescriptor.setArtifacts( extensionRecord.getArtifacts() );
-    }
-
-    private void setupComponentDescriptors( ExtensionRealmCache.CacheRecord extensionRecord,
-                                            List<ComponentDescriptor<?>> components )
-    {
-        components.stream().forEach( descriptor -> descriptor.setRealm( extensionRecord.getRealm() ) );
-    }
-
-    /**
-     * For internal usage. It is assumed that the prerequisites are met so a setup of the extensions realm can be
-     * processed without any error. Any exception thrown indicates a programming error, not a user error!
-     */
-    private ExtensionRealmCache.CacheRecord setupExtensionsRealmInternal( MavenProject project, Plugin plugin,
-                                                                          RepositorySystemSession repositorySystemSession )
-    {
-        try
-        {
-            return setupExtensionsRealm( project, plugin, repositorySystemSession );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new IllegalStateException( e );
         }
     }
 
