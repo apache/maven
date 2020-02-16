@@ -20,6 +20,10 @@ package org.apache.maven.graph;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
@@ -282,7 +287,7 @@ public class DefaultGraphBuilder
     {
         List<MavenProject> result = projects;
 
-        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) || request.isResumeFromLastFailedProject() )
         {
             File reactorDirectory = null;
             if ( request.getBaseDirectory() != null )
@@ -290,7 +295,35 @@ public class DefaultGraphBuilder
                 reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            String selector = request.getResumeFrom();
+            String selector;
+
+            if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+            {
+                selector = request.getResumeFrom();
+            }
+            else
+            {
+                String buildDirectory = projects.stream()
+                        .filter( mp -> mp.getBasedir().toString().equals( request.getBaseDirectory() ) )
+                        .findFirst()
+                        .map( mp -> mp.getBuild().getDirectory() )
+                        .orElseThrow( () -> new MavenExecutionException(
+                                "Could not determine build directory for main pom", request.getPom() ) );
+
+                Path resumeFromCacheFile = Paths.get( buildDirectory, "resume-from-cache" );
+                try ( Stream<String> allLines = Files.lines( resumeFromCacheFile ) )
+                {
+                    selector = allLines.findFirst().orElseThrow(
+                            // TODO - or should we not fail and fallback on all projects and warning log?
+                            () -> new MavenExecutionException( "resume-from-cache file was empty", request.getPom() )
+                    );
+                }
+                catch ( IOException e )
+                {
+                    throw new MavenExecutionException( "Error occurred while reading resume-from-cache file",
+                            request.getPom() );
+                }
+            }
 
             result = new ArrayList<>( projects.size() );
 

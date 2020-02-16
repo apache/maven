@@ -1518,7 +1518,15 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
         {
-            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+            String resumeFromProject = commandLine.getOptionValue( CLIManager.RESUME_FROM );
+            if ( StringUtils.isNotEmpty( resumeFromProject ) )
+            {
+                request.setResumeFrom( resumeFromProject );
+            }
+            else
+            {
+                request.setResumeFromLastFailedProject();
+            }
         }
 
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )

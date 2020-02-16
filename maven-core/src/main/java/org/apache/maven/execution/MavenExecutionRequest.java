@@ -175,6 +175,10 @@ public interface MavenExecutionRequest
 
     String getResumeFrom();
 
+    MavenExecutionRequest setResumeFromLastFailedProject();
+
+    boolean isResumeFromLastFailedProject();
+
     MavenExecutionRequest setMakeBehavior( String makeBehavior );
 
     String getMakeBehavior();

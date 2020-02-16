@@ -118,6 +118,8 @@ public class DefaultMavenExecutionRequest
 
     private String resumeFrom;
 
+    private boolean resumeFromLastFailedProject = false;
+
     private String makeBehavior;
 
     private Properties systemProperties;
@@ -304,6 +306,12 @@ public class DefaultMavenExecutionRequest
     public String getResumeFrom()
     {
         return resumeFrom;
+    }
+
+    @Override
+    public boolean isResumeFromLastFailedProject()
+    {
+        return resumeFromLastFailedProject;
     }
 
     @Override
@@ -602,6 +610,14 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setResumeFrom( String project )
     {
         this.resumeFrom = project;
+
+        return this;
+    }
+
+    @Override
+    public MavenExecutionRequest setResumeFromLastFailedProject()
+    {
+        this.resumeFromLastFailedProject = true;
 
         return this;
     }
