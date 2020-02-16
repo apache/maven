@@ -762,7 +762,7 @@ public class MavenCli
 
                 configure( cliRequest );
 
-				MavenExecutionRequest request = cliRequest.request.copy();
+                MavenExecutionRequest request = cliRequest.request.copy();
 
                 populateRequest( cliRequest, request );
 
