@@ -344,6 +344,12 @@ public class DefaultGraphBuilder
                         "Could not determine build directory for root project", request.getPom() ) );
 
         Path resumeFromCacheFile = Paths.get( buildDirectory, "resume-from-cache" );
+        if ( !resumeFromCacheFile.toFile().isFile() )
+        {
+            throw new MavenExecutionException( "--resume-from without args expects a file called resume-from-cache "
+                    + "in the build directory with the last failed project descriptor.", request.getPom() );
+        }
+
         try ( Stream<String> allLines = Files.lines( resumeFromCacheFile ) )
         {
             return allLines.findFirst().orElseThrow(
