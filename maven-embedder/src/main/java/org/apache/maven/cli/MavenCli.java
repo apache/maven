@@ -1099,14 +1099,14 @@ public class MavenCli
             }
             catch ( IOException e )
             {
-                slf4jLogger.warn( "Failed writing last failed project to resume-from-cache file at: {}",
+                slf4jLogger.info( "Failed writing last failed project to resume-from-cache file at: {}",
                         resumeFromCache, e );
                 return false;
             }
         }
         else
         {
-            slf4jLogger.warn( "Failed creating build directory for root project to store resume-from-cache file" );
+            slf4jLogger.info( "Failed creating build directory for root project to store resume-from-cache file" );
             return false;
         }
     }
