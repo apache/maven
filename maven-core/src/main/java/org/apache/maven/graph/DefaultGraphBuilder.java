@@ -287,7 +287,8 @@ public class DefaultGraphBuilder
     {
         List<MavenProject> result = projects;
 
-        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) || request.isResumeFromLastFailedProject() )
+        String resumeFrom = request.getResumeFrom();
+        if ( resumeFrom != null )
         {
             File reactorDirectory = null;
             if ( request.getBaseDirectory() != null )
@@ -296,32 +297,13 @@ public class DefaultGraphBuilder
             }
 
             String selector;
-
-            if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+            if ( StringUtils.isNotEmpty( resumeFrom ) )
             {
-                selector = request.getResumeFrom();
+                selector = resumeFrom;
             }
             else
             {
-                String buildDirectory = projects.stream()
-                        .filter( mp -> mp.getBasedir().toString().equals( request.getBaseDirectory() ) )
-                        .findFirst()
-                        .map( mp -> mp.getBuild().getDirectory() )
-                        .orElseThrow( () -> new MavenExecutionException(
-                                "Could not determine build directory for root project", request.getPom() ) );
-
-                Path resumeFromCacheFile = Paths.get( buildDirectory, "resume-from-cache" );
-                try ( Stream<String> allLines = Files.lines( resumeFromCacheFile ) )
-                {
-                    selector = allLines.findFirst().orElseThrow(
-                            () -> new MavenExecutionException( "resume-from-cache file was empty", request.getPom() )
-                    );
-                }
-                catch ( IOException e )
-                {
-                    throw new MavenExecutionException( "Error occurred while reading resume-from-cache file",
-                            request.getPom() );
-                }
+                selector = getLastFailedProject( projects, request );
             }
 
             result = new ArrayList<>( projects.size() );
@@ -349,6 +331,30 @@ public class DefaultGraphBuilder
         }
 
         return result;
+    }
+
+    private String getLastFailedProject( List<MavenProject> projects, MavenExecutionRequest request )
+            throws MavenExecutionException
+    {
+        String buildDirectory = projects.stream()
+                .filter( mp -> mp.getBasedir().toString().equals( request.getBaseDirectory() ) )
+                .findFirst()
+                .map( mp -> mp.getBuild().getDirectory() )
+                .orElseThrow( () -> new MavenExecutionException(
+                        "Could not determine build directory for root project", request.getPom() ) );
+
+        Path resumeFromCacheFile = Paths.get( buildDirectory, "resume-from-cache" );
+        try ( Stream<String> allLines = Files.lines( resumeFromCacheFile ) )
+        {
+            return allLines.findFirst().orElseThrow(
+                    () -> new MavenExecutionException( "resume-from-cache file was empty", request.getPom() )
+            );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenExecutionException( "Error occurred while reading resume-from-cache file",
+                    request.getPom() );
+        }
     }
 
     private String formatProjects( List<MavenProject> projects )

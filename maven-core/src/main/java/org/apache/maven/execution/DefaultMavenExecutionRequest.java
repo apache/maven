@@ -302,16 +302,14 @@ public class DefaultMavenExecutionRequest
         return excludedProjects;
     }
 
+    /**
+     * @return the project where the build should be resumed from,
+     *  or empty when it should start from the last failed project.
+     */
     @Override
     public String getResumeFrom()
     {
         return resumeFrom;
-    }
-
-    @Override
-    public boolean isResumeFromLastFailedProject()
-    {
-        return resumeFromLastFailedProject;
     }
 
     @Override
@@ -606,18 +604,15 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
+    /**
+     * @param project The project where the build should be started from,
+     *                or empty string when it should resume from the last failed project.
+     * @return this MavenExecutionRequest
+     */
     @Override
     public MavenExecutionRequest setResumeFrom( String project )
     {
         this.resumeFrom = project;
-
-        return this;
-    }
-
-    @Override
-    public MavenExecutionRequest setResumeFromLastFailedProject()
-    {
-        this.resumeFromLastFailedProject = true;
 
         return this;
     }

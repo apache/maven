@@ -171,13 +171,18 @@ public interface MavenExecutionRequest
      */
     List<String> getExcludedProjects();
 
+    /**
+     * @param project The project where the build should be started from,
+     *                or empty string when it should start from the last failed project.
+     * @return this MavenExecutionRequest
+     */
     MavenExecutionRequest setResumeFrom( String project );
 
+    /**
+     * @return the project where the build should be started from,
+     *  or empty when it should start from the last failed project.
+     */
     String getResumeFrom();
-
-    MavenExecutionRequest setResumeFromLastFailedProject();
-
-    boolean isResumeFromLastFailedProject();
 
     MavenExecutionRequest setMakeBehavior( String makeBehavior );
 

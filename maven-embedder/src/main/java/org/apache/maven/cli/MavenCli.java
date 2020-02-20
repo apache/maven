@@ -1088,7 +1088,7 @@ public class MavenCli
     {
         String buildDirectory = result.getProject().getBuild().getDirectory();
         File buildDirectoryFile = new File( buildDirectory );
-        boolean isBuildDirectoryPresent = ( buildDirectoryFile.exists() || buildDirectoryFile.mkdirs() );
+        boolean isBuildDirectoryPresent = buildDirectoryFile.exists() || buildDirectoryFile.mkdirs();
         if ( isBuildDirectoryPresent )
         {
             Path resumeFromCache = Paths.get( buildDirectory, "resume-from-cache" );
@@ -1099,14 +1099,14 @@ public class MavenCli
             }
             catch ( IOException e )
             {
-                slf4jLogger.debug( "Failed writing last failed project to resume-from-cache file at: {}",
+                slf4jLogger.warn( "Failed writing last failed project to resume-from-cache file at: {}",
                         resumeFromCache, e );
                 return false;
             }
         }
         else
         {
-            slf4jLogger.debug( "Failed creating build directory for root project to store resume-from-cache file" );
+            slf4jLogger.warn( "Failed creating build directory for root project to store resume-from-cache file" );
             return false;
         }
     }
@@ -1550,15 +1550,9 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
         {
-            String resumeFromProject = commandLine.getOptionValue( CLIManager.RESUME_FROM );
-            if ( StringUtils.isNotEmpty( resumeFromProject ) )
-            {
-                request.setResumeFrom( resumeFromProject );
-            }
-            else
-            {
-                request.setResumeFromLastFailedProject();
-            }
+            String optionValue = commandLine.getOptionValue( CLIManager.RESUME_FROM );
+            String resumeFromProject = optionValue != null ? optionValue : "";
+            request.setResumeFrom( resumeFromProject );
         }
 
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
