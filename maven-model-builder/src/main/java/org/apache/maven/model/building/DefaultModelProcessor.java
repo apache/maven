@@ -23,16 +23,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
+import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.eclipse.sisu.Typed;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -71,6 +76,9 @@ public class DefaultModelProcessor
 
     @Inject
     private ModelReader reader;
+    
+    @Inject
+    private ModelSourceTransformer transformer;
 
     public DefaultModelProcessor setModelLocator( ModelLocator locator )
     {
@@ -81,6 +89,12 @@ public class DefaultModelProcessor
     public DefaultModelProcessor setModelReader( ModelReader reader )
     {
         this.reader = reader;
+        return this;
+    }
+    
+    public DefaultModelProcessor setTransformer( ModelSourceTransformer transformer )
+    {
+        this.transformer = transformer;
         return this;
     }
 
@@ -111,4 +125,9 @@ public class DefaultModelProcessor
         return reader.read( input, options );
     }
 
+    @Override
+    public Model read( Path pomFile, BuildPomXMLFilterFactory factory ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException
+    {
+        return reader.read( transformer.transform( pomFile, factory ), null );
+    }
 }

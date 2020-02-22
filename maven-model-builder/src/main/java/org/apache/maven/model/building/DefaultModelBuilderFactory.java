@@ -82,6 +82,7 @@ public class DefaultModelBuilderFactory
         DefaultModelProcessor processor = new DefaultModelProcessor();
         processor.setModelLocator( newModelLocator() );
         processor.setModelReader( newModelReader() );
+        processor.setTransformer( newTransformer() );
         return processor;
     }
 
@@ -198,6 +199,11 @@ public class DefaultModelBuilderFactory
     protected ReportingConverter newReportingConverter()
     {
         return new DefaultReportingConverter();
+    }
+
+    protected ModelSourceTransformer newTransformer()
+    {
+        return new DefaultModelSourceTransformer();
     }
 
     /**

@@ -25,9 +25,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
@@ -178,7 +180,9 @@ public class ProjectModelResolver
 
         if ( modelPool != null )
         {
-            pomFile = modelPool.get( groupId, artifactId, version );
+            pomFile = Optional.ofNullable( modelPool.get( groupId, artifactId,
+                                                          version ) ).map( Model::getPomFile )
+                            .orElse( null );
         }
 
         if ( pomFile == null )

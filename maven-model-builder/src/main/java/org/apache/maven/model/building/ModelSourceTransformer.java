@@ -1,17 +1,5 @@
 package org.apache.maven.model.building;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.function.Function;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.ModelParseException;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -31,24 +19,24 @@ import org.apache.maven.model.io.ModelParseException;
  * under the License.
  */
 
-import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.locator.ModelLocator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.xml.sax.SAXException;
 
 /**
- * ModelProcessor
+ * 
+ * @author Robert Scholte
+ * @since 3.7.0
  */
-@SuppressWarnings( "checkstyle:interfaceistype" )
-public interface ModelProcessor
-    extends ModelLocator, ModelReader
+public interface ModelSourceTransformer
 {
 
-    String SOURCE = "org.apache.maven.model.building.source";
-    
-    default Model read( Path pomFile, BuildPomXMLFilterFactory factory ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException
-    {
-        return read( pomFile.toFile(), null );
-    }
+    InputStream transform( Path pomFile, BuildPomXMLFilterFactory buildPomXMLFilterFactory ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException;
 
 }

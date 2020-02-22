@@ -24,14 +24,7 @@ import static org.apache.maven.model.building.Result.newResult;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,9 +41,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -100,7 +90,6 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -699,7 +688,7 @@ public class DefaultModelBuilder
         {
             try
             {
-                Model rawModel = modelProcessor.read( transformData( pomFile.toPath() ), null );
+                Model rawModel = modelProcessor.read( pomFile.toPath(), buildPomXMLFilterFactory.get() );
 
                 model.setPomFile( pomFile );
                 
@@ -893,81 +882,6 @@ public class DefaultModelBuilder
             Model child = lineage.get( i ).getModel();
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
-    }
-    
-    private InputStream transformData( final Path pomFile )
-                    throws IOException, TransformerException, SAXException, ParserConfigurationException
-    {
-        final TransformerFactory transformerFactory = Factories.newTransformerFactory() ;
-        
-        final PipedOutputStream pipedOutputStream  = new PipedOutputStream();
-        final PipedInputStream pipedInputStream  = new PipedInputStream( pipedOutputStream );
-
-        // Should always be FileSource for reactor poms
-        // System.out.println( "transforming " + pomFile );
-        
-        final SAXSource transformSource =
-            new SAXSource( buildPomXMLFilterFactory.get().get( pomFile ),
-                           new org.xml.sax.InputSource( new FileInputStream( pomFile.toFile() ) ) );
-
-        OutputStream out;
-        if ( xmlFilterListener != null )
-        {
-            out = new FilterOutputStream( pipedOutputStream )
-            {
-                @Override
-                public void write( byte[] b, int off, int len )
-                    throws IOException
-                {
-                    super.write( b, off, len );
-                    xmlFilterListener.write( pomFile, b, off, len );
-                }  
-            };
-        }
-        else
-        {
-            out = pipedOutputStream;
-        }
-
-        final StreamResult result = new StreamResult( out );
-        
-////        final Callable<Void> callable = () ->
-////        {
-////            try ( PipedOutputStream out = pipedOutputStream )
-////            {
-////                transformerFactory.newTransformer().transform( transformSource, result );
-////            }
-////            return null;
-////        };
-////
-////        ExecutorService executorService = Executors.newSingleThreadExecutor();
-////        try
-////        {
-////            executorService.submit( callable ).get();
-////        }
-////        catch ( InterruptedException | ExecutionException e )
-////        {
-////            throw new TransformerException( "Failed to transform pom", e );
-////        }
-        final Runnable runnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try ( PipedOutputStream out = pipedOutputStream )
-                {
-                    transformerFactory.newTransformer().transform( transformSource, result );
-                }
-                catch ( TransformerException | IOException e )
-                {
-                    throw new RuntimeException( e );
-                }
-            }
-        };
-
-        new Thread( runnable ).start();
-
-        return pipedInputStream;
     }
 
     private Map<String, Activation> getProfileActivations( Model model, boolean clone )

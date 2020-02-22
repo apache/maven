@@ -366,7 +366,8 @@ public class DefaultProjectBuilder
 
         List<InterimResult> interimResults = new ArrayList<>();
 
-        ReactorModelPool modelPool = new ReactorModelPool();
+        ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
+        ReactorModelPool modelPool = poolBuilder.build();
 
         InternalConfig config = new InternalConfig( request, modelPool,
                 useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
@@ -377,7 +378,7 @@ public class DefaultProjectBuilder
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
                    config );
 
-        populateReactorModelPool( modelPool, interimResults );
+        populateReactorModelPool( poolBuilder, interimResults );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -592,12 +593,12 @@ public class DefaultProjectBuilder
 
     }
 
-    private void populateReactorModelPool( ReactorModelPool reactorModelPool, List<InterimResult> interimResults )
+    private void populateReactorModelPool( ReactorModelPool.Builder reactorModelPool, List<InterimResult> interimResults )
     {
         for ( InterimResult interimResult : interimResults )
         {
             Model model = interimResult.result.getEffectiveModel();
-            reactorModelPool.put( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getPomFile() );
+            reactorModelPool.put( model.getPomFile().toPath(),  model );
 
             populateReactorModelPool( reactorModelPool, interimResult.modules );
         }
