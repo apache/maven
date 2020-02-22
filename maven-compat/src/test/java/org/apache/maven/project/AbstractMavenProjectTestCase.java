@@ -121,7 +121,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class );
 
         ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null );
 
