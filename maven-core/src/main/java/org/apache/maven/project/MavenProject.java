@@ -999,6 +999,7 @@ public class MavenProject
      *
      * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getArtifacts() to get all transitive dependencies
+     * @deprecated
      */
     @Deprecated
     public Set<Artifact> getDependencyArtifacts()
@@ -1006,6 +1007,11 @@ public class MavenProject
         return dependencyArtifacts;
     }
 
+    /**
+     *
+     * @param dependencyArtifacts
+     * @deprecated
+     */
     @Deprecated
     public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
     {
@@ -1477,6 +1483,9 @@ public class MavenProject
 
     private Map<String, String> moduleAdjustments;
 
+    /**
+     * @deprecated
+     */
     @Deprecated // This appears only to be used in test code
     public String getModulePathAdjustment( MavenProject moduleProject )
         throws IOException
@@ -1533,6 +1542,9 @@ public class MavenProject
         return moduleAdjustments.get( module );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                           ArtifactFilter filter )
@@ -1541,12 +1553,18 @@ public class MavenProject
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, filter, this );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     protected void setScriptSourceRoots( List<String> scriptSourceRoots )
     {
         this.scriptSourceRoots = scriptSourceRoots;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public void addScriptSourceRoot( String path )
     {
@@ -1563,12 +1581,18 @@ public class MavenProject
         }
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<String> getScriptSourceRoots()
     {
         return scriptSourceRoots;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Artifact> getCompileArtifacts()
     {
@@ -1590,6 +1614,9 @@ public class MavenProject
         return list;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Dependency> getCompileDependencies()
     {
@@ -1623,6 +1650,9 @@ public class MavenProject
         return Collections.unmodifiableList( list );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Artifact> getTestArtifacts()
     {
@@ -1639,6 +1669,9 @@ public class MavenProject
         return list;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Dependency> getTestDependencies()
     {
@@ -1667,6 +1700,9 @@ public class MavenProject
         return Collections.unmodifiableList( list );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated // used by the Maven ITs
     public List<Dependency> getRuntimeDependencies()
     {
@@ -1699,6 +1735,9 @@ public class MavenProject
         return Collections.unmodifiableList( list );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Artifact> getRuntimeArtifacts()
     {
@@ -1717,6 +1756,9 @@ public class MavenProject
         return list;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
@@ -1743,6 +1785,9 @@ public class MavenProject
         return list;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Artifact> getSystemArtifacts()
     {
@@ -1763,6 +1808,9 @@ public class MavenProject
         return list;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<Dependency> getSystemDependencies()
     {
@@ -1795,12 +1843,18 @@ public class MavenProject
         return Collections.unmodifiableList( list );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public void setReporting( Reporting reporting )
     {
         getModel().setReporting( reporting );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Reporting getReporting()
     {
@@ -1815,12 +1869,18 @@ public class MavenProject
         reportArtifactMap = null;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Set<Artifact> getReportArtifacts()
     {
         return reportArtifacts;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Map<String, Artifact> getReportArtifactMap()
     {
@@ -1832,6 +1892,9 @@ public class MavenProject
         return reportArtifactMap;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
     {
@@ -1840,12 +1903,18 @@ public class MavenProject
         extensionArtifactMap = null;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Set<Artifact> getExtensionArtifacts()
     {
         return extensionArtifacts;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Map<String, Artifact> getExtensionArtifactMap()
     {
@@ -1857,6 +1926,9 @@ public class MavenProject
         return extensionArtifactMap;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public List<ReportPlugin> getReportPlugins()
     {
@@ -1867,6 +1939,9 @@ public class MavenProject
         return Collections.unmodifiableList( getModel().getReporting().getPlugins() );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
     {
@@ -1943,6 +2018,9 @@ public class MavenProject
         pomWriter.write( writer, getOriginalModel() );
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
     {
@@ -1955,6 +2033,7 @@ public class MavenProject
      *
      * @return The project building request or {@code null}.
      * @since 2.1
+     * @deprecated
      */
     @Deprecated
     public ProjectBuildingRequest getProjectBuildingRequest()
@@ -1968,6 +2047,7 @@ public class MavenProject
      *
      * @param projectBuildingRequest The project building request, may be {@code null}.
      * @since 2.1
+     * @deprecated
      */
     // used by maven-dependency-tree
     @Deprecated
