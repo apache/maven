@@ -661,7 +661,8 @@ public class DefaultProjectBuilder
 
     }
 
-    private void populateReactorModelPool( ReactorModelPool.Builder reactorModelPool, List<InterimResult> interimResults )
+    private void populateReactorModelPool( ReactorModelPool.Builder reactorModelPool,
+                                           List<InterimResult> interimResults )
     {
         for ( InterimResult interimResult : interimResults )
         {

@@ -54,13 +54,15 @@ class ReactorModelPool
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      * @throws NoSuchElementException if model could not be found
      */
-    public Model get( String groupId, String artifactId, String version ) throws IllegalStateException, NoSuchElementException
+    public Model get( String groupId, String artifactId, String version )
+        throws IllegalStateException, NoSuchElementException
     {
         // TODO DefaultModelBuilder.readParentExternally still tries to use the ReactorModelPool, should be fixed
         // For now, use getOrDefault/orElse instead of get 
         return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptyList() ).stream()
                         .filter( m -> version == null || version.equals( m.getVersion() ) )
-                        .reduce( ( a, b ) -> {
+                        .reduce( ( a, b ) -> 
+                        {
                             throw new IllegalStateException( "Multiple modules with key "
                                 + a.getGroupId() + ':' + a.getArtifactId() );
                         } ).orElse( null );

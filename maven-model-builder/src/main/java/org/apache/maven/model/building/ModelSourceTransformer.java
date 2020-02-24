@@ -35,5 +35,6 @@ import org.xml.sax.SAXException;
  */
 public interface ModelSourceTransformer
 {
-    InputStream transform( Path pomFile, TransformerContext context ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException;
+    InputStream transform( Path pomFile, TransformerContext context )
+        throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException;
 }

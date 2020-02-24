@@ -40,8 +40,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -96,7 +94,6 @@ import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
-import org.xml.sax.SAXException;
 
 /**
  * @author Benjamin Bentmann
@@ -677,9 +674,7 @@ public class DefaultModelBuilder
                 .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).setException( e ) );
             throw problems.newModelBuildingException();
         }
-
         model.setPomFile( pomFile );
-
         problems.setSource( model );
 
         modelValidator.validateFileModel( model, request, problems );
@@ -689,7 +684,9 @@ public class DefaultModelBuilder
         {
             try
             {
-                Model rawModel = modelProcessor.read( pomFile, Collections.singletonMap( "transformerContext", buildPomXMLFilterFactory ) );
+                Model rawModel =
+                    modelProcessor.read( pomFile,
+                                         Collections.singletonMap( "transformerContext", buildPomXMLFilterFactory ) );
 
                 model.setPomFile( pomFile );
                 

@@ -1882,10 +1882,6 @@ public class PomConstructionTest
         repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
         config.setRepositorySession( repoSession );
         
-        sessionScope.seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                 config.getRepositorySession(),
-                                                                 new DefaultMavenExecutionRequest(), null ) );
-
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }
 

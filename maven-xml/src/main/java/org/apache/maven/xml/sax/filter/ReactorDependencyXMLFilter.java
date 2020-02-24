@@ -1,7 +1,5 @@
 package org.apache.maven.xml.sax.filter;
 
-import java.util.function.BiFunction;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,8 @@ import java.util.function.BiFunction;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.util.function.BiFunction;
 
 import org.apache.maven.xml.sax.SAXEventUtils;
 import org.xml.sax.Attributes;

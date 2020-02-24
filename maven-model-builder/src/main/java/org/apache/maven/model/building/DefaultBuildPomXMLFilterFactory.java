@@ -70,7 +70,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
     @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
-        return (g,a) -> Optional.ofNullable( context.getRawModel( g, a ) )
+        return (g, a) -> Optional.ofNullable( context.getRawModel( g, a ) )
                             .map( m -> toVersion( m ) )
                             .orElse( null );
     }
