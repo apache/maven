@@ -24,18 +24,12 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilter;
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.DependencyKey;
-import org.apache.maven.xml.sax.filter.RelativeProject;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -77,23 +71,13 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             }
             
             @Override
-            protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+            protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
             {
                 return null;
             }
         };
         
-        Provider<BuildPomXMLFilterFactory> provider = new Provider<BuildPomXMLFilterFactory>()
-        {
-
-            @Override
-            public BuildPomXMLFilterFactory get()
-            {
-                return buildPomXMLFilterFactory;
-            }
-        };
-        
-        ConsumerPomXMLFilter filter = new ConsumerPomXMLFilterFactory( provider )
+        ConsumerPomXMLFilter filter = new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
         {
         }.get( Paths.get( "pom.xml" ) );
         filter.setFeature( "http://xml.org/sax/features/namespaces", true );

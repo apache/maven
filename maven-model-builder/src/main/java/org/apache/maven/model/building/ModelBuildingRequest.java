@@ -349,4 +349,8 @@ public interface ModelBuildingRequest
     WorkspaceModelResolver getWorkspaceModelResolver();
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
+    
+    TransformerContext getTransformerContext();
+
+    ModelBuildingRequest setTransformerContext( TransformerContext context );
 }

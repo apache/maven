@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,7 +35,5 @@ import org.xml.sax.SAXException;
  */
 public interface ModelSourceTransformer
 {
-
-    InputStream transform( Path pomFile, BuildPomXMLFilterFactory buildPomXMLFilterFactory ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException;
-
+    InputStream transform( Path pomFile, TransformerContext context ) throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException;
 }

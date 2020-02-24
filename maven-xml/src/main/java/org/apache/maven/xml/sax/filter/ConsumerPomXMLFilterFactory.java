@@ -21,8 +21,6 @@ package org.apache.maven.xml.sax.filter;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -33,17 +31,11 @@ import org.xml.sax.SAXException;
  * @author Robert Scholte
  * @since 3.7.0
  */
-public abstract class ConsumerPomXMLFilterFactory
+public class ConsumerPomXMLFilterFactory
 {
-    @Inject
-    private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory;
+    private BuildPomXMLFilterFactory buildPomXMLFilterFactory;
     
-    public ConsumerPomXMLFilterFactory()
-    {
-    }
-
-    // For testing purpose
-    ConsumerPomXMLFilterFactory( Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory )
+    public ConsumerPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
     {
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
@@ -51,7 +43,7 @@ public abstract class ConsumerPomXMLFilterFactory
     public final ConsumerPomXMLFilter get( Path projectPath )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
-        BuildPomXMLFilter parent = buildPomXMLFilterFactory.get().get( projectPath );
+        BuildPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
         
         // Ensure that xs:any elements aren't touched by next filters
         AbstractSAXFilter filter = new FastForwardFilter( parent );

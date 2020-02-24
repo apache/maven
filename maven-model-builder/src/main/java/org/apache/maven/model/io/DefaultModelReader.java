@@ -27,11 +27,13 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -48,6 +50,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultModelReader
     implements ModelReader
 {
+    @Inject
+    private ModelSourceTransformer transformer;
+
+
+    
 
     @Override
     public Model read( File input, Map<String, ?> options )

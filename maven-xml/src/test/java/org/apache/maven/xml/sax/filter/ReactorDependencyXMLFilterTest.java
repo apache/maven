@@ -18,13 +18,11 @@ package org.apache.maven.xml.sax.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.xmlunit.assertj.XmlAssert.*;
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.maven.xml.sax.filter.ReactorDependencyXMLFilter;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -34,7 +32,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests
     protected ReactorDependencyXMLFilter getFilter()
         throws TransformerException, SAXException, ParserConfigurationException
     {
-        return new ReactorDependencyXMLFilter( r -> "1.0.0" );
+        return new ReactorDependencyXMLFilter( (g, a) -> "1.0.0" );
     }
 
     @Test
@@ -55,7 +53,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests
     @Test
     public void testManagedDependency() throws Exception
     {
-        ReactorDependencyXMLFilter filter = new ReactorDependencyXMLFilter( r -> null );
+        ReactorDependencyXMLFilter filter = new ReactorDependencyXMLFilter( (g, a) -> null );
         
         String input = "<dependency>"
             + "<groupId>GROUPID</groupId>"

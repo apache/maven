@@ -1,5 +1,7 @@
 package org.apache.maven.xml.sax.filter;
 
+import java.util.function.BiFunction;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +20,6 @@ package org.apache.maven.xml.sax.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.function.Function;
 
 import org.apache.maven.xml.sax.SAXEventUtils;
 import org.xml.sax.Attributes;
@@ -44,9 +44,9 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
     private String artifactId;
 
-    private final Function<DependencyKey, String> reactorVersionMapper;
+    private final BiFunction<String, String, String> reactorVersionMapper;
 
-    public ReactorDependencyXMLFilter( Function<DependencyKey, String> reactorVersionMapper )
+    public ReactorDependencyXMLFilter( BiFunction<String, String, String> reactorVersionMapper )
     {
         this.reactorVersionMapper = reactorVersionMapper;
     }
@@ -136,7 +136,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
     private String getVersion()
     {
-        return reactorVersionMapper.apply( new DependencyKey( groupId, artifactId ) );
+        return reactorVersionMapper.apply( groupId, artifactId  );
     }
 
     @Override

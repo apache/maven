@@ -53,9 +53,10 @@ class DefaultModelSourceTransformer implements ModelSourceTransformer
     private BuildPomXMLFilterListener xmlFilterListener;
     
     @Override
-    public InputStream transform( Path pomFile, BuildPomXMLFilterFactory buildPomXMLFilterFactory )
+    public InputStream transform( Path pomFile, TransformerContext context )
         throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException
     {
+        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new DefaultBuildPomXMLFilterFactory( context );
         final TransformerFactory transformerFactory = Factories.newTransformerFactory() ;
         
         final PipedOutputStream pipedOutputStream  = new PipedOutputStream();

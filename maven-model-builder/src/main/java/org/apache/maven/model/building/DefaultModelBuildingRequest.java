@@ -73,6 +73,8 @@ public class DefaultModelBuildingRequest
     private ModelCache modelCache;
 
     private WorkspaceModelResolver workspaceResolver;
+    
+    private TransformerContext context;
 
     /**
      * Creates an empty request.
@@ -419,6 +421,19 @@ public class DefaultModelBuildingRequest
     public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
     {
         this.workspaceResolver = workspaceResolver;
+        return this;
+    }
+    
+    @Override
+    public TransformerContext getTransformerContext()
+    {
+        return context;
+    }
+    
+    @Override
+    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    {
+        this.context = context;
         return this;
     }
 }

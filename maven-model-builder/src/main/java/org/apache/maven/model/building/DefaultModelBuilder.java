@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -688,7 +689,7 @@ public class DefaultModelBuilder
         {
             try
             {
-                Model rawModel = modelProcessor.read( pomFile.toPath(), buildPomXMLFilterFactory.get() );
+                Model rawModel = modelProcessor.read( pomFile, Collections.singletonMap( "transformerContext", buildPomXMLFilterFactory ) );
 
                 model.setPomFile( pomFile );
                 
@@ -698,7 +699,7 @@ public class DefaultModelBuilder
                 // Apply enriched data
                 modelMerger.merge( model, rawModel, false, null );
             }
-            catch ( IOException | TransformerException | SAXException | ParserConfigurationException e )
+            catch ( IOException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V37 ).setException( e ) );
             }

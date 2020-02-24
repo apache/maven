@@ -21,6 +21,7 @@ package org.apache.maven.xml.sax.filter;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +44,14 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
+    /**
+     * 
+     * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
+     * @return
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws TransformerConfigurationException
+     */
     public final BuildPomXMLFilter get( Path projectFile )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
@@ -127,7 +136,7 @@ public class BuildPomXMLFilterFactory
         return null;
     }
     
-    protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+    protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
         return null;
     }

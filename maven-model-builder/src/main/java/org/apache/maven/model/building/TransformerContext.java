@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,19 +19,20 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
+import java.nio.file.Path;
+
+import org.apache.maven.model.Model;
 
 /**
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public interface TransformerContext
 {
-    public DefaultConsumerPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
-    {
-        super( buildPomXMLFilterFactory );
-    }
-
+    String getUserProperty( String key );
+    
+    Model getRawModel( Path p );
+    
+    Model getRawModel( String groupId, String artifactId );
 }

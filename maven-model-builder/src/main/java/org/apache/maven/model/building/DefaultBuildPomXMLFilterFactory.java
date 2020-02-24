@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,17 +22,11 @@ package org.apache.maven.xml.internal;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelCacheManager;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.DependencyKey;
 import org.apache.maven.xml.sax.filter.RelativeProject;
 
 /**
@@ -40,49 +34,43 @@ import org.apache.maven.xml.sax.filter.RelativeProject;
  * @author Robert Scholte
  * @since 3.7.0
  */
-@Named
-@Singleton
 public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
 {
-    private MavenSession session;
+    private final TransformerContext context;
     
-    @Inject
-    private ModelCacheManager rawModelCache; 
-    
-    @Inject
-    public DefaultBuildPomXMLFilterFactory( MavenSession session )
+    public DefaultBuildPomXMLFilterFactory( TransformerContext context )
     {
-        this.session = session;
+        this.context = context;
     }
-
+    
     @Override
     protected Optional<String> getChangelist()
     {
-        return Optional.ofNullable( session.getUserProperties().getProperty( "changelist" ) );
+        return Optional.ofNullable( context.getUserProperty( "changelist" ) );
     }
 
     @Override
     protected Optional<String> getRevision()
     {
-        return Optional.ofNullable( session.getUserProperties().getProperty( "revision" ) );
+        return Optional.ofNullable( context.getUserProperty( "revision" ) );
     }
 
     @Override
     protected Optional<String> getSha1()
     {
-        return Optional.ofNullable( session.getUserProperties().getProperty( "sha1" ) );
+        return Optional.ofNullable( context.getUserProperty( "sha1" ) );
     }
 
     @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
-        return p -> Optional.ofNullable( rawModelCache.get( p ) ).map( m -> toRelativeProject( m ) );
+        return p -> Optional.ofNullable( context.getRawModel( p ) ).map( m -> toRelativeProject( m ) );
     }
     
     @Override
-    protected Function<DependencyKey, String> getDependencyKeyToVersionMapper()
+    protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
-        return k -> Optional.ofNullable( rawModelCache.get( k ) )
+        return (g,a) -> Optional.ofNullable( context.getRawModel( g, a ) )
                             .map( m -> toVersion( m ) )
                             .orElse( null );
     }

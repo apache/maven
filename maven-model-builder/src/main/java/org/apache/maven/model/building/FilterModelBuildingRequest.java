@@ -294,4 +294,17 @@ class FilterModelBuildingRequest
         request.setWorkspaceModelResolver( workspaceResolver );
         return this;
     }
+    
+    @Override
+    public TransformerContext getTransformerContext()
+    {
+        return request.getTransformerContext();
+    }
+    
+    @Override
+    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    {
+        request.setTransformerContext( context );
+        return this;
+    }
 }

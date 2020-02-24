@@ -64,7 +64,6 @@ import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
@@ -82,7 +81,6 @@ public class DefaultModelBuilderFactory
         DefaultModelProcessor processor = new DefaultModelProcessor();
         processor.setModelLocator( newModelLocator() );
         processor.setModelReader( newModelReader() );
-        processor.setTransformer( newTransformer() );
         return processor;
     }
 
@@ -201,11 +199,6 @@ public class DefaultModelBuilderFactory
         return new DefaultReportingConverter();
     }
 
-    protected ModelSourceTransformer newTransformer()
-    {
-        return new DefaultModelSourceTransformer();
-    }
-
     /**
      * Creates a new model builder instance.
      *
@@ -232,7 +225,6 @@ public class DefaultModelBuilderFactory
         modelBuilder.setPluginConfigurationExpander( newPluginConfigurationExpander() );
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
-        modelBuilder.setBuildPomXMLFilterFactory( new BuildPomXMLFilterFactory() );
         modelBuilder.setModelCacheManager( new DefaultModelCacheManager() );
 
         return modelBuilder;
