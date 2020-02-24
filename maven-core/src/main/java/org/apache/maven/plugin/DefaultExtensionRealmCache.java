@@ -68,7 +68,8 @@ public class DefaultExtensionRealmCache
 
         private FileCacheKey( List<Artifact> extensionArtifacts )
         {
-            this.files = extensionArtifacts.stream().map( artifact -> {
+            this.files = extensionArtifacts.stream().map( artifact ->
+            {
                 File file = artifact.getFile();
                 long lastModified = file != null ? file.lastModified() : 0;
                 long size = file != null ? file.length() : 0;
