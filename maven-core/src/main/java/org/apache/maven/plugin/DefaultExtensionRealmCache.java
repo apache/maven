@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ExtensionDescriptor;
@@ -42,12 +43,22 @@ public class DefaultExtensionRealmCache
     implements ExtensionRealmCache, Disposable
 {
 
-    private static final ConcurrentHashMap<String, FileInfo> FILE_INFO_CACHE = new ConcurrentHashMap<>( 512 );
+    /**
+     * Control flag to restore legacy filesystem behaviour in case issues.
+     */
+    private final boolean useFsKey = Boolean.getBoolean( "maven.extensions.fskey" );
 
     /**
-     * CacheKey
+     * Legacy key implementation which access file system each time just to create a key. As this operation is invoked
+     * under a lock it slows down graph build significantly on slow file systems. Initial reason for this implementation
+     * is unknown, but we can assume it is a sort of protection from background file modifications at build time.
+     * Though such protection itself raises questions of build correctness if maven coordinates map to physically
+     * different filesets during the same build.
+     *
+     * @deprecated use {@link ArtifactCacheKey}
+     * @see #createKey(List)
      */
-    protected static class CacheKey
+    protected static class FileCacheKey
         implements Key
     {
 
@@ -55,29 +66,69 @@ public class DefaultExtensionRealmCache
 
         private final int hashCode;
 
-        public CacheKey( List<Artifact> extensionArtifacts )
+        private FileCacheKey( List<Artifact> extensionArtifacts )
         {
-            this.files = new ArrayList<>( extensionArtifacts.size() );
-
-            for ( Artifact artifact : extensionArtifacts )
-            {
-                String artifactKey = getArtifactKey( artifact );
-                FileInfo fileInfo = FILE_INFO_CACHE.get( artifactKey );
-                if ( fileInfo == null )
-                {
-                    File file = artifact.getFile();
-                    long lastModified = file != null ? file.lastModified() : 0;
-                    long size = file != null ? file.length() : 0;
-                    fileInfo = new FileInfo( file, lastModified, size, artifact.getVersion() );
-                    FILE_INFO_CACHE.putIfAbsent( artifactKey, fileInfo );
-                }
-                files.add( fileInfo );
-            }
+            this.files = extensionArtifacts.stream().map( artifact -> {
+                File file = artifact.getFile();
+                long lastModified = file != null ? file.lastModified() : 0;
+                long size = file != null ? file.length() : 0;
+                return new FileInfo( file, lastModified, size, artifact.getVersion() );
+            } ).collect( Collectors.toCollection( ArrayList::new ) );
 
             this.hashCode = files.hashCode();
         }
 
-        private String getArtifactKey( Artifact artifact )
+        @Override
+        public int hashCode()
+        {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( o == this )
+            {
+                return true;
+            }
+
+            if ( !( o instanceof FileCacheKey ) )
+            {
+                return false;
+            }
+
+            FileCacheKey other = (FileCacheKey) o;
+
+            return files.equals( other.files );
+        }
+
+        @Override
+        public String toString()
+        {
+            return files.toString();
+        }
+    }
+
+    /**
+     * Lightweight artifact coordinates based key
+     * @see #createKey(List)
+     */
+    protected static class ArtifactCacheKey
+            implements Key
+    {
+
+        private final List<String> artifactKeys;
+
+        private final int hashCode;
+
+        private ArtifactCacheKey( List<Artifact> extensionArtifacts )
+        {
+            this.artifactKeys = extensionArtifacts.stream().map( ArtifactCacheKey::getArtifactKey )
+                    .collect( Collectors.toCollection( ArrayList::new ) );
+            this.hashCode = artifactKeys.hashCode();
+        }
+
+        private static String getArtifactKey( Artifact artifact )
         {
             return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion()
                     + ( artifact.hasClassifier() ? ":" + artifact.getClassifier() : "" ) + ":" + artifact.getType();
@@ -97,20 +148,20 @@ public class DefaultExtensionRealmCache
                 return true;
             }
 
-            if ( !( o instanceof CacheKey ) )
+            if ( !( o instanceof ArtifactCacheKey ) )
             {
                 return false;
             }
 
-            CacheKey other = (CacheKey) o;
+            ArtifactCacheKey other = (ArtifactCacheKey) o;
 
-            return files.equals( other.files );
+            return artifactKeys.equals( other.artifactKeys );
         }
 
         @Override
         public String toString()
         {
-            return files.toString();
+            return artifactKeys.toString();
         }
     }
 
@@ -119,7 +170,7 @@ public class DefaultExtensionRealmCache
     @Override
     public Key createKey( List<Artifact> extensionArtifacts )
     {
-        return new CacheKey( extensionArtifacts );
+        return useFsKey ? new FileCacheKey( extensionArtifacts ) : new ArtifactCacheKey( extensionArtifacts );
     }
 
     public CacheRecord get( Key key )
