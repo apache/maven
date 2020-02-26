@@ -28,13 +28,12 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.util.FileUtils;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
 {
+
     private List<File> filesToDelete = new ArrayList<>();
 
     private File localRepoDir;
@@ -85,11 +84,6 @@ public class DefaultMavenProjectBuilderTest
         configuration.setLocalRepository( getLocalRepository() );
         initRepoSession( configuration );
 
-        getSessionScope().seed( MavenSession.class,
-                                new MavenSession( getContainer(), 
-                                                  configuration.getRepositorySession(),
-                                                  new DefaultMavenExecutionRequest(), null ) );
-        
         return projectBuilder.build( pom, allowStub, configuration ).getProject();
     }
 
@@ -231,10 +225,6 @@ public class DefaultMavenProjectBuilderTest
             ProjectBuildingRequest request = newBuildingRequest();
             request.setProcessPlugins( false );
             request.setResolveDependencies( true );
-            
-            getSessionScope().seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                          request.getRepositorySession(),
-                                                                          new DefaultMavenExecutionRequest(), null ) );
             projectBuilder.build( pomFile, request );
             fail( "Project building did not fail despite invalid POM" );
         }
@@ -259,10 +249,6 @@ public class DefaultMavenProjectBuilderTest
         ProjectBuildingRequest request = newBuildingRequest();
         request.setProcessPlugins( false );
         request.setResolveDependencies( true );
-        
-        getSessionScope().seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                      request.getRepositorySession(),
-                                                                      new DefaultMavenExecutionRequest(), null ) );
         projectBuilder.build( pomFile, request );
     }
 

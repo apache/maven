@@ -71,7 +71,7 @@ public class DefaultModelProcessor
 
     @Inject
     private ModelReader reader;
-    
+
     public DefaultModelProcessor setModelLocator( ModelLocator locator )
     {
         this.locator = locator;
@@ -110,4 +110,5 @@ public class DefaultModelProcessor
     {
         return reader.read( input, options );
     }
+
 }

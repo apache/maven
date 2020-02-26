@@ -26,8 +26,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +37,9 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import com.google.common.io.Files;
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -77,15 +75,8 @@ public class ProjectBuilderTest
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         ModelSource modelSource = new FileModelSource( pomFile );
-        
-        SessionScope sessionScope = lookup( SessionScope.class );
-        sessionScope.enter();
-        sessionScope.seed( MavenSession.class, mavenSession );
-        
         ProjectBuildingResult result =
             lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
-
-        sessionScope.exit();
 
         assertNotNull( result.getProject().getParentFile() );
     }
@@ -151,20 +142,19 @@ public class ProjectBuilderTest
         String initialValue = System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString( true ) );
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
-
-        Path tempDir = Files.createTempDirectory( null );
-        FileUtils.copyDirectoryStructure ( new File( "src/test/resources/projects/grandchild-check" ), tempDir.toFile() );
+        File tempDir = Files.createTempDir();
+        FileUtils.copyDirectoryStructure (new File( "src/test/resources/projects/grandchild-check"), tempDir );
         try
         {
             MavenSession mavenSession = createMavenSession( null );
             ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
             configuration.setRepositorySession( mavenSession.getRepositorySession() );
             org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
-            File child = new File( tempDir.toFile(), "child/pom.xml" );
+            File child = new File( tempDir, "child/pom.xml" );
             // build project once
             projectBuilder.build( child, configuration );
             // modify parent
-            File parent = new File( tempDir.toFile(), "pom.xml" );
+            File parent = new File( tempDir, "pom.xml" );
             String parentContent = FileUtils.fileRead( parent );
             parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
             		"<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
@@ -183,7 +173,7 @@ public class ProjectBuilderTest
             {
                 System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, initialValue );
             }
-            FileUtils.deleteDirectory( tempDir.toFile() );
+            FileUtils.deleteDirectory( tempDir );
         }
     }
 
@@ -242,7 +232,6 @@ public class ProjectBuilderTest
         try
         {
             projectBuilder.build( pomFile, configuration );
-            fail();
         }
         catch ( InvalidArtifactRTException iarte )
         {
@@ -253,7 +242,6 @@ public class ProjectBuilderTest
         try
         {
             projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
-            fail();
         }
         catch ( ProjectBuildingException ex )
         {
@@ -315,7 +303,7 @@ public class ProjectBuilderTest
         return null;
     }
 
-    private void assertResultShowNoError( List<ProjectBuildingResult> results )
+    private void assertResultShowNoError(List<ProjectBuildingResult> results)
     {
         for ( ProjectBuildingResult result : results )
         {
@@ -332,8 +320,8 @@ public class ProjectBuilderTest
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         configuration.setResolveDependencies( true );
-        List<ProjectBuildingResult> result = projectBuilder.build( Collections.singletonList( file ), true, configuration );
-        MavenProject project = result.get( 0 ).getProject();
+        List<ProjectBuildingResult> result = projectBuilder.build( Collections.singletonList(file), true, configuration );
+        MavenProject project = result.get(0).getProject();
         // verify a few typical parameters are not duplicated
         assertEquals( 1, project.getTestCompileSourceRoots().size() );
         assertEquals( 1, project.getCompileSourceRoots().size() );

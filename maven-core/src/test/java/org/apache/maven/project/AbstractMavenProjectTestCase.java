@@ -23,13 +23,11 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
@@ -44,8 +42,6 @@ public abstract class AbstractMavenProjectTestCase
     protected ProjectBuilder projectBuilder;
 
     protected RepositorySystem repositorySystem;
-    
-    private SessionScope sessionScope;
 
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
@@ -71,17 +67,12 @@ public abstract class AbstractMavenProjectTestCase
         }
 
         repositorySystem = lookup( RepositorySystem.class );
-        
-        sessionScope = lookup( SessionScope.class );
-        sessionScope.enter();
     }
 
     @Override
     protected void tearDown()
         throws Exception
     {
-        sessionScope.exit();
-        
         projectBuilder = null;
 
         super.tearDown();
@@ -90,11 +81,6 @@ public abstract class AbstractMavenProjectTestCase
     protected ProjectBuilder getProjectBuilder()
     {
         return projectBuilder;
-    }
-    
-    protected final SessionScope getSessionScope()
-    {
-        return sessionScope;
     }
 
     @Override
@@ -133,7 +119,11 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
+
+        ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null );
+
+        return r;
     }
 
     // ----------------------------------------------------------------------
@@ -148,9 +138,6 @@ public abstract class AbstractMavenProjectTestCase
         configuration.setProcessPlugins( false );
         configuration.setResolveDependencies( true );
 
-        sessionScope.seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                 configuration.getRepositorySession(),
-                                                                 new DefaultMavenExecutionRequest(), null ) );
         try
         {
             return projectBuilder.build( pom, configuration ).getProject();
@@ -177,10 +164,6 @@ public abstract class AbstractMavenProjectTestCase
     {
         ProjectBuildingRequest configuration = newBuildingRequest();
 
-        sessionScope.seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                 configuration.getRepositorySession(),
-                                                                 new DefaultMavenExecutionRequest(), null ) );
-        
         return projectBuilder.build( pom, configuration ).getProject();
     }
 
@@ -191,10 +174,6 @@ public abstract class AbstractMavenProjectTestCase
         configuration.setLocalRepository( this.getLocalRepository() );
         configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
         initRepoSession( configuration );
-        
-        sessionScope.seed( MavenSession.class, new MavenSession( getContainer(), 
-                                                                 configuration.getRepositorySession(),
-                                                                 new DefaultMavenExecutionRequest(), null ) );
 
         return projectBuilder.build( pom, configuration ).getProject();
     }

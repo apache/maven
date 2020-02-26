@@ -45,7 +45,7 @@ class ModelData
     private String artifactId;
 
     private String version;
-    
+
     /**
      * Creates a new container for the specified model.
      *
@@ -212,7 +212,7 @@ class ModelData
 
         return buffer.toString();
     }
-    
+
     @Override
     public String toString()
     {

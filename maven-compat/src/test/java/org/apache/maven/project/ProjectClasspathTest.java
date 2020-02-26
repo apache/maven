@@ -35,7 +35,6 @@ public class ProjectClasspathTest
     public void setUp()
         throws Exception
     {
-        super.setUp();
         ArtifactResolver resolver = lookup( ArtifactResolver.class, "classpath" );
         DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)lookup(ArtifactDescriptorReader.class);
         pomReader.setArtifactResolver( resolver );

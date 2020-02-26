@@ -19,14 +19,7 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -35,7 +28,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
@@ -45,6 +37,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 
 public class PomConstructionWithSettingsTest
     extends PlexusTestCase
@@ -56,11 +52,9 @@ public class PomConstructionWithSettingsTest
     private DefaultProjectBuilder projectBuilder;
 
     private RepositorySystem repositorySystem;
-    
-    private SessionScope sessionScope;
 
     private File testDirectory;
-    
+
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
@@ -75,7 +69,6 @@ public class PomConstructionWithSettingsTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
         repositorySystem = lookup( RepositorySystem.class );
-        sessionScope = lookup( SessionScope.class );
     }
 
     @Override
@@ -101,7 +94,6 @@ public class PomConstructionWithSettingsTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "test-pom-and-settings-interpolation" );
-        
         assertEquals( "applied", pom.getValue( "properties/settingsProfile" ) );
         assertEquals( "applied", pom.getValue( "properties/pomProfile" ) );
         assertEquals( "settings", pom.getValue( "properties/pomVsSettings" ) );
@@ -146,15 +138,6 @@ public class PomConstructionWithSettingsTest
         repoSession.setLocalRepositoryManager(
             new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
         config.setRepositorySession( repoSession );
-        
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.setActiveProfiles( settings.getActiveProfiles() );
-        
-        sessionScope.enter();
-        sessionScope.seed( MavenSession.class,
-                           new MavenSession( getContainer(), 
-                                             repoSession, 
-                                             new DefaultMavenExecutionRequest(), null ) );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }
