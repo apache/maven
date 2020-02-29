@@ -173,31 +173,6 @@ under the License.
             </excludes>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <versionRange>[1.2,)</versionRange>
-                    <goals>
-                      <goal>create-timestamp</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -239,16 +214,6 @@ under the License.
         <artifactId>buildnumber-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>create-noncanonicalrev</id>
-            <goals>
-              <goal>create-timestamp</goal>
-            </goals>
-            <configuration>
-              <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd'T'HH:mm:ssXXX_'${user.name}'</timestampFormat>
-              <timestampPropertyName>nonCanonicalRevision</timestampPropertyName>
-            </configuration>
-          </execution>
-          <execution>
             <id>create-buildnumber</id>
             <goals>
               <goal>create</goal>
@@ -256,7 +221,7 @@ under the License.
             <configuration>
               <doCheck>false</doCheck>
               <doUpdate>false</doUpdate>
-              <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
+              <revisionOnScmFailure>NON_CANONICAL</revisionOnScmFailure>
             </configuration>
           </execution>
         </executions>

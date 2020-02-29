@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
@@ -119,11 +118,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
-
-        ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null );
-
-        return r;
+        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
     }
 
     // ----------------------------------------------------------------------
