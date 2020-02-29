@@ -198,11 +198,7 @@ public class DefaultMavenProjectBuilderTest
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "default" );
-        ArtifactRepository r =
-            repositorySystem.createArtifactRepository( "local", "file://" + localRepoDir.getAbsolutePath(), repoLayout,
-                                                       null, null );
-        return r;
+        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
     }
 
     public void xtestLoop()
