@@ -27,7 +27,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -42,7 +41,6 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -95,10 +93,6 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
-    
-    @Inject
-    @Nullable
-    private Provider<ConsumerPomXMLFilterFactory> consumerPomXMLFilterFactory;
     
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {

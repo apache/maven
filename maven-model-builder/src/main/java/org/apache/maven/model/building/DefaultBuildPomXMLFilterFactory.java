@@ -43,6 +43,11 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
         this.context = context;
     }
     
+    public final TransformerContext getContext()
+    {
+        return context;
+    }
+    
     @Override
     protected Optional<String> getChangelist()
     {

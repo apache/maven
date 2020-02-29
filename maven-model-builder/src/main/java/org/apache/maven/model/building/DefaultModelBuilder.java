@@ -38,7 +38,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -89,8 +88,6 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
@@ -154,17 +151,6 @@ public class DefaultModelBuilder
 
     @Inject
     private ReportingConverter reportingConverter;
-    
-    // Using provider so MavenSession can be used in the constructor
-    @Inject
-    private Provider<BuildPomXMLFilterFactory> buildPomXMLFilterFactory; 
-    
-    @Inject
-    private ModelCacheManager modelCacheManager;
-    
-    @Inject
-    @Nullable
-    private BuildPomXMLFilterListener xmlFilterListener;
     
     private ModelMerger modelMerger = new FileToRawModelMerger();
 
@@ -270,17 +256,6 @@ public class DefaultModelBuilder
         return this;
     }
     
-    public DefaultModelBuilder setBuildPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
-    {
-        this.buildPomXMLFilterFactory = () -> buildPomXMLFilterFactory;
-        return this;
-    }
-    
-    public void setModelCacheManager( ModelCacheManager modelCacheManager )
-    {
-        this.modelCacheManager = modelCacheManager;
-    }
-
     @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
@@ -465,7 +440,7 @@ public class DefaultModelBuilder
         
         if ( request.getPomFile() != null )
         {
-            modelCacheManager.put( request.getPomFile().toPath(), resultModel ); 
+            // request.getModelCache().put( request.getPomFile().toPath(), resultModel ); 
         }
 
         for ( ModelData currentData : lineage )
@@ -686,7 +661,7 @@ public class DefaultModelBuilder
             {
                 Model rawModel =
                     modelProcessor.read( pomFile,
-                                         Collections.singletonMap( "transformerContext", buildPomXMLFilterFactory ) );
+                               Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
 
                 model.setPomFile( pomFile );
                 
@@ -1007,12 +982,17 @@ public class DefaultModelBuilder
 
             if ( parentData == null )
             {
-                parentData = fromCache( request.getModelCache(), 
-                                       parent.getGroupId(), parent.getArtifactId(),
-                                       parent.getVersion(), ModelCacheTag.RAW );
+                ModelData candidateData = fromCache( request.getModelCache(), 
+                                                     parent.getGroupId(), parent.getArtifactId(),
+                                                     parent.getVersion(), ModelCacheTag.RAW );
+
                 
-                // ArtifactModelSource means repositorySource
-                if ( parentData == null || !( parentData.getSource() instanceof ArtifactModelSource ) )
+                if ( candidateData != null && candidateData.getSource() instanceof ArtifactModelSource )
+                {
+                    // ArtifactModelSource means repositorySource
+                    parentData = candidateData;
+                }
+                else
                 {
                     parentData = readParentExternally( childModel, request, problems );
                     
@@ -1021,20 +1001,19 @@ public class DefaultModelBuilder
                               parentData.getVersion(), ModelCacheTag.RAW, parentData );
                 }
             }
-
-            Model parentModel = parentData.getModel();
-
-            if ( !"pom".equals( parentModel.getPackaging() ) )
+            
+            if ( parentData != null ) 
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
-                    .setLocation( parentModel.getLocation( "packaging" ) ) );
+                Model parentModel = parentData.getModel();
+
+                if ( !"pom".equals( parentModel.getPackaging() ) )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                                         + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
+                        .setLocation( parentModel.getLocation( "packaging" ) ) );
+                }
             }
-        }
-        else
-        {
-            parentData = null;
         }
 
         return parentData;
@@ -1413,7 +1392,7 @@ public class DefaultModelBuilder
                     final ModelSource importSource;
                     try
                     {
-                        importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                        importSource = modelResolver.resolveModel( dependency );
                     }
                     catch ( UnresolvableModelException e )
                     {

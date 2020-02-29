@@ -44,16 +44,21 @@ import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
 
+/**
+ * 
+ * @author Robert Scholte
+ * @since 3.7.0
+ */
 @Named
 @Singleton
-class DefaultModelSourceTransformer implements ModelSourceTransformer
+public class DefaultModelSourceTransformer implements ModelSourceTransformer
 {
     @Inject
     @Nullable
     private BuildPomXMLFilterListener xmlFilterListener;
     
     @Override
-    public InputStream transform( Path pomFile, TransformerContext context )
+    public final InputStream transform( Path pomFile, TransformerContext context )
         throws IOException, TransformerConfigurationException, SAXException, ParserConfigurationException
     {
         final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new DefaultBuildPomXMLFilterFactory( context );

@@ -353,4 +353,6 @@ public interface ModelBuildingRequest
     TransformerContext getTransformerContext();
 
     ModelBuildingRequest setTransformerContext( TransformerContext context );
+    
+    
 }

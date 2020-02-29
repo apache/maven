@@ -73,6 +73,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
@@ -407,7 +408,16 @@ public class DefaultProjectBuilder
             artifact.setResolved( true );
         }
 
-        return build( localProject ? pomFile : null, new FileModelSource( pomFile ), config );
+        if ( localProject )
+        {
+            return build( pomFile, new FileModelSource( pomFile ), config );
+        }
+        else
+        {
+            return build( null, new ArtifactModelSource( pomFile, artifact.getGroupId(), artifact.getArtifactId(),
+                                                         artifact.getVersion() ),
+                          config );
+        }
     }
 
     private ModelSource createStubModelSource( Artifact artifact )
@@ -444,9 +454,7 @@ public class DefaultProjectBuilder
 
         boolean noErrors =
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
-                   config );
-
-        populateReactorModelPool( poolBuilder, interimResults );
+                   config, poolBuilder );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -472,7 +480,8 @@ public class DefaultProjectBuilder
     @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
                            Map<String, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
-                           boolean isRoot, boolean recursive, InternalConfig config )
+                           boolean isRoot, boolean recursive, InternalConfig config,
+                           ReactorModelPool.Builder poolBuilder )
     {
         boolean noErrors = true;
 
@@ -480,7 +489,8 @@ public class DefaultProjectBuilder
         {
             aggregatorFiles.add( pomFile );
 
-            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config ) )
+            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config,
+                         poolBuilder ) )
             {
                 noErrors = false;
             }
@@ -494,7 +504,8 @@ public class DefaultProjectBuilder
     @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
                            Map<String, MavenProject> projectIndex, File pomFile, Set<File> aggregatorFiles,
-                           boolean isRoot, boolean recursive, InternalConfig config )
+                           boolean isRoot, boolean recursive, InternalConfig config,
+                           ReactorModelPool.Builder poolBuilder )
     {
         boolean noErrors = true;
 
@@ -531,6 +542,10 @@ public class DefaultProjectBuilder
         }
 
         Model model = result.getEffectiveModel();
+        
+        // move to here!!
+        poolBuilder.put( model.getPomFile().toPath(),  result.getRawModel() );
+        
         try
         {
             // first pass: build without building parent.
@@ -625,7 +640,7 @@ public class DefaultProjectBuilder
             interimResult.modules = new ArrayList<>();
 
             if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                         recursive, config ) )
+                         recursive, config, poolBuilder ) )
             {
                 noErrors = false;
             }
@@ -659,18 +674,6 @@ public class DefaultProjectBuilder
             this.root = root;
         }
 
-    }
-
-    private void populateReactorModelPool( ReactorModelPool.Builder reactorModelPool,
-                                           List<InterimResult> interimResults )
-    {
-        for ( InterimResult interimResult : interimResults )
-        {
-            Model model = interimResult.result.getEffectiveModel();
-            reactorModelPool.put( model.getPomFile().toPath(),  model );
-
-            populateReactorModelPool( reactorModelPool, interimResult.modules );
-        }
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,

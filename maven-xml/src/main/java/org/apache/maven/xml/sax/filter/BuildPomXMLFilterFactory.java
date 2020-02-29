@@ -76,18 +76,6 @@ public class BuildPomXMLFilterFactory
             parentFilter.setLexicalHandler( parent );
             parent = parentFilter;
         }
-        
-        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter();
-        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
-        getRevision().ifPresent( ciFriendlyFilter::setRevision );
-        getSha1().ifPresent( ciFriendlyFilter::setSha1 );
-        
-        if ( ciFriendlyFilter.isSet() )
-        {
-            ciFriendlyFilter.setParent( parent );
-            ciFriendlyFilter.setLexicalHandler( parent );
-            parent = ciFriendlyFilter;
-        }
 
         return new BuildPomXMLFilter( parent );
     }

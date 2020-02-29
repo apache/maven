@@ -21,13 +21,13 @@ package org.apache.maven.project;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
 
@@ -40,7 +40,7 @@ import org.apache.maven.model.Model;
  */
 class ReactorModelPool
 {
-    private final Map<GAKey, List<Model>> modelsByGa = new HashMap<>();
+    private final Map<GAKey, Set<Model>> modelsByGa = new HashMap<>();
 
     private final Map<Path, Model> modelsByPath = new HashMap<>();
 
@@ -49,18 +49,16 @@ class ReactorModelPool
      *  
      * @param groupId, never {@code null}
      * @param artifactId, never {@code null}
-     * @param version, might be {@code null}
-     * @return
+     * @param version, can be {@code null}
+     * @return the matching model
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      * @throws NoSuchElementException if model could not be found
      */
     public Model get( String groupId, String artifactId, String version )
         throws IllegalStateException, NoSuchElementException
     {
-        // TODO DefaultModelBuilder.readParentExternally still tries to use the ReactorModelPool, should be fixed
-        // For now, use getOrDefault/orElse instead of get 
-        return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptyList() ).stream()
-                        .filter( m -> version == null || version.equals( m.getVersion() ) )
+        return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptySet() ).stream()
+                        .filter( m -> version == null || version.equals( getVersion( m ) ) )
                         .reduce( ( a, b ) -> 
                         {
                             throw new IllegalStateException( "Multiple modules with key "
@@ -81,6 +79,16 @@ class ReactorModelPool
         }
         return modelsByPath.get( pomFile );
     }
+    
+    private String getVersion( Model model )
+    {
+        String version = model.getVersion();
+        if ( version == null && model.getParent() != null )
+        {
+            version = model.getParent().getVersion();
+        }
+        return version;
+    }
 
     static class Builder
     {
@@ -89,14 +97,24 @@ class ReactorModelPool
         Builder put( Path pomFile, Model model )
         {
             pool.modelsByPath.put( pomFile, model );
-            pool.modelsByGa.computeIfAbsent( new GAKey( model.getGroupId(), model.getArtifactId() ),
-                                             k -> new ArrayList<Model>() ).add( model );
+            pool.modelsByGa.computeIfAbsent( new GAKey( getGroupId( model ), model.getArtifactId() ),
+                                             k -> new HashSet<Model>() ).add( model );
             return this;
         }
         
         ReactorModelPool build() 
         {
             return pool;
+        }
+
+        private static String getGroupId( Model model )
+        {
+            String groupId = model.getGroupId();
+            if ( groupId == null && model.getParent() != null )
+            {
+                groupId = model.getParent().getGroupId();
+            }
+            return groupId;
         }
     }
 

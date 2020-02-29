@@ -47,6 +47,21 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
         final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory()
         {
             @Override
+            protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+            {
+                return null;
+            }
+            
+            @Override
+            protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
+            {
+                return null;
+            }
+        };
+        
+        ConsumerPomXMLFilter filter = new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
+        {
+            @Override
             protected Optional<String> getSha1()
             {
                 return Optional.empty();
@@ -63,22 +78,6 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             {
                 return Optional.of( "CL" );
             }
-            
-            @Override
-            protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
-            {
-                return null;
-            }
-            
-            @Override
-            protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
-            {
-                return null;
-            }
-        };
-        
-        ConsumerPomXMLFilter filter = new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
-        {
         }.get( Paths.get( "pom.xml" ) );
         filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         return filter;

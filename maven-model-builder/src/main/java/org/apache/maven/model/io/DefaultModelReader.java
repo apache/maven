@@ -30,15 +30,19 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
+import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.xml.sax.SAXException;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
@@ -53,16 +57,41 @@ public class DefaultModelReader
     @Inject
     private ModelSourceTransformer transformer;
 
-
+    public void setTransformer( ModelSourceTransformer transformer )
+    {
+        this.transformer = transformer;
+    }
     
-
     @Override
     public Model read( File input, Map<String, ?> options )
         throws IOException
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        Model model = read( new FileInputStream( input ), options );
+        TransformerContext context = null;
+        if ( options != null )
+        {
+            context = (TransformerContext) options.get( "transformerContext" );
+        }        
+
+        final InputStream is;
+        if ( context == null )
+        {
+            is = new FileInputStream( input );
+        }
+        else
+        {
+            try
+            {
+                is = transformer.transform( input.toPath(), context );
+            }
+            catch ( TransformerConfigurationException | SAXException | ParserConfigurationException e )
+            {
+                throw new IOException( "Failed to transform " + input,  e );
+            }
+        }
+
+        Model model = read( is, options );
 
         model.setPomFile( input );
 

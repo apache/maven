@@ -20,6 +20,7 @@ package org.apache.maven.model.inheritance;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.DefaultModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertThat;
 public class DefaultInheritanceAssemblerTest
     extends TestCase
 {
-    private ModelReader reader;
+    private DefaultModelReader reader;
 
     private ModelWriter writer;
 
@@ -54,6 +55,7 @@ public class DefaultInheritanceAssemblerTest
         super.setUp();
 
         reader = new DefaultModelReader();
+        reader.setTransformer( new DefaultModelSourceTransformer() );
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }

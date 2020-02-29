@@ -19,7 +19,10 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
+import java.util.Optional;
+
+import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
+import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 
 /**
@@ -29,9 +32,32 @@ import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
  */
 public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
 {
-    public DefaultConsumerPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
+    private final TransformerContext context;
+    
+    public DefaultConsumerPomXMLFilterFactory( DefaultBuildPomXMLFilterFactory buildPomXMLFilterFactory )
     {
         super( buildPomXMLFilterFactory );
+        this.context = buildPomXMLFilterFactory.getContext();
     }
+    
+    @Override
+    protected Optional<String> getChangelist()
+    {
+        return Optional.ofNullable( context.getUserProperty( "changelist" ) );
+    }
+
+    @Override
+    protected Optional<String> getRevision()
+    {
+        return Optional.ofNullable( context.getUserProperty( "revision" ) );
+    }
+
+    @Override
+    protected Optional<String> getSha1()
+    {
+        return Optional.ofNullable( context.getUserProperty( "sha1" ) );
+    }
+
+
 
 }

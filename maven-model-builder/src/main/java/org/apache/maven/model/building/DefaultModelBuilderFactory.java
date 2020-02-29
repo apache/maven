@@ -91,7 +91,9 @@ public class DefaultModelBuilderFactory
 
     protected ModelReader newModelReader()
     {
-        return new DefaultModelReader();
+        DefaultModelReader reader = new DefaultModelReader();
+        reader.setTransformer( newModelSourceTransformer() );
+        return reader;
     }
 
     protected ProfileSelector newProfileSelector()
@@ -199,6 +201,11 @@ public class DefaultModelBuilderFactory
         return new DefaultReportingConverter();
     }
 
+    private ModelSourceTransformer newModelSourceTransformer()
+    {
+        return new DefaultModelSourceTransformer();
+    }
+
     /**
      * Creates a new model builder instance.
      *
@@ -225,7 +232,6 @@ public class DefaultModelBuilderFactory
         modelBuilder.setPluginConfigurationExpander( newPluginConfigurationExpander() );
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
-        modelBuilder.setModelCacheManager( new DefaultModelCacheManager() );
 
         return modelBuilder;
     }
