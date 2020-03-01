@@ -19,15 +19,6 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -59,6 +50,14 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @since 3.3.0
@@ -93,7 +92,7 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
-    
+
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -241,7 +240,7 @@ public class DefaultRepositorySystemSessionFactory
 
         return session;
     }
-    
+
     private String getUserAgent()
     {
         return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "

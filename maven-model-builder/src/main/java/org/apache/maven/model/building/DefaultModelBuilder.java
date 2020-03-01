@@ -292,7 +292,7 @@ public class DefaultModelBuilder
         {
             inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
-        
+
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -438,11 +438,6 @@ public class DefaultModelBuilder
 
         result.setEffectiveModel( resultModel );
         
-        if ( request.getPomFile() != null )
-        {
-            // request.getModelCache().put( request.getPomFile().toPath(), resultModel ); 
-        }
-
         for ( ModelData currentData : lineage )
         {
             String modelId = ( currentData != superData ) ? currentData.getId() : "";

@@ -543,7 +543,6 @@ public class DefaultProjectBuilder
 
         Model model = result.getEffectiveModel();
         
-        // move to here!!
         poolBuilder.put( model.getPomFile().toPath(),  result.getRawModel() );
         
         try
