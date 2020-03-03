@@ -1551,7 +1551,7 @@ public class DefaultModelBuilder
     }
 
     /**
-     * As long is Maven controls the BuildPomXMLFilter, the entities that need merging is known.
+     * As long as Maven controls the BuildPomXMLFilter, the entities that need merging are known.
      * All others can simply be copied from source to target to restore the locationTracker 
      * 
      * @author Robert Scholte

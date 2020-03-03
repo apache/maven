@@ -36,10 +36,10 @@ import org.xml.sax.SAXException;
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-        protected String omitXmlDeclaration()
-        {
-            return "no";
-        }
+    protected String omitXmlDeclaration()
+    {
+        return "no";
+    }
     
     @Override
     protected AbstractSAXFilter getFilter() throws SAXException, ParserConfigurationException, TransformerConfigurationException

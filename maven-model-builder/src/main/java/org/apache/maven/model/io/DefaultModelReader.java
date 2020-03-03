@@ -30,19 +30,17 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.xml.sax.SAXException;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
@@ -85,7 +83,7 @@ public class DefaultModelReader
             {
                 is = transformer.transform( input.toPath(), context );
             }
-            catch ( TransformerConfigurationException | SAXException | ParserConfigurationException e )
+            catch ( TransformerException e )
             {
                 throw new IOException( "Failed to transform " + input,  e );
             }

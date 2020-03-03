@@ -9,7 +9,7 @@ package org.apache.maven.model.building;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,17 +19,22 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-
 /**
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public interface ModelSourceTransformer
+public class TransformerException extends Exception
 {
-    InputStream transform( Path pomFile, TransformerContext context )
-        throws IOException, TransformerException;
+
+    public TransformerException( Exception e )
+    {
+        super ( e );
+    }
+
+    public TransformerException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
+
 }

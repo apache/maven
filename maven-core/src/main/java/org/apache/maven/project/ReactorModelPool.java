@@ -36,7 +36,7 @@ import org.apache.maven.model.Model;
  * reactor when building another project's effective model.
  *
  * @author Benjamin Bentmann
- * @Robert Scholte
+ * @author Robert Scholte
  */
 class ReactorModelPool
 {
@@ -45,12 +45,12 @@ class ReactorModelPool
     private final Map<Path, Model> modelsByPath = new HashMap<>();
 
     /**
-     * This used to be the only method, which  
+     * Get the model by its GAV or (since 3.7.0) by its GA if there is only one.
      *  
      * @param groupId, never {@code null}
      * @param artifactId, never {@code null}
      * @param version, can be {@code null}
-     * @return the matching model
+     * @return the matching model or {@code null}
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      * @throws NoSuchElementException if model could not be found
      */
@@ -66,6 +66,13 @@ class ReactorModelPool
                         } ).orElse( null );
     }
 
+    /**
+     * Find model by path, useful when location the parent by relativePath
+     * 
+     * @param path
+     * @return the matching model or {@code null}
+     * @since 3.7.0
+     */
     public Model get( Path path )
     {
         final Path pomFile;
