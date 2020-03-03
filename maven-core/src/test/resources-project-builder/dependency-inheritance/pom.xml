@@ -33,7 +33,7 @@ under the License.
   <packaging>pom</packaging>
 
   <properties>
-    <junitVersion>4.4</junitVersion>
+    <junitVersion>4.13</junitVersion>
   </properties>
   <!--start-->
   <dependencies>
