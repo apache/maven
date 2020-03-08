@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +58,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
-
 import org.apache.maven.shared.utils.StringUtils;
 
 /**
