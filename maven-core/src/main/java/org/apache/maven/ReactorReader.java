@@ -230,7 +230,7 @@ class ReactorReader
             return true;
         }
 
-        try ( Stream<Path> outputFiles = Files.list( outputDirectory ) )
+        try ( Stream<Path> outputFiles = Files.walk( outputDirectory ) )
         {
             long artifactLastModified = packagedArtifactFile.lastModified();
             Predicate<Path> isNewerThanPackagedArtifact = path -> path.toFile().lastModified() > artifactLastModified;
