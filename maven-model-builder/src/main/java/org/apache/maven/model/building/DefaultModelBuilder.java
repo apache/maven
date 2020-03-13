@@ -539,10 +539,14 @@ public class DefaultModelBuilder
                 new FileModelSource( Objects.requireNonNull( pomFile, "neither pomFile nor modelSource can be null" ) );
         }
 
-        Model model = getModelFromCache( modelSource, request.getModelCache() );
-        if ( model != null )
+        Model model;
+        if ( pomFile == null )
         {
-            return model;
+            model = getModelFromCache( modelSource, request.getModelCache() );
+            if ( model != null )
+            {
+                return model;
+            }
         }
 
         problems.setSource( modelSource.getLocation() );
@@ -634,7 +638,14 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        model.setPomFile( pomFile );
+        if ( pomFile != null )
+        {
+            model.setPomFile( pomFile );
+        }
+        else if ( modelSource instanceof FileModelSource )
+        {
+            model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
+        }
 
         problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
@@ -992,13 +1003,7 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            File pomFile = null;
-            if ( candidateSource instanceof FileModelSource )
-            {
-                pomFile = ( (FileModelSource) candidateSource ).getPomFile();
-            }
-
-            candidateModel = readModel( candidateSource, pomFile, request, problems );
+            candidateModel = readModel( candidateSource, null, request, problems );
         }
         else
         {
