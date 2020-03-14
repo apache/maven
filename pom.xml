@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>33</version>
+    <version>34</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
