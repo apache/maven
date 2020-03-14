@@ -31,15 +31,11 @@ import org.xml.sax.ext.LexicalHandler;
  * @since 3.7.0
  */
 class ModulesXMLFilter
-    extends AbstractSAXFilter
+    extends AbstractEventXMLFilter
 {
-    /**
-     * Using 3 to also remove whitespace-block after closing tag
-     * -1 none
-     *  1 started
-     *  2 ended
-     */
-    int modulesStatus = -1;
+    private boolean parsingModules;
+    
+    private String state;
     
     ModulesXMLFilter()
     {
@@ -55,57 +51,61 @@ class ModulesXMLFilter
     public void startElement( String uri, String localName, String qName, Attributes atts )
         throws SAXException
     {
-        if ( modulesStatus == -1 && "modules".equals( localName ) )
+        if ( !parsingModules && "modules".equals( localName ) )
         {
-            modulesStatus = 1;
-        }
-        else if ( modulesStatus == 2 )
-        {
-            modulesStatus = -1;
+            parsingModules = true;
         }
 
-        if ( modulesStatus != 1 )
+        if ( parsingModules )
         {
-            super.startElement( uri, localName, qName, atts );
+            state = localName;
         }
+        
+        super.startElement( uri, localName, qName, atts );
     }
-
+    
     @Override
     public void endElement( String uri, String localName, String qName )
         throws SAXException
     {
-        if ( modulesStatus == 1 && "modules".equals( localName ) )
+        if ( parsingModules )
         {
-            modulesStatus = 2;
+            switch ( localName )
+            {
+                case "modules":
+                    executeEvents();
+                    
+                    parsingModules = false;
+                    break;
+                default:
+                    super.endElement( uri, localName, qName );
+                    break;
+            }
         }
-        else if ( modulesStatus == 2 )
-        {
-            modulesStatus = -1;
-        }
-        
-        if ( modulesStatus == -1 )
+        else
         {
             super.endElement( uri, localName, qName );
         }
-    }
-
-    @Override
-    public void characters( char[] ch, int start, int length )
-        throws SAXException
-    {
-        if ( modulesStatus == -1 )
-        {
-            super.characters( ch, start, length );
-        }
+        
+        // for this simple structure resetting to modules it sufficient
+        state = "modules"; 
     }
     
     @Override
-    public void comment( char[] ch, int start, int length )
-        throws SAXException
+    protected boolean isParsing()
     {
-        if ( modulesStatus != 1 )
-        {
-            super.comment( ch, start, length );
-        }
+        return parsingModules;
+    }
+
+    @Override
+    protected String getState()
+    {
+        return state;
+    }
+
+    @Override
+    protected boolean acceptEvent( String state )
+    {
+        return false;
     }
 }

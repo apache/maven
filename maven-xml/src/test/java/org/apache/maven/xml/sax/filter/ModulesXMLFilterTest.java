@@ -73,4 +73,23 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 	    String actual = transform( input );
 	    assertThat( actual ).and( expected ).areIdentical();
 	}
+	
+    @Test
+    public void setOfModulesLF() throws Exception {
+        String input = "<project>\n"
+            + "\n"
+            + "  <modules>\n"
+            + "    <module>ab</module>\n"
+            + "    <module>../cd</module>\n"
+            + "  </modules>\n"
+            + "\n"
+            + "</project>\n";
+        String expected = "<project>\n"
+            + "\n"
+            + "  \n"
+            + "\n"
+            + "</project>\n";
+        String actual = transform( input );
+        assertThat( actual ).and( expected ).areIdentical();
+    }	
 }

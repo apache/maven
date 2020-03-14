@@ -25,9 +25,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
 /**
- * Remove content from relativePath
- * 
- * TODO fix indentation of closing parent tag
+ * Remove relativePath element, has no value for consumer pom
  * 
  * @author Robert Scholte
  * @since 3.7.0

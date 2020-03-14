@@ -540,6 +540,7 @@ public class DefaultModelBuilder
         }
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException

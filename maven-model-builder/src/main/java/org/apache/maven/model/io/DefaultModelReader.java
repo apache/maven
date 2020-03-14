@@ -89,11 +89,14 @@ public class DefaultModelReader
             }
         }
 
-        Model model = read( is, options );
+        try ( InputStream in = is )
+        {
+            Model model = read( is, options );
 
-        model.setPomFile( input );
+            model.setPomFile( input );
 
-        return model;
+            return model;
+        }
     }
 
     @Override
