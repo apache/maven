@@ -57,7 +57,7 @@ under the License.
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
-    <guiceVersion>4.2.2</guiceVersion>
+    <guiceVersion>4.2.3</guiceVersion>
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
     <wagonVersion>3.3.4</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
