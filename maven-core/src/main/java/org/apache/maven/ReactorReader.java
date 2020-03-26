@@ -208,7 +208,6 @@ class ReactorReader
 
                 if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
                 {
-                    // If the target project is not part of the build,
                     return outputDirectory;
                 }
             }
