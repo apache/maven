@@ -194,9 +194,22 @@ class ReactorReader
             else
             {
                 String type = artifact.getProperty( "type", "" );
-                if ( COMPILE_PHASE_TYPES.contains( type ) )
+                File outputDirectory = new File( project.getBuild().getOutputDirectory() );
+
+                // Check if the target project is being built during this session, and if we can expect any output.
+                // There is no need to check if the build has created any outputs, see MNG-2222.
+                boolean projectCompiledDuringThisSession
+                        = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
+
+                // Check if the target project lacks 'validate' so we know it's not part of the build at all. If so, we
+                // check if a possible earlier Maven invocation produced some output for that project.
+                boolean projectHasOutputFromPreviousSession
+                        = !project.hasLifecyclePhase( "validate" ) && outputDirectory.exists();
+
+                if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
                 {
-                    return new File( project.getBuild().getOutputDirectory() );
+                    // If the target project is not part of the build,
+                    return outputDirectory;
                 }
             }
         }
