@@ -66,6 +66,8 @@ class ReactorReader
 
     private Logger logger;
 
+    private MavenSession session;
+
     private Map<String, MavenProject> projectsByGAV;
 
     private Map<String, List<MavenProject>> projectsByGA;
@@ -76,6 +78,7 @@ class ReactorReader
     ReactorReader( MavenSession session, Logger logger )
     {
         this.logger = logger;
+        this.session = session;
         this.projectsByGAV = new HashMap<>( session.getAllProjects().size() * 2 );
         session.getAllProjects().forEach( project ->
         {
@@ -196,15 +199,15 @@ class ReactorReader
                 String type = artifact.getProperty( "type", "" );
                 File outputDirectory = new File( project.getBuild().getOutputDirectory() );
 
-                // Check if the target project is being built during this session, and if we can expect any output.
+                // Check if the project is being built during this session, and if we can expect any output.
                 // There is no need to check if the build has created any outputs, see MNG-2222.
                 boolean projectCompiledDuringThisSession
                         = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
 
-                // Check if the target project lacks 'validate' so we know it's not part of the build at all. If so, we
-                // check if a possible earlier Maven invocation produced some output for that project.
+                // Check if the project is part of the session (not filtered by -pl, -rf, etc). If so, we check
+                // if a possible earlier Maven invocation produced some output for that project which we can use.
                 boolean projectHasOutputFromPreviousSession
-                        = !project.hasLifecyclePhase( "validate" ) && outputDirectory.exists();
+                        = !session.getProjects().contains( project ) && outputDirectory.exists();
 
                 if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
                 {
