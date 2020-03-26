@@ -19,10 +19,11 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.building.Source;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -414,6 +415,16 @@ public class DefaultModelBuilder
         resultData.setArtifactId( resultModel.getArtifactId() );
         resultData.setVersion( resultModel.getVersion() );
 
+        if ( request.getPomFile() != null )
+        {
+            intoCache( request.getModelCache(), new FileModelSource( request.getPomFile() ), ModelCacheTag.RAW,
+                      resultData );
+        }
+        else
+        {
+            intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, resultData );
+        }
+
         result.setEffectiveModel( resultModel );
 
         for ( ModelData currentData : lineage )
@@ -522,17 +533,19 @@ public class DefaultModelBuilder
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model model;
-
         if ( modelSource == null )
         {
-            if ( pomFile != null )
+            modelSource =
+                new FileModelSource( Objects.requireNonNull( pomFile, "neither pomFile nor modelSource can be null" ) );
+        }
+
+        Model model;
+        if ( pomFile == null )
+        {
+            model = getModelFromCache( modelSource, request.getModelCache() );
+            if ( model != null )
             {
-                modelSource = new FileModelSource( pomFile );
-            }
-            else
-            {
-                throw new NullPointerException( "neither pomFile nor modelSource can be null" );
+                return model;
             }
         }
 
@@ -540,12 +553,20 @@ public class DefaultModelBuilder
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
-            InputSource source = request.isLocationTracking() ? new InputSource() : null;
 
-            Map<String, Object> options = new HashMap<>();
+            Map<String, Object> options = new HashMap<>( 3 );
             options.put( ModelProcessor.IS_STRICT, strict );
-            options.put( ModelProcessor.INPUT_SOURCE, source );
             options.put( ModelProcessor.SOURCE, modelSource );
+
+            InputSource source;
+            if ( request.isLocationTracking() ) 
+            {
+                source = (InputSource) options.computeIfAbsent( ModelProcessor.INPUT_SOURCE, k -> new InputSource() );
+            }
+            else
+            {
+                source = null;
+            }
 
             try
             {
@@ -617,7 +638,14 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        model.setPomFile( pomFile );
+        if ( pomFile != null )
+        {
+            model.setPomFile( pomFile );
+        }
+        else if ( modelSource instanceof FileModelSource )
+        {
+            model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
+        }
 
         problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
@@ -627,7 +655,69 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
+        if ( pomFile != null )
+        {
+            intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
+        }
+
+        String groupId = getGroupId( model );
+        String artifactId = model.getArtifactId();
+        String version = getVersion( model );
+
+        ModelData modelData = new ModelData( modelSource, model, groupId, artifactId, version );
+        intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
+
         return model;
+    }
+
+    private Model getModelFromCache( ModelSource modelSource, ModelCache cache )
+    {
+        Model model;
+        if ( modelSource instanceof ArtifactModelSource )
+        {
+            ArtifactModelSource artifactModelSource = ( ArtifactModelSource ) modelSource;
+            ModelData modelData = fromCache( cache, artifactModelSource.getGroupId(),
+                                            artifactModelSource.getArtifactId(),
+                                            artifactModelSource.getVersion(), ModelCacheTag.RAW );
+            if ( modelData != null )
+            {
+                model = modelData.getModel();
+            }
+            else 
+            {
+                model = null;
+            }
+        }
+        else
+        {
+            model = fromCache( cache, modelSource, ModelCacheTag.FILEMODEL );
+            
+            if ( model != null )
+            {
+                model = model.clone();
+            }
+        }
+        return model;
+    }
+
+    private String getGroupId( Model model )
+    {
+        String groupId = model.getGroupId();
+        if ( groupId == null && model.getParent() != null )
+        {
+            groupId = model.getParent().getGroupId();
+        }
+        return groupId;
+    }
+
+    private String getVersion( Model model ) 
+    {
+        String version = model.getVersion();
+        if ( version == null && model.getParent() != null )
+        {
+            version = model.getParent().getVersion();
+        } 
+        return version;
     }
 
     private DefaultProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
@@ -822,49 +912,59 @@ public class DefaultModelBuilder
                                   DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        ModelData parentData;
+        ModelData parentData = null;
 
         Parent parent = childModel.getParent();
 
         if ( parent != null )
         {
-            String groupId = parent.getGroupId();
-            String artifactId = parent.getArtifactId();
-            String version = parent.getVersion();
+            ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
 
-            parentData = getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW );
+            if ( expectedParentSource != null )
+            {
+                ModelData candidateData = readParentLocally( childModel, childSource, request, problems );
+
+                if ( candidateData != null )
+                {
+                    /*
+                     * NOTE: This is a sanity check of the cache hit. If the cached parent POM was locally resolved, 
+                     * the child's GAV should match with that parent, too. If it doesn't, we ignore the cache and
+                     * resolve externally, to mimic the behavior if the cache didn't exist in the first place. 
+                     * Otherwise, the cache would obscure a bad POM.
+                     */
+                    try
+                    {
+                        VersionRange parentVersion = VersionRange.createFromVersionSpec( parent.getVersion() );
+                        ArtifactVersion actualVersion = new DefaultArtifactVersion( candidateData.getVersion() );
+
+                        if ( parent.getGroupId().equals( candidateData.getGroupId() )
+                            && parent.getArtifactId().equals( candidateData.getArtifactId() )
+                            && parentVersion.containsVersion( actualVersion ) )
+                        {
+                            parentData = candidateData;
+                        }
+                    }
+                    catch ( InvalidVersionSpecificationException e )
+                    {
+                        // This should already been blocked during validation
+                    }
+                }
+            }
 
             if ( parentData == null )
             {
-                parentData = readParentLocally( childModel, childSource, request, problems );
-
-                if ( parentData == null )
+                parentData = fromCache( request.getModelCache(), 
+                                       parent.getGroupId(), parent.getArtifactId(),
+                                       parent.getVersion(), ModelCacheTag.RAW );
+                
+                // ArtifactModelSource means repositorySource
+                if ( parentData == null || !( parentData.getSource() instanceof ArtifactModelSource ) )
                 {
                     parentData = readParentExternally( childModel, request, problems );
-                }
-
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, parentData );
-            }
-            else
-            {
-                /*
-                 * NOTE: This is a sanity check of the cache hit. If the cached parent POM was locally resolved, the
-                 * child's <relativePath> should point at that parent, too. If it doesn't, we ignore the cache and
-                 * resolve externally, to mimic the behavior if the cache didn't exist in the first place. Otherwise,
-                 * the cache would obscure a bad POM.
-                 */
-
-                File pomFile = parentData.getModel().getPomFile();
-                if ( pomFile != null )
-                {
-                    FileModelSource pomSource = new FileModelSource( pomFile );
-                    ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
-
-                    if ( expectedParentSource == null || ( expectedParentSource instanceof ModelSource2
-                        && !pomSource.equals(  expectedParentSource ) ) )
-                    {
-                        parentData = readParentExternally( childModel, request, problems );
-                    }
+                    
+                    intoCache( request.getModelCache(), 
+                              parentData.getGroupId(), parentData.getArtifactId(),
+                              parentData.getVersion(), ModelCacheTag.RAW, parentData );
                 }
             }
 
@@ -903,13 +1003,7 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            File pomFile = null;
-            if ( candidateSource instanceof FileModelSource )
-            {
-                pomFile = ( (FileModelSource) candidateSource ).getPomFile();
-            }
-
-            candidateModel = readModel( candidateSource, pomFile, request, problems );
+            candidateModel = readModel( candidateSource, null, request, problems );
         }
         else
         {
@@ -1224,7 +1318,7 @@ public class DefaultModelBuilder
                 continue;
             }
 
-            DependencyManagement importMgmt = getCache( request.getModelCache(), groupId, artifactId, version,
+            DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
                                                         ModelCacheTag.IMPORT );
 
             if ( importMgmt == null )
@@ -1313,7 +1407,7 @@ public class DefaultModelBuilder
                     importMgmt = new DependencyManagement();
                 }
 
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
             }
 
             if ( importMgmts == null )
@@ -1329,7 +1423,7 @@ public class DefaultModelBuilder
         dependencyManagementImporter.importManagement( model, importMgmts, request, problems );
     }
 
-    private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,
+    private <T> void intoCache( ModelCache modelCache, String groupId, String artifactId, String version,
                                ModelCacheTag<T> tag, T data )
     {
         if ( modelCache != null )
@@ -1338,12 +1432,33 @@ public class DefaultModelBuilder
         }
     }
 
-    private <T> T getCache( ModelCache modelCache, String groupId, String artifactId, String version,
+    private <T> void intoCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data )
+    {
+        if ( modelCache != null )
+        {
+            modelCache.put( source, tag.getName(), tag.intoCache( data ) );
+        }
+    }
+
+    private <T> T fromCache( ModelCache modelCache, String groupId, String artifactId, String version,
                             ModelCacheTag<T> tag )
     {
         if ( modelCache != null )
         {
             Object data = modelCache.get( groupId, artifactId, version, tag.getName() );
+            if ( data != null )
+            {
+                return tag.fromCache( tag.getType().cast( data ) );
+            }
+        }
+        return null;
+    }
+
+    private <T> T fromCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
+    {
+        if ( modelCache != null )
+        {
+            Object data = modelCache.get( source, tag.getName() );
             if ( data != null )
             {
                 return tag.fromCache( tag.getType().cast( data ) );

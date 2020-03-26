@@ -19,6 +19,8 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import org.apache.maven.building.Source;
+
 /**
  * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache
  * is meant for exclusive consumption by the model builder and is opaque to the cache implementation. The cache key is
@@ -27,9 +29,36 @@ package org.apache.maven.model.building;
  * model builder.
  *
  * @author Benjamin Bentmann
+ * @author Robert Scholte
  */
 public interface ModelCache
 {
+    /**
+     * Puts the specified data into the cache.
+     * 
+     * @param path The path of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @param data The data to store in the cache, must not be {@code null}.
+     * @since 3.7.0
+     */
+    default void put( Source path, String tag, Object data ) 
+    {
+        // only useful for ReactorModelCache
+    }
+
+    /**
+     * Gets the specified data from the cache.
+     * 
+     * @param path The path of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @return The requested data or {@code null} if none was present in the cache.
+     * @since 3.7.0
+     */
+    default Object get( Source path, String tag ) 
+    {
+        // only useful for ReactorModelCache
+        return null;
+    }
 
     /**
      * Puts the specified data into the cache.

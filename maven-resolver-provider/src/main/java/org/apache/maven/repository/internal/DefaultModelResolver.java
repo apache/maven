@@ -19,7 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,7 +29,7 @@ import java.util.Set;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -176,9 +175,7 @@ class DefaultModelResolver
             throw new UnresolvableModelException( e.getMessage(), groupId, artifactId, version, e );
         }
 
-        File pomFile = pomArtifact.getFile();
-
-        return new FileModelSource( pomFile );
+        return new ArtifactModelSource( pomArtifact.getFile(), groupId, artifactId, version );
     }
 
     @Override
