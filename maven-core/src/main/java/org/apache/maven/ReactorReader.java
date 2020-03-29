@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -247,16 +247,20 @@ class ReactorReader
 
         try ( Stream<Path> outputFiles = Files.walk( outputDirectory ) )
         {
-            long artifactLastModified = packagedArtifactFile.lastModified();
-            Predicate<Path> isNewerThanPackagedArtifact = path -> path.toFile().lastModified() > artifactLastModified;
-            boolean isPackagedArtifactUpToDate = outputFiles.noneMatch( isNewerThanPackagedArtifact );
+            // Not using File#lastModified() to avoid a Linux JDK8 milliseconds precision bug: JDK-8177809.
+            long artifactLastModified = Files.getLastModifiedTime( packagedArtifactFile.toPath() ).toMillis();
 
-            if ( !isPackagedArtifactUpToDate )
+            for ( Path outputFile : outputFiles.collect( Collectors.toList() ) )
             {
-                logger.warn( "Packaged artifact is not up-to-date compared to the build output directory" );
+                long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
+                if ( outputFileLastModified > artifactLastModified )
+                {
+                    logger.warn( "Packaged artifact is not up-to-date compared to the build output directory" );
+                    return false;
+                }
             }
 
-            return isPackagedArtifactUpToDate;
+            return true;
         }
         catch ( IOException e )
         {
