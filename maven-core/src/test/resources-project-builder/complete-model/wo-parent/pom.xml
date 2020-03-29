@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -29,16 +29,16 @@ under the License.
 
   <name>project-name</name>
   <description>project-description</description>
-  <url>http://project.url/</url>
+  <url>https://project.url/</url>
   <inceptionYear>2009</inceptionYear>
   <organization>
     <name>project-org</name>
-    <url>http://project-org.url/</url>
+    <url>https://project-org.url/</url>
   </organization>
   <licenses>
     <license>
       <name>project-license</name>
-      <url>http://project.url/license</url>
+      <url>https://project.url/license</url>
       <distribution>repo</distribution>
       <comments>free</comments>
     </license>
@@ -49,9 +49,9 @@ under the License.
       <id>dev</id>
       <name>project-developer</name>
       <email>developer@</email>
-      <url>http://developer</url>
+      <url>https://developer</url>
       <organization>developer</organization>
-      <organizationUrl>http://devel.org</organizationUrl>
+      <organizationUrl>https://devel.org</organizationUrl>
       <roles>
         <role>devel</role>
       </roles>
@@ -65,9 +65,9 @@ under the License.
     <contributor>
       <name>project-contributor</name>
       <email>contributor@</email>
-      <url>http://contributor</url>
+      <url>https://contributor</url>
       <organization>contributor</organization>
-      <organizationUrl>http://contrib.org</organizationUrl>
+      <organizationUrl>https://contrib.org</organizationUrl>
       <roles>
         <role>contrib</role>
       </roles>
@@ -96,18 +96,18 @@ under the License.
   </prerequisites>
 
   <scm>
-    <url>http://project.url/trunk</url>
-    <connection>http://project.url/scm</connection>
+    <url>https://project.url/trunk</url>
+    <connection>https://project.url/scm</connection>
     <developerConnection>https://project.url/scm</developerConnection>
     <tag>TAG</tag>
   </scm>
   <issueManagement>
     <system>issues</system>
-    <url>http://project.url/issues</url>
+    <url>https://project.url/issues</url>
   </issueManagement>
   <ciManagement>
     <system>ci</system>
-    <url>http://project.url/ci</url>
+    <url>https://project.url/ci</url>
     <notifiers>
       <notifier>
         <type>irc</type>
@@ -124,22 +124,22 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://project.url/dist</url>
+      <url>https://project.url/dist</url>
       <id>project.distros</id>
       <name>distros</name>
     </repository>
     <snapshotRepository>
-      <url>http://project.url/snaps</url>
+      <url>https://project.url/snaps</url>
       <id>project.snaps</id>
       <name>snaps</name>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
     <site>
-      <url>http://project.url/site</url>
+      <url>https://project.url/site</url>
       <id>project.site</id>
       <name>docs</name>
     </site>
-    <downloadUrl>http://project.url/download</downloadUrl>
+    <downloadUrl>https://project.url/download</downloadUrl>
     <relocation>
       <groupId>reloc-gid</groupId>
       <artifactId>reloc-aid</artifactId>
@@ -194,7 +194,7 @@ under the License.
   <repositories>
     <repository>
       <id>project-remote-repo</id>
-      <url>http://project.url/remote</url>
+      <url>https://project.url/remote</url>
       <name>repo</name>
     </repository>
   </repositories>

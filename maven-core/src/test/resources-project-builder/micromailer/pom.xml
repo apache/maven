@@ -17,7 +17,7 @@
 	<!-- SCM -->
 	<scm>
 		<connection>scm:svn:http://svn.sonatype.org/spice/trunk/micromailer</connection>
-		<url>http://svn.sonatype.org/spice/trunk/micromailer</url>
+		<url>https://svn.sonatype.org/spice/trunk/micromailer</url>
 		<developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/micromailer</developerConnection>
 	</scm>
 
