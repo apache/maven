@@ -19,11 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +39,10 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -624,18 +622,18 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "url-inheritance/sub" );
-        assertEquals( "http://parent.url/child", pom.getValue( "url" ) );
-        assertEquals( "http://parent.url/org", pom.getValue( "organization/url" ) );
-        assertEquals( "http://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
-        assertEquals( "http://parent.url/viewvc/child", pom.getValue( "scm/url" ) );
-        assertEquals( "http://parent.url/scm/child", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://parent.url/child", pom.getValue( "url" ) );
+        assertEquals( "https://parent.url/org", pom.getValue( "organization/url" ) );
+        assertEquals( "https://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
+        assertEquals( "https://parent.url/viewvc/child", pom.getValue( "scm/url" ) );
+        assertEquals( "https://parent.url/scm/child", pom.getValue( "scm/connection" ) );
         assertEquals( "https://parent.url/scm/child", pom.getValue( "scm/developerConnection" ) );
-        assertEquals( "http://parent.url/issues", pom.getValue( "issueManagement/url" ) );
-        assertEquals( "http://parent.url/ci", pom.getValue( "ciManagement/url" ) );
-        assertEquals( "http://parent.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
-        assertEquals( "http://parent.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
-        assertEquals( "http://parent.url/site/child", pom.getValue( "distributionManagement/site/url" ) );
-        assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
+        assertEquals( "https://parent.url/issues", pom.getValue( "issueManagement/url" ) );
+        assertEquals( "https://parent.url/ci", pom.getValue( "ciManagement/url" ) );
+        assertEquals( "https://parent.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
+        assertEquals( "https://parent.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
+        assertEquals( "https://parent.url/site/child", pom.getValue( "distributionManagement/site/url" ) );
+        assertEquals( "https://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
 
     /* MNG-3846*/
@@ -643,18 +641,18 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "url-inheritance/another-parent/sub" );
-        assertEquals( "http://parent.url/ap/child", pom.getValue( "url" ) );
-        assertEquals( "http://parent.url/org", pom.getValue( "organization/url" ) );
-        assertEquals( "http://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
-        assertEquals( "http://parent.url/viewvc/ap/child", pom.getValue( "scm/url" ) );
-        assertEquals( "http://parent.url/scm/ap/child", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://parent.url/ap/child", pom.getValue( "url" ) );
+        assertEquals( "https://parent.url/org", pom.getValue( "organization/url" ) );
+        assertEquals( "https://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
+        assertEquals( "https://parent.url/viewvc/ap/child", pom.getValue( "scm/url" ) );
+        assertEquals( "https://parent.url/scm/ap/child", pom.getValue( "scm/connection" ) );
         assertEquals( "https://parent.url/scm/ap/child", pom.getValue( "scm/developerConnection" ) );
-        assertEquals( "http://parent.url/issues", pom.getValue( "issueManagement/url" ) );
-        assertEquals( "http://parent.url/ci", pom.getValue( "ciManagement/url" ) );
-        assertEquals( "http://parent.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
-        assertEquals( "http://parent.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
-        assertEquals( "http://parent.url/site/ap/child", pom.getValue( "distributionManagement/site/url" ) );
-        assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
+        assertEquals( "https://parent.url/issues", pom.getValue( "issueManagement/url" ) );
+        assertEquals( "https://parent.url/ci", pom.getValue( "ciManagement/url" ) );
+        assertEquals( "https://parent.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
+        assertEquals( "https://parent.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
+        assertEquals( "https://parent.url/site/ap/child", pom.getValue( "distributionManagement/site/url" ) );
+        assertEquals( "https://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
     //*/
 
@@ -715,17 +713,17 @@ public class PomConstructionTest
 
         assertEquals( "child-name", pom.getValue( "properties/projectName" ) );
         assertEquals( "child-desc", pom.getValue( "properties/projectDesc" ) );
-        assertEquals( "http://child.org/", pom.getValue( "properties/projectUrl" ) );
+        assertEquals( "https://child.org/", pom.getValue( "properties/projectUrl" ) );
         assertEquals( "2008", pom.getValue( "properties/projectYear" ) );
         assertEquals( "child-org-name", pom.getValue( "properties/projectOrgName" ) );
 
         assertEquals( "2.0.0", pom.getValue( "properties/projectPrereqMvn" ) );
-        assertEquals( "http://scm.org/", pom.getValue( "properties/projectScmUrl" ) );
-        assertEquals( "http://issue.org/", pom.getValue( "properties/projectIssueUrl" ) );
-        assertEquals( "http://ci.org/", pom.getValue( "properties/projectCiUrl" ) );
+        assertEquals( "https://scm.org/", pom.getValue( "properties/projectScmUrl" ) );
+        assertEquals( "https://issue.org/", pom.getValue( "properties/projectIssueUrl" ) );
+        assertEquals( "https://ci.org/", pom.getValue( "properties/projectCiUrl" ) );
         assertEquals( "child-dist-repo", pom.getValue( "properties/projectDistRepoName" ) );
-        assertEquals( "http://dist.org/", pom.getValue( "properties/projectDistRepoUrl" ) );
-        assertEquals( "http://site.org/", pom.getValue( "properties/projectDistSiteUrl" ) );
+        assertEquals( "https://dist.org/", pom.getValue( "properties/projectDistRepoUrl" ) );
+        assertEquals( "https://site.org/", pom.getValue( "properties/projectDistSiteUrl" ) );
 
         assertEquals( "org.apache.maven.its.mng3831", pom.getValue( "properties/parentGroupId" ) );
         assertEquals( "parent", pom.getValue( "properties/parentArtifactId" ) );
@@ -1013,11 +1011,11 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "url-append/child" );
-        assertEquals( "http://project.url/child", pom.getValue( "url" ) );
-        assertEquals( "http://viewvc.project.url/child", pom.getValue( "scm/url" ) );
-        assertEquals( "http://scm.project.url/child", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://project.url/child", pom.getValue( "url" ) );
+        assertEquals( "https://viewvc.project.url/child", pom.getValue( "scm/url" ) );
+        assertEquals( "https://scm.project.url/child", pom.getValue( "scm/connection" ) );
         assertEquals( "https://scm.project.url/child", pom.getValue( "scm/developerConnection" ) );
-        assertEquals( "http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ) );
+        assertEquals( "https://site.project.url/child", pom.getValue( "distributionManagement/site/url" ) );
     }
 
     /** MNG-0479 */
@@ -1162,15 +1160,15 @@ public class PomConstructionTest
 
         assertEquals( "project-name", pom.getValue( "name" ) );
         assertEquals( "project-description", pom.getValue( "description" ) );
-        assertEquals( "http://project.url/", pom.getValue( "url" ) );
+        assertEquals( "https://project.url/", pom.getValue( "url" ) );
         assertEquals( "2009", pom.getValue( "inceptionYear" ) );
 
         assertEquals( "project-org", pom.getValue( "organization/name" ) );
-        assertEquals( "http://project-org.url/", pom.getValue( "organization/url" ) );
+        assertEquals( "https://project-org.url/", pom.getValue( "organization/url" ) );
 
         assertEquals( 1, ( (List<?>) pom.getValue( "licenses" ) ).size() );
         assertEquals( "project-license", pom.getValue( "licenses[1]/name" ) );
-        assertEquals( "http://project.url/license", pom.getValue( "licenses[1]/url" ) );
+        assertEquals( "https://project.url/license", pom.getValue( "licenses[1]/url" ) );
         assertEquals( "repo", pom.getValue( "licenses[1]/distribution" ) );
         assertEquals( "free", pom.getValue( "licenses[1]/comments" ) );
 
@@ -1178,9 +1176,9 @@ public class PomConstructionTest
         assertEquals( "dev", pom.getValue( "developers[1]/id" ) );
         assertEquals( "project-developer", pom.getValue( "developers[1]/name" ) );
         assertEquals( "developer@", pom.getValue( "developers[1]/email" ) );
-        assertEquals( "http://developer", pom.getValue( "developers[1]/url" ) );
+        assertEquals( "https://developer", pom.getValue( "developers[1]/url" ) );
         assertEquals( "developer", pom.getValue( "developers[1]/organization" ) );
-        assertEquals( "http://devel.org", pom.getValue( "developers[1]/organizationUrl" ) );
+        assertEquals( "https://devel.org", pom.getValue( "developers[1]/organizationUrl" ) );
         assertEquals( "-1", pom.getValue( "developers[1]/timezone" ) );
         assertEquals( "yes", pom.getValue( "developers[1]/properties/developer" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "developers[1]/roles" ) ).size() );
@@ -1189,9 +1187,9 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "contributors" ) ).size() );
         assertEquals( "project-contributor", pom.getValue( "contributors[1]/name" ) );
         assertEquals( "contributor@", pom.getValue( "contributors[1]/email" ) );
-        assertEquals( "http://contributor", pom.getValue( "contributors[1]/url" ) );
+        assertEquals( "https://contributor", pom.getValue( "contributors[1]/url" ) );
         assertEquals( "contributor", pom.getValue( "contributors[1]/organization" ) );
-        assertEquals( "http://contrib.org", pom.getValue( "contributors[1]/organizationUrl" ) );
+        assertEquals( "https://contrib.org", pom.getValue( "contributors[1]/organizationUrl" ) );
         assertEquals( "+1", pom.getValue( "contributors[1]/timezone" ) );
         assertEquals( "yes", pom.getValue( "contributors[1]/properties/contributor" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "contributors[1]/roles" ) ).size() );
@@ -1208,16 +1206,16 @@ public class PomConstructionTest
 
         assertEquals( "2.0.1", pom.getValue( "prerequisites/maven" ) );
 
-        assertEquals( "http://project.url/trunk", pom.getValue( "scm/url" ) );
-        assertEquals( "http://project.url/scm", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://project.url/trunk", pom.getValue( "scm/url" ) );
+        assertEquals( "https://project.url/scm", pom.getValue( "scm/connection" ) );
         assertEquals( "https://project.url/scm", pom.getValue( "scm/developerConnection" ) );
         assertEquals( "TAG", pom.getValue( "scm/tag" ) );
 
         assertEquals( "issues", pom.getValue( "issueManagement/system" ) );
-        assertEquals( "http://project.url/issues", pom.getValue( "issueManagement/url" ) );
+        assertEquals( "https://project.url/issues", pom.getValue( "issueManagement/url" ) );
 
         assertEquals( "ci", pom.getValue( "ciManagement/system" ) );
-        assertEquals( "http://project.url/ci", pom.getValue( "ciManagement/url" ) );
+        assertEquals( "https://project.url/ci", pom.getValue( "ciManagement/url" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "ciManagement/notifiers" ) ).size() );
         assertEquals( "irc", pom.getValue( "ciManagement/notifiers[1]/type" ) );
         assertEquals( "ci@", pom.getValue( "ciManagement/notifiers[1]/address" ) );
@@ -1229,19 +1227,19 @@ public class PomConstructionTest
 
         assertEquals( "project.distros", pom.getValue( "distributionManagement/repository/id" ) );
         assertEquals( "distros", pom.getValue( "distributionManagement/repository/name" ) );
-        assertEquals( "http://project.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
+        assertEquals( "https://project.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
         assertEquals( Boolean.TRUE, pom.getValue( "distributionManagement/repository/uniqueVersion" ) );
 
         assertEquals( "project.snaps", pom.getValue( "distributionManagement/snapshotRepository/id" ) );
         assertEquals( "snaps", pom.getValue( "distributionManagement/snapshotRepository/name" ) );
-        assertEquals( "http://project.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
+        assertEquals( "https://project.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
         assertEquals( Boolean.FALSE, pom.getValue( "distributionManagement/snapshotRepository/uniqueVersion" ) );
 
         assertEquals( "project.site", pom.getValue( "distributionManagement/site/id" ) );
         assertEquals( "docs", pom.getValue( "distributionManagement/site/name" ) );
-        assertEquals( "http://project.url/site", pom.getValue( "distributionManagement/site/url" ) );
+        assertEquals( "https://project.url/site", pom.getValue( "distributionManagement/site/url" ) );
 
-        assertEquals( "http://project.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
+        assertEquals( "https://project.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
         assertEquals( "reloc-gid", pom.getValue( "distributionManagement/relocation/groupId" ) );
         assertEquals( "reloc-aid", pom.getValue( "distributionManagement/relocation/artifactId" ) );
         assertEquals( "reloc-version", pom.getValue( "distributionManagement/relocation/version" ) );
@@ -1279,7 +1277,7 @@ public class PomConstructionTest
 
         assertEquals( 2, ( (List<?>) pom.getValue( "repositories" ) ).size() );
         assertEquals( "project-remote-repo", pom.getValue( "repositories[1]/id" ) );
-        assertEquals( "http://project.url/remote", pom.getValue( "repositories[1]/url" ) );
+        assertEquals( "https://project.url/remote", pom.getValue( "repositories[1]/url" ) );
         assertEquals( "repo", pom.getValue( "repositories[1]/name" ) );
         assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_ID, pom.getValue( "repositories[2]/id" ) );
         assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_URL, pom.getValue( "repositories[2]/url" ) );
@@ -1457,12 +1455,12 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "url-no-decoding" );
-        assertEquals( "http://maven.apache.org/spacy%20path", pom.getValue( "url" ) );
-        assertEquals( "http://svn.apache.org/viewvc/spacy%20path", pom.getValue( "scm/url" ) );
+        assertEquals( "https://maven.apache.org/spacy%20path", pom.getValue( "url" ) );
+        assertEquals( "https://svn.apache.org/viewvc/spacy%20path", pom.getValue( "scm/url" ) );
         assertEquals( "scm:svn:svn+ssh://svn.apache.org/spacy%20path", pom.getValue( "scm/connection" ) );
         assertEquals( "scm:svn:svn+ssh://svn.apache.org/spacy%20path", pom.getValue( "scm/developerConnection" ) );
-        assertEquals( "http://issues.apache.org/spacy%20path", pom.getValue( "issueManagement/url" ) );
-        assertEquals( "http://ci.apache.org/spacy%20path", pom.getValue( "ciManagement/url" ) );
+        assertEquals( "https://issues.apache.org/spacy%20path", pom.getValue( "issueManagement/url" ) );
+        assertEquals( "https://ci.apache.org/spacy%20path", pom.getValue( "ciManagement/url" ) );
         assertEquals( "scm:svn:svn+ssh://dist.apache.org/spacy%20path",
                       pom.getValue( "distributionManagement/repository/url" ) );
         assertEquals( "scm:svn:svn+ssh://snap.apache.org/spacy%20path",
@@ -1635,7 +1633,7 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "licenses-inheritance/child-2" );
         assertEquals( 1, ( (List<?>) pom.getValue( "licenses" ) ).size() );
         assertEquals( "child-license", pom.getValue( "licenses[1]/name" ) );
-        assertEquals( "http://child.url/license", pom.getValue( "licenses[1]/url" ) );
+        assertEquals( "https://child.url/license", pom.getValue( "licenses[1]/url" ) );
     }
 
     public void testDevelopersAreInheritedButNotAggregated()

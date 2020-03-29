@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -33,19 +33,19 @@ under the License.
   </description>
 
   <!-- some URLs using percent-encoded characters -->
-  <url>http://maven.apache.org/spacy%20path</url>
+  <url>https://maven.apache.org/spacy%20path</url>
   <scm>
     <connection>scm:svn:svn+ssh://svn.apache.org/spacy%20path</connection>
     <developerConnection>scm:svn:svn+ssh://svn.apache.org/spacy%20path</developerConnection>
-    <url>http://svn.apache.org/viewvc/spacy%20path</url>
+    <url>https://svn.apache.org/viewvc/spacy%20path</url>
   </scm>
   <issueManagement>
     <system>none</system>
-    <url>http://issues.apache.org/spacy%20path</url>
+    <url>https://issues.apache.org/spacy%20path</url>
   </issueManagement>
   <ciManagement>
     <system>none</system>
-    <url>http://ci.apache.org/spacy%20path</url>
+    <url>https://ci.apache.org/spacy%20path</url>
   </ciManagement>
   <distributionManagement>
     <repository>
