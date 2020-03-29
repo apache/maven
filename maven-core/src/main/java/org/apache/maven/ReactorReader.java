@@ -30,9 +30,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -250,8 +250,10 @@ class ReactorReader
             // Not using File#lastModified() to avoid a Linux JDK8 milliseconds precision bug: JDK-8177809.
             long artifactLastModified = Files.getLastModifiedTime( packagedArtifactFile.toPath() ).toMillis();
 
-            for ( Path outputFile : outputFiles.collect( Collectors.toList() ) )
+            Iterator<Path> iterator = outputFiles.iterator();
+            while ( iterator.hasNext() )
             {
+                Path outputFile = iterator.next();
                 long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
                 if ( outputFileLastModified > artifactLastModified )
                 {
