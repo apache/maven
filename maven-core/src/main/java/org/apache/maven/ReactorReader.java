@@ -250,6 +250,12 @@ class ReactorReader
             // Not using File#lastModified() to avoid a Linux JDK8 milliseconds precision bug: JDK-8177809.
             long artifactLastModified = Files.getLastModifiedTime( packagedArtifactFile.toPath() ).toMillis();
 
+            long buildStartTime = session.getProjectBuildingRequest().getBuildStartTime().getTime();
+            if ( artifactLastModified > buildStartTime )
+            {
+                return true;
+            }
+
             Iterator<Path> iterator = outputFiles.iterator();
             while ( iterator.hasNext() )
             {
