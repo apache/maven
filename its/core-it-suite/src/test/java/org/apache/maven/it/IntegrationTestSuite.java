@@ -107,55 +107,56 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
-        suite.addTestSuite( MavenITmng5669ReadPomsOnce.class );
-        suite.addTestSuite( MavenITmng6071GetResourceWithCustomPom.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );
         suite.addTestSuite( MavenITmng6720FailFastTest.class );
+        suite.addTestSuite( MavenITmng6558ToolchainsBuildingEventTest.class );
         suite.addTestSuite( MavenITmng6506PackageAnnotationTest.class );
-        suite.addTestSuite( MavenITmng6256SpecialCharsAlternatePOMLocation.class );
+        suite.addTestSuite( MavenITmng6391PrintVersionTest.class );
         suite.addTestSuite( MavenITmng6386BaseUriPropertyTest.class );
+        suite.addTestSuite( MavenITmng6352PrintVersionTest.class );
         suite.addTestSuite( MavenITmng6330RelativePath.class );
-        suite.addTestSuite( MavenITmng5965ParallelBuildMultipliesWorkTest.class );
+        suite.addTestSuite( MavenITmng6256SpecialCharsAlternatePOMLocation.class );
         suite.addTestSuite( MavenITmng6255FixConcatLines.class );
         suite.addTestSuite( MavenITmng6240PluginExtensionAetherProvider.class );
         suite.addTestSuite( MavenITmng6223FindBasedir.class );
+        suite.addTestSuite( MavenITmng6210CoreExtensionsCustomScopesTest.class );
         suite.addTestSuite( MavenITmng6189SiteReportPluginsWarningTest.class );
-        suite.addTestSuite( MavenITmng6127PluginExecutionConfigurationInterferenceTest.class );
-        suite.addTestSuite( MavenITmng6065FailOnSeverityTest.class );
-        suite.addTestSuite( MavenITmng6057CheckReactorOrderTest.class );
-        suite.addTestSuite( MavenITmng5895CIFriendlyUsageWithPropertyTest.class );
-        suite.addTestSuite( MavenITmng6090CIFriendlyTest.class );
-        suite.addTestSuite( MavenITmng6084Jsr250PluginTest.class );
         suite.addTestSuite( MavenITmng6173GetProjectsAndDependencyGraphTest.class );
         suite.addTestSuite( MavenITmng6173GetAllProjectsInReactorTest.class );
+        suite.addTestSuite( MavenITmng6127PluginExecutionConfigurationInterferenceTest.class );
+        suite.addTestSuite( MavenITmng6090CIFriendlyTest.class );
+        suite.addTestSuite( MavenITmng6084Jsr250PluginTest.class );
+        suite.addTestSuite( MavenITmng6071GetResourceWithCustomPom.class );
+        suite.addTestSuite( MavenITmng6065FailOnSeverityTest.class );
+        suite.addTestSuite( MavenITmng6057CheckReactorOrderTest.class );
+        suite.addTestSuite( MavenITmng5965ParallelBuildMultipliesWorkTest.class );
         suite.addTestSuite( MavenITmng5958LifecyclePhaseBinaryCompat.class );
         suite.addTestSuite( MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest.class );
         suite.addTestSuite( MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest.class );
+        suite.addTestSuite( MavenITmng5895CIFriendlyUsageWithPropertyTest.class );
         suite.addTestSuite( MavenITmng5889FindBasedir.class );
-        suite.addTestSuite( MavenITmng5840ParentVersionRanges.class );
         suite.addTestSuite( MavenITmng5840RelativePathReactorMatching.class );
-        suite.addTestSuite( MavenITmng5805PkgTypeMojoConfiguration.class );
+        suite.addTestSuite( MavenITmng5840ParentVersionRanges.class );
         suite.addTestSuite( MavenITmng5805PkgTypeMojoConfiguration2.class );
+        suite.addTestSuite( MavenITmng5805PkgTypeMojoConfiguration.class );
         suite.addTestSuite( MavenITmng5783PluginDependencyFiltering.class );
         suite.addTestSuite( MavenITmng5774ConfigurationProcessorsTest.class );
         suite.addTestSuite( MavenITmng5771CoreExtensionsTest.class );
         suite.addTestSuite( MavenITmng5768CliExecutionIdTest.class );
-        suite.addTestSuite( MavenITmng5742BuildExtensionClassloaderTest.class );
-        suite.addTestSuite( MavenITmng5578SessionScopeTest.class );
         suite.addTestSuite( MavenITmng5753CustomMojoExecutionConfiguratorTest.class );
+        suite.addTestSuite( MavenITmng5742BuildExtensionClassloaderTest.class );
         suite.addTestSuite( MavenITmng5716ToolchainsTypeTest.class );
+        suite.addTestSuite( MavenITmng5669ReadPomsOnce.class );
         suite.addTestSuite( MavenITmng5663NestedImportScopePomResolutionTest.class );
-        suite.addTestSuite( MavenITmng2562Timestamp322Test.class );
-        suite.addTestSuite( MavenITmng2199ParentVersionRangeTest.class );
         suite.addTestSuite( MavenITmng5640LifecycleParticipantAfterSessionEnd.class );
         suite.addTestSuite( MavenITmng5639ImportScopePomResolutionTest.class );
         suite.addTestSuite( MavenITmng5608ProfileActivationWarningTest.class );
         suite.addTestSuite( MavenITmng5591WorkspaceReader.class );
         suite.addTestSuite( MavenITmng5581LifecycleMappingDelegate.class );
-        suite.addTestSuite( MavenITmng5572ReactorPluginExtensionsTest.class  );
+        suite.addTestSuite( MavenITmng5578SessionScopeTest.class );
         suite.addTestSuite( MavenITmng5576CdFriendlyVersions.class );
+        suite.addTestSuite( MavenITmng5572ReactorPluginExtensionsTest.class  );
         suite.addTestSuite( MavenITmng5530MojoExecutionScopeTest.class );
-        //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5389LifecycleParticipantAfterSessionEnd.class );
@@ -166,6 +167,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5230MakeReactorWithExcludesTest.class );
         suite.addTestSuite( MavenITmng5224InjectedSettings.class );
         suite.addTestSuite( MavenITmng5214DontMapWsdlToJar.class );
+        //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         suite.addTestSuite( MavenITmng5175WagonHttpTest.class );
         suite.addTestSuite( MavenITmng5137ReactorResolutionInForkedBuildTest.class );
         suite.addTestSuite( MavenITmng5135AggregatorDepResolutionModuleExtensionTest.class );
@@ -505,7 +507,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3477DependencyResolutionErrorMessageTest.class );
         suite.addTestSuite( MavenITmng3475BaseAlignedDirTest.class );
         suite.addTestSuite( MavenITmng3470StrictCheckumVerificationOfDependencyPomTest.class );
-		// Fails in a locked-down environment, see MNG-6613
+        // Fails in a locked-down environment, see MNG-6613
         suite.addTestSuite( MavenITmng3461MirrorMatchingTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
@@ -524,9 +526,9 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3288SystemScopeDirTest.class );
         suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         suite.addTestSuite( MavenITmng3271DefaultReportsSuppressionTest.class );
-        suite.addTestSuite( MavenITmng3221InfiniteForkingTest.class );
         suite.addTestSuite( MavenITmng3268MultipleHyphenPCommandLineTest.class );
         suite.addTestSuite( MavenITmng3259DepsDroppedInMultiModuleBuildTest.class );
+        suite.addTestSuite( MavenITmng3221InfiniteForkingTest.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
         suite.addTestSuite( MavenITmng3217InterPluginDependencyTest.class );
         suite.addTestSuite( MavenITmng3208ProfileAwareReactorSortingTest.class );
@@ -574,6 +576,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2577SettingsXmlInterpolationTest.class );
         suite.addTestSuite( MavenITmng2576MakeLikeReactorTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
+        suite.addTestSuite( MavenITmng2562Timestamp322Test.class );
         suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenITmng2486TimestampedDependencyVersionInterpolationTest.class );
         suite.addTestSuite( MavenITmng2432PluginPrefixOrderTest.class );
@@ -592,6 +595,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2228ComponentInjectionTest.class );
         suite.addTestSuite( MavenITmng2222OutputDirectoryReactorResolutionTest.class );
         suite.addTestSuite( MavenITmng2201PluginConfigInterpolationTest.class );
+        suite.addTestSuite( MavenITmng2199ParentVersionRangeTest.class );
         suite.addTestSuite( MavenITmng2196ParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2174PluginDepsManagedByParentProfileTest.class );
         suite.addTestSuite( MavenITmng2140ReactorAwareDepResolutionWhenForkTest.class );
@@ -715,10 +719,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0010DependencyClosureResolutionTest.class );
         suite.addTestSuite( MavenIT0009GoalConfigurationTest.class );
         suite.addTestSuite( MavenIT0008SimplePluginTest.class );
-        suite.addTestSuite( MavenITmng6210CoreExtensionsCustomScopesTest.class );
-        suite.addTestSuite( MavenITmng6352PrintVersionTest.class );
-        suite.addTestSuite( MavenITmng6391PrintVersionTest.class );
-        suite.addTestSuite( MavenITmng6558ToolchainsBuildingEventTest.class );
         /*
          * Add tests in reverse alpha order above.
          */
