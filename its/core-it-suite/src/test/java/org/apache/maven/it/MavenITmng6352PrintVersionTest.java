@@ -42,7 +42,7 @@ public class MavenITmng6352PrintVersionTest
 
     public MavenITmng6352PrintVersionTest()
     {
-        super( "[3.5.3-SNAPSHOT,3.5.4-SNAPSHOT]" );
+        super( "[3.5.3,3.5.4]" );
     }
 
     /**

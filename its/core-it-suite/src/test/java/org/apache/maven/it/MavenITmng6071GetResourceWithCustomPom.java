@@ -15,7 +15,7 @@ public class MavenITmng6071GetResourceWithCustomPom
 {
     public MavenITmng6071GetResourceWithCustomPom()
     {
-        super( "[3.7.0-SNAPSHOT,)" );
+        super( "[3.7.0,)" );
     }
 
     /**

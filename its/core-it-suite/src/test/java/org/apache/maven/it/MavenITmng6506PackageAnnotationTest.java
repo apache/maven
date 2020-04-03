@@ -29,7 +29,7 @@ public class MavenITmng6506PackageAnnotationTest
 
     public MavenITmng6506PackageAnnotationTest()
     {
-        super( "[3.6.1-SNAPSHOT,)" );
+        super( "[3.6.1,)" );
     }
 
     public void testGetPackageAnnotation()

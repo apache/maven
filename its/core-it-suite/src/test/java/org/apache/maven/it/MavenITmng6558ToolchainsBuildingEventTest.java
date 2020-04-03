@@ -33,7 +33,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest
 
     public MavenITmng6558ToolchainsBuildingEventTest()
     {
-        super( "[3.6.1-SNAPSHOT,)" );
+        super( "[3.6.1,)" );
     }
 
     /**

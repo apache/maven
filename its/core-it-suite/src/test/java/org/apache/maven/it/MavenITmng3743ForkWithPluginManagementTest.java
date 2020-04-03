@@ -38,7 +38,7 @@ public class MavenITmng3743ForkWithPluginManagementTest
 {
     public MavenITmng3743ForkWithPluginManagementTest()
     {
-        super( "(2.0.8,3.1-SNAPSHOT)" ); // only test in 2.0.9+
+        super( "(2.0.8,3.1)" ); // only test in 2.0.9+
     }
 
     public void testitMNG3743 ()
