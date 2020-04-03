@@ -44,7 +44,7 @@ under the License.
   <mirrors>
     <mirror>
       <id>central</id>
-      <url>http://maven.apache.org/null</url>
+      <url>@baseurl@/target/bogus</url>
       <!--
       The explicit mismatch with maven-core-it should be dominant over the wildcard, even if the wildcard
       is given first.
