@@ -25,8 +25,6 @@ import java.util.Properties;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.utils.Precondition;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -37,6 +35,8 @@ import org.eclipse.aether.version.VersionScheme;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static org.apache.maven.utils.Precondition.isNotEmpty;
 
 /**
  * Provides information about the current Maven runtime.
