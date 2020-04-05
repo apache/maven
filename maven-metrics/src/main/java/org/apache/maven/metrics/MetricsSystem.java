@@ -26,6 +26,8 @@ package org.apache.maven.metrics;
 public interface MetricsSystem
 {
 
+    static final String HINT = "metricsSystem";
+    
     /**
      * Access current metrics context.
      * @return the metrics context

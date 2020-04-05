@@ -19,9 +19,6 @@ package org.apache.maven.metrics;
  * under the License.
  */
 
-import java.util.Properties;
-import java.util.function.BiConsumer;
-
 /**
  * A MetricsProvider is a system which collects Metrics and publishes current values to external facilities.
  *
@@ -34,23 +31,14 @@ import java.util.function.BiConsumer;
  */
 public interface MetricsProvider
 {
-
-    /**
-     * Configure the provider.
-     *
-     * @param configuration the configuration.
-     *
-     * @throws MetricsProviderLifeCycleException in case of invalid configuration.
-     */
-    void configure( Properties configuration ) throws MetricsProviderLifeCycleException;
-
     /**
      * Start the provider.
      * For instance such method will start a network endpoint.
      *
      * @throws MetricsProviderLifeCycleException in case of failure
      */
-    void start() throws MetricsProviderLifeCycleException;
+    default void start() throws MetricsProviderLifeCycleException {
+    }
 
     /**
      * Provides access to the root context.
@@ -61,23 +49,20 @@ public interface MetricsProvider
 
     /**
      * Releases resources held by the provider.<br>
-     * This method must not throw exceptions.<br>
+     * This method must not throw exceptions.
+     * The provider may dump the results to the logs or send
+     * the results to an external <br>
      * This method can be called more than once.
      */
-    void stop();
-
-    /**
-     * Dumps all metrics as a key-value pair.
-     * This method will be used in legacy monitor command.
-     * @param sink the receiver of all of the current values.
-     */
-    void dump( BiConsumer<String, Object> sink );
+    default void stop() {
+    }
 
     /**
      * Reset all values.
      * This method is optional and can be noop, depending
      * on the underlying implementation.
      */
-    void resetAllValues();
+    default void resetAllValues() {
+    }
 
 }

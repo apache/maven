@@ -116,6 +116,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.apache.maven.cli.ResolveFile.resolveFile;
+import org.apache.maven.metrics.MetricsProviderLifeCycleException;
+import org.apache.maven.metrics.MetricsSystem;
+import org.apache.maven.metrics.internal.DefaultMetricsSystem;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
@@ -155,6 +158,8 @@ public class MavenCli
     private Logger slf4jLogger;
 
     private EventSpyDispatcher eventSpyDispatcher;
+    
+    private MetricsSystem metricsSystem;
 
     private ModelProcessor modelProcessor;
 
@@ -679,6 +684,10 @@ public class MavenCli
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
+        metricsSystem = container.lookup(MetricsSystem.class);
+        System.out.println("metricsSystem: "+metricsSystem);
+        System.out.println("LIST: "+container.lookupList(MetricsSystem.class));
+        
         eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
 
         DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
@@ -970,6 +979,14 @@ public class MavenCli
     private int execute( CliRequest cliRequest )
         throws MavenExecutionRequestPopulationException
     {
+        slf4jLogger.info("MetricsSystem: " + metricsSystem);
+        try {
+            metricsSystem.getMetricsProvider().start();
+        } catch (MetricsProviderLifeCycleException error) {
+            slf4jLogger.error( "Cannot start MetricsProvider, falling back to default", error);
+            metricsSystem = new DefaultMetricsSystem();
+        }
+        
         MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
 
         eventSpyDispatcher.onEvent( request );
@@ -979,6 +996,8 @@ public class MavenCli
         eventSpyDispatcher.onEvent( result );
 
         eventSpyDispatcher.close();
+        
+        metricsSystem.getMetricsProvider().stop();
 
         if ( result.hasExceptions() )
         {

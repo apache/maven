@@ -31,10 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
@@ -46,7 +42,6 @@ import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
-import org.apache.maven.metrics.MetricsSystem;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
@@ -56,6 +51,8 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -66,42 +63,37 @@ import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 /**
  * @author Jason van Zyl
  */
-@Named
-@Singleton
+@Component( role = Maven.class )
 public class DefaultMaven
     implements Maven
 {
 
-    @Inject
+    @Requirement
     private Logger logger;
 
-    @Inject
+    @Requirement
     protected ProjectBuilder projectBuilder;
 
-    @Inject
+    @Requirement
     private LifecycleStarter lifecycleStarter;
 
-    @Inject
+    @Requirement
     protected PlexusContainer container;
 
-    @Inject
+    @Requirement
     private ExecutionEventCatapult eventCatapult;
 
-    @Inject
+    @Requirement
     private LegacySupport legacySupport;
 
-    @Inject
+    @Requirement
     private SessionScope sessionScope;
 
-    @Inject
+    @Requirement
     private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
-    @Inject
-    @Named( GraphBuilder.HINT )
+    @Requirement( hint = GraphBuilder.HINT )
     private GraphBuilder graphBuilder;
-    
-    @Requirement
-    private MetricsSystem metricsSystem;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -132,11 +124,6 @@ public class DefaultMaven
         finally
         {
             legacySupport.setSession( null );
-            
-            logger.info("Dumping metrics provider info ("+metricsSystem.getMetricsProvider()+"): ");
-            metricsSystem.getMetricsProvider().dump((k,v) -> {
-                logger.info(k+": "+v);
-            });
         }
 
         return result;

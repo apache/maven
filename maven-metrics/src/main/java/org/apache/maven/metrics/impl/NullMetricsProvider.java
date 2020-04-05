@@ -19,13 +19,10 @@ package org.apache.maven.metrics.impl;
  * under the License.
  */
 
-import java.util.Properties;
-import java.util.function.BiConsumer;
 import org.apache.maven.metrics.Counter;
 import org.apache.maven.metrics.Gauge;
 import org.apache.maven.metrics.MetricsContext;
 import org.apache.maven.metrics.MetricsProvider;
-import org.apache.maven.metrics.MetricsProviderLifeCycleException;
 import org.apache.maven.metrics.Summary;
 import org.apache.maven.metrics.SummarySet;
 
@@ -41,34 +38,9 @@ public class NullMetricsProvider implements MetricsProvider
     public static final MetricsProvider INSTANCE = new NullMetricsProvider();
 
     @Override
-    public void configure( Properties configuration ) throws MetricsProviderLifeCycleException
-    {
-    }
-
-    @Override
-    public void start() throws MetricsProviderLifeCycleException
-    {
-    }
-
-    @Override
     public MetricsContext getRootContext()
     {
         return NullMetricsContext.INSTANCE;
-    }
-
-    @Override
-    public void dump( BiConsumer<String, Object> sink )
-    {
-    }
-
-    @Override
-    public void resetAllValues()
-    {
-    }
-
-    @Override
-    public void stop()
-    {
     }
 
     /**

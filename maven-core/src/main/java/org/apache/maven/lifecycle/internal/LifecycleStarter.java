@@ -72,8 +72,9 @@ public class LifecycleStarter
     
     @Inject
     private SessionScope sessionScope;
-    
-    @Requirement
+
+    @Inject
+    @Named( MetricsSystem.HINT )
     private MetricsSystem metricsSystem;
 
     public void execute( MavenSession session )
@@ -134,7 +135,7 @@ public class LifecycleStarter
             }
             long startBuild = System.currentTimeMillis();
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
-            metricsSystem.getMetricsContext().getSummary("buildTime").add(System.currentTimeMillis() - startBuild);
+            metricsSystem.getMetricsContext().getSummary( "buildTime" ).add(System.currentTimeMillis() - startBuild);
         }
         catch ( Exception e )
         {

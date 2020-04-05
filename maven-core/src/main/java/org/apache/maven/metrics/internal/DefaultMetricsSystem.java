@@ -32,33 +32,26 @@ import org.apache.maven.metrics.impl.NullMetricsProvider;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Default Implementation of Metrics System Runtime
+ * Default Implementation of Metrics System Runtime.
+ * Implementations are supposed to be configured as Maven Extensions.
  * @author Enrico Olivelli
  */
 @Singleton
-@Named
+@Named( MetricsSystem.HINT )
 public class DefaultMetricsSystem implements MetricsSystem {
- 
-    private final Logger log;
-    private final MetricsProvider metricsProvider;
 
     @Inject
-    public DefaultMetricsSystem(Logger log, ClassRealmManager classRealmManager) throws Exception {
-        this.log = log;
-        String metricsProviderClass = System.getProperty("maven.metrics.provider", NullMetricsProvider.class.getName());
-        log.info("Starting DefaultMetricsSystem maven.metrics.provider="+metricsProviderClass);
-        metricsProvider = (MetricsProvider) Class.forName(metricsProviderClass, true, classRealmManager.getCoreRealm()).getConstructor().newInstance();
-        log.info("Metrics provider: "+metricsProvider);
+    public DefaultMetricsSystem() {
     }
     
     @Override
     public MetricsContext getMetricsContext() {
-        return metricsProvider.getRootContext();
+        return NullMetricsProvider.INSTANCE.getRootContext();
     }
 
     @Override
     public MetricsProvider getMetricsProvider() {
-        return metricsProvider;
+        return NullMetricsProvider.INSTANCE;
     }
     
 }
