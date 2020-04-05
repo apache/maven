@@ -37,7 +37,8 @@ public interface MetricsProvider
      *
      * @throws MetricsProviderLifeCycleException in case of failure
      */
-    default void start() throws MetricsProviderLifeCycleException {
+    default void start() throws MetricsProviderLifeCycleException
+    {
     }
 
     /**
@@ -54,7 +55,8 @@ public interface MetricsProvider
      * the results to an external <br>
      * This method can be called more than once.
      */
-    default void stop() {
+    default void stop()
+    {
     }
 
     /**
@@ -62,7 +64,8 @@ public interface MetricsProvider
      * This method is optional and can be noop, depending
      * on the underlying implementation.
      */
-    default void resetAllValues() {
+    default void resetAllValues()
+    {
     }
 
 }
