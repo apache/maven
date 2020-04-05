@@ -164,7 +164,7 @@ public abstract class AbstractModelSourceTransformer
                 }
                 catch ( Throwable t )
                 {
-                    throw new AssertionError();
+                    throw new AssertionError( "Failed to transform pom", t );
                 }
             }
         }

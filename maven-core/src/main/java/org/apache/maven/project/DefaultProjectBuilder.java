@@ -88,7 +88,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -97,8 +96,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.transform.FileTransformer;
-import org.eclipse.aether.transform.TransformException;
 import org.xml.sax.SAXException;
 
 /**
@@ -299,7 +296,6 @@ public class DefaultProjectBuilder
 
         RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
-        RepositorySystemSession repoSession;
         if ( Features.buildConsumer().isActive() )
         {
             TransformerContext context = new TransformerContext()
@@ -313,27 +309,24 @@ public class DefaultProjectBuilder
                 @Override
                 public Model getRawModel( Path p )
                 {
-                    return config.modelPool.get( p );
+                    ReactorModelPool pool = config.modelPool;
+                    return pool != null ? pool.get( p ) : null;
                 }
 
                 @Override
                 public Model getRawModel( String groupId, String artifactId )
                 {
-                    return config.modelPool.get( groupId, artifactId, null );
+                    ReactorModelPool pool = config.modelPool;
+                    return pool != null ? pool.get( groupId, artifactId, null ) : null;
                 }
             };
-            request.setTransformerContext( context );
+            config.session.getData().set( TransformerContext.class, context );
             
-            repoSession = new DefaultRepositorySystemSession( config.session )
-                                        .setFileTransformerManager( a -> getTransformersForArtifact( a, context ) );
-        }
-        else
-        {
-            repoSession = config.session;
+            request.setTransformerContext( context );
         }
         
         ModelResolver resolver =
-            new ProjectModelResolver( repoSession, trace, repoSystem, repositoryManager, config.repositories,
+            new ProjectModelResolver( config.session, trace, repoSystem, repositoryManager, config.repositories,
                                       configuration.getRepositoryMerging(), config.modelPool );
 
         request.setValidationLevel( configuration.getValidationLevel() );
@@ -1103,39 +1096,6 @@ public class DefaultProjectBuilder
         }
 
         return null;
-    }
-    
-    private Collection<FileTransformer> getTransformersForArtifact( final org.eclipse.aether.artifact.Artifact artifact,
-                                                                    TransformerContext context )
-    {
-        Collection<FileTransformer> transformers = new ArrayList<>();
-        if ( "pom".equals( artifact.getExtension() ) )
-        {
-            transformers.add( new FileTransformer()
-            {
-                @Override
-                public InputStream transformData( File pomFile )
-                    throws IOException, TransformException
-                {
-                    try
-                    {
-                        return new ConsumerModelSourceTransformer().transform( pomFile.toPath(), context );
-                    }
-                    catch ( org.apache.maven.model.building.TransformerException e )
-                    {
-                        throw new TransformException( e );
-                    }
-                }
-                
-                @Override
-                public org.eclipse.aether.artifact.Artifact transformArtifact( 
-                                                                   org.eclipse.aether.artifact.Artifact artifact )
-                {
-                    return artifact;
-                }
-            } );
-        }
-        return Collections.unmodifiableCollection( transformers );
     }
 
     /**

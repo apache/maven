@@ -99,23 +99,6 @@ public class BuildPomXMLFilterFactory
             + " it is not an instance of SAXTransformerFactory" );
     }
     
-    // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
-    
-    protected Optional<String> getChangelist()
-    {
-        return Optional.empty();
-    }
-        
-    protected Optional<String> getRevision()
-    {
-        return Optional.empty();
-    }
-    
-    protected Optional<String> getSha1()
-    {
-        return Optional.empty();
-    }
-    
     /**
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */

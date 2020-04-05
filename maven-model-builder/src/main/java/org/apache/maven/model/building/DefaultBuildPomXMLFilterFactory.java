@@ -49,24 +49,6 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
     }
     
     @Override
-    protected Optional<String> getChangelist()
-    {
-        return Optional.ofNullable( context.getUserProperty( "changelist" ) );
-    }
-
-    @Override
-    protected Optional<String> getRevision()
-    {
-        return Optional.ofNullable( context.getUserProperty( "revision" ) );
-    }
-
-    @Override
-    protected Optional<String> getSha1()
-    {
-        return Optional.ofNullable( context.getUserProperty( "sha1" ) );
-    }
-
-    @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
         return p -> Optional.ofNullable( context.getRawModel( p ) ).map( m -> toRelativeProject( m ) );
