@@ -1,6 +1,5 @@
 package org.apache.maven.metrics.internal;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,16 +19,12 @@ package org.apache.maven.metrics.internal;
  * under the License.
  */
 
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.metrics.MetricsContext;
 import org.apache.maven.metrics.MetricsProvider;
 import org.apache.maven.metrics.MetricsSystem;
 import org.apache.maven.metrics.impl.NullMetricsProvider;
-import org.codehaus.plexus.logging.Logger;
 
 /**
  * Default Implementation of Metrics System Runtime.
@@ -38,20 +33,19 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Singleton
 @Named( MetricsSystem.HINT )
-public class DefaultMetricsSystem implements MetricsSystem {
+public class DefaultMetricsSystem implements MetricsSystem
+{
 
-    @Inject
-    public DefaultMetricsSystem() {
-    }
-    
     @Override
-    public MetricsContext getMetricsContext() {
+    public MetricsContext getMetricsContext()
+    {
         return NullMetricsProvider.INSTANCE.getRootContext();
     }
 
     @Override
-    public MetricsProvider getMetricsProvider() {
+    public MetricsProvider getMetricsProvider()
+    {
         return NullMetricsProvider.INSTANCE;
     }
-    
+
 }
