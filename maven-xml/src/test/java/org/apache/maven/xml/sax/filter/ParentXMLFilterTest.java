@@ -189,4 +189,27 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
         assertEquals( expected, actual );
     }
     
+    @Test
+    public void testIndent() throws Exception
+    {
+        String input = "<project>\n"
+            + "  <parent>\n"
+            + "    <groupId>GROUPID</groupId>\n"
+            + "    <artifactId>ARTIFACTID</artifactId>\n"
+            + "    <!--version here-->\n"
+            + "  </parent>\n"
+            + "</project>";
+        String expected = "<project>" + System.lineSeparator()
+            + "  <parent>" + System.lineSeparator()
+            + "    <groupId>GROUPID</groupId>" + System.lineSeparator()
+            + "    <artifactId>ARTIFACTID</artifactId>" + System.lineSeparator()
+            + "    <!--version here-->" + System.lineSeparator()
+            + "    <version>1.0.0</version>" + System.lineSeparator()
+            + "  </parent>" + System.lineSeparator()
+            + "</project>";
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
+    }
 }

@@ -49,6 +49,9 @@ class ParentXMLFilter
     // states
     private String state;
 
+    // whiteSpace after <parent>, to be used to position <version>
+    private String parentWhitespace = "";
+    
     private String groupId;
 
     private String artifactId;
@@ -120,15 +123,7 @@ class ParentXMLFilter
             switch ( eventState )
             {
                 case "parent":
-                    int l;
-                    for ( l = length ; l >= 0; l-- )
-                    {
-                        int i = start + l - 1; 
-                        if ( ch[i] == '\n' || ch[i] == '\r' )
-                        {
-                            break;
-                        }
-                    }
+                    parentWhitespace = new String( ch, start, length );
                     break;
                 case "relativePath":
                     relativePath = new String( ch, start, length );
@@ -164,30 +159,35 @@ class ParentXMLFilter
                     
                     if ( !hasVersion && resolvedParent.isPresent() )
                     {
-                        String versionQName = SAXEventUtils.renameQName( qName, "version" );
-                        
-                        super.startElement( uri, "version", versionQName, null );
-                        
-                        String resolvedParentVersion = resolvedParent.get().getVersion();
-                        
-                        super.characters( resolvedParentVersion.toCharArray(), 0,
-                                                      resolvedParentVersion.length() );
-                        
-                        super.endElement( uri, "version", versionQName );
+                        try ( Includer i = super.include() )
+                        {
+                            super.characters( parentWhitespace.toCharArray(), 0,
+                                              parentWhitespace.length() );
+                            
+                            String versionQName = SAXEventUtils.renameQName( qName, "version" );
+                            
+                            super.startElement( uri, "version", versionQName, null );
+                            
+                            String resolvedParentVersion = resolvedParent.get().getVersion();
+                            
+                            super.characters( resolvedParentVersion.toCharArray(), 0,
+                                                          resolvedParentVersion.length() );
+                            
+                            super.endElement( uri, "version", versionQName );
+                        }
                     }
-                    executeEvents();
+                    super.executeEvents();
                     
                     parsingParent = false;
                     break;
                 default:
+                    // marker?
                     break;
             }
         }
         
         super.endElement( uri, localName, qName );
-
-        // for this simple structure resetting to parent it sufficient
-        state = "parent";
+        state = "";
     }
 
     protected Optional<RelativeProject> resolveRelativePath( Path relativePath )

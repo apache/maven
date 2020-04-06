@@ -20,8 +20,6 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 
 import org.apache.maven.xml.sax.SAXEvent;
@@ -45,11 +43,10 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     private SAXEventFactory eventFactory;
     
     // characters BEFORE startElement must get state of startingElement
-    // this way removing based on state keeps formatting
+    // this way removing based on state keeps correct formatting
     private SAXEvent characters;
     
-    // map of characters AFTER starting element, will be cleaned up after closeElement
-    private Map<String, SAXEvent> charactersMap = new HashMap<>();
+    private boolean lockCharacters = false;
     
     protected abstract boolean isParsing();
     
@@ -87,7 +84,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
             final String eventState = getState();
             final SAXEvent charactersEvent = characters;
             
-            if ( charactersEvent != null )
+            if ( !lockCharacters && charactersEvent != null )
             {
                 saxEvents.add( () -> 
                 {
@@ -112,7 +109,20 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
             event.execute();
         }
     }
-    
+
+    /**
+     * Should be used to include extra events before a closing element.
+     * This is a lightweight solution to keep the correct indentation.
+     * 
+     * @return
+     */
+    protected Includer include() 
+    {
+        this.lockCharacters = true;
+        
+        return () -> lockCharacters = false;
+    }
+
     protected final void executeEvents() throws SAXException
     {
         final String eventState = getState();
@@ -188,10 +198,13 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     @Override
     public void characters( char[] ch, int start, int length ) throws SAXException
     {
-        if ( isParsing() )
+        if ( lockCharacters )
+        {
+            processEvent( getEventFactory().characters( ch, start, length ) );
+        }
+        else if ( isParsing() )
         {
             this.characters = getEventFactory().characters( ch, start, length );
-            this.charactersMap.put( getState(), characters );
         }
         else
         {
@@ -260,5 +273,17 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         throws SAXException
     {
         processEvent( getEventFactory().comment( ch, start, length ) );
+    }
+    
+    /**
+     * AutoCloseable with a close method that doesn't throw an exception
+     * 
+     * @author Robert Scholte
+     *
+     */
+    @FunctionalInterface
+    protected interface Includer extends AutoCloseable
+    {
+        void close();
     }
 }
