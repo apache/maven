@@ -58,9 +58,6 @@ public class MavenITmng3810BadProfileActivationTest
             verifier.verifyTextInLog( "The property name is required to activate the profile" );
         }
         verifier.resetStreams();
-
-        Properties props = verifier.loadProperties( "target/profile.properties" );
-        assertNull( props.getProperty( "project.properties.pomProperty" ) );
     }
 
 }
