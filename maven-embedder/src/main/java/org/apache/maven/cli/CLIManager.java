@@ -19,9 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -29,6 +26,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * @author Jason van Zyl
@@ -99,8 +99,6 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
-    public static final String LEGACY_LOCAL_REPOSITORY = "llr";
-
     public static final String BUILDER = "b";
 
     public static final String NO_TRANSFER_PROGRESS = "ntp";
@@ -143,10 +141,11 @@ public class CLIManager
         options.addOption( Option.builder( ENCRYPT_MASTER_PASSWORD ).longOpt( "encrypt-master-password" ).hasArg().optionalArg( true ).desc( "Encrypt master security password" ).build() );
         options.addOption( Option.builder( ENCRYPT_PASSWORD ).longOpt( "encrypt-password" ).hasArg().optionalArg( true ).desc( "Encrypt server password" ).build() );
         options.addOption( Option.builder( THREADS ).longOpt( "threads" ).hasArg().desc( "Thread count, for instance 2.0C where C is core multiplied" ).build() );
-        options.addOption( Option.builder( LEGACY_LOCAL_REPOSITORY ).longOpt( "legacy-local-repository" ).desc( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).build() );
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
 
+        // Marked deprecated with MNG-6889
+        options.addOption( Option.builder( "llr" ).longOpt( "legacy-local-repository" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
         // Adding this back in for compatibility with the verifier that hard codes this option.
         options.addOption( Option.builder( "npr" ).longOpt( "no-plugin-registry" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
         options.addOption( Option.builder( "cpu" ).longOpt( "check-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );

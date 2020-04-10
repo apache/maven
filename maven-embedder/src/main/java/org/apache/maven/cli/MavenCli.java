@@ -287,7 +287,6 @@ public class MavenCli
             toolchains( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
-            repository( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -957,16 +956,6 @@ public class MavenCli
         }
     }
 
-    private void repository( CliRequest cliRequest )
-        throws Exception
-    {
-        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean(
-            "maven.legacyLocalRepo" ) )
-        {
-            cliRequest.request.setUseLegacyLocalRepository( true );
-        }
-    }
-
     private int execute( CliRequest cliRequest )
         throws MavenExecutionRequestPopulationException
     {
@@ -1326,7 +1315,7 @@ public class MavenCli
         boolean quiet = cliRequest.quiet;
         boolean showErrors = cliRequest.showErrors;
 
-        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
+        String[] deprecatedOptions = { "up", "npu", "cpu", "npr", "llr" };
         for ( String deprecatedOption : deprecatedOptions )
         {
             if ( commandLine.hasOption( deprecatedOption ) )
