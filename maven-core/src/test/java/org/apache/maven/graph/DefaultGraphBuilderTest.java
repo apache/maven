@@ -85,7 +85,7 @@ public class DefaultGraphBuilderTest
     private String parameterMakeBehavior;
     private List<String> parameterExpectedReactorProjects;
 
-    @Parameters
+    @Parameters(name = "{index}. {0}")
     public static Collection<Object[]> parameters()
     {
         return asList( new Object[][] {
@@ -112,7 +112,7 @@ public class DefaultGraphBuilderTest
     }
 
     @Test
-    public void test()
+    public void testGetReactorProjects()
     {
         // Given
         List<String> selectedProjects = parameterSelectedProjects.stream().map( p -> ":" + p ).collect( Collectors.toList() );
@@ -146,10 +146,10 @@ public class DefaultGraphBuilderTest
         ProjectBuildingResult projectBuildingResult1 = mock( ProjectBuildingResult.class );
         ProjectBuildingResult projectBuildingResult2 = mock( ProjectBuildingResult.class );
         ProjectBuildingResult projectBuildingResult3 = mock( ProjectBuildingResult.class );
-        MavenProject projectModuleA = getMockMavenProject( "module-a" );
-        MavenProject projectModuleB = getMockMavenProject( "module-b" );
-        MavenProject projectModuleC = getMockMavenProject( "module-c" );
-        Dependency dependencyOnModuleB = mock( Dependency.class );
+        MavenProject projectModuleA = getMavenProject( "module-a" );
+        MavenProject projectModuleB = getMavenProject( "module-b" );
+        MavenProject projectModuleC = getMavenProject( "module-c" );
+        projectModuleC.setDependencies( singletonList( toDependency( projectModuleB) ) );
 
         when( session.getRequest() ).thenReturn( mavenExecutionRequest );
         when( session.getProjects() ).thenReturn( null ); // needed, otherwise it will be an empty list by default
@@ -163,11 +163,6 @@ public class DefaultGraphBuilderTest
 
         when( projectBuilder.build( anyList(), anyBoolean(), any( ProjectBuildingRequest.class ) ) ).thenReturn( asList( projectBuildingResult1, projectBuildingResult2, projectBuildingResult3 ) );
 
-        when( dependencyOnModuleB.getGroupId() ).thenReturn( "org.apache.maven.graph.unittest" );
-        when( dependencyOnModuleB.getArtifactId() ).thenReturn( "module-b" );
-        when( dependencyOnModuleB.getVersion() ).thenReturn( "1.0" );
-        when( projectModuleC.getDependencies() ).thenReturn( singletonList( dependencyOnModuleB ) );
-
         artifactIdProjectMap = ImmutableMap.of(
                 MODULE_A, projectModuleA,
                 MODULE_B, projectModuleB,
@@ -175,13 +170,21 @@ public class DefaultGraphBuilderTest
         );
     }
 
-    private MavenProject getMockMavenProject( String artifactId )
+    private MavenProject getMavenProject( String artifactId )
     {
-        MavenProject mavenProject = mock( MavenProject.class );
-        when( mavenProject.getGroupId() ).thenReturn( "org.apache.maven.graph.unittest" );
-        when( mavenProject.getArtifactId() ).thenReturn( artifactId );
-        when( mavenProject.getVersion() ).thenReturn( "1.0" );
-        when( mavenProject.getModel() ).thenReturn( mock( Model.class ) );
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setGroupId( "unittest" );
+        mavenProject.setArtifactId( artifactId );
+        mavenProject.setVersion( "1.0" );
         return mavenProject;
+    }
+
+    private Dependency toDependency( MavenProject mavenProject )
+    {
+        Dependency dependency = new Dependency();
+        dependency.setGroupId( mavenProject.getGroupId() );
+        dependency.setArtifactId( mavenProject.getArtifactId() );
+        dependency.setVersion( mavenProject.getVersion() );
+        return dependency;
     }
 }
