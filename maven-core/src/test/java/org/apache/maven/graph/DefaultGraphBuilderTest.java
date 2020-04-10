@@ -59,9 +59,10 @@ import static org.mockito.Mockito.when;
 @RunWith( Parameterized.class )
 public class DefaultGraphBuilderTest
 {
+    private static final String INDEPENDENT_MODULE = "module-independent";
     private static final String MODULE_A = "module-a";
-    private static final String MODULE_B = "module-b";
-    private static final String MODULE_C = "module-c";
+    private static final String MODULE_B = "module-b"; // depends on module-a
+    private static final String MODULE_C = "module-c"; // depends on module-b
 
     @InjectMocks
     private DefaultGraphBuilder graphBuilder;
@@ -89,39 +90,59 @@ public class DefaultGraphBuilderTest
     public static Collection<Object[]> parameters()
     {
         return asList(
-                scenario("Full reactor")
-                        .expectResult( asList( MODULE_A, MODULE_B, MODULE_C ) ),
-                scenario("Selected project")
+                scenario( "Full reactor" )
+                        .expectResult( asList( INDEPENDENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) ),
+                scenario( "Selected project" )
                         .selectedProjects( singletonList( MODULE_B ) )
                         .expectResult( singletonList( MODULE_B ) ),
-                scenario("Excluded project")
+                scenario( "Excluded project" )
+                        .excludedProjects( singletonList( MODULE_B ) )
+                        .expectResult( asList( INDEPENDENT_MODULE, MODULE_A, MODULE_C ) ),
+                scenario( "Resuming from project" )
+                        .resumeFrom( MODULE_B )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario( "Selected project with also make dependencies" )
+                        .selectedProjects( singletonList( MODULE_C ) )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_A, MODULE_B, MODULE_C ) ),
+                scenario( "Selected project with also make dependents" )
+                        .selectedProjects( singletonList( MODULE_B ) )
+                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario( "Resuming from project with also make dependencies" )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .resumeFrom( MODULE_C )
+                        .expectResult( asList( MODULE_A, MODULE_B, MODULE_C ) ),
+                scenario( "Selected project with resume from an also make dependency (MNG-4960 IT#1)" )
+                        .selectedProjects( singletonList( MODULE_C ) )
+                        .resumeFrom( MODULE_B )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_A, MODULE_B, MODULE_C ) ),
+                scenario( "Selected project with resume from an also make dependent (MNG-4960 IT#2)" )
+                        .selectedProjects( singletonList( MODULE_B ) )
+                        .resumeFrom( MODULE_C )
+                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .expectResult( singletonList( MODULE_C ) ),
+                scenario( "Excluding an also make dependency from selectedProject does take its transitive dependency" )
+                        .selectedProjects( singletonList( MODULE_C ) )
+                        .excludedProjects( singletonList( MODULE_B ) )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_A, MODULE_C ) ),
+                scenario( "Excluding an also make dependency from resumeFrom does take its transitive dependency" )
+                        .resumeFrom( MODULE_C )
+                        .excludedProjects( singletonList( MODULE_B ) )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_A, MODULE_C ) ),
+                scenario( "Resume from exclude project downstream" )
+                        .resumeFrom( MODULE_A )
                         .excludedProjects( singletonList( MODULE_B ) )
                         .expectResult( asList( MODULE_A, MODULE_C ) ),
-                scenario("Resuming from project")
+                scenario( "Exclude the project we are resuming from (as proposed in MNG-6676)" )
                         .resumeFrom( MODULE_B )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
-                scenario("Selected project with also make dependencies")
-                        .selectedProjects( singletonList( MODULE_C ) )
-                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
-                scenario("Selected project with also make dependents")
-                        .selectedProjects( singletonList( MODULE_B ) )
-                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
-                scenario("Resuming from project with also make dependencies")
-                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .resumeFrom( MODULE_C )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
-                scenario("Selected project with resume from an also make dependency (MNG-4960 IT#1)")
-                        .selectedProjects( singletonList( MODULE_C ) )
-                        .resumeFrom( MODULE_B )
-                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
-                scenario("Selected project with resume from an also make dependent (MNG-4960 IT#2)")
-                        .selectedProjects( singletonList( MODULE_B ) )
-                        .resumeFrom( MODULE_C )
-                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .excludedProjects( singletonList( MODULE_B ) )
                         .expectResult( singletonList( MODULE_C ) )
+
+
         );
     }
 
@@ -170,9 +191,12 @@ public class DefaultGraphBuilderTest
         ProjectBuildingResult projectBuildingResult1 = mock( ProjectBuildingResult.class );
         ProjectBuildingResult projectBuildingResult2 = mock( ProjectBuildingResult.class );
         ProjectBuildingResult projectBuildingResult3 = mock( ProjectBuildingResult.class );
+        ProjectBuildingResult projectBuildingResult4 = mock( ProjectBuildingResult.class );
+        MavenProject projectIndependentModule = getMavenProject( "independent-module" );
         MavenProject projectModuleA = getMavenProject( "module-a" );
         MavenProject projectModuleB = getMavenProject( "module-b" );
         MavenProject projectModuleC = getMavenProject( "module-c" );
+        projectModuleB.setDependencies( singletonList( toDependency( projectModuleA) ) );
         projectModuleC.setDependencies( singletonList( toDependency( projectModuleB) ) );
 
         when( session.getRequest() ).thenReturn( mavenExecutionRequest );
@@ -181,13 +205,16 @@ public class DefaultGraphBuilderTest
         when( mavenExecutionRequest.getProjectBuildingRequest() ).thenReturn( projectBuildingRequest );
         when( mavenExecutionRequest.getPom() ).thenReturn( new File( "/tmp/unit-test" ) );
 
-        when( projectBuildingResult1.getProject() ).thenReturn( projectModuleA );
-        when( projectBuildingResult2.getProject() ).thenReturn( projectModuleB );
-        when( projectBuildingResult3.getProject() ).thenReturn( projectModuleC );
+        when( projectBuildingResult1.getProject() ).thenReturn( projectIndependentModule );
+        when( projectBuildingResult2.getProject() ).thenReturn( projectModuleA );
+        when( projectBuildingResult3.getProject() ).thenReturn( projectModuleB );
+        when( projectBuildingResult4.getProject() ).thenReturn( projectModuleC );
 
-        when( projectBuilder.build( anyList(), anyBoolean(), any( ProjectBuildingRequest.class ) ) ).thenReturn( asList( projectBuildingResult1, projectBuildingResult2, projectBuildingResult3 ) );
+        when( projectBuilder.build( anyList(), anyBoolean(), any( ProjectBuildingRequest.class ) ) )
+                .thenReturn( asList( projectBuildingResult1, projectBuildingResult2, projectBuildingResult3, projectBuildingResult4 ) );
 
         artifactIdProjectMap = ImmutableMap.of(
+                INDEPENDENT_MODULE, projectIndependentModule,
                 MODULE_A, projectModuleA,
                 MODULE_B, projectModuleB,
                 MODULE_C, projectModuleC
