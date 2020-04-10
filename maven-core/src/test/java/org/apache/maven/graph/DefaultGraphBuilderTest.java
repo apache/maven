@@ -24,7 +24,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -52,6 +51,7 @@ import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
 import static org.apache.maven.execution.MavenExecutionRequest.*;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
+import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -83,22 +83,46 @@ public class DefaultGraphBuilderTest
     private List<String> parameterExcludedProjects;
     private String parameterResumeFrom;
     private String parameterMakeBehavior;
-    private List<String> parameterExpectedReactorProjects;
+    private List<String> parameterExpectedResult;
 
     @Parameters(name = "{index}. {0}")
     public static Collection<Object[]> parameters()
     {
-        return asList( new Object[][] {
-                { "Full reactor", emptyList(), emptyList(), "", "", asList( MODULE_A, MODULE_B, MODULE_C ) },
-                { "Selected project", singletonList( MODULE_B ), emptyList(), "", "", singletonList( MODULE_B )},
-                { "Excluded project", emptyList(), singletonList( MODULE_B ), "", "", asList( MODULE_A, MODULE_C )},
-                { "Resuming from project", emptyList(), emptyList(), MODULE_B, "", asList( MODULE_B, MODULE_C )},
-                { "Selected project with also make dependencies", singletonList( MODULE_C ), emptyList(), "", REACTOR_MAKE_UPSTREAM, asList( MODULE_B, MODULE_C )},
-                { "Selected project with also make dependents", singletonList( MODULE_B ), emptyList(), "", REACTOR_MAKE_DOWNSTREAM, asList( MODULE_B, MODULE_C )},
-                { "Resuming from project with also make dependencies", emptyList(), emptyList(), MODULE_C, REACTOR_MAKE_UPSTREAM, asList( MODULE_B, MODULE_C )},
-                { "Selected project with resume from an also make dependency (MNG-4960 IT#1)", singletonList( MODULE_C ), emptyList(), MODULE_B, REACTOR_MAKE_UPSTREAM, asList( MODULE_B, MODULE_C )},
-                { "Selected project with resume from an also make dependent (MNG-4960 IT#2)", singletonList( MODULE_B ), emptyList(), MODULE_C, REACTOR_MAKE_DOWNSTREAM, singletonList( MODULE_C )}
-        } );
+        return asList(
+                scenario("Full reactor")
+                        .expectResult( asList( MODULE_A, MODULE_B, MODULE_C ) ),
+                scenario("Selected project")
+                        .selectedProjects( singletonList( MODULE_B ) )
+                        .expectResult( singletonList( MODULE_B ) ),
+                scenario("Excluded project")
+                        .excludedProjects( singletonList( MODULE_B ) )
+                        .expectResult( asList( MODULE_A, MODULE_C ) ),
+                scenario("Resuming from project")
+                        .resumeFrom( MODULE_B )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario("Selected project with also make dependencies")
+                        .selectedProjects( singletonList( MODULE_C ) )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario("Selected project with also make dependents")
+                        .selectedProjects( singletonList( MODULE_B ) )
+                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario("Resuming from project with also make dependencies")
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .resumeFrom( MODULE_C )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario("Selected project with resume from an also make dependency (MNG-4960 IT#1)")
+                        .selectedProjects( singletonList( MODULE_C ) )
+                        .resumeFrom( MODULE_B )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario("Selected project with resume from an also make dependent (MNG-4960 IT#2)")
+                        .selectedProjects( singletonList( MODULE_B ) )
+                        .resumeFrom( MODULE_C )
+                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .expectResult( singletonList( MODULE_C ) )
+        );
     }
 
     public DefaultGraphBuilderTest( String description, List<String> selectedProjects, List<String> excludedProjects, String resumedFrom, String makeBehavior, List<String> expectedReactorProjects )
@@ -108,7 +132,7 @@ public class DefaultGraphBuilderTest
         this.parameterExcludedProjects = excludedProjects;
         this.parameterResumeFrom = resumedFrom;
         this.parameterMakeBehavior = makeBehavior;
-        this.parameterExpectedReactorProjects = expectedReactorProjects;
+        this.parameterExpectedResult = expectedReactorProjects;
     }
 
     @Test
@@ -131,7 +155,7 @@ public class DefaultGraphBuilderTest
 
         // Then
         List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
-        List<MavenProject> expectedReactorProjects = parameterExpectedReactorProjects.stream()
+        List<MavenProject> expectedReactorProjects = parameterExpectedResult.stream()
                 .map( artifactIdProjectMap::get )
                 .collect( Collectors.toList());
         assertEquals( parameterDescription, expectedReactorProjects, actualReactorProjects );
@@ -186,5 +210,54 @@ public class DefaultGraphBuilderTest
         dependency.setArtifactId( mavenProject.getArtifactId() );
         dependency.setVersion( mavenProject.getVersion() );
         return dependency;
+    }
+
+    static class ScenarioBuilder
+    {
+        private String description;
+        private List<String> selectedProjects = emptyList();
+        private List<String> excludedProjects = emptyList();
+        private String resumeFrom = "";
+        private String makeBehavior = "";
+
+        private ScenarioBuilder() { }
+
+        public static ScenarioBuilder scenario( String description )
+        {
+            ScenarioBuilder scenarioBuilder = new ScenarioBuilder();
+            scenarioBuilder.description = description;
+            return scenarioBuilder;
+        }
+
+        public ScenarioBuilder selectedProjects( List<String> selectedProjects )
+        {
+            this.selectedProjects = selectedProjects;
+            return this;
+        }
+
+        public ScenarioBuilder excludedProjects( List<String> excludedProjects )
+        {
+            this.excludedProjects = excludedProjects;
+            return this;
+        }
+
+        public ScenarioBuilder resumeFrom( String resumeFrom )
+        {
+            this.resumeFrom = resumeFrom;
+            return this;
+        }
+
+        public ScenarioBuilder makeBehavior( String makeBehavior )
+        {
+            this.makeBehavior = makeBehavior;
+            return this;
+        }
+
+        public Object[] expectResult( List<String> expectedReactorProjects )
+        {
+            return new Object[] {
+                    description, selectedProjects, excludedProjects, resumeFrom, makeBehavior, expectedReactorProjects
+            };
+        }
     }
 }
