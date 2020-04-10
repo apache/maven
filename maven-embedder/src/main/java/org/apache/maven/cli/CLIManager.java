@@ -149,12 +149,6 @@ public class CLIManager
         options.addOption( Option.builder( LEGACY_LOCAL_REPOSITORY ).longOpt( "legacy-local-repository" ).desc( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).build() );
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
-
-        // Adding this back in for compatibility with the verifier that hard codes this option.
-        options.addOption( Option.builder( "npr" ).longOpt( "no-plugin-registry" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
-        options.addOption( Option.builder( "cpu" ).longOpt( "check-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
-        options.addOption( Option.builder( "up" ).longOpt( "update-plugins" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
-        options.addOption( Option.builder( "npu" ).longOpt( "no-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
     }
 
     public CommandLine parse( String[] args )
