@@ -67,7 +67,7 @@ under the License.
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.4.1</resolverVersion>
     <slf4jVersion>1.7.29</slf4jVersion>
-    <xmlunitVersion>2.2.1</xmlunitVersion>
+    <xmlunitVersion>2.6.4</xmlunitVersion>
     <powermockVersion>1.7.4</powermockVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
