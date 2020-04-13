@@ -18,9 +18,9 @@ Apache Maven
 ============
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)][license]
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven%22%20AND%20a%3A%22apache-maven%22)
-[![Jenkins Status](https://img.shields.io/jenkins/s/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?style=flat-square)][build]
-[![Jenkins tests](https://img.shields.io/jenkins/t/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?style=flat-square)][test-results]
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
+[![Jenkins Status](https://img.shields.io/jenkins/s/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?)][build]
+[![Jenkins tests](https://img.shields.io/jenkins/t/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?)][test-results]
 
 
 Apache Maven is a software project management and comprehension tool. Based on
@@ -75,8 +75,8 @@ mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.7.x-SNAPSHOT" clean 
 [license]: https://www.apache.org/licenses/LICENSE-2.0
 [build]: https://builds.apache.org/job/maven-box/job/maven/job/master/
 [test-results]: https://builds.apache.org/job/maven-box/job/maven/job/master/lastCompletedBuild/testReport/
-[build-status]: https://img.shields.io/jenkins/s/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?style=flat-square
-[build-tests]: https://img.shields.io/jenkins/t/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?style=flat-square
+[build-status]: https://img.shields.io/jenkins/s/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?
+[build-tests]: https://img.shields.io/jenkins/t/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?
 [maven-home]: https://maven.apache.org/
 [maven-download]: https://maven.apache.org/download.cgi
 [users-list]: https://maven.apache.org/mailing-lists.html
