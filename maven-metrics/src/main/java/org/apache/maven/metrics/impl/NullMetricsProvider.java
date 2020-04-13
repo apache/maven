@@ -58,13 +58,13 @@ public class NullMetricsProvider implements MetricsProvider
         }
 
         @Override
-        public Counter getCounter( String name )
+        public Counter getCounter( String name, String description )
         {
             return NullCounter.INSTANCE;
         }
 
         @Override
-        public void registerGauge( String name, Gauge gauge )
+        public void registerGauge( String name, String description, Gauge gauge )
         {
         }
 
@@ -74,13 +74,13 @@ public class NullMetricsProvider implements MetricsProvider
         }
 
         @Override
-        public Summary getSummary( String name )
+        public Summary getSummary( String name, String description )
         {
             return NullSummary.INSTANCE;
         }
 
         @Override
-        public SummarySet getSummarySet( String name )
+        public SummarySet getSummarySet( String name, String description )
         {
             return NullSummarySet.INSTANCE;
         }

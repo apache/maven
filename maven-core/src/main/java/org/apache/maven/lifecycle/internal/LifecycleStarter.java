@@ -135,7 +135,9 @@ public class LifecycleStarter
             }
             long startBuild = System.currentTimeMillis();
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
-            metricsSystem.getMetricsContext().getSummary( "buildTime" ).add( System.currentTimeMillis() - startBuild );
+            metricsSystem.getMetricsContext()
+                    .getSummary( "buildTime", "Effective build time (in ms)" )
+                    .add( System.currentTimeMillis() - startBuild );
         }
         catch ( Exception e )
         {

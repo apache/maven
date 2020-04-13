@@ -50,7 +50,7 @@ public interface MetricsContext
      * @param name
      * @return the counter identified by name in this context.
      */
-    Counter getCounter( String name );
+    Counter getCounter( String name, String description );
 
     /**
      * Registers an user provided {@link Gauge} which will be called by the
@@ -63,7 +63,7 @@ public interface MetricsContext
      * @param gauge the implementation of the Gauge
      *
      */
-    void registerGauge( String name, Gauge gauge );
+    void registerGauge( String name, String description, Gauge gauge );
 
     /**
      * Unregisters the user provided {@link Gauge} bound to the given name.
@@ -79,7 +79,7 @@ public interface MetricsContext
      * @param name
      * @return the summary identified by name in this context.
      */
-    Summary getSummary( String name );
+    Summary getSummary( String name, String description );
 
     /**
      * Returns a set of summaries.
@@ -87,6 +87,6 @@ public interface MetricsContext
      * @param name
      * @return the summary identified by name in this context.
      */
-    SummarySet getSummarySet( String name );
+    SummarySet getSummarySet( String name, String description );
 
 }
