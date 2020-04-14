@@ -17,6 +17,7 @@
 Apache Maven
 ============
 
+[![ASF Jira](https://img.shields.io/endpoint?url=https%3A%2F%2Fmaven.apache.org%2Fbadges%2Fasf_jira-MNG.json)][jira]
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)][license]
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
 [![Jenkins Status](https://img.shields.io/jenkins/s/https/builds.apache.org/job/maven-box/job/maven/job/master.svg?)][build]
@@ -27,7 +28,7 @@ Apache Maven is a software project management and comprehension tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
-If you think you have found a bug, please file an issue in the [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG).
+If you think you have found a bug, please file an issue in the [Maven Issue Tracker][jira]].
 
 Documentation
 -------------
@@ -72,6 +73,7 @@ mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.7.x-SNAPSHOT" clean 
 
 
 [home]: https://maven.apache.org/
+[jira]: https://issues.apache.org/jira/projects/MNG/
 [license]: https://www.apache.org/licenses/LICENSE-2.0
 [build]: https://builds.apache.org/job/maven-box/job/maven/job/master/
 [test-results]: https://builds.apache.org/job/maven-box/job/maven/job/master/lastCompletedBuild/testReport/
