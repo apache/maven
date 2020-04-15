@@ -31,7 +31,18 @@ public class LogLevelRecorder
 
     public LogLevelRecorder( String threshold )
     {
-        Level level = Level.valueOf( threshold );
+        Level level;
+        try
+        {
+            level = Level.valueOf( threshold );
+        }
+        catch ( IllegalArgumentException iae )
+        {
+            String message = String.format(
+                    "%s is not a valid log severity threshold. Valid severities are WARN, WARNING and ERROR.",
+                    threshold );
+            throw new IllegalArgumentException( message );
+        }
         if ( level.toInt() < Level.WARN.toInt() )
         {
             throw new IllegalArgumentException( "Logging severity thresholds can only be set to WARN or ERROR" );
