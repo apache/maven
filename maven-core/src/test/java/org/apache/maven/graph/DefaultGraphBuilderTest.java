@@ -79,12 +79,12 @@ public class DefaultGraphBuilderTest
     private Map<String, MavenProject> artifactIdProjectMap;
 
     // Parameters for the test
-    private String parameterDescription;
-    private List<String> parameterSelectedProjects;
-    private List<String> parameterExcludedProjects;
-    private String parameterResumeFrom;
-    private String parameterMakeBehavior;
-    private List<String> parameterExpectedResult;
+    private final String parameterDescription;
+    private final List<String> parameterSelectedProjects;
+    private final List<String> parameterExcludedProjects;
+    private final String parameterResumeFrom;
+    private final String parameterMakeBehavior;
+    private final List<String> parameterExpectedResult;
 
     @Parameters(name = "{index}. {0}")
     public static Collection<Object[]> parameters()
