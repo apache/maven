@@ -45,12 +45,22 @@ public class LogLevelRecorderTest
     }
 
     @Test
+    public void createsLogLevelRecorderWithWarning()
+    {
+        LogLevelRecorder logLevelRecorder = new LogLevelRecorder( "WARNING" );
+        logLevelRecorder.record( Level.ERROR );
+
+        assertTrue( logLevelRecorder.metThreshold() );
+    }
+
+    @Test
     public void failsOnUnknownLogLevel ()
     {
         Throwable thrown = assertThrows( IllegalArgumentException.class, () -> new LogLevelRecorder( "SEVERE" ) );
         String message = thrown.getMessage();
         assertThat( message, containsString( "SEVERE is not a valid log severity threshold" ) );
         assertThat( message, containsString( "WARN" ) );
+        assertThat( message, containsString( "WARNING" ) );
         assertThat( message, containsString( "ERROR" ) );
     }
 }
