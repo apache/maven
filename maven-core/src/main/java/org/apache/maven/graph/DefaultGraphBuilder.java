@@ -180,7 +180,7 @@ public class DefaultGraphBuilder
 
             result.addAll( selectedProjects );
 
-            result = includeAlsoMakeTransitives( result, request, graph );
+            result = includeAlsoMakeTransitively( result, request, graph );
         }
 
         return result;
@@ -225,7 +225,7 @@ public class DefaultGraphBuilder
                         + " vs " + formatProjects( projects ), request.getPom() );
             }
 
-            result = includeAlsoMakeTransitives( result, request, graph );
+            result = includeAlsoMakeTransitively( result, request, graph );
         }
 
         return result;
@@ -284,8 +284,8 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    private List<MavenProject> includeAlsoMakeTransitives( List<MavenProject> projects, MavenExecutionRequest request,
-                                                           ProjectDependencyGraph graph )
+    private List<MavenProject> includeAlsoMakeTransitively( List<MavenProject> projects, MavenExecutionRequest request,
+                                                            ProjectDependencyGraph graph )
             throws MavenExecutionException
     {
         List<MavenProject> result;
