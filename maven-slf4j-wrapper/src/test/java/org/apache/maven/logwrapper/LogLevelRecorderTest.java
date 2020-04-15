@@ -51,7 +51,6 @@ public class LogLevelRecorderTest
         String message = thrown.getMessage();
         assertThat( message, containsString( "SEVERE is not a valid log severity threshold" ) );
         assertThat( message, containsString( "WARN" ) );
-        assertThat( message, containsString( "WARNING" ) );
         assertThat( message, containsString( "ERROR" ) );
     }
 }

@@ -39,7 +39,7 @@ public class LogLevelRecorder
         catch ( IllegalArgumentException iae )
         {
             String message = String.format(
-                    "%s is not a valid log severity threshold. Valid severities are WARN, WARNING and ERROR.",
+                    "%s is not a valid log severity threshold. Valid severities are WARN and ERROR.",
                     threshold );
             throw new IllegalArgumentException( message );
         }
