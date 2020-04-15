@@ -297,7 +297,7 @@ public class MavenSession
     private final Settings settings;
     
     @Deprecated
-    /** @deprecated This appears to only be used in the ReactorReader and we can do any processing required there */
+    /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap() 
     {
         return projectMap;

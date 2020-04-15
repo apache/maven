@@ -38,7 +38,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -197,9 +196,11 @@ public class MavenMetadataSource
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            MavenProject project = session.getProjectMap().get(
-                ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() ) );
-            pomRepositories = project.getRemoteArtifactRepositories();
+            pomRepositories = session.getProjects().stream()
+                    .filter( p -> artifact.equals( p.getArtifact() ) )
+                    .map( MavenProject::getRemoteArtifactRepositories )
+                    .findFirst()
+                    .orElseGet( ArrayList::new );
         }
         else if ( artifact instanceof ArtifactWithDependencies )
         {
