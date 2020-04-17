@@ -74,7 +74,7 @@ under the License.
       <plugins>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.3</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
