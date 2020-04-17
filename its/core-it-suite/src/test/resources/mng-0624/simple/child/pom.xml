@@ -20,9 +20,9 @@
                 <phase>install</phase>
                 <goals><goal>run</goal></goals>
                 <configuration>
-                  <tasks>
+                  <target>
                     <echo>hello world</echo>
-                  </tasks>
+                  </target>
                 </configuration>
               </execution>
             </executions>
