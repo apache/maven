@@ -37,6 +37,7 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -45,7 +46,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
@@ -65,6 +66,9 @@ public class DefaultLifecyclePluginAnalyzer
 
     @Requirement
     private Logger logger;
+
+    @Requirement
+    private RuntimeInformation runtimeInformation;
 
     public DefaultLifecyclePluginAnalyzer()
     {
@@ -143,7 +147,7 @@ public class DefaultLifecyclePluginAnalyzer
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
     {
-        String modelId = "org.apache.maven:maven-core:" + this.getClass().getPackage().getImplementationVersion()
+        String modelId = "org.apache.maven:maven-core:" + runtimeInformation.getMavenVersion()
             + ":default-lifecycle-bindings";
         InputSource inputSource = new InputSource();
         inputSource.setModelId( modelId );
@@ -153,13 +157,13 @@ public class DefaultLifecyclePluginAnalyzer
         List<LifecycleMojo> mojos = goals.getMojos();
         if ( mojos != null )
         {
-            
+
             for ( int i = 0; i < mojos.size(); i++ )
             {
                 LifecycleMojo mojo = mojos.get( i );
-                
+
                 GoalSpec gs = parseGoalSpec( mojo.getGoal() );
-    
+
                 if ( gs == null )
                 {
                     logger.warn( "Ignored invalid goal specification '" + mojo.getGoal()
@@ -176,7 +180,7 @@ public class DefaultLifecyclePluginAnalyzer
                 plugin.setLocation( "groupId", location );
                 plugin.setLocation( "artifactId", location );
                 plugin.setLocation( "version", location );
-    
+
                 Plugin existing = plugins.get( plugin );
                 if ( existing != null )
                 {
@@ -191,7 +195,7 @@ public class DefaultLifecyclePluginAnalyzer
                 {
                     plugins.put( plugin, plugin );
                 }
-    
+
                 PluginExecution execution = new PluginExecution();
                 execution.setId( getExecutionId( plugin, gs.goal ) );
                 execution.setPhase( phase );
