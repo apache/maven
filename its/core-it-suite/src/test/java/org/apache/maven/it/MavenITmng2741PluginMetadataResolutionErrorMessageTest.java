@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2741">MNG-2741</a>.
- * 
+ *
  *
  */
 public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
@@ -79,7 +79,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
             List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
             for ( String line : lines )
             {
-                sb.append( line ).append( System.getProperty( "line.separator" ) );
+                sb.append( line ).append( System.lineSeparator() );
                 if ( line.matches( ".*Connection refused.*" ) )
                 {
                     foundCause = true;
@@ -90,13 +90,13 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
                     foundCause = true;
                     break;
                 }
-                if ( line.matches( ".*Transfer failed for http://localhost:54312/repo/.*/maven-metadata.xml.*" ) )
+                if ( line.matches( ".*[Tt]ransfer failed for http://localhost:54312/repo/.*/maven-metadata.xml.*" ) )
                 {
                     foundCause = true;
                     break;
                 }
             }
-            assertTrue( "Transfer error cause was not found : " +  sb.toString(), foundCause );
+            assertTrue( "Transfer error cause was not found: " +  sb, foundCause );
         }
         finally
         {
