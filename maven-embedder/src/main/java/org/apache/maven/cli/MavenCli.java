@@ -115,6 +115,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Comparator.comparing;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -986,7 +987,7 @@ public class MavenCli
 
             Map<String, String> references = new LinkedHashMap<>();
 
-            MavenProject project = null;
+            List<MavenProject> failedProjects = new ArrayList<>();
 
             for ( Throwable exception : result.getExceptions() )
             {
@@ -994,10 +995,9 @@ public class MavenCli
 
                 logSummary( summary, references, "", cliRequest.showErrors );
 
-                if ( project == null && exception instanceof LifecycleExecutionException )
+                if ( exception instanceof LifecycleExecutionException )
                 {
-                    LifecycleExecutionException lifecycleExecutionException = (LifecycleExecutionException) exception;
-                    project = lifecycleExecutionException.getProject();
+                    failedProjects.add ( ( (LifecycleExecutionException) exception ).getProject() );
                 }
             }
 
@@ -1026,15 +1026,23 @@ public class MavenCli
                 }
             }
 
-            List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
             if ( result.canResume() )
             {
-                logBuildResumeHint( "mvn <args> -r " );
+                logBuildResumeHint( "mvn <args> -r" );
             }
-            else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
+            else if ( !failedProjects.isEmpty() )
             {
-                String resumeFromSelector = getResumeFromSelector( sortedProjects, project );
-                logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
+
+                // Sort the failedProjects list in the topologically sorted order.
+                failedProjects.sort( comparing( sortedProjects::indexOf ) );
+
+                MavenProject firstFailedProject = failedProjects.get( 0 );
+                if ( !firstFailedProject.equals( sortedProjects.get( 0 ) ) )
+                {
+                    String resumeFromSelector = getResumeFromSelector( sortedProjects, firstFailedProject );
+                    logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                }
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1074,22 +1082,22 @@ public class MavenCli
      * This method is made package-private for testing purposes.
      *
      * @param mavenProjects Maven projects which are part of build execution.
-     * @param failedProject Project which has failed.
+     * @param firstFailedProject The first project which has failed.
      * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general
      * and {@code groupId:artifactId} when there is a name clash).
      */
-    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
+    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject firstFailedProject )
     {
         boolean hasOverlappingArtifactId = mavenProjects.stream()
-                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
+                .filter( project -> firstFailedProject.getArtifactId().equals( project.getArtifactId() ) )
                 .count() > 1;
 
         if ( hasOverlappingArtifactId )
         {
-            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
+            return firstFailedProject.getGroupId() + ":" + firstFailedProject.getArtifactId();
         }
 
-        return ":" + failedProject.getArtifactId();
+        return ":" + firstFailedProject.getArtifactId();
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
