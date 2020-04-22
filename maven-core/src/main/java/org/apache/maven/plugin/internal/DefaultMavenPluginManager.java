@@ -770,16 +770,24 @@ public class DefaultMavenPluginManager
 
         for ( Parameter parameter : mojoDescriptor.getParameters() )
         {
-            PlexusConfiguration config = configuration.getChild( parameter.getName(), false );
-            if ( config != null && !parameter.isEditable() )
+            if ( parameter.isEditable() )
             {
-                String value = config.getValue( null );
-                String defaultValue = config.getAttribute( "default-value", null );
-                if ( value != null && defaultValue != null && !Objects.equals( defaultValue, value ) )
-                {
-                    invalidParameters.add( parameter );
-                    logger.error( "Setting read-only parameter '" + parameter.getName() + "' to " + value );
-                }
+                // mojo parameter not read-only: ignore
+                continue;
+            }
+            PlexusConfiguration config = configuration.getChild( parameter.getName(), false );
+            if ( config == null )
+            {
+              // parameter not configured: ignore
+              continue;
+            }
+
+            String value = config.getValue( null );
+            String defaultValue = config.getAttribute( "default-value", null );
+            if ( value != null && defaultValue != null && !Objects.equals( defaultValue, value ) )
+            {
+                invalidParameters.add( parameter );
+                logger.error( "Setting read-only parameter '" + parameter.getName() + "' to " + value );
             }
         }
 
