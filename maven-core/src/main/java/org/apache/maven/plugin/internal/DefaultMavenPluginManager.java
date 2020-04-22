@@ -787,7 +787,8 @@ public class DefaultMavenPluginManager
             if ( value != null && defaultValue != null && !Objects.equals( defaultValue, value ) )
             {
                 invalidParameters.add( parameter );
-                logger.error( "Setting read-only parameter '" + parameter.getName() + "' to " + value );
+                logger.error( "Invalid plugin configuration: Cannot override read-only parameter '"
+                    + parameter.getName() + "' in goal '" + mojoDescriptor.getGoal() + "'" );
             }
         }
 
