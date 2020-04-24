@@ -125,8 +125,8 @@ public class DefaultGraphBuilder
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
+        activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
-        activeProjects = trimResumedProjects( activeProjects, session.getRequest() );
 
         if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
         {
@@ -144,6 +144,8 @@ public class DefaultGraphBuilder
 
         if ( !request.getSelectedProjects().isEmpty() )
         {
+            result = new ArrayList<>( projects.size() );
+
             File reactorDirectory = null;
             if ( request.getBaseDirectory() != null )
             {
@@ -176,52 +178,54 @@ public class DefaultGraphBuilder
                 }
             }
 
-            boolean makeUpstream = false;
-            boolean makeDownstream = false;
+            result.addAll( selectedProjects );
 
-            if ( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( request.getMakeBehavior() ) )
-            {
-                makeUpstream = true;
-            }
-            else if ( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( request.getMakeBehavior() ) )
-            {
-                makeDownstream = true;
-            }
-            else if ( MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( request.getMakeBehavior() ) )
-            {
-                makeUpstream = true;
-                makeDownstream = true;
-            }
-            else if ( StringUtils.isNotEmpty( request.getMakeBehavior() ) )
-            {
-                throw new MavenExecutionException( "Invalid reactor make behavior: " + request.getMakeBehavior(),
-                                                   request.getPom() );
-            }
+            result = includeAlsoMakeTransitively( result, request, graph );
+        }
 
-            if ( makeUpstream || makeDownstream )
+        return result;
+    }
+
+    private List<MavenProject> trimResumedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
+                                                    MavenExecutionRequest request )
+            throws MavenExecutionException
+    {
+        List<MavenProject> result = projects;
+
+        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+        {
+            File reactorDirectory = null;
+            if ( request.getBaseDirectory() != null )
             {
-                for ( MavenProject selectedProject : new ArrayList<>( selectedProjects ) )
-                {
-                    if ( makeUpstream )
-                    {
-                        selectedProjects.addAll( graph.getUpstreamProjects( selectedProject, true ) );
-                    }
-                    if ( makeDownstream )
-                    {
-                        selectedProjects.addAll( graph.getDownstreamProjects( selectedProject, true ) );
-                    }
-                }
+                reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            result = new ArrayList<>( selectedProjects.size() );
+            String selector = request.getResumeFrom();
+
+            result = new ArrayList<>( projects.size() );
+
+            boolean resumed = false;
 
             for ( MavenProject project : projects )
             {
-                if ( selectedProjects.contains( project ) )
+                if ( !resumed && isMatchingProject( project, selector, reactorDirectory ) )
+                {
+                    resumed = true;
+                }
+
+                if ( resumed )
                 {
                     result.add( project );
                 }
             }
+
+            if ( !resumed )
+            {
+                throw new MavenExecutionException( "Could not find project to resume reactor build from: " + selector
+                        + " vs " + formatProjects( projects ), request.getPom() );
+            }
+
+            result = includeAlsoMakeTransitively( result, request, graph );
         }
 
         return result;
@@ -280,42 +284,57 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    private List<MavenProject> trimResumedProjects( List<MavenProject> projects, MavenExecutionRequest request )
-        throws MavenExecutionException
+    private List<MavenProject> includeAlsoMakeTransitively( List<MavenProject> projects, MavenExecutionRequest request,
+                                                            ProjectDependencyGraph graph )
+            throws MavenExecutionException
     {
-        List<MavenProject> result = projects;
+        List<MavenProject> result;
 
-        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+        boolean makeUpstream = false;
+        boolean makeDownstream = false;
+
+        if ( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( request.getMakeBehavior() ) )
         {
-            File reactorDirectory = null;
-            if ( request.getBaseDirectory() != null )
+            makeUpstream = true;
+        }
+        else if ( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( request.getMakeBehavior() ) )
+        {
+            makeDownstream = true;
+        }
+        else if ( MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( request.getMakeBehavior() ) )
+        {
+            makeUpstream = true;
+            makeDownstream = true;
+        }
+        else if ( StringUtils.isNotEmpty( request.getMakeBehavior() ) )
+        {
+            throw new MavenExecutionException( "Invalid reactor make behavior: " + request.getMakeBehavior(),
+                    request.getPom() );
+        }
+
+        if ( makeUpstream || makeDownstream )
+        {
+
+            for ( MavenProject project : new ArrayList<>( projects ) )
             {
-                reactorDirectory = new File( request.getBaseDirectory() );
-            }
-
-            String selector = request.getResumeFrom();
-
-            result = new ArrayList<>( projects.size() );
-
-            boolean resumed = false;
-
-            for ( MavenProject project : projects )
-            {
-                if ( !resumed && isMatchingProject( project, selector, reactorDirectory ) )
+                if ( makeUpstream )
                 {
-                    resumed = true;
+                    projects.addAll( graph.getUpstreamProjects( project, true ) );
                 }
-
-                if ( resumed )
+                if ( makeDownstream )
                 {
-                    result.add( project );
+                    projects.addAll( graph.getDownstreamProjects( project, true ) );
                 }
             }
+        }
 
-            if ( !resumed )
+        result = new ArrayList<>( projects.size() );
+
+        for ( MavenProject project : graph.getSortedProjects() )
+        {
+            if ( projects.contains( project ) )
             {
-                throw new MavenExecutionException( "Could not find project to resume reactor build from: " + selector
-                    + " vs " + formatProjects( projects ), request.getPom() );
+                result.add( project );
             }
         }
 
