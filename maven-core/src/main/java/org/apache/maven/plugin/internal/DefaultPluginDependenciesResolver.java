@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.metrics.MetricsSystem;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -86,6 +87,9 @@ public class DefaultPluginDependenciesResolver
     @Inject
     private RepositorySystem repoSystem;
 
+    @Inject
+    private MetricsSystem metricsSystem;
+
     private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
     {
         return new DefaultArtifact( plugin.getGroupId(), plugin.getArtifactId(), null, "jar", plugin.getVersion(),
@@ -95,6 +99,7 @@ public class DefaultPluginDependenciesResolver
     public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
+        long startResolve = System.currentTimeMillis();
         RequestTrace trace = RequestTrace.newChild( null, plugin );
 
         Artifact pluginArtifact = toArtifact( plugin, session );
@@ -134,7 +139,10 @@ public class DefaultPluginDependenciesResolver
         {
             throw new PluginResolutionException( plugin, e );
         }
-
+        metricsSystem
+                .getMetricsContext()
+                .getSummary("resolvePluginDependency", "Time to resolve dependencies of a plugin (ms)")
+                .add(System.currentTimeMillis() - startResolve);
         return pluginArtifact;
     }
 
