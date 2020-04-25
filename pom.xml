@@ -59,7 +59,7 @@ under the License.
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
-    <wagonVersion>3.3.4</wagonVersion>
+    <wagonVersion>3.4.0</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
     <securityDispatcherVersion>1.4</securityDispatcherVersion>
     <cipherVersion>1.8</cipherVersion>
