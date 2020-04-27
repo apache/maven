@@ -65,7 +65,7 @@ under the License.
     <cipherVersion>1.8</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.4.1</resolverVersion>
+    <resolverVersion>1.4.2</resolverVersion>
     <slf4jVersion>1.7.29</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <powermockVersion>1.7.4</powermockVersion>
