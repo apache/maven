@@ -19,19 +19,27 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<runtime>
-  <archive name="${project.artifactId}-${project.version}.tar.gz" />
-  
-  <artifactSet to="/.mvn/wrapper">
-     <artifact ref="projectArtifact" as="maven-wrapper.jar"/> 
-  </artifactSet>
-  
-  <fileSet to="/">
-    <directory path="${basedir}">
-      <include>mvnw</include>
-      <include>mvnw.cmd</include>
-      <include>.mvn/**</include>
-      <exclude>**/*.jar</exclude>
-    </directory>
-  </fileSet>
-</runtime>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>script</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>src/assembly/shared</directory>
+      <outputDirectory>.</outputDirectory>
+      <filtered>true</filtered>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <includes>
+        <include></include>
+      </includes>
+      <outputDirectory>.mvn/wrapper</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
