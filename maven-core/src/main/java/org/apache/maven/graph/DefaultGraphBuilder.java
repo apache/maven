@@ -150,7 +150,7 @@ public class DefaultGraphBuilder
         {
             File reactorDirectory = getReactorDirectory( request );
 
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( request.getSelectedProjects().size() );
+            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( request.getSelectedProjects().size(), 1 );
 
             for ( String selector : request.getSelectedProjects() )
             {
