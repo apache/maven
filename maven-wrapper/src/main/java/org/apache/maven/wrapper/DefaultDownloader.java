@@ -23,8 +23,6 @@ import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_PASSWORD;
 import static org.apache.maven.wrapper.MavenWrapperMain.MVNW_USERNAME;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,6 +32,8 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 
 /**
@@ -73,6 +73,7 @@ public class DefaultDownloader
         {
             Authenticator.setDefault( new Authenticator()
             {
+                @Override
                 protected PasswordAuthentication getPasswordAuthentication()
                 {
                     return new PasswordAuthentication( System.getProperty( "MVNW_USERNAME" ),
@@ -82,33 +83,29 @@ public class DefaultDownloader
         }
     }
 
-    public void download( URI address, File destination )
-        throws Exception
+    @Override
+    public void download( URI address, Path destination ) throws IOException
     {
-        if ( destination.exists() )
+        if ( Files.exists( destination ) )
         {
             return;
         }
-        destination.getParentFile().mkdirs();
+        Files.createDirectories( destination.getParent() );
 
         downloadInternal( address, destination );
     }
 
-    private void downloadInternal( URI address, File destination )
-        throws Exception
+    private void downloadInternal( URI address, Path destination ) throws IOException
     {
-        OutputStream out = null;
-        URLConnection conn;
-        InputStream in = null;
-        try
+        URL url = address.toURL();
+        URLConnection conn = url.openConnection();
+        addBasicAuthentication( address, conn );
+        final String userAgentValue = calculateUserAgent();
+        conn.setRequestProperty( "User-Agent", userAgentValue );
+
+        try ( OutputStream out = new BufferedOutputStream( Files.newOutputStream( destination ) );
+              InputStream in = conn.getInputStream() )
         {
-            URL url = address.toURL();
-            out = new BufferedOutputStream( new FileOutputStream( destination ) );
-            conn = url.openConnection();
-            addBasicAuthentication( address, conn );
-            final String userAgentValue = calculateUserAgent();
-            conn.setRequestProperty( "User-Agent", userAgentValue );
-            in = conn.getInputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
             int numRead;
             long progressCounter = 0;
@@ -126,14 +123,6 @@ public class DefaultDownloader
         finally
         {
             Logger.info( "" );
-            if ( in != null )
-            {
-                in.close();
-            }
-            if ( out != null )
-            {
-                out.close();
-            }
         }
     }
 

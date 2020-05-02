@@ -19,12 +19,12 @@ package org.apache.maven.wrapper;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 /**
@@ -44,34 +44,31 @@ public class WrapperExecutor
 
     private final Properties properties;
 
-    private final File propertiesFile;
-
-    private final Appendable warningOutput;
+    private final Path propertiesFile;
 
     private final WrapperConfiguration config = new WrapperConfiguration();
 
-    public static WrapperExecutor forProjectDirectory( File projectDir, Appendable warningOutput )
+    public static WrapperExecutor forProjectDirectory( Path projectDir )
     {
-        return new WrapperExecutor( new File( projectDir, "maven/wrapper/maven-wrapper.properties" ), new Properties(),
-                                    warningOutput );
+        return new WrapperExecutor( projectDir.resolve( "maven/wrapper/maven-wrapper.properties" ),
+                                    new Properties() );
     }
 
-    public static WrapperExecutor forWrapperPropertiesFile( File propertiesFile, Appendable warningOutput )
+    public static WrapperExecutor forWrapperPropertiesFile( Path propertiesFile )
     {
-        if ( !propertiesFile.exists() )
+        if ( !Files.exists( propertiesFile ) )
         {
             throw new RuntimeException( String.format( "Wrapper properties file '%s' does not exist.",
                                                        propertiesFile ) );
         }
-        return new WrapperExecutor( propertiesFile, new Properties(), warningOutput );
+        return new WrapperExecutor( propertiesFile, new Properties() );
     }
 
-    WrapperExecutor( File propertiesFile, Properties properties, Appendable warningOutput )
+    WrapperExecutor( Path propertiesFile, Properties properties )
     {
         this.properties = properties;
         this.propertiesFile = propertiesFile;
-        this.warningOutput = warningOutput;
-        if ( propertiesFile.exists() )
+        if ( Files.exists( propertiesFile ) )
         {
             try
             {
@@ -82,7 +79,7 @@ public class WrapperExecutor
                 config.setZipBase( getProperty( ZIP_STORE_BASE_PROPERTY, config.getZipBase() ) );
                 config.setZipPath( getProperty( ZIP_STORE_PATH_PROPERTY, config.getZipPath() ) );
             }
-            catch ( Exception e )
+            catch ( IOException | URISyntaxException e )
             {
                 throw new RuntimeException( String.format( "Could not load wrapper properties from '%s'.",
                                                            propertiesFile ),
@@ -98,7 +95,7 @@ public class WrapperExecutor
         if ( source.getScheme() == null )
         {
             // no scheme means someone passed a relative url. In our context only file relative urls make sense.
-            return new File( propertiesFile.getParentFile(), source.getSchemeSpecificPart() ).toURI();
+            return propertiesFile.getParent().resolve( source.getSchemeSpecificPart() ).toUri();
         }
         else
         {
@@ -118,17 +115,12 @@ public class WrapperExecutor
         return null; // previous line will fail
     }
 
-    private static void loadProperties( File propertiesFile, Properties properties )
-        throws IOException
+    private static void loadProperties( Path propertiesFile, Properties properties )
+                    throws IOException
     {
-        InputStream inStream = new FileInputStream( propertiesFile );
-        try
+        try ( InputStream inStream = Files.newInputStream( propertiesFile ) )
         {
             properties.load( inStream );
-        }
-        finally
-        {
-            inStream.close();
         }
     }
 
@@ -152,7 +144,7 @@ public class WrapperExecutor
     public void execute( String[] args, Installer install, BootstrapMainStarter bootstrapMainStarter )
         throws Exception
     {
-        File mavenHome = install.createDist( config );
+        Path mavenHome = install.createDist( config );
         bootstrapMainStarter.start( args, mavenHome );
     }
 
