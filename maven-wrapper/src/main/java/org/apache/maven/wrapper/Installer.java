@@ -19,20 +19,21 @@ package org.apache.maven.wrapper;
  * under the License.
  */
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URI;
-import java.util.ArrayList;
+import java.net.URISyntaxException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -54,8 +55,8 @@ public class Installer
         this.pathAssembler = pathAssembler;
     }
 
-    public File createDist( WrapperConfiguration configuration )
-        throws Exception
+    public Path createDist( WrapperConfiguration configuration )
+        throws IOException, URISyntaxException
     {
         URI distributionUrl;
         String mvnwRepoUrl = System.getenv( MavenWrapperMain.MVNW_REPOURL );
@@ -74,30 +75,51 @@ public class Installer
 
         PathAssembler.LocalDistribution localDistribution = pathAssembler.getDistribution( configuration );
 
-        File localZipFile = localDistribution.getZipFile();
+        Path localZipFile = localDistribution.getZipFile();
         boolean downloaded = false;
-        if ( alwaysDownload || !localZipFile.exists() )
+        if ( alwaysDownload || !Files.exists( localZipFile ) )
         {
-            File tmpZipFile = new File( localZipFile.getParentFile(), localZipFile.getName() + ".part" );
-            tmpZipFile.delete();
+            Path tmpZipFile = localZipFile.resolveSibling( localZipFile.getFileName() + ".part" );
+            Files.deleteIfExists( tmpZipFile );
             Logger.info( "Downloading " + distributionUrl );
             download.download( distributionUrl, tmpZipFile );
-            tmpZipFile.renameTo( localZipFile );
+            Files.move( tmpZipFile, localZipFile );
             downloaded = true;
         }
 
-        File distDir = localDistribution.getDistributionDir();
-        List<File> dirs = listDirs( distDir );
+        Path distDir = localDistribution.getDistributionDir();
+        List<Path> dirs = listDirs( distDir );
 
         if ( downloaded || alwaysUnpack || dirs.isEmpty() )
         {
-            for ( File dir : dirs )
+            Files.walkFileTree( distDir.toAbsolutePath(), new SimpleFileVisitor<Path>()
             {
-                Logger.info( "Deleting directory " + dir.getAbsolutePath() );
-                deleteDir( dir );
-            }
-            Logger.info( "Unzipping " + localZipFile.getAbsolutePath() + " to " + distDir.getAbsolutePath() );
+                @Override
+                public FileVisitResult postVisitDirectory( Path dir, IOException exc )
+                    throws IOException
+                {
+                    if ( dir.getParent().equals( distDir ) )
+                    {
+                        Logger.info( "Deleting directory " + distDir.toAbsolutePath() );
+                        Files.delete( dir );
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                public FileVisitResult visitFile( Path file, BasicFileAttributes attrs )
+                    throws IOException
+                {
+                    if ( !file.getParent().equals( distDir ) )
+                    {
+                        Files.delete( file );
+                    }
+                    return FileVisitResult.CONTINUE;
+                };
+            } );
+
+            Logger.info( "Unzipping " + localZipFile.toAbsolutePath() + " to " + distDir.toAbsolutePath() );
             unzip( localZipFile, distDir );
+
             dirs = listDirs( distDir );
             if ( dirs.isEmpty() )
             {
@@ -109,68 +131,59 @@ public class Installer
         }
         if ( dirs.size() != 1 )
         {
-            throw new RuntimeException( String.format( 
+            throw new IllegalStateException( String.format( 
                    "Maven distribution '%s' contains too many directories. Expected to find exactly 1 directory.",
                    distributionUrl ) );
         }
         return dirs.get( 0 );
     }
 
-    private List<File> listDirs( File distDir )
+    private List<Path> listDirs( Path distDir ) throws IOException
     {
-        List<File> dirs = new ArrayList<File>();
-        if ( distDir.exists() )
-        {
-            for ( File file : distDir.listFiles() )
-            {
-                if ( file.isDirectory() )
-                {
-                    dirs.add( file );
-                }
-            }
-        }
-        return dirs;
+        return Files.walk( distDir, 1 )
+                        .filter( p -> !distDir.equals( p ) )
+                        .filter( Files::isDirectory )
+                        .collect( Collectors.toList() );
     }
 
-    private void setExecutablePermissions( File mavenHome )
+    private void setExecutablePermissions( Path mavenHome )
     {
         if ( isWindows() )
         {
             return;
         }
-        File mavenCommand = new File( mavenHome, "bin/mvn" );
+        Path mavenCommand = mavenHome.resolve( "bin/mvn" );
         String errorMessage = null;
         try
         {
-            ProcessBuilder pb = new ProcessBuilder( "chmod", "755", mavenCommand.getCanonicalPath() );
+            ProcessBuilder pb = new ProcessBuilder( "chmod", "755", mavenCommand.toString() );
             Process p = pb.start();
             if ( p.waitFor() == 0 )
             {
-                Logger.info( "Set executable permissions for: " + mavenCommand.getAbsolutePath() );
+                Logger.info( "Set executable permissions for: " + mavenCommand.toString() );
             }
             else
             {
-                BufferedReader is = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
-                Formatter stdout = new Formatter();
-                String line;
-                while ( ( line = is.readLine() ) != null )
+
+                try ( BufferedReader is = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
+                      Formatter stdout = new Formatter() )
                 {
-                    stdout.format( "%s%n", line );
+                    String line;
+                    while ( ( line = is.readLine() ) != null )
+                    {
+                        stdout.format( "%s%n", line );
+                    }
+                    errorMessage = stdout.toString();
                 }
-                errorMessage = stdout.toString();
             }
         }
-        catch ( IOException e )
-        {
-            errorMessage = e.getMessage();
-        }
-        catch ( InterruptedException e )
+        catch ( IOException | InterruptedException e )
         {
             errorMessage = e.getMessage();
         }
         if ( errorMessage != null )
         {
-            Logger.warn( "Could not set executable permissions for: " + mavenCommand.getAbsolutePath() );
+            Logger.warn( "Could not set executable permissions for: " + mavenCommand );
             Logger.warn( "Please do this manually if you want to use maven." );
         }
     }
@@ -178,72 +191,36 @@ public class Installer
     private boolean isWindows()
     {
         String osName = System.getProperty( "os.name" ).toLowerCase( Locale.US );
-        if ( osName.indexOf( "windows" ) > -1 )
-        {
-            return true;
-        }
-        return false;
+
+        return ( osName.indexOf( "windows" ) > -1 );
     }
 
-    private boolean deleteDir( File dir )
+    private void unzip( Path zip, Path dest )
+        throws IOException
     {
-        if ( dir.isDirectory() )
+        try ( ZipFile zipFile = new ZipFile( zip.toFile() ) )
         {
-            String[] children = dir.list();
-            for ( int i = 0; i < children.length; i++ )
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+            while ( entries.hasMoreElements() )
             {
-                boolean success = deleteDir( new File( dir, children[i] ) );
-                if ( !success )
+                ZipEntry entry = entries.nextElement();
+
+                if ( entry.isDirectory() )
                 {
-                    return false;
+                    continue;
+                }
+
+                Path targetFile = dest.resolve( entry.getName() );
+
+                // prevent Zip Slip
+                if ( targetFile.startsWith( dest ) ) 
+                {
+                    Files.createDirectories( targetFile.getParent() );
+
+                    Files.copy( zipFile.getInputStream( entry ), targetFile );
                 }
             }
         }
-
-        // The directory is now empty so delete it
-        return dir.delete();
     }
-
-    public void unzip( File zip, File dest )
-        throws IOException
-    {
-        Enumeration entries;
-        ZipFile zipFile;
-
-        zipFile = new ZipFile( zip );
-
-        entries = zipFile.entries();
-
-        while ( entries.hasMoreElements() )
-        {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-
-            if ( entry.isDirectory() )
-            {
-                ( new File( dest, entry.getName() ) ).mkdirs();
-                continue;
-            }
-
-            new File( dest, entry.getName() ).getParentFile().mkdirs();
-            copyInputStream( zipFile.getInputStream( entry ),
-                             new BufferedOutputStream( new FileOutputStream( new File( dest, entry.getName() ) ) ) );
-        }
-        zipFile.close();
-    }
-
-    public void copyInputStream( InputStream in, OutputStream out )
-        throws IOException
-    {
-        byte[] buffer = new byte[1024];
-        int len;
-
-        while ( ( len = in.read( buffer ) ) >= 0 )
-        {
-            out.write( buffer, 0, len );
-        }
-
-        in.close();
-        out.close();
-    }
-
 }

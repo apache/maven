@@ -19,42 +19,41 @@ package org.apache.maven.wrapper;
  * under the License.
  */
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Hans Dockter
  */
 public class BootstrapMainStarter
 {
-    public void start( String[] args, File mavenHome )
+    public void start( String[] args, Path mavenHome )
         throws Exception
     {
-        File mavenJar = findLauncherJar( mavenHome );
-        URLClassLoader contextClassLoader = new URLClassLoader( new URL[] { mavenJar.toURI().toURL() },
+        Path mavenJar = findLauncherJar( mavenHome );
+        URLClassLoader contextClassLoader = new URLClassLoader( new URL[] { mavenJar.toUri().toURL() },
                                                                 ClassLoader.getSystemClassLoader().getParent() );
         Thread.currentThread().setContextClassLoader( contextClassLoader );
         Class<?> mainClass = contextClassLoader.loadClass( "org.codehaus.plexus.classworlds.launcher.Launcher" );
 
-        System.setProperty( "maven.home", mavenHome.getAbsolutePath() );
-        System.setProperty( "classworlds.conf", new File( mavenHome, "/bin/m2.conf" ).getAbsolutePath() );
+        System.setProperty( "maven.home", mavenHome.toAbsolutePath().toString() );
+        System.setProperty( "classworlds.conf", mavenHome.resolve( "bin/m2.conf" ).toAbsolutePath().toString() );
 
         Method mainMethod = mainClass.getMethod( "main", String[].class );
         mainMethod.invoke( null, new Object[] { args } );
     }
 
-    private File findLauncherJar( File mavenHome )
+    private Path findLauncherJar( Path mavenHome ) throws RuntimeException, IOException
     {
-        for ( File file : new File( mavenHome, "boot" ).listFiles() )
-        {
-            if ( file.getName().matches( "plexus-classworlds-.*\\.jar" ) )
-            {
-                return file;
-            }
-        }
-        throw new RuntimeException( 
-                   String.format( "Could not locate the Maven launcher JAR in Maven distribution '%s'.", mavenHome ) );
+        return Files.list( mavenHome.resolve( "boot" ) )
+                        .filter( p -> p.getFileName().toString().matches( "plexus-classworlds-.*\\.jar" )  )
+                        .findFirst()
+                        .orElseThrow( () -> new RuntimeException( 
+                                  String.format( "Couldn't locate the Maven launcher JAR in Maven distribution '%s'.",
+                                   mavenHome ) ) );
     }
 }

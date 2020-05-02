@@ -21,50 +21,52 @@ package org.apache.maven.wrapper;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class DownloaderTest
 {
+    @Rule
+    public TemporaryFolder testDir = new TemporaryFolder();
 
     private DefaultDownloader download;
 
-    private File testDir;
+    private Path downloadFile;
 
-    private File downloadFile;
-
-    private File rootDir;
+    private Path rootDir;
 
     private URI sourceRoot;
 
-    private File remoteFile;
+    private Path remoteFile;
 
     @Before
     public void setUp()
         throws Exception
     {
         download = new DefaultDownloader( "mvnw", "aVersion" );
-        testDir = new File( "target/test-files/DownloadTest" );
-        rootDir = new File( testDir, "root" );
-        downloadFile = new File( rootDir, "file" );
-        if ( downloadFile.exists() )
-            downloadFile.delete();
-        remoteFile = new File( testDir, "remoteFile" );
-        FileUtils.write( remoteFile, "sometext" );
-        sourceRoot = remoteFile.toURI();
+        rootDir = testDir.newFolder( "root" ).toPath();
+        downloadFile = rootDir.resolve( "file" );
+        remoteFile = testDir.newFile( "remoteFile" ).toPath();
+        Files.write( remoteFile, Arrays.asList( "sometext" ) );
+        sourceRoot = remoteFile.toUri();
     }
 
     @Test
     public void testDownload()
         throws Exception
     {
-        assert !downloadFile.exists();
+        assert !Files.exists( downloadFile );
         download.download( sourceRoot, downloadFile );
-        assert downloadFile.exists();
-        assertEquals( "sometext", FileUtils.readFileToString( downloadFile ) );
+        assert Files.exists( downloadFile );
+        assertEquals( "sometext",
+                      Files.readAllLines( downloadFile ).stream().collect( Collectors.joining() ) );
     }
 }

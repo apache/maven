@@ -94,9 +94,9 @@ under the License.
     <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
+    <module>apache-maven</module>
     <module>maven-wrapper</module>
     <module>maven-wrapper/maven-wrapper.pom</module>
-    <module>apache-maven</module>
   </modules>
 
   <scm>
