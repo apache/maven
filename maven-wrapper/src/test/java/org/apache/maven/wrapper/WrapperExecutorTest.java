@@ -23,40 +23,46 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
 public class WrapperExecutorTest
 {
-    private final Installer install;
+    @Rule
+    public TemporaryFolder testDir = new TemporaryFolder();
 
-    private final BootstrapMainStarter start;
+    private Installer install;
 
-    private File propertiesFile;
+    private BootstrapMainStarter start;
+
+    private Path propertiesFile;
 
     private Properties properties = new Properties();
 
-    private File testDir = new File( "target/test-files/SystemPropertiesHandlerTest-" + System.currentTimeMillis() );
+    private Path mockInstallDir;
 
-    private File mockInstallDir = new File( testDir, "mock-dir" );
-
-    public WrapperExecutorTest()
+    @Before
+    public void setUp()
         throws Exception
     {
+        mockInstallDir = testDir.newFolder( "mock-dir" ).toPath();
+        
         install = mock( Installer.class );
         when( install.createDist( Mockito.any( WrapperConfiguration.class ) ) ).thenReturn( mockInstallDir );
         start = mock( BootstrapMainStarter.class );
 
-        testDir.mkdirs();
-        propertiesFile = new File( testDir, "maven/wrapper/maven-wrapper.properties" );
+        propertiesFile = testDir.newFolder( "maven", "wrapper" ).toPath().resolve( "maven-wrapper.properties" );
 
         properties.put( "distributionUrl", "http://server/test/maven.zip" );
         properties.put( "distributionBase", "testDistBase" );
@@ -65,14 +71,13 @@ public class WrapperExecutorTest
         properties.put( "zipStorePath", "testZipPath" );
 
         writePropertiesFile( properties, propertiesFile, "header" );
-
     }
 
     @Test
     public void loadWrapperMetadataFromFile()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile, System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile );
 
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getDistribution() );
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getConfiguration().getDistribution() );
@@ -86,7 +91,7 @@ public class WrapperExecutorTest
     public void loadWrapperMetadataFromDirectory()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir, System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir.getRoot().toPath() );
 
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getDistribution() );
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getConfiguration().getDistribution() );
@@ -100,7 +105,7 @@ public class WrapperExecutorTest
     public void useDefaultMetadataNoProeprtiesFile()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( new File( testDir, "unknown" ), System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir.getRoot().toPath().resolve( "unknown" ) );
 
         Assert.assertNull( wrapper.getDistribution() );
         Assert.assertNull( wrapper.getConfiguration().getDistribution() );
@@ -119,7 +124,7 @@ public class WrapperExecutorTest
         properties.put( "distributionUrl", "http://server/test/maven.zip" );
         writePropertiesFile( properties, propertiesFile, "header" );
 
-        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile, System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile );
 
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getDistribution() );
         Assert.assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getConfiguration().getDistribution() );
@@ -133,7 +138,7 @@ public class WrapperExecutorTest
     public void executeInstallAndLaunch()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( propertiesFile, System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( propertiesFile );
 
         wrapper.execute( new String[] { "arg" }, install, start );
         verify( install ).createDist( Mockito.any( WrapperConfiguration.class ) );
@@ -149,26 +154,24 @@ public class WrapperExecutorTest
 
         try
         {
-            WrapperExecutor.forWrapperPropertiesFile( propertiesFile, System.out );
+            WrapperExecutor.forWrapperPropertiesFile( propertiesFile );
             Assert.fail( "Expected RuntimeException" );
         }
         catch ( RuntimeException e )
         {
-            Assert.assertEquals( "Could not load wrapper properties from '" + propertiesFile + "'.", e.getMessage() );
             Assert.assertEquals( "No value with key 'distributionUrl' specified in wrapper properties file '"
-                + propertiesFile + "'.", e.getCause().getMessage() );
+                + propertiesFile + "'.", e.getMessage() );
         }
-
     }
 
     @Test
     public void failWhenPropertiesFileDoesNotExist()
     {
-        propertiesFile = new File( testDir, "unknown.properties" );
+        propertiesFile = testDir.getRoot().toPath().resolve( "unknown.properties" );
 
         try
         {
-            WrapperExecutor.forWrapperPropertiesFile( propertiesFile, System.out );
+            WrapperExecutor.forWrapperPropertiesFile( propertiesFile );
             Assert.fail( "Expected RuntimeException" );
         }
         catch ( RuntimeException e )
@@ -186,26 +189,19 @@ public class WrapperExecutorTest
         properties.put( "distributionUrl", "some/relative/url/to/bin.zip" );
         writePropertiesFile( properties, propertiesFile, "header" );
 
-        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile, System.out );
+        WrapperExecutor wrapper = WrapperExecutor.forWrapperPropertiesFile( propertiesFile );
         Assert.assertNotEquals( "some/relative/url/to/bin.zip", wrapper.getDistribution().getSchemeSpecificPart() );
         Assert.assertTrue( wrapper.getDistribution().getSchemeSpecificPart().endsWith( "some/relative/url/to/bin.zip" ) );
     }
 
-    private void writePropertiesFile( Properties properties, File propertiesFile, String message )
-        throws Exception
+    private void writePropertiesFile( Properties properties, Path propertiesFile, String message )
+        throws IOException
     {
+        Files.createDirectories( propertiesFile.getParent() );
 
-        propertiesFile.getParentFile().mkdirs();
-
-        OutputStream outStream = null;
-        try
+        try ( OutputStream outStream = Files.newOutputStream( propertiesFile ) )
         {
-            outStream = new FileOutputStream( propertiesFile );
             properties.store( outStream, message );
-        }
-        finally
-        {
-            IOUtils.closeQuietly( outStream );
         }
     }
 }
