@@ -21,23 +21,48 @@ package org.apache.maven.logwrapper;
 
 import org.slf4j.event.Level;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Responsible for keeping state of whether the threshold of the --fail-on-severity flag has been hit.
  */
 public class LogLevelRecorder
 {
+    private static final Map<String, Level> ACCEPTED_LEVELS = new HashMap<>();
+    static
+    {
+        ACCEPTED_LEVELS.put( "WARN", Level.WARN );
+        ACCEPTED_LEVELS.put( "WARNING", Level.WARN );
+        ACCEPTED_LEVELS.put( "ERROR", Level.ERROR );
+    }
+
     private final Level logThreshold;
     private boolean metThreshold = false;
 
     public LogLevelRecorder( String threshold )
     {
-        Level level = Level.valueOf( threshold );
+        Level level = determineThresholdLevel( threshold );
+
         if ( level.toInt() < Level.WARN.toInt() )
         {
             throw new IllegalArgumentException( "Logging severity thresholds can only be set to WARN or ERROR" );
         }
 
         logThreshold = level;
+    }
+
+    private Level determineThresholdLevel( String input )
+    {
+        final Level result = ACCEPTED_LEVELS.get( input );
+        if ( result == null )
+        {
+            String message = String.format(
+                    "%s is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.",
+                    input );
+            throw new IllegalArgumentException( message );
+        }
+        return result;
     }
 
     public void record( Level logLevel )
