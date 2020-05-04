@@ -168,6 +168,8 @@ public class MavenCli
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
+    private BuildResumptionManager buildResumptionManager;
+
     public MavenCli()
     {
         this( null );
@@ -705,6 +707,8 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
+        buildResumptionManager = container.lookup( BuildResumptionManager.class );
+
         return container;
     }
 
@@ -1025,12 +1029,20 @@ public class MavenCli
                 }
             }
 
-            if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
+            boolean resumeFileCreated = buildResumptionManager.createResumptionFile( result );
+
+            slf4jLogger.error( "" );
+            slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
+
+            List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
+            if ( resumeFileCreated )
             {
-                slf4jLogger.error( "" );
-                slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -rf "
-                    + getResumeFrom( result.getTopologicallySortedProjects(), project ) ).toString() );
+                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -r " ).toString() );
+            }
+            else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
+            {
+                String resumeFromSelector = buildResumptionManager.getResumeFromSelector( sortedProjects, project );
+                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -rf " + resumeFromSelector ).toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
