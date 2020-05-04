@@ -306,7 +306,7 @@ under the License.
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
         <artifactId>jansi</artifactId>
-        <version>1.17.1</version>
+        <version>1.18</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
