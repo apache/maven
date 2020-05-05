@@ -296,35 +296,6 @@ public class DefaultProjectBuilder
 
         RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
-        if ( Features.buildConsumer().isActive() )
-        {
-            TransformerContext context = new TransformerContext()
-            {
-                @Override
-                public String getUserProperty( String key )
-                {
-                    return config.session.getUserProperties().get( key );
-                }
-
-                @Override
-                public Model getRawModel( Path p )
-                {
-                    ReactorModelPool pool = config.modelPool;
-                    return pool != null ? pool.get( p ) : null;
-                }
-
-                @Override
-                public Model getRawModel( String groupId, String artifactId )
-                {
-                    ReactorModelPool pool = config.modelPool;
-                    return pool != null ? pool.get( groupId, artifactId, null ) : null;
-                }
-            };
-            config.session.getData().set( TransformerContext.class, context );
-            
-            request.setTransformerContext( context );
-        }
-        
         ModelResolver resolver =
             new ProjectModelResolver( config.session, trace, repoSystem, repositoryManager, config.repositories,
                                       configuration.getRepositoryMerging(), config.modelPool );
@@ -339,6 +310,7 @@ public class DefaultProjectBuilder
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
         request.setModelCache( config.modelCache );
+        request.setTransformerContext( (TransformerContext) config.session.getData().get( TransformerContext.class ) );
 
         return request;
     }
@@ -427,7 +399,32 @@ public class DefaultProjectBuilder
         List<InterimResult> interimResults = new ArrayList<>();
 
         ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
-        ReactorModelPool modelPool = poolBuilder.build();
+        final ReactorModelPool modelPool = poolBuilder.build();
+        
+        if ( Features.buildConsumer().isActive() )
+        {
+            final TransformerContext context = new TransformerContext()
+            {
+                @Override
+                public String getUserProperty( String key )
+                {
+                    return request.getUserProperties().getProperty( key );
+                }
+    
+                @Override
+                public Model getRawModel( Path p )
+                {
+                    return modelPool.get( p );
+                }
+    
+                @Override
+                public Model getRawModel( String groupId, String artifactId )
+                {
+                    return modelPool.get( groupId, artifactId, null );
+                }
+            };
+            request.getRepositorySession().getData().set( TransformerContext.class, context );
+        }
 
         InternalConfig config = new InternalConfig( request, modelPool,
                 useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );

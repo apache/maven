@@ -37,6 +37,9 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
     // states
     private String state;
+    
+    // whiteSpace after <dependency>, to be used to position <version>
+    private String dependencyWhitespace = "";
 
     private boolean hasVersion;
 
@@ -78,6 +81,9 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
             final String eventState = state;
             switch ( eventState )
             {
+                case "dependency":
+                    dependencyWhitespace = new String( ch, start, length );
+                    break;
                 case "groupId":
                     groupId = new String( ch, start, length );
                     break;
@@ -107,11 +113,16 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
                         // dependency is not part of reactor, probably it is managed
                         if ( version != null )
                         {
-                            String versionQName = SAXEventUtils.renameQName( qName, "version" );
-                            
-                            super.startElement( uri, "version", versionQName, null );
-                            super.characters( version.toCharArray(), 0, version.length() );
-                            super.endElement( uri, "version", versionQName );
+                            try ( Includer i = super.include() )
+                            {
+                                super.characters( dependencyWhitespace.toCharArray(), 0,
+                                                  dependencyWhitespace.length() );
+                                String versionQName = SAXEventUtils.renameQName( qName, "version" );
+                                
+                                super.startElement( uri, "version", versionQName, null );
+                                super.characters( version.toCharArray(), 0, version.length() );
+                                super.endElement( uri, "version", versionQName );
+                            }
                         }
                     }
                     super.executeEvents();
@@ -131,7 +142,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
         super.endElement( uri, localName, qName );
         
-        state = "dependency";
+        state = "";
     }
 
     private String getVersion()
