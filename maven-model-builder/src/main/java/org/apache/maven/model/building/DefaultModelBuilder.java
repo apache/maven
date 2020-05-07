@@ -28,6 +28,7 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
@@ -1407,7 +1408,40 @@ public class DefaultModelBuilder
                     importMgmt = new DependencyManagement();
                 }
 
-                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                // [MNG-5600] Dependency management import should support exclusions.
+                if ( !dependency.getExclusions().isEmpty() )
+                {
+                    for ( final Exclusion exclusion : dependency.getExclusions() )
+                    {
+                        if ( exclusion.getGroupId() != null && exclusion.getArtifactId() != null )
+                        {
+                            for ( final Iterator<Dependency> dependencies = importMgmt.getDependencies().iterator();
+                                dependencies.hasNext(); )
+                            {
+                                final Dependency candidate = dependencies.next();
+
+                                if ( ( exclusion.getGroupId().equals( "*" )
+                                    || exclusion.getGroupId().equals( candidate.getGroupId() ) )
+                                    && ( exclusion.getArtifactId().equals( "*" )
+                                    || exclusion.getArtifactId().equals( candidate.getArtifactId() ) ) )
+                                {
+                                    // Dependency excluded from import.
+                                    dependencies.remove();
+                                }
+                            }
+                        }
+                    }
+
+                    for ( final Dependency includedDependency : importMgmt.getDependencies() )
+                    {
+                        includedDependency.getExclusions().addAll( dependency.getExclusions() );
+                    }
+                }
+                else
+                {
+                    // Only dependency managements without exclusion processing applied can be cached.
+                    intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                }
             }
 
             if ( importMgmts == null )
