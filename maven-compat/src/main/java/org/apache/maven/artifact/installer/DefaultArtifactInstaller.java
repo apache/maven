@@ -32,6 +32,7 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.metrics.MetricsSystem;
+import org.apache.maven.metrics.util.MetricsUtils;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
@@ -76,7 +77,7 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        long startInstall = System.currentTimeMillis();
+        long startInstall = MetricsUtils.now();
         RepositorySystemSession session =
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
@@ -137,8 +138,8 @@ public class DefaultArtifactInstaller
         artifact.addMetadata( new ArtifactRepositoryMetadata( artifact, versioning ) );
         metricsSystem
                 .getMetricsContext()
-                .getSummary("installArtifact", "Time to install an artifact (ms)")
-                .add(System.currentTimeMillis() - startInstall);
+                .getSummary( "installArtifact", "Time to install an artifact (ms)" )
+                .add( MetricsUtils.elapsedMillis( startInstall ) );
     }
 
 }

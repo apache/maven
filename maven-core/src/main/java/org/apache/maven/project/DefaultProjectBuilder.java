@@ -45,6 +45,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.metrics.MetricsSystem;
+import org.apache.maven.metrics.util.MetricsUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -323,13 +324,13 @@ public class DefaultProjectBuilder
             ArtifactRequest pomRequest = new ArtifactRequest();
             pomRequest.setArtifact( pomArtifact );
             pomRequest.setRepositories( config.repositories );
-            long startResolvePom = System.currentTimeMillis();
+            long startResolvePom = MetricsUtils.now();
             ArtifactResult pomResult = repoSystem.resolveArtifact( config.session, pomRequest );
 
             metricsSystem
                 .getMetricsContext()
-                .getSummary("resolvePom", "Time to resolve pom artifact (ms)")
-                .add(System.currentTimeMillis() - startResolvePom);
+                .getSummary( "resolvePom" , "Time to resolve pom artifact (ms)" )
+                .add( MetricsUtils.elapsedMillis( startResolvePom ) );
 
             pomArtifact = pomResult.getArtifact();
             localProject = pomResult.getRepository() instanceof WorkspaceRepository;

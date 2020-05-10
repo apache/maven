@@ -41,7 +41,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-metrics</artifactId>
+      <artifactId>maven-metrics-api</artifactId>
     </dependency>
     <!-- Remove the following two deps to see how to remove Settings from the core -->
     <dependency>

@@ -25,6 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.maven.metrics.MetricsContext;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -210,11 +211,13 @@ public abstract class AbstractMavenTransferListener
         }
     }
 
-    protected PrintStream out;
+    protected final PrintStream out;
+    private final MetricsContext metricsContext;
 
-    protected AbstractMavenTransferListener( PrintStream out )
+    protected AbstractMavenTransferListener( PrintStream out , MetricsContext metricsContext )
     {
         this.out = out;
+        this.metricsContext = metricsContext;
     }
 
     @Override
@@ -247,7 +250,7 @@ public abstract class AbstractMavenTransferListener
     {
         String action = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
-
+        String metricDescription = event.getRequestType() == TransferEvent.RequestType.PUT ? "uploads" : "downloads";
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
@@ -267,6 +270,19 @@ public abstract class AbstractMavenTransferListener
 
         message.append( ')' );
         out.println( message.toString() );
+        
+        metricsContext
+                .getContext( "transfer" )
+                .getSummary( event.getRequestType().name().toLowerCase() + "_bytes",
+                               "total bytes ( " + metricDescription + ")" )
+                .add( contentLength );
+        
+        metricsContext
+                .getContext( "transfer" )
+                .getSummary( event.getRequestType().name().toLowerCase() + "_time",
+                               "total time (" + metricDescription + ") " )
+                .add( duration );
+        
     }
 
 }

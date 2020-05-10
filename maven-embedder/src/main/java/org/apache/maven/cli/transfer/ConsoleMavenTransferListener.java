@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.metrics.MetricsContext;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -43,12 +44,12 @@ public class ConsoleMavenTransferListener
     private Map<TransferResource, Long> transfers = Collections.synchronizedMap(
             new LinkedHashMap<>() );
 
-    private boolean printResourceNames;
+    private final boolean printResourceNames;
     private int lastLength;
 
-    public ConsoleMavenTransferListener( PrintStream out, boolean printResourceNames )
+    public ConsoleMavenTransferListener( PrintStream out, boolean printResourceNames, MetricsContext metricsContext )
     {
-        super( out );
+        super( out, metricsContext );
         this.printResourceNames = printResourceNames;
     }
 

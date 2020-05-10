@@ -40,6 +40,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.metrics.MetricsSystem;
+import org.apache.maven.metrics.util.MetricsUtils;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -168,7 +169,7 @@ public class MojoExecutor
                           DependencyContext dependencyContext )
         throws LifecycleExecutionException
     {
-        long startExecute = System.currentTimeMillis();
+        long startExecute = MetricsUtils.now();
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         try
@@ -217,8 +218,9 @@ public class MojoExecutor
             {
                 pluginManager.executeMojo( session, mojoExecution );
                 metricsSystem.getMetricsContext()
-                    .getSummarySet("executeMojo", "Time to execute a mojo (ms)")
-                    .add(mojoExecution.getLifecyclePhase()+"_"+mojoExecution.getGoal(), System.currentTimeMillis() - startExecute);
+                    .getSummarySet( "executeMojo", "Time to execute a mojo (ms)" )
+                    .add( mojoExecution.getLifecyclePhase() + "_" + mojoExecution.getGoal(),
+                            MetricsUtils.elapsedMillis( startExecute ) );
             }
             catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
                 | MojoExecutionException e )

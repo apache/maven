@@ -64,6 +64,7 @@ under the License.
     <securityDispatcherVersion>1.4</securityDispatcherVersion>
     <cipherVersion>1.8</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
+    <metricsVersion>1.0.0-SNAPSHOT</metricsVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.4.2</resolverVersion>
     <slf4jVersion>1.7.29</slf4jVersion>
@@ -84,7 +85,6 @@ under the License.
     <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
-    <module>maven-metrics</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -186,8 +186,8 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-metrics</artifactId>
-        <version>${project.version}</version>
+        <artifactId>maven-metrics-api</artifactId>
+        <version>${metricsVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>

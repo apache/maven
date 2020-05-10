@@ -1744,12 +1744,12 @@ public class MavenCli
 
     protected TransferListener getConsoleTransferListener( boolean printResourceNames )
     {
-        return new ConsoleMavenTransferListener( System.out, printResourceNames );
+        return new ConsoleMavenTransferListener( System.out, printResourceNames, metricsSystem.getMetricsContext() );
     }
 
     protected TransferListener getBatchTransferListener()
     {
-        return new Slf4jMavenTransferListener();
+        return new Slf4jMavenTransferListener( metricsSystem.getMetricsContext() );
     }
 
     protected void customizeContainer( PlexusContainer container )
