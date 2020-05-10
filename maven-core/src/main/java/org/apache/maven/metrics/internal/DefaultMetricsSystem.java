@@ -33,7 +33,7 @@ import org.apache.maven.metrics.impl.NullMetricsProvider;
  */
 @Singleton
 @Named( MetricsSystem.HINT )
-public class DefaultMetricsSystem implements MetricsSystem
+public class DefaultMetricsSystem extends MetricsSystem
 {
 
     @Override
