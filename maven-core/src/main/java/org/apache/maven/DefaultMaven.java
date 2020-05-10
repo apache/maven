@@ -31,6 +31,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
@@ -51,8 +55,6 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -63,36 +65,38 @@ import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 /**
  * @author Jason van Zyl
  */
-@Component( role = Maven.class )
+@Named
+@Singleton
 public class DefaultMaven
     implements Maven
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     protected ProjectBuilder projectBuilder;
 
-    @Requirement
+    @Inject
     private LifecycleStarter lifecycleStarter;
 
-    @Requirement
+    @Inject
     protected PlexusContainer container;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     private SessionScope sessionScope;
 
-    @Requirement
+    @Inject
     private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
-    @Requirement( hint = GraphBuilder.HINT )
+    @Inject
+    @Named( GraphBuilder.HINT )
     private GraphBuilder graphBuilder;
 
     @Override
