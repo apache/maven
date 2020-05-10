@@ -20,7 +20,6 @@ package org.apache.maven.cli.transfer;
  */
 
 import java.io.PrintStream;
-import org.apache.maven.metrics.MetricsContext;
 
 /**
  * BatchModeMavenTransferListener
@@ -28,9 +27,9 @@ import org.apache.maven.metrics.MetricsContext;
 public class BatchModeMavenTransferListener
     extends AbstractMavenTransferListener
 {
-    public BatchModeMavenTransferListener( PrintStream out, MetricsContext metricsContext )
+    public BatchModeMavenTransferListener( PrintStream out )
     {
-        super( out, metricsContext );
+        super( out );
     }
 
 }

@@ -22,7 +22,6 @@ package org.apache.maven.cli.transfer;
 import java.util.Locale;
 
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
-import org.apache.maven.metrics.MetricsContext;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -38,19 +37,16 @@ public class Slf4jMavenTransferListener
 {
 
     protected final Logger out;
-    private final MetricsContext metricsContext;
 
-    public Slf4jMavenTransferListener( MetricsContext metricsContext )
+    public Slf4jMavenTransferListener()
     {
         this.out = LoggerFactory.getLogger( Slf4jMavenTransferListener.class );
-        this.metricsContext = metricsContext;
     }
 
     // TODO should we deprecate?
-    public Slf4jMavenTransferListener( Logger out, MetricsContext metricsContext )
+    public Slf4jMavenTransferListener( Logger out )
     {
         this.out = out;
-        this.metricsContext = metricsContext;
     }
 
     @Override
@@ -82,7 +78,6 @@ public class Slf4jMavenTransferListener
     {
         String action = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
-        String metricDescription = event.getRequestType() == TransferEvent.RequestType.PUT ? "uploads" : "downloads";
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
@@ -103,18 +98,6 @@ public class Slf4jMavenTransferListener
 
         message.append( ')' );
         out.info( message.toString() );
-
-        metricsContext
-                .getContext( "transfer" )
-                .getSummary( event.getRequestType().name().toLowerCase() + "_bytes",
-                               "total bytes ( " + metricDescription + ")" )
-                .add( contentLength );
-        
-        metricsContext
-                .getContext( "transfer" )
-                .getSummary( event.getRequestType().name().toLowerCase() + "_time",
-                               "total time (" + metricDescription + ") " )
-                .add( duration );
     }
 
 }
