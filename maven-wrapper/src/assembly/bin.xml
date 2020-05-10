@@ -28,25 +28,45 @@ under the License.
     <format>zip</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
-  <fileSets>
-    <fileSet>
-      <directory>src/assembly/shared</directory>
-      <outputDirectory>.</outputDirectory>
-      <filtered>true</filtered>
-    </fileSet>
-    <fileSet>
-      <directory>target</directory>
-      <includes>
-        <include></include>
-      </includes>
-      <outputDirectory>.mvn/wrapper</outputDirectory>
-    </fileSet>
-  </fileSets>
   <files>
+    <file>
+      <source>src/assembly/shared/mvnwDebug.cmd</source>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>dos</lineEnding>
+    </file>
+    <file>
+      <source>src/assembly/shared/mvnwDebug</source>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>src/assembly/shared/mvnw.cmd</source>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>src/assembly/shared/mvnw</source>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+      <filtered>true</filtered>
+    </file>
     <file>
       <source>target/maven-wrapper.jar</source>
       <outputDirectory>.mvn/wrapper</outputDirectory>
       <destName>maven-wrapper.jar</destName> <!-- TODO include version -->
     </file>
   </files>
+  <fileSets>
+    <fileSet>
+      <directory>src/assembly/shared</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>.mvn/**</include>
+      </includes>
+      <filtered>true</filtered>
+    </fileSet>
+  </fileSets>
 </assembly>
