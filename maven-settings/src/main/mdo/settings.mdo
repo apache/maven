@@ -580,6 +580,92 @@
             ]]>
           </description>
         </field>
+         
+        
+         <field>
+          <name>trustStore</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The path to the trust store. If not defined, the JRE's cacert store is used.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>trustStorePassword</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The password to the trust store. 
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>trustStoreType</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The type of trust store, default is JKS
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>keyStore</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The path to the keystore used for authentication purposes, or null
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        
+        <field>
+          <name>keyStorePassword</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            Keystore password, can be null
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>keyAlias</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            Keystore if the key store has multiple key pairs, this can be used to explicitly
+            select a specific certificate via it's alias. If null, the most appropriate
+            certificate is automatically selected by the SSL Factory
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>keyPassword</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The password to unlock the key, can be null
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>keyStoreType</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The key store type, defaults to JKS
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        
       </fields>
     </class>
     <class>

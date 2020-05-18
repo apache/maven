@@ -19,6 +19,13 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -50,14 +57,6 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @since 3.3.0
@@ -93,6 +92,7 @@ public class DefaultRepositorySystemSessionFactory
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
 
+    @SuppressWarnings( "checkstyle:MethodLength" )
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -197,6 +197,15 @@ public class DefaultRepositorySystemSessionFactory
         for ( Server server : decrypted.getServers() )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            //MNG-5583 per endpoint PKI authentication
+            authBuilder.addString( "getKeyAlias", server.getKeyAlias() );
+            authBuilder.addString( "getKeyPassword", server.getKeyPassword() );
+            authBuilder.addString( "getKeyStore", server.getKeyStore() );
+            authBuilder.addString( "getKeyStorePassword", server.getKeyStorePassword() );
+            authBuilder.addString( "getKeyStoreType", server.getKeyStoreType() );
+            authBuilder.addString( "getTrustStore", server.getTrustStore() );
+            authBuilder.addString( "getTrustStorePassword", server.getTrustStorePassword() );
+            authBuilder.addString( "getTrustStoreType", server.getTrustStoreType() );
             authBuilder.addUsername( server.getUsername() ).addPassword( server.getPassword() );
             authBuilder.addPrivateKey( server.getPrivateKey(), server.getPassphrase() );
             authSelector.add( server.getId(), authBuilder.build() );
