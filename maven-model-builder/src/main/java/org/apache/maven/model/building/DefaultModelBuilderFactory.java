@@ -39,10 +39,12 @@ import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.DefaultModelPathTranslator;
 import org.apache.maven.model.path.DefaultModelUrlNormalizer;
 import org.apache.maven.model.path.DefaultPathTranslator;
+import org.apache.maven.model.path.DefaultProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.DefaultUrlNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
 import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.apache.maven.model.plugin.DefaultPluginConfigurationExpander;
 import org.apache.maven.model.plugin.DefaultReportConfigurationExpander;
@@ -109,7 +111,13 @@ public class DefaultModelBuilderFactory
     protected ProfileActivator[] newProfileActivators()
     {
         return new ProfileActivator[] { new JdkVersionProfileActivator(), new OperatingSystemProfileActivator(),
-            new PropertyProfileActivator(), new FileProfileActivator().setPathTranslator( newPathTranslator() ) };
+            new PropertyProfileActivator(), new FileProfileActivator()
+                        .setProfileActivationFilePathInterpolator( newProfileActivationFilePathInterpolator() ) };
+    }
+
+    protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator()
+    {
+        return new DefaultProfileActivationFilePathInterpolator().setPathTranslator( newPathTranslator() );
     }
 
     protected UrlNormalizer newUrlNormalizer()
@@ -225,6 +233,7 @@ public class DefaultModelBuilderFactory
         modelBuilder.setPluginConfigurationExpander( newPluginConfigurationExpander() );
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
+        modelBuilder.setProfileActivationFilePathInterpolator( newProfileActivationFilePathInterpolator() );
 
         return modelBuilder;
     }

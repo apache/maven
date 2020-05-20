@@ -28,15 +28,13 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.interpolation.AbstractValueSource;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -58,11 +56,12 @@ public class FileProfileActivator
 {
 
     @Inject
-    private PathTranslator pathTranslator;
+    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
-    public FileProfileActivator setPathTranslator( PathTranslator pathTranslator )
+    public FileProfileActivator setProfileActivationFilePathInterpolator(
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
-        this.pathTranslator = pathTranslator;
+        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         return this;
     }
 
@@ -101,64 +100,23 @@ public class FileProfileActivator
             return false;
         }
 
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        final File basedir = context.getProjectDirectory();
-
-        if ( basedir != null )
-        {
-            interpolator.addValueSource( new AbstractValueSource( false )
-            {
-                @Override
-                public Object getValue( String expression )
-                {
-                    /*
-                     * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
-                     * would suggest that other project.* expressions can be used which is however beyond the design.
-                     */
-                    if ( "basedir".equals( expression ) )
-                    {
-                        return basedir.getAbsolutePath();
-                    }
-                    return null;
-                }
-            } );
-        }
-        else if ( path.contains( "${basedir}" ) )
-        {
-            return false;
-        }
-
-        interpolator.addValueSource( new MapBasedValueSource( context.getProjectProperties() ) );
-
-        interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
-
-        interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
-
         try
         {
-            path = interpolator.interpolate( path, "" );
+            path = profileActivationFilePathInterpolator.interpolate( path, context );
         }
-        catch ( Exception e )
+        catch ( InterpolationException e )
         {
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                     .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
-                                 + ": " + e.getMessage() )
+                            + ": " + e.getMessage() )
                     .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
                     .setException( e ) );
             return false;
         }
 
-        path = pathTranslator.alignToBaseDirectory( path, basedir );
-
-        // replace activation value with interpolated value
-        if ( missing )
+        if ( path == null )
         {
-            file.setMissing( path );
-        }
-        else
-        {
-            file.setExists( path );
+            return false;
         }
 
         File f = new File( path );

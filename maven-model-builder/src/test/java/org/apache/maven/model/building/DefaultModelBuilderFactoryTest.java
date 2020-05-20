@@ -20,7 +20,10 @@ package org.apache.maven.model.building;
  */
 
 import java.io.File;
+import java.io.FileReader;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import junit.framework.TestCase;
@@ -56,4 +59,29 @@ public class DefaultModelBuilderFactoryTest
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }
 
+    public void test_pom_changes() throws Exception
+    {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull( builder );
+        File pom = getPom( "simple" );
+
+        String originalExists = readPom( pom ).getProfiles().get( 1 ).getActivation().getFile().getExists();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setProcessPlugins( true );
+        request.setPomFile( pom );
+        ModelBuildingResult result = builder.build( request );
+        String resultedExists = result.getRawModel().getProfiles().get( 1 ).getActivation().getFile().getExists();
+
+        assertEquals( originalExists, resultedExists );
+        assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists()
+                .contains( "src/test/resources/poms/factory/" ) );
+    }
+
+    private static Model readPom( File file ) throws Exception
+    {
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+
+        return reader.read( new FileReader( file ) );
+    }
 }
