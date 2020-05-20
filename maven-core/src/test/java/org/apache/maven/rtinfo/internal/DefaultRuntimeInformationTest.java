@@ -21,12 +21,18 @@ package org.apache.maven.rtinfo.internal;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 public class DefaultRuntimeInformationTest
     extends PlexusTestCase
 {
+    @Inject
+    RuntimeInformation rtInfo;
 
     @Override
     protected void customizeContainerConfiguration(
@@ -37,21 +43,31 @@ public class DefaultRuntimeInformationTest
         configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
-    public void testGetMavenVersion()
-        throws Exception
+    @Override
+    protected void setUp() throws Exception
     {
-        RuntimeInformation rtInfo = lookup( RuntimeInformation.class );
+        super.setUp();
+        getContainer();
+    }
+    @Override
+    protected synchronized void setupContainer()
+    {
+        super.setupContainer();
 
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+    }
+
+    public void testGetMavenVersion()
+    {
         String mavenVersion = rtInfo.getMavenVersion();
         assertNotNull( mavenVersion );
         assertTrue( mavenVersion.length() > 0 );
     }
 
     public void testIsMavenVersion()
-        throws Exception
     {
-        RuntimeInformation rtInfo = lookup( RuntimeInformation.class );
-
         assertTrue( rtInfo.isMavenVersion( "2.0" ) );
         assertFalse( rtInfo.isMavenVersion( "9.9" ) );
 

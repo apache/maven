@@ -15,10 +15,12 @@
 package org.apache.maven.lifecycle;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,19 +42,21 @@ public class DefaultLifecyclesTest
         configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
-    protected void setUp()
-        throws Exception
+    @Override
+    protected void setUp() throws Exception
     {
         super.setUp();
-        defaultLifeCycles = lookup( DefaultLifecycles.class );
+        getContainer();
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
+    protected synchronized void setupContainer()
     {
-        defaultLifeCycles = null;
-        super.tearDown();
+        super.setupContainer();
+
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
     }
 
     public void testLifecycle()

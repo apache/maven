@@ -23,13 +23,13 @@ import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -38,9 +38,11 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 
 public class PomConstructionWithSettingsTest
     extends PlexusTestCase
@@ -49,8 +51,10 @@ public class PomConstructionWithSettingsTest
 
     private static final String BASE_POM_DIR = BASE_DIR + "/resources-settings";
 
+    @Inject
     private DefaultProjectBuilder projectBuilder;
 
+    @Inject
     private RepositorySystem repositorySystem;
 
     private File testDirectory;
@@ -63,12 +67,21 @@ public class PomConstructionWithSettingsTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Override
+    protected synchronized void setupContainer()
+    {
+        super.setupContainer();
+
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+    }
+
     protected void setUp()
         throws Exception
     {
+        getContainer();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
-        projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
-        repositorySystem = lookup( RepositorySystem.class );
     }
 
     @Override

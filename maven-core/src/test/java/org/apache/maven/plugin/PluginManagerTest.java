@@ -41,13 +41,6 @@ public class PluginManagerTest
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        pluginManager = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory()
     {

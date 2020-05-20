@@ -36,14 +36,6 @@ public class ProjectDependenciesResolverTest
     @Inject
     private ProjectDependenciesResolver resolver;
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        resolver = null;
-        super.tearDown();
-    }
-
     protected String getProjectsDirectory()
     {
         return "src/test/projects/project-dependencies-resolver";
