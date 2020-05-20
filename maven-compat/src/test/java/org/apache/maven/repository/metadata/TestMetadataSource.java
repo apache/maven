@@ -27,18 +27,20 @@ import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalExce
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component(role = ArtifactMetadataSource.class)
+@Named
+@Singleton
 public class TestMetadataSource
     implements ArtifactMetadataSource
 {
-    @Requirement
+    @Inject
     private ArtifactFactory factory;
 
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )

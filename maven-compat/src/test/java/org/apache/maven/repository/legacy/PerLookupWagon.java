@@ -20,12 +20,14 @@ package org.apache.maven.repository.legacy;
  */
 
 import org.apache.maven.wagon.Wagon;
-import org.codehaus.plexus.component.annotations.Component;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Wagon with per-lookup instantiation strategy.
  */
-@Component( role = Wagon.class, hint = "perlookup", instantiationStrategy = "per-lookup" )
+@Named("perlookup")
 public class PerLookupWagon
     extends WagonMock
 {

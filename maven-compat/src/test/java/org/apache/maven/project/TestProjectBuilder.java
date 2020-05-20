@@ -19,9 +19,12 @@ import java.io.File;
 import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role=ProjectBuilder.class,hint="classpath")
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named("classpath")
+@Singleton
 public class TestProjectBuilder
     extends DefaultProjectBuilder
 {

@@ -1,8 +1,5 @@
 package org.apache.maven.repository.legacy;
 
-import org.apache.maven.wagon.Wagon;
-import org.codehaus.plexus.component.annotations.Component;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,13 +19,17 @@ import org.codehaus.plexus.component.annotations.Component;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * Wagon for testing, for protocol <code>c</code>
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-@Component(role=Wagon.class,hint="c")
+@Named( "c" )
+@Singleton
 public class WagonC
     extends WagonMock
 {
