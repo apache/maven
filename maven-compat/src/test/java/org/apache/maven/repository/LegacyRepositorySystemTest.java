@@ -17,6 +17,7 @@ package org.apache.maven.repository;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -31,14 +32,18 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import javax.inject.Inject;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -48,8 +53,9 @@ import org.eclipse.aether.repository.LocalRepository;
 public class LegacyRepositorySystemTest
     extends PlexusTestCase
 {
+    @Inject
     private RepositorySystem repositorySystem;
-
+    @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
 
     @Override
@@ -62,20 +68,13 @@ public class LegacyRepositorySystemTest
 
     @Override
     protected void setUp()
-        throws Exception
+            throws Exception
     {
         super.setUp();
-        repositorySystem = lookup( RepositorySystem.class, "default" );
-        resolutionErrorHandler = lookup( ResolutionErrorHandler.class );
-    }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        resolutionErrorHandler = null;
-        super.tearDown();
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
     }
 
     protected List<ArtifactRepository> getRemoteRepositories()

@@ -21,17 +21,25 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
+
+import javax.inject.Inject;
 
 /**
  * @author Jason van Zyl
@@ -41,6 +49,7 @@ public abstract class AbstractMavenProjectTestCase
 {
     protected ProjectBuilder projectBuilder;
 
+    @Inject
     protected RepositorySystem repositorySystem;
 
     @Override
@@ -51,10 +60,15 @@ public abstract class AbstractMavenProjectTestCase
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Override
     protected void setUp()
-        throws Exception
+            throws Exception
     {
         super.setUp();
+
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
 
         if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
         {
@@ -65,8 +79,6 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( ProjectBuilder.class );
         }
-
-        repositorySystem = lookup( RepositorySystem.class );
     }
 
     @Override

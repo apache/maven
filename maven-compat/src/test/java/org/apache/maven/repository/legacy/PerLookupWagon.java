@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 /**
  * Wagon with per-lookup instantiation strategy.
  */
-@Named("perlookup")
+@Named( "perlookup" )
 public class PerLookupWagon
     extends WagonMock
 {

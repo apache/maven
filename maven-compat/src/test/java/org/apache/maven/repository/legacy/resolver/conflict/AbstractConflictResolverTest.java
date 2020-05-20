@@ -27,9 +27,11 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
+import javax.inject.Inject;
 import java.util.Collections;
 
 /**
@@ -54,6 +56,7 @@ public abstract class AbstractConflictResolverTest
 
     private final String roleHint;
 
+    @Inject
     private ArtifactFactory artifactFactory;
 
     private ConflictResolver conflictResolver;
@@ -76,14 +79,16 @@ public abstract class AbstractConflictResolverTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    /*
-     * @see junit.framework.TestCase#setUp()
-     */
-    protected void setUp() throws Exception
+    @Override
+    protected void setUp()
+            throws Exception
     {
         super.setUp();
 
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+
         conflictResolver = (ConflictResolver) lookup( ConflictResolver.ROLE, roleHint );
 
         a1 = createArtifact( "a", "1.0" );
@@ -100,7 +105,6 @@ public abstract class AbstractConflictResolverTest
         a2 = null;
         b1 = null;
 
-        artifactFactory = null;
         conflictResolver = null;
 
         super.tearDown();

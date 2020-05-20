@@ -22,6 +22,7 @@ package org.apache.maven.repository.legacy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -44,9 +45,12 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -54,12 +58,15 @@ import org.codehaus.plexus.util.FileUtils;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
-    private DefaultWagonManager wagonManager;
+    @Inject
+    private WagonManager wagonManager;
 
-    private TransferListener transferListener = new Debug();
+    private final TransferListener transferListener = new Debug();
 
+    @Inject
     private ArtifactFactory artifactFactory;
 
+    @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Override
@@ -70,22 +77,15 @@ public class DefaultWagonManagerTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Override
     protected void setUp()
-        throws Exception
+            throws Exception
     {
         super.setUp();
-        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );
-        artifactFactory = lookup( ArtifactFactory.class );
-        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
-    }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        wagonManager = null;
-        artifactFactory = null;
-        super.tearDown();
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
     }
 
     public void testUnnecessaryRepositoryLookup()
@@ -161,8 +161,7 @@ public class DefaultWagonManagerTest
     }
 
     public void testGetRemoteJar()
-        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
-        AuthorizationException
+        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "jar" );
 

@@ -20,35 +20,45 @@ package org.apache.maven.repository;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.settings.Mirror;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+
+import javax.inject.Inject;
 
 public class MirrorProcessorTest
     extends PlexusTestCase
 {
+    @Inject
     private DefaultMirrorSelector mirrorSelector;
+    @Inject
     private ArtifactRepositoryFactory repositorySystem;
 
-    protected void setUp()
-        throws Exception
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        mirrorSelector = (DefaultMirrorSelector) lookup( MirrorSelector.class );
-        repositorySystem = lookup( ArtifactRepositoryFactory.class );
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
+    protected void setUp()
+            throws Exception
     {
-        mirrorSelector = null;
-        repositorySystem = null;
+        super.setUp();
 
-        super.tearDown();
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
     }
 
     public void testExternalURL()

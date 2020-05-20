@@ -24,21 +24,16 @@ import java.io.File;
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 
+import javax.inject.Inject;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public class ArtifactInstallerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactInstaller artifactInstaller;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactInstaller = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
-    }
 
     protected String component()
     {

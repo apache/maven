@@ -20,12 +20,18 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 
@@ -42,16 +48,21 @@ public class ProjectClasspathTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    public void setUp()
-        throws Exception
+    @Override
+    protected void setUp()
+            throws Exception
     {
+        super.setUp();
+
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+
         ArtifactResolver resolver = lookup( ArtifactResolver.class, "classpath" );
         DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)lookup(ArtifactDescriptorReader.class);
         pomReader.setArtifactResolver( resolver );
 
         projectBuilder = lookup( ProjectBuilder.class, "classpath" );
-
-        repositorySystem = lookup( RepositorySystem.class );
     }
 
     @Override

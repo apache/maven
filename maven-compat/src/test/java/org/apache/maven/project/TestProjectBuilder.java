@@ -23,7 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Named("classpath")
+@Named( "classpath" )
 @Singleton
 public class TestProjectBuilder
     extends DefaultProjectBuilder

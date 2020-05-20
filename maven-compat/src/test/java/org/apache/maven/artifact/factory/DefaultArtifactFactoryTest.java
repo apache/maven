@@ -21,13 +21,24 @@ package org.apache.maven.artifact.factory;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+import org.eclipse.aether.RepositorySystemSession;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 public class DefaultArtifactFactoryTest
     extends PlexusTestCase
 {
+
+    @Inject
+    ArtifactFactory factory;
 
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
@@ -37,10 +48,19 @@ public class DefaultArtifactFactoryTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    public void testPropagationOfSystemScopeRegardlessOfInheritedScope() throws Exception
+    @Override
+    protected void setUp()
+            throws Exception
     {
-        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        super.setUp();
 
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+    }
+
+    public void testPropagationOfSystemScopeRegardlessOfInheritedScope()
+    {
         Artifact artifact = factory.createDependencyArtifact( "test-grp", "test-artifact", VersionRange.createFromVersion("1.0"), "type", null, "system", "provided" );
         Artifact artifact2 = factory.createDependencyArtifact( "test-grp", "test-artifact-2", VersionRange.createFromVersion("1.0"), "type", null, "system", "test" );
         Artifact artifact3 = factory.createDependencyArtifact( "test-grp", "test-artifact-3", VersionRange.createFromVersion("1.0"), "type", null, "system", "runtime" );
