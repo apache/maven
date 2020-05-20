@@ -17,24 +17,17 @@ package org.apache.maven;
 
 
 import org.apache.maven.exception.ExceptionHandler;
-import org.codehaus.plexus.component.annotations.Requirement;
+
+import javax.inject.Inject;
 
 public class MavenTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private Maven maven;
 
-    @Requirement
+    @Inject
     private ExceptionHandler exceptionHandler;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        maven = lookup( Maven.class );
-        exceptionHandler = lookup( ExceptionHandler.class );
-    }
 
     @Override
     protected void tearDown()

@@ -31,21 +31,15 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+
+import javax.inject.Inject;
 
 public class PluginManagerTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private DefaultBuildPluginManager pluginManager;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        pluginManager = (DefaultBuildPluginManager) lookup( BuildPluginManager.class );
-    }
 
     @Override
     protected void tearDown()

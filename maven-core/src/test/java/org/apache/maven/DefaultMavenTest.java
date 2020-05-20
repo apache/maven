@@ -3,6 +3,8 @@ package org.apache.maven;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 
+import javax.inject.Inject;
+
 import static java.util.Arrays.asList;
 
 /*
@@ -25,10 +27,12 @@ import static java.util.Arrays.asList;
  */
 public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase{
 
+    @Inject
+    private Maven maven;
+
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
             throws Exception
     {
-        Maven maven = getContainer().lookup( Maven.class );
         MavenExecutionRequest request = createMavenExecutionRequest( getProject( "cyclic-reference" ) ).setGoals( asList("validate") );
 
         MavenExecutionResult result = maven.execute( request );

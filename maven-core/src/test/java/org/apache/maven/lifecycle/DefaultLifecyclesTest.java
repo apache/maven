@@ -17,8 +17,8 @@ package org.apache.maven.lifecycle;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ import java.util.List;
 public class DefaultLifecyclesTest
     extends PlexusTestCase
 {
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
     @Override
@@ -56,7 +56,6 @@ public class DefaultLifecyclesTest
     }
 
     public void testLifecycle()
-        throws Exception
     {
         final List<Lifecycle> cycles = defaultLifeCycles.getLifeCycles();
         assertNotNull( cycles );

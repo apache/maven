@@ -322,15 +322,8 @@ public class MavenCliTest
                 super.customizeContainer(container);
                 container.addComponent(mock(Maven.class), "org.apache.maven.Maven");
 
-                ((DefaultPlexusContainer)container).addPlexusInjector(Collections.<PlexusBeanModule>emptyList(),
-                        new Module()
-                        {
-                            public void configure( final Binder binder )
-                            {
-                                binder.bind( EventSpyDispatcher.class ).toInstance( eventSpyDispatcherMock );
-                            }
-                        }
-                    );
+                ((DefaultPlexusContainer)container).addPlexusInjector(Collections.emptyList(),
+                        binder -> binder.bind( EventSpyDispatcher.class ).toInstance( eventSpyDispatcherMock ) );
             }
         };
 

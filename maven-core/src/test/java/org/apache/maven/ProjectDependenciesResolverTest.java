@@ -27,20 +27,14 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
+
+import javax.inject.Inject;
 
 public class ProjectDependenciesResolverTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver resolver;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        resolver = lookup( ProjectDependenciesResolver.class );
-    }
 
     @Override
     protected void tearDown()
