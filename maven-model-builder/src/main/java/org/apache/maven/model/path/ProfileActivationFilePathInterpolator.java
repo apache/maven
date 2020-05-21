@@ -23,12 +23,16 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
 /**
- * TODO(dehasi): Add javadoc
+ * Interpolates path for {@link org.apache.maven.model.ActivationFile}.
+ *
+ * @author Ravil Galeyev
  */
 public interface ProfileActivationFilePathInterpolator
 {
     /**
-     * TODO(dehasi): Add javadoc
+     * Interpolates given {@code path}.
+     * 
+     * @return absolute path or {@code null} if the input was {@code null}.
      */
     String interpolate( String path, ProfileActivationContext context ) throws InterpolationException;
 }

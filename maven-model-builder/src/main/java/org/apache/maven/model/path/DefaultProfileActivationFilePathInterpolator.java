@@ -31,7 +31,9 @@ import javax.inject.Singleton;
 import java.io.File;
 
 /**
- * TODO(dehasi): Add javadoc
+ * Interpolates path.
+ *
+ * @author Ravil Galeyev
  */
 @Named
 @Singleton
@@ -46,9 +48,7 @@ public class DefaultProfileActivationFilePathInterpolator implements ProfileActi
         return this;
     }
 
-    /**
-     * TODO(dehasi): Add javadoc
-     */
+    /** {@inheritDoc} */
     @Override
     public String interpolate( String path, ProfileActivationContext context ) throws InterpolationException
     {
