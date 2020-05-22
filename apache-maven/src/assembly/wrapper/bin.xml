@@ -19,15 +19,25 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>script</id>
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+  <id>bin</id>
   <formats>
     <format>tar.gz</format>
     <format>zip</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <includes>
+        <include>org.apache.maven:maven-wrapper:jar:*</include>
+      </includes>
+      <outputDirectory>.mvn/wrapper</outputDirectory>
+      <outputFileNameMapping>maven-wrapper.jar</outputFileNameMapping>
+    </dependencySet>
+  </dependencySets>  
   <files>
     <file>
       <source>src/assembly/shared/mvnwDebug.cmd</source>
@@ -41,13 +51,25 @@ under the License.
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>src/assembly/shared/mvnw.cmd</source>
+      <sources>
+        <source>src/assembly/shared/validate.cmd</source>
+        <source>src/assembly/shared/init.cmd</source>
+        <source>src/assembly/shared/mvnwlauncher.cmd</source>
+        <source>src/assembly/shared/run.cmd</source>
+      </sources>
+      <destName>mvnw.cmd</destName>
       <outputDirectory>.</outputDirectory>
       <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
     </file>
     <file>
-      <source>src/assembly/shared/mvnw</source>
+      <sources>
+        <source>src/assembly/shared/validate</source>
+        <source>src/assembly/shared/init</source>
+        <source>src/assembly/shared/mvnwlauncher</source>
+        <source>src/assembly/shared/run</source>
+      </sources>
+      <destName>mvnw</destName>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -56,7 +78,7 @@ under the License.
   </files>
   <fileSets>
     <fileSet>
-      <directory>src/assembly/shared</directory>
+      <directory>src/assembly/wrapper/shared</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
         <include>.mvn/**</include>
