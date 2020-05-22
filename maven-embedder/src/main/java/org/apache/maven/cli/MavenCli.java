@@ -1032,18 +1032,15 @@ public class MavenCli
 
             boolean resumeFileCreated = buildResumptionManager.persistResumptionData( result );
 
-            slf4jLogger.error( "" );
-            slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-
             List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
             if ( resumeFileCreated )
             {
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -r " ).toString() );
+                logBuildResumeHint( "mvn <args> -r " );
             }
             else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
             {
                 String resumeFromSelector = buildResumptionManager.getResumeFromSelector( sortedProjects, project );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -rf " + resumeFromSelector ).toString() );
+                logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1061,6 +1058,13 @@ public class MavenCli
         {
             return 0;
         }
+    }
+
+    private void logBuildResumeHint( String resumeBuildHint )
+    {
+        slf4jLogger.error( "" );
+        slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
+        slf4jLogger.error( buffer().a( "  " ).strong( resumeBuildHint ).toString() );
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
