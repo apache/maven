@@ -48,6 +48,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.execution.BuildResumptionManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -1029,7 +1030,7 @@ public class MavenCli
                 }
             }
 
-            boolean resumeFileCreated = buildResumptionManager.createResumptionFile( result );
+            boolean resumeFileCreated = buildResumptionManager.persistResumptionData( result );
 
             slf4jLogger.error( "" );
             slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
@@ -1526,6 +1527,11 @@ public class MavenCli
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
+        }
+
+        if ( commandLine.hasOption( CLIManager.RESUME ) )
+        {
+            request.setResume();
         }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )

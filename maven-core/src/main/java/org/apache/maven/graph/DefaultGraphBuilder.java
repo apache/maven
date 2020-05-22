@@ -38,6 +38,7 @@ import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildResumptionManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
@@ -73,6 +74,9 @@ public class DefaultGraphBuilder
     @Inject
     protected ProjectBuilder projectBuilder;
 
+    @Inject
+    private BuildResumptionManager buildResumptionManager;
+
     @Override
     public Result<ProjectDependencyGraph> build( MavenSession session )
     {
@@ -84,6 +88,7 @@ public class DefaultGraphBuilder
             {
                 final List<MavenProject> projects = getProjectsForMavenReactor( session );
                 validateProjects( projects );
+                enrichRequestFromResumptionData( projects, session.getRequest() );
                 result = reactorDependencyGraph( session, projects );
             }
 
@@ -339,6 +344,18 @@ public class DefaultGraphBuilder
         }
 
         return result;
+    }
+
+    private void enrichRequestFromResumptionData( List<MavenProject> projects, MavenExecutionRequest request )
+    {
+        if ( request.isResume() )
+        {
+            projects.stream()
+                    .filter( MavenProject::isExecutionRoot )
+                    .findFirst()
+                    .ifPresent( rootProject ->
+                            buildResumptionManager.applyResumptionData( request, rootProject ) );
+        }
     }
 
     private String formatProjects( List<MavenProject> projects )

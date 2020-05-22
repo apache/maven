@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,16 +19,19 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.maven.execution.BuildFailure;
-import org.apache.maven.execution.BuildSuccess;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static java.util.Arrays.asList;
@@ -36,9 +39,14 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@RunWith( MockitoJUnitRunner.class )
 public class BuildResumptionManagerTest
 {
-    private final BuildResumptionManager buildResumptionManager = new BuildResumptionManager();
+    @Mock
+    private Logger logger;
+
+    @InjectMocks
+    private BuildResumptionManager buildResumptionManager;
 
     private MavenExecutionResult result;
 
@@ -109,6 +117,46 @@ public class BuildResumptionManagerTest
         Properties properties = buildResumptionManager.determineResumptionProperties( result );
 
         assertThat( properties.get( "excludedProjects" ), is( "test:B, test:C" ) );
+    }
+
+    @Test
+    public void resumeFromPropertyGetsApplied()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        Properties properties = new Properties();
+        properties.setProperty( "resumeFrom", ":module-a" );
+
+        buildResumptionManager.applyResumptionProperties( request, properties );
+
+        assertThat( request.getResumeFrom(), is( ":module-a" ) );
+    }
+
+    @Test
+    public void resumeFromPropertyDoesNotOverrideExistingRequestParameters()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setResumeFrom( ":module-b" );
+        Properties properties = new Properties();
+        properties.setProperty( "resumeFrom", ":module-a" );
+
+        buildResumptionManager.applyResumptionProperties( request, properties );
+
+        assertThat( request.getResumeFrom(), is( ":module-b" ) );
+    }
+
+    @Test
+    public void excludedProjectsFromPropertyGetsAddedToExistingRequestParameters()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        List<String> excludedProjects = new ArrayList<>();
+        excludedProjects.add( ":module-a" );
+        request.setExcludedProjects( excludedProjects );
+        Properties properties = new Properties();
+        properties.setProperty( "excludedProjects", ":module-b, :module-c" );
+
+        buildResumptionManager.applyResumptionProperties( request, properties );
+
+        assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
     }
 
     private MavenProject createMavenProject( String artifactId )

@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,7 +21,6 @@ package org.apache.maven.cli;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
@@ -31,10 +30,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,16 +44,24 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 
+/**
+ * This class contains most of the logic needed for the --resume / -r feature.
+ * It persists information in a properties file to ensure newer builds, using the -r feature,
+ *   skip successfully built projects.
+ */
 @Named
 @Singleton
-class BuildResumptionManager
+public class BuildResumptionManager
 {
     private static final String RESUME_PROPERTIES_FILENAME = "resume.properties";
+    private static final String RESUME_FROM_PROPERTY = "resumeFrom";
+    private static final String EXCLUDED_PROJECTS_PROPERTY = "excludedProjects";
+    private static final String PROPERTY_DELIMITER = ", ";
 
     @Inject
     private Logger logger;
-
-    public boolean createResumptionFile( MavenExecutionResult result )
+    
+    public boolean persistResumptionData( MavenExecutionResult result )
     {
         Properties properties = determineResumptionProperties( result );
 
@@ -63,6 +72,42 @@ class BuildResumptionManager
         }
 
         return writeResumptionFile( result, properties );
+    }
+
+    public void applyResumptionData( MavenExecutionRequest request, MavenProject rootProject )
+    {
+        Properties properties = loadResumptionFile( rootProject.getBuild().getDirectory() );
+        applyResumptionProperties( request, properties );
+    }
+
+    /**
+     * A helper method to determine the value to resume the build with {@code -rf} taking into account the edge case
+     *   where multiple modules in the reactor have the same artifactId.
+     * <p>
+     * {@code -rf :artifactId} will pick up the first module which matches, but when multiple modules in the reactor
+     *   have the same artifactId, effective failed module might be later in build reactor.
+     * This means that developer will either have to type groupId or wait for build execution of all modules which
+     *   were fine, but they are still before one which reported errors.
+     * <p>Then the returned value is {@code groupId:artifactId} when there is a name clash and
+     * {@code :artifactId} if there is no conflict.
+     *
+     * @param mavenProjects Maven projects which are part of build execution.
+     * @param failedProject Project which has failed.
+     * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general
+     * and {@code groupId:artifactId} when there is a name clash).
+     */
+    public String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
+    {
+        boolean hasOverlappingArtifactId = mavenProjects.stream()
+                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
+                .count() > 1;
+
+        if ( hasOverlappingArtifactId )
+        {
+            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
+        }
+
+        return ":" + failedProject.getArtifactId();
     }
 
     @VisibleForTesting
@@ -77,8 +122,8 @@ class BuildResumptionManager
             Optional<String> resumeFrom = getResumeFrom( result, resumeFromProject );
             Optional<String> projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProject );
 
-            resumeFrom.ifPresent( value -> properties.setProperty( "resumeFrom", value ) );
-            projectsToSkip.ifPresent( value -> properties.setProperty( "excludedProjects", value ) );
+            resumeFrom.ifPresent( value -> properties.setProperty( RESUME_FROM_PROPERTY, value ) );
+            projectsToSkip.ifPresent( value -> properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, value ) );
         }
         else
         {
@@ -144,7 +189,7 @@ class BuildResumptionManager
                 .filter( project -> result.getBuildSummary( project ) != null )
                 .filter( project -> hasNoDependencyOnProjects( project, failedProjectsGAList ) )
                 .map( project -> String.format( "%s:%s", project.getGroupId(), project.getArtifactId() ) )
-                .collect( Collectors.joining( ", " ) );
+                .collect( Collectors.joining( PROPERTY_DELIMITER ) );
 
         if ( !StringUtils.isEmpty( projectsToSkip ) )
         {
@@ -159,32 +204,6 @@ class BuildResumptionManager
         return project.getDependencies().stream()
                 .map( GroupArtifactPair::new )
                 .noneMatch( projectsGAs::contains );
-    }
-
-    /**
-     * A helper method to determine the value to resume the build with {@code -rf} taking into account the edge case where multiple modules in the reactor have the same artifactId.
-     * <p>
-     * {@code -rf :artifactId} will pick up the first module which matches, but when multiple modules in the reactor have the same artifactId, effective failed module might be later in build reactor.
-     * This means that developer will either have to type groupId or wait for build execution of all modules which were fine, but they are still before one which reported errors.
-     * <p>Then the returned value is {@code groupId:artifactId} when there is a name clash and
-     * {@code :artifactId} if there is no conflict.
-     *
-     * @param mavenProjects Maven projects which are part of build execution.
-     * @param failedProject Project which has failed.
-     * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general and {@code groupId:artifactId} when there is a name clash).
-     */
-    public String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
-    {
-        boolean hasOverlappingArtifactId = mavenProjects.stream()
-                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
-                .count() > 1;
-
-        if ( hasOverlappingArtifactId )
-        {
-            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
-        }
-
-        return ":" + failedProject.getArtifactId();
     }
 
     private boolean writeResumptionFile( MavenExecutionResult result, Properties properties )
@@ -205,6 +224,47 @@ class BuildResumptionManager
         }
 
         return true;
+    }
+
+    private Properties loadResumptionFile( String rootBuildDirectory )
+    {
+        Properties properties = new Properties();
+        Path path = Paths.get( rootBuildDirectory, RESUME_PROPERTIES_FILENAME );
+        if ( !Files.exists( path ) )
+        {
+            logger.warn( "The " + path + " file does not exist. The --resume / -r feature will not work." );
+            return properties;
+        }
+
+        try ( Reader reader = Files.newBufferedReader( path ) )
+        {
+            properties.load( reader );
+        }
+        catch ( IOException e )
+        {
+            logger.warn( "Unable to read " + path + ". The --resume / -r feature will not work." );
+        }
+
+        return properties;
+    }
+
+    @VisibleForTesting
+    void applyResumptionProperties( MavenExecutionRequest request, Properties properties )
+    {
+        if ( properties.containsKey( RESUME_FROM_PROPERTY ) && StringUtils.isEmpty( request.getResumeFrom() ) )
+        {
+            String propertyValue = properties.getProperty( RESUME_FROM_PROPERTY );
+            request.setResumeFrom( propertyValue );
+            logger.info( "Resuming from " + propertyValue + " due to the --resume / -r feature." );
+        }
+
+        if ( properties.containsKey( EXCLUDED_PROJECTS_PROPERTY ) )
+        {
+            String propertyValue = properties.getProperty( EXCLUDED_PROJECTS_PROPERTY );
+            String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
+            request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
+            logger.info( "Additionally excluding projects '" + propertyValue + "' due to the --resume / -r feature." );
+        }
     }
 
     private static class GroupArtifactPair
