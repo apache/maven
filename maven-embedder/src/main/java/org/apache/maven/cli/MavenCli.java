@@ -1063,35 +1063,6 @@ public class MavenCli
         }
     }
 
-    /**
-     * A helper method to determine the value to resume the build with {@code -rf} taking into account the
-     * edge case where multiple modules in the reactor have the same artifactId.
-     * <p>
-     * {@code -rf :artifactId} will pick up the first module which matches, but when multiple modules in the
-     * reactor have the same artifactId, effective failed module might be later in build reactor.
-     * This means that developer will either have to type groupId or wait for build execution of all modules
-     * which were fine, but they are still before one which reported errors.
-     * <p>Then the returned value is {@code groupId:artifactId} when there is a name clash and
-     * {@code :artifactId} if there is no conflict.
-     *
-     * @param mavenProjects Maven projects which are part of build execution.
-     * @param failedProject Project which has failed.
-     * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in
-     *    general and {@code groupId:artifactId} when there is a name clash).
-     */
-    private String getResumeFrom( List<MavenProject> mavenProjects, MavenProject failedProject )
-    {
-        for ( MavenProject buildProject : mavenProjects )
-        {
-            if ( failedProject.getArtifactId().equals( buildProject.getArtifactId() ) && !failedProject.equals(
-                    buildProject ) )
-            {
-                return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
-            }
-        }
-        return ":" + failedProject.getArtifactId();
-    }
-
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
                              boolean showErrors )
     {
