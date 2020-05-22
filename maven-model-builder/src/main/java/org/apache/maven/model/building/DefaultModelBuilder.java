@@ -307,11 +307,11 @@ public class DefaultModelBuilder
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
-            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
+            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( tmpModel.getProfiles(),
                                                                                  profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
+            Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
             // profile injection

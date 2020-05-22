@@ -21,6 +21,8 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import junit.framework.TestCase;
@@ -54,6 +56,26 @@ public class DefaultModelBuilderFactoryTest
         Xpp3Dom conf = (Xpp3Dom) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
         assertEquals( "1.5", conf.getChild( "source" ).getValue() );
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
+    }
+
+    public void testRawModelProfileFileActivationNotInterpolated()
+        throws Exception
+    {
+        final ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        final DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setProcessPlugins( true );
+        request.setPomFile( getPom( "simple" ) );
+
+        final ModelBuildingResult result = builder.build( request );
+
+        final Model rawModel = result.getRawModel();
+        assertEquals( 2, rawModel.getProfiles().size() );
+
+        final Profile profile = rawModel.getProfiles().get( 1 );
+        assertEquals( "file", profile.getId() );
+        assertNotNull( profile.getActivation().getFile() );
+        assertEquals( "simple.xml", profile.getActivation().getFile().getExists() );
     }
 
 }
