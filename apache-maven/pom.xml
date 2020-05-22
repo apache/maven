@@ -128,7 +128,20 @@ under the License.
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
             <excludes combine.children="append">
-              <exclude>src/bin/m2.conf</exclude>
+              <exclude>src/assembly/maven/bin/m2.conf</exclude>
+              <!-- these are partial scripts, resulting in mvn/mwnw scripts -->
+              <exclude>src/assembly/shared/init</exclude>
+              <exclude>src/assembly/shared/init.cmd</exclude>
+              <exclude>src/assembly/shared/mvnlauncher</exclude>
+              <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
+              <exclude>src/assembly/shared/mvnvalidate</exclude>
+              <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
+              <exclude>src/assembly/shared/mvnwlauncher</exclude>
+              <exclude>src/assembly/shared/mvnwlauncher.cmd</exclude>
+              <exclude>src/assembly/shared/run</exclude>
+              <exclude>src/assembly/shared/run.cmd</exclude>
+              <exclude>src/assembly/wrapper/*/download</exclude>
+              <exclude>src/assembly/wrapper/*/download.cmd</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -195,7 +208,7 @@ under the License.
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assembly/bin.xml</descriptor>
+                <descriptor>src/assembly/maven/bin.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
@@ -263,7 +276,7 @@ under the License.
                   <attach>false</attach>
                   <outputDirectory>${distributionTargetDir}</outputDirectory>
                   <descriptors>
-                    <descriptor>src/main/assembly/dir.xml</descriptor>
+                    <descriptor>src/assembly/maven/dir.xml</descriptor>
                   </descriptors>
                 </configuration>
               </execution>
@@ -287,7 +300,7 @@ under the License.
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>src/main/assembly/src.xml</descriptor>
+                    <descriptor>src/assembly/maven/src.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
@@ -322,6 +335,12 @@ under the License.
             </configuration>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>versionlessMavenDist</id>
+      <build>
+        <finalName>${project.artifactId}</finalName>
       </build>
     </profile>
   </profiles>

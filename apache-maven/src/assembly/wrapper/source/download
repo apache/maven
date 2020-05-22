@@ -1,0 +1,34 @@
+##########################################################################################
+# Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+# This allows using the maven wrapper in projects that prohibit checking in binary data.
+##########################################################################################
+if [ -r "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar" ]; then
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Found .mvn/wrapper/maven-wrapper.jar"
+    fi
+else
+    javaClass="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/MavenWrapperDownloader.java"
+    # For Cygwin, switch paths to Windows format before running javac
+    if $cygwin; then
+      javaClass=`cygpath --path --windows "$javaClass"`
+    fi
+    if [ -e "$javaClass" ]; then
+        if [ ! -e "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+            if [ "$MVNW_VERBOSE" = true ]; then
+              echo " - Compiling MavenWrapperDownloader.java ..."
+            fi
+            # Compiling the Java class
+            ("$JAVA_HOME/bin/javac" "$javaClass")
+        fi
+        if [ -e "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+            # Running the downloader
+            if [ "$MVNW_VERBOSE" = true ]; then
+              echo " - Running MavenWrapperDownloader.java ..."
+            fi
+            ("$JAVA_HOME/bin/java" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+        fi
+    fi
+fi
+##########################################################################################
+# End of extension
+##########################################################################################
