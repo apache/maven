@@ -57,6 +57,12 @@ under the License.
   
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
+
+  To test with the maven wrapper, you should add the wrapperDistroDir too.
+
+    mvn clean test -Prun-its -Dmaven.repo.local=<path-to-local-repo>  -DmavenDistro=<path-to-bin-archive> -DwrapperDistroDir=<path-to-wrapper-distro-directory> -DmavenWrapper=<path-to-wrapper-jar>
+	
+  Tests can pick up the maven.wrapper.distrodir system property to unpack it into their testDir to verify the wrapper.
   
   If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user, proxy.pass and
   proxy.nonProxyHosts to specify the required proxy setup for the ITs. Alternatively, set the system property
@@ -141,6 +147,17 @@ under the License.
       <artifactId>guava</artifactId>
       <version>16.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-archiver</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+      <version>0.3.4</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -175,6 +192,14 @@ under the License.
             <property>
               <name>maven.it.global-settings.dir</name>
               <value>${project.build.testOutputDirectory}</value>
+            </property>
+            <property>
+              <name>maven.wrapper.distrodir</name>
+              <value>${wrapperDistroDir}</value>
+            </property>
+            <property>
+              <name>maven.distro</name>
+              <value>${mavenDistro}</value>
             </property>
           </systemProperties>
         </configuration>
@@ -445,6 +470,36 @@ under the License.
                     <chmod dir="${mavenHome}/bin" perm="ugo+rx"
                       includes="mvn,mvnDebug" />
                   </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-wrapper</id>
+      <activation>
+        <property>
+          <name>mavenWrapper</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <version>2.5.2</version>
+            <executions>
+              <!-- install, so it can be called via a URL -->
+              <execution>
+                <id>prepare-wrapper</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>install-file</goal>
+                </goals>
+                <configuration>
+                  <file>${mavenWrapper}</file>
                 </configuration>
               </execution>
             </executions>

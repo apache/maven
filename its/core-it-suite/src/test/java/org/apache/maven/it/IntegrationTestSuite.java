@@ -86,7 +86,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITBootstrapTest.class );
 
         /*
-         * Add tests in reverse alpha order by number below. This makes testing new
+         * Add tests in reverse order of implementation. This makes testing new
          * ITs quicker and since it counts down to zero, it's easier to judge how close
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
@@ -107,6 +107,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5937MavenWrapper.class );
         suite.addTestSuite( MavenITmng4660ResumeFromTest.class );
         suite.addTestSuite( MavenITmng4660OutdatedPackagedArtifact.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );

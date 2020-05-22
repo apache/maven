@@ -130,7 +130,7 @@ public abstract class AbstractMavenIntegrationTestCase
      *
      * @return The Maven version or <code>null</code> if unknown.
      */
-    private ArtifactVersion getMavenVersion()
+    protected final ArtifactVersion getMavenVersion()
     {
         if ( mavenVersion == null )
         {

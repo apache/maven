@@ -19,7 +19,7 @@
 
 @REM How JvZ runs the ITs from a clean slate if it would be on Windows
 
-mvn clean install -Prun-its,embedded -Dmaven.repo.local=%cd%\repo
+mvn clean install -U -Prun-its,embedded -Dmaven.repo.local=%cd%\repo
 
 @REM If behind a proxy try this..
 
