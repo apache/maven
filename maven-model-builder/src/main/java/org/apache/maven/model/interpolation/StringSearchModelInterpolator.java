@@ -365,7 +365,7 @@ public class StringSearchModelInterpolator
 
                 String interpolated = ctx.interpolate( value );
 
-                if ( !interpolated.equals( value ) )
+                if ( interpolated != null && !interpolated.equals( value ) )
                 {
                     field.set( target, interpolated );
                 }
@@ -459,7 +459,7 @@ public class StringSearchModelInterpolator
                     {
                         String interpolated = ctx.interpolate( (String) value );
 
-                        if ( !interpolated.equals( value ) )
+                        if ( interpolated != null && !interpolated.equals( value ) )
                         {
                             try
                             {
