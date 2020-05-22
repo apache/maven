@@ -100,6 +100,14 @@ class BuildResumptionManager
                 .collect( Collectors.toList() );
     }
 
+    /**
+     * Determine the project where the next build can be resumed from.
+     * If the failed project is the first project of the build,
+     * it does not make sense to use --resume-from, so the result will be empty.
+     * @param result The result of the Maven build.
+     * @param failedProject The first failed project of the build.
+     * @return An optional containing the resume-from suggestion.
+     */
     private Optional<String> getResumeFrom( MavenExecutionResult result, MavenProject failedProject )
     {
         List<MavenProject> allSortedProjects = result.getTopologicallySortedProjects();
