@@ -167,13 +167,15 @@ class BuildResumptionManager
      */
     public String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
     {
-        for ( MavenProject buildProject : mavenProjects )
+        boolean hasOverlappingArtifactId = mavenProjects.stream()
+                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
+                .count() > 1;
+
+        if ( hasOverlappingArtifactId )
         {
-            if ( failedProject.getArtifactId().equals( buildProject.getArtifactId() ) && !failedProject.equals( buildProject ) )
-            {
-                return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
-            }
+            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
         }
+
         return ":" + failedProject.getArtifactId();
     }
 
