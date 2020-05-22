@@ -94,9 +94,9 @@ under the License.
     <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
-    <module>apache-maven</module>
+    <module>apache-maven</module> <!-- rename to apache-maven/maven.pom after RAT-268 -->
     <module>maven-wrapper</module>
-    <module>maven-wrapper/maven-wrapper.pom</module>
+    <module>apache-maven/maven-wrapper.pom</module>
   </modules>
 
   <scm>
@@ -488,6 +488,11 @@ under the License.
           </executions>
         </plugin>
         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
@@ -634,6 +639,7 @@ under the License.
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <executions>
               <execution>

@@ -60,14 +60,13 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             ]) {
 			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
 			    sh "mvn clean"
-                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true"
+                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
             }
             dir ('apache-maven/target') {
-                sh "mv apache-maven-*-bin.zip apache-maven-dist.zip"
-                stash includes: 'apache-maven-dist.zip', name: 'maven-dist'
+                stash includes: 'apache-maven-bin.zip,apache-maven-wrapper-*.zip', name: 'maven-dist'
             }
             dir ('maven-wrapper/target') {
-                stash includes: 'apache-maven-wrapper-*.zip,maven-wrapper.jar', name: 'wrapper-dist'
+                stash includes: 'maven-wrapper.jar', name: 'wrapper-dist'
             }
         }
 
@@ -104,16 +103,12 @@ for (String os in runITsOses) {
                         dir('dists') {
                           unstash 'maven-dist'
                           unstash 'wrapper-dist'
-
-                          if (isUnix()) {
-                            sh 'zipinfo apache-maven-wrapper-3.7.0-SNAPSHOT-bin.zip'
-                          }
                         }
                         try {
                             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
                                 junitPublisher(ignoreAttachments: false)
                             ]) {
-                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-dist.zip -Dmaven.test.failure.ignore=true -DmavenWrapper=$WORK_DIR/dists/maven-wrapper.jar -DwrapperDistroDir=${WORK_DIR}/dists"
+                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore=true -DmavenWrapper=$WORK_DIR/dists/maven-wrapper.jar -DwrapperDistroDir=${WORK_DIR}/dists"
 
                                 if (isUnix()) {
                                     sh 'df -hT'
