@@ -25,6 +25,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -37,6 +38,8 @@ import java.util.concurrent.FutureTask;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * StringSearchModelInterpolatorTest - not in use
@@ -48,21 +51,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest
 {
-
-    protected ModelInterpolator interpolator;
-
     @Override
-    protected void setUp()
-        throws Exception
+    public void setUp()
     {
         super.setUp();
         interpolator = new StringSearchModelInterpolator();
-    }
-
-
-    protected ModelInterpolator createInterpolator( org.apache.maven.model.path.PathTranslator translator )
-    {
-        return this.interpolator;
     }
 
     protected ModelInterpolator createInterpolator()
@@ -70,6 +63,7 @@ public class StringSearchModelInterpolatorTest
         return this.interpolator;
     }
 
+    @Test
     public void testInterpolateStringArray()
     {
         Model model = new Model();
@@ -99,6 +93,7 @@ public class StringSearchModelInterpolatorTest
         return config;
     }
 
+    @Test
     public void testInterpolateObjectWithStringArrayField()
     {
         Model model = new Model();
@@ -123,6 +118,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", obj.values[1] );
     }
 
+    @Test
     public void testInterpolateObjectWithStringListField()
     {
         Model model = new Model();
@@ -149,6 +145,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", obj.values.get( 1 ) );
     }
 
+    @Test
     public void testInterpolateObjectWithStringListFieldAndOneLiteralValue()
     {
         Model model = new Model();
@@ -175,6 +172,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", obj.values.get( 1 ) );
     }
 
+    @Test
     public void testInterpolateObjectWithUnmodifiableStringListField()
     {
         Model model = new Model();
@@ -198,6 +196,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "${key}", obj.values.get( 0 ) );
     }
 
+    @Test
     public void testInterpolateObjectWithStringArrayListField()
     {
         Model model = new Model();
@@ -228,6 +227,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value4", ( (String[]) obj.values.get( 1 ) )[1] );
     }
 
+    @Test
     public void testInterpolateObjectWithStringToStringMapField()
     {
         Model model = new Model();
@@ -254,6 +254,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", obj.values.get( "key2" ) );
     }
 
+    @Test
     public void testInterpolateObjectWithStringToStringMapFieldAndOneLiteralValue()
     {
         Model model = new Model();
@@ -280,6 +281,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", obj.values.get( "key2" ) );
     }
 
+    @Test
     public void testInterpolateObjectWithUnmodifiableStringToStringMapField()
     {
         Model model = new Model();
@@ -303,6 +305,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "${key}", obj.values.get( "key" ) );
     }
 
+    @Test
     public void testInterpolateObjectWithStringToStringArrayMapField()
     {
         Model model = new Model();
@@ -333,6 +336,7 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value4", ( (String[]) obj.values.get( "key2" ) )[1] );
     }
 
+    @Test
     public void testInterpolateObjectWithPomFile()
             throws Exception
     {
@@ -364,6 +368,7 @@ public class StringSearchModelInterpolatorTest
         ) ) );
     }
 
+    @Test
     public void testNotInterpolateObjectWithFile()
             throws Exception
     {
@@ -411,6 +416,7 @@ public class StringSearchModelInterpolatorTest
         return (Map<Class<?>, ?>) field.get( null );
     }
 
+    @Test
     public void testNotInterpolateFile()
             throws Exception
     {
@@ -438,6 +444,7 @@ public class StringSearchModelInterpolatorTest
     }
 
 
+    @Test
     public void testConcurrentInterpolation()
         throws Exception
     {
@@ -451,7 +458,6 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key5", "value5" );
 
         final StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
-
 
         int numItems = 100;
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -496,7 +502,6 @@ public class StringSearchModelInterpolatorTest
 
         return new ObjectWithMixedProtection( values, values2, values3, "${key5}" );
     }
-
 
     private static final class ObjectWithStringArrayField
     {
@@ -567,6 +572,7 @@ public class StringSearchModelInterpolatorTest
         }
     }
 
+    @Test
     public void testFinalFieldsExcludedFromInterpolation()
     {
         Properties props = new Properties();
@@ -578,7 +584,7 @@ public class StringSearchModelInterpolatorTest
         StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
         interpolator.interpolateObject( new ClassWithFinalField(), new Model(), null, request, problems );
 
-        assertProblemFree(  problems );
+        assertProblemFree( problems );
     }
 
     static class ClassWithFinalField
@@ -586,7 +592,8 @@ public class StringSearchModelInterpolatorTest
         public static final String CONSTANT = "${expression}";
     }
 
-    public void testLocationTrackerShouldBeExcludedFromInterpolation()
+    @Test
+    public void locationTrackerShouldBeExcludedFromInterpolation()
     {
         Properties props = new Properties();
         props.setProperty( "expression", "value" );
