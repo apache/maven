@@ -103,6 +103,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -146,6 +147,8 @@ public class MavenCli
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
+
+    private static final String[] DEPRECATED_OPTIONS = { "up", "npu", "cpu", "npr" };
 
     private ClassWorld classWorld;
 
@@ -1648,15 +1651,12 @@ public class MavenCli
 
     private void warnAboutDeprecatedOptionsUsed( final CommandLine commandLine )
     {
-        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
-        for ( String deprecatedOption : deprecatedOptions )
-        {
-            if ( commandLine.hasOption( deprecatedOption ) )
-            {
-                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
-                        deprecatedOption );
-            }
-        }
+        Arrays.stream( DEPRECATED_OPTIONS )
+                .filter( commandLine::hasOption )
+                .forEach( deprecatedOption -> slf4jLogger.warn(
+                        "Command line option -{} is deprecated and will be removed in future Maven versions.",
+                        deprecatedOption )
+                );
     }
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
