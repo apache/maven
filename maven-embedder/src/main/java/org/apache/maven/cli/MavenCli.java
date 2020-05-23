@@ -1434,24 +1434,7 @@ public class MavenCli
             }
         }
 
-        TransferListener transferListener;
-
-        if ( quiet || cliRequest.commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
-        {
-            transferListener = new QuietMavenTransferListener();
-        }
-        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            //
-            // If we're logging to a file then we don't want the console transfer listener as it will spew
-            // download progress all over the place
-            //
-            transferListener = getConsoleTransferListener( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) );
-        }
-        else
-        {
-            transferListener = getBatchTransferListener();
-        }
+        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
 
         ExecutionListener executionListener = new ExecutionEventLogger();
         if ( eventSpyDispatcher != null )
@@ -1469,8 +1452,7 @@ public class MavenCli
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
-            .setExecutionListener( executionListener ).setTransferListener(
-            transferListener ) // default: batch mode which goes along with interactive
+            .setExecutionListener( executionListener )
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
@@ -1630,6 +1612,29 @@ public class MavenCli
         {
             // this is the default behavior.
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+    }
+
+    private TransferListener determineTransferListener( final boolean quiet,
+                                                        final CommandLine commandLine,
+                                                        final MavenExecutionRequest request )
+    {
+        if ( quiet || commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
+        {
+            return new QuietMavenTransferListener();
+        }
+        else if ( request.isInteractiveMode() && !commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            //
+            // If we're logging to a file then we don't want the console transfer listener as it will spew
+            // download progress all over the place
+            //
+            return getConsoleTransferListener( commandLine.hasOption( CLIManager.DEBUG ) );
+        }
+        else
+        {
+            // default: batch mode which goes along with interactive
+            return getBatchTransferListener();
         }
     }
 
