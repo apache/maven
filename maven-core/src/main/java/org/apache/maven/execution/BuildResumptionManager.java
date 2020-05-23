@@ -80,6 +80,19 @@ public class BuildResumptionManager
         applyResumptionProperties( request, properties );
     }
 
+    public void removeResumptionData( MavenProject rootProject )
+    {
+        Path resumeProperties = Paths.get( rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
+        try
+        {
+            Files.deleteIfExists( resumeProperties );
+        }
+        catch ( IOException e )
+        {
+            logger.warn( "Could not delete " + RESUME_PROPERTIES_FILENAME + " file. ", e );
+        }
+    }
+
     /**
      * A helper method to determine the value to resume the build with {@code -rf} taking into account the edge case
      *   where multiple modules in the reactor have the same artifactId.

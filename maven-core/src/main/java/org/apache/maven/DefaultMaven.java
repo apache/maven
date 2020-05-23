@@ -322,6 +322,13 @@ public class DefaultMaven
                 saveResumptionDataWhenApplicable( result, session );
                 return result;
             }
+            else
+            {
+                session.getAllProjects().stream()
+                        .filter( MavenProject::isExecutionRoot )
+                        .findFirst()
+                        .ifPresent( buildResumptionManager::removeResumptionData );
+            }
         }
         finally
         {
