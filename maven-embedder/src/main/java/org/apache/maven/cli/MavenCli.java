@@ -1570,21 +1570,7 @@ public class MavenCli
             request.setExcludedProjects( exclProjects );
         }
 
-        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
-        }
-        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
-        }
-        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
-        }
+        request.setMakeBehavior( determineMakeBehavior( commandLine ) );
 
         String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
 
@@ -1649,6 +1635,26 @@ public class MavenCli
                         "Command line option -{} is deprecated and will be removed in future Maven versions.",
                         deprecatedOption )
                 );
+    }
+
+    private String determineMakeBehavior( final CommandLine cl )
+    {
+        if ( cl.hasOption( CLIManager.ALSO_MAKE ) && !cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
+        }
+        else if ( !cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
+        }
+        else if ( cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_BOTH;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
