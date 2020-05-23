@@ -1406,16 +1406,7 @@ public class MavenCli
             request.setUpdateSnapshots( true ); // default: false
         }
 
-        String globalChecksumPolicy = null;
-
-        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        }
-        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
-        }
+        request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
 
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
@@ -1495,7 +1486,6 @@ public class MavenCli
             .addInactiveProfiles( inactiveProfiles ) // optional
             .setExecutionListener( executionListener ).setTransferListener(
             transferListener ) // default: batch mode which goes along with interactive
-            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
@@ -1650,6 +1640,22 @@ public class MavenCli
         else if ( cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
             return MavenExecutionRequest.REACTOR_MAKE_BOTH;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String determineGlobalCheckPolicy( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         }
         else
         {
