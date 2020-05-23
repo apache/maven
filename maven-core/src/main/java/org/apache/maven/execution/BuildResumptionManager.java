@@ -61,7 +61,7 @@ public class BuildResumptionManager
     @Inject
     private Logger logger;
     
-    public boolean persistResumptionData( MavenExecutionResult result )
+    public boolean persistResumptionData( MavenExecutionResult result, MavenProject rootProject )
     {
         Properties properties = determineResumptionProperties( result );
 
@@ -71,7 +71,7 @@ public class BuildResumptionManager
             return false;
         }
 
-        return writeResumptionFile( result, properties );
+        return writeResumptionFile( rootProject, properties );
     }
 
     public void applyResumptionData( MavenExecutionRequest request, MavenProject rootProject )
@@ -206,9 +206,9 @@ public class BuildResumptionManager
                 .noneMatch( projectsGAs::contains );
     }
 
-    private boolean writeResumptionFile( MavenExecutionResult result, Properties properties )
+    private boolean writeResumptionFile( MavenProject rootProject, Properties properties )
     {
-        Path resumeProperties = Paths.get( result.getProject().getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
+        Path resumeProperties = Paths.get( rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
         try
         {
             Files.createDirectories( resumeProperties.getParent() );

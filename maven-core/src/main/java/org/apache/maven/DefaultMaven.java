@@ -30,12 +30,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildResumptionManager;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -44,6 +46,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.Prerequisites;
@@ -98,6 +101,9 @@ public class DefaultMaven
     @Inject
     @Named( GraphBuilder.HINT )
     private GraphBuilder graphBuilder;
+
+    @Inject
+    private BuildResumptionManager buildResumptionManager;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -312,7 +318,9 @@ public class DefaultMaven
 
             if ( session.getResult().hasExceptions() )
             {
-                return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
+                addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
+                saveResumptionDataWhenApplicable( result, session );
+                return result;
             }
         }
         finally
@@ -346,6 +354,26 @@ public class DefaultMaven
         finally
         {
             Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
+    }
+
+    private void saveResumptionDataWhenApplicable( MavenExecutionResult result, MavenSession session )
+    {
+        List<LifecycleExecutionException> lifecycleExecutionExceptions = result.getExceptions().stream()
+                .filter( LifecycleExecutionException.class::isInstance )
+                .map( LifecycleExecutionException.class::cast )
+                .collect( Collectors.toList() );
+
+        if ( !lifecycleExecutionExceptions.isEmpty() )
+        {
+            session.getAllProjects().stream()
+                    .filter( MavenProject::isExecutionRoot )
+                    .findFirst()
+                    .ifPresent( rootProject ->
+                    {
+                        boolean persisted = buildResumptionManager.persistResumptionData( result, rootProject );
+                        lifecycleExecutionExceptions.forEach( e -> e.setBuildResumptionDataSaved( persisted ) );
+                    } );
         }
     }
 

@@ -992,6 +992,7 @@ public class MavenCli
             Map<String, String> references = new LinkedHashMap<>();
 
             MavenProject project = null;
+            boolean isResumptionDataSaved = false;
 
             for ( Throwable exception : result.getExceptions() )
             {
@@ -1001,7 +1002,9 @@ public class MavenCli
 
                 if ( project == null && exception instanceof LifecycleExecutionException )
                 {
-                    project = ( (LifecycleExecutionException) exception ).getProject();
+                    LifecycleExecutionException lifecycleExecutionException = (LifecycleExecutionException) exception;
+                    project = lifecycleExecutionException.getProject();
+                    isResumptionDataSaved = lifecycleExecutionException.isBuildResumptionDataSaved();
                 }
             }
 
@@ -1030,10 +1033,8 @@ public class MavenCli
                 }
             }
 
-            boolean resumeFileCreated = buildResumptionManager.persistResumptionData( result );
-
             List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
-            if ( resumeFileCreated )
+            if ( isResumptionDataSaved )
             {
                 logBuildResumeHint( "mvn <args> -r " );
             }
