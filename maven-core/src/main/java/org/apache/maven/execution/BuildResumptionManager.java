@@ -186,7 +186,7 @@ public class BuildResumptionManager
                 .collect( Collectors.toList() );
 
         String projectsToSkip = remainingProjects.stream()
-                .filter( project -> result.getBuildSummary( project ) != null )
+                .filter( project -> result.getBuildSummary( project ) instanceof BuildSuccess )
                 .filter( project -> hasNoDependencyOnProjects( project, failedProjectsGAList ) )
                 .map( project -> String.format( "%s:%s", project.getGroupId(), project.getArtifactId() ) )
                 .collect( Collectors.joining( PROPERTY_DELIMITER ) );

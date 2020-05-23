@@ -107,6 +107,21 @@ public class BuildResumptionManagerTest
     }
 
     @Test
+    public void projectsFailingAfterAnotherFailedProjectAreNotExcluded()
+    {
+        MavenProject projectA = createSucceededMavenProject( "A" );
+        MavenProject projectB = createFailedMavenProject( "B" );
+        MavenProject projectC = createSucceededMavenProject( "C" );
+        MavenProject projectD = createFailedMavenProject( "D" );
+        result.setTopologicallySortedProjects( asList( projectA, projectB, projectC, projectD ) );
+
+        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+
+        assertThat( properties.get( "resumeFrom" ), is("test:B") );
+        assertThat( properties.get( "excludedProjects" ), is("test:C") );
+    }
+
+    @Test
     public void multipleExcludedProjectsAreCommaSeparated()
     {
         MavenProject projectA = createFailedMavenProject( "A" );
