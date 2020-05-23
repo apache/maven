@@ -1361,10 +1361,9 @@ public class MavenCli
             request.setInteractiveMode( false );
         }
 
-        boolean noSnapshotUpdates = false;
         if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
         {
-            noSnapshotUpdates = true;
+            request.setNoSnapshotUpdates( true ); // default: false
         }
 
         // ----------------------------------------------------------------------
@@ -1502,7 +1501,6 @@ public class MavenCli
             .setExecutionListener( executionListener ).setTransferListener(
             transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
-            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
