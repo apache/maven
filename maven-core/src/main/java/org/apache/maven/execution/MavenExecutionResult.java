@@ -67,4 +67,18 @@ public interface MavenExecutionResult
      * @param summary The build summary to add, must not be {@code null}.
      */
     void addBuildSummary( BuildSummary summary );
+
+    /**
+     * Indicates whether or not resumption data has been stored.
+     * @see org.apache.maven.execution.BuildResumptionManager
+     * @return <code>true</code> when it is possible to resume the build, <code>false</code> otherwise.
+     */
+    boolean isResumptionDataStored();
+
+    /**
+     * Indicate that resumption data has been stored.
+     * @see org.apache.maven.execution.BuildResumptionManager
+     * @see #isResumptionDataStored()
+     */
+    void setResumptionDataStored();
 }

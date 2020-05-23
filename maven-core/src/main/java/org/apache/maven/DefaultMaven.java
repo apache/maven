@@ -366,20 +366,21 @@ public class DefaultMaven
 
     private void saveResumptionDataWhenApplicable( MavenExecutionResult result, MavenSession session )
     {
-        List<LifecycleExecutionException> lifecycleExecutionExceptions = result.getExceptions().stream()
+        long lifecycleExecutionExceptionCount = result.getExceptions().stream()
                 .filter( LifecycleExecutionException.class::isInstance )
-                .map( LifecycleExecutionException.class::cast )
-                .collect( Collectors.toList() );
+                .count();
 
-        if ( !lifecycleExecutionExceptions.isEmpty() )
+        if ( lifecycleExecutionExceptionCount > 0 )
         {
             session.getAllProjects().stream()
                     .filter( MavenProject::isExecutionRoot )
                     .findFirst()
                     .ifPresent( rootProject ->
                     {
-                        boolean persisted = buildResumptionManager.persistResumptionData( result, rootProject );
-                        lifecycleExecutionExceptions.forEach( e -> e.setBuildResumptionDataSaved( persisted ) );
+                        if ( buildResumptionManager.persistResumptionData( result, rootProject ) )
+                        {
+                            result.setResumptionDataStored();
+                        }
                     } );
         }
     }

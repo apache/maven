@@ -43,6 +43,8 @@ public class DefaultMavenExecutionResult
     private final Map<MavenProject, BuildSummary> buildSummaries =
         Collections.synchronizedMap( new IdentityHashMap<>() );
 
+    private boolean resumptionDataStored = false;
+
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -107,5 +109,17 @@ public class DefaultMavenExecutionResult
     public void addBuildSummary( BuildSummary summary )
     {
         buildSummaries.put( summary.getProject(), summary );
+    }
+
+    @Override
+    public boolean isResumptionDataStored()
+    {
+        return resumptionDataStored;
+    }
+
+    @Override
+    public void setResumptionDataStored()
+    {
+        this.resumptionDataStored = true;
     }
 }

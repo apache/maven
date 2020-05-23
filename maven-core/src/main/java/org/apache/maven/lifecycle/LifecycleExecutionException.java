@@ -33,8 +33,6 @@ public class LifecycleExecutionException
 {
     private MavenProject project;
 
-    private boolean buildResumptionDataSaved = false;
-
     public LifecycleExecutionException( String message )
     {
         super( message );
@@ -76,16 +74,6 @@ public class LifecycleExecutionException
     public MavenProject getProject()
     {
         return project;
-    }
-
-    public boolean isBuildResumptionDataSaved()
-    {
-        return buildResumptionDataSaved;
-    }
-
-    public void setBuildResumptionDataSaved( boolean isBuildResumptionDataSaved )
-    {
-        this.buildResumptionDataSaved = isBuildResumptionDataSaved;
     }
 
     private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
