@@ -1436,11 +1436,7 @@ public class MavenCli
 
         request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
 
-        ExecutionListener executionListener = new ExecutionEventLogger();
-        if ( eventSpyDispatcher != null )
-        {
-            executionListener = eventSpyDispatcher.chainListener( executionListener );
-        }
+        request.setExecutionListener( determineExecutionListener() );
 
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
@@ -1452,7 +1448,6 @@ public class MavenCli
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
-            .setExecutionListener( executionListener )
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
@@ -1582,6 +1577,19 @@ public class MavenCli
         }
 
         return request;
+    }
+
+    private ExecutionListener determineExecutionListener()
+    {
+        ExecutionListener executionListener = new ExecutionEventLogger();
+        if ( eventSpyDispatcher != null )
+        {
+            return eventSpyDispatcher.chainListener( executionListener );
+        }
+        else
+        {
+            return executionListener;
+        }
     }
 
     private void warnAboutDeprecatedOptionsUsed( final CommandLine commandLine )
