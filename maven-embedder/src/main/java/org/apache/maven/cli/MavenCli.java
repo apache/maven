@@ -1339,7 +1339,6 @@ public class MavenCli
         return populateRequest( cliRequest, cliRequest.request );
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
         CommandLine commandLine = cliRequest.commandLine;
