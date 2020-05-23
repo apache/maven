@@ -1373,27 +1373,13 @@ public class MavenCli
         request.setGoals( commandLine.getArgList() );
 
 
-        // this is the default behavior.
-        String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
+        request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
 
         if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
         {
             request.setRecursive( false ); // default: true
-        }
-
-        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
         }
 
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
@@ -1480,8 +1466,7 @@ public class MavenCli
         }
 
         request.setBaseDirectory( baseDirectory ).setSystemProperties(
-            cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties ).setReactorFailureBehavior(
-            reactorFailureBehaviour ) // default: fail fast
+            cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
             .setExecutionListener( executionListener ).setTransferListener(
@@ -1625,6 +1610,27 @@ public class MavenCli
                         "Command line option -{} is deprecated and will be removed in future Maven versions.",
                         deprecatedOption )
                 );
+    }
+
+    private String determineReactorFailureBehaviour( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_AT_END;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_NEVER;
+        }
+        else
+        {
+            // this is the default behavior.
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
     }
 
     private String determineMakeBehavior( final CommandLine cl )
