@@ -64,9 +64,9 @@ public class DefaultMavenExecutionRequest
 
     private boolean interactiveMode = true;
 
-    private boolean cacheTransferError;
+    private boolean cacheTransferError = false;
 
-    private boolean cacheNotFound;
+    private boolean cacheNotFound = false;
 
     private List<Proxy> proxies;
 
@@ -159,7 +159,7 @@ public class DefaultMavenExecutionRequest
      *
      * @issue MNG-2681
      */
-    private boolean noSnapshotUpdates;
+    private boolean noSnapshotUpdates = false;
 
     private boolean useLegacyLocalRepositoryManager = false;
 
