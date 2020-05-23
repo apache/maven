@@ -40,13 +40,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @RunWith( MockitoJUnitRunner.class )
-public class BuildResumptionManagerTest
+public class DefaultBuildResumptionManagerTest
 {
     @Mock
     private Logger logger;
 
     @InjectMocks
-    private BuildResumptionManager buildResumptionManager;
+    private DefaultBuildResumptionManager buildResumptionManager;
 
     private MavenExecutionResult result;
 
