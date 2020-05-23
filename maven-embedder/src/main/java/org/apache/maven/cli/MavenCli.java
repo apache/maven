@@ -1346,15 +1346,7 @@ public class MavenCli
         boolean quiet = cliRequest.quiet;
         boolean showErrors = cliRequest.showErrors;
 
-        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
-        for ( String deprecatedOption : deprecatedOptions )
-        {
-            if ( commandLine.hasOption( deprecatedOption ) )
-            {
-                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
-                        deprecatedOption );
-            }
-        }
+        warnAboutDeprecatedOptionsUsed( commandLine );
 
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
@@ -1652,6 +1644,19 @@ public class MavenCli
         }
 
         return request;
+    }
+
+    private void warnAboutDeprecatedOptionsUsed( final CommandLine commandLine )
+    {
+        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
+        for ( String deprecatedOption : deprecatedOptions )
+        {
+            if ( commandLine.hasOption( deprecatedOption ) )
+            {
+                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
+                        deprecatedOption );
+            }
+        }
     }
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
