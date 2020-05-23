@@ -1347,7 +1347,7 @@ public class MavenCli
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
-        boolean showErrors = cliRequest.showErrors;
+        request.setShowErrors( cliRequest.showErrors ); // default: false
 
         warnAboutDeprecatedOptionsUsed( commandLine );
 
@@ -1491,7 +1491,6 @@ public class MavenCli
         request.setBaseDirectory( baseDirectory ).setGoals( goals ).setSystemProperties(
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties ).setReactorFailureBehavior(
             reactorFailureBehaviour ) // default: fail fast
-            .setShowErrors( showErrors ) // default: false
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
             .setExecutionListener( executionListener ).setTransferListener(
