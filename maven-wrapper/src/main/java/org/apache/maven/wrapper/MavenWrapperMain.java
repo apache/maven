@@ -36,10 +36,6 @@ public class MavenWrapperMain
     
     public static final String DEFAULT_MAVEN_USER_HOME = System.getProperty( "user.home" ) + "/.m2";
 
-    public static final String MAVEN_USER_HOME_PROPERTY_KEY = "maven.user.home";
-
-    public static final String MAVEN_USER_HOME_ENV_KEY = "MAVEN_USER_HOME";
-
     public static final String MVNW_VERBOSE = "MVNW_VERBOSE";
 
     public static final String MVNW_USERNAME = "MVNW_USERNAME";
@@ -104,20 +100,6 @@ public class MavenWrapperMain
 
     private static Path mavenUserHome()
     {
-        String mavenUserHome = System.getProperty( MAVEN_USER_HOME_PROPERTY_KEY );
-        if ( mavenUserHome != null )
-        {
-            return Paths.get( mavenUserHome );
-        }
-        
-        mavenUserHome = System.getenv( MAVEN_USER_HOME_ENV_KEY );
-        if ( mavenUserHome  != null )
-        {
-            return Paths.get( mavenUserHome );
-        }
-        else
-        {
-            return Paths.get( DEFAULT_MAVEN_USER_HOME );
-        }
+        return Paths.get( DEFAULT_MAVEN_USER_HOME );
     }
 }
