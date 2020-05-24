@@ -1431,19 +1431,10 @@ public class MavenCli
 
     private String determineLocalRepositoryPath( final MavenExecutionRequest request )
     {
-        String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-
-        if ( localRepoProperty == null )
-        {
-            localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-        }
-
-        if ( localRepoProperty != null )
-        {
-            return localRepoProperty;
-        }
-
-        return null;
+        return request.getUserProperties().getProperty(
+                MavenCli.LOCAL_REPO_PROPERTY,
+                request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY ) // null if not found
+        );
     }
 
     private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
