@@ -1350,6 +1350,7 @@ public class MavenCli
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
         request.setShowErrors( cliRequest.showErrors ); // default: false
+        File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
         warnAboutDeprecatedOptionsUsed( commandLine );
 
@@ -1361,44 +1362,40 @@ public class MavenCli
         request.setOffline( commandLine.hasOption( CLIManager.OFFLINE ) );
         request.setUpdateSnapshots( !commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
         request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
-
-        File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
-
-        // ----------------------------------------------------------------------
-        // Profile Activation
-        // ----------------------------------------------------------------------
-
-        ProfileActivation profileActivation = determineProfileActivation( commandLine );
-        request.addActiveProfiles( profileActivation.activeProfiles );
-        request.addInactiveProfiles( profileActivation.inactiveProfiles );
-
-        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
-
-        request.setExecutionListener( determineExecutionListener() );
-
         request.setBaseDirectory( baseDirectory );
         request.setSystemProperties( cliRequest.systemProperties );
         request.setUserProperties( cliRequest.userProperties );
         request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
-
         request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
+        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
+        request.setExecutionListener( determineExecutionListener() );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
         }
 
+        request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
         if ( commandLine.hasOption( CLIManager.RESUME ) )
         {
             request.setResume( true );
         }
-        request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        request.setMakeBehavior( determineMakeBehavior( commandLine ) );
+        request.setCacheNotFound( true );
+        request.setCacheTransferError( false );
 
         final ProjectActivation projectActivation = determineProjectActivation( commandLine );
         request.setSelectedProjects( projectActivation.activeProjects );
         request.setExcludedProjects( projectActivation.inactiveProjects );
 
-        request.setMakeBehavior( determineMakeBehavior( commandLine ) );
+        final ProfileActivation profileActivation = determineProfileActivation( commandLine );
+        request.addActiveProfiles( profileActivation.activeProfiles );
+        request.addInactiveProfiles( profileActivation.inactiveProfiles );
+
+        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
+        {
+            request.setBaseDirectory( request.getPom().getParentFile() );
+        }
 
         String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
 
@@ -1411,9 +1408,6 @@ public class MavenCli
         {
             request.setLocalRepositoryPath( localRepoProperty );
         }
-
-        request.setCacheNotFound( true );
-        request.setCacheTransferError( false );
 
         //
         // Builder, concurrency and parallelism
