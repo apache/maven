@@ -692,7 +692,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( pomFilename != null )
         {
-            pom = new File( pomFilename );
+            this.setPom( new File( pomFilename ) );
         }
 
         return this;
@@ -702,6 +702,11 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setPom( File pom )
     {
         this.pom = pom;
+
+        if ( this.pom != null && this.pom.getParentFile() != null )
+        {
+            this.setBaseDirectory( this.pom.getParentFile() );
+        }
 
         return this;
     }

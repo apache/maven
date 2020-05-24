@@ -1392,11 +1392,6 @@ public class MavenCli
         request.addActiveProfiles( profileActivation.activeProfiles );
         request.addInactiveProfiles( profileActivation.inactiveProfiles );
 
-        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
-        {
-            request.setBaseDirectory( request.getPom().getParentFile() );
-        }
-
         String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
 
         if ( localRepoProperty == null )
