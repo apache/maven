@@ -173,7 +173,11 @@ public class StringSearchModelInterpolator
             {
                 cacheEntry.interpolate( target, this );
 
-                traverseObjectWithParents( cls.getSuperclass(), target );
+                Class<?> superclass = cls.getSuperclass();
+                if ( superclass != cls )
+                {
+                    traverseObjectWithParents( superclass, target );
+                }
             }
         }
 
