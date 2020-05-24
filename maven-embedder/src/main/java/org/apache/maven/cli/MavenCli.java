@@ -1345,6 +1345,7 @@ public class MavenCli
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
@@ -1353,22 +1354,12 @@ public class MavenCli
         warnAboutDeprecatedOptionsUsed( commandLine );
 
         request.setInteractiveMode( !commandLine.hasOption( CLIManager.BATCH_MODE ) );
-
         request.setNoSnapshotUpdates( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) );
-
         request.setGoals( commandLine.getArgList() );
-
-
         request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
-
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-
         request.setRecursive( !commandLine.hasOption( CLIManager.NON_RECURSIVE ) );
-
         request.setOffline( commandLine.hasOption( CLIManager.OFFLINE ) );
-
         request.setUpdateSnapshots( !commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
-
         request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
 
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
