@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import static java.util.Arrays.asList;
 import static org.apache.maven.cli.MavenCli.determineProfileActivation;
+import static org.apache.maven.cli.MavenCli.determineProjectActivation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,6 +30,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -107,6 +109,32 @@ public class MavenCliTest
         assertThat( result.activeProfiles, contains( "test2" ) );
         assertThat( result.inactiveProfiles.size(), is( 1 ) );
         assertThat( result.inactiveProfiles, contains( "test1" ) );
+    }
+
+    @Test
+    public void testDetermineProjectActivation() throws ParseException
+    {
+        MavenCli.ProjectActivation result;
+        Options options = new Options();
+        options.addOption( Option.builder( CLIManager.PROJECT_LIST ).hasArg().build() );
+
+        result = determineProjectActivation( new GnuParser().parse( options, new String[0] ) );
+        assertThat( result.activeProjects, is( nullValue() ) );
+        assertThat( result.inactiveProjects, is( nullValue() ) );
+
+        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl", "test1,+test2" } ) );
+        assertThat( result.activeProjects.size(), is( 2 ) );
+        assertThat( result.activeProjects, contains( "test1", "test2" ) );
+
+        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl", "!test1,-test2" } ) );
+        assertThat( result.inactiveProjects.size(), is( 2 ) );
+        assertThat( result.inactiveProjects, contains( "test1", "test2" ) );
+
+        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl" ,"-test1,+test2" } ) );
+        assertThat( result.activeProjects.size(), is( 1 ) );
+        assertThat( result.activeProjects, contains( "test2" ) );
+        assertThat( result.inactiveProjects.size(), is( 1 ) );
+        assertThat( result.inactiveProjects, contains( "test1" ) );
     }
 
     @Test

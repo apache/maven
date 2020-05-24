@@ -1393,6 +1393,8 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         ProfileActivation profileActivation = determineProfileActivation( commandLine );
+        request.addActiveProfiles( profileActivation.activeProfiles );
+        request.addInactiveProfiles( profileActivation.inactiveProfiles );
 
         request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
 
@@ -1406,8 +1408,6 @@ public class MavenCli
 
         request.setBaseDirectory( baseDirectory ).setSystemProperties(
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
-            .addActiveProfiles( profileActivation.activeProfiles ) // optional
-            .addInactiveProfiles( profileActivation.inactiveProfiles ) // optional
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
@@ -1445,42 +1445,9 @@ public class MavenCli
             request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
         }
 
-        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
-        {
-            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
-
-            List<String> inclProjects = new ArrayList<>();
-            List<String> exclProjects = new ArrayList<>();
-
-            if ( projectOptionValues != null )
-            {
-                for ( String projectOptionValue : projectOptionValues )
-                {
-                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
-
-                    while ( projectTokens.hasMoreTokens() )
-                    {
-                        String projectAction = projectTokens.nextToken().trim();
-
-                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
-                        {
-                            exclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else if ( projectAction.startsWith( "+" ) )
-                        {
-                            inclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            inclProjects.add( projectAction );
-                        }
-                    }
-                }
-            }
-
-            request.setSelectedProjects( inclProjects );
-            request.setExcludedProjects( exclProjects );
-        }
+        final ProjectActivation projectActivation = determineProjectActivation( commandLine );
+        request.setSelectedProjects( projectActivation.activeProjects );
+        request.setExcludedProjects( projectActivation.inactiveProjects );
 
         request.setMakeBehavior( determineMakeBehavior( commandLine ) );
 
@@ -1537,6 +1504,46 @@ public class MavenCli
         }
 
         return request;
+    }
+
+    @VisibleForTesting
+    static ProjectActivation determineProjectActivation ( final CommandLine commandLine )
+    {
+        final ProjectActivation projectActivation = new ProjectActivation();
+
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+
+            if ( projectOptionValues != null )
+            {
+                for ( String projectOptionValue : projectOptionValues )
+                {
+                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
+
+                    while ( projectTokens.hasMoreTokens() )
+                    {
+                        String projectAction = projectTokens.nextToken().trim();
+
+                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
+                        {
+                            projectActivation.deactivate( projectAction.substring( 1 ) );
+                        }
+                        else if ( projectAction.startsWith( "+" ) )
+                        {
+                            projectActivation.activate( projectAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            projectActivation.activate( projectAction );
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return projectActivation;
     }
 
     @VisibleForTesting
@@ -1809,6 +1816,31 @@ public class MavenCli
         public void activate( final String profile )
         {
             activeProfiles.add( profile );
+        }
+    }
+
+    @VisibleForTesting
+    static class ProjectActivation
+    {
+        List<String> activeProjects;
+        List<String> inactiveProjects;
+
+        public void deactivate( final String project )
+        {
+            if ( inactiveProjects == null )
+            {
+                inactiveProjects = new ArrayList<>();
+            }
+            inactiveProjects.add( project );
+        }
+
+        public void activate( final String project )
+        {
+            if ( activeProjects == null )
+            {
+                activeProjects = new ArrayList<>();
+            }
+            activeProjects.add( project );
         }
     }
 }
