@@ -19,6 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -1351,11 +1352,6 @@ public class MavenCli
 
         warnAboutDeprecatedOptionsUsed( commandLine );
 
-        // ----------------------------------------------------------------------
-        // Now that we have everything that we need we will fire up plexus and
-        // bring the maven component to life for use.
-        // ----------------------------------------------------------------------
-
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
@@ -1365,10 +1361,6 @@ public class MavenCli
         {
             request.setNoSnapshotUpdates( true ); // default: false
         }
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
 
         request.setGoals( commandLine.getArgList() );
 
@@ -1400,39 +1392,7 @@ public class MavenCli
         // Profile Activation
         // ----------------------------------------------------------------------
 
-        List<String> activeProfiles = new ArrayList<>();
-
-        List<String> inactiveProfiles = new ArrayList<>();
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
-            {
-                for ( String profileOptionValue : profileOptionValues )
-                {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
-                    {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            activeProfiles.add( profileAction );
-                        }
-                    }
-                }
-            }
-        }
+        ProfileActivation profileActivation = determineProfileActivation( commandLine );
 
         request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
 
@@ -1446,8 +1406,8 @@ public class MavenCli
 
         request.setBaseDirectory( baseDirectory ).setSystemProperties(
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
+            .addActiveProfiles( profileActivation.activeProfiles ) // optional
+            .addInactiveProfiles( profileActivation.inactiveProfiles ) // optional
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
@@ -1577,6 +1537,44 @@ public class MavenCli
         }
 
         return request;
+    }
+
+    @VisibleForTesting
+    static ProfileActivation determineProfileActivation( final CommandLine commandLine )
+    {
+        final ProfileActivation result = new ProfileActivation();
+
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+            if ( profileOptionValues != null )
+            {
+                for ( String profileOptionValue : profileOptionValues )
+                {
+                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
+
+                    while ( profileTokens.hasMoreTokens() )
+                    {
+                        String profileAction = profileTokens.nextToken().trim();
+
+                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
+                        {
+                            result.deactivate( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "+" ) )
+                        {
+                            result.activate( profileAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            result.activate( profileAction );
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private ExecutionListener determineExecutionListener()
@@ -1795,5 +1793,22 @@ public class MavenCli
         throws ComponentLookupException
     {
         return container.lookup( ModelProcessor.class );
+    }
+
+    @VisibleForTesting
+    static class ProfileActivation
+    {
+        final List<String> activeProfiles = new ArrayList<>();
+        final List<String> inactiveProfiles = new ArrayList<>();
+
+        public void deactivate( final String profile )
+        {
+            inactiveProfiles.add( profile );
+        }
+
+        public void activate( final String profile )
+        {
+            activeProfiles.add( profile );
+        }
     }
 }

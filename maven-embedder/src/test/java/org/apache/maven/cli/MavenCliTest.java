@@ -20,14 +20,16 @@ package org.apache.maven.cli;
  */
 
 import static java.util.Arrays.asList;
+import static org.apache.maven.cli.MavenCli.determineProfileActivation;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -36,6 +38,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -79,6 +85,28 @@ public class MavenCliTest
         {
             System.getProperties().remove( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
         }
+    }
+
+    @Test
+    public void testDetermineProfileActivation() throws ParseException
+    {
+        MavenCli.ProfileActivation result;
+        Options options = new Options();
+        options.addOption( Option.builder( Character.toString( CLIManager.ACTIVATE_PROFILES ) ).hasArg().build() );
+
+        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "test1,+test2" } ) );
+        assertThat( result.activeProfiles.size(), is( 2 ) );
+        assertThat( result.activeProfiles, contains( "test1", "test2" ) );
+
+        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "!test1,-test2" } ) );
+        assertThat( result.inactiveProfiles.size(), is( 2 ) );
+        assertThat( result.inactiveProfiles, contains( "test1", "test2" ) );
+
+        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "-test1,+test2" } ) );
+        assertThat( result.activeProfiles.size(), is( 1 ) );
+        assertThat( result.activeProfiles, contains( "test2" ) );
+        assertThat( result.inactiveProfiles.size(), is( 1 ) );
+        assertThat( result.inactiveProfiles, contains( "test1" ) );
     }
 
     @Test
