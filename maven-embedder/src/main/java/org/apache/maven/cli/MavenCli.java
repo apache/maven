@@ -1439,11 +1439,7 @@ public class MavenCli
         {
             request.setResume( true );
         }
-
-        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
-        {
-            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
-        }
+        request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
 
         final ProjectActivation projectActivation = determineProjectActivation( commandLine );
         request.setSelectedProjects( projectActivation.activeProjects );
@@ -1474,9 +1470,7 @@ public class MavenCli
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
         // extend the command line to accept its own configuration parameters.
         //
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
-            ? commandLine.getOptionValue( CLIManager.THREADS )
-            : null;
+        final String threadConfiguration = commandLine.getOptionValue( CLIManager.THREADS );
 
         if ( threadConfiguration != null )
         {
@@ -1498,10 +1492,7 @@ public class MavenCli
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        if ( commandLine.hasOption( CLIManager.BUILDER ) )
-        {
-            request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
-        }
+        request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
 
         return request;
     }
