@@ -1376,35 +1376,11 @@ public class MavenCli
 
         request.setExecutionListener( determineExecutionListener() );
 
-        String alternatePomFile = null;
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
-        {
-            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
-        }
-
         request.setBaseDirectory( baseDirectory ).setSystemProperties(
             cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
-        if ( alternatePomFile != null )
-        {
-            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
-            if ( pom.isDirectory() )
-            {
-                pom = new File( pom, "pom.xml" );
-            }
-
-            request.setPom( pom );
-        }
-        else if ( modelProcessor != null )
-        {
-            File pom = modelProcessor.locatePom( baseDirectory );
-
-            if ( pom.isFile() )
-            {
-                request.setPom( pom );
-            }
-        }
+        request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
@@ -1471,6 +1447,37 @@ public class MavenCli
         request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
 
         return request;
+    }
+
+    private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
+    {
+        String alternatePomFile = null;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+        {
+            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+        }
+
+        if ( alternatePomFile != null )
+        {
+            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+            if ( pom.isDirectory() )
+            {
+                pom = new File( pom, "pom.xml" );
+            }
+
+            return pom;
+        }
+        else if ( modelProcessor != null )
+        {
+            File pom = modelProcessor.locatePom( baseDirectory );
+
+            if ( pom.isFile() )
+            {
+                return pom;
+            }
+        }
+
+        return null;
     }
 
     @VisibleForTesting
