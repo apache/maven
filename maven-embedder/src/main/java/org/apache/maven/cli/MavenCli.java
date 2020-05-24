@@ -1424,7 +1424,7 @@ public class MavenCli
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
+        request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER, request.getBuilderId() ) );
 
         return request;
     }
