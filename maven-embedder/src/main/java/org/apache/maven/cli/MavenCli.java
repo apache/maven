@@ -1376,9 +1376,10 @@ public class MavenCli
 
         request.setExecutionListener( determineExecutionListener() );
 
-        request.setBaseDirectory( baseDirectory ).setSystemProperties(
-            cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties )
-            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
+        request.setBaseDirectory( baseDirectory );
+        request.setSystemProperties( cliRequest.systemProperties );
+        request.setUserProperties( cliRequest.userProperties );
+        request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
 
