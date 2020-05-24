@@ -1359,7 +1359,7 @@ public class MavenCli
         request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
         request.setRecursive( !commandLine.hasOption( CLIManager.NON_RECURSIVE ) );
         request.setOffline( commandLine.hasOption( CLIManager.OFFLINE ) );
-        request.setUpdateSnapshots( !commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
+        request.setUpdateSnapshots( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
         request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
         request.setBaseDirectory( baseDirectory );
         request.setSystemProperties( cliRequest.systemProperties );
