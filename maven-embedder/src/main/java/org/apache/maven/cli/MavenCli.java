@@ -1352,15 +1352,9 @@ public class MavenCli
 
         warnAboutDeprecatedOptionsUsed( commandLine );
 
-        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            request.setInteractiveMode( false );
-        }
+        request.setInteractiveMode( !commandLine.hasOption( CLIManager.BATCH_MODE ) );
 
-        if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
-        {
-            request.setNoSnapshotUpdates( true ); // default: false
-        }
+        request.setNoSnapshotUpdates( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) );
 
         request.setGoals( commandLine.getArgList() );
 
@@ -1369,20 +1363,11 @@ public class MavenCli
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
 
-        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
-        {
-            request.setRecursive( false ); // default: true
-        }
+        request.setRecursive( !commandLine.hasOption( CLIManager.NON_RECURSIVE ) );
 
-        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
-        {
-            request.setOffline( true );
-        }
+        request.setOffline( commandLine.hasOption( CLIManager.OFFLINE ) );
 
-        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
-        {
-            request.setUpdateSnapshots( true ); // default: false
-        }
+        request.setUpdateSnapshots( !commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
 
         request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
 
