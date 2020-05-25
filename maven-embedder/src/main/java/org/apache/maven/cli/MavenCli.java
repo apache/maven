@@ -1032,7 +1032,7 @@ public class MavenCli
             }
 
             List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
-            if ( result.isResumptionDataStored() )
+            if ( result.canResume() )
             {
                 logBuildResumeHint( "mvn <args> -r " );
             }

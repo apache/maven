@@ -43,7 +43,7 @@ public class DefaultMavenExecutionResult
     private final Map<MavenProject, BuildSummary> buildSummaries =
         Collections.synchronizedMap( new IdentityHashMap<>() );
 
-    private boolean resumptionDataStored = false;
+    private boolean canResume = false;
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -112,14 +112,14 @@ public class DefaultMavenExecutionResult
     }
 
     @Override
-    public boolean isResumptionDataStored()
+    public boolean canResume()
     {
-        return resumptionDataStored;
+        return canResume;
     }
 
     @Override
-    public void setResumptionDataStored()
+    public void setCanResume()
     {
-        this.resumptionDataStored = true;
+        this.canResume = true;
     }
 }

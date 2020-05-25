@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -378,7 +377,7 @@ public class DefaultMaven
                     {
                         if ( buildResumptionManager.persistResumptionData( result, rootProject ) )
                         {
-                            result.setResumptionDataStored();
+                            result.setCanResume();
                         }
                     } );
         }

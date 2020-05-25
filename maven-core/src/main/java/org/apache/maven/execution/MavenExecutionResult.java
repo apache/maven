@@ -69,16 +69,16 @@ public interface MavenExecutionResult
     void addBuildSummary( BuildSummary summary );
 
     /**
-     * Indicates whether or not resumption data has been stored.
+     * Indicates whether or not the build could be resumed by a second invocation of Maven.
      * @see org.apache.maven.execution.BuildResumptionManager
      * @return <code>true</code> when it is possible to resume the build, <code>false</code> otherwise.
      */
-    boolean isResumptionDataStored();
+    boolean canResume();
 
     /**
-     * Indicate that resumption data has been stored.
+     * Indicate that the build could be resumed by a second invocation of Maven.
      * @see org.apache.maven.execution.BuildResumptionManager
-     * @see #isResumptionDataStored()
+     * @see #canResume()
      */
-    void setResumptionDataStored();
+    void setCanResume();
 }
