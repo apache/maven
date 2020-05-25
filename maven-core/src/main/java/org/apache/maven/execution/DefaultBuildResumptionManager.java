@@ -24,9 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -56,9 +56,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
     private static final String RESUME_FROM_PROPERTY = "resumeFrom";
     private static final String EXCLUDED_PROJECTS_PROPERTY = "excludedProjects";
     private static final String PROPERTY_DELIMITER = ", ";
-
-    @Inject
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionManager.class );
 
     @Override
     public boolean persistResumptionData( MavenExecutionResult result, MavenProject rootProject )
@@ -67,7 +65,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
 
         if ( properties.isEmpty() )
         {
-            logger.debug( "Will not create " + RESUME_PROPERTIES_FILENAME + " file: nothing to resume from" );
+            LOGGER.debug( "Will not create {} file: nothing to resume from", RESUME_PROPERTIES_FILENAME );
             return false;
         }
 
@@ -91,7 +89,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         }
         catch ( IOException e )
         {
-            logger.warn( "Could not delete " + RESUME_PROPERTIES_FILENAME + " file. ", e );
+            LOGGER.warn( "Could not delete {} file. ", RESUME_PROPERTIES_FILENAME, e );
         }
     }
 
@@ -127,7 +125,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         }
         else
         {
-            logger.warn( "Could not create " + RESUME_PROPERTIES_FILENAME + " file: no failed projects found" );
+            LOGGER.warn( "Could not create {} file: no failed projects found", RESUME_PROPERTIES_FILENAME );
         }
 
         return properties;
@@ -219,7 +217,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         }
         catch ( IOException e )
         {
-            logger.warn( "Could not create " + RESUME_PROPERTIES_FILENAME + " file. ", e );
+            LOGGER.warn( "Could not create {} file. ", RESUME_PROPERTIES_FILENAME, e );
             return false;
         }
 
@@ -232,7 +230,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         Path path = Paths.get( RESUME_PROPERTIES_FILENAME ).resolve( rootBuildDirectory );
         if ( !Files.exists( path ) )
         {
-            logger.warn( "The " + path + " file does not exist. The --resume / -r feature will not work." );
+            LOGGER.warn( "The {} file does not exist. The --resume / -r feature will not work.", path );
             return properties;
         }
 
@@ -242,7 +240,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         }
         catch ( IOException e )
         {
-            logger.warn( "Unable to read " + path + ". The --resume / -r feature will not work." );
+            LOGGER.warn( "Unable to read {}. The --resume / -r feature will not work.", path );
         }
 
         return properties;
@@ -255,7 +253,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         {
             String propertyValue = properties.getProperty( RESUME_FROM_PROPERTY );
             request.setResumeFrom( propertyValue );
-            logger.info( "Resuming from " + propertyValue + " due to the --resume / -r feature." );
+            LOGGER.info( "Resuming from {} due to the --resume / -r feature.", propertyValue );
         }
 
         if ( properties.containsKey( EXCLUDED_PROJECTS_PROPERTY ) )
@@ -263,7 +261,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
             String propertyValue = properties.getProperty( EXCLUDED_PROJECTS_PROPERTY );
             String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
             request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
-            logger.info( "Additionally excluding projects '" + propertyValue + "' due to the --resume / -r feature." );
+            LOGGER.info( "Additionally excluding projects '{}' due to the --resume / -r feature.", propertyValue );
         }
     }
 
