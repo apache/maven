@@ -77,7 +77,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
     @Override
     public void applyResumptionData( MavenExecutionRequest request, MavenProject rootProject )
     {
-        Properties properties = loadResumptionFile( rootProject.getBuild().getDirectory() );
+        Properties properties = loadResumptionFile( Paths.get( rootProject.getBuild().getDirectory() ) );
         applyResumptionProperties( request, properties );
     }
 
@@ -226,10 +226,10 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         return true;
     }
 
-    private Properties loadResumptionFile( String rootBuildDirectory )
+    private Properties loadResumptionFile( Path rootBuildDirectory )
     {
         Properties properties = new Properties();
-        Path path = Paths.get( rootBuildDirectory, RESUME_PROPERTIES_FILENAME );
+        Path path = Paths.get( RESUME_PROPERTIES_FILENAME ).resolve( rootBuildDirectory );
         if ( !Files.exists( path ) )
         {
             logger.warn( "The " + path + " file does not exist. The --resume / -r feature will not work." );
