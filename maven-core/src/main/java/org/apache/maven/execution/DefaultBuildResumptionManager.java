@@ -156,7 +156,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         List<MavenProject> allSortedProjects = result.getTopologicallySortedProjects();
         if ( !allSortedProjects.get( 0 ).equals( failedProject ) )
         {
-            return Optional.of( String.format( "%s:%s", failedProject.getGroupId(), failedProject.getArtifactId() ) );
+            return Optional.of( failedProject.getGroupId() + ":" + failedProject.getArtifactId() );
         }
 
         return Optional.empty();
@@ -186,7 +186,7 @@ public class DefaultBuildResumptionManager implements BuildResumptionManager
         String projectsToSkip = remainingProjects.stream()
                 .filter( project -> result.getBuildSummary( project ) instanceof BuildSuccess )
                 .filter( project -> hasNoDependencyOnProjects( project, failedProjectsGAList ) )
-                .map( project -> String.format( "%s:%s", project.getGroupId(), project.getArtifactId() ) )
+                .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
                 .collect( Collectors.joining( PROPERTY_DELIMITER ) );
 
         if ( !StringUtils.isEmpty( projectsToSkip ) )
