@@ -366,11 +366,10 @@ public class DefaultMaven
 
     private void saveResumptionDataWhenApplicable( MavenExecutionResult result, MavenSession session )
     {
-        long lifecycleExecutionExceptionCount = result.getExceptions().stream()
-                .filter( LifecycleExecutionException.class::isInstance )
-                .count();
+        boolean hasLifecycleExecutionExceptions = result.getExceptions().stream()
+                .anyMatch( LifecycleExecutionException.class::isInstance );
 
-        if ( lifecycleExecutionExceptionCount > 0 )
+        if ( hasLifecycleExecutionExceptions )
         {
             session.getAllProjects().stream()
                     .filter( MavenProject::isExecutionRoot )
