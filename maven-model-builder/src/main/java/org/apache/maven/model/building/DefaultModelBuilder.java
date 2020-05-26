@@ -476,20 +476,20 @@ public class DefaultModelBuilder
         return interpolatedActivations;
     }
 
-    private void replaceWithInterpolatedValue( ActivationFile file, ProfileActivationContext context,
+    private void replaceWithInterpolatedValue( ActivationFile activationFile, ProfileActivationContext context,
                                                DefaultModelProblemCollector problems  )
     {
         String path;
         boolean missing;
 
-        if ( StringUtils.isNotEmpty( file.getExists() ) )
+        if ( StringUtils.isNotEmpty( activationFile.getExists() ) )
         {
-            path = file.getExists();
+            path = activationFile.getExists();
             missing = false;
         }
-        else if ( StringUtils.isNotEmpty( file.getMissing() ) )
+        else if ( StringUtils.isNotEmpty( activationFile.getMissing() ) )
         {
-            path = file.getMissing();
+            path = activationFile.getMissing();
             missing = true;
         }
         else
@@ -499,23 +499,22 @@ public class DefaultModelBuilder
 
         try
         {
-            path = profileActivationFilePathInterpolator.interpolate( path, context );
+            String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
+
+            if ( missing )
+            {
+                activationFile.setMissing( absolutePath );
+            }
+            else
+            {
+                activationFile.setExists( absolutePath );
+            }
         }
         catch ( InterpolationException e )
         {
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
                     "Failed to interpolate file location " + path + ": " + e.getMessage() ).setLocation(
-                    file.getLocation( missing ? "missing" : "exists" ) ).setException( e ) );
-            return;
-        }
-
-        if ( missing )
-        {
-            file.setMissing( path );
-        }
-        else
-        {
-            file.setExists( path );
+                    activationFile.getLocation( missing ? "missing" : "exists" ) ).setException( e ) );
         }
     }
 

@@ -31,7 +31,7 @@ import javax.inject.Singleton;
 import java.io.File;
 
 /**
- * Interpolates path for {@link org.apache.maven.model.ActivationFile}.
+ * Finds an absolute path for {@link org.apache.maven.model.ActivationFile}.
  *
  * @author Ravil Galeyev
  */
@@ -52,7 +52,7 @@ public class ProfileActivationFilePathInterpolator
     /**
      * Interpolates given {@code path}.
      *
-     * @return absolute path or {@code null} if the input was {@code null}.
+     * @return absolute path or {@code null} if the input was {@code null}
      */
     public String interpolate( String path, ProfileActivationContext context ) throws InterpolationException
     {
@@ -73,8 +73,8 @@ public class ProfileActivationFilePathInterpolator
                 public Object getValue( String expression )
                 {
                     /*
-                     * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
-                     * would suggest that other project.* expressions can be used which is however beyond the design.
+                     * We intentionally only support ${basedir} and not ${project.basedir} as the latter form
+                     * would suggest that other project.* expressions can be used which is beyond the design.
                      */
                     if ( "basedir".equals( expression ) )
                     {
@@ -95,8 +95,8 @@ public class ProfileActivationFilePathInterpolator
 
         interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
 
-        path = interpolator.interpolate( path, "" );
+        String absolutePath = interpolator.interpolate( path, "" );
 
-        return pathTranslator.alignToBaseDirectory( path, basedir );
+        return pathTranslator.alignToBaseDirectory( absolutePath, basedir );
     }
 }

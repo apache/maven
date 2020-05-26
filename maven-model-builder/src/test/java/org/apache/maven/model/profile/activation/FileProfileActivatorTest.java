@@ -27,6 +27,7 @@ import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Tests {@link FileProfileActivator}.
@@ -59,7 +60,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         {
             if ( !file.createNewFile() )
             {
-                throw new RuntimeException( String.format( "Can't create %s", file ) );
+                throw new IOException( "Can't create " + file );
             }
         }
     }
@@ -136,7 +137,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         {
             if ( !file.delete() )
             {
-                throw new RuntimeException( String.format( "Can't delete %s", file ) );
+                throw new IOException( "Can't delete " + file );
             }
         }
         super.tearDown();

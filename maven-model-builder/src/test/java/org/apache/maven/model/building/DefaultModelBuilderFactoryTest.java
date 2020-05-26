@@ -20,7 +20,7 @@ package org.apache.maven.model.building;
  */
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -82,6 +82,6 @@ public class DefaultModelBuilderFactoryTest
     {
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
-        return reader.read( new FileReader( file ) );
+        return reader.read( new FileInputStream( file ) );
     }
 }
