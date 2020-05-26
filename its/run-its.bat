@@ -17,10 +17,15 @@
 @REM under the License.
 @REM
 
-@REM How JvZ runs the ITs from a clean slate if it would be on Windows
-
-mvn clean install -U -Prun-its,embedded -Dmaven.repo.local=%cd%\repo
+@ECHO OFF
+if  "%MAVENCODEBASE%" == "" (
+ echo Please set MAVENCODEBASE
+ @ECHO ON
+) else (
+ @ECHO ON
+ mvn verify -Plocal-it -f "%MAVENCODEBASE%"
+ mvn clean install -Prun-its,embdedded -Dmaven.repo.local="%cd%\repo"  -DmavenDistro="%MAVENCODEBASE%\apache-maven\target\apache-maven-bin.zip" -DwrapperDistroDir="%MAVENCODEBASE%\apache-maven\target" -DmavenWrapper="%MAVENCODEBASE%\maven-wrapper\target\maven-wrapper.jar"
+)
 
 @REM If behind a proxy try this..
-
 @REM mvn clean install -Prun-its,embedded -Dmaven.repo.local=%cd%\repo -Dproxy.host=<host> -Dproxy.port=<port> -Dproxy.user= -Dproxy.pass= -Dproxy.nonProxyHosts=<hosts>
