@@ -39,7 +39,6 @@ import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.DefaultModelPathTranslator;
 import org.apache.maven.model.path.DefaultModelUrlNormalizer;
 import org.apache.maven.model.path.DefaultPathTranslator;
-import org.apache.maven.model.path.DefaultProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.DefaultUrlNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
@@ -117,7 +116,7 @@ public class DefaultModelBuilderFactory
 
     protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator()
     {
-        return new DefaultProfileActivationFilePathInterpolator().setPathTranslator( newPathTranslator() );
+        return new ProfileActivationFilePathInterpolator().setPathTranslator( newPathTranslator() );
     }
 
     protected UrlNormalizer newUrlNormalizer()

@@ -20,19 +20,83 @@ package org.apache.maven.model.path;
  */
 
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
 
 /**
  * Interpolates path for {@link org.apache.maven.model.ActivationFile}.
  *
  * @author Ravil Galeyev
  */
-public interface ProfileActivationFilePathInterpolator
+@Named
+@Singleton
+public class ProfileActivationFilePathInterpolator
 {
+
+    @Inject
+    private PathTranslator pathTranslator;
+
+    public ProfileActivationFilePathInterpolator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+        return this;
+    }
+
     /**
      * Interpolates given {@code path}.
-     * 
+     *
      * @return absolute path or {@code null} if the input was {@code null}.
      */
-    String interpolate( String path, ProfileActivationContext context ) throws InterpolationException;
+    public String interpolate( String path, ProfileActivationContext context ) throws InterpolationException
+    {
+        if ( path == null )
+        {
+            return null;
+        }
+
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        final File basedir = context.getProjectDirectory();
+
+        if ( basedir != null )
+        {
+            interpolator.addValueSource( new AbstractValueSource( false )
+            {
+                @Override
+                public Object getValue( String expression )
+                {
+                    /*
+                     * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
+                     * would suggest that other project.* expressions can be used which is however beyond the design.
+                     */
+                    if ( "basedir".equals( expression ) )
+                    {
+                        return basedir.getAbsolutePath();
+                    }
+                    return null;
+                }
+            } );
+        }
+        else if ( path.contains( "${basedir}" ) )
+        {
+            return null;
+        }
+
+        interpolator.addValueSource( new MapBasedValueSource( context.getProjectProperties() ) );
+
+        interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
+
+        interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
+
+        path = interpolator.interpolate( path, "" );
+
+        return pathTranslator.alignToBaseDirectory( path, basedir );
+    }
 }

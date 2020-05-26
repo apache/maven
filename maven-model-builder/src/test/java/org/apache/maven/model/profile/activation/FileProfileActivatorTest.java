@@ -22,9 +22,8 @@ package org.apache.maven.model.profile.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.DefaultModelBuilder;
 import org.apache.maven.model.path.DefaultPathTranslator;
-import org.apache.maven.model.path.DefaultProfileActivationFilePathInterpolator;
+import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 
 import java.io.File;
@@ -51,7 +50,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     {
         super.setUp();
         activator.setProfileActivationFilePathInterpolator(
-                new DefaultProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator()  ) );
+                new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
 
         context.setProjectDirectory( new File( PATH ) );
 
@@ -132,7 +131,6 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     @Override
     protected void tearDown() throws Exception
     {
-        super.tearDown();
         File file = new File( PATH + FILE );
         if ( file.exists() )
         {
@@ -141,5 +139,6 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
                 throw new RuntimeException( String.format( "Can't delete %s", file ) );
             }
         }
+        super.tearDown();
     }
 }
