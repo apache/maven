@@ -19,6 +19,7 @@ package org.apache.maven.model.path;
  * under the License.
  */
 
+import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -31,7 +32,7 @@ import javax.inject.Singleton;
 import java.io.File;
 
 /**
- * Finds an absolute path for {@link org.apache.maven.model.ActivationFile}.
+ * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
  * @author Ravil Galeyev
  */
