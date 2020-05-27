@@ -81,7 +81,7 @@ under the License.
         </executions>
         <configuration>
           <descriptors>
-            <descriptor>src/assembly/wrapper//script.xml</descriptor>
+            <descriptor>src/assembly/wrapper/script.xml</descriptor>
             <descriptor>src/assembly/wrapper/bin.xml</descriptor>
             <descriptor>src/assembly/wrapper/source.xml</descriptor>
           </descriptors>
