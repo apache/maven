@@ -8,10 +8,6 @@ goto endWrapper
 :downloadWrapper
 set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/maven-wrapper/${project.version}/maven-wrapper-${project.version}.jar"
 
-FOR /F "tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO (
-    IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B
-)
-
 if not "%MVNW_REPOURL%" == "" (
     SET DOWNLOAD_URL="%MVNW_REPOURL%/org/apache/maven/maven-wrapper/${project.version}/maven-wrapper-${project.version}.jar"
 )
