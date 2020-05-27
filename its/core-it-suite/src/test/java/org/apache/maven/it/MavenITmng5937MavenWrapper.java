@@ -1,5 +1,7 @@
 package org.apache.maven.it;
 
+import java.io.BufferedWriter;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,8 +23,11 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +45,7 @@ public class MavenITmng5937MavenWrapper
     
     private final Map<String,String> envVars;
     
-    private final Path baseDir = Paths.get( "target/test-classes/mng-5937-wrapper" );
+    private final Path baseDir = Paths.get( "target/test-classes/mng-5937 wrapper" );
     
     private ZipUnArchiver zipUnArchiver = new ZipUnArchiver();
     
@@ -125,6 +130,36 @@ public class MavenITmng5937MavenWrapper
         
         unpack( testDir.toPath(), "source" );
         
+        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.setDebug( true );
+        verifier.executeGoal( "validate", envVars );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testitMNG5937WrapperProperties()
+                    throws Exception
+    {
+        final File testDir = baseDir.resolve( "properties" ).toFile();
+        
+        unpack( testDir.toPath(), "bin" );
+        
+        Path p = baseDir.resolve( "properties/.mvn/wrapper/maven-wrapper.properties" );
+        try ( BufferedWriter out = Files.newBufferedWriter( p, StandardOpenOption.TRUNCATE_EXISTING ) )
+        {
+            String localRepo = System.getProperty("maven.repo.local");
+            out.append( "distributionUrl = " + Paths.get( localRepo ).toUri().toURL().toString() )
+               .append( "org/apache/maven/apache-maven/")
+               .append( getMavenVersion().toString() )
+               .append( "/apache-maven-")
+               .append( getMavenVersion().toString() )
+               .append( "-bin.zip" );
+        }
+
+        envVars.remove( "MVNW_REPOURL" );
         envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );

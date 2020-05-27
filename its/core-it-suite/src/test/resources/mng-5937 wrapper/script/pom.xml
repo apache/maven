@@ -22,10 +22,7 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng5936</groupId>
+  <groupId>org.apache.maven.its.mng5937</groupId>
   <artifactId>test</artifactId>
   <version>1</version>
-
-  <name>Maven Integration Test :: MNG-5979</name> 
-
 </project>
