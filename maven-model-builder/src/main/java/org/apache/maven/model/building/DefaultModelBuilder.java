@@ -19,7 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -67,6 +66,7 @@ import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
 
 import java.io.File;
