@@ -19,14 +19,16 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.project.MavenProject;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -34,7 +36,8 @@ import java.util.List;
  * @since 3.0
  * @author Kristian Rosenvold
  */
-@Component( role = BuildListCalculator.class )
+@Named
+@Singleton
 public class BuildListCalculator
 {
     public ProjectBuildList calculateProjectBuilds( MavenSession session, List<TaskSegment> taskSegments )

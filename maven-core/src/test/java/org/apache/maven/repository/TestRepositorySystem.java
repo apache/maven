@@ -26,6 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -48,8 +52,6 @@ import org.apache.maven.project.artifact.ArtifactWithDependencies;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
@@ -57,16 +59,22 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = RepositorySystem.class )
+@Named
+@Singleton
 public class TestRepositorySystem
     implements RepositorySystem
 {
 
-    @Requirement
-    private ModelReader modelReader;
+    private final ModelReader modelReader;
 
-    @Requirement
-    private ArtifactFactory artifactFactory;
+    private final ArtifactFactory artifactFactory;
+
+    @Inject
+    public TestRepositorySystem( ModelReader modelReader, ArtifactFactory artifactFactory )
+    {
+        this.modelReader = modelReader;
+        this.artifactFactory = artifactFactory;
+    }
 
     public ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException

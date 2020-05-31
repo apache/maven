@@ -62,10 +62,18 @@ under the License.
       <resource>
         <directory>${project.basedir}/src/main/resources</directory>
       </resource>
+      <resource>
+        <directory>${project.basedir}/src/main/resources-filtered</directory>
+        <filtering>true</filtering>
+      </resource>
     </resources>
     <testResources>
       <testResource>
         <directory>${project.basedir}/src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources-filtered</directory>
+        <filtering>true</filtering>
       </testResource>
     </testResources>
     <pluginManagement>
@@ -74,7 +82,7 @@ under the License.
       <plugins>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.3</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>

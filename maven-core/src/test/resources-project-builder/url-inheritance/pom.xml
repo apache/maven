@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -32,43 +32,43 @@ under the License.
     Test that inheritance of certain URLs automatically appends the child's artifact id.
   </description>
 
-  <url>http://parent.url</url>
+  <url>https://parent.url</url>
   <organization>
     <name>parent-org</name>
-    <url>http://parent.url/org</url>
+    <url>https://parent.url/org</url>
   </organization>
   <licenses>
     <license>
       <name>parent-license</name>
-      <url>http://parent.url/license.txt</url>
+      <url>https://parent.url/license.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
 
   <scm>
-    <url>http://parent.url/viewvc</url>
-    <connection>http://parent.url/scm</connection>
+    <url>https://parent.url/viewvc</url>
+    <connection>https://parent.url/scm</connection>
     <developerConnection>https://parent.url/scm</developerConnection>
   </scm>
   <issueManagement>
-    <url>http://parent.url/issues</url>
+    <url>https://parent.url/issues</url>
   </issueManagement>
   <ciManagement>
-    <url>http://parent.url/ci</url>
+    <url>https://parent.url/ci</url>
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://parent.url/dist</url>
+      <url>https://parent.url/dist</url>
       <id>parent.distros</id>
     </repository>
     <snapshotRepository>
-      <url>http://parent.url/snaps</url>
+      <url>https://parent.url/snaps</url>
       <id>parent.snaps</id>
     </snapshotRepository>
     <site>
-      <url>http://parent.url/site</url>
+      <url>https://parent.url/site</url>
       <id>parent.site</id>
     </site>
-    <downloadUrl>http://parent.url/download</downloadUrl>
+    <downloadUrl>https://parent.url/download</downloadUrl>
   </distributionManagement>
 </project>

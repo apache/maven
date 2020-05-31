@@ -27,6 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -40,22 +44,21 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
  * @author Benjamin Bentmann
  */
-@Component( role = LifecycleBindingsInjector.class )
+@Named
+@Singleton
 public class DefaultLifecycleBindingsInjector
     implements LifecycleBindingsInjector
 {
 
     private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
 
-    @Requirement
+    @Inject
     private LifeCyclePluginAnalyzer lifecycle;
 
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )

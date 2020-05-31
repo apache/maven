@@ -22,7 +22,10 @@ package org.apache.maven.logwrapper;
 import org.junit.Test;
 import org.slf4j.event.Level;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogLevelRecorderTest
 {
@@ -41,9 +44,23 @@ public class LogLevelRecorderTest
         new LogLevelRecorder( "INFO" );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test
+    public void createsLogLevelRecorderWithWarning()
+    {
+        LogLevelRecorder logLevelRecorder = new LogLevelRecorder( "WARNING" );
+        logLevelRecorder.record( Level.ERROR );
+
+        assertTrue( logLevelRecorder.metThreshold() );
+    }
+
+    @Test
     public void failsOnUnknownLogLevel ()
     {
-        new LogLevelRecorder( "SEVERE" );
+        Throwable thrown = assertThrows( IllegalArgumentException.class, () -> new LogLevelRecorder( "SEVERE" ) );
+        String message = thrown.getMessage();
+        assertThat( message, containsString( "SEVERE is not a valid log severity threshold" ) );
+        assertThat( message, containsString( "WARN" ) );
+        assertThat( message, containsString( "WARNING" ) );
+        assertThat( message, containsString( "ERROR" ) );
     }
 }

@@ -25,13 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -54,18 +56,19 @@ import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = ProjectDependenciesResolver.class )
+@Named
+@Singleton
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private List<RepositorySessionDecorator> decorators;
 
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )

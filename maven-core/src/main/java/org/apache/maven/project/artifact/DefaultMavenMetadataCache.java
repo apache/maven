@@ -30,17 +30,20 @@ import java.util.Set;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * DefaultMavenMetadataCache
  */
-@Component( role = MavenMetadataCache.class )
+@Named
+@Singleton
 public class DefaultMavenMetadataCache
     implements MavenMetadataCache
 {

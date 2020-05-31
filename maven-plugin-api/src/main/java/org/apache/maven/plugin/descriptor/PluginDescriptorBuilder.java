@@ -46,49 +46,102 @@ public class PluginDescriptorBuilder
     public PluginDescriptor build( Reader reader, String source )
         throws PlexusConfigurationException
     {
-        PlexusConfiguration c = buildConfiguration( reader );
+        return build( source, buildConfiguration( reader ) );
+    }
 
+    private PluginDescriptor build( String source, PlexusConfiguration c )
+        throws PlexusConfigurationException
+    {
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
         pluginDescriptor.setSource( source );
-        pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
-        pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
-        pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
-        pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
+        pluginDescriptor.setGroupId( extractGroupId( c ) );
+        pluginDescriptor.setArtifactId( extractArtifactId( c ) );
+        pluginDescriptor.setVersion( extractVersion( c ) );
+        pluginDescriptor.setGoalPrefix( extractGoalPrefix( c ) );
 
-        pluginDescriptor.setName( c.getChild( "name" ).getValue() );
-        pluginDescriptor.setDescription( c.getChild( "description" ).getValue() );
+        pluginDescriptor.setName( extractName( c ) );
+        pluginDescriptor.setDescription( extractDescription( c ) );
 
-        String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
+        pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
+        pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
 
-        if ( isolatedRealm != null )
-        {
-            pluginDescriptor.setIsolatedRealm( Boolean.parseBoolean( isolatedRealm ) );
-        }
+        pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
 
-        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+        pluginDescriptor.setDependencies( extractComponentDependencies( c ) );
 
-        if ( inheritedByDefault != null )
-        {
-            pluginDescriptor.setInheritedByDefault( Boolean.parseBoolean( inheritedByDefault ) );
-        }
+        return pluginDescriptor;
+    }
 
-        // ----------------------------------------------------------------------
-        // Components
-        // ----------------------------------------------------------------------
+    private String extractGroupId( PlexusConfiguration c )
+    {
+        return c.getChild( "groupId" ).getValue();
+    }
+
+    private String extractArtifactId( PlexusConfiguration c )
+    {
+        return c.getChild( "artifactId" ).getValue();
+    }
+
+    private String extractVersion( PlexusConfiguration c )
+    {
+        return c.getChild( "version" ).getValue();
+    }
+
+    private String extractGoalPrefix( PlexusConfiguration c )
+    {
+        return c.getChild( "goalPrefix" ).getValue();
+    }
+
+    private String extractName( PlexusConfiguration c )
+    {
+        return c.getChild( "name" ).getValue();
+    }
+
+    private String extractDescription( PlexusConfiguration c )
+    {
+        return c.getChild( "description" ).getValue();
+    }
+
+    private List<MojoDescriptor> extractMojos( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
+        throws PlexusConfigurationException
+    {
+        List<MojoDescriptor> mojos = new ArrayList<>();
 
         PlexusConfiguration[] mojoConfigurations = c.getChild( "mojos" ).getChildren( "mojo" );
 
         for ( PlexusConfiguration component : mojoConfigurations )
         {
-            MojoDescriptor mojoDescriptor = buildComponentDescriptor( component, pluginDescriptor );
+            mojos.add( buildComponentDescriptor( component, pluginDescriptor ) );
 
-            pluginDescriptor.addMojo( mojoDescriptor );
         }
+        return mojos;
+    }
 
-        // ----------------------------------------------------------------------
-        // Dependencies
-        // ----------------------------------------------------------------------
+    private boolean extractInheritedByDefault( PlexusConfiguration c )
+    {
+        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+
+        if ( inheritedByDefault != null )
+        {
+            return Boolean.parseBoolean( inheritedByDefault );
+        }
+        return false;
+    }
+
+    private boolean extractIsolatedRealm( PlexusConfiguration c )
+    {
+        String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
+
+        if ( isolatedRealm != null )
+        {
+            return Boolean.parseBoolean( isolatedRealm );
+        }
+        return false;
+    }
+
+    private List<ComponentDependency> extractComponentDependencies( PlexusConfiguration c )
+    {
 
         PlexusConfiguration[] dependencyConfigurations = c.getChild( "dependencies" ).getChildren( "dependency" );
 
@@ -96,22 +149,23 @@ public class PluginDescriptorBuilder
 
         for ( PlexusConfiguration d : dependencyConfigurations )
         {
-            ComponentDependency cd = new ComponentDependency();
-
-            cd.setArtifactId( d.getChild( "artifactId" ).getValue() );
-
-            cd.setGroupId( d.getChild( "groupId" ).getValue() );
-
-            cd.setType( d.getChild( "type" ).getValue() );
-
-            cd.setVersion( d.getChild( "version" ).getValue() );
-
-            dependencies.add( cd );
+            dependencies.add( extractComponentDependency( d ) );
         }
+        return dependencies;
+    }
 
-        pluginDescriptor.setDependencies( dependencies );
+    private ComponentDependency extractComponentDependency( PlexusConfiguration d )
+    {
+        ComponentDependency cd = new ComponentDependency();
 
-        return pluginDescriptor;
+        cd.setArtifactId( extractArtifactId( d ) );
+
+        cd.setGroupId( extractGroupId( d ) );
+
+        cd.setType( d.getChild( "type" ).getValue() );
+
+        cd.setVersion( extractVersion( d ) );
+        return cd;
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -190,7 +244,7 @@ public class PluginDescriptorBuilder
 
         mojo.setInstantiationStrategy( c.getChild( "instantiationStrategy" ).getValue() );
 
-        mojo.setDescription( c.getChild( "description" ).getValue() );
+        mojo.setDescription( extractDescription( c ) );
 
         PlexusConfiguration dependencyResolution = c.getChild( "requiresDependencyResolution", false );
 
@@ -274,7 +328,7 @@ public class PluginDescriptorBuilder
         {
             Parameter parameter = new Parameter();
 
-            parameter.setName( d.getChild( "name" ).getValue() );
+            parameter.setName( extractName( d ) );
 
             parameter.setAlias( d.getChild( "alias" ).getValue() );
 
@@ -294,7 +348,7 @@ public class PluginDescriptorBuilder
                 parameter.setEditable( editable == null || Boolean.parseBoolean( editable ) );
             }
 
-            parameter.setDescription( d.getChild( "description" ).getValue() );
+            parameter.setDescription( extractDescription( d ) );
 
             parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
 

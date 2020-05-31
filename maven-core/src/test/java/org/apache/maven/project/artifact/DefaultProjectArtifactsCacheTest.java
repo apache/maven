@@ -26,9 +26,10 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.codehaus.plexus.PlexusTestCase;
 
-public class DefaultProjectArtifactsCacheTest extends PlexusTestCase
+import junit.framework.TestCase;
+
+public class DefaultProjectArtifactsCacheTest extends TestCase
 {
     
     private ProjectArtifactsCache cache;
@@ -38,7 +39,7 @@ public class DefaultProjectArtifactsCacheTest extends PlexusTestCase
         throws Exception
     {
         super.setUp();
-        cache = lookup( ProjectArtifactsCache.class );
+        cache = new DefaultProjectArtifactsCache();
     }
     
     public void testProjectDependencyOrder() throws Exception

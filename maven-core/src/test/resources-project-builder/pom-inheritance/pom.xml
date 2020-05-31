@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -33,16 +33,16 @@ under the License.
 
   <name>parent-name</name>
   <description>parent-description</description>
-  <url>http://parent.url/</url>
+  <url>https://parent.url/</url>
   <inceptionYear>2008</inceptionYear>
   <organization>
     <name>parent-org</name>
-    <url>http://parent-org.url/</url>
+    <url>https://parent-org.url/</url>
   </organization>
   <licenses>
     <license>
       <name>parent-license</name>
-      <url>http://parent.url/license</url>
+      <url>https://parent.url/license</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -74,27 +74,27 @@ under the License.
   </modules>
 
   <scm>
-    <url>http://parent.url/trunk</url>
+    <url>https://parent.url/trunk</url>
     <connection>http://parent.url/scm</connection>
     <developerConnection>https://parent.url/scm</developerConnection>
   </scm>
   <issueManagement>
-    <url>http://parent.url/issues</url>
+    <url>https://parent.url/issues</url>
   </issueManagement>
   <ciManagement>
-    <url>http://parent.url/ci</url>
+    <url>https://parent.url/ci</url>
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://parent.url/dist</url>
+      <url>https://parent.url/dist</url>
       <id>parent.distros</id>
     </repository>
     <snapshotRepository>
-      <url>http://parent.url/snaps</url>
+      <url>https://parent.url/snaps</url>
       <id>parent.snaps</id>
     </snapshotRepository>
     <site>
-      <url>http://parent.url/site</url>
+      <url>https://parent.url/site</url>
       <id>parent.site</id>
     </site>
     <downloadUrl>http://parent.url/download</downloadUrl>
@@ -130,7 +130,7 @@ under the License.
   <repositories>
     <repository>
       <id>parent-remote-repo</id>
-      <url>http://parent.url/remote</url>
+      <url>https://parent.url/remote</url>
     </repository>
   </repositories>
 

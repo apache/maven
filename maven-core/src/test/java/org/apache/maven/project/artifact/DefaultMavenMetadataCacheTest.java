@@ -44,7 +44,7 @@ public class DefaultMavenMetadataCacheTest
         throws Exception
     {
         super.setUp();
-        repositorySystem = new TestRepositorySystem();
+        repositorySystem = new TestRepositorySystem( null, null );
     }
 
     @Override

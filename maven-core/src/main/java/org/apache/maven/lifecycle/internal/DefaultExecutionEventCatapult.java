@@ -19,11 +19,13 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Assists in firing execution events. <strong>Warning:</strong> This is an internal utility class that is only public
@@ -32,7 +34,8 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ExecutionEventCatapult.class )
+@Named
+@Singleton
 public class DefaultExecutionEventCatapult
     implements ExecutionEventCatapult
 {

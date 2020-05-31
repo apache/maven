@@ -29,9 +29,9 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.apache.maven.model.path.PathTranslator;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -42,19 +42,19 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import static org.junit.Assert.*;
+
 /**
  * @author jdcasey
  */
 public abstract class AbstractModelInterpolatorTest
-    extends TestCase
 {
+    protected ModelInterpolator interpolator;
     private Properties context;
 
-    protected void setUp()
-        throws Exception
+    @Before
+    public void setUp()
     {
-        super.setUp();
-
         context = new Properties();
         context.put( "basedir", "myBasedir" );
         context.put( "project.baseUri", "myBaseUri" );
@@ -68,22 +68,11 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals( "Expected no fatals", 0, collector.getFatals().size() );
     }
 
-    /**
-     * @deprecated instead use {@link #assertCollectorState(int, int, int, SimpleProblemCollector)}
-     */
-    @Deprecated
-    protected void assertColllectorState( int numFatals, int numErrors, int numWarnings,
-                                          SimpleProblemCollector collector )
+    protected void assertCollectorState( int numFatals, int numErrors, int numWarnings, SimpleProblemCollector collector )
     {
-        assertEquals( "Errors",  numErrors, collector.getErrors().size() );
+        assertEquals( "Errors", numErrors, collector.getErrors().size() );
         assertEquals( "Warnings", numWarnings, collector.getWarnings().size() );
         assertEquals( "Fatals", numFatals, collector.getFatals().size() );
-    }
-
-    protected void assertCollectorState( int numFatals, int numErrors, int numWarnings,
-                                          SimpleProblemCollector collector )
-    {
-        assertColllectorState(numFatals, numErrors, numWarnings, collector);
     }
 
     private ModelBuildingRequest createModelBuildingRequest( Properties p )
@@ -96,6 +85,7 @@ public abstract class AbstractModelInterpolatorTest
         return config;
     }
 
+    @Test
     public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat()
     {
         Calendar cal = Calendar.getInstance();
@@ -121,13 +111,13 @@ public abstract class AbstractModelInterpolatorTest
 
         Date secondTestDate = cal.getTime();
 
-        SimpleDateFormat format =
-            new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
+        SimpleDateFormat format = new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
         format.setTimeZone( MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE );
         assertEquals( "1976-11-11T00:16:00Z", format.format( firstTestDate ) );
         assertEquals( "1976-11-11T23:16:00Z", format.format( secondTestDate ) );
     }
 
+    @Test
     public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover()
     {
         Calendar cal = Calendar.getInstance();
@@ -146,15 +136,14 @@ public abstract class AbstractModelInterpolatorTest
 
         Date secondTestDate = cal.getTime();
 
-        SimpleDateFormat format =
-            new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
+        SimpleDateFormat format = new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
         format.setTimeZone( MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE );
         assertEquals( "2014-06-15T23:16:00Z", format.format( firstTestDate ) );
         assertEquals( "2014-11-16T00:16:00Z", format.format( secondTestDate ) );
     }
 
-    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue()
-        throws Exception
+    @Test
+    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception
     {
         Model model = new Model();
 
@@ -166,15 +155,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
 
-        assertProblemFree(  collector );
+        assertProblemFree( collector );
         assertEquals( "${test}/somepath", out.getScm().getConnection() );
     }
 
-    public void testShouldThrowExceptionOnRecursiveScmConnectionReference()
-        throws Exception
+    @Test
+    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception
     {
         Model model = new Model();
 
@@ -183,22 +172,15 @@ public abstract class AbstractModelInterpolatorTest
 
         model.setScm( scm );
 
-        try
-        {
-            ModelInterpolator interpolator = createInterpolator();
+        ModelInterpolator interpolator = createInterpolator();
 
-            final SimpleProblemCollector collector = new SimpleProblemCollector();
-            interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-            assertCollectorState(  0, 1, 0, collector );
-        }
-        catch ( Exception e )
-        {
-
-        }
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
+        assertCollectorState(  0, 1, 0, collector );
     }
 
-    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression()
-        throws Exception
+    @Test
+    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception
     {
         Model model = new Model();
 
@@ -212,16 +194,16 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
 
-        assertProblemFree(  collector );
+        assertProblemFree( collector );
 
         assertEquals( "test/somepath", out.getScm().getConnection() );
     }
 
-    public void testShouldInterpolateOrganizationNameCorrectly()
-        throws Exception
+    @Test
+    public void shouldInterpolateOrganizationNameCorrectly() throws Exception
     {
         String orgName = "MyCo";
 
@@ -235,15 +217,14 @@ public abstract class AbstractModelInterpolatorTest
 
         ModelInterpolator interpolator = createInterpolator();
 
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
-                                           new SimpleProblemCollector() );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                new SimpleProblemCollector() );
 
         assertEquals( orgName + " Tools", out.getName() );
     }
 
-    public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
-        throws Exception
+    @Test
+    public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -256,15 +237,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertCollectorState(0, 0, 1, collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
+        assertCollectorState( 0, 0, 1, collector );
 
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
-    public void testShouldNotInterpolateDependencyVersionWithInvalidReference()
-        throws Exception
+    @Test
+    public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -292,15 +273,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
         assertProblemFree( collector );
 
         assertEquals( "${something}", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
-    public void testTwoReferences()
-        throws Exception
+    @Test
+    public void testTwoReferences() throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -314,15 +295,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
         assertCollectorState( 0, 0, 2, collector );
 
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
-    public void testBasedir()
-        throws Exception
+    @Test
+    public void testBasedir() throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -343,8 +324,8 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals( "file://localhost/myBasedir/temp-repo", ( out.getRepositories().get( 0 ) ).getUrl() );
     }
 
-    public void testBaseUri()
-        throws Exception
+    @Test
+    public void testBaseUri() throws Exception
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -365,10 +346,10 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals( "myBaseUri/temp-repo", ( out.getRepositories().get( 0 ) ).getUrl() );
     }
 
-    public void testEnvars()
-        throws Exception
+    @Test
+    public void testEnvars() throws Exception
     {
-         Properties context = new Properties();
+        Properties context = new Properties();
 
         context.put( "env.HOME", "/path/to/home" );
 
@@ -383,15 +364,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
         assertProblemFree( collector );
 
         assertEquals( "/path/to/home", out.getProperties().getProperty( "outputDirectory" ) );
     }
 
-    public void testEnvarExpressionThatEvaluatesToNullReturnsTheLiteralString()
-        throws Exception
+    @Test
+    public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
         Model model = new Model();
 
@@ -404,15 +385,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
         assertProblemFree( collector );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
     }
 
-    public void testExpressionThatEvaluatesToNullReturnsTheLiteralString()
-        throws Exception
+    @Test
+    public void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
         Model model = new Model();
 
@@ -425,15 +406,15 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out =
-            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
+        Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
+                collector );
         assertProblemFree( collector );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
 
-    public void testShouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly()
-        throws Exception
+    @Test
+    public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception
     {
         Model model = new Model();
 
@@ -472,8 +453,8 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
     }
 
-    public void testShouldInterpolateUnprefixedBasedirExpression()
-        throws Exception
+    @Test
+    public void shouldInterpolateUnprefixedBasedirExpression() throws Exception
     {
         File basedir = new File( "/test/path" );
         Model model = new Model();
@@ -485,21 +466,57 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model result = interpolator.interpolateModel( model, basedir, createModelBuildingRequest( context ), collector );
-        assertProblemFree(  collector );
+        Model result = interpolator.interpolateModel( model, basedir, createModelBuildingRequest( context ),
+                collector );
+        assertProblemFree( collector );
 
 
         List<Dependency> rDeps = result.getDependencies();
         assertNotNull( rDeps );
         assertEquals( 1, rDeps.size() );
         assertEquals( new File( basedir, "artifact.jar" ).getAbsolutePath(),
-                      new File( rDeps.get( 0 ).getSystemPath() ).getAbsolutePath() );
+                new File( rDeps.get( 0 ).getSystemPath() ).getAbsolutePath() );
     }
 
-    protected abstract ModelInterpolator createInterpolator( PathTranslator translator )
-        throws Exception;
+    @Test
+    public void testRecursiveExpressionCycleNPE() throws Exception
+    {
+        Properties props = new Properties();
+        props.setProperty( "aa", "${bb}" );
+        props.setProperty( "bb", "${aa}" );
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
-    protected abstract ModelInterpolator createInterpolator()
-        throws Exception;
+        Model model = new Model();
+        model.setProperties( props );
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelInterpolator interpolator = createInterpolator();
+        interpolator.interpolateModel( model, null, request, collector );
+
+        assertCollectorState( 0, 2, 0, collector );
+        assertTrue( collector.getErrors().get( 0 ).contains( "Detected the following recursive expression cycle" ) );
+    }
+
+    @Test
+    public void testRecursiveExpressionCycleBaseDir() throws Exception
+    {
+        Properties props = new Properties();
+        props.setProperty( "basedir", "${basedir}" );
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+
+        Model model = new Model();
+        model.setProperties( props );
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelInterpolator interpolator = createInterpolator();
+        interpolator.interpolateModel( model, null, request, collector );
+
+        assertCollectorState( 0, 1, 0, collector );
+        assertEquals(
+                "Resolving expression: '${basedir}': Detected the following recursive expression cycle in 'basedir': [basedir]",
+                collector.getErrors().get( 0 ) );
+    }
+
+    protected abstract ModelInterpolator createInterpolator() throws Exception;
 
 }
