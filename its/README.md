@@ -34,7 +34,7 @@ mvn verify -P local-it -f "$MAVENCODEBASE"
 
 Now run (don't forget to update the versions!)
 ```
-mvn clean install -Prun-its,embdedded -Dmaven.repo.local=`pwd`/repo  -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-<VERSION>-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar"
+mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo  -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-<VERSION>-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar"
 ```
 
 or if behind a proxy
