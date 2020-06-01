@@ -2,7 +2,7 @@ pipeline {
   agent { node { label 'ubuntu' } }
   options {
     durabilityHint('PERFORMANCE_OPTIMIZED')
-    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '5'))
     timeout(time: 180, unit: 'MINUTES')
   }
   stages {
@@ -10,7 +10,7 @@ pipeline {
       steps {
         sh "rm -rf ${env.WORKSPACE}/repo"
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
-            sh "mvn -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
+            sh "mvn -B -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
       }
 //        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
@@ -25,7 +25,7 @@ pipeline {
 //        unstash name: 'mavenWrapper'
         sh "ls -lrt"
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
-          sh "mvn clean test -Prun-its,embedded -Dmaven.test.failure.ignore=true -Dmaven.repo.local=${env.WORKSPACE}/repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
+          sh "mvn clean test -B -Prun-its,embedded -Dmaven.test.failure.ignore=true -Dmaven.repo.local=${env.WORKSPACE}/repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
         }
       }
     }
