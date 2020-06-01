@@ -37,6 +37,9 @@ pipeline {
   post {
     always {
       junit testResults: 'core-it-suite/target/surefire-reports/*.xml', allowEmptyResults: true
+      script{
+        currentBuild.description = "Build with Core Its branch:$ITS_BRANCH"
+      }
       cleanWs()
     }
   }
