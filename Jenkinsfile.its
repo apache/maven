@@ -8,6 +8,7 @@ pipeline {
   stages {
     stage("Build Maven Core") {
       steps {
+        sh "rm -rf ${env.WORKSPACE}/repo"
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
             sh "mvn -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
