@@ -8,8 +8,9 @@ pipeline {
   stages {
     stage("Build Maven Core") {
       steps {
-        withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3',publisherStrategy: 'EXPLICIT'){
-          sh "mvn -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
+        withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
+            sh "mvn -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
+          }
         }
 //        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
 //        stash name: 'wrapperDistroDir', includes: 'apache-maven/target/**'
@@ -23,9 +24,7 @@ pipeline {
 //        unstash name: 'wrapperDistroDir'
 //        unstash name: 'mavenWrapper'
         sh "ls -lrt"
-        withMaven(jdk: 'JDK 1.8 (latest)',
-                  maven: 'Maven 3.6.3',
-                  publisherStrategy: 'EXPLICIT'){
+        withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
           sh "mvn clean test -Prun-its,embedded -Dmaven.test.failure.ignore=true -Dmaven.repo.local=${env.WORKSPACE}/repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
         }
       }
