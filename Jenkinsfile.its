@@ -5,6 +5,10 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '5'))
     timeout(time: 180, unit: 'MINUTES')
   }
+  parameters {
+    string( defaultValue: 'master', description: 'Core Its branch (default master)',
+            name: 'ITS_BRANCH' )
+  }
   stages {
     stage("Build Maven Core") {
       steps {
@@ -18,7 +22,7 @@ pipeline {
     }
     stage( "Run Maven Integration Testing" ) {
       steps {
-        git url: "https://github.com/apache/maven-integration-testing.git", branch: "master"
+        git url: "https://github.com/apache/maven-integration-testing.git", branch: "${ITS_BRANCH}"
 //        unstash name: 'apache-maven-bin.zip'
 //        unstash name: 'wrapperDistroDir'
 //        unstash name: 'mavenWrapper'
