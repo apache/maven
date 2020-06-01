@@ -34,7 +34,7 @@ mvn verify -P local-it -f "$MAVENCODEBASE"
 
 Now run (don't forget to update the versions!)
 ```
-mvn clean install -Prun-its,embdedded -Dmaven.repo.local=`pwd`/repo  -DmavenDistro="$MAVENCODEBASE\apache-maven\target\apache-maven-<VERSION>-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE\apache-maven\target" -DmavenWrapper="$MAVENCODEBASE\maven-wrapper\target\maven-wrapper-<VERSION>.jar"
+mvn clean install -Prun-its,embdedded -Dmaven.repo.local=`pwd`/repo  -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-<VERSION>-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar"
 ```
 
 or if behind a proxy
@@ -42,5 +42,11 @@ or if behind a proxy
 ```
 mvn clean install -Prun-its -Dmaven.repo.local=`pwd`/repo -DmavenDistro=/path/to/apache-maven-dist.zip -Dproxy.active=true -Dproxy.type=http -Dproxy.host=... -Dproxy.port=... -Dproxy.user=... -Dproxy.pass=...
 ```
+
+Using the script 
+
+Build Maven core with the profile `-PversionlessMavenDist`
+
+Now Run the script: `sh ./run-its.sh` 
 
 Maven Developers List: dev@maven.apache.org
