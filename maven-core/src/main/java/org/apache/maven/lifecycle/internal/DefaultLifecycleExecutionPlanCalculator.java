@@ -41,6 +41,8 @@ import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -153,6 +155,8 @@ public class DefaultLifecycleExecutionPlanCalculator
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
+        final List<MojoExecution> setupMojoExecutions = new ArrayList<>();
+
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             setupMojoExecution( session, project, mojoExecution );
@@ -206,12 +210,38 @@ public class DefaultLifecycleExecutionPlanCalculator
                     executionId = pluginGoal.substring( executionIdx + 1 );
                 }
 
-                MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor( pluginGoal, session, project );
+                final MojoDescriptor mojoDescriptor =
+                        mojoDescriptorCreator.getMojoDescriptor( pluginGoal, session, project );
 
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId,
-                                                                 MojoExecution.Source.CLI );
+                if ( executionId.equals( "*" ) )
+                {
+                    final String g = mojoDescriptor.getPluginDescriptor().getGroupId();
+                    final String a = mojoDescriptor.getPluginDescriptor().getArtifactId();
 
-                mojoExecutions.add( mojoExecution );
+                    Plugin plugin = findPlugin( g, a, project.getBuildPlugins() );
+
+                    if ( plugin == null && project.getPluginManagement() != null )
+                    {
+                        plugin = findPlugin( g, a, project.getPluginManagement().getPlugins() );
+                    }
+
+                    for ( final PluginExecution execution : plugin.getExecutions() )
+                    {
+                        final MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId(),
+                                MojoExecution.Source.CLI );
+
+                        mojoExecutions.add( mojoExecution );
+                    }
+
+                }
+                else
+                {
+
+                    final MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId,
+                            MojoExecution.Source.CLI );
+
+                    mojoExecutions.add( mojoExecution );
+                }
             }
             else if ( task instanceof LifecycleTask )
             {
@@ -231,6 +261,19 @@ public class DefaultLifecycleExecutionPlanCalculator
             }
         }
         return mojoExecutions;
+    }
+
+    private Plugin findPlugin( final String groupId, final String artifactId, final Collection<Plugin> plugins )
+    {
+        for ( final Plugin plugin : plugins )
+        {
+            if ( artifactId.equals( plugin.getArtifactId() ) && groupId.equals( plugin.getGroupId() ) )
+            {
+                return plugin;
+            }
+        }
+
+        return null;
     }
 
     private Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
