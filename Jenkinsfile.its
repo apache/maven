@@ -32,7 +32,7 @@ pipeline {
   }
   post {
     always {
-      junit 'core-it-suite/target/surefire-reports/*.xml'
+      junit testResults: 'core-it-suite/target/surefire-reports/*.xml', allowEmptyResults: true
       cleanWs()
     }
   }
