@@ -9,7 +9,7 @@ pipeline {
     stage("Build Maven Core") {
       steps {
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
-            sh "mvn -Drat.skip=true -T2 -B -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
+            sh "mvn -Drat.skip=true -T2 -B -V install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
       }
 //        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
