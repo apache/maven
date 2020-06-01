@@ -16,7 +16,7 @@ pipeline {
 //        stash name: 'mavenWrapper', includes: 'maven-wrapper/target/maven-wrapper.jar'
       }
     }
-    stage( "Checkout Maven Integration Testing" ) {
+    stage( "Run Maven Integration Testing" ) {
       steps {
         git url: "https://github.com/apache/maven-integration-testing.git", branch: "master"
 //        unstash name: 'apache-maven-bin.zip'
