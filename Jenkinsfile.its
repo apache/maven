@@ -16,16 +16,10 @@ pipeline {
             sh "mvn -Drat.skip=true -T2 -B -V install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
       }
-//        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
-//        stash name: 'wrapperDistroDir', includes: 'apache-maven/target/**'
-//        stash name: 'mavenWrapper', includes: 'maven-wrapper/target/maven-wrapper.jar'
     }
     stage( "Run Maven Integration Testing" ) {
       steps {
         git url: "https://github.com/apache/maven-integration-testing.git", branch: "${ITS_BRANCH}"
-//        unstash name: 'apache-maven-bin.zip'
-//        unstash name: 'wrapperDistroDir'
-//        unstash name: 'mavenWrapper'
         sh "ls -lrt ${env.WORKSPACE}/apache-maven/target/"
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
           //embedded fastest
