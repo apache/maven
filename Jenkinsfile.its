@@ -9,7 +9,7 @@ pipeline {
     stage("Build Maven Core") {
       steps {
         withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3',publisherStrategy: 'EXPLICIT'){
-          sh "mvn -V clean install -P versionlessMavenDist"
+          sh "mvn -V clean install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
 //        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
 //        stash name: 'wrapperDistroDir', includes: 'apache-maven/target/**'
