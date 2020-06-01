@@ -8,6 +8,7 @@ pipeline {
   stages {
     stage("Build Maven Core") {
       steps {
+        cleanWs()
         withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3',publisherStrategy: 'EXPLICIT'){
           sh "mvn -V clean install -P versionlessMavenDist"
         }
