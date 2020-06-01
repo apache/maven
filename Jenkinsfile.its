@@ -1,0 +1,16 @@
+pipeline {
+  agent any
+  options {
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+    timeout(time: 180, unit: 'MINUTES')
+  }
+  stages {
+    stage( "Checkout Maven Integration Testing" ) {
+      steps {
+        git url: "https://github.com/apache/maven-integration-testing.git", branch: "master"
+        sh "ls -lrt"
+      }
+    }
+  }
+}
