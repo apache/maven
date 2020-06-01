@@ -27,7 +27,7 @@ pipeline {
                   maven: 'Maven 3.6.3',
                   publisherStrategy: 'EXPLICIT',
                   options: [junitPublisher(disabled: false)]){
-          sh "mvn test -Prun-its,embdedded -Dmaven.repo.local=./repo  -DmavenDistro=apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=apache-maven/target -DmavenWrapper=maven-wrapper/target/maven-wrapper.jar"
+          sh "mvn test -Prun-its,embdedded -Dmaven.repo.local=./repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
         }
       }
     }
