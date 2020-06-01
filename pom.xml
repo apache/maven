@@ -552,6 +552,7 @@ under the License.
               -->
               <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+              <excludes>Jenkinsfile.its</excludes>
             </excludes>
           </configuration>
         </plugin>
