@@ -25,8 +25,7 @@ pipeline {
         sh "ls -lrt"
         withMaven(jdk: 'JDK 1.8 (latest)',
                   maven: 'Maven 3.6.3',
-                  publisherStrategy: 'EXPLICIT',
-                  options: [junitPublisher(disabled: false)]){
+                  publisherStrategy: 'EXPLICIT'){
           sh "mvn clean test -Prun-its,embdedded -Dmaven.test.failure.ignore=true -Dmaven.repo.local=./repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
         }
       }
@@ -34,6 +33,7 @@ pipeline {
   }
   post {
     always {
+      junit 'core-it-suite/target/surefire-reports/*.xml'
       cleanWs()
     }
   }
