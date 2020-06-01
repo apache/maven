@@ -8,21 +8,24 @@ pipeline {
   stages {
     stage("Build Maven Core") {
       steps {
-        withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3'){
+        withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3',publisherStrategy: 'EXPLICIT'){
           sh "mvn -V clean install -P versionlessMavenDist"
         }
-        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
-        stash name: 'wrapperDistroDir', includes: 'apache-maven/target/**'
-        stash name: 'mavenWrapper', includes: 'maven-wrapper/target/maven-wrapper.jar'
+//        stash name: 'apache-maven-bin.zip', includes: 'apache-maven/target/apache-maven-bin.zip'
+//        stash name: 'wrapperDistroDir', includes: 'apache-maven/target/**'
+//        stash name: 'mavenWrapper', includes: 'maven-wrapper/target/maven-wrapper.jar'
       }
     }
     stage( "Checkout Maven Integration Testing" ) {
       steps {
         git url: "https://github.com/apache/maven-integration-testing.git", branch: "master"
-        unstash name: 'apache-maven-bin.zip'
-        unstash name: 'wrapperDistroDir'
-        unstash name: 'mavenWrapper'
+//        unstash name: 'apache-maven-bin.zip'
+//        unstash name: 'wrapperDistroDir'
+//        unstash name: 'mavenWrapper'
         sh "ls -lrt"
+        withMaven(jdk: 'JDK 1.8 (latest)', maven: 'Maven 3.6.3',publisherStrategy: 'EXPLICIT'){
+          sh "mvn test -Prun-its,embdedded -Dmaven.repo.local=./repo  -DmavenDistro=apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=apache-maven/target -DmavenWrapper=maven-wrapper/target/maven-wrapper.jar"
+        }
       }
     }
   }
