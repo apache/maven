@@ -65,9 +65,8 @@ public class InstallMojo
 
             if ( attachedArtifacts != null )
             {
-                for ( Object attachedArtifact1 : attachedArtifacts )
+                for ( Artifact attachedArtifact : attachedArtifacts )
                 {
-                    Artifact attachedArtifact = (Artifact) attachedArtifact1;
                     installer.install( attachedArtifact.getFile(), attachedArtifact, localRepository );
                 }
             }
