@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
+    <version>3.7.0-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>apache-maven-wrapper</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>Apache Maven Wrapper Distribution</name>
+  <description>The Apache Maven Wrapper distribution in zip and tar.gz formats.</description>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <configuration>
+            <excludes combine.children="append">
+              <exclude>src/assembly/maven/bin/m2.conf</exclude>
+              <!-- these are partial scripts, resulting in mvn/mwnw scripts -->
+              <exclude>src/assembly/shared/init</exclude>
+              <exclude>src/assembly/shared/init.cmd</exclude>
+              <exclude>src/assembly/shared/mvnlauncher</exclude>
+              <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
+              <exclude>src/assembly/shared/mvnvalidate</exclude>
+              <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
+              <exclude>src/assembly/shared/mvnwlauncher</exclude>
+              <exclude>src/assembly/shared/mvnwlauncher.cmd</exclude>
+              <exclude>src/assembly/shared/run</exclude>
+              <exclude>src/assembly/shared/run.cmd</exclude>
+              <exclude>src/assembly/wrapper/*/download</exclude>
+              <exclude>src/assembly/wrapper/*/download.cmd</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <skip>true</skip> <!-- sharing outputDirectory with maven-dist -->
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assembly/wrapper/script.xml</descriptor>
+            <descriptor>src/assembly/wrapper/bin.xml</descriptor>
+            <descriptor>src/assembly/wrapper/source.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>apache-release</id>
+      <build>
+        <plugins>
+          <!-- calculate checksums of source release for Apache dist area -->
+          <plugin>
+            <groupId>net.nicoulaj.maven.plugins</groupId>
+            <artifactId>checksum-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>source-release-checksum</id>
+                <goals>
+                  <goal>files</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>${project.artifactId}-${project.version}-bin.zip</include>
+                    <include>${project.artifactId}-${project.version}-bin.tar.gz</include>
+                    <include>${project.artifactId}-${project.version}-script.zip</include>
+                    <include>${project.artifactId}-${project.version}-script.tar.gz</include>
+                    <include>${project.artifactId}-${project.version}-source.zip</include>
+                    <include>${project.artifactId}-${project.version}-source.tar.gz</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+              <failIfNoFiles>true</failIfNoFiles>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

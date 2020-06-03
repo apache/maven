@@ -16,8 +16,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<component xmlns="http://maven.apache.org/ASSEMBLY-COMPONENT/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY-COMPONENT/2.0.0 http://maven.apache.org/xsd/assembly-component-2.0.0.xsd">
+<component xmlns="http://maven.apache.org/ASSEMBLY-COMPONENT/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY-COMPONENT/2.1.0 http://maven.apache.org/xsd/assembly-component-2.1.0.xsd">
   <dependencySets>
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
@@ -72,7 +72,7 @@ under the License.
       <fileMode>0755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>src/bin</directory>
+      <directory>src/assembly/maven/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>*.cmd</include>
@@ -81,7 +81,7 @@ under the License.
       <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>src/bin</directory>
+      <directory>src/assembly/maven/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>mvn</include>
@@ -93,12 +93,42 @@ under the License.
       <fileMode>0755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>src/conf</directory>
+      <directory>src/assembly/maven/conf</directory>
       <outputDirectory>conf</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/lib</directory>
+      <directory>src/assembly/maven/lib</directory>
       <outputDirectory>lib</outputDirectory>
     </fileSet>
   </fileSets>
+  
+  <files>
+    <file>
+      <sources>
+        <source>src/assembly/shared/validate.cmd</source>
+        <source>src/assembly/shared/mvnvalidate.cmd</source>
+        <source>src/assembly/shared/init.cmd</source>
+        <source>src/assembly/shared/mvnlauncher.cmd</source>
+        <source>src/assembly/shared/run.cmd</source>
+      </sources>
+      <destName>mvn.cmd</destName>
+      <outputDirectory>bin</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <sources>
+        <source>src/assembly/shared/validate</source>
+        <source>src/assembly/shared/mvnvalidate</source>
+        <source>src/assembly/shared/init</source>
+        <source>src/assembly/shared/mvnlauncher</source>
+        <source>src/assembly/shared/run</source>
+      </sources>
+      <destName>mvn</destName>
+      <outputDirectory>bin</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+      <filtered>true</filtered>
+    </file>
+  </files>
 </component>
