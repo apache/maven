@@ -75,9 +75,8 @@ public class DeployMojo
 
             if ( attachedArtifacts != null )
             {
-                for ( Object attachedArtifact1 : attachedArtifacts )
+                for ( Artifact attachedArtifact : attachedArtifacts )
                 {
-                    Artifact attachedArtifact = (Artifact) attachedArtifact1;
                     deployer.deploy( attachedArtifact.getFile(), attachedArtifact, deploymentRepository,
                                      localRepository );
                 }

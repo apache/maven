@@ -52,7 +52,7 @@ public abstract class AbstractRepoMojo
      * @readonly
      * @required
      */
-    protected Collection attachedArtifacts;
+    protected Collection<Artifact> attachedArtifacts;
 
     /**
      * The packaging of the project.
