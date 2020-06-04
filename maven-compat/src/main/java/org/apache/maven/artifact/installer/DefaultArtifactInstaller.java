@@ -31,6 +31,8 @@ import org.apache.maven.artifact.repository.metadata.MetadataBridge;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.metrics.MetricsSystem;
+import org.apache.maven.metrics.util.MetricsUtils;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
@@ -58,6 +60,9 @@ public class DefaultArtifactInstaller
     @Requirement
     private LegacySupport legacySupport;
 
+    @Requirement( hint = MetricsSystem.HINT )
+    private MetricsSystem metricsSystem;
+
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
@@ -72,6 +77,7 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
+        long startInstall = MetricsUtils.now();
         RepositorySystemSession session =
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
@@ -130,6 +136,10 @@ public class DefaultArtifactInstaller
             versioning.setRelease( artifact.getBaseVersion() );
         }
         artifact.addMetadata( new ArtifactRepositoryMetadata( artifact, versioning ) );
+        metricsSystem
+                .getMetricsContext()
+                .getSummary( "installArtifact", "Time to install an artifact (ms)" )
+                .add( MetricsUtils.elapsedMillis( startInstall ) );
     }
 
 }

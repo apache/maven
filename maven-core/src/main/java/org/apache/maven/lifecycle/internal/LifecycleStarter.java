@@ -34,6 +34,7 @@ import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
+import org.apache.maven.metrics.MetricsSystem;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.logging.Logger;
 
@@ -71,6 +72,10 @@ public class LifecycleStarter
     
     @Inject
     private SessionScope sessionScope;
+
+    @Inject
+    @Named( MetricsSystem.HINT )
+    private MetricsSystem metricsSystem;
 
     public void execute( MavenSession session )
     {
@@ -128,8 +133,11 @@ public class LifecycleStarter
                 logger.info( String.format( "Using the %s implementation with a thread count of %d",
                                             builder.getClass().getSimpleName(), degreeOfConcurrency ) );
             }
+            long startBuild = System.currentTimeMillis();
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
-
+            metricsSystem.getMetricsContext()
+                    .getSummary( "buildTime", "Effective build time (in ms)" )
+                    .add( System.currentTimeMillis() - startBuild );
         }
         catch ( Exception e )
         {
