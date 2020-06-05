@@ -46,7 +46,7 @@ public class DefaultToolchainsWriter implements ToolchainsWriter
         Objects.requireNonNull( output, "output cannot be null" );
         Objects.requireNonNull( toolchains, "toolchains cannot be null" );
 
-        try ( final Writer out = output )
+        try ( Writer out = output )
         {
             new MavenToolchainsXpp3Writer().write( out, toolchains );
         }

@@ -50,7 +50,7 @@ public enum ArtifactScopeEnum
     /**
      * Helper method to simplify null processing
      */
-    public static final ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
+    public static ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
     {
         return scope == null ? DEFAULT_SCOPE : scope;
     }

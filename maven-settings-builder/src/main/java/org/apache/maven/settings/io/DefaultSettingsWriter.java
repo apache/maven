@@ -64,7 +64,7 @@ public class DefaultSettingsWriter
         Objects.requireNonNull( output, "output cannot be null" );
         Objects.requireNonNull( settings, "settings cannot be null" );
 
-        try ( final Writer out = output )
+        try ( Writer out = output )
         {
             new SettingsXpp3Writer().write( out, settings );
         }
@@ -84,7 +84,7 @@ public class DefaultSettingsWriter
             encoding = "UTF-8";
         }
 
-        try ( final Writer out = new OutputStreamWriter( output, encoding ) )
+        try ( Writer out = new OutputStreamWriter( output, encoding ) )
         {
             write( out, options, settings );
         }
