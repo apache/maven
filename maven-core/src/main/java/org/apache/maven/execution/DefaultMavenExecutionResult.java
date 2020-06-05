@@ -118,8 +118,8 @@ public class DefaultMavenExecutionResult
     }
 
     @Override
-    public void setCanResume()
+    public void setCanResume( boolean canResume )
     {
-        this.canResume = true;
+        this.canResume = canResume;
     }
 }

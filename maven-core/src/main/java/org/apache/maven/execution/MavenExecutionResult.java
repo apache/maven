@@ -76,9 +76,10 @@ public interface MavenExecutionResult
     boolean canResume();
 
     /**
-     * Indicate that the build could be resumed by a second invocation of Maven.
+     * Indicate that the build can or cannot be resumed by a second invocation of Maven.
+     * @param canResume <code>true</code> when it is possible to resume the build, <code>false</code> otherwise.
      * @see org.apache.maven.execution.BuildResumer
      * @see #canResume()
      */
-    void setCanResume();
+    void setCanResume( boolean canResume );
 }

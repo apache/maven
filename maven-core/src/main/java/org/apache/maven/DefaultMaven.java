@@ -378,10 +378,8 @@ public class DefaultMaven
                     {
                         try
                         {
-                            if ( buildResumer.persistResumptionData( result, rootProject ) )
-                            {
-                                result.setCanResume();
-                            }
+                            boolean persistenceResult = buildResumer.persistResumptionData( result, rootProject );
+                            result.setCanResume( persistenceResult );
                         }
                         catch ( BuildResumptionPersistenceException e )
                         {
