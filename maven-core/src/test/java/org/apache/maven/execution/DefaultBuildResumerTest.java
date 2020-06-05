@@ -22,12 +22,9 @@ package org.apache.maven.execution;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -37,16 +34,13 @@ import java.util.Properties;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumerTest
 {
-    @Mock
-    private Logger logger;
-
-    @InjectMocks
-    private DefaultBuildResumer buildResumer;
+    private final DefaultBuildResumer buildResumer = new DefaultBuildResumer();
 
     private MavenExecutionResult result;
 
