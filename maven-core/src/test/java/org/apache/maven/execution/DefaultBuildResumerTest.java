@@ -40,13 +40,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @RunWith( MockitoJUnitRunner.class )
-public class DefaultBuildResumptionManagerTest
+public class DefaultBuildResumerTest
 {
     @Mock
     private Logger logger;
 
     @InjectMocks
-    private DefaultBuildResumptionManager buildResumptionManager;
+    private DefaultBuildResumer buildResumer;
 
     private MavenExecutionResult result;
 
@@ -62,7 +62,7 @@ public class DefaultBuildResumptionManagerTest
         MavenProject projectB = createFailedMavenProject( "B" );
         result.setTopologicallySortedProjects( asList( projectA, projectB ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.get( "resumeFrom" ), is( "test:B" ) );
     }
@@ -74,7 +74,7 @@ public class DefaultBuildResumptionManagerTest
         MavenProject projectB = createMavenProject( "B" );
         result.setTopologicallySortedProjects( asList( projectA, projectB ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.containsKey( "resumeFrom" ), is(false) );
     }
@@ -87,7 +87,7 @@ public class DefaultBuildResumptionManagerTest
         MavenProject projectC = createSucceededMavenProject( "C" );
         result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.get( "excludedProjects" ), is("test:C") );
     }
@@ -101,7 +101,7 @@ public class DefaultBuildResumptionManagerTest
         projectC.setDependencies( singletonList( toDependency( projectB ) ) );
         result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.containsKey( "excludedProjects" ), is(false) );
     }
@@ -115,7 +115,7 @@ public class DefaultBuildResumptionManagerTest
         MavenProject projectD = createFailedMavenProject( "D" );
         result.setTopologicallySortedProjects( asList( projectA, projectB, projectC, projectD ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.get( "resumeFrom" ), is("test:B") );
         assertThat( properties.get( "excludedProjects" ), is("test:C") );
@@ -129,7 +129,7 @@ public class DefaultBuildResumptionManagerTest
         MavenProject projectC = createSucceededMavenProject( "C" );
         result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
 
-        Properties properties = buildResumptionManager.determineResumptionProperties( result );
+        Properties properties = buildResumer.determineResumptionProperties( result );
 
         assertThat( properties.get( "excludedProjects" ), is( "test:B, test:C" ) );
     }
@@ -141,7 +141,7 @@ public class DefaultBuildResumptionManagerTest
         Properties properties = new Properties();
         properties.setProperty( "resumeFrom", ":module-a" );
 
-        buildResumptionManager.applyResumptionProperties( request, properties );
+        buildResumer.applyResumptionProperties( request, properties );
 
         assertThat( request.getResumeFrom(), is( ":module-a" ) );
     }
@@ -154,7 +154,7 @@ public class DefaultBuildResumptionManagerTest
         Properties properties = new Properties();
         properties.setProperty( "resumeFrom", ":module-a" );
 
-        buildResumptionManager.applyResumptionProperties( request, properties );
+        buildResumer.applyResumptionProperties( request, properties );
 
         assertThat( request.getResumeFrom(), is( ":module-b" ) );
     }
@@ -169,7 +169,7 @@ public class DefaultBuildResumptionManagerTest
         Properties properties = new Properties();
         properties.setProperty( "excludedProjects", ":module-b, :module-c" );
 
-        buildResumptionManager.applyResumptionProperties( request, properties );
+        buildResumer.applyResumptionProperties( request, properties );
 
         assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
     }
@@ -182,7 +182,7 @@ public class DefaultBuildResumptionManagerTest
                 createMavenProject( "group", "module-b" ) );
         MavenProject failedProject = allProjects.get( 0 );
 
-        String selector = buildResumptionManager.getResumeFromSelector( allProjects, failedProject );
+        String selector = buildResumer.getResumeFromSelector( allProjects, failedProject );
 
         assertThat( selector, is( ":module-a" ) );
     }
@@ -195,7 +195,7 @@ public class DefaultBuildResumptionManagerTest
                 createMavenProject( "group-b", "module" ) );
         MavenProject failedProject = allProjects.get( 0 );
 
-        String selector = buildResumptionManager.getResumeFromSelector( allProjects, failedProject );
+        String selector = buildResumer.getResumeFromSelector( allProjects, failedProject );
 
         assertThat( selector, is( "group-a:module" ) );
     }

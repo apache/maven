@@ -48,7 +48,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.BuildResumptionManager;
+import org.apache.maven.execution.BuildResumer;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -169,7 +169,7 @@ public class MavenCli
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
-    private BuildResumptionManager buildResumptionManager;
+    private BuildResumer buildResumer;
 
     public MavenCli()
     {
@@ -708,7 +708,7 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
-        buildResumptionManager = container.lookup( BuildResumptionManager.class );
+        buildResumer = container.lookup( BuildResumer.class );
 
         return container;
     }
@@ -1038,7 +1038,7 @@ public class MavenCli
             }
             else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
             {
-                String resumeFromSelector = buildResumptionManager.getResumeFromSelector( sortedProjects, project );
+                String resumeFromSelector = buildResumer.getResumeFromSelector( sortedProjects, project );
                 logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
             }
 

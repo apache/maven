@@ -28,7 +28,7 @@ import java.util.List;
  * builds of the same project that have the -r command-line flag skip successfully built projects during earlier
  * invocations of Maven.
  */
-public interface BuildResumptionManager
+public interface BuildResumer
 {
     /**
      * Persists any data needed to resume the build at a later point in time, using a new Maven invocation. This method

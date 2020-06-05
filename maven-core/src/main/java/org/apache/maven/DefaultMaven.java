@@ -36,7 +36,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.execution.BuildResumptionManager;
+import org.apache.maven.execution.BuildResumer;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -102,7 +102,7 @@ public class DefaultMaven
     private GraphBuilder graphBuilder;
 
     @Inject
-    private BuildResumptionManager buildResumptionManager;
+    private BuildResumer buildResumer;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -326,7 +326,7 @@ public class DefaultMaven
                 session.getAllProjects().stream()
                         .filter( MavenProject::isExecutionRoot )
                         .findFirst()
-                        .ifPresent( buildResumptionManager::removeResumptionData );
+                        .ifPresent( buildResumer::removeResumptionData );
             }
         }
         finally
@@ -375,7 +375,7 @@ public class DefaultMaven
                     .findFirst()
                     .ifPresent( rootProject ->
                     {
-                        if ( buildResumptionManager.persistResumptionData( result, rootProject ) )
+                        if ( buildResumer.persistResumptionData( result, rootProject ) )
                         {
                             result.setCanResume();
                         }
