@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
@@ -108,7 +107,7 @@ public class DefaultBuildResumer implements BuildResumer
         return ":" + failedProject.getArtifactId();
     }
 
-    @VisibleForTesting
+    // This method is made package-private for testing purposes
     Properties determineResumptionProperties( MavenExecutionResult result )
     {
         Properties properties = new Properties();
@@ -246,7 +245,7 @@ public class DefaultBuildResumer implements BuildResumer
         return properties;
     }
 
-    @VisibleForTesting
+    // This method is made package-private for testing purposes
     void applyResumptionProperties( MavenExecutionRequest request, Properties properties )
     {
         if ( properties.containsKey( RESUME_FROM_PROPERTY ) && StringUtils.isEmpty( request.getResumeFrom() ) )
