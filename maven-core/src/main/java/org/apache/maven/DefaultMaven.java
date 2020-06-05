@@ -318,7 +318,7 @@ public class DefaultMaven
             if ( session.getResult().hasExceptions() )
             {
                 addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
-                saveResumptionDataWhenApplicable( result, session );
+                persistResumptionData( result, session );
                 return result;
             }
             else
@@ -363,7 +363,7 @@ public class DefaultMaven
         }
     }
 
-    private void saveResumptionDataWhenApplicable( MavenExecutionResult result, MavenSession session )
+    private void persistResumptionData( MavenExecutionResult result, MavenSession session )
     {
         boolean hasLifecycleExecutionExceptions = result.getExceptions().stream()
                 .anyMatch( LifecycleExecutionException.class::isInstance );
