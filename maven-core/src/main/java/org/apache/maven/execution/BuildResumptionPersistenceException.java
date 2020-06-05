@@ -19,11 +19,9 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.project.MavenProject;
-
 /**
  * This exception will be thrown when something fails while persisting build resumption data.
- * @see BuildResumer#persistResumptionData(MavenExecutionResult, MavenProject)
+ * @see BuildResumer#persistResumptionData
  */
 public class BuildResumptionPersistenceException extends Exception
 {

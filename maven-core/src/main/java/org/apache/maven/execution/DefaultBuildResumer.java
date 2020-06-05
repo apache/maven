@@ -219,7 +219,7 @@ public class DefaultBuildResumer implements BuildResumer
         catch ( IOException e )
         {
             String message = "Could not create " + RESUME_PROPERTIES_FILENAME + " file.";
-            throw new BuildResumptionPersistenceException( message, e);
+            throw new BuildResumptionPersistenceException( message, e );
         }
 
         return true;
