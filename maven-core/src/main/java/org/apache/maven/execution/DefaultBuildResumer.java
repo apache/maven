@@ -59,6 +59,7 @@ public class DefaultBuildResumer implements BuildResumer
 
     @Override
     public boolean persistResumptionData( MavenExecutionResult result, MavenProject rootProject )
+            throws BuildResumptionPersistenceException
     {
         Properties properties = determineResumptionProperties( result );
 
@@ -204,6 +205,7 @@ public class DefaultBuildResumer implements BuildResumer
     }
 
     private boolean writeResumptionFile( MavenProject rootProject, Properties properties )
+            throws BuildResumptionPersistenceException
     {
         Path resumeProperties = Paths.get( rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
         try
@@ -216,8 +218,8 @@ public class DefaultBuildResumer implements BuildResumer
         }
         catch ( IOException e )
         {
-            LOGGER.warn( "Could not create {} file. ", RESUME_PROPERTIES_FILENAME, e );
-            return false;
+            String message = "Could not create " + RESUME_PROPERTIES_FILENAME + " file.";
+            throw new BuildResumptionPersistenceException( message, e);
         }
 
         return true;

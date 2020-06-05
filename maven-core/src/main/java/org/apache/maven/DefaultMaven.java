@@ -37,6 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumer;
+import org.apache.maven.execution.BuildResumptionPersistenceException;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -375,9 +376,16 @@ public class DefaultMaven
                     .findFirst()
                     .ifPresent( rootProject ->
                     {
-                        if ( buildResumer.persistResumptionData( result, rootProject ) )
+                        try
                         {
-                            result.setCanResume();
+                            if ( buildResumer.persistResumptionData( result, rootProject ) )
+                            {
+                                result.setCanResume();
+                            }
+                        }
+                        catch ( BuildResumptionPersistenceException e )
+                        {
+                            logger.warn( "Could not persist build resumption data", e );
                         }
                     } );
         }

@@ -37,9 +37,11 @@ public interface BuildResumer
      *
      * @param result The result of the current Maven invocation.
      * @param rootProject The root project that is being built.
+     * @throws BuildResumptionPersistenceException When an error occurs while persisting data.
      * @return Whether any data was persisted.
      */
-    boolean persistResumptionData( final MavenExecutionResult result, final MavenProject rootProject );
+    boolean persistResumptionData( final MavenExecutionResult result, final MavenProject rootProject )
+            throws BuildResumptionPersistenceException;
 
     /**
      * Uses previously stored resumption data to enrich an existing execution request.
