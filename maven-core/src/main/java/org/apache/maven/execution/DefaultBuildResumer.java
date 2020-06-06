@@ -93,21 +93,6 @@ public class DefaultBuildResumer implements BuildResumer
         }
     }
 
-    @Override
-    public String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
-    {
-        boolean hasOverlappingArtifactId = mavenProjects.stream()
-                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
-                .count() > 1;
-
-        if ( hasOverlappingArtifactId )
-        {
-            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
-        }
-
-        return ":" + failedProject.getArtifactId();
-    }
-
     // This method is made package-private for testing purposes
     Properties determineResumptionProperties( MavenExecutionResult result )
     {

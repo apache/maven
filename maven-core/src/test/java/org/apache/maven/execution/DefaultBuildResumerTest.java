@@ -168,41 +168,10 @@ public class DefaultBuildResumerTest
         assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
     }
 
-    @Test
-    public void resumeFromSelectorIsSuggestedWithoutGroupId()
-    {
-        List<MavenProject> allProjects = asList(
-                createMavenProject( "group", "module-a" ),
-                createMavenProject( "group", "module-b" ) );
-        MavenProject failedProject = allProjects.get( 0 );
-
-        String selector = buildResumer.getResumeFromSelector( allProjects, failedProject );
-
-        assertThat( selector, is( ":module-a" ) );
-    }
-
-    @Test
-    public void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique()
-    {
-        List<MavenProject> allProjects = asList(
-                createMavenProject( "group-a", "module" ),
-                createMavenProject( "group-b", "module" ) );
-        MavenProject failedProject = allProjects.get( 0 );
-
-        String selector = buildResumer.getResumeFromSelector( allProjects, failedProject );
-
-        assertThat( selector, is( "group-a:module" ) );
-    }
-
     private MavenProject createMavenProject( String artifactId )
     {
-        return createMavenProject( "test", artifactId );
-    }
-
-    private MavenProject createMavenProject( String groupId, String artifactId )
-    {
         MavenProject project = new MavenProject();
-        project.setGroupId( groupId );
+        project.setGroupId( "test" );
         project.setArtifactId( artifactId );
         return project;
     }
