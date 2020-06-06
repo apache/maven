@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class MavenITmng5937MavenWrapper
     extends AbstractMavenIntegrationTestCase
 {
-    private final Path wrapperDistro;
+    private Path wrapperDistro;
     
     private final Map<String,String> envVars;
     
@@ -49,10 +49,28 @@ public class MavenITmng5937MavenWrapper
     
     private ZipUnArchiver zipUnArchiver = new ZipUnArchiver();
     
-    public MavenITmng5937MavenWrapper() throws Exception
+    public MavenITmng5937MavenWrapper()
+        throws Exception
     {
         super( "[3.7.0,)" );
         
+        String localRepo = System.getProperty("maven.repo.local");
+        
+        envVars = new HashMap<>( 4 );
+        envVars.put( "MVNW_REPOURL", Paths.get( localRepo ).toUri().toURL().toString() );
+        envVars.put( "MVNW_VERBOSE", "true" );
+        String javaHome = System.getenv( "JAVA_HOME" );
+        if ( javaHome != null )
+        {
+            // source needs to call the javac executable.
+            // if JAVA_HOME is not set, ForkedLauncher sets it to java.home, which is the JRE home
+            envVars.put( "JAVA_HOME", javaHome );
+        }
+    }
+
+    public void setUp()
+        throws Exception
+    {
         String mavenDist = System.getProperty( "maven.distro" );
         if ( StringUtils.isEmpty( mavenDist ) )
         {
@@ -74,19 +92,6 @@ public class MavenITmng5937MavenWrapper
             throw new IllegalStateException( "Missing maven.wrapper.distrodir=${wrapperDistroDir} parameter to test maven-wrapper: see run ITs instructions" );
         }
         wrapperDistro = Paths.get( distroValue );
-        
-        String localRepo = System.getProperty("maven.repo.local");
-        
-        envVars = new HashMap<>( 4 );
-        envVars.put( "MVNW_REPOURL", Paths.get( localRepo ).toUri().toURL().toString() );
-        envVars.put( "MVNW_VERBOSE", "true" );
-        String javaHome = System.getenv( "JAVA_HOME" );
-        if ( javaHome != null )
-        {
-            // source needs to call the javac executable.
-            // if JAVA_HOME is not set, ForkedLauncher sets it to java.home, which is the JRE home
-            envVars.put( "JAVA_HOME", javaHome );
-        }
     }
 
     public void testitMNG5937Bin()
