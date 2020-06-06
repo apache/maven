@@ -60,7 +60,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             ]) {
 			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
 			    sh "mvn clean"
-                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
+                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -DdistributionFileName=${project.artifactId}"
             }
             dir ('apache-maven/target') {
                 stash includes: 'apache-maven-bin.zip,apache-maven-wrapper-*.zip', name: 'maven-dist'
