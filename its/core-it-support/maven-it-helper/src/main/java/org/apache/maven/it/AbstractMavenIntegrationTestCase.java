@@ -200,13 +200,34 @@ public abstract class AbstractMavenIntegrationTestCase
     protected void runTest()
         throws Throwable
     {
-        String line = getTestName();
-        out.print( line );
-        out.print( pad( RESULT_COLUMN - line.length() ) );
+        String testName = getTestName();
+
+        if ( testName.startsWith( "mng" ) || Character.isDigit( testName.charAt( 0 ) ) )
+        {
+            int mng = 4;
+            while ( Character.isDigit( testName.charAt( mng ) ) )
+            {
+                mng++;
+            }
+            out.print( AnsiSupport.bold( testName.substring( 0, mng ) ) );
+            out.print( ' ' );
+            out.print( testName.substring( mng ) );
+        }
+        else
+        {
+            int index = testName.indexOf( ' ' );
+            out.print( AnsiSupport.bold( testName.substring( 0, index ) ) );
+            out.print( testName.substring( index ) );
+            out.print( '.' );
+        }
+
+        out.print( pad( RESULT_COLUMN - testName.length() ) );
+        out.print( ' ' );
 
         if ( skip )
         {
-            out.println( "SKIPPED - Maven version " + getMavenVersion() + " not in range " + versionRange );
+            out.println( AnsiSupport.warning( "SKIPPED" ) + " - Maven version " + getMavenVersion() + " not in range "
+                + versionRange );
             return;
         }
 
@@ -225,22 +246,24 @@ public abstract class AbstractMavenIntegrationTestCase
             {
                 throw invert;
             }
-            out.println( "OK " + formatTime( milliseconds ) );
+            out.println( AnsiSupport.success( "OK" ) + " " + formatTime( milliseconds ) );
         }
         catch ( UnsupportedJavaVersionException e )
         {
-            out.println( "SKIPPED - Java version " + e.javaVersion + " not in range " + e.supportedRange );
+            out.println( AnsiSupport.warning( "SKIPPED" ) + " - Java version " + e.javaVersion + " not in range "
+                + e.supportedRange );
             return;
         }
         catch ( UnsupportedMavenVersionException e )
         {
-            out.println( "SKIPPED - Maven version " + e.mavenVersion + " not in range " + e.supportedRange );
+            out.println( AnsiSupport.warning( "SKIPPED" ) + " - Maven version " + e.mavenVersion + " not in range "
+                + e.supportedRange );
             return;
         }
         catch ( BrokenMavenVersionException e )
         {
-            out.println( "UNEXPECTED OK - Maven version " + e.mavenVersion + " expected to fail "
-                    + formatTime( milliseconds ) );
+            out.println( AnsiSupport.error( "UNEXPECTED OK" ) + " - Maven version " + e.mavenVersion
+                + " expected to fail " + formatTime( milliseconds ) );
             fail( "Expected failure when with Maven version " + e.mavenVersion );
         }
         catch ( Throwable t )
@@ -248,12 +271,12 @@ public abstract class AbstractMavenIntegrationTestCase
             milliseconds = System.currentTimeMillis() - milliseconds;
             if ( invert != null )
             {
-                out.println( "EXPECTED FAIL - Maven version " + invert.mavenVersion + " expected to fail "
-                        + formatTime( milliseconds ) );
+                out.println( AnsiSupport.success( "EXPECTED FAIL" ) + " - Maven version " + invert.mavenVersion
+                    + " expected to fail " + formatTime( milliseconds ) );
             }
             else
             {
-                out.println( "FAILURE " + formatTime( milliseconds ) );
+                out.println( AnsiSupport.error( "FAILURE" ) + " " + formatTime( milliseconds ) );
                 throw t;
             }
         }
@@ -426,7 +449,7 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             methodName = methodName.substring( 4 );
         }
-        return className + '(' + methodName + ')';
+        return className + " (" + methodName + ')';
     }
 
     private String pad( int chars )
