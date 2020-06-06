@@ -49,7 +49,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
             String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
-            withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
+            withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", mavenOpts:'-DdistributionFileName=${project.artifactId}', options:[
                 artifactsPublisher(disabled: false),
                 junitPublisher(ignoreAttachments: false),
                 findbugsPublisher(disabled: false),
@@ -60,7 +60,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             ]) {
 			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
 			    sh "mvn clean"
-                sh """mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -DdistributionFileName=${project.artifactId}"""
+                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true"
             }
             dir ('apache-maven/target') {
                 stash includes: 'apache-maven-bin.zip,apache-maven-wrapper-*.zip', name: 'maven-dist'
