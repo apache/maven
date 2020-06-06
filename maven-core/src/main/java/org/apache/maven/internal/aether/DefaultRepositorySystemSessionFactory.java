@@ -40,6 +40,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.SessionData;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -247,8 +248,7 @@ public class DefaultRepositorySystemSessionFactory
 
         if ( Features.buildConsumer().isActive() )
         {
-            session.setFileTransformerManager( a -> getTransformersForArtifact( a,
-                          (TransformerContext) session.getData().get( TransformerContext.KEY ) ) );
+            session.setFileTransformerManager( a -> getTransformersForArtifact( a, session.getData() ) );
         }
 
         return session;
@@ -281,8 +281,9 @@ public class DefaultRepositorySystemSessionFactory
     }
     
     private Collection<FileTransformer> getTransformersForArtifact( final org.eclipse.aether.artifact.Artifact artifact,
-                                                                    TransformerContext context )
+                                                                    final SessionData sessionData )
     {
+        TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
         Collection<FileTransformer> transformers = new ArrayList<>();
         if ( "pom".equals( artifact.getExtension() ) )
         {
