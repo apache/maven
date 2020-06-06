@@ -21,8 +21,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -39,16 +37,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -67,9 +55,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.ArtifactModelSource;
-import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -84,9 +70,6 @@ import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.apache.maven.xml.Factories;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -98,7 +81,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.xml.sax.SAXException;
 
 /**
  * DefaultProjectBuilder
@@ -313,7 +295,7 @@ public class DefaultProjectBuilder
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
         request.setModelCache( config.modelCache );
-        request.setTransformerContext( (TransformerContext) config.session.getData().get( TransformerContext.class ) );
+        request.setTransformerContext( (TransformerContext) config.session.getData().get( TransformerContext.KEY ) );
 
         return request;
     }
@@ -426,7 +408,7 @@ public class DefaultProjectBuilder
                     return modelPool.get( groupId, artifactId, null );
                 }
             };
-            request.getRepositorySession().getData().set( TransformerContext.class, context );
+            request.getRepositorySession().getData().set( TransformerContext.KEY, context );
         }
 
         InternalConfig config = new InternalConfig( request, modelPool,
@@ -1125,63 +1107,6 @@ public class DefaultProjectBuilder
             repositories = RepositoryUtils.toRepos( request.getRemoteRepositories() );
         }
 
-    }
-
-    static class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
-    {
-        @Override
-        protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
-            throws TransformerConfigurationException, SAXException, ParserConfigurationException
-        {
-            return new ConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context ) ).get( pomFile );
-        }
-        
-        @Override
-        protected TransformerHandler getTransformerHandler( Path pomFile )
-            throws IOException, org.apache.maven.model.building.TransformerException
-        {
-            final TransformerHandler transformerHandler;
-            
-            final SAXTransformerFactory transformerFactory =
-                            (SAXTransformerFactory) Factories.newTransformerFactory();
-            
-            // Keep same encoding+version
-            try ( InputStream input = Files.newInputStream( pomFile ) )
-            {
-                XMLStreamReader streamReader =
-                    XMLInputFactory.newFactory().createXMLStreamReader( input );
-
-                transformerHandler = transformerFactory.newTransformerHandler();
-
-                final String encoding = streamReader.getCharacterEncodingScheme();
-                final String version = streamReader.getVersion();
-                
-                Transformer transformer = transformerHandler.getTransformer();
-                if ( encoding == null && version == null )
-                {
-                    transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
-                }
-                else
-                {
-                    transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
-
-                    if ( encoding != null )
-                    {
-                        transformer.setOutputProperty( OutputKeys.ENCODING, encoding );
-                    }
-                    if ( version != null )
-                    {
-                        transformer.setOutputProperty( OutputKeys.VERSION, version );
-                    }
-                }
-            }
-            catch ( XMLStreamException | TransformerConfigurationException e )
-            {
-                throw new org.apache.maven.model.building.TransformerException( 
-                                   "Failed to detect XML encoding and version", e );
-            }
-            return transformerHandler;
-        }
     }
 
     private ReactorModelCache getModelCache()

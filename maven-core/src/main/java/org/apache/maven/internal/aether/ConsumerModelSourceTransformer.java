@@ -81,6 +81,7 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
             final String version = streamReader.getVersion();
             
             Transformer transformer = transformerHandler.getTransformer();
+            transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
             if ( encoding == null && version == null )
             {
                 transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );

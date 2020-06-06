@@ -30,12 +30,18 @@ under the License.
   </parent>
   <artifactId>maven-xml</artifactId>
   <name>Maven XML</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-assertj</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 </project>

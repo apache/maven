@@ -248,7 +248,7 @@ public class DefaultRepositorySystemSessionFactory
         if ( Features.buildConsumer().isActive() )
         {
             session.setFileTransformerManager( a -> getTransformersForArtifact( a,
-                          (TransformerContext) session.getData().get( TransformerContext.class ) ) );
+                          (TransformerContext) session.getData().get( TransformerContext.KEY ) ) );
         }
 
         return session;

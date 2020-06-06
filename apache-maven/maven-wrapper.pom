@@ -33,7 +33,12 @@ under the License.
   <name>Apache Maven Wrapper Distribution</name>
   <description>The Apache Maven Wrapper distribution in zip and tar.gz formats.</description>
 
+  <properties>
+    <distributionFileName>${artifactId}-${project.version}</distributionFileName>
+  </properties>
+
   <build>
+    <finalName>${distributionFileName}</finalName>
     <pluginManagement>
       <plugins>
         <plugin>

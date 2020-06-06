@@ -39,6 +39,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.xml.Factories;
+import org.apache.maven.xml.sax.ext.CommentRenormalizer;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.SAXException;
 
@@ -101,8 +102,9 @@ public abstract class AbstractModelSourceTransformer
         }
         else
         {
+            result = new SAXResult( transformerHandler );
+            ( (SAXResult) result ).setLexicalHandler( new CommentRenormalizer( transformerHandler ) );
             transformerHandler.setResult( new StreamResult( out ) );
-            result = new SAXResult( transformerHandler ); 
         }
 
         IOExceptionHandler eh = new IOExceptionHandler();

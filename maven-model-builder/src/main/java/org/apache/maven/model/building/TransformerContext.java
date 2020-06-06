@@ -30,6 +30,8 @@ import org.apache.maven.model.Model;
  */
 public interface TransformerContext
 {
+    Object KEY = TransformerContext.class;
+    
     String getUserProperty( String key );
     
     Model getRawModel( Path p );
