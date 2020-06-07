@@ -449,7 +449,7 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             methodName = methodName.substring( 4 );
         }
-        return className + " (" + methodName + ')';
+        return className + '.' + methodName + "()";
     }
 
     private String pad( int chars )
