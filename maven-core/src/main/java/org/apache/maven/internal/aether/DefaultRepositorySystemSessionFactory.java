@@ -285,7 +285,9 @@ public class DefaultRepositorySystemSessionFactory
     {
         TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
         Collection<FileTransformer> transformers = new ArrayList<>();
-        if ( "pom".equals( artifact.getExtension() ) )
+        
+        // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle. 
+        if ( "pom".equals( artifact.getExtension() ) && context != null )
         {
             transformers.add( new FileTransformer()
             {
