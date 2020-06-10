@@ -31,7 +31,7 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd
         super( "[3.2.1,)" );
     }
 
-    public void test()
+    public void testit()
         throws Exception
     {
         File testDir =

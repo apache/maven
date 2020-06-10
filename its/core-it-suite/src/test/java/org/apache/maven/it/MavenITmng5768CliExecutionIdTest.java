@@ -32,7 +32,7 @@ public class MavenITmng5768CliExecutionIdTest
         super( "(3.2.5,)" );
     }
 
-    public void test()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5768-cli-execution-id" );

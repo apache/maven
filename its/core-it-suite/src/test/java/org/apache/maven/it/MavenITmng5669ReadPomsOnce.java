@@ -45,7 +45,7 @@ public class MavenITmng5669ReadPomsOnce
         super( "[3.7.0,)" );
     }
 
-    public void test()
+    public void testit()
         throws Exception
     {
         // prepare JavaAgent
