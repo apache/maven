@@ -359,7 +359,7 @@ public class StringSearchModelInterpolatorTest
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
         assertProblemFree( collector );
 
-        assertThat( baseDir.getCanonicalPath(), is( System.getProperty( "user.dir" ) ) );
+        assertThat( baseDir.getAbsolutePath(), is( System.getProperty( "user.dir" ) ) );
         assertThat( obj.values.size(), is( 1 ) );
         assertThat( (String) obj.values.get( "key" ), is( anyOf(
                 is( System.getProperty( "user.dir" ) + File.separator + "target" ),
