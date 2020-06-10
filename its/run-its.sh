@@ -25,8 +25,12 @@
 if [ -z "$MAVENCODEBASE" ] ; then
  echo Please export MAVENCODEBASE
 else
- mvn verify -P versionlessMavenDist -f "$MAVENCODEBASE"
- mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo  -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar"
+ case "$MAVENCODEBASE" in
+  /*) ;;
+  *) MAVENCODEBASE="$PWD/$MAVENCODEBASE" ;;
+ esac
+ mvn verify -P versionlessMavenDist -f "$MAVENCODEBASE" || exit $?
+ mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar"
 fi
 
 
