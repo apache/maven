@@ -216,8 +216,15 @@ public abstract class AbstractMavenIntegrationTestCase
         else
         {
             int index = testName.indexOf( ' ' );
-            out.print( AnsiSupport.bold( testName.substring( 0, index ) ) );
-            out.print( testName.substring( index ) );
+            if ( index == -1 )
+            {
+                out.print( testName );
+            }
+            else
+            {
+                out.print( AnsiSupport.bold( testName.substring( 0, index ) ) );
+                out.print( testName.substring( index ) );
+            }
             out.print( '.' );
         }
 
