@@ -105,7 +105,7 @@ public class DefaultModelReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final Reader in = input )
+        try ( Reader in = input )
         {
             return read( in, isStrict( options ), getSource( options ) );
         }
@@ -117,7 +117,7 @@ public class DefaultModelReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final XmlStreamReader in = ReaderFactory.newXmlReader( input ) )
+        try ( XmlStreamReader in = ReaderFactory.newXmlReader( input ) )
         {
             return read( in, isStrict( options ), getSource( options ) );
         }

@@ -64,7 +64,7 @@ public class DefaultModelWriter
         Objects.requireNonNull( output, "output cannot be null" );
         Objects.requireNonNull( model, "model cannot be null" );
 
-        try ( final Writer out = output )
+        try ( Writer out = output )
         {
             new MavenXpp3Writer().write( out, model );
         }
@@ -84,7 +84,7 @@ public class DefaultModelWriter
             encoding = "UTF-8";
         }
 
-        try ( final Writer out = new OutputStreamWriter( output, encoding ) )
+        try ( Writer out = new OutputStreamWriter( output, encoding ) )
         {
             write( out, options, model );
         }
