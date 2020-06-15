@@ -72,6 +72,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -144,34 +145,35 @@ public abstract class AbstractMojoTestCase
                     MAVEN_VERSION == null || new DefaultArtifactVersion( "3.2.3" ).compareTo( MAVEN_VERSION ) < 0 );
 
         configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
+        Context context = container.getContext();
+        Map<Object, Object> map = context.getContextData();
 
-        InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
-
-        XmlStreamReader reader = new XmlStreamReader( is );
-
-        InterpolationFilterReader interpolationFilterReader =
-            new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
-
-        PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationFilterReader );
-
-        Artifact artifact =
-            lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
-                                                             pluginDescriptor.getArtifactId(),
-                                                             pluginDescriptor.getVersion(), ".jar" );
-
-        artifact.setFile( getPluginArtifactFile() );
-        pluginDescriptor.setPluginArtifact( artifact );
-        pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
-
-        for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
+        try ( InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
+              Reader reader = new BufferedReader( new XmlStreamReader( is ) ); 
+              InterpolationFilterReader interpolationReader = new InterpolationFilterReader( reader, map, "${", "}" ) )
         {
-            getContainer().addComponentDescriptor( desc );
-        }
-
-        mojoDescriptors = new HashMap<>();
-        for ( MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos() )
-        {
-            mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
+            
+            PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationReader );
+    
+            Artifact artifact =
+                lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
+                                                                 pluginDescriptor.getArtifactId(),
+                                                                 pluginDescriptor.getVersion(), ".jar" );
+    
+            artifact.setFile( getPluginArtifactFile() );
+            pluginDescriptor.setPluginArtifact( artifact );
+            pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
+    
+            for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
+            {
+                getContainer().addComponentDescriptor( desc );
+            }
+    
+            mojoDescriptors = new HashMap<>();
+            for ( MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos() )
+            {
+                mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
+            }
         }
     }
 
@@ -573,11 +575,12 @@ public abstract class AbstractMojoTestCase
     protected PlexusConfiguration extractPluginConfiguration( String artifactId, File pom )
         throws Exception
     {
-        Reader reader = ReaderFactory.newXmlReader( pom );
-
-        Xpp3Dom pomDom = Xpp3DomBuilder.build( reader );
-
-        return extractPluginConfiguration( artifactId, pomDom );
+        
+        try ( Reader reader = ReaderFactory.newXmlReader( pom ) )
+        {
+            Xpp3Dom pomDom = Xpp3DomBuilder.build( reader );
+            return extractPluginConfiguration( artifactId, pomDom );
+        }
     }
 
     /**
