@@ -17,7 +17,7 @@
 	<!-- SCM -->
 	<scm>
 		<connection>scm:svn:http://svn.sonatype.org/spice/trunk/micromailer</connection>
-		<url>http://svn.sonatype.org/spice/trunk/micromailer</url>
+		<url>https://svn.sonatype.org/spice/trunk/micromailer</url>
 		<developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/micromailer</developerConnection>
 	</scm>
 
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-utils</artifactId>
-			<version>1.5.5</version>
+			<version>3.3.0</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -97,7 +97,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
+			<version>4.13</version>
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>

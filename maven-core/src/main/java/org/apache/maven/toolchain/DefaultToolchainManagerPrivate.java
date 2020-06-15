@@ -23,15 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author mkleint
  * @author Robert Scholte
  */
-@Component( role = ToolchainManagerPrivate.class )
+@Named
+@Singleton
 public class DefaultToolchainManagerPrivate
     extends DefaultToolchainManager
     implements ToolchainManagerPrivate

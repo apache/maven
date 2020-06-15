@@ -72,6 +72,8 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The concern of the project is provide runtime values based on the model.
@@ -90,6 +92,9 @@ import org.eclipse.aether.repository.RemoteRepository;
 public class MavenProject
     implements Cloneable
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( MavenProject.class );
+
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
 
     public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
@@ -122,7 +127,7 @@ public class MavenProject
 
     private List<RemoteRepository> remotePluginRepositories;
 
-    private List<Artifact> attachedArtifacts;
+    private List<Artifact> attachedArtifacts = new ArrayList<>();
 
     private MavenProject executionProject;
 
@@ -175,7 +180,7 @@ public class MavenProject
 
     private DependencyFilter extensionDependencyFilter;
 
-    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
+    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<>() );
 
     public MavenProject()
     {
@@ -921,12 +926,23 @@ public class MavenProject
      * coordinates.
      *
      * @param artifact the artifact to add or replace.
-     * @throws DuplicateArtifactAttachmentException
+     * @deprecated Please use {@link MavenProjectHelper}
+     * @throws DuplicateArtifactAttachmentException will never happen but leave it for backward compatibility
      */
     public void addAttachedArtifact( Artifact artifact )
         throws DuplicateArtifactAttachmentException
     {
-        getAttachedArtifacts().add( artifact );
+        // if already there we remove it and add again
+        int index = attachedArtifacts.indexOf( artifact );
+        if ( index >= 0 )
+        {
+            LOGGER.warn( "artifact {} already attached, replace previous instance", artifact );
+            attachedArtifacts.set( index, artifact );
+        }
+        else
+        {
+            attachedArtifacts.add( artifact );
+        }
     }
 
     public List<Artifact> getAttachedArtifacts()
@@ -935,7 +951,7 @@ public class MavenProject
         {
             attachedArtifacts = new ArrayList<>();
         }
-        return attachedArtifacts;
+        return Collections.unmodifiableList( attachedArtifacts );
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,

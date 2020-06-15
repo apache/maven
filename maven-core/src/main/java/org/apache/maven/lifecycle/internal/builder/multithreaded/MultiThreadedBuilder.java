@@ -29,6 +29,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.BuildThreadFactory;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
@@ -39,8 +43,6 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -57,15 +59,16 @@ import org.codehaus.plexus.logging.Logger;
  *         Builds one or more lifecycles for a full module
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component( role = Builder.class, hint = "multithreaded" )
+@Named( "multithreaded" )
+@Singleton
 public class MultiThreadedBuilder
     implements Builder
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private LifecycleModuleBuilder lifecycleModuleBuilder;
 
     public MultiThreadedBuilder()
@@ -182,17 +185,14 @@ public class MultiThreadedBuilder
                                                           final ReactorContext reactorContext,
                                                           final TaskSegment taskSegment, final ThreadOutputMuxer muxer )
     {
-        return new Callable<ProjectSegment>()
+        return () ->
         {
-            public ProjectSegment call()
-            {
-                // muxer.associateThreadWithProjectSegment( projectBuild );
-                lifecycleModuleBuilder.buildProject( projectBuild.getSession(), rootSession, reactorContext,
-                                                     projectBuild.getProject(), taskSegment );
-                // muxer.setThisModuleComplete( projectBuild );
+            // muxer.associateThreadWithProjectSegment( projectBuild );
+            lifecycleModuleBuilder.buildProject( projectBuild.getSession(), rootSession, reactorContext,
+                                                 projectBuild.getProject(), taskSegment );
+            // muxer.setThisModuleComplete( projectBuild );
 
-                return projectBuild;
-            }
+            return projectBuild;
         };
     }
 }

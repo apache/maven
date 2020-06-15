@@ -38,7 +38,7 @@ class DefaultProblemCollector
 
     DefaultProblemCollector( List<Problem> problems )
     {
-        this.problems = ( problems != null ) ? problems : new ArrayList<Problem>();
+        this.problems = ( problems != null ) ? problems : new ArrayList<>();
     }
 
     @Override

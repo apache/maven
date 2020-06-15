@@ -33,7 +33,9 @@ public class UrlSource
     implements Source
 {
 
-    private URL url;
+    private final URL url;
+
+    private final int hashCode;
 
     /**
      * Creates a new source backed by the specified URL.
@@ -43,6 +45,7 @@ public class UrlSource
     public UrlSource( URL url )
     {
         this.url = Objects.requireNonNull( url, "url cannot be null" );
+        this.hashCode = Objects.hashCode( url );
     }
 
     @Override
@@ -74,4 +77,31 @@ public class UrlSource
         return getLocation();
     }
 
+    @Override
+    public int hashCode()
+    {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+
+        if ( obj == null )
+        {
+            return false;
+        }
+
+        if ( !UrlSource.class.equals( obj.getClass() ) )
+        {
+            return false;
+        }
+
+        UrlSource other = (UrlSource) obj;
+        return this.url.equals( other.url );
+    }
 }

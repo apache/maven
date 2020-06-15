@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -62,8 +66,6 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -79,7 +81,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
 /**
  * DefaultProjectBuilder
  */
-@Component( role = ProjectBuilder.class )
+@Named
+@Singleton
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
@@ -87,28 +90,28 @@ public class DefaultProjectBuilder
     public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
             "maven.defaultProjectBuilder.disableGlobalModelCache";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private ModelBuilder modelBuilder;
 
-    @Requirement
+    @Inject
     private ModelProcessor modelProcessor;
 
-    @Requirement
+    @Inject
     private ProjectBuildingHelper projectBuildingHelper;
 
-    @Requirement
+    @Inject
     private MavenRepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private org.eclipse.aether.RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private RemoteRepositoryManager repositoryManager;
 
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver dependencyResolver;
 
     private final ReactorModelCache modelCache = new ReactorModelCache();
@@ -185,8 +188,8 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.<String, MavenProject>emptyMap(), true,
-                             result, new HashMap<File, Boolean>(), projectBuildingRequest );
+                initProject( project, Collections.emptyMap(), true,
+                             result, new HashMap<>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -374,7 +377,7 @@ public class DefaultProjectBuilder
         Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
         boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive,
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
                    config );
 
         populateReactorModelPool( modelPool, interimResults );
@@ -384,8 +387,8 @@ public class DefaultProjectBuilder
         try
         {
             noErrors =
-                build( results, new ArrayList<MavenProject>(), projectIndex, interimResults, request,
-                       new HashMap<File, Boolean>(), config.session ) && noErrors;
+                build( results, new ArrayList<>(), projectIndex, interimResults, request,
+                        new HashMap<>(), config.session ) && noErrors;
         }
         finally
         {
@@ -465,7 +468,7 @@ public class DefaultProjectBuilder
         try
         {
             // first pass: build without building parent.
-            initProject( project, projectIndex, false, result, new HashMap<File, Boolean>( 0 ), config.request );
+            initProject( project, projectIndex, false, result, new HashMap<>( 0 ), config.request );
         }
         catch ( InvalidArtifactRTException iarte )
         {

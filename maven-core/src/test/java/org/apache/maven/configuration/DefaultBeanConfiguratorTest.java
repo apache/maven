@@ -23,16 +23,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import junit.framework.TestCase;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultBeanConfiguratorTest
-    extends PlexusTestCase
+    extends TestCase
 {
 
     private BeanConfigurator configurator;
@@ -43,7 +45,7 @@ public class DefaultBeanConfiguratorTest
     {
         super.setUp();
 
-        configurator = lookup( BeanConfigurator.class );
+        configurator = new DefaultBeanConfigurator();
     }
 
     @Override
@@ -89,26 +91,16 @@ public class DefaultBeanConfiguratorTest
 
         Xpp3Dom config = toConfig( "<file>${test}</file>" );
 
-        BeanConfigurationValuePreprocessor preprocessor = new BeanConfigurationValuePreprocessor()
+        BeanConfigurationValuePreprocessor preprocessor = ( value, type ) ->
         {
-            public Object preprocessValue( String value, Class<?> type )
-                throws BeanConfigurationException
+            if ( value != null && value.startsWith( "${" ) && value.endsWith( "}" ) )
             {
-                if ( value != null && value.startsWith( "${" ) && value.endsWith( "}" ) )
-                {
-                    return value.substring( 2, value.length() - 1 );
-                }
-                return value;
+                return value.substring( 2, value.length() - 1 );
             }
+            return value;
         };
 
-        BeanConfigurationPathTranslator translator = new BeanConfigurationPathTranslator()
-        {
-            public File translatePath( File path )
-            {
-                return new File( "base", path.getPath() ).getAbsoluteFile();
-            }
-        };
+        BeanConfigurationPathTranslator translator = path -> new File( "base", path.getPath() ).getAbsoluteFile();
 
         DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
         request.setBean( bean ).setConfiguration( config );

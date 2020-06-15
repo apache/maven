@@ -22,7 +22,6 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.profiles.activation.ProfileActivationException;
@@ -37,7 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 /**
  * DefaultProfileManager
@@ -187,18 +185,13 @@ public class DefaultProfileManager
 
         final List<ProfileActivationException> errors = new ArrayList<>();
 
-        List<Profile> profiles =
-            profileSelector.getActiveProfiles( profilesById.values(), context, new ModelProblemCollector()
+        List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req ->
+        {
+            if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
             {
-
-                public void add( ModelProblemCollectorRequest req )
-                {
-                    if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
-                    {
-                        errors.add( new ProfileActivationException( req.getMessage(), req.getException() ) );
-                    }
-                }
-            } );
+                errors.add( new ProfileActivationException( req.getMessage(), req.getException() ) );
+            }
+        } );
 
         if ( !errors.isEmpty() )
         {

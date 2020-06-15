@@ -41,7 +41,7 @@ public class MultipleArtifactsNotFoundException
                                                List<Artifact> missingArtifacts,
                                                List<ArtifactRepository> remoteRepositories )
     {
-        this( originatingArtifact, new ArrayList<Artifact>(), missingArtifacts, remoteRepositories );
+        this( originatingArtifact, new ArrayList<>(), missingArtifacts, remoteRepositories );
     }
 
     /**

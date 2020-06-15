@@ -436,4 +436,14 @@ public class PluginDescriptor
         }
     }
 
+    public void addMojos( List<MojoDescriptor> mojos )
+        throws DuplicateMojoDescriptorException
+    {
+        for ( MojoDescriptor mojoDescriptor : mojos )
+        {
+            addMojo( mojoDescriptor );
+        }
+
+    }
+
 }

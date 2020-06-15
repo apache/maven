@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -39,22 +43,26 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build execution plan given {@link Lifecycle} and
  * lifecycle phase. Standard lifecycles use plugin execution {@code <phase>} or mojo default lifecycle phase to
  * calculate the execution plan, but custom lifecycles can use alternative mapping strategies.
  */
-@Component( role = LifecycleMappingDelegate.class, hint = DefaultLifecycleMappingDelegate.HINT )
+@Named( DefaultLifecycleMappingDelegate.HINT )
+@Singleton
 public class DefaultLifecycleMappingDelegate
     implements LifecycleMappingDelegate
 {
     public static final String HINT = "default";
 
-    @Requirement
-    private BuildPluginManager pluginManager;
+    private final BuildPluginManager pluginManager;
+
+    @Inject
+    public DefaultLifecycleMappingDelegate( BuildPluginManager pluginManager )
+    {
+        this.pluginManager = pluginManager;
+    }
 
     public Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                         Lifecycle lifecycle, String lifecyclePhase )
@@ -149,13 +157,7 @@ public class DefaultLifecycleMappingDelegate
     private void addMojoExecution( Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,
                                    int priority )
     {
-        List<MojoExecution> mojoExecutions = phaseBindings.get( priority );
-
-        if ( mojoExecutions == null )
-        {
-            mojoExecutions = new ArrayList<>();
-            phaseBindings.put( priority, mojoExecutions );
-        }
+        List<MojoExecution> mojoExecutions = phaseBindings.computeIfAbsent( priority, k -> new ArrayList<>() );
 
         mojoExecutions.add( mojoExecution );
     }

@@ -22,7 +22,10 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -33,8 +36,6 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * <p>
@@ -47,31 +48,28 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author Jason van Zyl
  * @author Kristian Rosenvold (extracted class)
  */
-@Component( role = LifecycleModuleBuilder.class )
+@Named
+@Singleton
 public class LifecycleModuleBuilder
 {
 
-    @Requirement
+    @Inject
     private MojoExecutor mojoExecutor;
 
-    @Requirement
+    @Inject
     private BuilderCommon builderCommon;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
     private ProjectExecutionListener projectExecutionListener;
 
-    // this tricks plexus-component-metadata generate required metadata
-    @Requirement
-    private List<ProjectExecutionListener> projectExecutionListeners;
-
-    @Requirement
+    @Inject
     private SessionScope sessionScope;
 
+    @Inject
     public void setProjectExecutionListeners( final List<ProjectExecutionListener> listeners )
     {
-        this.projectExecutionListeners = listeners;
         this.projectExecutionListener = new CompoundProjectExecutionListener( listeners );
     }
 
@@ -108,7 +106,7 @@ public class LifecycleModuleBuilder
             eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
             MavenExecutionPlan executionPlan =
-                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
+                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<>() );
             List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
 
             projectExecutionListener.beforeProjectLifecycleExecution( new ProjectExecutionEvent( session,

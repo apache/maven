@@ -40,7 +40,7 @@ class DefaultSettingsBuildingResult
     DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
     {
         this.effectiveSettings = effectiveSettings;
-        this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
+        this.problems = ( problems != null ) ? problems : new ArrayList<>();
     }
 
     @Override

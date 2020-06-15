@@ -26,9 +26,11 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -37,7 +39,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = MetadataReader.class )
+@Named
+@Singleton
 public class DefaultMetadataReader
     implements MetadataReader
 {
@@ -57,7 +60,7 @@ public class DefaultMetadataReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final Reader in = input )
+        try ( Reader in = input )
         {
             return new MetadataXpp3Reader().read( in, isStrict( options ) );
         }
@@ -72,7 +75,7 @@ public class DefaultMetadataReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final InputStream in = input )
+        try ( InputStream in = input )
         {
             return new MetadataXpp3Reader().read( in, isStrict( options ) );
         }

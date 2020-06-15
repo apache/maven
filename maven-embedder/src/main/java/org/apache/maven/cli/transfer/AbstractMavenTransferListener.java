@@ -192,7 +192,7 @@ public abstract class AbstractMavenTransferListener
         public String formatProgress( long progressedSize, long size )
         {
             Validate.isTrue( progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize );
-            Validate.isTrue( size >= 0L && progressedSize <= size || size < 0L,
+            Validate.isTrue( size < 0L || progressedSize <= size,
                 "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
 
             if ( size >= 0L && progressedSize != size )

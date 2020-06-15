@@ -62,8 +62,6 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -100,12 +98,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -115,7 +116,8 @@ import java.util.zip.ZipEntry;
  * @author Benjamin Bentmann
  * @since 3.0
  */
-@Component( role = MavenPluginManager.class )
+@Named
+@Singleton
 public class DefaultMavenPluginManager
     implements MavenPluginManager
 {
@@ -131,37 +133,37 @@ public class DefaultMavenPluginManager
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private LoggerManager loggerManager;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private ClassRealmManager classRealmManager;
 
-    @Requirement
+    @Inject
     private PluginDescriptorCache pluginDescriptorCache;
 
-    @Requirement
+    @Inject
     private PluginRealmCache pluginRealmCache;
 
-    @Requirement
+    @Inject
     private PluginDependenciesResolver pluginDependenciesResolver;
 
-    @Requirement
+    @Inject
     private RuntimeInformation runtimeInformation;
 
-    @Requirement
+    @Inject
     private ExtensionRealmCache extensionRealmCache;
 
-    @Requirement
+    @Inject
     private PluginVersionResolver pluginVersionResolver;
 
-    @Requirement
+    @Inject
     private PluginArtifactsCache pluginArtifactsCache;
 
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
@@ -453,14 +455,7 @@ public class DefaultMavenPluginManager
     {
         List<Artifact> artifacts = new ArrayList<>( nlg.getNodes().size() );
         RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
-        for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
-        {
-            Artifact artifact = it.next();
-            if ( artifact.getFile() == null )
-            {
-                it.remove();
-            }
-        }
+        artifacts.removeIf( artifact -> artifact.getFile() == null );
         return Collections.unmodifiableList( artifacts );
     }
 

@@ -45,7 +45,7 @@ public class DuplicateProjectException
     {
         super( message, (File) null );
 
-        this.collisions = ( collisions != null ) ? collisions : new LinkedHashMap<String, List<File>>();
+        this.collisions = ( collisions != null ) ? collisions : new LinkedHashMap<>();
     }
 
     /**

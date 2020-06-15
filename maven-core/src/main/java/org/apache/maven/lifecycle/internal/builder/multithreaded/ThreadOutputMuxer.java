@@ -56,7 +56,7 @@ public class ThreadOutputMuxer
 
     private final PrintStream defaultPrintStream = new PrintStream( defaultOutputStreamForUnknownData );
 
-    private final Set<ProjectSegment> completedBuilds = Collections.synchronizedSet( new HashSet<ProjectSegment>() );
+    private final Set<ProjectSegment> completedBuilds = Collections.synchronizedSet( new HashSet<>() );
 
     private volatile ProjectSegment currentBuild;
 

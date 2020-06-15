@@ -330,11 +330,10 @@ public class ArtifactTransferEvent
         {
             return false;
         }
-        else if ( !source.equals( other.source ) )
+        else
         {
-            return false;
+            return source.equals( other.source );
         }
-        return true;
     }
 
 }

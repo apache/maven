@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
@@ -39,12 +43,10 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -65,23 +67,24 @@ import org.eclipse.aether.version.VersionScheme;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-@Component( role = PluginVersionResolver.class )
+@Named
+@Singleton
 public class DefaultPluginVersionResolver
     implements PluginVersionResolver
 {
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private RepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private MetadataReader metadataReader;
 
-    @Requirement
+    @Inject
     private MavenPluginManager pluginManager;
 
     public PluginVersionResult resolve( PluginVersionRequest request )

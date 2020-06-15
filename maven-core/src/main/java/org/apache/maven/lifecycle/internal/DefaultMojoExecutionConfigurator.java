@@ -21,19 +21,22 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.Collection;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * @since 3.3.1, MNG-5753
  */
-@Component( role = MojoExecutionConfigurator.class )
+@Named
+@Singleton
 public class DefaultMojoExecutionConfigurator
     implements MojoExecutionConfigurator
 {

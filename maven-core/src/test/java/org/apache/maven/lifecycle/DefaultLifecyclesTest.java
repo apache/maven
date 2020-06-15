@@ -14,6 +14,8 @@
  */
 package org.apache.maven.lifecycle;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -29,6 +31,14 @@ public class DefaultLifecyclesTest
     @Requirement
     private DefaultLifecycles defaultLifeCycles;
 
+    @Override
+    protected void customizeContainerConfiguration(
+            ContainerConfiguration configuration)
+    {
+        super.customizeContainerConfiguration(configuration);
+        configuration.setAutoWiring(true);
+        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+    }
 
     protected void setUp()
         throws Exception

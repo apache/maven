@@ -20,14 +20,20 @@ package org.apache.maven;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +43,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
+import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -57,6 +64,10 @@ class ReactorReader
     private static final Collection<String> COMPILE_PHASE_TYPES =
         Arrays.asList( "jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client" );
 
+    private Logger logger;
+
+    private MavenSession session;
+
     private Map<String, MavenProject> projectsByGAV;
 
     private Map<String, List<MavenProject>> projectsByGA;
@@ -64,22 +75,23 @@ class ReactorReader
     private WorkspaceRepository repository;
 
     @Inject
-    ReactorReader( MavenSession session )
+    ReactorReader( MavenSession session, Logger logger )
     {
-        projectsByGAV = session.getProjectMap();
+        this.logger = logger;
+        this.session = session;
+        this.projectsByGAV = new HashMap<>( session.getAllProjects().size() * 2 );
+        session.getAllProjects().forEach( project ->
+        {
+            String projectId = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+            this.projectsByGAV.put( projectId, project );
+        } );
 
         projectsByGA = new HashMap<>( projectsByGAV.size() * 2 );
         for ( MavenProject project : projectsByGAV.values() )
         {
             String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            List<MavenProject> projects = projectsByGA.get( key );
-
-            if ( projects == null )
-            {
-                projects = new ArrayList<>( 1 );
-                projectsByGA.put( key, projects );
-            }
+            List<MavenProject> projects = projectsByGA.computeIfAbsent( key, k -> new ArrayList<>( 1 ) );
 
             projects.add( project );
         }
@@ -158,12 +170,19 @@ class ReactorReader
         }
 
         Artifact projectArtifact = findMatchingArtifact( project, artifact );
+        File packagedArtifactFile = determinePreviouslyPackagedArtifactFile( project, projectArtifact );
 
         if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
         {
             return projectArtifact.getFile();
         }
-        else if ( !hasBeenPackaged( project ) )
+        // Check whether an earlier Maven run might have produced an artifact that is still on disk.
+        else if ( packagedArtifactFile != null && packagedArtifactFile.exists()
+                && isPackagedArtifactUpToDate( project, packagedArtifactFile ) )
+        {
+            return packagedArtifactFile;
+        }
+        else if ( !hasBeenPackagedDuringThisSession( project ) )
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
@@ -178,9 +197,21 @@ class ReactorReader
             else
             {
                 String type = artifact.getProperty( "type", "" );
-                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
+                File outputDirectory = new File( project.getBuild().getOutputDirectory() );
+
+                // Check if the project is being built during this session, and if we can expect any output.
+                // There is no need to check if the build has created any outputs, see MNG-2222.
+                boolean projectCompiledDuringThisSession
+                        = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
+
+                // Check if the project is part of the session (not filtered by -pl, -rf, etc). If so, we check
+                // if a possible earlier Maven invocation produced some output for that project which we can use.
+                boolean projectHasOutputFromPreviousSession
+                        = !session.getProjects().contains( project ) && outputDirectory.exists();
+
+                if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
                 {
-                    return new File( project.getBuild().getOutputDirectory() );
+                    return outputDirectory;
                 }
             }
         }
@@ -190,12 +221,68 @@ class ReactorReader
         return null;
     }
 
+    private File determinePreviouslyPackagedArtifactFile( MavenProject project, Artifact artifact )
+    {
+        if ( artifact == null )
+        {
+            return null;
+        }
+
+        String fileName = String.format( "%s.%s", project.getBuild().getFinalName(), artifact.getExtension() );
+        return new File( project.getBuild().getDirectory(), fileName );
+    }
+
     private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
     {
         return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
     }
 
-    private boolean hasBeenPackaged( MavenProject project )
+    private boolean isPackagedArtifactUpToDate( MavenProject project, File packagedArtifactFile )
+    {
+        Path outputDirectory = Paths.get( project.getBuild().getOutputDirectory() );
+        if ( !outputDirectory.toFile().exists() )
+        {
+            return true;
+        }
+
+        try ( Stream<Path> outputFiles = Files.walk( outputDirectory ) )
+        {
+            // Not using File#lastModified() to avoid a Linux JDK8 milliseconds precision bug: JDK-8177809.
+            long artifactLastModified = Files.getLastModifiedTime( packagedArtifactFile.toPath() ).toMillis();
+
+            if ( session.getProjectBuildingRequest().getBuildStartTime() != null )
+            {
+                long buildStartTime = session.getProjectBuildingRequest().getBuildStartTime().getTime();
+                if ( artifactLastModified > buildStartTime )
+                {
+                    return true;
+                }
+            }
+
+            Iterator<Path> iterator = outputFiles.iterator();
+            while ( iterator.hasNext() )
+            {
+                Path outputFile = iterator.next();
+                long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
+                if ( outputFileLastModified > artifactLastModified )
+                {
+                    logger.warn( "Packaged artifact is not up-to-date compared to the build output directory" );
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch ( IOException e )
+        {
+            logger.warn( "An I/O error occurred while checking if the packaged artifact is up-to-date "
+                    + "against the build output directory. "
+                    + "Continuing with the assumption that it is up-to-date.", e );
+            return true;
+        }
+    }
+
+    private boolean hasBeenPackagedDuringThisSession( MavenProject project )
     {
         return project.hasLifecyclePhase( "package" ) || project.hasLifecyclePhase( "install" )
             || project.hasLifecyclePhase( "deploy" );
