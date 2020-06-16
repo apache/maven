@@ -37,13 +37,14 @@ import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
 
 /**
+ * ModelSourceTransformer for the build pom
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
 @Named
 @Singleton
-public class DefaultModelSourceTransformer extends AbstractModelSourceTransformer
+class BuildModelSourceTransformer extends AbstractModelSourceTransformer
 {
     @Inject
     @Nullable

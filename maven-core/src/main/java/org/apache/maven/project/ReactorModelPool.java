@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -52,10 +51,8 @@ class ReactorModelPool
      * @param version, can be {@code null}
      * @return the matching model or {@code null}
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
-     * @throws NoSuchElementException if model could not be found
      */
     public Model get( String groupId, String artifactId, String version )
-        throws IllegalStateException, NoSuchElementException
     {
         return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptySet() ).stream()
                         .filter( m -> version == null || version.equals( getVersion( m ) ) )

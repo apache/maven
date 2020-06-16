@@ -44,6 +44,8 @@ import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.SAXException;
 
 /**
+ * Offers a transformation implementation based on PipelineStreams.
+ * Subclasses are responsible for providing the right SAXFilter.
  * 
  * @author Robert Scholte
  * @since 3.7.0

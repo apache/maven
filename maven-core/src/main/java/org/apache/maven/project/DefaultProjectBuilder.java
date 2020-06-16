@@ -161,7 +161,7 @@ public class DefaultProjectBuilder
 
             if ( project == null )
             {
-                ModelBuildingRequest request = getModelBuildingRequest( config, pomFile );
+                ModelBuildingRequest request = getModelBuildingRequest( config );
 
                 project = new MavenProject();
                 project.setFile( pomFile );
@@ -273,7 +273,7 @@ public class DefaultProjectBuilder
         return ids;
     }
 
-    private ModelBuildingRequest getModelBuildingRequest( InternalConfig config, File pomFile )
+    private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
     {
         ProjectBuildingRequest configuration = config.request;
 
@@ -444,7 +444,7 @@ public class DefaultProjectBuilder
     @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
                            Map<String, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
-                           boolean isRoot, boolean recursive, InternalConfig config,
+                           boolean root, boolean recursive, InternalConfig config,
                            ReactorModelPool.Builder poolBuilder )
     {
         boolean noErrors = true;
@@ -453,7 +453,7 @@ public class DefaultProjectBuilder
         {
             aggregatorFiles.add( pomFile );
 
-            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config,
+            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, root, recursive, config,
                          poolBuilder ) )
             {
                 noErrors = false;
@@ -473,7 +473,7 @@ public class DefaultProjectBuilder
     {
         boolean noErrors = true;
 
-        ModelBuildingRequest request = getModelBuildingRequest( config, pomFile );
+        ModelBuildingRequest request = getModelBuildingRequest( config );
 
         MavenProject project = new MavenProject();
         project.setFile( pomFile );

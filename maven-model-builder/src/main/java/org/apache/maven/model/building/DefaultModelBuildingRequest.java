@@ -38,7 +38,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
-    private transient Model fileModel;
+    private Model fileModel;
 
     private Model rawModel;
 

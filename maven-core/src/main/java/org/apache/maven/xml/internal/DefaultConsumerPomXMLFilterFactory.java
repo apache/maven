@@ -26,6 +26,8 @@ import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 
 /**
+ * The default implementation of the {@link ConsumerPomXMLFilterFactory}
+ * It will provide several values for the consumer pom based on its context.
  * 
  * @author Robert Scholte
  * @since 3.7.0

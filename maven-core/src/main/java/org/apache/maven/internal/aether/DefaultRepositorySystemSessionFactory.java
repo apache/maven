@@ -26,6 +26,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -41,6 +42,7 @@ import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.SessionData;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -280,7 +282,7 @@ public class DefaultRepositorySystemSessionFactory
         return props.getProperty( "version", "unknown-version" );
     }
     
-    private Collection<FileTransformer> getTransformersForArtifact( final org.eclipse.aether.artifact.Artifact artifact,
+    private Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact,
                                                                     final SessionData sessionData )
     {
         TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
@@ -299,15 +301,14 @@ public class DefaultRepositorySystemSessionFactory
                     {
                         return new ConsumerModelSourceTransformer().transform( pomFile.toPath(), context );
                     }
-                    catch ( org.apache.maven.model.building.TransformerException e )
+                    catch ( TransformerException e )
                     {
                         throw new TransformException( e );
                     }
                 }
                 
                 @Override
-                public org.eclipse.aether.artifact.Artifact transformArtifact( 
-                                                                   org.eclipse.aether.artifact.Artifact artifact )
+                public Artifact transformArtifact( Artifact artifact )
                 {
                     return artifact;
                 }

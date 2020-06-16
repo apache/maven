@@ -35,11 +35,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
 /**
- * Base class for third parties to extend. When annotating it with Named("somecustomname"),
- * Maven will pick this up as  instead of the DefaultBuildPomXMLFilterFactory 
+ * Base implementation for providing the BuildPomXML.
  * 
  * @author Robert Scholte
- * 
  * @since 3.7.0
  */
 public class BuildPomXMLFilterFactory

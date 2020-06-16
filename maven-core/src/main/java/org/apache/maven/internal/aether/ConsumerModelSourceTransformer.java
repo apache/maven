@@ -55,9 +55,8 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
      * This transformer will ensure that encoding and version are kept.
      * However, it cannot prevent:
      * <ul>
-     *   <li>line-endings will be unix-style(LF)</li>
      *   <li>attributes will be on one line</li>
-     *   <li>Unnecessary whitespace before the rootelement will be remove</li> 
+     *   <li>Unnecessary whitespace before the rootelement will be removed</li> 
      * </ul>
      */
     @Override

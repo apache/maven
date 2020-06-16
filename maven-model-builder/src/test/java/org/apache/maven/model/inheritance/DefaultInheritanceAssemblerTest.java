@@ -20,19 +20,24 @@ package org.apache.maven.model.inheritance;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelSourceTransformer;
+import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
-import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
-
+import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.xml.sax.SAXException;
 import org.xmlunit.matchers.CompareMatcher;
 
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
 import static org.junit.Assert.assertThat;
 
@@ -55,7 +60,15 @@ public class DefaultInheritanceAssemblerTest
         super.setUp();
 
         reader = new DefaultModelReader();
-        reader.setTransformer( new DefaultModelSourceTransformer() );
+        reader.setTransformer( new AbstractModelSourceTransformer()
+        {
+            @Override
+            protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
+                throws TransformerConfigurationException, SAXException, ParserConfigurationException
+            {
+                return null;
+            }
+        } );
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }
