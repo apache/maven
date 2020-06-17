@@ -103,10 +103,13 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
         {
             MavenProject resumeFromProject = failedProjects.get( 0 );
             Optional<String> resumeFrom = getResumeFrom( result, resumeFromProject );
-            Optional<String> projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProject );
+            List<String> projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProject );
 
             resumeFrom.ifPresent( value -> properties.setProperty( RESUME_FROM_PROPERTY, value ) );
-            projectsToSkip.ifPresent( value -> properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, value ) );
+            if ( !projectsToSkip.isEmpty() ) {
+                String excludedProjects = String.join( PROPERTY_DELIMITER, projectsToSkip );
+                properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
+            }
         }
         else
         {
@@ -154,11 +157,10 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
      * @param result The result of the Maven build.
      * @param failedProjects The list of failed projects in the build.
      * @param resumeFromProject The project where the build will be resumed with in the next run.
-     * @return An optional containing a comma separated list of projects which can be skipped,
-     *   or an empty optional if no projects can be skipped.
+     * @return A list of projects which can be skipped in a later build.
      */
-    private Optional<String> determineProjectsToSkip( MavenExecutionResult result, List<MavenProject> failedProjects,
-                                                      MavenProject resumeFromProject )
+    private List<String> determineProjectsToSkip( MavenExecutionResult result, List<MavenProject> failedProjects,
+                                                  MavenProject resumeFromProject )
     {
         List<MavenProject> allProjects = result.getTopologicallySortedProjects();
         int resumeFromProjectIndex = allProjects.indexOf( resumeFromProject );
@@ -168,18 +170,11 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
                 .map( GroupArtifactPair::new )
                 .collect( Collectors.toList() );
 
-        String projectsToSkip = remainingProjects.stream()
+        return remainingProjects.stream()
                 .filter( project -> result.getBuildSummary( project ) instanceof BuildSuccess )
                 .filter( project -> hasNoDependencyOnProjects( project, failedProjectsGAList ) )
                 .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
-                .collect( Collectors.joining( PROPERTY_DELIMITER ) );
-
-        if ( !StringUtils.isEmpty( projectsToSkip ) )
-        {
-            return Optional.of( projectsToSkip );
-        }
-
-        return Optional.empty();
+                .collect( Collectors.toList() );
     }
 
     private boolean hasNoDependencyOnProjects( MavenProject project, List<GroupArtifactPair> projectsGAs )
