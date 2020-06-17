@@ -44,18 +44,18 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.comparing;
 
 /**
- * This implementation of {@link BuildResumer} persists information in a properties file. The file is stored
+ * This implementation of {@link BuildResumptionDataRepository} persists information in a properties file. The file is stored
  * in the build output directory under the Maven execution root.
  */
 @Named
 @Singleton
-public class DefaultBuildResumer implements BuildResumer
+public class DefaultBuildResumptionDataRepository implements BuildResumptionDataRepository
 {
     private static final String RESUME_PROPERTIES_FILENAME = "resume.properties";
     private static final String RESUME_FROM_PROPERTY = "resumeFrom";
     private static final String EXCLUDED_PROJECTS_PROPERTY = "excludedProjects";
     private static final String PROPERTY_DELIMITER = ", ";
-    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumer.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
     @Override
     public boolean persistResumptionData( MavenExecutionResult result, MavenProject rootProject )

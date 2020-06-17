@@ -38,9 +38,9 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 @RunWith( MockitoJUnitRunner.class )
-public class DefaultBuildResumerTest
+public class DefaultBuildResumptionDataRepositoryTest
 {
-    private final DefaultBuildResumer buildResumer = new DefaultBuildResumer();
+    private final DefaultBuildResumptionDataRepository buildResumer = new DefaultBuildResumptionDataRepository();
 
     private MavenExecutionResult result;
 

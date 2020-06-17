@@ -48,7 +48,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.BuildResumer;
+import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -169,7 +169,7 @@ public class MavenCli
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
-    private BuildResumer buildResumer;
+    private BuildResumptionDataRepository buildResumptionDataRepository;
 
     public MavenCli()
     {
@@ -708,7 +708,7 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
-        buildResumer = container.lookup( BuildResumer.class );
+        buildResumptionDataRepository = container.lookup( BuildResumptionDataRepository.class );
 
         return container;
     }

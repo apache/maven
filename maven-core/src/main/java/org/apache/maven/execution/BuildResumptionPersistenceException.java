@@ -21,7 +21,7 @@ package org.apache.maven.execution;
 
 /**
  * This exception will be thrown when something fails while persisting build resumption data.
- * @see BuildResumer#persistResumptionData
+ * @see BuildResumptionDataRepository#persistResumptionData
  */
 public class BuildResumptionPersistenceException extends Exception
 {
