@@ -33,12 +33,12 @@ public interface BuildResumptionDataRepository
      * may also decide it is not needed or meaningful to persist such data, and return <code>false</code> to indicate
      * so.
      *
-     * @param result The result of the current Maven invocation.
      * @param rootProject The root project that is being built.
+     * @param buildResumptionData Information needed to resume the build.
      * @throws BuildResumptionPersistenceException When an error occurs while persisting data.
      * @return Whether any data was persisted.
      */
-    boolean persistResumptionData( final MavenExecutionResult result, final MavenProject rootProject )
+    boolean persistResumptionData( final MavenProject rootProject, final BuildResumptionData buildResumptionData )
             throws BuildResumptionPersistenceException;
 
     /**

@@ -20,8 +20,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +33,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparing;
 
 /**
- * This implementation of {@link BuildResumptionDataRepository} persists information in a properties file. The file is stored
- * in the build output directory under the Maven execution root.
+ * This implementation of {@link BuildResumptionDataRepository} persists information in a properties file. The file is
+ * stored in the build output directory under the Maven execution root.
  */
 @Named
 @Singleton
@@ -58,18 +50,37 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
     @Override
-    public boolean persistResumptionData( MavenExecutionResult result, MavenProject rootProject )
+    public boolean persistResumptionData( MavenProject rootProject, BuildResumptionData buildResumptionData )
             throws BuildResumptionPersistenceException
     {
-        Properties properties = determineResumptionProperties( result );
+        Properties properties = convertToProperties( buildResumptionData );
 
-        if ( properties.isEmpty() )
+        Path resumeProperties = Paths.get( rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
+        try
         {
-            LOGGER.debug( "Will not create {} file: nothing to resume from", RESUME_PROPERTIES_FILENAME );
-            return false;
+            Files.createDirectories( resumeProperties.getParent() );
+            try ( Writer writer = Files.newBufferedWriter( resumeProperties ) )
+            {
+                properties.store( writer, null );
+            }
+        }
+        catch ( IOException e )
+        {
+            String message = "Could not create " + RESUME_PROPERTIES_FILENAME + " file.";
+            throw new BuildResumptionPersistenceException( message, e );
         }
 
-        return writeResumptionFile( rootProject, properties );
+        return true;
+    }
+
+    private Properties convertToProperties( final BuildResumptionData buildResumptionData )
+    {
+        Properties properties = new Properties();
+        properties.setProperty( RESUME_FROM_PROPERTY, buildResumptionData.getResumeFrom() );
+        String excludedProjects = String.join( PROPERTY_DELIMITER, buildResumptionData.getProjectsToSkip() );
+        properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
+
+        return properties;
     }
 
     @Override
@@ -91,118 +102,6 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
         {
             LOGGER.warn( "Could not delete {} file. ", RESUME_PROPERTIES_FILENAME, e );
         }
-    }
-
-    // This method is made package-private for testing purposes
-    Properties determineResumptionProperties( MavenExecutionResult result )
-    {
-        Properties properties = new Properties();
-
-        List<MavenProject> failedProjects = getFailedProjectsInOrder( result );
-        if ( !failedProjects.isEmpty() )
-        {
-            MavenProject resumeFromProject = failedProjects.get( 0 );
-            Optional<String> resumeFrom = getResumeFrom( result, resumeFromProject );
-            List<String> projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProject );
-
-            resumeFrom.ifPresent( value -> properties.setProperty( RESUME_FROM_PROPERTY, value ) );
-            if ( !projectsToSkip.isEmpty() ) {
-                String excludedProjects = String.join( PROPERTY_DELIMITER, projectsToSkip );
-                properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
-            }
-        }
-        else
-        {
-            LOGGER.warn( "Could not create {} file: no failed projects found", RESUME_PROPERTIES_FILENAME );
-        }
-
-        return properties;
-    }
-
-    private List<MavenProject> getFailedProjectsInOrder( MavenExecutionResult result )
-    {
-        List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
-
-        return result.getExceptions().stream()
-                .filter( LifecycleExecutionException.class::isInstance )
-                .map( LifecycleExecutionException.class::cast )
-                .map( LifecycleExecutionException::getProject )
-                .sorted( comparing( sortedProjects::indexOf ) )
-                .collect( Collectors.toList() );
-    }
-
-    /**
-     * Determine the project where the next build can be resumed from.
-     * If the failed project is the first project of the build,
-     * it does not make sense to use --resume-from, so the result will be empty.
-     * @param result The result of the Maven build.
-     * @param failedProject The first failed project of the build.
-     * @return An optional containing the resume-from suggestion.
-     */
-    private Optional<String> getResumeFrom( MavenExecutionResult result, MavenProject failedProject )
-    {
-        List<MavenProject> allSortedProjects = result.getTopologicallySortedProjects();
-        if ( !allSortedProjects.get( 0 ).equals( failedProject ) )
-        {
-            return Optional.of( failedProject.getGroupId() + ":" + failedProject.getArtifactId() );
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Projects after the first failed project could have succeeded by using -T or --fail-at-end.
-     * These projects can be skipped from later builds.
-     * This is not the case these projects are dependent on one of the failed projects.
-     * @param result The result of the Maven build.
-     * @param failedProjects The list of failed projects in the build.
-     * @param resumeFromProject The project where the build will be resumed with in the next run.
-     * @return A list of projects which can be skipped in a later build.
-     */
-    private List<String> determineProjectsToSkip( MavenExecutionResult result, List<MavenProject> failedProjects,
-                                                  MavenProject resumeFromProject )
-    {
-        List<MavenProject> allProjects = result.getTopologicallySortedProjects();
-        int resumeFromProjectIndex = allProjects.indexOf( resumeFromProject );
-        List<MavenProject> remainingProjects = allProjects.subList( resumeFromProjectIndex + 1, allProjects.size() );
-
-        List<GroupArtifactPair> failedProjectsGAList = failedProjects.stream()
-                .map( GroupArtifactPair::new )
-                .collect( Collectors.toList() );
-
-        return remainingProjects.stream()
-                .filter( project -> result.getBuildSummary( project ) instanceof BuildSuccess )
-                .filter( project -> hasNoDependencyOnProjects( project, failedProjectsGAList ) )
-                .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
-                .collect( Collectors.toList() );
-    }
-
-    private boolean hasNoDependencyOnProjects( MavenProject project, List<GroupArtifactPair> projectsGAs )
-    {
-        return project.getDependencies().stream()
-                .map( GroupArtifactPair::new )
-                .noneMatch( projectsGAs::contains );
-    }
-
-    private boolean writeResumptionFile( MavenProject rootProject, Properties properties )
-            throws BuildResumptionPersistenceException
-    {
-        Path resumeProperties = Paths.get( rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME );
-        try
-        {
-            Files.createDirectories( resumeProperties.getParent() );
-            try ( Writer writer = Files.newBufferedWriter( resumeProperties ) )
-            {
-                properties.store( writer, null );
-            }
-        }
-        catch ( IOException e )
-        {
-            String message = "Could not create " + RESUME_PROPERTIES_FILENAME + " file.";
-            throw new BuildResumptionPersistenceException( message, e );
-        }
-
-        return true;
     }
 
     private Properties loadResumptionFile( Path rootBuildDirectory )
@@ -243,45 +142,6 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
             String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
             request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
             LOGGER.info( "Additionally excluding projects '{}' due to the --resume / -r feature.", propertyValue );
-        }
-    }
-
-    private static class GroupArtifactPair
-    {
-        private final String groupId;
-        private final String artifactId;
-
-        GroupArtifactPair( MavenProject project )
-        {
-            this.groupId = project.getGroupId();
-            this.artifactId = project.getArtifactId();
-        }
-
-        GroupArtifactPair( Dependency dependency )
-        {
-            this.groupId = dependency.getGroupId();
-            this.artifactId = dependency.getArtifactId();
-        }
-
-        @Override
-        public boolean equals( Object o )
-        {
-            if ( this == o )
-            {
-                return true;
-            }
-            if ( o == null || getClass() != o.getClass() )
-            {
-                return false;
-            }
-            GroupArtifactPair that = (GroupArtifactPair) o;
-            return Objects.equals( groupId, that.groupId ) && Objects.equals( artifactId, that.artifactId );
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return Objects.hash( groupId, artifactId );
         }
     }
 }

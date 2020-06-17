@@ -36,6 +36,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.BuildResumptionPersistenceException;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -101,6 +102,9 @@ public class DefaultMaven
     @Inject
     @Named( GraphBuilder.HINT )
     private GraphBuilder graphBuilder;
+
+    @Inject
+    private BuildResumptionAnalyzer buildResumptionAnalyzer;
 
     @Inject
     private BuildResumptionDataRepository buildResumptionDataRepository;
@@ -371,21 +375,23 @@ public class DefaultMaven
 
         if ( hasLifecycleExecutionExceptions )
         {
-            session.getAllProjects().stream()
+            MavenProject rootProject = session.getAllProjects().stream()
                     .filter( MavenProject::isExecutionRoot )
                     .findFirst()
-                    .ifPresent( rootProject ->
-                    {
-                        try
-                        {
-                            boolean persistenceResult = buildResumptionDataRepository.persistResumptionData( result, rootProject );
-                            result.setCanResume( persistenceResult );
-                        }
-                        catch ( BuildResumptionPersistenceException e )
-                        {
-                            logger.warn( "Could not persist build resumption data", e );
-                        }
-                    } );
+                    .orElseThrow( () -> new IllegalStateException( "No project in the session is execution root" ) );
+
+            buildResumptionAnalyzer.determineBuildResumptionData( result ).ifPresent( resumption ->
+            {
+                try
+                {
+                    boolean canResume = buildResumptionDataRepository.persistResumptionData( rootProject, resumption );
+                    result.setCanResume( canResume );
+                }
+                catch ( BuildResumptionPersistenceException e )
+                {
+                    logger.warn( "Could not persist build resumption data", e );
+                }
+            } );
         }
     }
 

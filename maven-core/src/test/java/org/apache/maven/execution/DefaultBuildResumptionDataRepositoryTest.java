@@ -19,10 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -31,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
@@ -40,93 +34,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumptionDataRepositoryTest
 {
-    private final DefaultBuildResumptionDataRepository buildResumer = new DefaultBuildResumptionDataRepository();
-
-    private MavenExecutionResult result;
-
-    @Before
-    public void before() {
-        result = new DefaultMavenExecutionResult();
-    }
-
-    @Test
-    public void resumeFromGetsDetermined()
-    {
-        MavenProject projectA = createSucceededMavenProject( "A" );
-        MavenProject projectB = createFailedMavenProject( "B" );
-        result.setTopologicallySortedProjects( asList( projectA, projectB ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.get( "resumeFrom" ), is( "test:B" ) );
-    }
-
-    @Test
-    public void resumeFromIsIgnoredWhenFirstProjectFails()
-    {
-        MavenProject projectA = createFailedMavenProject( "A" );
-        MavenProject projectB = createMavenProject( "B" );
-        result.setTopologicallySortedProjects( asList( projectA, projectB ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.containsKey( "resumeFrom" ), is(false) );
-    }
-
-    @Test
-    public void projectsSucceedingAfterFailedProjectsAreExcluded()
-    {
-        MavenProject projectA = createSucceededMavenProject( "A" );
-        MavenProject projectB = createFailedMavenProject( "B" );
-        MavenProject projectC = createSucceededMavenProject( "C" );
-        result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.get( "excludedProjects" ), is("test:C") );
-    }
-
-    @Test
-    public void projectsDependingOnFailedProjectsAreNotExcluded()
-    {
-        MavenProject projectA = createSucceededMavenProject( "A" );
-        MavenProject projectB = createFailedMavenProject( "B" );
-        MavenProject projectC = createSucceededMavenProject( "C" );
-        projectC.setDependencies( singletonList( toDependency( projectB ) ) );
-        result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.containsKey( "excludedProjects" ), is(false) );
-    }
-
-    @Test
-    public void projectsFailingAfterAnotherFailedProjectAreNotExcluded()
-    {
-        MavenProject projectA = createSucceededMavenProject( "A" );
-        MavenProject projectB = createFailedMavenProject( "B" );
-        MavenProject projectC = createSucceededMavenProject( "C" );
-        MavenProject projectD = createFailedMavenProject( "D" );
-        result.setTopologicallySortedProjects( asList( projectA, projectB, projectC, projectD ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.get( "resumeFrom" ), is("test:B") );
-        assertThat( properties.get( "excludedProjects" ), is("test:C") );
-    }
-
-    @Test
-    public void multipleExcludedProjectsAreCommaSeparated()
-    {
-        MavenProject projectA = createFailedMavenProject( "A" );
-        MavenProject projectB = createSucceededMavenProject( "B" );
-        MavenProject projectC = createSucceededMavenProject( "C" );
-        result.setTopologicallySortedProjects( asList( projectA, projectB, projectC ) );
-
-        Properties properties = buildResumer.determineResumptionProperties( result );
-
-        assertThat( properties.get( "excludedProjects" ), is( "test:B, test:C" ) );
-    }
+    private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();
 
     @Test
     public void resumeFromPropertyGetsApplied()
@@ -135,7 +43,7 @@ public class DefaultBuildResumptionDataRepositoryTest
         Properties properties = new Properties();
         properties.setProperty( "resumeFrom", ":module-a" );
 
-        buildResumer.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties( request, properties );
 
         assertThat( request.getResumeFrom(), is( ":module-a" ) );
     }
@@ -148,7 +56,7 @@ public class DefaultBuildResumptionDataRepositoryTest
         Properties properties = new Properties();
         properties.setProperty( "resumeFrom", ":module-a" );
 
-        buildResumer.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties( request, properties );
 
         assertThat( request.getResumeFrom(), is( ":module-b" ) );
     }
@@ -163,40 +71,8 @@ public class DefaultBuildResumptionDataRepositoryTest
         Properties properties = new Properties();
         properties.setProperty( "excludedProjects", ":module-b, :module-c" );
 
-        buildResumer.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties( request, properties );
 
         assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
-    }
-
-    private MavenProject createMavenProject( String artifactId )
-    {
-        MavenProject project = new MavenProject();
-        project.setGroupId( "test" );
-        project.setArtifactId( artifactId );
-        return project;
-    }
-
-    private Dependency toDependency( MavenProject mavenProject )
-    {
-        Dependency dependency = new Dependency();
-        dependency.setGroupId( mavenProject.getGroupId() );
-        dependency.setArtifactId( mavenProject.getArtifactId() );
-        dependency.setVersion( mavenProject.getVersion() );
-        return dependency;
-    }
-
-    private MavenProject createSucceededMavenProject( String artifactId )
-    {
-        MavenProject project = createMavenProject( artifactId );
-        result.addBuildSummary( new BuildSuccess( project, 0 ) );
-        return project;
-    }
-
-    private MavenProject createFailedMavenProject( String artifactId )
-    {
-        MavenProject project = createMavenProject( artifactId );
-        result.addBuildSummary( new BuildFailure( project, 0, new Exception() ) );
-        result.addException( new LifecycleExecutionException( "", project ) );
-        return project;
     }
 }
