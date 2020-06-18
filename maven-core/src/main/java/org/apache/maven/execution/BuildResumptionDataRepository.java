@@ -36,9 +36,8 @@ public interface BuildResumptionDataRepository
      * @param rootProject The root project that is being built.
      * @param buildResumptionData Information needed to resume the build.
      * @throws BuildResumptionPersistenceException When an error occurs while persisting data.
-     * @return Whether any data was persisted.
      */
-    boolean persistResumptionData( final MavenProject rootProject, final BuildResumptionData buildResumptionData )
+    void persistResumptionData( final MavenProject rootProject, final BuildResumptionData buildResumptionData )
             throws BuildResumptionPersistenceException;
 
     /**

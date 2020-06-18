@@ -384,8 +384,8 @@ public class DefaultMaven
             {
                 try
                 {
-                    boolean canResume = buildResumptionDataRepository.persistResumptionData( rootProject, resumption );
-                    result.setCanResume( canResume );
+                    buildResumptionDataRepository.persistResumptionData( rootProject, resumption );
+                    result.setCanResume( true );
                 }
                 catch ( BuildResumptionPersistenceException e )
                 {

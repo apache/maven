@@ -50,7 +50,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
     @Override
-    public boolean persistResumptionData( MavenProject rootProject, BuildResumptionData buildResumptionData )
+    public void persistResumptionData( MavenProject rootProject, BuildResumptionData buildResumptionData )
             throws BuildResumptionPersistenceException
     {
         Properties properties = convertToProperties( buildResumptionData );
@@ -69,8 +69,6 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
             String message = "Could not create " + RESUME_PROPERTIES_FILENAME + " file.";
             throw new BuildResumptionPersistenceException( message, e );
         }
-
-        return true;
     }
 
     private Properties convertToProperties( final BuildResumptionData buildResumptionData )
