@@ -41,18 +41,15 @@ under the License.
           <lifecycle>
             <id>default</id>
             <phases>
-              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources
-              </process-test-resources>
-              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
-              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-              <package>
-                org.apache.maven.plugins:maven-jar-plugin:jar
-              </package>
-              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:0.1-stub-SNAPSHOT:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:0.1-stub-SNAPSHOT:compile</compile>
+              <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:0.1-stub-SNAPSHOT:testResources</process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:0.1-stub-SNAPSHOT:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:0.1-stub-SNAPSHOT:test</test>
+              <!-- Results of these plugins are used for verification -->
+              <package>org.apache.maven.plugins:maven-jar-plugin:2.2:jar</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:2.5.2:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:0.1-stub-SNAPSHOT:deploy</deploy>
             </phases>
           </lifecycle>
         </lifecycles>
