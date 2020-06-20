@@ -40,11 +40,18 @@ import java.util.List;
  * @author Martin Kanters
  */
 public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTestCase {
-    private final File testDir;
+    private final File parentDependentTestDir;
+    private final File parentIndependentTestDir;
+    private final File noProjectTestDir;
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
         super( "[3.7.0,)" );
-        this.testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5760-resume-feature" );
+        this.parentDependentTestDir = ResourceExtractor.simpleExtractResources( getClass(),
+                "/mng-5760-resume-feature/parent-dependent" );
+        this.parentIndependentTestDir = ResourceExtractor.simpleExtractResources( getClass(),
+                "/mng-5760-resume-feature/parent-independent" );
+        this.noProjectTestDir = ResourceExtractor.simpleExtractResources( getClass(),
+                "/mng-5760-resume-feature/no-project" );
     }
 
     /**
@@ -52,7 +59,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
      */
     public void testShouldSuggestToResumeWithoutArgs() throws Exception
     {
-        final Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        final Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-b.fail=true" );
 
         try
@@ -69,11 +76,19 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         {
             verifier.resetStreams();
         }
+
+        // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
+        verifier.getCliOptions().clear();
+        verifier.addCliOption( "-r" );
+        verifier.executeGoal( "test" );
+        verifyTextNotInLog( verifier, "Building module-a 1.0" );
+        verifier.verifyTextInLog( "Building module-b 1.0" );
+        verifier.verifyTextInLog( "Building module-c 1.0" );
     }
 
     public void testShouldSkipSuccessfulProjects() throws Exception
     {
-        final Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        final Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-a.fail=true" );
         verifier.addCliOption( "--fail-at-end");
 
@@ -102,6 +117,56 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         try
         {
             verifier.executeGoal( "test" );
+        }
+        finally
+        {
+            verifier.resetStreams();
+        }
+    }
+
+    public void testShouldSkipSuccessfulModulesWhenTheFirstModuleFailed() throws Exception
+    {
+        // In this multi-module project, the submodules are not dependent on the parent.
+        // This results in the parent to be built last, and module-a to be built first.
+        // This enables us to let the first module in the reactor (module-a) fail.
+        final Verifier verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
+        verifier.addCliOption( "-Dmodule-a.fail=true" );
+        verifier.addCliOption( "--fail-at-end");
+
+        try
+        {
+            verifier.executeGoal( "test" );
+            fail( "Expected this invocation to fail" );
+        }
+        catch ( final VerificationException ve )
+        {
+            verifier.verifyTextInLog( "mvn <args> -r" );
+        }
+        finally
+        {
+            verifier.resetStreams();
+        }
+
+        verifier.getCliOptions().clear();
+        verifier.addCliOption( "-r" );
+        verifier.executeGoal( "test" );
+        verifier.verifyTextInLog( "Building module-a 1.0" );
+        verifyTextNotInLog( verifier, "Building module-b 1.0" );
+    }
+
+    public void testShouldNotCrashWithoutProject() throws Exception
+    {
+        // There is no Maven project available in the test directory.
+        // As reported in JIRA this would previously break with a NullPointerException.
+        // (see https://issues.apache.org/jira/browse/MNG-5760?focusedCommentId=17143795&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-17143795)
+        final Verifier verifier = newVerifier( noProjectTestDir.getAbsolutePath() );
+        try
+        {
+            verifier.executeGoal( "resources:resources" );
+        }
+        catch ( final VerificationException ve )
+        {
+            verifier.verifyTextInLog( "Goal requires a project to execute but there is no POM in this directory" );
         }
         finally
         {
