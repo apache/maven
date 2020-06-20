@@ -28,14 +28,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -50,14 +48,15 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.repository.ArtifactDoesNotExistException;
+import org.apache.maven.repository.ArtifactTransferFailedException;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalArtifactRepository;
-import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.MirrorSelector;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.ArtifactDoesNotExistException;
-import org.apache.maven.repository.ArtifactTransferFailedException;
+import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.SettingsProblem;
@@ -602,6 +601,17 @@ public class LegacyRepositorySystem
                                             authCtx.get( AuthenticationContext.PASSWORD ) );
                     result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
                     result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
+                    //MNG-5583 per endpoint PKI authentication
+                    result.setKeyAlias( authCtx.get( "getKeyAlias" ) );
+                    result.setKeyPassword( authCtx.get( "getKeyPassword" ) );
+                    result.setKeyStore( authCtx.get( "getKeyStore" ) );
+                    result.setKeyStorePassword( authCtx.get( "getKeyStorePassword" ) );
+                    result.setKeyStoreType( authCtx.get( "getKeyStoreType" ) );
+                    result.setTrustStore( authCtx.get( "getTrustStore" ) );
+                    result.setTrustStorePassword( authCtx.get( "getTrustStorePassword" ) );
+                    result.setTrustStoreType( authCtx.get( "getTrustStoreType" ) );   
+
+                    
                     authCtx.close();
                     return result;
                 }

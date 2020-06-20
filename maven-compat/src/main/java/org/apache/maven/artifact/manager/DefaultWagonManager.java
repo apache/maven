@@ -20,7 +20,6 @@ package org.apache.maven.artifact.manager;
  */
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -93,7 +92,16 @@ public class DefaultWagonManager
                             authInfo.setUserName( server.getUsername() );
                             authInfo.setPassword( server.getPassword() );
                             authInfo.setPrivateKey( server.getPrivateKey() );
+                            //MNG-5583 per endpoint PKI authentication
                             authInfo.setPassphrase( server.getPassphrase() );
+                            authInfo.setKeyAlias( server.getKeyAlias() );
+                            authInfo.setKeyPassword( server.getKeyPassword() );
+                            authInfo.setKeyStore( server.getKeyStore() );
+                            authInfo.setKeyStoreType( server.getKeyStoreType() );
+                            authInfo.setKeyStorePassword( server.getKeyStorePassword() );
+                            authInfo.setTrustStore( server.getTrustStore() );
+                            authInfo.setTrustStoreType( server.getTrustStoreType() );
+                            authInfo.setTrustStorePassword( server.getTrustStorePassword() );
 
                             return authInfo;
                         }
