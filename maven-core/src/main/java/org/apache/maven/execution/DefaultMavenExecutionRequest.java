@@ -116,6 +116,8 @@ public class DefaultMavenExecutionRequest
 
     private List<String> excludedProjects;
 
+    private boolean resume = false;
+
     private String resumeFrom;
 
     private String makeBehavior;
@@ -298,6 +300,12 @@ public class DefaultMavenExecutionRequest
         }
 
         return excludedProjects;
+    }
+
+    @Override
+    public boolean isResume()
+    {
+        return resume;
     }
 
     @Override
@@ -594,6 +602,14 @@ public class DefaultMavenExecutionRequest
         {
             this.excludedProjects = null;
         }
+
+        return this;
+    }
+
+    @Override
+    public MavenExecutionRequest setResume()
+    {
+        resume = true;
 
         return this;
     }

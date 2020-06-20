@@ -19,6 +19,9 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,10 +34,12 @@ import static org.mockito.Mockito.times;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -346,4 +351,37 @@ public class MavenCliTest
         orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingResult.class));
     }
 
+    @Test
+    public void resumeFromSelectorIsSuggestedWithoutGroupId()
+    {
+        List<MavenProject> allProjects = asList(
+                createMavenProject( "group", "module-a" ),
+                createMavenProject( "group", "module-b" ) );
+        MavenProject failedProject = allProjects.get( 0 );
+
+        String selector = cli.getResumeFromSelector( allProjects, failedProject );
+
+        assertThat( selector, is( ":module-a" ) );
+    }
+
+    @Test
+    public void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique()
+    {
+        List<MavenProject> allProjects = asList(
+                createMavenProject( "group-a", "module" ),
+                createMavenProject( "group-b", "module" ) );
+        MavenProject failedProject = allProjects.get( 0 );
+
+        String selector = cli.getResumeFromSelector( allProjects, failedProject );
+
+        assertThat( selector, is( "group-a:module" ) );
+    }
+
+    private MavenProject createMavenProject( String groupId, String artifactId )
+    {
+        MavenProject project = new MavenProject();
+        project.setGroupId( groupId );
+        project.setArtifactId( artifactId );
+        return project;
+    }
 }
