@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.Collections;
 import java.util.List;
 
 /**
