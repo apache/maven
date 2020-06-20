@@ -42,14 +42,7 @@ public class LogLevelRecorder
 
     public LogLevelRecorder( String threshold )
     {
-        Level level = determineThresholdLevel( threshold );
-
-        if ( level.toInt() < Level.WARN.toInt() )
-        {
-            throw new IllegalArgumentException( "Logging severity thresholds can only be set to WARN or ERROR" );
-        }
-
-        logThreshold = level;
+        logThreshold = determineThresholdLevel( threshold );
     }
 
     private Level determineThresholdLevel( String input )
