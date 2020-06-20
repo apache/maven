@@ -171,6 +171,17 @@ public interface MavenExecutionRequest
      */
     List<String> getExcludedProjects();
 
+    /**
+     * Sets whether the build should be resumed from the data in the resume.properties file.
+     * @return This request, never {@code null}.
+     */
+    MavenExecutionRequest setResume();
+
+    /**
+     * @return Whether the build should be resumed from the data in the resume.properties file.
+     */
+    boolean isResume();
+
     MavenExecutionRequest setResumeFrom( String project );
 
     String getResumeFrom();

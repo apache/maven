@@ -48,6 +48,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -167,6 +168,8 @@ public class MavenCli
     private DefaultSecDispatcher dispatcher;
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
+
+    private BuildResumptionDataRepository buildResumptionDataRepository;
 
     public MavenCli()
     {
@@ -705,6 +708,8 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
+        buildResumptionDataRepository = container.lookup( BuildResumptionDataRepository.class );
+
         return container;
     }
 
@@ -996,7 +1001,8 @@ public class MavenCli
 
                 if ( project == null && exception instanceof LifecycleExecutionException )
                 {
-                    project = ( (LifecycleExecutionException) exception ).getProject();
+                    LifecycleExecutionException lifecycleExecutionException = (LifecycleExecutionException) exception;
+                    project = lifecycleExecutionException.getProject();
                 }
             }
 
@@ -1025,12 +1031,15 @@ public class MavenCli
                 }
             }
 
-            if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
+            List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
+            if ( result.canResume() )
             {
-                slf4jLogger.error( "" );
-                slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( buffer().a( "  " ).strong( "mvn <args> -rf "
-                    + getResumeFrom( result.getTopologicallySortedProjects(), project ) ).toString() );
+                logBuildResumeHint( "mvn <args> -r " );
+            }
+            else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
+            {
+                String resumeFromSelector = getResumeFromSelector( sortedProjects, project );
+                logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1050,32 +1059,41 @@ public class MavenCli
         }
     }
 
+    private void logBuildResumeHint( String resumeBuildHint )
+    {
+        slf4jLogger.error( "" );
+        slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
+        slf4jLogger.error( buffer().a( "  " ).strong( resumeBuildHint ).toString() );
+    }
+
     /**
-     * A helper method to determine the value to resume the build with {@code -rf} taking into account the
-     * edge case where multiple modules in the reactor have the same artifactId.
+     * A helper method to determine the value to resume the build with {@code -rf} taking into account the edge case
+     *   where multiple modules in the reactor have the same artifactId.
      * <p>
-     * {@code -rf :artifactId} will pick up the first module which matches, but when multiple modules in the
-     * reactor have the same artifactId, effective failed module might be later in build reactor.
-     * This means that developer will either have to type groupId or wait for build execution of all modules
-     * which were fine, but they are still before one which reported errors.
+     * {@code -rf :artifactId} will pick up the first module which matches, but when multiple modules in the reactor
+     *   have the same artifactId, effective failed module might be later in build reactor.
+     * This means that developer will either have to type groupId or wait for build execution of all modules which
+     *   were fine, but they are still before one which reported errors.
      * <p>Then the returned value is {@code groupId:artifactId} when there is a name clash and
      * {@code :artifactId} if there is no conflict.
+     * This method is made package-private for testing purposes.
      *
      * @param mavenProjects Maven projects which are part of build execution.
      * @param failedProject Project which has failed.
-     * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in
-     *    general and {@code groupId:artifactId} when there is a name clash).
+     * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general
+     * and {@code groupId:artifactId} when there is a name clash).
      */
-    private String getResumeFrom( List<MavenProject> mavenProjects, MavenProject failedProject )
+    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
     {
-        for ( MavenProject buildProject : mavenProjects )
+        boolean hasOverlappingArtifactId = mavenProjects.stream()
+                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
+                .count() > 1;
+
+        if ( hasOverlappingArtifactId )
         {
-            if ( failedProject.getArtifactId().equals( buildProject.getArtifactId() ) && !failedProject.equals(
-                    buildProject ) )
-            {
-                return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
-            }
+            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
         }
+
         return ":" + failedProject.getArtifactId();
     }
 
@@ -1514,6 +1532,11 @@ public class MavenCli
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
+        }
+
+        if ( commandLine.hasOption( CLIManager.RESUME ) )
+        {
+            request.setResume();
         }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
