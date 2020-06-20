@@ -1531,7 +1531,7 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.RESUME ) )
         {
-            request.setResume();
+            request.setResume( true );
         }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )

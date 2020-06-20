@@ -607,9 +607,9 @@ public class DefaultMavenExecutionRequest
     }
 
     @Override
-    public MavenExecutionRequest setResume()
+    public MavenExecutionRequest setResume( boolean resume )
     {
-        resume = true;
+        this.resume = resume;
 
         return this;
     }
