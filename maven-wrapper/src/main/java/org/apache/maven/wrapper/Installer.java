@@ -211,7 +211,7 @@ public class Installer
                     continue;
                 }
 
-                Path targetFile = dest.resolve( entry.getName() );
+                Path targetFile = dest.resolve( entry.getName() ).normalize();
 
                 // prevent Zip Slip
                 if ( targetFile.startsWith( dest ) ) 
