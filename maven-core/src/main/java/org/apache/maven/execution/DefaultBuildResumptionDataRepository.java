@@ -74,9 +74,15 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private Properties convertToProperties( final BuildResumptionData buildResumptionData )
     {
         Properties properties = new Properties();
-        properties.setProperty( RESUME_FROM_PROPERTY, buildResumptionData.getResumeFrom() );
-        String excludedProjects = String.join( PROPERTY_DELIMITER, buildResumptionData.getProjectsToSkip() );
-        properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
+
+        buildResumptionData.getResumeFrom()
+                .ifPresent( resumeFrom -> properties.setProperty( RESUME_FROM_PROPERTY, resumeFrom ) );
+
+        if ( !buildResumptionData.getProjectsToSkip().isEmpty() )
+        {
+            String excludedProjects = String.join( PROPERTY_DELIMITER, buildResumptionData.getProjectsToSkip() );
+            properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
+        }
 
         return properties;
     }
@@ -105,7 +111,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private Properties loadResumptionFile( Path rootBuildDirectory )
     {
         Properties properties = new Properties();
-        Path path = Paths.get( RESUME_PROPERTIES_FILENAME ).resolve( rootBuildDirectory );
+        Path path = rootBuildDirectory.resolve( RESUME_PROPERTIES_FILENAME );
         if ( !Files.exists( path ) )
         {
             LOGGER.warn( "The {} file does not exist. The --resume / -r feature will not work.", path );
@@ -137,9 +143,12 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
         if ( properties.containsKey( EXCLUDED_PROJECTS_PROPERTY ) )
         {
             String propertyValue = properties.getProperty( EXCLUDED_PROJECTS_PROPERTY );
-            String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
-            request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
-            LOGGER.info( "Additionally excluding projects '{}' due to the --resume / -r feature.", propertyValue );
+            if ( !StringUtils.isEmpty( propertyValue ) )
+            {
+                String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
+                request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
+                LOGGER.info( "Additionally excluding projects '{}' due to the --resume / -r feature.", propertyValue );
+            }
         }
     }
 }

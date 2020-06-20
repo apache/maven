@@ -173,9 +173,10 @@ public interface MavenExecutionRequest
 
     /**
      * Sets whether the build should be resumed from the data in the resume.properties file.
+     * @param resume Whether or not to resume a previous build.
      * @return This request, never {@code null}.
      */
-    MavenExecutionRequest setResume();
+    MavenExecutionRequest setResume( boolean resume );
 
     /**
      * @return Whether the build should be resumed from the data in the resume.properties file.
