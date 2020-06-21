@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumptionDataRepositoryTest
