@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 @RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumptionDataRepositoryTest
@@ -76,6 +75,18 @@ public class DefaultBuildResumptionDataRepositoryTest
         repository.applyResumptionProperties( request, properties );
 
         assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
+    }
+
+    @Test
+    public void excludedProjectsAreNotAddedWhenPropertyValueIsEmpty()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        Properties properties = new Properties();
+        properties.setProperty( "excludedProjects", "" );
+
+        repository.applyResumptionProperties( request, properties );
+
+        assertThat( request.getExcludedProjects(), is( empty() ) );
     }
 
     @Test
