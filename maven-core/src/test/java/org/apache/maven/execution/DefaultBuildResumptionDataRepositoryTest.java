@@ -19,6 +19,8 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -74,5 +76,20 @@ public class DefaultBuildResumptionDataRepositoryTest
         repository.applyResumptionProperties( request, properties );
 
         assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
+    }
+
+    @Test
+    public void applyResumptionData_shouldLoadData()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        Build build = new Build();
+        build.setDirectory( "src/test/resources/org/apache/maven/execution/" );
+        MavenProject rootProject = new MavenProject();
+        rootProject.setBuild( build );
+
+        repository.applyResumptionData( request,  rootProject );
+
+        assertThat( request.getResumeFrom(), is( "example:module-c" ) );
+        assertThat( request.getExcludedProjects(), contains( "example:module-a", "example:module-b" ) );
     }
 }
