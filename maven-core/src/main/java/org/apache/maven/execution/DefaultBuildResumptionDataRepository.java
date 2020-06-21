@@ -109,7 +109,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private Properties loadResumptionFile( Path rootBuildDirectory )
     {
         Properties properties = new Properties();
-        Path path = rootBuildDirectory.resolve( Paths.get( RESUME_PROPERTIES_FILENAME ) );
+        Path path = rootBuildDirectory.resolve( RESUME_PROPERTIES_FILENAME );
         if ( !Files.exists( path ) )
         {
             LOGGER.warn( "The {} file does not exist. The --resume / -r feature will not work.", path );
