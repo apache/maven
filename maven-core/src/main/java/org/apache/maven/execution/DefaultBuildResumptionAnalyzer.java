@@ -22,6 +22,7 @@ package org.apache.maven.execution;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,16 +57,31 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
 
         final MavenProject resumeFromProject = failedProjects.get( 0 );
 
+        final String resumeFromSelector;
+        final List<String> projectsToSkip;
         if ( isFailedProjectFirstInBuild( result, resumeFromProject ) )
         {
-            LOGGER.info( "The first module in the build failed, resuming the build would not make sense." );
-            return Optional.empty();
+            // As the first module in the build failed, there is no need to specify this as the resumeFrom project.
+            resumeFromSelector = null;
+            projectsToSkip = determineProjectsToSkip( result, failedProjects, 0 );
+        }
+        else
+        {
+            resumeFromSelector = resumeFromProject.getGroupId() + ":" + resumeFromProject.getArtifactId();
+            List<MavenProject> allProjects = result.getTopologicallySortedProjects();
+            int resumeFromProjectIndex = allProjects.indexOf( resumeFromProject );
+            projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProjectIndex + 1 );
         }
 
-        final String resumeFromSelector = resumeFromProject.getGroupId() + ":" + resumeFromProject.getArtifactId();
-        final List<String> projectsToSkip = determineProjectsToSkip( result, failedProjects, resumeFromProject );
-
-        return Optional.of( new BuildResumptionData( resumeFromSelector, projectsToSkip ) );
+        boolean canBuildBeResumed = StringUtils.isNotEmpty( resumeFromSelector ) || !projectsToSkip.isEmpty();
+        if ( canBuildBeResumed )
+        {
+            return Optional.of( new BuildResumptionData( resumeFromSelector, projectsToSkip ) );
+        }
+        else
+        {
+            return Optional.empty();
+        }
     }
 
     private boolean isFailedProjectFirstInBuild( final MavenExecutionResult result, final MavenProject failedProject )
@@ -92,16 +108,15 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
      * This is not the case these projects are dependent on one of the failed projects.
      * @param result The result of the Maven build.
      * @param failedProjects The list of failed projects in the build.
-     * @param resumeFromProject The project where the build will be resumed with in the next run.
+     * @param startFromProjectIndex Start looking for projects which can be skipped from a certain index.
      * @return A list of projects which can be skipped in a later build.
      */
     private List<String> determineProjectsToSkip( MavenExecutionResult result,
                                                   List<MavenProject> failedProjects,
-                                                  MavenProject resumeFromProject )
+                                                  int startFromProjectIndex )
     {
         List<MavenProject> allProjects = result.getTopologicallySortedProjects();
-        int resumeFromProjectIndex = allProjects.indexOf( resumeFromProject );
-        List<MavenProject> remainingProjects = allProjects.subList( resumeFromProjectIndex + 1, allProjects.size() );
+        List<MavenProject> remainingProjects = allProjects.subList( startFromProjectIndex, allProjects.size() );
 
         List<GroupArtifactPair> failedProjectsGAList = failedProjects.stream()
                 .map( GroupArtifactPair::new )

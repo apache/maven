@@ -74,7 +74,9 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     private Properties convertToProperties( final BuildResumptionData buildResumptionData )
     {
         Properties properties = new Properties();
-        properties.setProperty( RESUME_FROM_PROPERTY, buildResumptionData.getResumeFrom() );
+
+        buildResumptionData.getResumeFrom()
+                .ifPresent( resumeFrom -> properties.setProperty( RESUME_FROM_PROPERTY, resumeFrom ) );
 
         if ( !buildResumptionData.getProjectsToSkip().isEmpty() )
         {
