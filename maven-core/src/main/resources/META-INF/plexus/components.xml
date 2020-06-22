@@ -111,6 +111,26 @@ under the License.
       </configuration>
     </component>
 
+    <!-- 'wrapper' lifecycle, with default bindings -->
+    <component>
+      <role>org.apache.maven.lifecycle.Lifecycle</role>
+      <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+      <role-hint>wrapper</role-hint>
+      <configuration>
+        <id>wrapper</id>
+        <!-- START SNIPPET: wrapper -->
+        <phases>
+          <phase>wrapper</phase>
+        </phases>
+        <default-phases>
+          <wrapper>
+            org.apache.maven.plugins:maven-wrapper-plugin:3.0.1:wrapper
+          </wrapper>
+        </default-phases>
+        <!-- END SNIPPET: wrapper -->
+      </configuration>
+    </component>
+
     <component>
       <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>
       <role-hint>maven</role-hint>
