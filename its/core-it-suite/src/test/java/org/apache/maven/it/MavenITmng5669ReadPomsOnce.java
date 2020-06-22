@@ -45,7 +45,7 @@ public class MavenITmng5669ReadPomsOnce
         super( "[3.7.0,)" );
     }
 
-    public void testit()
+    public void testWithoutBuildConsumer()
         throws Exception
     {
         // prepare JavaAgent
@@ -61,11 +61,12 @@ public class MavenITmng5669ReadPomsOnce
         verifier.setAutoclean( false );
         verifier.addCliOption( "-q" );
         verifier.addCliOption( "-U" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.executeGoals( Arrays.asList( "verify" ) );
         verifier.resetStreams();
-        
+
         List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
-        for ( String line : logTxt ) 
+        for ( String line : logTxt )
         {
             if ( line.startsWith( "Picked up JAVA_TOOL_OPTIONS:" ) )
             {
@@ -74,21 +75,21 @@ public class MavenITmng5669ReadPomsOnce
             }
         }
         assertEquals( logTxt.toString(), 168, logTxt.size() );
-        
+
         // analyze lines. It is a Hashmap, so we can't rely on the order
         Set<String> uniqueBuildingSources = new HashSet<>( 168 );
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
-        for( String line : logTxt )
+        for ( String line : logTxt )
         {
             int start = line.indexOf( buildSourceKey );
             if ( start < 0 )
             {
                 continue;
             }
-            
-            int end = line.indexOf(", ", start);
-            if ( end < 0) 
+
+            int end = line.indexOf( ", ", start );
+            if ( end < 0 )
             {
                 end = line.length() - 1; // is the }
             }
@@ -96,4 +97,59 @@ public class MavenITmng5669ReadPomsOnce
         }
         assertEquals( uniqueBuildingSources.size(), 167 /* is 168 minus superpom */ );
     }
+
+    public void testWithBuildConsumer()
+        throws Exception
+    {
+        // prepare JavaAgent
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5669-read-poms-once" );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
+        Map<String, String> filterProperties =
+            Collections.singletonMap( "${javaAgentJar}",
+                                      verifier.getArtifactPath( "mng-coreit", "javaagent", "1.0-SNAPSHOT", "jar" ) );
+        verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
+
+        verifier.setForkJvm( true ); // pick up agent
+        verifier.setMavenDebug( false );
+        verifier.setAutoclean( false );
+        verifier.addCliOption( "-q" );
+        verifier.addCliOption( "-U" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.executeGoals( Arrays.asList( "verify" ) );
+        verifier.resetStreams();
+
+        List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
+        for ( String line : logTxt )
+        {
+            if ( line.startsWith( "Picked up JAVA_TOOL_OPTIONS:" ) )
+            {
+                logTxt.remove( line );
+                break;
+            }
+        }
+        assertEquals( logTxt.toString(), 168 + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
+                      logTxt.size() );
+
+        // analyze lines. It is a Hashmap, so we can't rely on the order
+        Set<String> uniqueBuildingSources = new HashSet<>( 168 );
+        final String buildSourceKey = "org.apache.maven.model.building.source=";
+        final int keyLength = buildSourceKey.length();
+        for ( String line : logTxt )
+        {
+            int start = line.indexOf( buildSourceKey );
+            if ( start < 0 )
+            {
+                continue;
+            }
+
+            int end = line.indexOf( ", ", start );
+            if ( end < 0 )
+            {
+                end = line.length() - 1; // is the }
+            }
+            uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
+        }
+        assertEquals( uniqueBuildingSources.size(), 167 /* is 168 minus superpom */ );
+    }
+
 }
