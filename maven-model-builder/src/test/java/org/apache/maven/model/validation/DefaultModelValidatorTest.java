@@ -64,10 +64,14 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
+        
+        Model model =  read( pom );
 
-        SimpleProblemCollector problems = new SimpleProblemCollector( read( pom ) );
+        SimpleProblemCollector problems = new SimpleProblemCollector( model );
+        
+        request.setFileModel( model );
 
-        validator.validateEffectiveModel( problems.getModel(), request, problems );
+        validator.validateEffectiveModel( model, request, problems );
 
         return problems;
     }
@@ -77,9 +81,15 @@ public class DefaultModelValidatorTest
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
-        SimpleProblemCollector problems = new SimpleProblemCollector( read( pom ) );
+        Model model = read( pom );
+        
+        SimpleProblemCollector problems = new SimpleProblemCollector( model );
 
-        validator.validateRawModel( problems.getModel(), request, problems );
+        validator.validateFileModel( model, request, problems );
+        
+        request.setFileModel( model );
+        
+        validator.validateRawModel( model, request, problems );
 
         return problems;
     }
@@ -366,7 +376,7 @@ public class DefaultModelValidatorTest
     public void testDuplicateModule()
         throws Exception
     {
-        SimpleProblemCollector result = validate( "duplicate-module.xml" );
+        SimpleProblemCollector result = validateRaw( "duplicate-module.xml" );
 
         assertViolations( result, 0, 1, 0 );
 
@@ -416,7 +426,6 @@ public class DefaultModelValidatorTest
         SimpleProblemCollector result = validateRaw( "incomplete-parent.xml" );
 
         assertViolations( result, 3, 0, 0 );
-
         assertTrue( result.getFatals().get( 0 ).contains( "parent.groupId" ) );
         assertTrue( result.getFatals().get( 1 ).contains( "parent.artifactId" ) );
         assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );

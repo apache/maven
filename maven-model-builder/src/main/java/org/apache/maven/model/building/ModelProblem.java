@@ -50,7 +50,8 @@ public interface ModelProblem
         BASE,
         V20,
         V30,
-        V31
+        V31,
+        V37
     }
 
     /**

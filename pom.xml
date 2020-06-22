@@ -97,6 +97,7 @@ under the License.
     <module>apache-maven</module> <!-- rename to apache-maven/maven.pom after RAT-268 -->
     <module>maven-wrapper</module>
     <module>apache-maven/maven-wrapper.pom</module>
+    <module>maven-xml</module>
   </modules>
 
   <scm>
@@ -248,6 +249,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-wrapper</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-xml</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -417,6 +423,12 @@ under the License.
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>${mockitoVersion}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-assertj</artifactId>
+        <version>${xmlunitVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

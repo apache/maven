@@ -38,6 +38,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
+    private Model fileModel;
 
     private Model rawModel;
 
@@ -72,6 +73,8 @@ public class DefaultModelBuildingRequest
     private ModelCache modelCache;
 
     private WorkspaceModelResolver workspaceResolver;
+    
+    private TransformerContext context;
 
     /**
      * Creates an empty request.
@@ -383,6 +386,19 @@ public class DefaultModelBuildingRequest
     }
 
     @Override
+    public Model getFileModel()
+    {
+        return fileModel;
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        this.fileModel = fileModel;
+        return this;
+    }
+    
+    @Override
     public Model getRawModel()
     {
         return rawModel;
@@ -407,5 +423,17 @@ public class DefaultModelBuildingRequest
         this.workspaceResolver = workspaceResolver;
         return this;
     }
-
+    
+    @Override
+    public TransformerContext getTransformerContext()
+    {
+        return context;
+    }
+    
+    @Override
+    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    {
+        this.context = context;
+        return this;
+    }
 }

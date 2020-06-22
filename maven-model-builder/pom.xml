@@ -59,6 +59,11 @@ under the License.
       <artifactId>maven-builder-support</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-xml</artifactId>
+    </dependency>
+    <!-- Testing -->
+    <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.inject</artifactId>
     </dependency>
@@ -67,7 +72,6 @@ under the License.
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Testing -->
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
