@@ -19,10 +19,13 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
 import org.apache.maven.lifecycle.internal.ProjectSegment;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -86,6 +89,10 @@ public class LifecycleExecutionPlanCalculatorStub
     public final static MojoDescriptor POST_SITE = createMojoDescriptor( "post-site" );
 
     public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
+
+    // wrapper
+
+    public final static MojoDescriptor WRAPPER = createMojoDescriptor( "wrapper" );
 
     /**
      * @deprecated instead use {@link #getNumberOfExecutions(ProjectBuildList)}
@@ -203,7 +210,11 @@ public class LifecycleExecutionPlanCalculatorStub
 
     private static MojoExecution createMojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor )
     {
+        InputSource defaultBindings = new InputSource();
+        defaultBindings.setModelId( DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID );
+        
         final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
+        plugin.setLocation( "version", new InputLocation( 12, 34, defaultBindings ) );
         MojoExecution result = new MojoExecution( plugin, goal, executionId );
         result.setConfiguration( new Xpp3Dom( executionId + "-" + goal ) );
         result.setMojoDescriptor( mojoDescriptor );
@@ -224,8 +235,8 @@ public class LifecycleExecutionPlanCalculatorStub
         mojoDescriptor.setPhase( phaseName );
         final PluginDescriptor descriptor = new PluginDescriptor();
         Plugin plugin = new Plugin();
-        plugin.setArtifactId( "org.apache.maven.test.MavenExecutionPlan" );
-        plugin.setGroupId( "stub-plugin-" + phaseName );
+        plugin.setGroupId( "org.apache.maven.test.MavenExecutionPlan" );
+        plugin.setArtifactId( "stub-plugin-" + phaseName );
         descriptor.setPlugin( plugin );
         descriptor.setArtifactId( "artifact." + phaseName );
         mojoDescriptor.setPluginDescriptor( descriptor );

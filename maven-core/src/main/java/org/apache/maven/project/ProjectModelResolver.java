@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,8 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
@@ -155,10 +156,10 @@ public class ProjectModelResolver
 
     private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
     {
-        Iterator iterator = repositories.iterator( );
+        Iterator<RemoteRepository> iterator = repositories.iterator( );
         while ( iterator.hasNext() )
         {
-            RemoteRepository next =  ( RemoteRepository ) iterator.next();
+            RemoteRepository next = iterator.next();
             if ( next.getId().equals( id ) )
             {
                 iterator.remove();
@@ -174,32 +175,20 @@ public class ProjectModelResolver
     public ModelSource resolveModel( String groupId, String artifactId, String version )
         throws UnresolvableModelException
     {
-        File pomFile = null;
+        Artifact pomArtifact = new DefaultArtifact( groupId, artifactId, "", "pom", version );
 
-        if ( modelPool != null )
+        try
         {
-            pomFile = modelPool.get( groupId, artifactId, version );
+            ArtifactRequest request = new ArtifactRequest( pomArtifact, repositories, context );
+            request.setTrace( trace );
+            pomArtifact = resolver.resolveArtifact( session, request ).getArtifact();
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new UnresolvableModelException( e.getMessage(), groupId, artifactId, version, e );
         }
 
-        if ( pomFile == null )
-        {
-            Artifact pomArtifact = new DefaultArtifact( groupId, artifactId, "", "pom", version );
-
-            try
-            {
-                ArtifactRequest request = new ArtifactRequest( pomArtifact, repositories, context );
-                request.setTrace( trace );
-                pomArtifact = resolver.resolveArtifact( session, request ).getArtifact();
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new UnresolvableModelException( e.getMessage(), groupId, artifactId, version, e );
-            }
-
-            pomFile = pomArtifact.getFile();
-        }
-
-        return new FileModelSource( pomFile );
+        return new ArtifactModelSource( pomArtifact.getFile(), groupId, artifactId, version );
     }
 
     @Override
@@ -285,6 +274,17 @@ public class ProjectModelResolver
             }
 
             dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
+            
+            if ( modelPool != null )
+            {
+                Model model =
+                    modelPool.get( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+                if ( model != null )
+                {
+                    return new FileModelSource( model.getPomFile() );
+                }
+            }
 
             return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
         }

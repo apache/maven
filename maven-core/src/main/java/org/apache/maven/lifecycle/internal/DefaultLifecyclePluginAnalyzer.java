@@ -56,6 +56,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
+    public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
+        + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
     @Requirement( role = LifecycleMapping.class )
     private Map<String, LifecycleMapping> lifecycleMappings;
@@ -143,10 +145,8 @@ public class DefaultLifecyclePluginAnalyzer
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
     {
-        String modelId = "org.apache.maven:maven-core:" + this.getClass().getPackage().getImplementationVersion()
-            + ":default-lifecycle-bindings";
         InputSource inputSource = new InputSource();
-        inputSource.setModelId( modelId );
+        inputSource.setModelId( DEFAULTLIFECYCLEBINDINGS_MODELID );
         InputLocation location = new InputLocation( -1, -1, inputSource );
         location.setLocation( 0, location );
 

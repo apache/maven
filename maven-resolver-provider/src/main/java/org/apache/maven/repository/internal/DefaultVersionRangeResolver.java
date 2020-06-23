@@ -244,7 +244,7 @@ public class DefaultVersionRangeResolver
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        try ( final InputStream in = new FileInputStream( metadata.getFile() ) )
+                        try ( InputStream in = new FileInputStream( metadata.getFile() ) )
                         {
                             versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
                         }

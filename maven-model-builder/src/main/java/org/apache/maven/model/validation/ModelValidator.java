@@ -30,10 +30,22 @@ import org.apache.maven.model.building.ModelProblemCollector;
  */
 public interface ModelValidator
 {
+    /**
+     * Checks the specified file model for missing or invalid values. This model is directly created from the POM
+     * file and has not been subjected to inheritance, interpolation or profile/default injection.
+     *
+     * @param model The model to validate, must not be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     */
+    default void validateFileModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    {
+        // do nothing
+    }
 
     /**
-     * Checks the specified (raw) model for missing or invalid values. The raw model is directly created from the POM
-     * file and has not been subjected to inheritance, interpolation or profile/default injection.
+     * Checks the specified (raw) model for missing or invalid values. The raw model is the file model + buildpom filter
+     * transformation and has not been subjected to inheritance, interpolation or profile/default injection.
      *
      * @param model The model to validate, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.

@@ -94,7 +94,7 @@ under the License.
         </exclusion>
         <exclusion>
           <groupId>org.checkerframework</groupId>
-          <artifactId>checker-compat-qual</artifactId>
+          <artifactId>checker-qual</artifactId>
         </exclusion>
         <exclusion>
           <groupId>com.google.errorprone</groupId>

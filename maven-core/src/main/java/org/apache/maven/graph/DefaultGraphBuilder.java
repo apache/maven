@@ -25,10 +25,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,6 +40,7 @@ import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
@@ -58,6 +61,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+import static java.util.Comparator.comparing;
+
 /**
  * Builds the {@link ProjectDependencyGraph inter-dependencies graph} between projects in the reactor.
  */
@@ -73,6 +78,9 @@ public class DefaultGraphBuilder
     @Inject
     protected ProjectBuilder projectBuilder;
 
+    @Inject
+    private BuildResumptionDataRepository buildResumptionDataRepository;
+
     @Override
     public Result<ProjectDependencyGraph> build( MavenSession session )
     {
@@ -84,6 +92,7 @@ public class DefaultGraphBuilder
             {
                 final List<MavenProject> projects = getProjectsForMavenReactor( session );
                 validateProjects( projects );
+                enrichRequestFromResumptionData( projects, session.getRequest() );
                 result = reactorDependencyGraph( session, projects );
             }
 
@@ -144,43 +153,27 @@ public class DefaultGraphBuilder
 
         if ( !request.getSelectedProjects().isEmpty() )
         {
-            result = new ArrayList<>( projects.size() );
+            File reactorDirectory = getReactorDirectory( request );
 
-            File reactorDirectory = null;
-            if ( request.getBaseDirectory() != null )
-            {
-                reactorDirectory = new File( request.getBaseDirectory() );
-            }
-
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( projects.size() );
+            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( request.getSelectedProjects().size(), 1 );
 
             for ( String selector : request.getSelectedProjects() )
             {
-                MavenProject selectedProject = null;
-
-                for ( MavenProject project : projects )
-                {
-                    if ( isMatchingProject( project, selector, reactorDirectory ) )
-                    {
-                        selectedProject = project;
-                        break;
-                    }
-                }
-
-                if ( selectedProject != null )
-                {
-                    selectedProjects.add( selectedProject );
-                }
-                else
-                {
-                    throw new MavenExecutionException( "Could not find the selected project in the reactor: "
-                        + selector, request.getPom() );
-                }
+                MavenProject selectedProject = projects.stream()
+                        .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                        .findFirst()
+                        .orElseThrow( () -> new MavenExecutionException(
+                                "Could not find the selected project in the reactor: " + selector, request.getPom() ) );
+                selectedProjects.add( selectedProject );
             }
 
-            result.addAll( selectedProjects );
+            result = new ArrayList<>( selectedProjects );
 
             result = includeAlsoMakeTransitively( result, request, graph );
+
+            // Order the new list in the original order
+            List<MavenProject> sortedProjects = graph.getSortedProjects();
+            result.sort( comparing( sortedProjects::indexOf ) );
         }
 
         return result;
@@ -194,38 +187,20 @@ public class DefaultGraphBuilder
 
         if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
         {
-            File reactorDirectory = null;
-            if ( request.getBaseDirectory() != null )
-            {
-                reactorDirectory = new File( request.getBaseDirectory() );
-            }
+            File reactorDirectory = getReactorDirectory( request );
 
             String selector = request.getResumeFrom();
 
-            result = new ArrayList<>( projects.size() );
+            MavenProject resumingFromProject = projects.stream()
+                    .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                    .findFirst()
+                    .orElseThrow( () -> new MavenExecutionException(
+                            "Could not find project to resume reactor build from: " + selector + " vs "
+                            + formatProjects( projects ), request.getPom() ) );
+            int resumeFromProjectIndex = projects.indexOf( resumingFromProject );
+            List<MavenProject> retainingProjects = result.subList( resumeFromProjectIndex, projects.size() );
 
-            boolean resumed = false;
-
-            for ( MavenProject project : projects )
-            {
-                if ( !resumed && isMatchingProject( project, selector, reactorDirectory ) )
-                {
-                    resumed = true;
-                }
-
-                if ( resumed )
-                {
-                    result.add( project );
-                }
-            }
-
-            if ( !resumed )
-            {
-                throw new MavenExecutionException( "Could not find project to resume reactor build from: " + selector
-                        + " vs " + formatProjects( projects ), request.getPom() );
-            }
-
-            result = includeAlsoMakeTransitively( result, request, graph );
+            result = includeAlsoMakeTransitively( retainingProjects, request, graph );
         }
 
         return result;
@@ -238,46 +213,18 @@ public class DefaultGraphBuilder
 
         if ( !request.getExcludedProjects().isEmpty() )
         {
-            File reactorDirectory = null;
+            File reactorDirectory = getReactorDirectory( request );
 
-            if ( request.getBaseDirectory() != null )
-            {
-                reactorDirectory = new File( request.getBaseDirectory() );
-            }
-
-            Collection<MavenProject> excludedProjects = new LinkedHashSet<>( projects.size() );
+            result = new ArrayList<>( projects );
 
             for ( String selector : request.getExcludedProjects() )
             {
-                MavenProject excludedProject = null;
-
-                for ( MavenProject project : projects )
-                {
-                    if ( isMatchingProject( project, selector, reactorDirectory ) )
-                    {
-                        excludedProject = project;
-                        break;
-                    }
-                }
-
-                if ( excludedProject != null )
-                {
-                    excludedProjects.add( excludedProject );
-                }
-                else
-                {
-                    throw new MavenExecutionException( "Could not find the selected project in the reactor: "
-                        + selector, request.getPom() );
-                }
-            }
-
-            result = new ArrayList<>( projects.size() );
-            for ( MavenProject project : projects )
-            {
-                if ( !excludedProjects.contains( project ) )
-                {
-                    result.add( project );
-                }
+                MavenProject excludedProject = projects.stream()
+                        .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                        .findFirst()
+                        .orElseThrow( () -> new MavenExecutionException( "Could not find the selected project in "
+                                + "the reactor: " + selector, request.getPom() ) );
+                result.remove( excludedProject );
             }
         }
 
@@ -288,57 +235,56 @@ public class DefaultGraphBuilder
                                                             ProjectDependencyGraph graph )
             throws MavenExecutionException
     {
-        List<MavenProject> result;
+        List<MavenProject> result = projects;
 
-        boolean makeUpstream = false;
-        boolean makeDownstream = false;
+        String makeBehavior = request.getMakeBehavior();
+        boolean makeBoth = MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( makeBehavior );
 
-        if ( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( request.getMakeBehavior() ) )
+        boolean makeUpstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( makeBehavior );
+        boolean makeDownstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( makeBehavior );
+
+        if ( StringUtils.isNotEmpty( makeBehavior ) && !makeUpstream && !makeDownstream )
         {
-            makeUpstream = true;
-        }
-        else if ( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( request.getMakeBehavior() ) )
-        {
-            makeDownstream = true;
-        }
-        else if ( MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( request.getMakeBehavior() ) )
-        {
-            makeUpstream = true;
-            makeDownstream = true;
-        }
-        else if ( StringUtils.isNotEmpty( request.getMakeBehavior() ) )
-        {
-            throw new MavenExecutionException( "Invalid reactor make behavior: " + request.getMakeBehavior(),
+            throw new MavenExecutionException( "Invalid reactor make behavior: " + makeBehavior,
                     request.getPom() );
         }
 
         if ( makeUpstream || makeDownstream )
         {
+            Set<MavenProject> projectsSet = new HashSet<>( projects );
 
-            for ( MavenProject project : new ArrayList<>( projects ) )
+            for ( MavenProject project : projects )
             {
                 if ( makeUpstream )
                 {
-                    projects.addAll( graph.getUpstreamProjects( project, true ) );
+                    projectsSet.addAll( graph.getUpstreamProjects( project, true ) );
                 }
                 if ( makeDownstream )
                 {
-                    projects.addAll( graph.getDownstreamProjects( project, true ) );
+                    projectsSet.addAll( graph.getDownstreamProjects( project, true ) );
                 }
             }
-        }
 
-        result = new ArrayList<>( projects.size() );
+            result = new ArrayList<>( projectsSet );
 
-        for ( MavenProject project : graph.getSortedProjects() )
-        {
-            if ( projects.contains( project ) )
-            {
-                result.add( project );
-            }
+            // Order the new list in the original order
+            List<MavenProject> sortedProjects = graph.getSortedProjects();
+            result.sort( comparing( sortedProjects::indexOf ) );
         }
 
         return result;
+    }
+
+    private void enrichRequestFromResumptionData( List<MavenProject> projects, MavenExecutionRequest request )
+    {
+        if ( request.isResume() )
+        {
+            projects.stream()
+                    .filter( MavenProject::isExecutionRoot )
+                    .findFirst()
+                    .ifPresent( rootProject ->
+                            buildResumptionDataRepository.applyResumptionData( request, rootProject ) );
+        }
     }
 
     private String formatProjects( List<MavenProject> projects )
@@ -393,6 +339,16 @@ public class DefaultGraphBuilder
         }
 
         return false;
+    }
+
+    private File getReactorDirectory( MavenExecutionRequest request )
+    {
+        if ( request.getBaseDirectory() != null )
+        {
+            return new File( request.getBaseDirectory() );
+        }
+
+        return null;
     }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

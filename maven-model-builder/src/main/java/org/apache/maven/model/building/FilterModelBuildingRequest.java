@@ -257,6 +257,19 @@ class FilterModelBuildingRequest
     }
 
     @Override
+    public Model getFileModel()
+    {
+        return request.getFileModel();
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        request.setFileModel( fileModel );
+        return this;
+    }
+    
+    @Override
     public Model getRawModel()
     {
         return request.getRawModel();
@@ -281,5 +294,17 @@ class FilterModelBuildingRequest
         request.setWorkspaceModelResolver( workspaceResolver );
         return this;
     }
-
+    
+    @Override
+    public TransformerContext getTransformerContext()
+    {
+        return request.getTransformerContext();
+    }
+    
+    @Override
+    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    {
+        request.setTransformerContext( context );
+        return this;
+    }
 }

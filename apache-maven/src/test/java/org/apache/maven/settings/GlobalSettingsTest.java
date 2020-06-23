@@ -42,7 +42,7 @@ public class GlobalSettingsTest
     {
         String basedir = System.getProperty( "basedir", System.getProperty( "user.dir" ) );
 
-        File globalSettingsFile = new File( basedir, "src/conf/settings.xml" );
+        File globalSettingsFile = new File( basedir, "src/assembly/maven/conf/settings.xml" );
         assertTrue( globalSettingsFile.getAbsolutePath(), globalSettingsFile.isFile() );
 
         try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8) )

@@ -62,7 +62,7 @@ public class DefaultSettingsReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final Reader in = input )
+        try ( Reader in = input )
         {
             return new SettingsXpp3Reader().read( in, isStrict( options ) );
         }
@@ -78,7 +78,7 @@ public class DefaultSettingsReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        try ( final InputStream in = input )
+        try ( InputStream in = input )
         {
             return new SettingsXpp3Reader().read( in, isStrict( options ) );
         }

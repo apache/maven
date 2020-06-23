@@ -1420,7 +1420,7 @@ public class StringVisitorModelInterpolator
                     {
                         String value = (String) v;
                         String inter = interpolate( value );
-                        if ( value != inter )
+                        if ( value != inter && inter != null )
                         {
                             entry.setValue( inter );
                         }

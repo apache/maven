@@ -92,7 +92,9 @@ public class DefaultModelBuilderFactory
 
     protected ModelReader newModelReader()
     {
-        return new DefaultModelReader();
+        DefaultModelReader reader = new DefaultModelReader();
+        reader.setTransformer( newModelSourceTransformer() );
+        return reader;
     }
 
     protected ProfileSelector newProfileSelector()
@@ -204,6 +206,11 @@ public class DefaultModelBuilderFactory
     protected ReportingConverter newReportingConverter()
     {
         return new DefaultReportingConverter();
+    }
+
+    private ModelSourceTransformer newModelSourceTransformer()
+    {
+        return new DefaultModelSourceTransformer();
     }
 
     /**

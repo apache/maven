@@ -57,7 +57,7 @@ under the License.
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
-    <guiceVersion>4.2.2</guiceVersion>
+    <guiceVersion>4.2.3</guiceVersion>
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
     <wagonVersion>3.4.0</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
@@ -94,7 +94,10 @@ under the License.
     <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
-    <module>apache-maven</module>
+    <module>apache-maven</module> <!-- rename to apache-maven/maven.pom after RAT-268 -->
+    <module>maven-wrapper</module>
+    <module>apache-maven/maven-wrapper.pom</module>
+    <module>maven-xml</module>
   </modules>
 
   <scm>
@@ -248,6 +251,11 @@ under the License.
         <artifactId>maven-slf4j-wrapper</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-xml</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
@@ -304,7 +312,7 @@ under the License.
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
         <artifactId>jansi</artifactId>
-        <version>1.17.1</version>
+        <version>1.18</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -419,6 +427,12 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-assertj</artifactId>
+        <version>${xmlunitVersion}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.xmlunit</groupId>
         <artifactId>xmlunit-core</artifactId>
         <version>${xmlunitVersion}</version>
         <scope>test</scope>
@@ -484,6 +498,11 @@ under the License.
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -632,6 +651,7 @@ under the License.
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <executions>
               <execution>

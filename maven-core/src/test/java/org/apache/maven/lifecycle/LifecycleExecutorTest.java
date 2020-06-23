@@ -15,6 +15,9 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -287,7 +290,7 @@ public class LifecycleExecutorTest
         List<Plugin> plugins =
             new ArrayList<>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );
 
-        assertEquals( 8, plugins.size() );
+        assertThat( plugins.toString(), plugins, hasSize( 9 ) );
     }
 
     public void testPluginConfigurationCreation()
@@ -395,27 +398,26 @@ public class LifecycleExecutorTest
         final MavenSession session = createMavenSession( pom );
         session.setProjectDependencyGraph( new ProjectDependencyGraph()
         {
+            @Override
             public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
             {
                 return Collections.emptyList();
             }
 
+            @Override
             public List<MavenProject> getAllProjects()
             {
                 return session.getAllProjects();
             }
 
+            @Override
             public List<MavenProject> getSortedProjects()
             {
                 return Collections.singletonList( session.getCurrentProject() );
             }
 
+            @Override
             public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
-            {
-                return Collections.emptyList();
-            }
-            
-            public java.util.List<MavenProject> getAllSortedProjects()
             {
                 return Collections.emptyList();
             }

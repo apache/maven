@@ -47,7 +47,9 @@ public class DefaultLifecyclesStub
         List<String> stubSiteCycle =
             Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase() );
 
-        Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
+        List<String> stubWrapperCycle = Arrays.asList( WRAPPER.getPhase() );
+
+        Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle, stubWrapperCycle ).iterator();
 
         Map<String, Lifecycle> lifeCycles = new HashMap<>();
         for ( String s : DefaultLifecycles.STANDARD_LIFECYCLES )

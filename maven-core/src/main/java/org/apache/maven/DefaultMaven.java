@@ -36,6 +36,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildResumptionAnalyzer;
+import org.apache.maven.execution.BuildResumptionDataRepository;
+import org.apache.maven.execution.BuildResumptionPersistenceException;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -44,6 +47,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.Prerequisites;
@@ -98,6 +102,12 @@ public class DefaultMaven
     @Inject
     @Named( GraphBuilder.HINT )
     private GraphBuilder graphBuilder;
+
+    @Inject
+    private BuildResumptionAnalyzer buildResumptionAnalyzer;
+
+    @Inject
+    private BuildResumptionDataRepository buildResumptionDataRepository;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -312,7 +322,16 @@ public class DefaultMaven
 
             if ( session.getResult().hasExceptions() )
             {
-                return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
+                addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
+                persistResumptionData( result, session );
+                return result;
+            }
+            else
+            {
+                session.getAllProjects().stream()
+                        .filter( MavenProject::isExecutionRoot )
+                        .findFirst()
+                        .ifPresent( buildResumptionDataRepository::removeResumptionData );
             }
         }
         finally
@@ -346,6 +365,33 @@ public class DefaultMaven
         finally
         {
             Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
+    }
+
+    private void persistResumptionData( MavenExecutionResult result, MavenSession session )
+    {
+        boolean hasLifecycleExecutionExceptions = result.getExceptions().stream()
+                .anyMatch( LifecycleExecutionException.class::isInstance );
+
+        if ( hasLifecycleExecutionExceptions )
+        {
+            MavenProject rootProject = session.getAllProjects().stream()
+                    .filter( MavenProject::isExecutionRoot )
+                    .findFirst()
+                    .orElseThrow( () -> new IllegalStateException( "No project in the session is execution root" ) );
+
+            buildResumptionAnalyzer.determineBuildResumptionData( result ).ifPresent( resumption ->
+            {
+                try
+                {
+                    buildResumptionDataRepository.persistResumptionData( rootProject, resumption );
+                    result.setCanResume( true );
+                }
+                catch ( BuildResumptionPersistenceException e )
+                {
+                    logger.warn( "Could not persist build resumption data", e );
+                }
+            } );
         }
     }
 

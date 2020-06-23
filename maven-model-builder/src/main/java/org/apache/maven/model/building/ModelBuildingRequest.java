@@ -63,6 +63,21 @@ public interface ModelBuildingRequest
      * Denotes strict validation as recommended by the current Maven version.
      */
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+    
+    /**
+     * 
+     * @return the file model
+     * @since 3.7.0
+     */
+    Model getFileModel();
+    
+    /**
+     * 
+     * @param fileModel
+     * @return This request, never {@code null}.
+     * @since 3.7.0
+     */
+    ModelBuildingRequest setFileModel( Model fileModel );
 
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
@@ -334,5 +349,10 @@ public interface ModelBuildingRequest
     WorkspaceModelResolver getWorkspaceModelResolver();
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
+    
+    TransformerContext getTransformerContext();
 
+    ModelBuildingRequest setTransformerContext( TransformerContext context );
+    
+    
 }

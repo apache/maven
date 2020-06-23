@@ -140,9 +140,14 @@ public class DefaultGraphBuilderTest
                 scenario( "Exclude the project we are resuming from (as proposed in MNG-6676)" )
                         .resumeFrom( MODULE_B )
                         .excludedProjects( singletonList( MODULE_B ) )
-                        .expectResult( singletonList( MODULE_C ) )
-
-
+                        .expectResult( singletonList( MODULE_C ) ),
+                scenario( "Selected projects in wrong order are resumed correctly in order" )
+                        .selectedProjects( asList( MODULE_C, MODULE_B, MODULE_A ) )
+                        .resumeFrom( MODULE_B )
+                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                scenario( "Duplicate projects are filtered out" )
+                        .selectedProjects( asList( MODULE_A, MODULE_A ) )
+                        .expectResult( singletonList( MODULE_A ) )
         );
     }
 

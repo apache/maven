@@ -19,23 +19,50 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
+
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
+import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
@@ -45,6 +72,7 @@ import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
+import org.apache.maven.model.merge.ModelMerger;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
@@ -68,25 +96,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
 
 /**
  * @author Benjamin Bentmann
@@ -113,7 +122,7 @@ public class DefaultModelBuilder
 
     @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
-
+    
     @Inject
     private SuperPomProvider superPomProvider;
 
@@ -147,6 +156,8 @@ public class DefaultModelBuilder
 
     @Inject
     private ReportingConverter reportingConverter;
+    
+    private ModelMerger modelMerger = new FileToRawModelMerger();
 
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
@@ -443,7 +454,7 @@ public class DefaultModelBuilder
         }
 
         result.setEffectiveModel( resultModel );
-
+        
         for ( ModelData currentData : lineage )
         {
             String modelId = ( currentData != superData ) ? currentData.getId() : "";
@@ -603,6 +614,7 @@ public class DefaultModelBuilder
         }
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
@@ -711,7 +723,6 @@ public class DefaultModelBuilder
                 .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).setException( e ) );
             throw problems.newModelBuildingException();
         }
-
         if ( pomFile != null )
         {
             model.setPomFile( pomFile );
@@ -720,8 +731,33 @@ public class DefaultModelBuilder
         {
             model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
         }
-
         problems.setSource( model );
+
+        modelValidator.validateFileModel( model, request, problems );
+        request.setFileModel( model );
+        
+        if ( Features.buildConsumer().isActive() && pomFile != null )
+        {
+            try
+            {
+                Model rawModel =
+                    modelProcessor.read( pomFile,
+                               Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
+
+                model.setPomFile( pomFile );
+                
+                // model with locationTrackers, required for proper feedback during validations
+                model = request.getFileModel().clone();
+                
+                // Apply enriched data
+                modelMerger.merge( model, rawModel, false, null );
+            }
+            catch ( IOException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V37 ).setException( e ) );
+            }
+        }
+
         modelValidator.validateRawModel( model, request, problems );
 
         if ( hasFatalErrors( problems ) )
@@ -1027,12 +1063,17 @@ public class DefaultModelBuilder
 
             if ( parentData == null )
             {
-                parentData = fromCache( request.getModelCache(), 
-                                       parent.getGroupId(), parent.getArtifactId(),
-                                       parent.getVersion(), ModelCacheTag.RAW );
+                ModelData candidateData = fromCache( request.getModelCache(), 
+                                                     parent.getGroupId(), parent.getArtifactId(),
+                                                     parent.getVersion(), ModelCacheTag.RAW );
+
                 
-                // ArtifactModelSource means repositorySource
-                if ( parentData == null || !( parentData.getSource() instanceof ArtifactModelSource ) )
+                if ( candidateData != null && candidateData.getSource() instanceof ArtifactModelSource )
+                {
+                    // ArtifactModelSource means repositorySource
+                    parentData = candidateData;
+                }
+                else
                 {
                     parentData = readParentExternally( childModel, request, problems );
                     
@@ -1041,20 +1082,19 @@ public class DefaultModelBuilder
                               parentData.getVersion(), ModelCacheTag.RAW, parentData );
                 }
             }
-
-            Model parentModel = parentData.getModel();
-
-            if ( !"pom".equals( parentModel.getPackaging() ) )
+            
+            if ( parentData != null ) 
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
-                    .setLocation( parentModel.getLocation( "packaging" ) ) );
+                Model parentModel = parentData.getModel();
+
+                if ( !"pom".equals( parentModel.getPackaging() ) )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                                         + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
+                        .setLocation( parentModel.getLocation( "packaging" ) ) );
+                }
             }
-        }
-        else
-        {
-            parentData = null;
         }
 
         return parentData;
@@ -1427,7 +1467,7 @@ public class DefaultModelBuilder
                     final ModelSource importSource;
                     try
                     {
-                        importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                        importSource = modelResolver.resolveModel( dependency );
                     }
                     catch ( UnresolvableModelException e )
                     {
@@ -1590,4 +1630,155 @@ public class DefaultModelBuilder
         }
     }
 
+    /**
+     * As long as Maven controls the BuildPomXMLFilter, the entities that need merging are known.
+     * All others can simply be copied from source to target to restore the locationTracker 
+     * 
+     * @author Robert Scholte
+     * @since 3.7.0
+     */
+    class FileToRawModelMerger extends ModelMerger
+    {
+        @Override
+        protected void mergeBuild_Extensions( Build target, Build source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+
+        @Override
+        protected void mergeBuildBase_Resources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeBuildBase_TestResources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeCiManagement_Notifiers( CiManagement target, CiManagement source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeDependencyManagement_Dependencies( DependencyManagement target, DependencyManagement source,
+                                                               boolean sourceDominant, Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
+                                                   Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Contributors( Model target, Model source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+        {
+            // don't merge
+        }
+
+        @Override
+        protected void mergeModel_Developers( Model target, Model source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_MailingLists( Model target, Model source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+        {
+            Iterator<Profile> sourceIterator = source.getProfiles().iterator();
+            target.getProfiles().stream().forEach( t -> mergeProfile( t, sourceIterator.next(), sourceDominant,
+                                                                      context ) );
+        }
+        
+        @Override
+        protected void mergeModelBase_Dependencies( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergeModelBase_PluginRepositories( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                          Map<Object, Object> context )
+        {
+            target.setPluginRepositories( source.getPluginRepositories() );
+        }
+        
+        @Override
+        protected void mergeModelBase_Repositories( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergePlugin_Dependencies( Plugin target, Plugin source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+        {
+            Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
+            target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+                                                                             context ) );
+        }
+        
+        @Override
+        protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+        {
+            // don't merge
+        }
+
+        @Override
+        protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
+        {
+            // don't merge
+        }
+        
+        @Override
+        protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
+                                                     boolean sourceDominant, Map<Object, Object> context )
+        {
+            // don't merge
+        }
+    }
 }

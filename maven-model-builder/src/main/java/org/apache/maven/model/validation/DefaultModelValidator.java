@@ -88,7 +88,7 @@ public class DefaultModelValidator
     private final Set<String> validIds = new HashSet<>();
 
     @Override
-    public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void validateFileModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Parent parent = m.getParent();
         if ( parent != null )
@@ -97,9 +97,6 @@ public class DefaultModelValidator
                                     parent );
 
             validateStringNotEmpty( "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(),
-                                    parent );
-
-            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
                                     parent );
 
             if ( equals( parent.getGroupId(), m.getGroupId() ) && equals( parent.getArtifactId(), m.getArtifactId() ) )
@@ -120,6 +117,17 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            Set<String> modules = new HashSet<>();
+            for ( int i = 0, n = m.getModules().size(); i < n; i++ )
+            {
+                String module = m.getModules().get( i );
+                if ( !modules.add( module ) )
+                {
+                    addViolation( problems, Severity.ERROR, Version.V20, "modules.module[" + i + "]", null,
+                                  "specifies duplicate child module " + module, m.getLocation( "modules" ) );
+                }
+            }
+
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
@@ -219,6 +227,18 @@ public class DefaultModelValidator
                     }
                 }
             }
+        }
+    }
+    
+    @Override
+    public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    {
+        Parent parent = m.getParent();
+        
+        if ( parent != null )
+        {
+            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
+                                    parent );
         }
     }
 
@@ -376,17 +396,6 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            Set<String> modules = new HashSet<>();
-            for ( int i = 0, n = m.getModules().size(); i < n; i++ )
-            {
-                String module = m.getModules().get( i );
-                if ( !modules.add( module ) )
-                {
-                    addViolation( problems, Severity.ERROR, Version.V20, "modules.module[" + i + "]", null,
-                                  "specifies duplicate child module " + module, m.getLocation( "modules" ) );
-                }
-            }
-
             Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
             validateBannedCharacters( EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m,
