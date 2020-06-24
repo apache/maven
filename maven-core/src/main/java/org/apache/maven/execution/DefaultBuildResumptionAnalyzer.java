@@ -98,6 +98,7 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
                 .filter( LifecycleExecutionException.class::isInstance )
                 .map( LifecycleExecutionException.class::cast )
                 .map( LifecycleExecutionException::getProject )
+                .filter( Objects::nonNull )
                 .sorted( comparing( sortedProjects::indexOf ) )
                 .collect( Collectors.toList() );
     }
