@@ -51,7 +51,7 @@ under the License.
     create a rendering engine for it if they like when the release stabilizes. JVZ
 
     -->
-    <doxiaVersion>1.0-alpha-9</doxiaVersion>
+    <doxiaVersion>1.9.2</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>4.13</junitVersion>
     <plexusVersion>1.0-beta-3.0.7-SNAPSHOT</plexusVersion>
