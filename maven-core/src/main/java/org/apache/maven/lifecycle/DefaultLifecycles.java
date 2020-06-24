@@ -124,13 +124,16 @@ public class DefaultLifecycles
         
         Comparator<String> comparator = ( l, r ) -> 
         {
-            if ( lifecycleIds.contains( l ) ) 
+            int lx = lifecycleIds.indexOf( l );
+            int rx = lifecycleIds.indexOf( r );
+
+            if ( lx < 0 || rx < 0 ) 
             {
-                return lifecycleIds.indexOf( l ) - lifecycleIds.indexOf( r );      
+                return rx - lx;
             }
-            else
+            else 
             {
-                return Integer.MAX_VALUE;
+                return lx - rx;
             }
         }; 
         
