@@ -21,10 +21,11 @@ package org.apache.maven.xml.sax.filter;
 
 import java.util.function.Function;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Resolves all ci-friendly properties occurrences
+ * Resolves all ci-friendly properties occurrences between version-tags
  * 
  * @author Robert Scholte
  * @since 3.7.0
@@ -33,6 +34,10 @@ class CiFriendlyXMLFilter
     extends AbstractSAXFilter
 {
     private Function<String, String> replaceChain = Function.identity();
+    
+    private String characters; 
+    
+    private boolean parseVersion;
     
     public CiFriendlyXMLFilter setChangelist( String changelist )
     {
@@ -64,20 +69,49 @@ class CiFriendlyXMLFilter
     public void characters( char[] ch, int start, int length )
         throws SAXException
     {
-        String text = new String( ch, start, length );
-
-        // assuming this has the best performance
-        if ( text.contains( "${" ) )
+        if ( parseVersion )
         {
-            String newText = replaceChain.apply( text );
-            
-            super.characters( newText.toCharArray(), 0, newText.length() );
+            this.characters = nullSafeAppend( characters, new String( ch, start, length ) );
         }
         else
         {
             super.characters( ch, start, length );
         }
     }
+
+    @Override
+    public void startElement( String uri, String localName, String qName, Attributes atts )
+        throws SAXException
+    {
+        if ( !parseVersion && "version".equals( localName ) )
+        {
+            parseVersion = true;
+        }
+
+        super.startElement( uri, localName, qName, atts );
+    }
     
-    
+    @Override
+    public void endElement( String uri, String localName, String qName )
+        throws SAXException
+    {
+        if ( parseVersion )
+        {
+            // assuming this has the best performance
+            if ( characters != null && characters.contains( "${" ) )
+            {
+                char[] ch = replaceChain.apply( characters ).toCharArray();
+                super.characters( ch, 0, ch.length );
+            }
+            else
+            {
+                char[] ch = characters.toCharArray();
+                super.characters( ch, 0, ch.length );
+            }
+            characters = null;
+            parseVersion = false;
+        }
+
+        super.endElement( uri, localName, qName );
+    }
 }

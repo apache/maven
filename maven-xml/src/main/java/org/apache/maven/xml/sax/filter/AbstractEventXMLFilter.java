@@ -20,6 +20,8 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import org.apache.maven.xml.sax.SAXEvent;
@@ -44,7 +46,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     
     // characters BEFORE startElement must get state of startingElement
     // this way removing based on state keeps correct formatting
-    private SAXEvent characters;
+    private List<SAXEvent> charactersSegments = new ArrayList<>();
     
     private boolean lockCharacters = false;
     
@@ -82,18 +84,20 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         if ( isParsing() )
         {
             final String eventState = getState();
-            final SAXEvent charactersEvent = characters;
             
-            if ( !lockCharacters && charactersEvent != null )
+            if ( !lockCharacters )
             {
-                saxEvents.add( () -> 
+                charactersSegments.stream().forEach( e -> 
                 {
-                    if ( acceptEvent( eventState ) )
+                    saxEvents.add( () -> 
                     {
-                        charactersEvent.execute();
-                    }
+                        if ( acceptEvent( eventState ) )
+                        {
+                            e.execute();
+                        }
+                    } );
                 } );
-                characters = null;
+                charactersSegments.clear();
             }
 
             saxEvents.add( () -> 
@@ -126,18 +130,17 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     protected final void executeEvents() throws SAXException
     {
         final String eventState = getState();
-        final SAXEvent charactersEvent = characters;
-        if ( charactersEvent != null )
+        charactersSegments.stream().forEach( e -> 
         {
             saxEvents.add( () -> 
             {
                 if ( acceptEvent( eventState ) )
                 {
-                    charactersEvent.execute();
+                    e.execute();
                 }
             } );
-            characters = null;
-        }
+        } );
+        charactersSegments.clear();
         
         // not with streams due to checked SAXException
         while ( !saxEvents.isEmpty() )
@@ -204,7 +207,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         }
         else if ( isParsing() )
         {
-            this.characters = getEventFactory().characters( ch, start, length );
+            this.charactersSegments.add( getEventFactory().characters( ch, start, length ) );
         }
         else
         {

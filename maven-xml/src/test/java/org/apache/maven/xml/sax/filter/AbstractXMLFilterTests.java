@@ -23,6 +23,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.ContentHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -35,10 +36,10 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.xml.Factories;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 public abstract class AbstractXMLFilterTests
 {
@@ -55,7 +56,10 @@ public abstract class AbstractXMLFilterTests
         {
             XMLReader r = Factories.newXMLReader();
             
-            filter.setParent( r );
+            AbstractSAXFilter perChar = new PerCharXMLFilter();
+            perChar.setParent( r );
+            
+            filter.setParent( perChar );
             filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         }
     }
@@ -86,6 +90,9 @@ public abstract class AbstractXMLFilterTests
         throws TransformerException, SAXException, ParserConfigurationException
     {
         setParent( filter );
+
+        filter = new PerCharXMLFilter( filter );
+
         return transform( new StringReader( input ), filter );
     }
 
@@ -107,7 +114,7 @@ public abstract class AbstractXMLFilterTests
         }
         transformerHandler.setResult( result );
         Transformer transformer = transformerFactory.newTransformer();
-
+        
         SAXSource transformSource = new SAXSource( filter, new InputSource( input ) );
 
         SAXResult transformResult = new SAXResult( transformerHandler );
@@ -115,5 +122,58 @@ public abstract class AbstractXMLFilterTests
         transformer.transform( transformSource, transformResult );
 
         return writer.toString();
+    }
+    
+    /**
+     * From {@link ContentHandler}
+     * <q>Your code should not assume that algorithms using char-at-a-time idioms will be working in characterunits; 
+     * in some cases they will split characters. This is relevant wherever XML permits arbitrary characters, such as 
+     * attribute values,processing instruction data, and comments as well as in data reported from this method. It's 
+     * also generally relevant whenever Java code manipulates internationalized text; the issue isn't unique to XML.</q>
+     *  
+     * @author Robert Scholte
+     */
+    class PerCharXMLFilter
+        extends AbstractSAXFilter
+    {
+        public PerCharXMLFilter()
+        {
+            super();
+        }
+        
+        public <T extends XMLReader & LexicalHandler> PerCharXMLFilter( T parent )
+        {
+            super( parent );
+        }
+
+        @Override
+        public void characters( char[] ch, int start, int length )
+            throws SAXException
+        {
+            for ( int i = 0; i < length; i++ )
+            {
+                super.characters( ch, start + i, 1 );
+            }
+        }
+        
+        @Override
+        public void comment( char[] ch, int start, int length )
+            throws SAXException
+        {
+            for ( int i = 0; i < length; i++ )
+            {
+                super.comment( ch, start + i, 1 );
+            }
+        }
+        
+        @Override
+        public void ignorableWhitespace( char[] ch, int start, int length )
+            throws SAXException
+        {
+            for ( int i = 0; i < length; i++ )
+            {
+                super.ignorableWhitespace( ch, start + i, 1 );
+            }
+        }
     }
 }

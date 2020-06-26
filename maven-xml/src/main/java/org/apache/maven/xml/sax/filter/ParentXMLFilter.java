@@ -120,19 +120,21 @@ class ParentXMLFilter
         {
             final String eventState = state;
             
+            final String charSegment =  new String( ch, start, length );
+            
             switch ( eventState )
             {
                 case "parent":
-                    parentWhitespace = new String( ch, start, length );
+                    parentWhitespace = nullSafeAppend( parentWhitespace, charSegment );
                     break;
                 case "relativePath":
-                    relativePath = new String( ch, start, length );
+                    relativePath = nullSafeAppend( relativePath, charSegment );
                     break;
                 case "groupId":
-                    groupId = new String( ch, start, length );
+                    groupId = nullSafeAppend( groupId, charSegment );
                     break;
                 case "artifactId":
-                    artifactId = new String( ch, start, length );
+                    artifactId = nullSafeAppend( artifactId, charSegment );
                     break;
                 default:
                     break;

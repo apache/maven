@@ -21,14 +21,13 @@ package org.apache.maven.xml;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerFactory;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Creates XML related factories with OWASP advices applied
@@ -56,46 +55,9 @@ public final class Factories
         return tf;
     }
     
-    public static SAXParserFactory newSAXParserFactory()
-    {
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-
-        try
-        {
-            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
-            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
-   
-            // Using the SAXParserFactory's setFeature
-            spf.setFeature( "http://xml.org/sax/features/external-general-entities", false );
-            
-            // Xerces 2 only - http://xerces.apache.org/xerces-j/features.html#external-general-entities
-            spf.setFeature( "http://apache.org/xml/features/disallow-doctype-decl", true );
-        }
-        catch ( ParserConfigurationException e )
-        {
-            // Tried an unsupported feature.
-        }
-        catch ( SAXNotRecognizedException e )
-        {
-            // Tried an unknown feature.
-        }
-        catch ( SAXNotSupportedException e )
-        {
-            // Tried a feature known to the parser but unsupported.
-        }
-        return spf;
-    }
-    
-    public static SAXParser newSAXParser() throws ParserConfigurationException, SAXException
-    {
-        SAXParser saxParser = newSAXParserFactory().newSAXParser();
-        
-        return saxParser;
-    }
-    
     public static XMLReader newXMLReader() throws SAXException, ParserConfigurationException
     {
-        XMLReader reader = newSAXParser().getXMLReader();
+        XMLReader reader = XMLReaderFactory.createXMLReader();
         
         try
         {

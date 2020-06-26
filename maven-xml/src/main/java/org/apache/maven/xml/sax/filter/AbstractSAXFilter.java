@@ -126,5 +126,19 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
             lexicalHandler.comment( ch, start, length );
         }
     }
+    
+    
+    protected static String nullSafeAppend( String originalValue, String charSegment )
+    {
+        if ( originalValue == null ) 
+        {
+            return charSegment;
+        }
+        else
+        {
+            return originalValue + charSegment;
+        }
+    }
+
 
 }
