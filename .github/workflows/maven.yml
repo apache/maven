@@ -1,0 +1,116 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Java CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        java: [8, 11, 14]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up cache for ~./m2/repository
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ matrix.os }}-java${{ matrix.java }}-
+            maven-${{ matrix.os }}-
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Build with Maven
+        run: mvn verify -e -B -V -DdistributionFileName=apache-maven
+
+      - name: Upload built Maven
+        uses: actions/upload-artifact@v2
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.java == '11' }}
+        with:
+          name: built-maven
+          path: apache-maven/target/
+
+      - name: Upload built Maven Wrapper
+        uses: actions/upload-artifact@v2
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.java == '11' }}
+        with:
+          name: built-maven-wrapper
+          path: maven-wrapper/target/maven-wrapper.jar
+
+  integration-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Collect environment context variables
+        shell: bash
+        run: |
+          set +e
+          repo=maven-integration-testing
+          user=${GITHUB_REPOSITORY%/*}
+          branch=${GITHUB_REF#refs/heads/}
+          target_branch=master
+          target_user=apache
+          if [ $branch != "master" ]; then
+            git ls-remote https://github.com/$user/$repo.git | grep $GITHUB_REF > /dev/null
+            if [ $? -eq 0 ]; then
+              echo "Found a branch \"$branch\" in fork \"$user/$repo\", configuring this for the integration tests to be run against."
+              target_branch=$branch
+              target_user=$user
+            else
+              echo "Could not find fork \"$user/$repo\" or a branch \"$branch\" in this fork. Falling back to \"$target_branch\" in \"$target_user/$repo\"."
+            fi
+          else
+            echo "Integration tests will run against $target_user/$repo for master builds."
+          fi
+          echo "::set-env name=REPO_BRANCH::$target_branch"
+          echo "::set-env name=REPO_USER::$target_user"
+
+      - name: Checkout maven-integration-testing
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.REPO_USER }}/maven-integration-testing
+          path: maven-integration-testing/
+          ref: ${{ env.REPO_BRANCH }}
+
+      - name: Download built Maven
+        uses: actions/download-artifact@v2
+        with:
+          name: built-maven
+          path: built-maven/
+
+      - name: Download built Maven Wrapper
+        uses: actions/download-artifact@v2
+        with:
+          name: built-maven-wrapper
+          path: built-maven-wrapper/
+
+      - name: Running integration tests
+        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$GITHUB_WORKSPACE/repo/ -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -DwrapperDistroDir="$GITHUB_WORKSPACE/built-maven/" -DmavenWrapper="$GITHUB_WORKSPACE/built-maven-wrapper/maven-wrapper.jar" -f maven-integration-testing/pom.xml
