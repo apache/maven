@@ -20,19 +20,25 @@ package org.apache.maven.model.building;
  */
 
 import java.io.File;
+import java.util.Objects;
+
+import org.apache.maven.building.FileSource;
 
 /**
+ * Represents a model pulled from a repository
  * 
  * @author Robert Scholte
  * @since 3.7.0
  */
-public class ArtifactModelSource extends FileModelSource
+public class ArtifactModelSource extends FileSource implements ModelSource
 {
     private final String groupId;
     
     private final String artifactId;
     
     private final String version;
+    
+    private final int hashCode;
 
     public ArtifactModelSource( File file, String groupId, String artifactId, String version )
     {
@@ -40,6 +46,7 @@ public class ArtifactModelSource extends FileModelSource
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.hashCode = Objects.hash( groupId, artifactId, version );
     }
 
     public String getGroupId()
@@ -55,5 +62,34 @@ public class ArtifactModelSource extends FileModelSource
     public String getVersion()
     {
         return version;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        if ( obj == null )
+        {
+            return false;
+        }
+
+        if ( !ArtifactModelSource.class.equals( obj.getClass() )  ) 
+        {
+            return false;
+        }
+
+        ArtifactModelSource other = (ArtifactModelSource) obj;
+        return Objects.equals( artifactId, other.artifactId ) 
+            && Objects.equals( groupId, other.groupId )
+            && Objects.equals( version, other.version );
     }
 }
