@@ -86,8 +86,17 @@ public class MavenITmng6386BaseUriPropertyTest
             assertEquals( testDir.toPath().toUri().toASCIIString(), pomProperty );
             // check that baseUri begins with file:///
             assertTrue( pomProperty.startsWith( "file:///" ) );
-            assertTrue( "Check that baseUri '" + pomProperty + "' ends with 'это по-русский/'",
-                    pomProperty.endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9/" ) );
+            // todo - check why we have different encoding on MacOS of й - %D0%B8%CC%86 vs %D0%B9
+            String msg = "Check that baseUri '" + pomProperty + "' ends with 'это по-русский/'";
+
+            if ( Os.isFamily( Os.FAMILY_MAC ))
+            {
+                assertTrue( msg, pomProperty.endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B8%CC%86/" ) );
+            }
+            else
+            {
+                assertTrue( msg, pomProperty.endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9/" ) );
+            }
         }
         else
         {
