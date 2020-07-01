@@ -128,6 +128,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6173GetProjectsAndDependencyGraphTest.class );
         suite.addTestSuite( MavenITmng6173GetAllProjectsInReactorTest.class );
         suite.addTestSuite( MavenITmng6127PluginExecutionConfigurationInterferenceTest.class );
+        suite.addTestSuite( MavenITmng6118SubmoduleInvocation.class );
         suite.addTestSuite( MavenITmng6090CIFriendlyTest.class );
         suite.addTestSuite( MavenITmng6084Jsr250PluginTest.class );
         suite.addTestSuite( MavenITmng6071GetResourceWithCustomPom.class );
