@@ -24,7 +24,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 14]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -37,36 +36,40 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.m2/repository
-          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+          key: maven-${{ matrix.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ matrix.os }}-java${{ matrix.java }}-
             maven-${{ matrix.os }}-
 
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
+          java-version: 8
 
       - name: Build with Maven
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
         uses: actions/upload-artifact@v2
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.java == '11' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
           path: apache-maven/target/
 
       - name: Upload built Maven Wrapper
         uses: actions/upload-artifact@v2
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.java == '11' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven-wrapper
           path: maven-wrapper/target/maven-wrapper.jar
 
   integration-test:
     needs: build
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        java: [8, 11, 14]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Collect environment context variables
@@ -112,5 +115,11 @@ jobs:
           name: built-maven-wrapper
           path: built-maven-wrapper/
 
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
       - name: Running integration tests
+        shell: bash
         run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$GITHUB_WORKSPACE/repo/ -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -DwrapperDistroDir="$GITHUB_WORKSPACE/built-maven/" -DmavenWrapper="$GITHUB_WORKSPACE/built-maven-wrapper/maven-wrapper.jar" -f maven-integration-testing/pom.xml
