@@ -680,7 +680,7 @@ public class DefaultModelBuilder
             }
             catch ( IOException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V37 ).setException( e ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
             }
         }
 

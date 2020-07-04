@@ -41,7 +41,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.sax.ext.CommentRenormalizer;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Offers a transformation implementation based on PipelineStreams.
@@ -82,6 +84,31 @@ public abstract class AbstractModelSourceTransformer
         {
             filter = getSAXFilter( pomFile, context );
             filter.setLexicalHandler( transformerHandler );
+            // By default errors are written to stderr.
+            // Hence set custom errorHandler to reduce noice 
+            filter.setErrorHandler( new ErrorHandler()
+            {
+                @Override
+                public void warning( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+                
+                @Override
+                public void fatalError( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+                
+                @Override
+                public void error( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+            } );
         }
         catch ( TransformerConfigurationException | SAXException | ParserConfigurationException e )
         {

@@ -19,11 +19,12 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -235,9 +235,9 @@ public class ProjectBuilderTest
         {
             projectBuilder.build( pomFile, configuration );
         }
-        catch ( InvalidArtifactRTException iarte )
+        catch ( Exception ex )
         {
-            assertThat( iarte.getMessage(), containsString( "The groupId cannot be empty." ) );
+             assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
         }
 
         // multi projects build entry point
@@ -248,9 +248,9 @@ public class ProjectBuilderTest
         catch ( ProjectBuildingException ex )
         {
             assertEquals( 1, ex.getResults().size() );
-            MavenProject project = ex.getResults().get( 0 ).getProject();
-            assertNotNull( project );
-            assertNotSame( 0, ex.getResults().get( 0 ).getProblems().size() );
+            assertNotNull( ex.getResults().get( 0 ).getPomFile() );
+            assertThat( ex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
+            assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
         }
     }
 
