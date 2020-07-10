@@ -266,17 +266,19 @@ public class DefaultModelBuilder
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
         // read and validate raw model
-        Model inputModel = request.getRawModel();
-        if ( inputModel == null )
-        {
-            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
-        }
+        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
-        inherit( request, result, problems, inputModel );
+        request.setFileModel( inputModel );
 
+        inherit( request, result, problems );
+        
         if ( !request.isTwoPhaseBuilding() )
         {
             build( request, result );
+        }
+        else if ( hasModelErrors( problems ) )
+        {
+            throw problems.newModelBuildingException();
         }
 
         return result;
@@ -284,9 +286,11 @@ public class DefaultModelBuilder
 
     @SuppressWarnings( "checkstyle:methodlength" )
     private void inherit( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
-                          DefaultModelProblemCollector problems, Model inputModel )
+                          DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
+        Model inputModel = request.getFileModel();
+
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
