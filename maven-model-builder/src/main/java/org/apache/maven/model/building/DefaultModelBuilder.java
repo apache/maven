@@ -256,7 +256,6 @@ public class DefaultModelBuilder
         return this;
     }
     
-    @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
@@ -265,6 +264,36 @@ public class DefaultModelBuilder
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
+
+        // read and validate raw model
+        Model inputModel = request.getRawModel();
+        if ( inputModel == null )
+        {
+            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        }
+
+        inherit( request, result, problems, inputModel );
+
+        if ( !request.isTwoPhaseBuilding() )
+        {
+            build( request, result );
+        }
+
+        return result;
+    }
+
+    @SuppressWarnings( "checkstyle:methodlength" )
+    private void inherit( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+                          DefaultModelProblemCollector problems, Model inputModel )
+        throws ModelBuildingException
+    {
+        problems.setRootModel( inputModel );
+
+        ModelData resultData = new ModelData( request.getModelSource(), inputModel );
+        ModelData superData = new ModelData( null, getSuperModel() );
+
+        Collection<String> parentIds = new LinkedHashSet<>();
+        List<ModelData> lineage = new ArrayList<>();
 
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
@@ -285,21 +314,6 @@ public class DefaultModelBuilder
             profileProps.putAll( profileActivationContext.getUserProperties() );
             profileActivationContext.setUserProperties( profileProps );
         }
-
-        // read and validate raw model
-        Model inputModel = request.getRawModel();
-        if ( inputModel == null )
-        {
-            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
-        }
-
-        problems.setRootModel( inputModel );
-
-        ModelData resultData = new ModelData( request.getModelSource(), inputModel );
-        ModelData superData = new ModelData( null, getSuperModel() );
-
-        Collection<String> parentIds = new LinkedHashSet<>();
-        List<ModelData> lineage = new ArrayList<>();
 
         for ( ModelData currentData = resultData; currentData != null; )
         {
@@ -446,23 +460,16 @@ public class DefaultModelBuilder
             result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
             result.setRawModel( modelId, currentData.getRawModel() );
         }
-
-        if ( !request.isTwoPhaseBuilding() )
-        {
-            build( request, result );
-        }
-
-        return result;
     }
 
     @Override
-    public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
+    public ModelBuildingResult build( final ModelBuildingRequest request, final ModelBuildingResult result )
         throws ModelBuildingException
     {
         return build( request, result, new LinkedHashSet<>() );
     }
 
-    private ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result,
+    private ModelBuildingResult build( final ModelBuildingRequest request, final ModelBuildingResult result,
                                        Collection<String> imports )
         throws ModelBuildingException
     {
