@@ -517,21 +517,29 @@ public class DefaultProjectBuilder
         catch ( InvalidArtifactRTException iarte )
         {
             result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
-                  iarte ) );
+                                                               iarte ) );
         }
 
         projectIndex.put( result.getModelIds().get( 0 ), project );
-
+        
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
-
-        if ( recursive && !model.getModules().isEmpty() )
+        
+        Model fileModel = request.getFileModel();
+        if ( recursive )
         {
+            Set<String> modules = new LinkedHashSet<>();
+            modules.addAll( fileModel.getModules() );
+            for ( Profile profile : result.getActivePomProfiles( result.getModelIds().get( 0 ) ) )
+            {
+                modules.addAll( profile.getModules() );
+            }
+            
             File basedir = pomFile.getParentFile();
 
             List<File> moduleFiles = new ArrayList<>();
 
-            for ( String module : model.getModules() )
+            for ( String module : modules )
             {
                 if ( StringUtils.isEmpty( module ) )
                 {
@@ -551,7 +559,7 @@ public class DefaultProjectBuilder
                 {
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, fileModel, -1,
                                                  -1, null );
                     result.getProblems().add( problem );
 
@@ -589,7 +597,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                 ModelProblem.Version.BASE, model, -1, -1, null );
+                                                 ModelProblem.Version.BASE, fileModel, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
