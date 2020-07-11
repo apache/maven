@@ -431,6 +431,8 @@ public class DefaultGraphBuilder
 
         // 3. Collect projects for explicitly requested POM.
         return requestPomCollectionStrategy.collectProjects( request );
+        
+        return projects;
     }
 
     private void validateProjects( List<MavenProject> projects, MavenExecutionRequest request )
