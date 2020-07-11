@@ -364,8 +364,6 @@ public class DefaultGraphBuilder
 
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        List<MavenProject> projects = new ArrayList<>();
-
         // We have no POM file.
         //
         if ( request.getPom() == null )
@@ -374,19 +372,20 @@ public class DefaultGraphBuilder
             MavenProject project = projectBuilder.build( modelSource, request.getProjectBuildingRequest() )
                 .getProject();
             project.setExecutionRoot( true );
-            projects.add( project );
             request.setProjectPresent( false );
-            return projects;
+            return Collections.singletonList( project );
         }
 
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
-        collectProjects( projects, files, request );
-        return projects;
+        return collectProjects( request );
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    private List<MavenProject> collectProjects( MavenExecutionRequest request )
         throws ProjectBuildingException
     {
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
+
+        List<MavenProject> projects = new ArrayList<>();
+        
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
@@ -424,6 +423,8 @@ public class DefaultGraphBuilder
                 + " longer support building such malformed projects." );
             logger.warn( "" );
         }
+        
+        return projects;
     }
 
     private void validateProjects( List<MavenProject> projects )
