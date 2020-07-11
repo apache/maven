@@ -671,7 +671,6 @@ public class DefaultModelBuilder
         problems.setSource( model );
 
         modelValidator.validateFileModel( model, request, problems );
-        request.setFileModel( model );
         
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
@@ -684,7 +683,7 @@ public class DefaultModelBuilder
                 model.setPomFile( pomFile );
                 
                 // model with locationTrackers, required for proper feedback during validations
-                model = request.getFileModel().clone();
+                model = model.clone();
                 
                 // Apply enriched data
                 modelMerger.merge( model, rawModel, false, null );
