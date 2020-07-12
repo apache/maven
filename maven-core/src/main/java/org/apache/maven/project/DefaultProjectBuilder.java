@@ -473,14 +473,13 @@ public class DefaultProjectBuilder
     {
         boolean noErrors = true;
 
-        ModelBuildingRequest request = getModelBuildingRequest( config );
-
         MavenProject project = new MavenProject();
         project.setFile( pomFile );
 
-        request.setPomFile( pomFile );
-        request.setTwoPhaseBuilding( true );
-        request.setLocationTracking( true );
+        ModelBuildingRequest request = getModelBuildingRequest( config )
+                        .setPomFile( pomFile )
+                        .setTwoPhaseBuilding( true )
+                        .setLocationTracking( true );
 
         DefaultModelBuildingListener listener =
             new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );
@@ -534,11 +533,13 @@ public class DefaultProjectBuilder
             {
                 modules.addAll( profile.getModules() );
             }
+            for ( Profile profile : result.getActiveExternalProfiles() )
+            {
+                modules.addAll( profile.getModules() );
+            }
             
             File basedir = pomFile.getParentFile();
-
             List<File> moduleFiles = new ArrayList<>();
-
             for ( String module : modules )
             {
                 if ( StringUtils.isEmpty( module ) )
@@ -616,7 +617,6 @@ public class DefaultProjectBuilder
                 noErrors = false;
             }
         }
-
         return noErrors;
     }
 
