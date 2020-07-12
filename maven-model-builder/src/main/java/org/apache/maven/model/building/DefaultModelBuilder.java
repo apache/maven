@@ -421,28 +421,27 @@ public class DefaultModelBuilder
 
         // model interpolation
         resultModel = interpolateModel( resultModel, request, problems );
-        resultData.setModel( resultModel );
 
-        if ( resultModel.getParent() != null )
+        resultData.setModel( resultModel );
+        resultData.setGroupId( resultModel.getGroupId() );
+        resultData.setArtifactId( resultModel.getArtifactId() );
+        resultData.setVersion( resultModel.getVersion() );
+
+        for ( ModelData currentData : lineage )
         {
-            final ModelData parentData = lineage.get( 1 );
-            if ( parentData.getVersion() == null || parentData.getVersion().contains( "${" ) )
-            {
-                final Model interpolatedParent = interpolateModel( parentData.getModel(), request, problems );
-                // parentData.setModel( interpolatedParent );
-                parentData.setVersion( interpolatedParent.getVersion() );
-            }
+            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+
+            result.addModelId( modelId );
+            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
+            result.setRawModel( modelId, currentData.getRawModel() );
         }
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
 
+
         // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems, true );
-
-        resultData.setGroupId( resultModel.getGroupId() );
-        resultData.setArtifactId( resultModel.getArtifactId() );
-        resultData.setVersion( resultModel.getVersion() );
 
         if ( request.getPomFile() != null )
         {
@@ -455,15 +454,6 @@ public class DefaultModelBuilder
         }
 
         result.setEffectiveModel( resultModel );
-        
-        for ( ModelData currentData : lineage )
-        {
-            String modelId = ( currentData != superData ) ? currentData.getId() : "";
-
-            result.addModelId( modelId );
-            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
-            result.setRawModel( modelId, currentData.getRawModel() );
-        }
     }
 
     @Override
