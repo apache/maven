@@ -533,10 +533,6 @@ public class DefaultProjectBuilder
             {
                 modules.addAll( profile.getModules() );
             }
-            for ( Profile profile : result.getActiveExternalProfiles() )
-            {
-                modules.addAll( profile.getModules() );
-            }
             
             File basedir = pomFile.getParentFile();
             List<File> moduleFiles = new ArrayList<>();
