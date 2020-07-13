@@ -338,7 +338,10 @@ public class DefaultModelBuilder
 
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
                                                                                  profileActivationContext, problems );
-            currentData.setActiveProfiles( activePomProfiles );
+
+            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+            result.addModelId( modelId );
+            result.setActivePomProfiles( modelId, activePomProfiles );
 
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
@@ -391,9 +394,9 @@ public class DefaultModelBuilder
             else if ( !parentIds.add( parentData.getId() ) )
             {
                 StringBuilder message = new StringBuilder( "The parents form a cycle: " );
-                for ( String modelId : parentIds )
+                for ( String parentId : parentIds )
                 {
-                    message.append( modelId ).append( " -> " );
+                    message.append( parentId ).append( " -> " );
                 }
                 message.append( parentData.getId() );
 
@@ -414,6 +417,13 @@ public class DefaultModelBuilder
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
+        for ( ModelData currentData : lineage )
+        {
+            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+
+            result.setRawModel( modelId, currentData.getRawModel() );
+        }
+
         Model resultModel = resultData.getModel();
 
         problems.setSource( resultModel );
@@ -426,15 +436,6 @@ public class DefaultModelBuilder
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
         resultData.setVersion( resultModel.getVersion() );
-
-        for ( ModelData currentData : lineage )
-        {
-            String modelId = ( currentData != superData ) ? currentData.getId() : "";
-
-            result.addModelId( modelId );
-            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
-            result.setRawModel( modelId, currentData.getRawModel() );
-        }
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
