@@ -19,10 +19,7 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
 
 /**
  * Holds a model along with some auxiliary information. This internal utility class assists the model builder during POM
@@ -37,8 +34,6 @@ class ModelData
     private Model model;
 
     private Model rawModel;
-
-    private List<Profile> activeProfiles;
 
     private String groupId;
 
@@ -120,26 +115,6 @@ class ModelData
     }
 
     /**
-     * Gets the active profiles from the model.
-     *
-     * @return The active profiles or {@code null} if not set.
-     */
-    public List<Profile> getActiveProfiles()
-    {
-        return activeProfiles;
-    }
-
-    /**
-     * Sets the active profiles from the model.
-     *
-     * @param activeProfiles The active profiles, may be {@code null}.
-     */
-    public void setActiveProfiles( List<Profile> activeProfiles )
-    {
-        this.activeProfiles = activeProfiles;
-    }
-
-    /**
      * Gets the effective group identifier of the model.
      *
      * @return The effective group identifier of the model or an empty string if unknown, never {@code null}.
@@ -200,17 +175,13 @@ class ModelData
     }
 
     /**
-     * Gets the effective identifier of the model in the form {@code <groupId>:<artifactId>:<version>}.
+     * Gets unique identifier of the model
      *
      * @return The effective identifier of the model, never {@code null}.
      */
     public String getId()
     {
-        StringBuilder buffer = new StringBuilder( 128 );
-
-        buffer.append( getGroupId() ).append( ':' ).append( getArtifactId() ).append( ':' ).append( getVersion() );
-
-        return buffer.toString();
+        return source.toString();
     }
 
     @Override
