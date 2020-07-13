@@ -1028,7 +1028,7 @@ public class MavenCli
 
             if ( result.canResume() )
             {
-                logBuildResumeHint( "mvn <args> -r " );
+                logBuildResumeHint( "mvn <args> -r" );
             }
             else if ( !failedProjects.isEmpty() )
             {
