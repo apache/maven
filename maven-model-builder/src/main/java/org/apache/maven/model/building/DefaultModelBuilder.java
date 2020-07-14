@@ -342,6 +342,7 @@ public class DefaultModelBuilder
             String modelId = ( currentData != superData ) ? currentData.getId() : "";
             result.addModelId( modelId );
             result.setActivePomProfiles( modelId, activePomProfiles );
+            result.setRawModel( modelId, rawModel );
 
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
@@ -416,13 +417,6 @@ public class DefaultModelBuilder
 
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
-
-        for ( ModelData currentData : lineage )
-        {
-            String modelId = ( currentData != superData ) ? currentData.getId() : "";
-
-            result.setRawModel( modelId, currentData.getRawModel() );
-        }
 
         Model resultModel = resultData.getModel();
 
