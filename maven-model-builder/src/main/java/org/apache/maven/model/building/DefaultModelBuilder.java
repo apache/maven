@@ -297,7 +297,7 @@ public class DefaultModelBuilder
         ModelData superData = new ModelData( null, getSuperModel() );
 
         Collection<String> parentIds = new LinkedHashSet<>();
-        List<ModelData> lineage = new ArrayList<>();
+        List<Model> lineage = new ArrayList<>();
 
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
@@ -321,8 +321,6 @@ public class DefaultModelBuilder
 
         for ( ModelData currentData = resultData; currentData != null; )
         {
-            lineage.add( currentData );
-
             Model rawModel = currentData.getModel();
             currentData.setRawModel( rawModel );
 
@@ -360,6 +358,9 @@ public class DefaultModelBuilder
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
             }
+
+            
+            lineage.add( currentData.getModel() );
 
             if ( currentData == superData )
             {
@@ -411,7 +412,7 @@ public class DefaultModelBuilder
                 currentData = parentData;
             }
         }
-
+        
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
@@ -796,7 +797,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private void checkPluginVersions( List<ModelData> lineage, ModelBuildingRequest request,
+    private void checkPluginVersions( List<Model> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
         if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
@@ -810,7 +811,7 @@ public class DefaultModelBuilder
 
         for ( int i = lineage.size() - 1; i >= 0; i-- )
         {
-            Model model = lineage.get( i ).getModel();
+            Model model = lineage.get( i );
             Build build = model.getBuild();
             if ( build != null )
             {
@@ -848,13 +849,13 @@ public class DefaultModelBuilder
         }
     }
 
-    private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request,
+    private void assembleInheritance( List<Model> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
         for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
-            Model parent = lineage.get( i + 1 ).getModel();
-            Model child = lineage.get( i ).getModel();
+            Model parent = lineage.get( i + 1 );
+            Model child = lineage.get( i );
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
     }
