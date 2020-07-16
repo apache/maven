@@ -113,6 +113,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1353,13 +1354,13 @@ public class MavenCli
 
         handleDeprecatedOptions( commandLine );
 
-        request.setInteractiveMode( !commandLine.hasOption( CLIManager.BATCH_MODE ) );
-        request.setNoSnapshotUpdates( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) );
+        disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
+        enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
         request.setGoals( commandLine.getArgList() );
         request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
-        request.setRecursive( !commandLine.hasOption( CLIManager.NON_RECURSIVE ) );
-        request.setOffline( commandLine.hasOption( CLIManager.OFFLINE ) );
-        request.setUpdateSnapshots( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) );
+        disableOnPresentOption( commandLine, CLIManager.NON_RECURSIVE, request::setRecursive );
+        enableOnPresentOption( commandLine, CLIManager.OFFLINE, request::setOffline );
+        enableOnPresentOption( commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots );
         request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
         request.setBaseDirectory( baseDirectory );
         request.setSystemProperties( cliRequest.systemProperties );
@@ -1375,10 +1376,7 @@ public class MavenCli
         }
 
         request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
-        if ( commandLine.hasOption( CLIManager.RESUME ) )
-        {
-            request.setResume( true );
-        }
+        enableOnPresentOption( commandLine, CLIManager.RESUME, request::setResume );
         request.setMakeBehavior( determineMakeBehavior( commandLine ) );
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
@@ -1650,6 +1648,50 @@ public class MavenCli
         else
         {
             return null;
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final String option,
+                                         final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( false );
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final char option,
+                                         final Consumer<Boolean> setting )
+    {
+        disableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final String option,
+                                        final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
+        }
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final char option,
+                                        final Consumer<Boolean> setting )
+    {
+        enableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnAbsentOption( final CommandLine commandLine,
+                                       final char option,
+                                       final Consumer<Boolean> setting )
+    {
+        if ( !commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
         }
     }
 
