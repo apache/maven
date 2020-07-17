@@ -325,7 +325,6 @@ public class DefaultModelBuilder
         for ( ModelData currentData = resultData; currentData != null; )
         {
             Model rawModel = currentData.getModel();
-            currentData.setRawModel( rawModel );
 
             profileActivationContext.setProjectProperties( rawModel.getProperties() );
 
