@@ -427,7 +427,7 @@ public class DefaultModelBuilder
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
-        Model resultModel = resultData.getModel();
+        Model resultModel = lineage.get( 0 );
 
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
