@@ -371,7 +371,7 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            ModelData parentData = readParent( tmpModel, currentData.getSource(), request, problems );
+            ModelData parentData = readParent( rawModel, currentData.getSource(), request, problems );
 
             if ( parentData == null )
             {
@@ -416,6 +416,13 @@ public class DefaultModelBuilder
         checkPluginVersions( lineage, request, problems );
         
         //--------------------------------------------------------------------------------------------------------------
+        
+        for ( String id : result.getModelIds() )
+        {
+            Model rawModel = result.getRawModel( id );
+            
+            
+        }
 
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
