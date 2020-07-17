@@ -19,6 +19,8 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.util.Objects;
+
 import org.apache.maven.building.Source;
 import org.apache.maven.model.Model;
 
@@ -182,7 +184,8 @@ class ModelData
      */
     public String getId()
     {
-        return source.toString();
+        // if source is null, it is the supermodel, which can be accessed via empty string
+        return Objects.toString( source, "" );
     }
 
     @Override

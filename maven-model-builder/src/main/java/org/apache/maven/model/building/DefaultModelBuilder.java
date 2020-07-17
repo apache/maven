@@ -332,18 +332,18 @@ public class DefaultModelBuilder
 
             problems.setSource( tmpModel );
 
-            // model normalization
-            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
-
-            profileActivationContext.setProjectProperties( tmpModel.getProperties() );
+            profileActivationContext.setProjectProperties( rawModel.getProperties() );
 
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
                                                                                  profileActivationContext, problems );
 
-            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+            String modelId = currentData.getId();
             result.addModelId( modelId );
             result.setActivePomProfiles( modelId, activePomProfiles );
             result.setRawModel( modelId, rawModel );
+
+            // model normalization
+            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
@@ -362,7 +362,7 @@ public class DefaultModelBuilder
                 }
             }
             
-            lineage.add( currentData.getModel() );
+            lineage.add( tmpModel );
 
             if ( currentData == superData )
             {
@@ -379,15 +379,12 @@ public class DefaultModelBuilder
             }
             else if ( currentData == resultData )
             { // First iteration - add initial id after version resolution.
-                currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getGroupId() );
-
-                currentData.setVersion( currentData.getRawModel().getVersion() == null ? parentData.getVersion()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getVersion() );
-
-                currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
+                currentData.setGroupId( rawModel.getGroupId() == null ? parentData.getGroupId()
+                                : rawModel.getGroupId() );
+                currentData.setVersion( rawModel.getVersion() == null ? parentData.getVersion()
+                                : rawModel.getVersion() );
+                currentData.setArtifactId( rawModel.getArtifactId() );
+                
                 parentIds.add( currentData.getId() );
                 // Reset - only needed for 'getId'.
                 currentData.setGroupId( null );
@@ -417,6 +414,8 @@ public class DefaultModelBuilder
         
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
+        
+        //--------------------------------------------------------------------------------------------------------------
 
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
