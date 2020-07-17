@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -100,6 +101,9 @@ import org.eclipse.sisu.Nullable;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
+    // modelId prefix for raw models including profile activation
+    private static final String ACTIVATED = "ACTIVATED+";
+
     @Inject
     private ModelProcessor modelProcessor;
 
@@ -270,7 +274,9 @@ public class DefaultModelBuilder
 
         request.setFileModel( inputModel );
 
-        inherit( request, result, problems );
+        rawModels( request, result, problems );
+        
+        effectiveModel( request, result, problems );
         
         if ( !request.isTwoPhaseBuilding() )
         {
@@ -285,7 +291,7 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void inherit( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+    private void rawModels( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -316,28 +322,24 @@ public class DefaultModelBuilder
         }
 
         Collection<String> parentIds = new LinkedHashSet<>();
-        List<Model> lineage = new ArrayList<>();
 
-        /*
-         * rawModel = fileModel
-         * model = rawModel + normalized + injected activeProfiles 
-         */
         for ( ModelData currentData = resultData; currentData != null; )
         {
+            String modelId = currentData.getId();
+            result.addModelId( modelId );
+
             Model rawModel = currentData.getModel();
+            result.setRawModel( modelId, rawModel );
 
             profileActivationContext.setProjectProperties( rawModel.getProperties() );
-
             problems.setSource( rawModel );
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
                                                                                  profileActivationContext, problems );
-
-            String modelId = currentData.getId();
-            result.addModelId( modelId );
             result.setActivePomProfiles( modelId, activePomProfiles );
-            result.setRawModel( modelId, rawModel );
 
             Model tmpModel = result.getRawModel( modelId ).clone();
+            result.setRawModel( ACTIVATED + modelId, tmpModel );
+
             problems.setSource( tmpModel );
 
             // model normalization
@@ -352,18 +354,14 @@ public class DefaultModelBuilder
                 profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
             }
 
-            if ( modelId.equals( result.getModelIds().get( 0 ) ) )
+            if ( currentData == resultData )
             {
                 for ( Profile activeProfile : result.getActiveExternalProfiles() )
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
-            }
-            
-            lineage.add( tmpModel );
-
-            // super-pom
-            if ( "".equals( modelId ) )
+            } 
+            else if ( currentData == superData )
             {
                 break;
             }
@@ -395,13 +393,16 @@ public class DefaultModelBuilder
                 currentData = parentData;
             }
         }
+    }
+
+    private void effectiveModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+                                 DefaultModelProblemCollector problems )
+    {
+        Model inputModel = request.getFileModel();
         
-        //--------------------------------------------------------------------------------------------------------------
-        
-        for ( String id : result.getModelIds() )
-        {
-            Model rawModel = result.getRawModel( id );
-        }
+        List<Model> lineage = result.getModelIds().stream()
+                        .map( id -> result.getRawModel( ACTIVATED + id ) )
+                        .collect( Collectors.toList() );
 
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
