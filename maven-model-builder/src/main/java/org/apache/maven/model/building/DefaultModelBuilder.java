@@ -396,15 +396,15 @@ public class DefaultModelBuilder
             }
         }
         
-        problems.setSource( inputModel );
-        checkPluginVersions( lineage, request, problems );
-        
         //--------------------------------------------------------------------------------------------------------------
         
         for ( String id : result.getModelIds() )
         {
             Model rawModel = result.getRawModel( id );
         }
+
+        problems.setSource( inputModel );
+        checkPluginVersions( lineage, request, problems );
 
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
