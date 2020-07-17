@@ -364,7 +364,8 @@ public class DefaultModelBuilder
             
             lineage.add( tmpModel );
 
-            if ( currentData == superData )
+            // super-pom
+            if ( "".equals( modelId ) )
             {
                 break;
             }
