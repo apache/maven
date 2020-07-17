@@ -345,18 +345,18 @@ public class DefaultModelBuilder
             // model normalization
             modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
+            Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
             // profile injection
-            for ( Profile activeProfile : activePomProfiles )
+            for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
             {
                 profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
             }
 
             if ( currentData == resultData )
             {
-                for ( Profile activeProfile : activeExternalProfiles )
+                for ( Profile activeProfile : result.getActiveExternalProfiles() )
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
