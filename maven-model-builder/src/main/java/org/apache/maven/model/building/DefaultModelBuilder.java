@@ -338,7 +338,6 @@ public class DefaultModelBuilder
             result.setRawModel( modelId, rawModel );
 
             Model tmpModel = result.getRawModel( modelId ).clone();
-            currentData.setModel( tmpModel );
             problems.setSource( tmpModel );
 
             // model normalization
@@ -420,8 +419,6 @@ public class DefaultModelBuilder
         for ( String id : result.getModelIds() )
         {
             Model rawModel = result.getRawModel( id );
-            
-            
         }
 
         // inheritance assembly
@@ -435,10 +432,8 @@ public class DefaultModelBuilder
         // model interpolation
         resultModel = interpolateModel( resultModel, request, problems );
 
-        resultData.setModel( resultModel );
-        resultData.setGroupId( resultModel.getGroupId() );
-        resultData.setArtifactId( resultModel.getArtifactId() );
-        resultData.setVersion( resultModel.getVersion() );
+        ModelData effectiveModelData = new ModelData( request.getModelSource(), resultModel, resultModel.getGroupId(),
+                                                  resultModel.getArtifactId(), resultModel.getVersion() );
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
@@ -450,11 +445,11 @@ public class DefaultModelBuilder
         if ( request.getPomFile() != null )
         {
             intoCache( request.getModelCache(), new FileModelSource( request.getPomFile() ), ModelCacheTag.RAW,
-                      resultData );
+                       effectiveModelData );
         }
         else
         {
-            intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, resultData );
+            intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, effectiveModelData );
         }
 
         result.setEffectiveModel( resultModel );

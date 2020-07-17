@@ -34,7 +34,7 @@ class ModelData
 {
     private final Source source;
 
-    private Model model;
+    private final Model model;
 
     private String groupId;
 
@@ -83,16 +83,6 @@ class ModelData
     public Model getModel()
     {
         return model;
-    }
-
-    /**
-     * Sets the model being wrapped.
-     *
-     * @param model The model, may be {@code null}.
-     */
-    public void setModel( Model model )
-    {
-        this.model = model;
     }
 
     /**
