@@ -36,8 +36,6 @@ class ModelData
 
     private Model model;
 
-    private Model rawModel;
-
     private String groupId;
 
     private String artifactId;
@@ -95,26 +93,6 @@ class ModelData
     public void setModel( Model model )
     {
         this.model = model;
-    }
-
-    /**
-     * Gets the raw model being wrapped.
-     *
-     * @return The raw model or {@code null} if not set.
-     */
-    public Model getRawModel()
-    {
-        return rawModel;
-    }
-
-    /**
-     * Sets the raw model being wrapped.
-     *
-     * @param rawModel The raw model, may be {@code null}.
-     */
-    public void setRawModel( Model rawModel )
-    {
-        this.rawModel = rawModel;
     }
 
     /**
