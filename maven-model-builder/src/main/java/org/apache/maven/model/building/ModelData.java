@@ -65,9 +65,9 @@ class ModelData
     {
         this.source = source;
         this.model = model;
-        setGroupId( groupId );
-        setArtifactId( artifactId );
-        setVersion( version );
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
     }
 
     public Source getSource()
@@ -96,16 +96,6 @@ class ModelData
     }
 
     /**
-     * Sets the effective group identifier of the model.
-     *
-     * @param groupId The effective group identifier of the model, may be {@code null}.
-     */
-    public void setGroupId( String groupId )
-    {
-        this.groupId = groupId;
-    }
-
-    /**
      * Gets the effective artifact identifier of the model.
      *
      * @return The effective artifact identifier of the model or an empty string if unknown, never {@code null}.
@@ -116,16 +106,6 @@ class ModelData
     }
 
     /**
-     * Sets the effective artifact identifier of the model.
-     *
-     * @param artifactId The effective artifact identifier of the model, may be {@code null}.
-     */
-    public void setArtifactId( String artifactId )
-    {
-        this.artifactId = artifactId;
-    }
-
-    /**
      * Gets the effective version of the model.
      *
      * @return The effective version of the model or an empty string if unknown, never {@code null}.
@@ -133,16 +113,6 @@ class ModelData
     public String getVersion()
     {
         return ( version != null ) ? version : "";
-    }
-
-    /**
-     * Sets the effective version of the model.
-     *
-     * @param version The effective version of the model, may be {@code null}.
-     */
-    public void setVersion( String version )
-    {
-        this.version = version;
     }
 
     /**
