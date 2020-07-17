@@ -327,13 +327,9 @@ public class DefaultModelBuilder
             Model rawModel = currentData.getModel();
             currentData.setRawModel( rawModel );
 
-            Model tmpModel = rawModel.clone();
-            currentData.setModel( tmpModel );
-
-            problems.setSource( tmpModel );
-
             profileActivationContext.setProjectProperties( rawModel.getProperties() );
 
+            problems.setSource( rawModel );
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
                                                                                  profileActivationContext, problems );
 
@@ -341,6 +337,10 @@ public class DefaultModelBuilder
             result.addModelId( modelId );
             result.setActivePomProfiles( modelId, activePomProfiles );
             result.setRawModel( modelId, rawModel );
+
+            Model tmpModel = result.getRawModel( modelId ).clone();
+            currentData.setModel( tmpModel );
+            problems.setSource( tmpModel );
 
             // model normalization
             modelNormalizer.mergeDuplicates( tmpModel, request, problems );
