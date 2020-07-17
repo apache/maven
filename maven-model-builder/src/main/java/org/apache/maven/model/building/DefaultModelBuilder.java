@@ -354,7 +354,7 @@ public class DefaultModelBuilder
                 profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
             }
 
-            if ( currentData == resultData )
+            if ( modelId.equals( result.getModelIds().get( 0 ) ) )
             {
                 for ( Profile activeProfile : result.getActiveExternalProfiles() )
                 {
