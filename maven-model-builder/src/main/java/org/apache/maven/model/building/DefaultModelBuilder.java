@@ -376,21 +376,6 @@ public class DefaultModelBuilder
             {
                 currentData = superData;
             }
-            else if ( currentData == resultData )
-            { // First iteration - add initial id after version resolution.
-                currentData.setGroupId( rawModel.getGroupId() == null ? parentData.getGroupId()
-                                : rawModel.getGroupId() );
-                currentData.setVersion( rawModel.getVersion() == null ? parentData.getVersion()
-                                : rawModel.getVersion() );
-                currentData.setArtifactId( rawModel.getArtifactId() );
-                
-                parentIds.add( currentData.getId() );
-                // Reset - only needed for 'getId'.
-                currentData.setGroupId( null );
-                currentData.setArtifactId( null );
-                currentData.setVersion( null );
-                currentData = parentData;
-            }
             else if ( !parentIds.add( parentData.getId() ) )
             {
                 StringBuilder message = new StringBuilder( "The parents form a cycle: " );
