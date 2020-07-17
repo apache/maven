@@ -290,14 +290,10 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         Model inputModel = request.getFileModel();
-
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
         ModelData superData = new ModelData( null, getSuperModel() );
-
-        Collection<String> parentIds = new LinkedHashSet<>();
-        List<Model> lineage = new ArrayList<>();
 
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
@@ -319,6 +315,13 @@ public class DefaultModelBuilder
             profileActivationContext.setUserProperties( profileProps );
         }
 
+        Collection<String> parentIds = new LinkedHashSet<>();
+        List<Model> lineage = new ArrayList<>();
+
+        /*
+         * rawModel = fileModel
+         * model = rawModel + normalized + injected activeProfiles 
+         */
         for ( ModelData currentData = resultData; currentData != null; )
         {
             Model rawModel = currentData.getModel();
@@ -358,7 +361,6 @@ public class DefaultModelBuilder
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
             }
-
             
             lineage.add( currentData.getModel() );
 
@@ -538,7 +540,7 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
+    private Model readModel( Source modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -702,7 +704,7 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model getModelFromCache( ModelSource modelSource, ModelCache cache )
+    private Model getModelFromCache( Source modelSource, ModelCache cache )
     {
         Model model;
         if ( modelSource instanceof ArtifactModelSource )
@@ -940,7 +942,7 @@ public class DefaultModelBuilder
         return interpolatedModel;
     }
 
-    private ModelData readParent( Model childModel, ModelSource childSource, ModelBuildingRequest request,
+    private ModelData readParent( Model childModel, Source childSource, ModelBuildingRequest request,
                                   DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -950,7 +952,7 @@ public class DefaultModelBuilder
 
         if ( parent != null )
         {
-            ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
+            Source expectedParentSource = getParentPomFile( childModel, childSource );
 
             if ( expectedParentSource != null )
             {
@@ -1022,12 +1024,12 @@ public class DefaultModelBuilder
         return parentData;
     }
 
-    private ModelData readParentLocally( Model childModel, ModelSource childSource, ModelBuildingRequest request,
+    private ModelData readParentLocally( Model childModel, Source childSource, ModelBuildingRequest request,
                                          DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         final Parent parent = childModel.getParent();
-        final ModelSource candidateSource;
+        final Source candidateSource;
         final Model candidateModel;
         final WorkspaceModelResolver resolver = request.getWorkspaceModelResolver();
         if ( resolver == null )
@@ -1156,7 +1158,7 @@ public class DefaultModelBuilder
         return parentData;
     }
 
-    private ModelSource getParentPomFile( Model childModel, ModelSource source )
+    private Source getParentPomFile( Model childModel, Source source )
     {
         if ( !( source instanceof ModelSource2 ) )
         {
