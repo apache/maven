@@ -506,7 +506,7 @@ public class DefaultProjectBuilder
 
         Model model = result.getEffectiveModel();
         
-        poolBuilder.put( model.getPomFile().toPath(),  result.getRawModel() );
+        poolBuilder.put( model.getPomFile().toPath(),  model );
         
         try
         {
