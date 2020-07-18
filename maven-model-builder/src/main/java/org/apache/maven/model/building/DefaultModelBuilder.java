@@ -387,7 +387,6 @@ public class DefaultModelBuilder
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
                                                                                  profileActivationContext, problems );
             result.setActivePomProfiles( modelId, activePomProfiles );
-
             
             Model tmpModel;
             if ( currentData == resultData )
@@ -397,33 +396,24 @@ public class DefaultModelBuilder
             else
             {
                 tmpModel = result.getRawModel( modelId ).clone();
-            }
-            result.setRawModel( ACTIVATED + modelId, tmpModel );
+                
+                problems.setSource( tmpModel );
 
-            problems.setSource( tmpModel );
+                // model normalization
+                modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
-            // model normalization
-            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+                Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
+                injectProfileActivations( tmpModel, interpolatedActivations );
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
-            injectProfileActivations( tmpModel, interpolatedActivations );
-
-            // profile injection
-            for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
-            {
-                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
-            }
-
-            if ( currentData == resultData )
-            {
-                for ( Profile activeProfile : result.getActiveExternalProfiles() )
+                // profile injection
+                for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
-                // this instance will be enriched, not replaced.
-                result.setEffectiveModel( tmpModel );
-            } 
-            else if ( currentData == superData )
+            }
+            result.setRawModel( ACTIVATED + modelId, tmpModel );
+            
+            if ( currentData == superData )
             {
                 break;
             }
