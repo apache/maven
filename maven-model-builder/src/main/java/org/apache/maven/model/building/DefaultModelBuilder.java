@@ -388,7 +388,16 @@ public class DefaultModelBuilder
                                                                                  profileActivationContext, problems );
             result.setActivePomProfiles( modelId, activePomProfiles );
 
-            Model tmpModel = result.getRawModel( modelId ).clone();
+            
+            Model tmpModel;
+            if ( currentData == resultData )
+            {
+                tmpModel = result.getEffectiveModel();
+            }
+            else
+            {
+                tmpModel = result.getRawModel( modelId ).clone();
+            }
             result.setRawModel( ACTIVATED + modelId, tmpModel );
 
             problems.setSource( tmpModel );
