@@ -360,6 +360,8 @@ public class DefaultModelBuilder
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
+                // this instance will be enriched, not replaced.
+                result.setEffectiveModel( tmpModel );
             } 
             else if ( currentData == superData )
             {
@@ -395,7 +397,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private void effectiveModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+    private void effectiveModel( final ModelBuildingRequest request, final ModelBuildingResult result,
                                  DefaultModelProblemCollector problems )
     {
         Model inputModel = request.getFileModel();
@@ -410,7 +412,7 @@ public class DefaultModelBuilder
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
-        Model resultModel = lineage.get( 0 );
+        Model resultModel = result.getEffectiveModel();
 
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
@@ -437,8 +439,6 @@ public class DefaultModelBuilder
         {
             intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, effectiveModelData );
         }
-
-        result.setEffectiveModel( resultModel );
     }
 
     @Override
