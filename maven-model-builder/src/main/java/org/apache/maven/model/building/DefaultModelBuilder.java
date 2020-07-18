@@ -277,8 +277,6 @@ public class DefaultModelBuilder
         rawModel( request, result, problems );
         rawModels( request, result, problems );
         
-        effectiveModel( request, result, problems );
-        
         if ( !request.isTwoPhaseBuilding() )
         {
             build( request, result );
@@ -509,12 +507,14 @@ public class DefaultModelBuilder
                                        Collection<String> imports )
         throws ModelBuildingException
     {
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
+
         // phase 2
         Model resultModel = result.getEffectiveModel();
-
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
+        
+        effectiveModel( request, result, problems );
 
         // model path translation
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
