@@ -274,6 +274,7 @@ public class DefaultModelBuilder
 
         request.setFileModel( inputModel );
 
+        rawModel( request, result, problems );
         rawModels( request, result, problems );
         
         effectiveModel( request, result, problems );
@@ -288,6 +289,62 @@ public class DefaultModelBuilder
         }
 
         return result;
+    }
+    
+    @SuppressWarnings( "checkstyle:methodlength" )
+    private void rawModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+                          DefaultModelProblemCollector problems )
+        throws ModelBuildingException
+    {
+        Model inputModel = request.getFileModel();
+        problems.setRootModel( inputModel );
+
+        // profile activation
+        DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
+
+        problems.setSource( "(external profiles)" );
+        List<Profile> activeExternalProfiles = profileSelector.getActiveProfiles( request.getProfiles(),
+                                                                                  profileActivationContext, problems );
+
+        result.setActiveExternalProfiles( activeExternalProfiles );
+
+        if ( !activeExternalProfiles.isEmpty() )
+        {
+            Properties profileProps = new Properties();
+            for ( Profile profile : activeExternalProfiles )
+            {
+                profileProps.putAll( profile.getProperties() );
+            }
+            profileProps.putAll( profileActivationContext.getUserProperties() );
+            profileActivationContext.setUserProperties( profileProps );
+        }
+
+        profileActivationContext.setProjectProperties( inputModel.getProperties() );
+        problems.setSource( inputModel );
+        List<Profile> activePomProfiles = profileSelector.getActiveProfiles( inputModel.getProfiles(),
+                                                                             profileActivationContext, problems );
+
+        Model tmpModel = inputModel.clone();
+        problems.setSource( tmpModel );
+
+        // model normalization
+        modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+
+        Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
+        injectProfileActivations( tmpModel, interpolatedActivations );
+
+        // profile injection
+        for ( Profile activeProfile : activePomProfiles )
+        {
+            profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+        }
+
+        for ( Profile activeProfile : activeExternalProfiles )
+        {
+            profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+        }
+        // this instance will be enriched, not replaced.
+        result.setEffectiveModel( tmpModel );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
