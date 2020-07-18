@@ -359,11 +359,7 @@ public class DefaultModelBuilder
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
-        problems.setSource( "(external profiles)" );
-        List<Profile> activeExternalProfiles = profileSelector.getActiveProfiles( request.getProfiles(),
-                                                                                  profileActivationContext, problems );
-
-        result.setActiveExternalProfiles( activeExternalProfiles );
+        List<Profile> activeExternalProfiles = result.getActiveExternalProfiles();
 
         if ( !activeExternalProfiles.isEmpty() )
         {
