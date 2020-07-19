@@ -41,6 +41,13 @@ public interface ModelBuildingResult
      * @return The model identifiers from the lineage of models, never {@code null}.
      */
     List<String> getModelIds();
+    
+    /**
+     * 
+     * @return the file model
+     * @since 3.7.0
+     */
+    Model getFileModel();
 
     /**
      * Gets the assembled model.

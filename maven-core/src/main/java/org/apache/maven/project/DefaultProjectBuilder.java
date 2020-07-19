@@ -524,7 +524,7 @@ public class DefaultProjectBuilder
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
         
-        Model fileModel = request.getFileModel();
+        Model fileModel = result.getFileModel();
         if ( recursive )
         {
             Set<String> modules = new LinkedHashSet<>();

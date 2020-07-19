@@ -386,19 +386,6 @@ public class DefaultModelBuildingRequest
     }
 
     @Override
-    public Model getFileModel()
-    {
-        return fileModel;
-    }
-    
-    @Override
-    public ModelBuildingRequest setFileModel( Model fileModel )
-    {
-        this.fileModel = fileModel;
-        return this;
-    }
-    
-    @Override
     public Model getRawModel()
     {
         return rawModel;
