@@ -36,6 +36,7 @@ import org.apache.maven.model.Profile;
 class DefaultModelBuildingResult
     implements ModelBuildingResult
 {
+    private Model fileModel;
 
     private Model effectiveModel;
 
@@ -56,6 +57,19 @@ class DefaultModelBuildingResult
         activePomProfiles = new HashMap<>();
         activeExternalProfiles = new ArrayList<>();
         problems = new ArrayList<>();
+    }
+    
+    @Override
+    public Model getFileModel()
+    {
+        return fileModel;
+    }
+    
+    public DefaultModelBuildingResult setFileModel( Model fileModel )
+    {
+        this.fileModel = fileModel;
+        
+        return this;
     }
 
     @Override

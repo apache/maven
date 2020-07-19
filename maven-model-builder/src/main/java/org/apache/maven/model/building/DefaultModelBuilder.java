@@ -272,7 +272,7 @@ public class DefaultModelBuilder
         // read and validate raw model
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
-        request.setFileModel( inputModel );
+        result.setFileModel( inputModel );
 
         rawModel( request, result, problems );
         rawModels( request, result, problems );
@@ -294,7 +294,7 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model inputModel = request.getFileModel();
+        Model inputModel = result.getFileModel();
         problems.setRootModel( inputModel );
 
         // profile activation
@@ -350,7 +350,7 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model inputModel = request.getFileModel();
+        Model inputModel = result.getFileModel();
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -450,7 +450,7 @@ public class DefaultModelBuilder
     private void effectiveModel( final ModelBuildingRequest request, final ModelBuildingResult result,
                                  DefaultModelProblemCollector problems )
     {
-        Model inputModel = request.getFileModel();
+        Model inputModel = result.getFileModel();
         
         List<Model> lineage = result.getModelIds().stream()
                         .map( id -> result.getRawModel( ACTIVATED + id ) )

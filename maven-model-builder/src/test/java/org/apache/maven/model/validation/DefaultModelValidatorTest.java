@@ -69,8 +69,6 @@ public class DefaultModelValidatorTest
 
         SimpleProblemCollector problems = new SimpleProblemCollector( model );
         
-        request.setFileModel( model );
-
         validator.validateEffectiveModel( model, request, problems );
 
         return problems;
@@ -86,8 +84,6 @@ public class DefaultModelValidatorTest
         SimpleProblemCollector problems = new SimpleProblemCollector( model );
 
         validator.validateFileModel( model, request, problems );
-        
-        request.setFileModel( model );
         
         validator.validateRawModel( model, request, problems );
 
