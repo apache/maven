@@ -447,9 +447,11 @@ public class DefaultModelBuilder
         }
     }
 
-    private void effectiveModel( final ModelBuildingRequest request, final ModelBuildingResult result,
+    private void effectiveModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
                                  DefaultModelProblemCollector problems )
     {
+        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
+        
         Model inputModel = result.getFileModel();
         
         List<Model> lineage = result.getModelIds().stream()
@@ -462,7 +464,7 @@ public class DefaultModelBuilder
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
-        Model resultModel = result.getEffectiveModel();
+        Model resultModel = lineage.get( 0 );
 
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
@@ -475,7 +477,8 @@ public class DefaultModelBuilder
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
-
+        
+        result.setEffectiveModel( resultModel );
 
         // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems, true );
