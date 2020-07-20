@@ -340,9 +340,6 @@ public class DefaultModelBuilder
         {
             profileInjector.injectProfile( inputModel, activeProfile, request, problems );
         }
-        
-        // this instance will be enriched, not replaced.
-        result.setEffectiveModel( inputModel.clone() );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -391,6 +388,9 @@ public class DefaultModelBuilder
             Model tmpModel;
             if ( currentData == resultData )
             {
+                // this instance will be enriched, not replaced.
+                result.setEffectiveModel( inputModel.clone() );
+                
                 tmpModel = result.getEffectiveModel();
             }
             else
