@@ -527,16 +527,9 @@ public class DefaultProjectBuilder
         Model fileModel = result.getFileModel();
         if ( recursive )
         {
-            Set<String> modules = new LinkedHashSet<>();
-            modules.addAll( fileModel.getModules() );
-            for ( Profile profile : result.getActivePomProfiles( result.getModelIds().get( 0 ) ) )
-            {
-                modules.addAll( profile.getModules() );
-            }
-            
             File basedir = pomFile.getParentFile();
             List<File> moduleFiles = new ArrayList<>();
-            for ( String module : modules )
+            for ( String module : fileModel.getModules() )
             {
                 if ( StringUtils.isEmpty( module ) )
                 {
