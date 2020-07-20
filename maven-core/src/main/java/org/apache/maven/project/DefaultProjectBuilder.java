@@ -493,7 +493,7 @@ public class DefaultProjectBuilder
         catch ( ModelBuildingException e )
         {
             result = e.getResult();
-            if ( result == null || result.getEffectiveModel() == null )
+            if ( result == null || result.getFileModel() == null )
             {
                  results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
@@ -504,7 +504,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = result.getEffectiveModel();
+        Model model = result.getFileModel();
         
         poolBuilder.put( model.getPomFile().toPath(),  model );
         
