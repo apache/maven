@@ -343,10 +343,12 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void rawModels( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+    private void rawModels( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
+        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
+        
         Model inputModel = result.getFileModel();
         problems.setRootModel( inputModel );
 
