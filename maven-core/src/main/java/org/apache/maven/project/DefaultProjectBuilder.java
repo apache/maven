@@ -508,19 +508,6 @@ public class DefaultProjectBuilder
         
         poolBuilder.put( model.getPomFile().toPath(),  model );
         
-        try
-        {
-            // first pass: build without building parent.
-            initProject( project, projectIndex, false, result, new HashMap<>( 0 ), config.request );
-        }
-        catch ( InvalidArtifactRTException iarte )
-        {
-            result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
-                                                               iarte ) );
-        }
-
-        projectIndex.put( result.getModelIds().get( 0 ), project );
-        
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
         
@@ -606,6 +593,20 @@ public class DefaultProjectBuilder
                 noErrors = false;
             }
         }
+        
+        try
+        {
+            // first pass: build without building parent.
+            initProject( project, projectIndex, false, result, new HashMap<>( 0 ), config.request );
+        }
+        catch ( InvalidArtifactRTException iarte )
+        {
+            result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
+                                                               iarte ) );
+        }
+
+        projectIndex.put( result.getModelIds().get( 0 ), project );
+
         return noErrors;
     }
 
