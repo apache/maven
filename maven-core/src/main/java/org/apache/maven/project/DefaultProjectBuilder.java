@@ -708,7 +708,7 @@ public class DefaultProjectBuilder
         Model model = result.getEffectiveModel();
 
         project.setModel( model );
-        project.setOriginalModel( result.getRawModel() );
+        project.setOriginalModel( result.getFileModel() );
         project.setFile( model.getPomFile() );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
