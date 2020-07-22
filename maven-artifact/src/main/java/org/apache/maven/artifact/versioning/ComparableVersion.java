@@ -582,6 +582,32 @@ public class ComparableVersion
             }
             return buffer.toString();
         }
+
+        /**
+         * Return the contents in the same format that is used when you call toString() on a List.
+         */
+        private String toListString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append( "[" );
+            for ( Item item : this )
+            {
+                if ( buffer.length() > 1 )
+                {
+                    buffer.append( ", " );
+                }
+                if ( item instanceof ListItem )
+                {
+                    buffer.append( ( (ListItem ) item ).toListString() );
+                }
+                else
+                {
+                    buffer.append( item );
+                }
+            }
+            buffer.append( "]" );
+            return buffer.toString();
+        }
     }
 
     public ComparableVersion( String version )
@@ -768,7 +794,8 @@ public class ComparableVersion
     // CHECKSTYLE_ON: LineLength
     public static void main( String... args )
     {
-        System.out.println( "Display parameters as parsed by Maven (in canonical form) and comparison result:" );
+        System.out.println( "Display parameters as parsed by Maven (in canonical form and as a list of tokens) and"
+                                + " comparison result:" );
         if ( args.length == 0 )
         {
             return;
@@ -787,7 +814,7 @@ public class ComparableVersion
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }
 
-            System.out.println( ( i++ ) + ". " + version + " == " + c.getCanonical() );
+            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical() + "   " + c.items.toListString() );
 
             prev = c;
         }
