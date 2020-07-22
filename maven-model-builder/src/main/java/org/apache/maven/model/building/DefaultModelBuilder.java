@@ -509,12 +509,12 @@ public class DefaultModelBuilder
     {
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        effectiveModel( request, result, problems );
+
         // phase 2
         Model resultModel = result.getEffectiveModel();
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
-        
-        effectiveModel( request, result, problems );
 
         // model path translation
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
