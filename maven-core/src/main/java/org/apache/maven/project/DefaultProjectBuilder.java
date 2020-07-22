@@ -414,7 +414,7 @@ public class DefaultProjectBuilder
         InternalConfig config = new InternalConfig( request, modelPool,
                 useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
 
-        Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
+        Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
         boolean noErrors =
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
@@ -443,7 +443,7 @@ public class DefaultProjectBuilder
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
-                           Map<String, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
+                           Map<File, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
                            boolean root, boolean recursive, InternalConfig config,
                            ReactorModelPool.Builder poolBuilder )
     {
@@ -467,7 +467,7 @@ public class DefaultProjectBuilder
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
-                           Map<String, MavenProject> projectIndex, File pomFile, Set<File> aggregatorFiles,
+                           Map<File, MavenProject> projectIndex, File pomFile, Set<File> aggregatorFiles,
                            boolean isRoot, boolean recursive, InternalConfig config,
                            ReactorModelPool.Builder poolBuilder )
     {
@@ -605,7 +605,7 @@ public class DefaultProjectBuilder
                                                                iarte ) );
         }
 
-        projectIndex.put( result.getModelIds().get( 0 ), project );
+        projectIndex.put( pomFile, project );
 
         return noErrors;
     }
@@ -638,7 +638,7 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
-                           Map<String, MavenProject> projectIndex, List<InterimResult> interimResults,
+                           Map<File, MavenProject> projectIndex, List<InterimResult> interimResults,
                            ProjectBuildingRequest request, Map<File, Boolean> profilesXmls,
                            RepositorySystemSession session )
     {
@@ -701,7 +701,7 @@ public class DefaultProjectBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void initProject( MavenProject project, Map<String, MavenProject> projects,
+    private void initProject( MavenProject project, Map<File, MavenProject> projects,
                               boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
@@ -936,7 +936,7 @@ public class DefaultProjectBuilder
         }
     }
 
-    private void initParent( MavenProject project, Map<String, MavenProject> projects, boolean buildParentIfNotExisting,
+    private void initParent( MavenProject project, Map<File, MavenProject> projects, boolean buildParentIfNotExisting,
                              ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
     {
         Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
@@ -955,7 +955,7 @@ public class DefaultProjectBuilder
             // org.apache.maven.its.mng4834:parent:0.1
             String parentModelId = result.getModelIds().get( 1 );
             File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
-            MavenProject parent = projects.get( parentModelId );
+            MavenProject parent = projects.get( parentPomFile );
             if ( parent == null && buildParentIfNotExisting )
             {
                 //
