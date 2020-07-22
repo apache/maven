@@ -530,8 +530,16 @@ public class ComparableVersion
                 {
                     return 0; // 1-0 = 1- (normalize) = 1
                 }
-                Item first = get( 0 );
-                return first.compareTo( null );
+                // Compare the entire list of items with null - not just the first one, MNG-6964
+                for ( Item i : this )
+                {
+                    int result = i.compareTo( null );
+                    if ( result != 0 )
+                    {
+                        return result;
+                    }
+                }
+                return 0;
             }
             switch ( item.getType() )
             {
