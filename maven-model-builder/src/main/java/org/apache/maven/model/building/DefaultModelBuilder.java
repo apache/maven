@@ -696,7 +696,7 @@ public class DefaultModelBuilder
             try
             {
                 Model rawModel =
-                    modelProcessor.read( pomFile,
+                    modelProcessor.read( modelSource.getInputStream(),
                                Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
 
                 model.setPomFile( pomFile );
