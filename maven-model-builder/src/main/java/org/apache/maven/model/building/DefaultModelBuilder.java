@@ -690,7 +690,12 @@ public class DefaultModelBuilder
         problems.setSource( model );
 
         modelValidator.validateFileModel( model, request, problems );
-        
+
+        if ( hasFatalErrors( problems ) )
+        {
+            throw problems.newModelBuildingException();
+        }
+
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
             try
