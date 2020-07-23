@@ -682,11 +682,8 @@ public class DefaultModelBuilder
                 .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).setException( e ) );
             throw problems.newModelBuildingException();
         }
-        if ( pomFile != null )
-        {
-            model.setPomFile( pomFile );
-        }
-        else if ( modelSource instanceof FileModelSource )
+        
+        if ( modelSource instanceof FileModelSource )
         {
             model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
         }
