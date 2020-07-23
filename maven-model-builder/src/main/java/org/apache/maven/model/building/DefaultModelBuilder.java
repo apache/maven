@@ -636,7 +636,7 @@ public class DefaultModelBuilder
                     throw e;
                 }
 
-                if ( pomFile != null )
+                if ( modelSource instanceof FileModelSource )
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V20 )
                         .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
