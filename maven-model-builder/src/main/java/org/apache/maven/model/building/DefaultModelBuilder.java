@@ -588,12 +588,6 @@ public class DefaultModelBuilder
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        if ( modelSource == null )
-        {
-            modelSource =
-                new FileModelSource( Objects.requireNonNull( pomFile, "neither pomFile nor modelSource can be null" ) );
-        }
-
         Model model;
         if ( pomFile == null )
         {
