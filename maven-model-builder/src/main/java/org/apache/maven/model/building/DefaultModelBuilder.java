@@ -275,7 +275,6 @@ public class DefaultModelBuilder
         result.setFileModel( inputModel );
 
         rawModel( request, result, problems );
-        rawModels( request, result, problems );
         
         if ( !request.isTwoPhaseBuilding() )
         {
@@ -509,6 +508,7 @@ public class DefaultModelBuilder
     {
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        rawModels( request, result, problems );
         effectiveModel( request, result, problems );
 
         // phase 2

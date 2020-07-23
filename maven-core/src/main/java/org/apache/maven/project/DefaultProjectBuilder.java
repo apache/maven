@@ -594,17 +594,6 @@ public class DefaultProjectBuilder
             }
         }
         
-        try
-        {
-            // first pass: build without building parent.
-            initProject( project, projectIndex, false, result, new HashMap<>( 0 ), config.request );
-        }
-        catch ( InvalidArtifactRTException iarte )
-        {
-            result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null, model, -1, -1,
-                                                               iarte ) );
-        }
-
         projectIndex.put( pomFile, project );
 
         return noErrors;
@@ -689,6 +678,9 @@ public class DefaultProjectBuilder
                 }
                 else
                 {
+                    // building effective model includes validation, make sure effectiveModel is available 
+                    project.setModel( interimResult.result.getEffectiveModel() );
+
                     result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
                 }
                 results.add( result );
