@@ -696,6 +696,15 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
+        model = readRawModel( modelSource, pomFile, request, problems, model );
+
+        return model;
+    }
+
+    private Model readRawModel( Source modelSource, File pomFile, ModelBuildingRequest request,
+                             DefaultModelProblemCollector problems, Model model )
+        throws ModelBuildingException
+    {
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
             try
@@ -736,7 +745,6 @@ public class DefaultModelBuilder
 
         ModelData modelData = new ModelData( modelSource, model, groupId, artifactId, version );
         intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
-
         return model;
     }
 
