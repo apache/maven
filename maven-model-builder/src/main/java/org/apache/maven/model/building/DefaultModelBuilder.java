@@ -588,14 +588,10 @@ public class DefaultModelBuilder
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model model;
-        if ( pomFile == null )
+        Model model = getModelFromCache( modelSource, request.getModelCache() );
+        if ( model != null )
         {
-            model = getModelFromCache( modelSource, request.getModelCache() );
-            if ( model != null )
-            {
-                return model;
-            }
+            return model;
         }
 
         problems.setSource( modelSource.getLocation() );
