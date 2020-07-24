@@ -484,15 +484,7 @@ public class DefaultModelBuilder
         // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems, true );
 
-        if ( request.getPomFile() != null )
-        {
-            intoCache( request.getModelCache(), new FileModelSource( request.getPomFile() ), ModelCacheTag.RAW,
-                       effectiveModelData );
-        }
-        else
-        {
-            intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, effectiveModelData );
-        }
+        intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, effectiveModelData );
     }
 
     @Override
