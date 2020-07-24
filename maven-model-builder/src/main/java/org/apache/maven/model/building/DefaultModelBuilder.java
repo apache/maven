@@ -692,7 +692,7 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        
+        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
 
         return model;
     }
@@ -739,8 +739,6 @@ public class DefaultModelBuilder
         {
             throw problems.newModelBuildingException();
         }
-
-        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
 
         String groupId = getGroupId( model );
         String artifactId = model.getArtifactId();
