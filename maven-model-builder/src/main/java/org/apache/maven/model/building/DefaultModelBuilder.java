@@ -726,10 +726,7 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        if ( pomFile != null )
-        {
-            intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
-        }
+        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
 
         String groupId = getGroupId( model );
         String artifactId = model.getArtifactId();
