@@ -273,6 +273,8 @@ public class DefaultModelBuilder
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
         result.setFileModel( inputModel );
+        
+        readRawModel( request, result, problems );
 
         rawModel( request, result, problems );
         
@@ -289,10 +291,12 @@ public class DefaultModelBuilder
     }
     
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void rawModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+    private void rawModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
+        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
+        
         Model inputModel = result.getFileModel();
         problems.setRootModel( inputModel );
 
@@ -688,11 +692,21 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        model = readRawModel( modelSource, pomFile, request, problems, model );
+        
 
         return model;
     }
 
+    private Model readRawModel( ModelBuildingRequest request, ModelBuildingResult result,
+                                DefaultModelProblemCollector problems ) throws ModelBuildingException
+    {
+        Source modelSource = request.getModelSource();
+        File pomFile = request.getPomFile();
+        Model model = result.getFileModel();
+        
+        return readRawModel( modelSource, pomFile, request, problems, model );
+    }
+    
     private Model readRawModel( Source modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems, Model model )
         throws ModelBuildingException
@@ -1074,7 +1088,8 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            candidateModel = readModel( candidateSource, null, request, problems );
+            candidateModel = readRawModel( candidateSource, null, request, problems,
+                                           readModel( candidateSource, null, request, problems ) );
         }
         else
         {
@@ -1276,6 +1291,8 @@ public class DefaultModelBuilder
         }
 
         Model parentModel = readModel( modelSource, null, lenientRequest, problems );
+        
+        parentModel = readRawModel( modelSource, null, lenientRequest, problems, parentModel );
 
         if ( !parent.getVersion().equals( version ) )
         {
