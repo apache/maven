@@ -133,6 +133,7 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
+        activeProjects = selectProjectsFromInvocation( activeProjects, projectDependencyGraph, session );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
@@ -143,6 +144,30 @@ public class DefaultGraphBuilder
         }
 
         return Result.success( projectDependencyGraph );
+    }
+
+    private List<MavenProject> selectProjectsFromInvocation( final List<MavenProject> activeProjects,
+                                                             final ProjectDependencyGraph projectDependencyGraph,
+                                                             final MavenSession session )
+    {
+        MavenProject requestedProject = projectDependencyGraph.getAllProjects().stream()
+                .filter( project -> project.getFile().equals( session.getRequest().getPom() ) )
+                .findFirst()
+                .get();
+
+        List<MavenProject> downstreamProjects = projectDependencyGraph.getDownstreamProjects( requestedProject, true );
+
+        /*
+         * If the requested project has a module that does *NOT* have the requested project as its parent (uni-
+         * directional relation), it is not selected by getDownstreamProjects.
+         *
+         * In the D.A.G., this relationship is not collected (it only looks for modules' parents, but not for children)
+         */
+
+        List<MavenProject> result = new ArrayList<>();
+        result.add( requestedProject );
+        result.addAll( downstreamProjects );
+        return result;
     }
 
     private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
@@ -379,7 +404,7 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
+        List<File> files = Arrays.asList( new File( request.getMultiModuleProjectDirectory(), "pom.xml" ) );
         collectProjects( projects, files, request );
         return projects;
     }

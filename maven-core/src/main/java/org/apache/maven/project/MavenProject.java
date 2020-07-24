@@ -284,6 +284,11 @@ public class MavenProject
         getModel().setDependencies( dependencies );
     }
 
+    public void setModules( List<String> modules )
+    {
+        getModel().setModules( modules );
+    }
+
     public List<Dependency> getDependencies()
     {
         return getModel().getDependencies();
