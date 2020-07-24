@@ -106,7 +106,7 @@ public class DefaultModelBuildingListener
             catch ( PluginResolutionException | PluginManagerException | PluginVersionResolutionException e )
             {
                 event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Unresolveable build extension: " + e.getMessage() )
+                        .setMessage( "Unresolvable build extension: " + e.getMessage() )
                         .setException( e ) );
             }
 
