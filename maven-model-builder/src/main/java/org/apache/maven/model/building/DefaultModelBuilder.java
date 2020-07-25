@@ -712,22 +712,22 @@ public class DefaultModelBuilder
     }
     
     private Model readRawModel( Source modelSource, File pomFile, ModelBuildingRequest request,
-                             DefaultModelProblemCollector problems, Model model )
+                             DefaultModelProblemCollector problems, Model fileModel )
         throws ModelBuildingException
     {
+        Model rawModel = fileModel.clone();
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
             try
             {
-                Model rawModel =
+                Model transformedFileModel =
                     modelProcessor.read( modelSource.getInputStream(),
                                Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
 
-                // model with locationTrackers, required for proper feedback during validations
-                model = model.clone();
+                // fileModel with locationTrackers, required for proper feedback during validations
                 
                 // Apply enriched data
-                modelMerger.merge( model, rawModel, false, null );
+                modelMerger.merge( rawModel, transformedFileModel, false, null );
             }
             catch ( IOException e )
             {
@@ -735,20 +735,20 @@ public class DefaultModelBuilder
             }
         }
 
-        modelValidator.validateRawModel( model, request, problems );
+        modelValidator.validateRawModel( rawModel, request, problems );
 
         if ( hasFatalErrors( problems ) )
         {
             throw problems.newModelBuildingException();
         }
 
-        String groupId = getGroupId( model );
-        String artifactId = model.getArtifactId();
-        String version = getVersion( model );
+        String groupId = getGroupId( rawModel );
+        String artifactId = fileModel.getArtifactId();
+        String version = getVersion( rawModel );
 
-        ModelData modelData = new ModelData( modelSource, model, groupId, artifactId, version );
+        ModelData modelData = new ModelData( modelSource, rawModel, groupId, artifactId, version );
         intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
-        return model;
+        return rawModel;
     }
 
     private Model getModelFromCache( Source modelSource, ModelCache cache )
