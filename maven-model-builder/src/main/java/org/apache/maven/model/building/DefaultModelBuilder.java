@@ -276,7 +276,7 @@ public class DefaultModelBuilder
         
         readRawModel( request, result, problems );
 
-        rawModel( request, result, problems );
+        activateFileModel( request, result, problems );
         
         if ( !request.isTwoPhaseBuilding() )
         {
@@ -291,7 +291,7 @@ public class DefaultModelBuilder
     }
     
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void rawModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
+    private void activateFileModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -352,7 +352,7 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
         
-        Model inputModel = result.getFileModel();
+        Model inputModel = result.getFileModel().clone();
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -394,7 +394,7 @@ public class DefaultModelBuilder
             if ( currentData == resultData )
             {
                 // this instance will be enriched, not replaced.
-                result.setEffectiveModel( inputModel.clone() );
+                result.setEffectiveModel( inputModel );
                 
                 tmpModel = result.getEffectiveModel();
             }
