@@ -700,7 +700,6 @@ public class DefaultProjectBuilder
 
         project.setModel( model );
         project.setOriginalModel( result.getFileModel() );
-        project.setFile( result.getFileModel().getPomFile() );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
 
