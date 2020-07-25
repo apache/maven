@@ -719,8 +719,6 @@ public class DefaultModelBuilder
                     modelProcessor.read( modelSource.getInputStream(),
                                Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
 
-                model.setPomFile( pomFile );
-                
                 // model with locationTrackers, required for proper feedback during validations
                 model = model.clone();
                 
