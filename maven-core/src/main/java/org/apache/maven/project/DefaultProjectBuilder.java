@@ -511,12 +511,11 @@ public class DefaultProjectBuilder
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
         
-        Model fileModel = result.getFileModel();
         if ( recursive )
         {
             File basedir = pomFile.getParentFile();
             List<File> moduleFiles = new ArrayList<>();
-            for ( String module : fileModel.getModules() )
+            for ( String module : model.getModules() )
             {
                 if ( StringUtils.isEmpty( module ) )
                 {
@@ -536,7 +535,7 @@ public class DefaultProjectBuilder
                 {
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, fileModel, -1,
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
                                                  -1, null );
                     result.getProblems().add( problem );
 
@@ -574,7 +573,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                 ModelProblem.Version.BASE, fileModel, -1, -1, null );
+                                                 ModelProblem.Version.BASE, model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
