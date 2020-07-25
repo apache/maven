@@ -343,6 +343,10 @@ public class DefaultModelBuilder
         {
             profileInjector.injectProfile( inputModel, activeProfile, request, problems );
         }
+        
+        result.addModelId( "BASE" );
+        result.setRawModel( "BASE", inputModel.clone() );
+        result.setActivePomProfiles( "BASE", activePomProfiles );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -376,6 +380,8 @@ public class DefaultModelBuilder
 
         Collection<String> parentIds = new LinkedHashSet<>();
 
+        result.getModelIds().clear();
+        
         for ( ModelData currentData = resultData; currentData != null; )
         {
             String modelId = currentData.getId();

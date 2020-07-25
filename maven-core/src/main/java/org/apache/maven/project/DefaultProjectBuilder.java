@@ -504,7 +504,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = result.getFileModel();
+        Model model = result.getRawModel();
         
         poolBuilder.put( model.getPomFile().toPath(),  model );
         
