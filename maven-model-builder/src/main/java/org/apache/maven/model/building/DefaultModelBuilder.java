@@ -463,13 +463,11 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
         
-        Model inputModel = result.getFileModel();
-        
         List<Model> lineage = result.getModelIds().stream()
                         .map( id -> result.getRawModel( ACTIVATED + id ) )
                         .collect( Collectors.toList() );
 
-        problems.setSource( inputModel );
+        problems.setSource( result.getRawModel() );
         checkPluginVersions( lineage, request, problems );
 
         // inheritance assembly
