@@ -356,7 +356,7 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
         
-        Model inputModel = result.getFileModel().clone();
+        Model inputModel = result.getRawModel();
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
