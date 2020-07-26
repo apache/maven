@@ -274,9 +274,9 @@ public class DefaultModelBuilder
 
         result.setFileModel( inputModel );
         
-        readRawModel( request, result, problems );
-
         activateFileModel( request, result, problems );
+
+        readRawModel( request, result, problems );
         
         if ( !request.isTwoPhaseBuilding() )
         {
