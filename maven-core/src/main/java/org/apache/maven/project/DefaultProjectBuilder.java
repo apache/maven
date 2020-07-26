@@ -671,7 +671,7 @@ public class DefaultProjectBuilder
             catch ( ModelBuildingException e )
             {
                 DefaultProjectBuildingResult result = null;
-                if ( project == null )
+                if ( project == null || interimResult.result.getEffectiveModel() == null )
                 {
                     result = new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() );
                 }
