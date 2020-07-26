@@ -325,27 +325,28 @@ public class DefaultModelBuilder
         List<Profile> activePomProfiles = profileSelector.getActiveProfiles( inputModel.getProfiles(),
                                                                              profileActivationContext, problems );
 
-        problems.setSource( inputModel );
+        Model rawModel = inputModel.clone();
 
         // model normalization
-        modelNormalizer.mergeDuplicates( inputModel, request, problems );
+        problems.setSource( rawModel );
+        modelNormalizer.mergeDuplicates( rawModel, request, problems );
         
-        Map<String, Activation> interpolatedActivations = getProfileActivations( inputModel, false );
-        injectProfileActivations( inputModel, interpolatedActivations );
+        Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
+        injectProfileActivations( rawModel, interpolatedActivations );
 
         // profile injection
         for ( Profile activeProfile : activePomProfiles )
         {
-            profileInjector.injectProfile( inputModel, activeProfile, request, problems );
+            profileInjector.injectProfile( rawModel, activeProfile, request, problems );
         }
 
         for ( Profile activeProfile : activeExternalProfiles )
         {
-            profileInjector.injectProfile( inputModel, activeProfile, request, problems );
+            profileInjector.injectProfile( rawModel, activeProfile, request, problems );
         }
         
         result.addModelId( "BASE" );
-        result.setRawModel( "BASE", inputModel.clone() );
+        result.setRawModel( "BASE", rawModel );
         result.setActivePomProfiles( "BASE", activePomProfiles );
     }
 
