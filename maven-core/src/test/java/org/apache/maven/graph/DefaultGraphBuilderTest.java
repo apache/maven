@@ -95,63 +95,63 @@ public class DefaultGraphBuilderTest
     {
         return asList(
                 scenario( "Full reactor" )
-                        .expectResult( asList( PARENT_MODULE, INDEPENDENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, INDEPENDENT_MODULE, MODULE_A, MODULE_B, MODULE_C ),
                 scenario( "Selected project" )
-                        .selectedProjects( singletonList( MODULE_B ) )
-                        .expectResult( singletonList( MODULE_B ) ),
+                        .selectedProjects( MODULE_B )
+                        .expectResult( MODULE_B ),
                 scenario( "Excluded project" )
-                        .excludedProjects( singletonList( MODULE_B ) )
-                        .expectResult( asList( PARENT_MODULE, INDEPENDENT_MODULE, MODULE_A, MODULE_C ) ),
+                        .excludedProjects( MODULE_B )
+                        .expectResult( PARENT_MODULE, INDEPENDENT_MODULE, MODULE_A, MODULE_C ),
                 scenario( "Resuming from project" )
                         .resumeFrom( MODULE_B )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                        .expectResult( MODULE_B, MODULE_C ),
                 scenario( "Selected project with also make dependencies" )
-                        .selectedProjects( singletonList( MODULE_C ) )
+                        .selectedProjects( MODULE_C )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ),
                 scenario( "Selected project with also make dependents" )
-                        .selectedProjects( singletonList( MODULE_B ) )
+                        .selectedProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                        .expectResult( MODULE_B, MODULE_C ),
                 scenario( "Resuming from project with also make dependencies" )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
                         .resumeFrom( MODULE_C )
-                        .expectResult( asList( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ),
                 scenario( "Selected project with resume from and also make dependency (MNG-4960 IT#1)" )
-                        .selectedProjects( singletonList( MODULE_C ) )
+                        .selectedProjects( MODULE_C )
                         .resumeFrom( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, MODULE_A, MODULE_B, MODULE_C ),
                 scenario( "Selected project with resume from and also make dependent (MNG-4960 IT#2)" )
-                        .selectedProjects( singletonList( MODULE_B ) )
+                        .selectedProjects( MODULE_B )
                         .resumeFrom( MODULE_C )
                         .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
-                        .expectResult( singletonList( MODULE_C ) ),
+                        .expectResult( MODULE_C ),
                 scenario( "Excluding an also make dependency from selectedProject does take its transitive dependency" )
-                        .selectedProjects( singletonList( MODULE_C ) )
-                        .excludedProjects( singletonList( MODULE_B ) )
+                        .selectedProjects( MODULE_C )
+                        .excludedProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( PARENT_MODULE, MODULE_A, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, MODULE_A, MODULE_C ),
                 scenario( "Excluding an also make dependency from resumeFrom does take its transitive dependency" )
                         .resumeFrom( MODULE_C )
-                        .excludedProjects( singletonList( MODULE_B ) )
+                        .excludedProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
-                        .expectResult( asList( PARENT_MODULE, MODULE_A, MODULE_C ) ),
+                        .expectResult( PARENT_MODULE, MODULE_A, MODULE_C ),
                 scenario( "Resume from exclude project downstream" )
                         .resumeFrom( MODULE_A )
-                        .excludedProjects( singletonList( MODULE_B ) )
-                        .expectResult( asList( MODULE_A, MODULE_C ) ),
+                        .excludedProjects( MODULE_B )
+                        .expectResult( MODULE_A, MODULE_C ),
                 scenario( "Exclude the project we are resuming from (as proposed in MNG-6676)" )
                         .resumeFrom( MODULE_B )
-                        .excludedProjects( singletonList( MODULE_B ) )
-                        .expectResult( singletonList( MODULE_C ) ),
+                        .excludedProjects( MODULE_B )
+                        .expectResult( MODULE_C ),
                 scenario( "Selected projects in wrong order are resumed correctly in order" )
-                        .selectedProjects( asList( MODULE_C, MODULE_B, MODULE_A ) )
+                        .selectedProjects( MODULE_C, MODULE_B, MODULE_A )
                         .resumeFrom( MODULE_B )
-                        .expectResult( asList( MODULE_B, MODULE_C ) ),
+                        .expectResult( MODULE_B, MODULE_C ),
                 scenario( "Duplicate projects are filtered out" )
-                        .selectedProjects( asList( MODULE_A, MODULE_A ) )
-                        .expectResult( singletonList( MODULE_A ) )
+                        .selectedProjects( MODULE_A, MODULE_A )
+                        .expectResult( MODULE_A )
         );
     }
 
@@ -284,15 +284,15 @@ public class DefaultGraphBuilderTest
             return scenarioBuilder;
         }
 
-        public ScenarioBuilder selectedProjects( List<String> selectedProjects )
+        public ScenarioBuilder selectedProjects( String... selectedProjects )
         {
-            this.selectedProjects = selectedProjects;
+            this.selectedProjects = asList( selectedProjects );
             return this;
         }
 
-        public ScenarioBuilder excludedProjects( List<String> excludedProjects )
+        public ScenarioBuilder excludedProjects( String... excludedProjects )
         {
-            this.excludedProjects = excludedProjects;
+            this.excludedProjects = asList( excludedProjects );
             return this;
         }
 
@@ -314,10 +314,10 @@ public class DefaultGraphBuilderTest
             return this;
         }
 
-        public Object[] expectResult( List<String> expectedReactorProjects )
+        public Object[] expectResult( String... expectedReactorProjects )
         {
             return new Object[] {
-                    description, selectedProjects, excludedProjects, resumeFrom, makeBehavior, expectedReactorProjects, requestedPom
+                    description, selectedProjects, excludedProjects, resumeFrom, makeBehavior, asList( expectedReactorProjects ), requestedPom
             };
         }
     }
