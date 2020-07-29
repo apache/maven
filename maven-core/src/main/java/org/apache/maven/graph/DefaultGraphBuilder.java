@@ -133,7 +133,7 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
-        activeProjects = selectProjectsFromInvocation( activeProjects, projectDependencyGraph, session );
+        activeProjects = selectProjectsFromRequest( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
@@ -146,27 +146,28 @@ public class DefaultGraphBuilder
         return Result.success( projectDependencyGraph );
     }
 
-    private List<MavenProject> selectProjectsFromInvocation( final List<MavenProject> activeProjects,
-                                                             final ProjectDependencyGraph projectDependencyGraph,
-                                                             final MavenSession session )
+    private List<MavenProject> selectProjectsFromRequest( List<MavenProject> activeProjects,
+                                                          ProjectDependencyGraph graph,
+                                                          MavenExecutionRequest request )
+            throws MavenExecutionException
     {
-        MavenProject requestedProject = projectDependencyGraph.getAllProjects().stream()
-                .filter( project -> project.getFile().equals( session.getRequest().getPom() ) )
-                .findFirst()
-                .get();
+        List<MavenProject> result = activeProjects;
+        boolean isFirstProjectRequested = request.getPom().equals( graph.getSortedProjects().get( 0 ).getFile() );
 
-        List<MavenProject> downstreamProjects = projectDependencyGraph.getDownstreamProjects( requestedProject, true );
+        if ( !isFirstProjectRequested )
+        {
+            MavenProject requestedProject = activeProjects.stream()
+                    .filter( project -> project.getFile().equals( request.getPom() ) )
+                    .findFirst()
+                    .orElseThrow( () -> new MavenExecutionException(
+                            "Could not find project in reactor matching requested POM", request.getPom() ) );
 
-        /*
-         * If the requested project has a module that does *NOT* have the requested project as its parent (uni-
-         * directional relation), it is not selected by getDownstreamProjects.
-         *
-         * In the D.A.G., this relationship is not collected (it only looks for modules' parents, but not for children)
-         */
+            List<MavenProject> childModules = requestedProject.getCollectedProjects();
+            result.add( requestedProject );
+            result.addAll( childModules );
 
-        List<MavenProject> result = new ArrayList<>();
-        result.add( requestedProject );
-        result.addAll( downstreamProjects );
+            result = includeAlsoMakeTransitively( result, request, graph );
+        }
         return result;
     }
 
