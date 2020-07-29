@@ -21,7 +21,6 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -406,9 +405,32 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        List<File> files = Arrays.asList( new File( request.getMultiModuleProjectDirectory(), "pom.xml" ) );
+        File pomFile = getMultiModuleRootPomFile( request );
+        List<File> files = Collections.singletonList( pomFile );
         collectProjects( projects, files, request );
         return projects;
+    }
+
+    private File getMultiModuleRootPomFile( MavenExecutionRequest request )
+    {
+        if ( request.getPom().getParentFile().equals( request.getMultiModuleProjectDirectory() ) )
+        {
+            return request.getPom().getAbsoluteFile();
+        }
+        else
+        {
+            File multiModuleRootPom = new File( request.getMultiModuleProjectDirectory(), "pom.xml" );
+            if ( !multiModuleRootPom.exists() )
+            {
+                logger.info( "Maven detected that the requested POM file is part of a multi module project, "
+                        + "but could not find a pom.xml file in the multi module root directory: '"
+                        + request.getMultiModuleProjectDirectory() + "'. ");
+                logger.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
+                return request.getPom().getAbsoluteFile();
+            }
+
+            return multiModuleRootPom;
+        }
     }
 
     private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
