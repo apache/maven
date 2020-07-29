@@ -151,6 +151,12 @@ public class DefaultGraphBuilder
             throws MavenExecutionException
     {
         List<MavenProject> result = activeProjects;
+
+        if ( request.getPom() == null )
+        {
+            return result;
+        }
+
         boolean isFirstProjectRequested = request.getPom().equals( graph.getSortedProjects().get( 0 ).getFile() );
 
         if ( !isFirstProjectRequested )
@@ -400,14 +406,28 @@ public class DefaultGraphBuilder
             MavenProject project = projectBuilder.build( modelSource, request.getProjectBuildingRequest() )
                 .getProject();
             project.setExecutionRoot( true );
-            projects.add( project );
             request.setProjectPresent( false );
+            projects.add( project );
             return projects;
         }
 
         File pomFile = getMultiModuleProjectPomFile( request );
         List<File> files = Collections.singletonList( pomFile.getAbsoluteFile() );
         collectProjects( projects, files, request );
+
+        // multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
+        // We should always check whether the requested pom project is collected.
+        // The integration tests for MNG-5889 are examples for this scenario.
+        boolean isRequestedProjectCollected = projects.stream()
+                .map( MavenProject::getFile )
+                .anyMatch( request.getPom()::equals );
+        if ( !isRequestedProjectCollected && !pomFile.equals( request.getPom() ) )
+        {
+            projects = new ArrayList<>();
+            files = Collections.singletonList( request.getPom().getAbsoluteFile() );
+            collectProjects( projects, files, request );
+        }
+
         return projects;
     }
 
