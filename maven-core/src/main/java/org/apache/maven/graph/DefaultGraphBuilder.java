@@ -405,31 +405,31 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        File pomFile = getMultiModuleRootPomFile( request );
-        List<File> files = Collections.singletonList( pomFile );
+        File pomFile = getMultiModuleProjectPomFile( request );
+        List<File> files = Collections.singletonList( pomFile.getAbsoluteFile() );
         collectProjects( projects, files, request );
         return projects;
     }
 
-    private File getMultiModuleRootPomFile( MavenExecutionRequest request )
+    private File getMultiModuleProjectPomFile( MavenExecutionRequest request )
     {
         if ( request.getPom().getParentFile().equals( request.getMultiModuleProjectDirectory() ) )
         {
-            return request.getPom().getAbsoluteFile();
+            return request.getPom();
         }
         else
         {
-            File multiModuleRootPom = new File( request.getMultiModuleProjectDirectory(), "pom.xml" );
-            if ( !multiModuleRootPom.exists() )
+            File multiModuleProjectPom = new File( request.getMultiModuleProjectDirectory(), "pom.xml" );
+            if ( !multiModuleProjectPom.exists() )
             {
                 logger.info( "Maven detected that the requested POM file is part of a multi module project, "
                         + "but could not find a pom.xml file in the multi module root directory: '"
-                        + request.getMultiModuleProjectDirectory() + "'. ");
+                        + request.getMultiModuleProjectDirectory() + "'. " );
                 logger.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
-                return request.getPom().getAbsoluteFile();
+                return request.getPom();
             }
 
-            return multiModuleRootPom;
+            return multiModuleProjectPom;
         }
     }
 
