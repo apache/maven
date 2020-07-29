@@ -163,6 +163,7 @@ public class DefaultGraphBuilder
                             "Could not find project in reactor matching requested POM", request.getPom() ) );
 
             List<MavenProject> childModules = requestedProject.getCollectedProjects();
+            result = new ArrayList<>();
             result.add( requestedProject );
             result.addAll( childModules );
 

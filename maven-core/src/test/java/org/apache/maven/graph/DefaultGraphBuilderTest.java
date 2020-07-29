@@ -40,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +165,18 @@ public class DefaultGraphBuilderTest
                         .expectResult( MODULE_B, MODULE_C_2 ),
                 scenario( "Duplicate projects are filtered out" )
                         .selectedProjects( MODULE_A, MODULE_A )
-                        .expectResult( MODULE_A )
+                        .expectResult( MODULE_A ),
+                scenario( "Select reactor by specific pom" )
+                        .requestedPom( MODULE_C )
+                        .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
+                scenario( "Select reactor by specific pom with also make dependencies" )
+                        .requestedPom( MODULE_C )
+                        .makeBehavior( REACTOR_MAKE_UPSTREAM )
+                        .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2 ),
+                scenario( "Select reactor by specific pom with also make dependents" )
+                        .requestedPom( MODULE_B )
+                        .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
+                        .expectResult( MODULE_B, MODULE_C_2 )
         );
     }
 
@@ -226,8 +238,8 @@ public class DefaultGraphBuilderTest
         // Set dependencies and modules
         projectModuleB.setDependencies( singletonList( toDependency( projectModuleA ) ) );
         projectModuleC2.setDependencies( singletonList( toDependency( projectModuleB ) ) );
-        projectParent.setModules( asList( INDEPENDENT_MODULE, MODULE_A, MODULE_B, MODULE_C ) );
-        projectModuleC.setModules( asList( MODULE_C_1, MODULE_C_2 ) );
+        projectParent.setCollectedProjects( asList( projectIndependentModule, projectModuleA, projectModuleB, projectModuleC, projectModuleC1, projectModuleC2 ) );
+        projectModuleC.setCollectedProjects( asList( projectModuleC1, projectModuleC2 ) );
 
         // Set up needed mocks
         when( session.getRequest() ).thenReturn( mavenExecutionRequest );
@@ -254,6 +266,7 @@ public class DefaultGraphBuilderTest
         mavenProject.setArtifactId( artifactId );
         mavenProject.setVersion( "1.0" );
         mavenProject.setPomFile( new File ( artifactId, "pom.xml" ) );
+        mavenProject.setCollectedProjects( new ArrayList<>() );
         return mavenProject;
     }
 
@@ -321,7 +334,7 @@ public class DefaultGraphBuilderTest
 
         public ScenarioBuilder requestedPom( String requestedPom )
         {
-            this.requestedPom = new File( requestedPom );
+            this.requestedPom = new File( requestedPom, "pom.xml" );
             return this;
         }
 
