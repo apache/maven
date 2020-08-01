@@ -407,6 +407,8 @@ public class DefaultGraphBuilder
             return projects;
         }
 
+        request.getProjectBuildingRequest().setBuildPom( request.getPom() );
+
         File pomFile = getMultiModuleProjectPomFile( request );
         List<File> files = Collections.singletonList( pomFile.getAbsoluteFile() );
         collectProjects( projects, files, request );

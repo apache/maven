@@ -426,7 +426,7 @@ public class DefaultProjectBuilder
         {
             noErrors =
                 build( results, new ArrayList<>(), projectIndex, interimResults, request,
-                        new HashMap<>(), config.session ) && noErrors;
+                        new HashMap<>(), config.session, false ) && noErrors;
         }
         finally
         {
@@ -639,10 +639,11 @@ public class DefaultProjectBuilder
 
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
                            Map<String, MavenProject> projectIndex, List<InterimResult> interimResults,
                            ProjectBuildingRequest request, Map<File, Boolean> profilesXmls,
-                           RepositorySystemSession session )
+                           RepositorySystemSession session, boolean isPhaseTwoBuildGuaranteed )
     {
         boolean noErrors = true;
 
@@ -651,7 +652,16 @@ public class DefaultProjectBuilder
             MavenProject project = interimResult.listener.getProject();
             try
             {
-                ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
+                ModelBuildingResult result = interimResult.result;
+
+                // We should only invoke the build on projects that the user wants to build.
+                // Other projects could be important for inter-module dependency resolution.
+                boolean shouldInvokeBuildPhaseTwo = isPhaseTwoBuildGuaranteed
+                        || request.getBuildPom().equals( project.getFile() );
+                if ( shouldInvokeBuildPhaseTwo )
+                {
+                    result = modelBuilder.build( interimResult.request, interimResult.result );
+                }
 
                 // 2nd pass of initialization: resolve and build parent if necessary
                 try
@@ -666,7 +676,8 @@ public class DefaultProjectBuilder
 
                 List<MavenProject> modules = new ArrayList<>();
                 noErrors =
-                    build( results, modules, projectIndex, interimResult.modules, request, profilesXmls, session )
+                    build( results, modules, projectIndex, interimResult.modules, request, profilesXmls, session,
+                            shouldInvokeBuildPhaseTwo )
                     && noErrors;
 
                 projects.addAll( modules );
