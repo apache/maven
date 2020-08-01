@@ -157,23 +157,19 @@ public class DefaultGraphBuilder
             return result;
         }
 
-        boolean isFirstProjectRequested = request.getPom().equals( graph.getSortedProjects().get( 0 ).getFile() );
+        MavenProject requestedProject = activeProjects.stream()
+                .filter( project -> project.getFile().equals( request.getPom() ) )
+                .findFirst()
+                .orElseThrow( () -> new MavenExecutionException(
+                        "Could not find project in reactor matching requested POM", request.getPom() ) );
 
-        if ( !isFirstProjectRequested )
-        {
-            MavenProject requestedProject = activeProjects.stream()
-                    .filter( project -> project.getFile().equals( request.getPom() ) )
-                    .findFirst()
-                    .orElseThrow( () -> new MavenExecutionException(
-                            "Could not find project in reactor matching requested POM", request.getPom() ) );
+        List<MavenProject> childModules = requestedProject.getCollectedProjects();
+        result = new ArrayList<>();
+        result.add( requestedProject );
+        result.addAll( childModules );
 
-            List<MavenProject> childModules = requestedProject.getCollectedProjects();
-            result = new ArrayList<>();
-            result.add( requestedProject );
-            result.addAll( childModules );
+        result = includeAlsoMakeTransitively( result, request, graph );
 
-            result = includeAlsoMakeTransitively( result, request, graph );
-        }
         return result;
     }
 
