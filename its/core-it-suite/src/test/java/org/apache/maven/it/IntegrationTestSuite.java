@@ -107,6 +107,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng6972AllowAccessToGraphPackageTest.class );
         suite.addTestSuite( MavenITmng5760ResumeFeatureTest.class );
         suite.addTestSuite( MavenITmng6656BuildConsumer.class );
         suite.addTestSuite( MavenITmng6562WarnDefaultBindings.class );
