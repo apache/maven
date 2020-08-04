@@ -64,7 +64,8 @@ public class MavenITmng5175WagonHttpTest
             {
                 try
                 {
-                    Thread.sleep( 15 );
+                    // wait long enough for read timeout to happen in client
+                    Thread.sleep( 100 );
                 }
                 catch ( InterruptedException e )
                 {
