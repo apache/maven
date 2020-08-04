@@ -174,6 +174,9 @@ public class DefaultGraphBuilder
         result.add( requestedProject );
         result.addAll( childModules );
 
+        List<MavenProject> sortedProjects = graph.getSortedProjects();
+        result.sort( comparing( sortedProjects::indexOf ) );
+
         result = includeAlsoMakeTransitively( result, request, graph );
 
         return result;
