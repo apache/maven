@@ -29,7 +29,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,6 +52,8 @@ import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.model.building.UrlModelSource;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -59,6 +63,8 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 import static java.util.Comparator.comparing;
 
@@ -411,7 +417,51 @@ public class DefaultGraphBuilder
 
         File pomFile = getMultiModuleProjectPomFile( request );
         List<File> files = Collections.singletonList( pomFile.getAbsoluteFile() );
-        collectProjects( projects, files, request );
+        boolean shouldRetryWithOnlyProjectsInBuild = false;
+        try
+        {
+            collectProjects( projects, files, request );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            Optional<MavenProject> buildProjectRoot = e.getResults().stream()
+                    .map( ProjectBuildingResult::getProject )
+                    .filter( project -> request.getPom().equals( project.getFile() ) )
+                    .findFirst();
+
+            if ( buildProjectRoot.isPresent() )
+            {
+                List<MavenProject> projectsToBeBuilt = new ArrayList<>( buildProjectRoot.get().getCollectedProjects() );
+                projectsToBeBuilt.add( buildProjectRoot.get() );
+
+                Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
+                        pr -> !projectsToBeBuilt.contains( pr.getProject() );
+
+                Predicate<Exception> pluginArtifactNotFoundException =
+                        exc -> exc instanceof PluginManagerException
+                        && exc.getCause() instanceof PluginResolutionException
+                        && exc.getCause().getCause() instanceof ArtifactResolutionException
+                        && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
+
+                Predicate<Plugin> isPluginPartOfBuild = plugin -> projectsToBeBuilt.stream()
+                        .anyMatch( project -> project.getGroupId().equals( plugin.getGroupId() )
+                                && project.getArtifactId().equals( plugin.getArtifactId() )
+                                && project.getVersion().equals( plugin.getVersion() ) );
+
+                shouldRetryWithOnlyProjectsInBuild = e.getResults().stream()
+                        .filter( projectsOutsideOfBuild )
+                        .flatMap( projectBuildingResult -> projectBuildingResult.getProblems().stream() )
+                        .map( ModelProblem::getException )
+                        .filter( pluginArtifactNotFoundException )
+                        .map( exc -> ( ( PluginResolutionException ) exc.getCause() ).getPlugin() )
+                        .anyMatch( isPluginPartOfBuild );
+
+                if ( !shouldRetryWithOnlyProjectsInBuild )
+                {
+                    throw e;
+                }
+            }
+        }
 
         // multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
         // We should always check whether the requested pom project is collected.
@@ -419,7 +469,11 @@ public class DefaultGraphBuilder
         boolean isRequestedProjectCollected = projects.stream()
                 .map( MavenProject::getFile )
                 .anyMatch( request.getPom()::equals );
-        if ( !isRequestedProjectCollected && !pomFile.equals( request.getPom() ) )
+
+        shouldRetryWithOnlyProjectsInBuild = shouldRetryWithOnlyProjectsInBuild
+                || ( !isRequestedProjectCollected && !pomFile.equals( request.getPom() ) );
+
+        if ( shouldRetryWithOnlyProjectsInBuild )
         {
             projects = new ArrayList<>();
             files = Collections.singletonList( request.getPom().getAbsoluteFile() );
