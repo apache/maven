@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -85,15 +84,6 @@ public interface ProjectBuildingRequest
     void setProject( MavenProject mavenProject );
 
     MavenProject getProject();
-
-    /**
-     * Set the pom where the build should be invoked on.
-     * This could be a submodule pom within a multi-module project.
-     * @param buildPom The pom describing the project that the build should be invoked on.
-     */
-    void setBuildPom( File buildPom );
-
-    File getBuildPom();
 
     ProjectBuildingRequest setProcessPlugins( boolean processPlugins );
 

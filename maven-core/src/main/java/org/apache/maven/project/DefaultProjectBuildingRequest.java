@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,8 +47,6 @@ public class DefaultProjectBuildingRequest
     private List<ArtifactRepository> pluginArtifactRepositories;
 
     private MavenProject project;
-
-    private File buildPom;
 
     private int validationLevel = ModelBuildingRequest.VALIDATION_LEVEL_STRICT;
 
@@ -115,18 +112,6 @@ public class DefaultProjectBuildingRequest
     public void setProject( MavenProject mavenProject )
     {
         this.project = mavenProject;
-    }
-
-    @Override
-    public void setBuildPom( File buildPom )
-    {
-        this.buildPom = buildPom;
-    }
-
-    @Override
-    public File getBuildPom()
-    {
-        return buildPom;
     }
 
     public ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository )

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -138,7 +137,7 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
-        activeProjects = selectProjectsFromRequest( activeProjects, projectDependencyGraph, session.getRequest() );
+        activeProjects = selectProjectsFromBuildRoot( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
@@ -151,33 +150,29 @@ public class DefaultGraphBuilder
         return Result.success( projectDependencyGraph );
     }
 
-    private List<MavenProject> selectProjectsFromRequest( List<MavenProject> activeProjects,
-                                                          ProjectDependencyGraph graph,
-                                                          MavenExecutionRequest request )
+    private List<MavenProject> selectProjectsFromBuildRoot( List<MavenProject> activeProjects,
+                                                            ProjectDependencyGraph graph,
+                                                            MavenExecutionRequest request )
             throws MavenExecutionException
     {
         List<MavenProject> result = activeProjects;
 
-        if ( request.getPom() == null )
+        if ( request.getPom() != null )
         {
-            return result;
+            MavenProject buildProjectRoot = activeProjects.stream()
+                    .filter( project -> project.getFile().equals( request.getPom() ) )
+                    .findFirst()
+                    .orElseThrow( () -> new MavenExecutionException(
+                            "Could not find project in reactor matching build POM", request.getPom() ) );
+
+            result = new ArrayList<>( buildProjectRoot.getCollectedProjects() );
+            result.add( buildProjectRoot );
+
+            List<MavenProject> sortedProjects = graph.getSortedProjects();
+            result.sort( comparing( sortedProjects::indexOf ) );
+
+            result = includeAlsoMakeTransitively( result, request, graph );
         }
-
-        MavenProject requestedProject = activeProjects.stream()
-                .filter( project -> project.getFile().equals( request.getPom() ) )
-                .findFirst()
-                .orElseThrow( () -> new MavenExecutionException(
-                        "Could not find project in reactor matching requested POM", request.getPom() ) );
-
-        List<MavenProject> childModules = requestedProject.getCollectedProjects();
-        result = new ArrayList<>();
-        result.add( requestedProject );
-        result.addAll( childModules );
-
-        List<MavenProject> sortedProjects = graph.getSortedProjects();
-        result.sort( comparing( sortedProjects::indexOf ) );
-
-        result = includeAlsoMakeTransitively( result, request, graph );
 
         return result;
     }
@@ -416,10 +411,9 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        request.getProjectBuildingRequest().setBuildPom( request.getPom() );
-
-        File pomFile = getMultiModuleProjectPomFile( request );
-        List<File> files = Collections.singletonList( pomFile.getAbsoluteFile() );
+        // Attempt to collect all projects in the multi-module project for resolving inter-module dependencies.
+        File moduleProjectPomFile = getMultiModuleProjectPomFile( request );
+        List<File> files = Collections.singletonList( moduleProjectPomFile.getAbsoluteFile() );
         boolean shouldRetryWithOnlyProjectsInBuild = false;
         try
         {
@@ -427,42 +421,11 @@ public class DefaultGraphBuilder
         }
         catch ( ProjectBuildingException e )
         {
-            Optional<MavenProject> buildProjectRoot = e.getResults().stream()
-                    .map( ProjectBuildingResult::getProject )
-                    .filter( project -> request.getPom().equals( project.getFile() ) )
-                    .findFirst();
+            shouldRetryWithOnlyProjectsInBuild = isModuleOutsideBuildDependingOnPluginModule( request, e );
 
-            if ( buildProjectRoot.isPresent() )
+            if ( !shouldRetryWithOnlyProjectsInBuild )
             {
-                List<MavenProject> projectsToBeBuilt = new ArrayList<>( buildProjectRoot.get().getCollectedProjects() );
-                projectsToBeBuilt.add( buildProjectRoot.get() );
-
-                Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
-                        pr -> !projectsToBeBuilt.contains( pr.getProject() );
-
-                Predicate<Exception> pluginArtifactNotFoundException =
-                        exc -> exc instanceof PluginManagerException
-                        && exc.getCause() instanceof PluginResolutionException
-                        && exc.getCause().getCause() instanceof ArtifactResolutionException
-                        && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
-
-                Predicate<Plugin> isPluginPartOfBuild = plugin -> projectsToBeBuilt.stream()
-                        .anyMatch( project -> project.getGroupId().equals( plugin.getGroupId() )
-                                && project.getArtifactId().equals( plugin.getArtifactId() )
-                                && project.getVersion().equals( plugin.getVersion() ) );
-
-                shouldRetryWithOnlyProjectsInBuild = e.getResults().stream()
-                        .filter( projectsOutsideOfBuild )
-                        .flatMap( projectBuildingResult -> projectBuildingResult.getProblems().stream() )
-                        .map( ModelProblem::getException )
-                        .filter( pluginArtifactNotFoundException )
-                        .map( exc -> ( ( PluginResolutionException ) exc.getCause() ).getPlugin() )
-                        .anyMatch( isPluginPartOfBuild );
-
-                if ( !shouldRetryWithOnlyProjectsInBuild )
-                {
-                    throw e;
-                }
+                throw e;
             }
         }
 
@@ -474,7 +437,7 @@ public class DefaultGraphBuilder
                 .anyMatch( request.getPom()::equals );
 
         shouldRetryWithOnlyProjectsInBuild = shouldRetryWithOnlyProjectsInBuild
-                || ( !isRequestedProjectCollected && !pomFile.equals( request.getPom() ) );
+                || ( !isRequestedProjectCollected && !moduleProjectPomFile.equals( request.getPom() ) );
 
         if ( shouldRetryWithOnlyProjectsInBuild )
         {
@@ -484,6 +447,54 @@ public class DefaultGraphBuilder
         }
 
         return projects;
+    }
+
+    /**
+     * This method finds out whether collecting projects failed because of the following scenario:
+     * - A multi module project containing a module which is a plugin and another module which depends on it.
+     * - Just the plugin is being built with the -f <pom> flag.
+     * - Because of inter-module dependency collection, all projects in the multi-module project are collected.
+     * - The plugin is not yet installed in a repository.
+     *
+     * The integration test for <a href="https://issues.apache.org/jira/browse/MNG-5572">MNG-5572</a> is an
+     *   example of this scenario.
+     *
+     * @return True if the module which fails to collect the inter-module plugin is not part of the build.
+     */
+    private boolean isModuleOutsideBuildDependingOnPluginModule( MavenExecutionRequest request,
+                                                                 ProjectBuildingException exception )
+    {
+        return exception.getResults().stream()
+                .map( ProjectBuildingResult::getProject )
+                .filter( project -> request.getPom().equals( project.getFile() ) )
+                .findFirst()
+                .map( buildProjectRoot ->
+                {
+                    List<MavenProject> projectsToBeBuilt = new ArrayList<>( buildProjectRoot.getCollectedProjects() );
+                    projectsToBeBuilt.add( buildProjectRoot );
+
+                    Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
+                            pr -> !projectsToBeBuilt.contains( pr.getProject() );
+
+                    Predicate<Exception> pluginArtifactNotFoundException =
+                            exc -> exc instanceof PluginManagerException
+                            && exc.getCause() instanceof PluginResolutionException
+                            && exc.getCause().getCause() instanceof ArtifactResolutionException
+                            && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
+
+                    Predicate<Plugin> isPluginPartOfBuild = plugin -> projectsToBeBuilt.stream()
+                            .anyMatch( project -> project.getGroupId().equals( plugin.getGroupId() )
+                                    && project.getArtifactId().equals( plugin.getArtifactId() )
+                                    && project.getVersion().equals( plugin.getVersion() ) );
+
+                    return exception.getResults().stream()
+                            .filter( projectsOutsideOfBuild )
+                            .flatMap( projectBuildingResult -> projectBuildingResult.getProblems().stream() )
+                            .map( ModelProblem::getException )
+                            .filter( pluginArtifactNotFoundException )
+                            .map( exc -> ( ( PluginResolutionException ) exc.getCause() ).getPlugin() )
+                            .anyMatch( isPluginPartOfBuild );
+                } ).orElse( false );
     }
 
     private File getMultiModuleProjectPomFile( MavenExecutionRequest request )
