@@ -721,7 +721,7 @@ public class DefaultModelBuilder
             try
             {
                 Model transformedFileModel =
-                    modelProcessor.read( modelSource.getInputStream(),
+                    modelProcessor.read( pomFile,
                                Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
 
                 // fileModel with locationTrackers, required for proper feedback during validations
