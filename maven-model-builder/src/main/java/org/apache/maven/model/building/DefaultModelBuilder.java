@@ -1123,11 +1123,6 @@ public class DefaultModelBuilder
             groupId = candidateModel.getParent().getGroupId();
         }
         String artifactId = candidateModel.getArtifactId();
-        String version = candidateModel.getVersion();
-        if ( version == null && candidateModel.getParent() != null )
-        {
-            version = candidateModel.getParent().getVersion();
-        }
 
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
             || !artifactId.equals( parent.getArtifactId() ) )
@@ -1146,6 +1141,12 @@ public class DefaultModelBuilder
             problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
                 .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ) );
             return null;
+        }
+
+        String version = candidateModel.getVersion();
+        if ( version == null && candidateModel.getParent() != null )
+        {
+            version = candidateModel.getParent().getVersion();
         }
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
         {
