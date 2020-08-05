@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -95,7 +96,7 @@ public class DefaultGraphBuilder
             if ( result == null )
             {
                 final List<MavenProject> projects = getProjectsForMavenReactor( session );
-                validateProjects( projects );
+                validateProjects( projects, session.getRequest() );
                 enrichRequestFromResumptionData( projects, session.getRequest() );
                 result = reactorDependencyGraph( session, projects );
             }
@@ -159,14 +160,7 @@ public class DefaultGraphBuilder
 
         if ( request.getPom() != null )
         {
-            MavenProject buildProjectRoot = activeProjects.stream()
-                    .filter( project -> project.getFile().equals( request.getPom() ) )
-                    .findFirst()
-                    .orElseThrow( () -> new MavenExecutionException(
-                            "Could not find project in reactor matching build POM", request.getPom() ) );
-
-            result = new ArrayList<>( buildProjectRoot.getCollectedProjects() );
-            result.add( buildProjectRoot );
+            result = getProjectsInBuildScope( request, activeProjects );
 
             List<MavenProject> sortedProjects = graph.getSortedProjects();
             result.sort( comparing( sortedProjects::indexOf ) );
@@ -319,6 +313,28 @@ public class DefaultGraphBuilder
         }
     }
 
+    private List<MavenProject> getProjectsInBuildScope( MavenExecutionRequest request, List<MavenProject> projects )
+            throws MavenExecutionException
+    {
+        if ( request.getPom() == null )
+        {
+            return projects;
+        }
+
+        MavenProject buildProjectRoot = projects.stream()
+                .filter( project -> request.getPom().equals( project.getFile() ) )
+                .findFirst()
+                .orElseThrow( () -> new MavenExecutionException(
+                        "Could not find project in reactor matching build POM", request.getPom() ) );
+
+        List<MavenProject> modules = buildProjectRoot.getCollectedProjects() != null
+                ? buildProjectRoot.getCollectedProjects() : Collections.emptyList();
+
+        List<MavenProject> result = new ArrayList<>( modules );
+        result.add( buildProjectRoot );
+        return result;
+    }
+
     private String formatProjects( List<MavenProject> projects )
     {
         StringBuilder projectNames = new StringBuilder();
@@ -464,13 +480,21 @@ public class DefaultGraphBuilder
     private boolean isModuleOutsideBuildDependingOnPluginModule( MavenExecutionRequest request,
                                                                  ProjectBuildingException exception )
     {
+        if ( request.getPom() == null )
+        {
+            return false;
+        }
+
         return exception.getResults().stream()
                 .map( ProjectBuildingResult::getProject )
+                .filter( Objects::nonNull )
                 .filter( project -> request.getPom().equals( project.getFile() ) )
                 .findFirst()
                 .map( buildProjectRoot ->
                 {
-                    List<MavenProject> projectsToBeBuilt = new ArrayList<>( buildProjectRoot.getCollectedProjects() );
+                    List<MavenProject> modules = buildProjectRoot.getCollectedProjects() != null
+                            ? buildProjectRoot.getCollectedProjects() : Collections.emptyList();
+                    List<MavenProject> projectsToBeBuilt = new ArrayList<>( modules );
                     projectsToBeBuilt.add( buildProjectRoot );
 
                     Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
@@ -561,11 +585,13 @@ public class DefaultGraphBuilder
         }
     }
 
-    private void validateProjects( List<MavenProject> projects )
+    private void validateProjects( List<MavenProject> projects, MavenExecutionRequest request )
+            throws MavenExecutionException
     {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        for ( MavenProject p : projects )
+        List<MavenProject> projectsInBuildScope = getProjectsInBuildScope( request, projects );
+        for ( MavenProject p : projectsInBuildScope )
         {
             String projectKey = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
 
