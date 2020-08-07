@@ -40,14 +40,14 @@ the [Maven User List][users-list].
 
 Where can I get the latest release?
 -----------------------------------
-You can download release source from our [download page][maven-download].
+You can download the release source from our [download page][maven-download].
 
 Contributing
 ------------
 
 If you are interested in the development of Maven, please consult the 
-documentation first and afterwards you are welcome to join the developers 
-mailing list to ask question or discuss new ideas / features / bugs etc.
+documentation first and afterward you are welcome to join the developers 
+mailing list to ask questions or discuss new ideas/features/bugs etc.
 
 Take a look into the [contribution guidelines](CONTRIBUTING.md).
 
@@ -59,7 +59,7 @@ See the `NOTICE` file for required notices and attributions.
 
 Donations
 ---------
-You like Apache Maven? Then [donate back to the ASF](https://www.apache.org/foundation/contributing.html) to support the development.
+Do you like Apache Maven? Then [donate back to the ASF](https://www.apache.org/foundation/contributing.html) to support the development.
 
 Quick Build
 -------
