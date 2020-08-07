@@ -6,7 +6,7 @@
 
   Maven is a software project management and comprehension tool. Based on
   the concept of a Project Object Model (POM), Maven can manage a project's
-  build, reporting and documentation from a central piece of information.
+  build, reporting, and documentation from a central piece of information.
 
   Documentation
   -------------
@@ -27,13 +27,11 @@
   Memory:
     No minimum requirement.
   Disk:
-    Approximately 10MB is required for the Maven installation itself. In addition to
-    that, additional disk space will be used for your local Maven repository. The size
-    of your local repository will vary depending on usage but expect at least 500MB.
+    Approximately 10MB is required for the Maven installation itself. In addition to that, additional disk space will be used for your local Maven repository. The size of your local repository will vary depending on usage but expect at least 500MB.
   Operating System:
     Windows:
       Windows 2000 or above.
-    Unix based systems (Linux, Solaris and Mac OS X) and others:
+    Unix based systems (Linux, Solaris, and Mac OS X) and others:
       No minimum requirement.
 
   Installing Maven
@@ -41,7 +39,7 @@
 
   1) Unpack the archive where you would like to store the binaries, e.g.:
 
-    Unix-based operating systems (Linux, Solaris and Mac OS X)
+    Unix-based operating systems (Linux, Solaris, and Mac OS X)
       tar zxvf apache-maven-3.x.y.tar.gz
     Windows
       unzip apache-maven-3.x.y.zip
@@ -66,7 +64,7 @@
 
   Please see the file called LICENSE.
 
-  Maven URLS
+  Maven URLs
   ----------
 
   Home Page:          https://maven.apache.org/
