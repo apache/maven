@@ -1,18 +1,14 @@
 <!---
- Licensed to the Apache Software Foundation (ASF) under one or more
- contributor license agreements.  See the NOTICE file distributed with
- this work for additional information regarding copyright ownership.
+ Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file distributed with this work for additional information regarding copyright ownership.
  The ASF licenses this file to You under the Apache License, Version 2.0
- (the "License"); you may not use this file except in compliance with
- the License.  You may obtain a copy of the License at
+ (the "License"); you may not use this file except in compliance with the License.  You may obtain a copy of the License at
 
       http://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ See the License for the specific language governing permissions and limitations under the License.
 -->
 Apache Maven
 ============
@@ -26,7 +22,7 @@ Apache Maven
 
 Apache Maven is a software project management and comprehension tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
-build, reporting and documentation from a central piece of information.
+build, reporting, and documentation from a central piece of information.
 
 If you think you have found a bug, please file an issue in the [Maven Issue Tracker][jira]].
 
@@ -40,14 +36,14 @@ the [Maven User List][users-list].
 
 Where can I get the latest release?
 -----------------------------------
-You can download release source from our [download page][maven-download].
+You can download the release source from our [download page][maven-download].
 
 Contributing
 ------------
 
 If you are interested in the development of Maven, please consult the 
-documentation first and afterwards you are welcome to join the developers 
-mailing list to ask question or discuss new ideas / features / bugs etc.
+documentation first and afterward you are welcome to join the developers 
+mailing list to ask questions or discuss new ideas/features/bugs etc.
 
 Take a look into the [contribution guidelines](CONTRIBUTING.md).
 
@@ -59,7 +55,7 @@ See the `NOTICE` file for required notices and attributions.
 
 Donations
 ---------
-You like Apache Maven? Then [donate back to the ASF](https://www.apache.org/foundation/contributing.html) to support the development.
+Do you like Apache Maven? Then [donate back to the ASF](https://www.apache.org/foundation/contributing.html) to support the development.
 
 Quick Build
 -------
