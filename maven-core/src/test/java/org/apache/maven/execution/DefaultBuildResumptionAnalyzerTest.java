@@ -55,7 +55,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getResumeFrom(), is( "test:B" ) );
+        assertThat( result.get().getResumeFrom(), is( Optional.of ( "test:B" ) ) );
     }
 
     @Test
@@ -111,7 +111,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getResumeFrom(), is( "test:B" ) );
+        assertThat( result.get().getResumeFrom(), is( Optional.of ( "test:B" ) ) );
         assertThat( result.get().getProjectsToSkip(), contains( "test:C" ) );
         assertThat( result.get().getProjectsToSkip(), not( contains( "test:D" ) ) );
     }

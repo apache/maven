@@ -295,6 +295,21 @@ public class ComparableVersionTest
         checkVersionsArrayEqual( arr );
     }
 
+    /**
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-6964">MNG-6964</a> edge cases
+     * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
+     */
+    public void testMng6964()
+    {
+        String a = "1-0.alpha";
+        String b = "1-0.beta";
+        String c = "1";
+
+        checkVersionsOrder( a, c ); // Now a < c, but before MNG-6964 they were equal
+        checkVersionsOrder( b, c ); // Now b < c, but before MNG-6964 they were equal
+        checkVersionsOrder( a, b ); // Should still be true
+    }
+
     public void testLocaleIndependent()
     {
         Locale orig = Locale.getDefault();

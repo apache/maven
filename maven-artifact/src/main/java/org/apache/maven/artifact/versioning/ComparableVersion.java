@@ -530,8 +530,16 @@ public class ComparableVersion
                 {
                     return 0; // 1-0 = 1- (normalize) = 1
                 }
-                Item first = get( 0 );
-                return first.compareTo( null );
+                // Compare the entire list of items with null - not just the first one, MNG-6964
+                for ( Item i : this )
+                {
+                    int result = i.compareTo( null );
+                    if ( result != 0 )
+                    {
+                        return result;
+                    }
+                }
+                return 0;
             }
             switch ( item.getType() )
             {
@@ -580,6 +588,32 @@ public class ComparableVersion
                 }
                 buffer.append( item );
             }
+            return buffer.toString();
+        }
+
+        /**
+         * Return the contents in the same format that is used when you call toString() on a List.
+         */
+        private String toListString()
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append( "[" );
+            for ( Item item : this )
+            {
+                if ( buffer.length() > 1 )
+                {
+                    buffer.append( ", " );
+                }
+                if ( item instanceof ListItem )
+                {
+                    buffer.append( ( (ListItem ) item ).toListString() );
+                }
+                else
+                {
+                    buffer.append( item );
+                }
+            }
+            buffer.append( "]" );
             return buffer.toString();
         }
     }
@@ -768,7 +802,8 @@ public class ComparableVersion
     // CHECKSTYLE_ON: LineLength
     public static void main( String... args )
     {
-        System.out.println( "Display parameters as parsed by Maven (in canonical form) and comparison result:" );
+        System.out.println( "Display parameters as parsed by Maven (in canonical form and as a list of tokens) and"
+                                + " comparison result:" );
         if ( args.length == 0 )
         {
             return;
@@ -787,7 +822,7 @@ public class ComparableVersion
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }
 
-            System.out.println( ( i++ ) + ". " + version + " == " + c.getCanonical() );
+            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical() + "   " + c.items.toListString() );
 
             prev = c;
         }
