@@ -52,12 +52,12 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
                 artifactsPublisher(disabled: false),
                 junitPublisher(ignoreAttachments: false),
-                findbugsPublisher(disabled: false),
-                openTasksPublisher(disabled: false),
-                dependenciesFingerprintPublisher(),
-                invokerPublisher(),
-                pipelineGraphPublisher()
-            ]) {
+                findbugsPublisher(disabled: true),
+                openTasksPublisher(disabled: true),
+                dependenciesFingerprintPublisher(disabled: false),
+                invokerPublisher(disabled: true),
+                pipelineGraphPublisher(disabled: false)
+            ], publisherStrategy: 'EXPLICIT') {
 			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
 			    sh "mvn clean"
                 sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
