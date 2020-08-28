@@ -177,11 +177,13 @@ under the License.
                 Snapshot snapshot = versioning.getSnapshot();
                 if ( snapshot != null )
                 {
+                    boolean updateSnapshotVersions = false;
                     if ( s == null )
                     {
                         s = new Snapshot();
                         v.setSnapshot( s );
                         changed = true;
+                        updateSnapshotVersions = true;
                     }
 
                     // overwrite
@@ -190,16 +192,23 @@ under the License.
                     {
                         s.setTimestamp( snapshot.getTimestamp() );
                         changed = true;
+                        updateSnapshotVersions = true;
                     }
                     if ( s.getBuildNumber() != snapshot.getBuildNumber() )
                     {
                         s.setBuildNumber( snapshot.getBuildNumber() );
                         changed = true;
+                        updateSnapshotVersions = true;
                     }
                     if ( s.isLocalCopy() != snapshot.isLocalCopy() )
                     {
                         s.setLocalCopy( snapshot.isLocalCopy() );
                         changed = true;
+                    }
+                    if (updateSnapshotVersions)
+                    {
+                      v.setSnapshotVersions( new java.util.ArrayList<SnapshotVersion>( versioning.getSnapshotVersions() ) );
+                      changed = true;
                     }
                 }
             }
