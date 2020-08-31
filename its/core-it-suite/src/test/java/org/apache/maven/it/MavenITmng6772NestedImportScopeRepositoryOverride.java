@@ -39,7 +39,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
 
     public MavenITmng6772NestedImportScopeRepositoryOverride()
     {
-        super( "[3.7.0,)" );
+        super( "(,3.7.0),[3.7.0,)" );
     }
 
     // This will test the behavior using ProjectModelResolver
