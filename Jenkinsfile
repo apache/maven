@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.6.2'
+def buildMvn = '3.6.3'
 def runITsOses = ['linux', 'windows']
-def runITsJdks = ['8', '11', '14', '15']
-def runITsMvn = '3.6.2'
+def runITsJdks = ['8', '11']
+def runITsMvn = '3.6.3'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -52,12 +52,12 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
                 artifactsPublisher(disabled: false),
                 junitPublisher(ignoreAttachments: false),
-                findbugsPublisher(disabled: false),
-                openTasksPublisher(disabled: false),
-                dependenciesFingerprintPublisher(),
-                invokerPublisher(),
-                pipelineGraphPublisher()
-            ]) {
+                findbugsPublisher(disabled: true),
+                openTasksPublisher(disabled: true),
+                dependenciesFingerprintPublisher(disabled: false),
+                invokerPublisher(disabled: true),
+                pipelineGraphPublisher(disabled: false)
+            ], publisherStrategy: 'EXPLICIT') {
 			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
 			    sh "mvn clean"
                 sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
