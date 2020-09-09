@@ -67,7 +67,15 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         {
             List<MavenProject> projects = new ArrayList<>();
             projectCollector.collectProjects( projects, files, request );
-            return projects;
+            boolean isRequestedProjectCollected = isRequestedProjectCollected( request, projects );
+            if ( isRequestedProjectCollected )
+            {
+                return projects;
+            }
+            else
+            {
+                return Collections.emptyList();
+            }
         }
         catch ( ProjectBuildingException e )
         {
@@ -102,6 +110,20 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 
             return multiModuleProjectPom;
         }
+    }
+
+    /**
+     * multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
+     * We should always check whether the requested pom project is collected.
+     * The integration tests for MNG-5889 are examples for this scenario.
+     *
+     * @return true if the collected projects contain the requested project (for example with -f)
+     */
+    private boolean isRequestedProjectCollected( MavenExecutionRequest request, List<MavenProject> projects )
+    {
+        return projects.stream()
+                .map( MavenProject::getFile )
+                .anyMatch( request.getPom()::equals );
     }
 
     /**

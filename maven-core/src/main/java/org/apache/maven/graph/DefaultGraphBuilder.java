@@ -405,28 +405,20 @@ public class DefaultGraphBuilder
     private List<MavenProject> getProjectsForMavenReactor( MavenSession session )
         throws ProjectBuildingException
     {
+        MavenExecutionRequest request = session.getRequest();
+        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
+
         List<ProjectCollectionStrategy> projectCollectionStrategies = Arrays.asList(
                 projectlessCollectionStrategy, // 1. Collect project for invocation without a POM.
                 multiModuleCollectionStrategy, // 2. Collect projects for all modules in the multi-module project.
                 requestPomCollectionStrategy   // 3. Collect projects for explicitly requested POM.
         );
 
-        MavenExecutionRequest request = session.getRequest();
-
-        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
-
         for ( ProjectCollectionStrategy strategy : projectCollectionStrategies )
         {
             List<MavenProject> projects = strategy.collectProjects( request );
 
-            // multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
-            // We should always check whether the requested pom project is collected.
-            // The integration tests for MNG-5889 are examples for this scenario.
-            boolean isRequestedProjectCollected = projects.stream()
-                    .map( MavenProject::getFile )
-                    .anyMatch( request.getPom()::equals ); // TODO [martinkanters] request.getPom() can be null
-
-            if ( request.getPom() != null && isRequestedProjectCollected )
+            if ( !projects.isEmpty() )
             {
                 return projects;
             }
