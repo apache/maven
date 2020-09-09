@@ -20,6 +20,7 @@ package org.apache.maven.graph;
  */
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,15 +30,12 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -47,24 +45,13 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
-import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblemUtils;
-import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.Result;
-import org.apache.maven.model.building.UrlModelSource;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 import static java.util.Comparator.comparing;
 
@@ -76,15 +63,25 @@ import static java.util.Comparator.comparing;
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
+    private final Logger logger;
+    private final BuildResumptionDataRepository buildResumptionDataRepository;
+    private final ProjectlessCollectionStrategy projectlessCollectionStrategy;
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
+    private final RequestPomCollectionStrategy requestPomCollectionStrategy;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    protected ProjectBuilder projectBuilder;
-
-    @Inject
-    private BuildResumptionDataRepository buildResumptionDataRepository;
+    public DefaultGraphBuilder( Logger logger,
+                                BuildResumptionDataRepository buildResumptionDataRepository,
+                                ProjectlessCollectionStrategy projectlessCollectionStrategy,
+                                MultiModuleCollectionStrategy multiModuleCollectionStrategy,
+                                RequestPomCollectionStrategy requestPomCollectionStrategy )
+    {
+        this.logger = logger;
+        this.buildResumptionDataRepository = buildResumptionDataRepository;
+        this.projectlessCollectionStrategy = projectlessCollectionStrategy;
+        this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
+        this.requestPomCollectionStrategy = requestPomCollectionStrategy;
+    }
 
     @Override
     public Result<ProjectDependencyGraph> build( MavenSession session )
@@ -408,181 +405,34 @@ public class DefaultGraphBuilder
     private List<MavenProject> getProjectsForMavenReactor( MavenSession session )
         throws ProjectBuildingException
     {
+        List<ProjectCollectionStrategy> projectCollectionStrategies = Arrays.asList(
+                projectlessCollectionStrategy, // 1. Collect project for invocation without a POM.
+                multiModuleCollectionStrategy, // 2. Collect projects for all modules in the multi-module project.
+                requestPomCollectionStrategy   // 3. Collect projects for explicitly requested POM.
+        );
+
         MavenExecutionRequest request = session.getRequest();
 
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        List<MavenProject> projects = new ArrayList<>();
-
-        // We have no POM file.
-        //
-        if ( request.getPom() == null )
+        for ( ProjectCollectionStrategy strategy : projectCollectionStrategies )
         {
-            ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-            MavenProject project = projectBuilder.build( modelSource, request.getProjectBuildingRequest() )
-                .getProject();
-            project.setExecutionRoot( true );
-            request.setProjectPresent( false );
-            projects.add( project );
-            return projects;
-        }
+            List<MavenProject> projects = strategy.collectProjects( request );
 
-        // Attempt to collect all projects in the multi-module project for resolving inter-module dependencies.
-        File moduleProjectPomFile = getMultiModuleProjectPomFile( request );
-        List<File> files = Collections.singletonList( moduleProjectPomFile.getAbsoluteFile() );
-        boolean shouldRetryWithOnlyProjectsInBuild = false;
-        try
-        {
-            collectProjects( projects, files, request );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            shouldRetryWithOnlyProjectsInBuild = isModuleOutsideBuildDependingOnPluginModule( request, e );
+            // multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
+            // We should always check whether the requested pom project is collected.
+            // The integration tests for MNG-5889 are examples for this scenario.
+            boolean isRequestedProjectCollected = projects.stream()
+                    .map( MavenProject::getFile )
+                    .anyMatch( request.getPom()::equals ); // TODO [martinkanters] request.getPom() can be null
 
-            if ( !shouldRetryWithOnlyProjectsInBuild )
+            if ( request.getPom() != null && isRequestedProjectCollected )
             {
-                throw e;
+                return projects;
             }
         }
 
-        // multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
-        // We should always check whether the requested pom project is collected.
-        // The integration tests for MNG-5889 are examples for this scenario.
-        boolean isRequestedProjectCollected = projects.stream()
-                .map( MavenProject::getFile )
-                .anyMatch( request.getPom()::equals );
-
-        shouldRetryWithOnlyProjectsInBuild = shouldRetryWithOnlyProjectsInBuild
-                || ( !isRequestedProjectCollected && !moduleProjectPomFile.equals( request.getPom() ) );
-
-        if ( shouldRetryWithOnlyProjectsInBuild )
-        {
-            projects = new ArrayList<>();
-            files = Collections.singletonList( request.getPom().getAbsoluteFile() );
-            collectProjects( projects, files, request );
-        }
-
-        return projects;
-    }
-
-    /**
-     * This method finds out whether collecting projects failed because of the following scenario:
-     * - A multi module project containing a module which is a plugin and another module which depends on it.
-     * - Just the plugin is being built with the -f <pom> flag.
-     * - Because of inter-module dependency collection, all projects in the multi-module project are collected.
-     * - The plugin is not yet installed in a repository.
-     *
-     * The integration test for <a href="https://issues.apache.org/jira/browse/MNG-5572">MNG-5572</a> is an
-     *   example of this scenario.
-     *
-     * @return True if the module which fails to collect the inter-module plugin is not part of the build.
-     */
-    private boolean isModuleOutsideBuildDependingOnPluginModule( MavenExecutionRequest request,
-                                                                 ProjectBuildingException exception )
-    {
-        if ( request.getPom() == null )
-        {
-            return false;
-        }
-
-        return exception.getResults().stream()
-                .map( ProjectBuildingResult::getProject )
-                .filter( Objects::nonNull )
-                .filter( project -> request.getPom().equals( project.getFile() ) )
-                .findFirst()
-                .map( buildProjectRoot ->
-                {
-                    List<MavenProject> modules = buildProjectRoot.getCollectedProjects() != null
-                            ? buildProjectRoot.getCollectedProjects() : Collections.emptyList();
-                    List<MavenProject> projectsToBeBuilt = new ArrayList<>( modules );
-                    projectsToBeBuilt.add( buildProjectRoot );
-
-                    Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
-                            pr -> !projectsToBeBuilt.contains( pr.getProject() );
-
-                    Predicate<Exception> pluginArtifactNotFoundException =
-                            exc -> exc instanceof PluginManagerException
-                            && exc.getCause() instanceof PluginResolutionException
-                            && exc.getCause().getCause() instanceof ArtifactResolutionException
-                            && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
-
-                    Predicate<Plugin> isPluginPartOfBuild = plugin -> projectsToBeBuilt.stream()
-                            .anyMatch( project -> project.getGroupId().equals( plugin.getGroupId() )
-                                    && project.getArtifactId().equals( plugin.getArtifactId() )
-                                    && project.getVersion().equals( plugin.getVersion() ) );
-
-                    return exception.getResults().stream()
-                            .filter( projectsOutsideOfBuild )
-                            .flatMap( projectBuildingResult -> projectBuildingResult.getProblems().stream() )
-                            .map( ModelProblem::getException )
-                            .filter( pluginArtifactNotFoundException )
-                            .map( exc -> ( ( PluginResolutionException ) exc.getCause() ).getPlugin() )
-                            .anyMatch( isPluginPartOfBuild );
-                } ).orElse( false );
-    }
-
-    private File getMultiModuleProjectPomFile( MavenExecutionRequest request )
-    {
-        if ( request.getPom().getParentFile().equals( request.getMultiModuleProjectDirectory() ) )
-        {
-            return request.getPom();
-        }
-        else
-        {
-            File multiModuleProjectPom = new File( request.getMultiModuleProjectDirectory(), "pom.xml" );
-            if ( !multiModuleProjectPom.exists() )
-            {
-                logger.info( "Maven detected that the requested POM file is part of a multi module project, "
-                        + "but could not find a pom.xml file in the multi module root directory: '"
-                        + request.getMultiModuleProjectDirectory() + "'. " );
-                logger.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
-                return request.getPom();
-            }
-
-            return multiModuleProjectPom;
-        }
-    }
-
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-        throws ProjectBuildingException
-    {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
-
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
-                                                                    projectBuildingRequest );
-
-        boolean problems = false;
-
-        for ( ProjectBuildingResult result : results )
-        {
-            projects.add( result.getProject() );
-
-            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
-            {
-                logger.warn( "" );
-                logger.warn( "Some problems were encountered while building the effective model for "
-                    + result.getProject().getId() );
-
-                for ( ModelProblem problem : result.getProblems() )
-                {
-                    String loc = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( loc ) ? " @ " + loc : "" ) );
-                }
-
-                problems = true;
-            }
-        }
-
-        if ( problems )
-        {
-            logger.warn( "" );
-            logger.warn( "It is highly recommended to fix these problems"
-                + " because they threaten the stability of your build." );
-            logger.warn( "" );
-            logger.warn( "For this reason, future Maven versions might no"
-                + " longer support building such malformed projects." );
-            logger.warn( "" );
-        }
+        return Collections.emptyList();
     }
 
     private void validateProjects( List<MavenProject> projects, MavenExecutionRequest request )

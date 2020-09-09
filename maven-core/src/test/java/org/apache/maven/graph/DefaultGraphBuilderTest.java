@@ -19,6 +19,7 @@ package org.apache.maven.graph;
  * under the License.
  */
 
+import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
@@ -29,15 +30,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -81,17 +80,20 @@ public class DefaultGraphBuilderTest
     private static final String MODULE_C_1 = "module-c-1";
     private static final String MODULE_C_2 = "module-c-2";
 
-    @InjectMocks
     private DefaultGraphBuilder graphBuilder;
 
-    @Mock
-    private ProjectBuilder projectBuilder;
+    private final ProjectBuilder projectBuilder = mock( ProjectBuilder.class );
+    private final MavenSession session = mock( MavenSession.class );
+    private final MavenExecutionRequest mavenExecutionRequest = mock( MavenExecutionRequest.class );
 
-    @Mock
-    private MavenSession session;
+    private final Logger logger = mock( Logger.class );
+    private final ProjectCollector projectCollector = new DefaultProjectCollector( logger, projectBuilder );
 
-    @Mock
-    private MavenExecutionRequest mavenExecutionRequest;
+    // Not using mocks for these strategies - a mock would just copy the actual implementation.
+
+    private final ProjectlessCollectionStrategy projectlessCollectionStrategy = new ProjectlessCollectionStrategy( projectBuilder );
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( logger, projectCollector );
+    private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectCollector );
 
     private Map<String, MavenProject> artifactIdProjectMap;
 
@@ -221,7 +223,13 @@ public class DefaultGraphBuilderTest
     @Before
     public void before() throws Exception
     {
-        MockitoAnnotations.initMocks( this );
+        graphBuilder = new DefaultGraphBuilder(
+                mock( Logger.class ),
+                mock( BuildResumptionDataRepository.class ),
+                projectlessCollectionStrategy,
+                multiModuleCollectionStrategy,
+                requestPomCollectionStrategy
+        );
 
         // Create projects
         MavenProject projectParent = getMavenProject( PARENT_MODULE );
