@@ -107,6 +107,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng6981ProjectListShouldIncludeChildrenTest.class );
         suite.addTestSuite( MavenITmng6972AllowAccessToGraphPackageTest.class );
         suite.addTestSuite( MavenITmng6772NestedImportScopeRepositoryOverride.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );
@@ -359,6 +360,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4270ArtifactHandlersFromPluginDepsTest.class );
         suite.addTestSuite( MavenITmng4269BadReactorResolutionFromOutDirTest.class );
         suite.addTestSuite( MavenITmng4262MakeLikeReactorDottedPathTest.class );
+        suite.addTestSuite( MavenITmng4262MakeLikeReactorDottedPath370Test.class );
         suite.addTestSuite( MavenITmng4254SelectableWagonProvidersTest.class );
         suite.addTestSuite( MavenITmng4238ArtifactHandlerExtensionUsageTest.class );
         suite.addTestSuite( MavenITmng4235HttpAuthDeploymentChecksumsTest.class );

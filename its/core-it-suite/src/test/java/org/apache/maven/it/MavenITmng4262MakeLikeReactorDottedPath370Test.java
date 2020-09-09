@@ -19,23 +19,22 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4262">MNG-4262</a>.
  * 
  * @author Benjamin Bentmann
  */
-public class MavenITmng4262MakeLikeReactorDottedPathTest
+public class MavenITmng4262MakeLikeReactorDottedPath370Test
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4262MakeLikeReactorDottedPathTest()
+    public MavenITmng4262MakeLikeReactorDottedPath370Test()
     {
-        super( "[3.0-alpha-3,3.7.0)" );
+        super( "[3.7.0,)" );
     }
 
     private void clean( Verifier verifier )
@@ -64,7 +63,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "../sub-a/target/touch.txt" );
+        verifier.assertFilePresent( "../sub-a/target/touch.txt" );
     }
 
     /**
