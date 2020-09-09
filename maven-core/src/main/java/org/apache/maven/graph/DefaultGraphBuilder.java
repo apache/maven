@@ -135,7 +135,7 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
-        activeProjects = selectProjectsFromBuildRoot( activeProjects, projectDependencyGraph, session.getRequest() );
+        activeProjects = trimProjectsToRequest( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
@@ -148,16 +148,16 @@ public class DefaultGraphBuilder
         return Result.success( projectDependencyGraph );
     }
 
-    private List<MavenProject> selectProjectsFromBuildRoot( List<MavenProject> activeProjects,
-                                                            ProjectDependencyGraph graph,
-                                                            MavenExecutionRequest request )
+    private List<MavenProject> trimProjectsToRequest( List<MavenProject> activeProjects,
+                                                      ProjectDependencyGraph graph,
+                                                      MavenExecutionRequest request )
             throws MavenExecutionException
     {
         List<MavenProject> result = activeProjects;
 
         if ( request.getPom() != null )
         {
-            result = getProjectsInBuildScope( request, activeProjects );
+            result = getProjectsInRequestScope( request, activeProjects );
 
             List<MavenProject> sortedProjects = graph.getSortedProjects();
             result.sort( comparing( sortedProjects::indexOf ) );
@@ -310,7 +310,7 @@ public class DefaultGraphBuilder
         }
     }
 
-    private List<MavenProject> getProjectsInBuildScope( MavenExecutionRequest request, List<MavenProject> projects )
+    private List<MavenProject> getProjectsInRequestScope( MavenExecutionRequest request, List<MavenProject> projects )
             throws MavenExecutionException
     {
         if ( request.getPom() == null )
@@ -318,17 +318,17 @@ public class DefaultGraphBuilder
             return projects;
         }
 
-        MavenProject buildProjectRoot = projects.stream()
+        MavenProject requestPomProject = projects.stream()
                 .filter( project -> request.getPom().equals( project.getFile() ) )
                 .findFirst()
                 .orElseThrow( () -> new MavenExecutionException(
-                        "Could not find project in reactor matching build POM", request.getPom() ) );
+                        "Could not find a project in reactor matching the request POM", request.getPom() ) );
 
-        List<MavenProject> modules = buildProjectRoot.getCollectedProjects() != null
-                ? buildProjectRoot.getCollectedProjects() : Collections.emptyList();
+        List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
+                ? requestPomProject.getCollectedProjects() : Collections.emptyList();
 
         List<MavenProject> result = new ArrayList<>( modules );
-        result.add( buildProjectRoot );
+        result.add( requestPomProject );
         return result;
     }
 
@@ -432,8 +432,8 @@ public class DefaultGraphBuilder
     {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        List<MavenProject> projectsInBuildScope = getProjectsInBuildScope( request, projects );
-        for ( MavenProject p : projectsInBuildScope )
+        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope( request, projects );
+        for ( MavenProject p : projectsInRequestScope )
         {
             String projectKey = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
 

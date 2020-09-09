@@ -79,14 +79,14 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         }
         catch ( ProjectBuildingException e )
         {
-            boolean shouldRetryWithOnlyProjectsInBuild = isModuleOutsideBuildDependingOnPluginModule( request, e );
+            boolean fallThrough = isModuleOutsideRequestScopeDependingOnPluginModule( request, e );
 
-            if ( !shouldRetryWithOnlyProjectsInBuild )
+            if ( fallThrough )
             {
-                throw e;
+                return Collections.emptyList();
             }
 
-            return Collections.emptyList();
+            throw e;
         }
     }
 
@@ -113,8 +113,8 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
     }
 
     /**
-     * multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the requested pom.
-     * We should always check whether the requested pom project is collected.
+     * multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the request pom.
+     * We should always check whether the request pom project is collected.
      * The integration tests for MNG-5889 are examples for this scenario.
      *
      * @return true if the collected projects contain the requested project (for example with -f)
@@ -140,28 +140,23 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
      *
      * @return true if the module which fails to collect the inter-module plugin is not part of the build.
      */
-    private boolean isModuleOutsideBuildDependingOnPluginModule( MavenExecutionRequest request,
-                                                                 ProjectBuildingException exception )
+    private boolean isModuleOutsideRequestScopeDependingOnPluginModule( MavenExecutionRequest request,
+                                                                        ProjectBuildingException exception )
     {
-        if ( request.getPom() == null )
-        {
-            return false;
-        }
-
         return exception.getResults().stream()
                 .map( ProjectBuildingResult::getProject )
                 .filter( Objects::nonNull )
                 .filter( project -> request.getPom().equals( project.getFile() ) )
                 .findFirst()
-                .map( buildProjectRoot ->
+                .map( requestPomProject ->
                 {
-                    List<MavenProject> modules = buildProjectRoot.getCollectedProjects() != null
-                            ? buildProjectRoot.getCollectedProjects() : Collections.emptyList();
-                    List<MavenProject> projectsToBeBuilt = new ArrayList<>( modules );
-                    projectsToBeBuilt.add( buildProjectRoot );
+                    List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
+                            ? requestPomProject.getCollectedProjects() : Collections.emptyList();
+                    List<MavenProject> projectsInRequestScope = new ArrayList<>( modules );
+                    projectsInRequestScope.add( requestPomProject );
 
-                    Predicate<ProjectBuildingResult> projectsOutsideOfBuild =
-                            pr -> !projectsToBeBuilt.contains( pr.getProject() );
+                    Predicate<ProjectBuildingResult> projectsOutsideOfRequestScope =
+                            pr -> !projectsInRequestScope.contains( pr.getProject() );
 
                     Predicate<Exception> pluginArtifactNotFoundException =
                             exc -> exc instanceof PluginManagerException
@@ -169,18 +164,18 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
                                     && exc.getCause().getCause() instanceof ArtifactResolutionException
                                     && exc.getCause().getCause().getCause() instanceof ArtifactNotFoundException;
 
-                    Predicate<Plugin> isPluginPartOfBuild = plugin -> projectsToBeBuilt.stream()
+                    Predicate<Plugin> isPluginPartOfRequestScope = plugin -> projectsInRequestScope.stream()
                             .anyMatch( project -> project.getGroupId().equals( plugin.getGroupId() )
                                     && project.getArtifactId().equals( plugin.getArtifactId() )
                                     && project.getVersion().equals( plugin.getVersion() ) );
 
                     return exception.getResults().stream()
-                            .filter( projectsOutsideOfBuild )
+                            .filter( projectsOutsideOfRequestScope )
                             .flatMap( projectBuildingResult -> projectBuildingResult.getProblems().stream() )
                             .map( ModelProblem::getException )
                             .filter( pluginArtifactNotFoundException )
                             .map( exc -> ( ( PluginResolutionException ) exc.getCause() ).getPlugin() )
-                            .anyMatch( isPluginPartOfBuild );
+                            .anyMatch( isPluginPartOfRequestScope );
                 } ).orElse( false );
     }
 }
