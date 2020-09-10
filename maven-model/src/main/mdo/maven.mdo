@@ -1191,16 +1191,16 @@
       </description>
       <fields>
         <field>
-          <name>artifactId</name>
+          <name>groupId</name>
           <version>4.0.0+</version>
-          <description>The artifact ID of the project to exclude.</description>
+          <description>The group ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
-          <name>groupId</name>
+          <name>artifactId</name>
           <version>4.0.0+</version>
-          <description>The group ID of the project to exclude.</description>
+          <description>The artifact ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
         </field>
