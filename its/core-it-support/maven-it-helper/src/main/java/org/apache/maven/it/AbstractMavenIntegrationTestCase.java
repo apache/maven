@@ -29,8 +29,13 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -579,7 +584,8 @@ public abstract class AbstractMavenIntegrationTestCase
 
         if ( matchesVersionRange( "(3.2.5,)" ) )
         {
-            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", basedir );
+            String multiModuleProjectDirectory = findMultiModuleProjectDirectory( basedir );
+            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", multiModuleProjectDirectory );
         }
 
         try
@@ -606,6 +612,36 @@ public abstract class AbstractMavenIntegrationTestCase
         }
         
         return verifier;
+    }
+
+    private boolean hasDotMvnSubfolder( Path path )
+    {
+        final Path probablySubfolder = path.resolve( ".mvn" );
+        return Files.exists( probablySubfolder ) && Files.isDirectory( probablySubfolder );
+    }
+
+    private String findMultiModuleProjectDirectory( String basedir )
+    {
+        Path path = Paths.get( basedir );
+        Path result = path;
+
+        Collection<Path> fileSystemRoots = new ArrayList<>();
+        for ( Path root : path.getFileSystem().getRootDirectories() )
+        {
+            fileSystemRoots.add( root );
+        }
+
+        while ( !fileSystemRoots.contains( path ) )
+        {
+            if ( hasDotMvnSubfolder( path ) )
+            {
+                result = path;
+                break;
+            }
+            path = path.getParent();
+        }
+
+        return result.toString();
     }
 
     public static void assertCanonicalFileEquals( String message, File expected, File actual )
