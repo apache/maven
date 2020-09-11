@@ -31,7 +31,6 @@ import java.util.List;
  */
 public interface ProjectCollector
 {
-    String HINT = "projectCollector";
     void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException;
 }

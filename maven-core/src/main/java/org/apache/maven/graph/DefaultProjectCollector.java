@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Utility to collect projects for a given set of pom.xml files.
  */
-@Named( ProjectCollector.HINT )
+@Named
 @Singleton
 public class DefaultProjectCollector implements ProjectCollector
 {
