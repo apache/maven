@@ -38,10 +38,10 @@ import java.util.List;
 @Singleton
 public class RequestPomCollectionStrategy implements ProjectCollectionStrategy
 {
-    private final ProjectCollector projectCollector;
+    private final ProjectsCollector projectCollector;
 
     @Inject
-    public RequestPomCollectionStrategy( ProjectCollector projectCollector )
+    public RequestPomCollectionStrategy( ProjectsCollector projectCollector )
     {
         this.projectCollector = projectCollector;
     }

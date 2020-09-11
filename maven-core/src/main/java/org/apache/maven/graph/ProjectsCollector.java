@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Facade to collect projects for a given set of pom.xml files.
  */
-public interface ProjectCollector
+public interface ProjectsCollector
 {
     /**
      * Collect Maven projects from a list of POM files.

@@ -42,7 +42,7 @@ import java.util.List;
  */
 @Named
 @Singleton
-public class DefaultProjectCollector implements ProjectCollector
+public class DefaultProjectCollector implements ProjectsCollector
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ProjectBuilder projectBuilder;

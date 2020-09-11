@@ -85,13 +85,13 @@ public class DefaultGraphBuilderTest
     private final MavenSession session = mock( MavenSession.class );
     private final MavenExecutionRequest mavenExecutionRequest = mock( MavenExecutionRequest.class );
 
-    private final ProjectCollector projectCollector = new DefaultProjectCollector( projectBuilder );
+    private final ProjectsCollector projectsCollector = new DefaultProjectCollector( projectBuilder );
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
     private final ProjectlessCollectionStrategy projectlessCollectionStrategy = new ProjectlessCollectionStrategy( projectBuilder );
-    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( projectCollector );
-    private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectCollector );
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( projectsCollector );
+    private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectsCollector );
 
     private Map<String, MavenProject> artifactIdProjectMap;
 

@@ -50,10 +50,10 @@ import java.util.function.Predicate;
 public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
-    private final ProjectCollector projectCollector;
+    private final ProjectsCollector projectCollector;
 
     @Inject
-    public MultiModuleCollectionStrategy( ProjectCollector projectCollector )
+    public MultiModuleCollectionStrategy( ProjectsCollector projectCollector )
     {
         this.projectCollector = projectCollector;
     }
