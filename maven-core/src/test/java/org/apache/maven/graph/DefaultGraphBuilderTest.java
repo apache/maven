@@ -30,7 +30,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,13 +85,12 @@ public class DefaultGraphBuilderTest
     private final MavenSession session = mock( MavenSession.class );
     private final MavenExecutionRequest mavenExecutionRequest = mock( MavenExecutionRequest.class );
 
-    private final Logger logger = mock( Logger.class );
-    private final ProjectCollector projectCollector = new DefaultProjectCollector( logger, projectBuilder );
+    private final ProjectCollector projectCollector = new DefaultProjectCollector( projectBuilder );
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
     private final ProjectlessCollectionStrategy projectlessCollectionStrategy = new ProjectlessCollectionStrategy( projectBuilder );
-    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( logger, projectCollector );
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( projectCollector );
     private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectCollector );
 
     private Map<String, MavenProject> artifactIdProjectMap;
@@ -224,7 +222,6 @@ public class DefaultGraphBuilderTest
     public void before() throws Exception
     {
         graphBuilder = new DefaultGraphBuilder(
-                mock( Logger.class ),
                 mock( BuildResumptionDataRepository.class ),
                 projectlessCollectionStrategy,
                 multiModuleCollectionStrategy,

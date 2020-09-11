@@ -27,8 +27,9 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,13 +44,12 @@ import java.util.List;
 @Singleton
 public class DefaultProjectCollector implements ProjectCollector
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ProjectBuilder projectBuilder;
 
     @Inject
-    public DefaultProjectCollector( Logger logger, ProjectBuilder projectBuilder )
+    public DefaultProjectCollector( ProjectBuilder projectBuilder )
     {
-        this.logger = logger;
         this.projectBuilder = projectBuilder;
     }
 

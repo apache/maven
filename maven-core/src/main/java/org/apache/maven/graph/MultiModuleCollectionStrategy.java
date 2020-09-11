@@ -27,9 +27,10 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,13 +49,12 @@ import java.util.function.Predicate;
 @Singleton
 public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ProjectCollector projectCollector;
 
     @Inject
-    public MultiModuleCollectionStrategy( Logger logger, ProjectCollector projectCollector )
+    public MultiModuleCollectionStrategy( ProjectCollector projectCollector )
     {
-        this.logger = logger;
         this.projectCollector = projectCollector;
     }
 

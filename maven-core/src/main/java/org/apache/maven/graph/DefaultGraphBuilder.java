@@ -49,9 +49,10 @@ import org.apache.maven.model.building.Result;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Comparator.comparing;
 
@@ -63,20 +64,18 @@ import static java.util.Comparator.comparing;
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final BuildResumptionDataRepository buildResumptionDataRepository;
     private final ProjectlessCollectionStrategy projectlessCollectionStrategy;
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
     private final RequestPomCollectionStrategy requestPomCollectionStrategy;
 
     @Inject
-    public DefaultGraphBuilder( Logger logger,
-                                BuildResumptionDataRepository buildResumptionDataRepository,
+    public DefaultGraphBuilder( BuildResumptionDataRepository buildResumptionDataRepository,
                                 ProjectlessCollectionStrategy projectlessCollectionStrategy,
                                 MultiModuleCollectionStrategy multiModuleCollectionStrategy,
                                 RequestPomCollectionStrategy requestPomCollectionStrategy )
     {
-        this.logger = logger;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.projectlessCollectionStrategy = projectlessCollectionStrategy;
         this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
