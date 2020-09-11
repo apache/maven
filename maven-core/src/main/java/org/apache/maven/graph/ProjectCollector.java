@@ -31,6 +31,13 @@ import java.util.List;
  */
 public interface ProjectCollector
 {
+    /**
+     * Collect Maven projects from a list of POM files.
+     * @param projects List that will be filled with the found projects.
+     * @param files List of POM files.
+     * @param request The {@link MavenExecutionRequest}
+     * @throws ProjectBuildingException In case the POMs are not used.
+     */
     void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException;
 }
