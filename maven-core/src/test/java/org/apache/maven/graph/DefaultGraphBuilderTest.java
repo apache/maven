@@ -26,6 +26,8 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.Result;
+import org.apache.maven.model.locator.DefaultModelLocator;
+import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -89,8 +91,9 @@ public class DefaultGraphBuilderTest
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
+    private final ModelLocator modelLocator = new DefaultModelLocator();
     private final ProjectlessCollectionStrategy projectlessCollectionStrategy = new ProjectlessCollectionStrategy( projectBuilder );
-    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( projectsCollector );
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( modelLocator, projectsCollector );
     private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectsCollector );
 
     private Map<String, MavenProject> artifactIdProjectMap;

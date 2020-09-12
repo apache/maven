@@ -22,6 +22,7 @@ package org.apache.maven.graph;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -50,11 +51,13 @@ import java.util.function.Predicate;
 public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final ModelLocator modelLocator;
     private final ProjectsCollector projectCollector;
 
     @Inject
-    public MultiModuleCollectionStrategy( ProjectsCollector projectCollector )
+    public MultiModuleCollectionStrategy( ModelLocator modelLocator, ProjectsCollector projectCollector )
     {
+        this.modelLocator = modelLocator;
         this.projectCollector = projectCollector;
     }
 
@@ -98,7 +101,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         }
         else
         {
-            File multiModuleProjectPom = new File( request.getMultiModuleProjectDirectory(), "pom.xml" );
+            File multiModuleProjectPom = modelLocator.locatePom( request.getMultiModuleProjectDirectory() );
             if ( !multiModuleProjectPom.exists() )
             {
                 logger.info( "Maven detected that the requested POM file is part of a multi module project, "
