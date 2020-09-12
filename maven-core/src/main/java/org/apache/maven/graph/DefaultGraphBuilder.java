@@ -419,7 +419,7 @@ public class DefaultGraphBuilder
 
             if ( !projects.isEmpty() )
             {
-                logger.debug( "Successfully collected projects using the " + strategy.getClass().getSimpleName() );
+                logger.debug( "Successfully collected projects using the {}", strategy.getClass().getSimpleName() );
                 return projects;
             }
         }
