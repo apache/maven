@@ -52,13 +52,13 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ModelLocator modelLocator;
-    private final ProjectsCollector projectCollector;
+    private final ProjectsCollector projectsCollector;
 
     @Inject
-    public MultiModuleCollectionStrategy( ModelLocator modelLocator, ProjectsCollector projectCollector )
+    public MultiModuleCollectionStrategy( ModelLocator modelLocator, ProjectsCollector projectsCollector )
     {
         this.modelLocator = modelLocator;
-        this.projectCollector = projectCollector;
+        this.projectsCollector = projectsCollector;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         try
         {
             List<MavenProject> projects = new ArrayList<>();
-            projectCollector.collectProjects( projects, files, request );
+            projectsCollector.collectProjects( projects, files, request );
             boolean isRequestedProjectCollected = isRequestedProjectCollected( request, projects );
             if ( isRequestedProjectCollected )
             {

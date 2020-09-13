@@ -38,21 +38,20 @@ import java.util.List;
 @Singleton
 public class RequestPomCollectionStrategy implements ProjectCollectionStrategy
 {
-    private final ProjectsCollector projectCollector;
+    private final ProjectsCollector projectsCollector;
 
     @Inject
-    public RequestPomCollectionStrategy( ProjectsCollector projectCollector )
+    public RequestPomCollectionStrategy( ProjectsCollector projectsCollector )
     {
-        this.projectCollector = projectCollector;
+        this.projectsCollector = projectsCollector;
     }
-
 
     @Override
     public List<MavenProject> collectProjects( MavenExecutionRequest request ) throws ProjectBuildingException
     {
         List<File> files = Collections.singletonList( request.getPom().getAbsoluteFile() );
         List<MavenProject> projects = new ArrayList<>();
-        projectCollector.collectProjects( projects, files, request );
+        projectsCollector.collectProjects( projects, files, request );
         return projects;
     }
 }

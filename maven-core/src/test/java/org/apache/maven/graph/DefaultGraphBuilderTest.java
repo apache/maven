@@ -87,7 +87,7 @@ public class DefaultGraphBuilderTest
     private final MavenSession session = mock( MavenSession.class );
     private final MavenExecutionRequest mavenExecutionRequest = mock( MavenExecutionRequest.class );
 
-    private final ProjectsCollector projectsCollector = new DefaultProjectCollector( projectBuilder );
+    private final ProjectsCollector projectsCollector = new DefaultProjectsCollector( projectBuilder );
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 

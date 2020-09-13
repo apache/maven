@@ -42,13 +42,13 @@ import java.util.List;
  */
 @Named
 @Singleton
-public class DefaultProjectCollector implements ProjectsCollector
+public class DefaultProjectsCollector implements ProjectsCollector
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ProjectBuilder projectBuilder;
 
     @Inject
-    public DefaultProjectCollector( ProjectBuilder projectBuilder )
+    public DefaultProjectsCollector( ProjectBuilder projectBuilder )
     {
         this.projectBuilder = projectBuilder;
     }
