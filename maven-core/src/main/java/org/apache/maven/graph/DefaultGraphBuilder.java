@@ -20,7 +20,6 @@ package org.apache.maven.graph;
  */
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -407,24 +406,21 @@ public class DefaultGraphBuilder
         MavenExecutionRequest request = session.getRequest();
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        List<ProjectCollectionStrategy> projectCollectionStrategies = Arrays.asList(
-                projectlessCollectionStrategy, // 1. Collect project for invocation without a POM.
-                multiModuleCollectionStrategy, // 2. Collect projects for all modules in the multi-module project.
-                requestPomCollectionStrategy   // 3. Collect projects for explicitly requested POM.
-        );
-
-        for ( ProjectCollectionStrategy strategy : projectCollectionStrategies )
+        // 1. Collect project for invocation without a POM.
+        if ( request.getPom() == null )
         {
-            List<MavenProject> projects = strategy.collectProjects( request );
-
-            if ( !projects.isEmpty() )
-            {
-                logger.debug( "Successfully collected projects using the {}", strategy.getClass().getSimpleName() );
-                return projects;
-            }
+            return projectlessCollectionStrategy.collectProjects( request );
         }
 
-        return Collections.emptyList();
+        // 2. Collect projects for all modules in the multi-module project.
+        List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects( request );
+        if ( !projects.isEmpty() )
+        {
+            return projects;
+        }
+
+        // 3. Collect projects for explicitly requested POM.
+        return requestPomCollectionStrategy.collectProjects( request );
     }
 
     private void validateProjects( List<MavenProject> projects, MavenExecutionRequest request )

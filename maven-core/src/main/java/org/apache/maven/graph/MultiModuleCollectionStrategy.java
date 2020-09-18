@@ -77,6 +77,12 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             }
             else
             {
+                logger.debug( "Multi module project collection failed: {}"
+                        + "Detected a POM file next to a .mvn folder in a parent directory ({}). "
+                        + "Maven assumed that POM file to be the parent of the requested project ({}), but it turned "
+                        + "out that it was not. Another project collection strategy will be executed as result.",
+                        System.lineSeparator(), moduleProjectPomFile.getAbsolutePath(),
+                        request.getPom().getAbsolutePath() );
                 return Collections.emptyList();
             }
         }
@@ -86,6 +92,11 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 
             if ( fallThrough )
             {
+                logger.debug( "Multi module project collection failed: {}"
+                        + "Detected that one of the modules of this multi module project uses another module as "
+                        + "plugin extension which still needed to be built. This is not possible within the same "
+                        + "reactor build. Another project collection strategy will be executed as result.",
+                        System.lineSeparator() );
                 return Collections.emptyList();
             }
 
@@ -118,7 +129,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
     /**
      * multiModuleProjectDirectory in MavenExecutionRequest is not always the parent of the request pom.
      * We should always check whether the request pom project is collected.
-     * The integration tests for MNG-5889 are examples for this scenario.
+     * The integration tests for MNG-6223 are examples for this scenario.
      *
      * @return true if the collected projects contain the requested project (for example with -f)
      */

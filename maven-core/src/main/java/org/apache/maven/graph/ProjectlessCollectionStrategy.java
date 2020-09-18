@@ -54,16 +54,14 @@ public class ProjectlessCollectionStrategy
     public List<MavenProject> collectProjects( final MavenExecutionRequest request )
             throws ProjectBuildingException
     {
+        ProjectBuildingRequest buildingRequest = request.getProjectBuildingRequest();
+        ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
+        MavenProject project = projectBuilder.build( modelSource,  buildingRequest ).getProject();
+        project.setExecutionRoot( true );
+        request.setProjectPresent( false );
+
         final List<MavenProject> result = new ArrayList<>();
-        if ( request.getPom() == null )
-        {
-            ProjectBuildingRequest buildingRequest = request.getProjectBuildingRequest();
-            ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-            MavenProject project = projectBuilder.build( modelSource,  buildingRequest ).getProject();
-            project.setExecutionRoot( true );
-            request.setProjectPresent( false );
-            result.add( project );
-        }
+        result.add( project );
         return result;
     }
 }
