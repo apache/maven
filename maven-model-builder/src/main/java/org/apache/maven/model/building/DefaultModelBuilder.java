@@ -473,15 +473,14 @@ public class DefaultModelBuilder
         assembleInheritance( lineage, request, problems );
 
         Model resultModel = lineage.get( 0 );
+        
+        // consider caching inherited model
 
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
         // model interpolation
         resultModel = interpolateModel( resultModel, request, problems );
-
-        ModelData effectiveModelData = new ModelData( request.getModelSource(), resultModel, resultModel.getGroupId(),
-                                                  resultModel.getArtifactId(), resultModel.getVersion() );
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
@@ -490,8 +489,6 @@ public class DefaultModelBuilder
 
         // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems, true );
-
-        intoCache( request.getModelCache(), request.getModelSource(), ModelCacheTag.RAW, effectiveModelData );
     }
 
     @Override
