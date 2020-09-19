@@ -270,7 +270,7 @@ public class DefaultModelBuilder
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
         // read and validate raw model
-        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        Model inputModel = readFileModel( request.getModelSource(), request.getPomFile(), request, problems );
 
         result.setFileModel( inputModel );
         
@@ -572,7 +572,7 @@ public class DefaultModelBuilder
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
         {
-            return newResult( readModel( null, pomFile, request, collector ), collector.getProblems() );
+            return newResult( readFileModel( null, pomFile, request, collector ), collector.getProblems() );
         }
         catch ( ModelBuildingException e )
         {
@@ -581,7 +581,7 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model readModel( Source modelSource, File pomFile, ModelBuildingRequest request,
+    private Model readFileModel( Source modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -1086,7 +1086,7 @@ public class DefaultModelBuilder
             }
 
             candidateModel = readRawModel( candidateSource, null, request, problems,
-                                           readModel( candidateSource, null, request, problems ) );
+                                           readFileModel( candidateSource, null, request, problems ) );
         }
         else
         {
@@ -1288,7 +1288,7 @@ public class DefaultModelBuilder
             };
         }
 
-        Model parentModel = readModel( modelSource, null, lenientRequest, problems );
+        Model parentModel = readFileModel( modelSource, null, lenientRequest, problems );
         
         parentModel = readRawModel( modelSource, null, lenientRequest, problems, parentModel );
 
