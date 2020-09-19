@@ -745,6 +745,11 @@ public class DefaultModelBuilder
 
         ModelData modelData = new ModelData( modelSource, rawModel, groupId, artifactId, version );
         intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
+        
+        if ( "pom".equals( rawModel.getPackaging() ) )
+        {
+            intoCache( request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData );
+        }
         return rawModel;
     }
 
