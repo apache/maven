@@ -386,6 +386,15 @@ public class DefaultProjectBuilder
         ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
         final ReactorModelPool modelPool = poolBuilder.build();
         
+        InternalConfig config = new InternalConfig( request, modelPool,
+                useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
+
+        Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
+
+        boolean noErrors =
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
+                   config, poolBuilder );
+        
         if ( Features.buildConsumer().isActive() )
         {
             final TransformerContext context = new TransformerContext()
@@ -410,15 +419,6 @@ public class DefaultProjectBuilder
             };
             request.getRepositorySession().getData().set( TransformerContext.KEY, context );
         }
-
-        InternalConfig config = new InternalConfig( request, modelPool,
-                useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
-
-        Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
-
-        boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
-                   config, poolBuilder );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
