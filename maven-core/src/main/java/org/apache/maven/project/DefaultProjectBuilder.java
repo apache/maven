@@ -33,6 +33,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -263,14 +264,7 @@ public class DefaultProjectBuilder
 
     private List<String> getProfileIds( List<Profile> profiles )
     {
-        List<String> ids = new ArrayList<>( profiles.size() );
-
-        for ( Profile profile : profiles )
-        {
-            ids.add( profile.getId() );
-        }
-
-        return ids;
+        return profiles.stream().map( Profile::getId ).collect( Collectors.toList() );
     }
 
     private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
