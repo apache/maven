@@ -89,7 +89,7 @@ jobs:
             branch=${GITHUB_REF#refs/heads/}
           fi
           if [ $branch != "master" ]; then
-            git ls-remote https://github.com/$user/$repo.git | grep $GITHUB_REF > /dev/null
+            git ls-remote https://github.com/$user/$repo.git | grep "refs/heads/${branch}$" > /dev/null
             if [ $? -eq 0 ]; then
               echo "Found a branch \"$branch\" in fork \"$user/$repo\", configuring this for the integration tests to be run against."
               target_branch=$branch
