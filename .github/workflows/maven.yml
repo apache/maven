@@ -82,11 +82,11 @@ jobs:
           target_branch=master
           target_user=apache
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            source_repo=${PR_HEAD_LABEL%:*}
-            source_branch=${PR_HEAD_LABEL#*:}
+            user=${PR_HEAD_LABEL%:*}
+            branch=${PR_HEAD_LABEL#*:}
           else
-            source_repo=${GITHUB_REPOSITORY%/*}
-            source_branch=${GITHUB_REF#refs/heads/}
+            user=${GITHUB_REPOSITORY%/*}
+            branch=${GITHUB_REF#refs/heads/}
           fi
           if [ $branch != "master" ]; then
             git ls-remote https://github.com/$user/$repo.git | grep $GITHUB_REF > /dev/null
