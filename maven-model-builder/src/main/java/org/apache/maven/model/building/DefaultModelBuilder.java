@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -101,9 +100,6 @@ import org.eclipse.sisu.Nullable;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
-    // modelId prefix for raw models including profile activation
-    private static final String ACTIVATED = "ACTIVATED+";
-
     @Inject
     private ModelProcessor modelProcessor;
 
@@ -381,6 +377,8 @@ public class DefaultModelBuilder
 
         result.getModelIds().clear();
         
+        List<Model> lineage = new ArrayList<>();
+
         for ( ModelData currentData = resultData; currentData != null; )
         {
             String modelId = currentData.getId();
@@ -421,7 +419,8 @@ public class DefaultModelBuilder
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
             }
-            result.setRawModel( ACTIVATED + modelId, tmpModel );
+            
+            lineage.add( tmpModel );
             
             if ( currentData == superData )
             {
@@ -455,16 +454,6 @@ public class DefaultModelBuilder
                 currentData = parentData;
             }
         }
-    }
-
-    private void effectiveModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
-                                 DefaultModelProblemCollector problems )
-    {
-        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
-        
-        List<Model> lineage = result.getModelIds().stream()
-                        .map( id -> result.getRawModel( ACTIVATED + id ) )
-                        .collect( Collectors.toList() );
 
         problems.setSource( result.getRawModel() );
         checkPluginVersions( lineage, request, problems );
@@ -506,7 +495,6 @@ public class DefaultModelBuilder
 
         readRawModel( request, result, problems );
         rawModels( request, result, problems );
-        effectiveModel( request, result, problems );
 
         // phase 2
         Model resultModel = result.getEffectiveModel();
