@@ -1338,7 +1338,7 @@ public class MavenCli
         return defaultLocation;
     }
 
-    private MavenExecutionRequest populateRequest( CliRequest cliRequest )
+    protected MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         return populateRequest( cliRequest, cliRequest.request );
     }
@@ -1389,7 +1389,11 @@ public class MavenCli
         request.addActiveProfiles( profileActivation.activeProfiles );
         request.addInactiveProfiles( profileActivation.inactiveProfiles );
 
-        request.setLocalRepositoryPath( determineLocalRepositoryPath( request ) );
+        final String localRepositoryPath = determineLocalRepositoryPath( request );
+        if ( localRepositoryPath != null )
+        {
+            request.setLocalRepositoryPath( localRepositoryPath );
+        }
 
         //
         // Builder, concurrency and parallelism
@@ -1428,10 +1432,13 @@ public class MavenCli
 
     private String determineLocalRepositoryPath( final MavenExecutionRequest request )
     {
-        return request.getUserProperties().getProperty(
-                MavenCli.LOCAL_REPO_PROPERTY,
-                request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY ) // null if not found
-        );
+        String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        if ( userDefinedLocalRepo != null )
+        {
+            return userDefinedLocalRepo;
+        }
+
+        return request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
     }
 
     private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
