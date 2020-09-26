@@ -1338,7 +1338,7 @@ public class MavenCli
         return defaultLocation;
     }
 
-    private MavenExecutionRequest populateRequest( CliRequest cliRequest )
+    protected MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         return populateRequest( cliRequest, cliRequest.request );
     }
