@@ -274,7 +274,7 @@ public class DefaultModelBuilder
 
         if ( !request.isTwoPhaseBuilding() )
         {
-            build( request, result );
+            return build( request, result );
         }
         else if ( hasModelErrors( problems ) )
         {
