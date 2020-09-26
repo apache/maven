@@ -350,6 +350,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
+        readRawModel( request, result, problems );
         
         Model inputModel = result.getRawModel();
         problems.setRootModel( inputModel );
@@ -493,7 +494,6 @@ public class DefaultModelBuilder
     {
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
-        readRawModel( request, result, problems );
         rawModels( request, result, problems );
 
         // phase 2
