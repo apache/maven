@@ -285,12 +285,10 @@ public class DefaultModelBuilder
     }
     
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void activateFileModel( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
+    private void activateFileModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
-        
         Model inputModel = result.getFileModel();
         problems.setRootModel( inputModel );
 
@@ -345,11 +343,10 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void rawModels( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
+    private void rawModels( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        DefaultModelBuildingResult result = (DefaultModelBuildingResult) phaseOneResult;
         readRawModel( request, result, problems );
         
         Model inputModel = result.getRawModel();
@@ -488,12 +485,14 @@ public class DefaultModelBuilder
         return build( request, result, new LinkedHashSet<>() );
     }
 
-    private ModelBuildingResult build( final ModelBuildingRequest request, final ModelBuildingResult result,
+    private ModelBuildingResult build( final ModelBuildingRequest request, final ModelBuildingResult phaseOneResult,
                                        Collection<String> imports )
         throws ModelBuildingException
     {
-        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
+        DefaultModelBuildingResult result = asDefaultModelBuildingResult( phaseOneResult );
 
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
+        
         rawModels( request, result, problems );
 
         // phase 2
@@ -549,6 +548,18 @@ public class DefaultModelBuilder
         }
 
         return result;
+    }
+
+    private DefaultModelBuildingResult asDefaultModelBuildingResult( ModelBuildingResult phaseOneResult )
+    {
+        if ( phaseOneResult instanceof DefaultModelBuildingResult )
+        {
+            return (DefaultModelBuildingResult) phaseOneResult;
+        }
+        else
+        {
+            return new DefaultModelBuildingResult( phaseOneResult );
+        }
     }
 
     @Override
