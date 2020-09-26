@@ -266,7 +266,7 @@ public class DefaultModelBuilder
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
         // read and validate raw model
-        Model inputModel = readFileModel( request.getModelSource(), request.getPomFile(), request, problems );
+        Model inputModel = readFileModel( request.getModelSource(), request, problems );
 
         result.setFileModel( inputModel );
         
@@ -571,7 +571,7 @@ public class DefaultModelBuilder
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
         {
-            return newResult( readFileModel( null, pomFile, request, collector ), collector.getProblems() );
+            return newResult( readFileModel( null, request, collector ), collector.getProblems() );
         }
         catch ( ModelBuildingException e )
         {
@@ -580,8 +580,9 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model readFileModel( Source modelSource, File pomFile, ModelBuildingRequest request,
-                             DefaultModelProblemCollector problems )
+    private Model readFileModel( Source modelSource,
+                                 ModelBuildingRequest request,
+                                 DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         Model model = getModelFromCache( modelSource, request.getModelCache() );
@@ -711,9 +712,11 @@ public class DefaultModelBuilder
                              DefaultModelProblemCollector problems, Model fileModel )
         throws ModelBuildingException
     {
-        Model rawModel = fileModel.clone();
+        Model rawModel;
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
+            rawModel = readFileModel( modelSource, request, problems );
+            
             try
             {
                 Model transformedFileModel =
@@ -729,6 +732,10 @@ public class DefaultModelBuilder
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
             }
+        }
+        else
+        {
+            rawModel = fileModel.clone();
         }
 
         modelValidator.validateRawModel( rawModel, request, problems );
@@ -1090,7 +1097,7 @@ public class DefaultModelBuilder
             }
 
             candidateModel = readRawModel( candidateSource, null, request, problems,
-                                           readFileModel( candidateSource, null, request, problems ) );
+                                           readFileModel( candidateSource, request, problems ) );
         }
         else
         {
@@ -1292,7 +1299,7 @@ public class DefaultModelBuilder
             };
         }
 
-        Model parentModel = readFileModel( modelSource, null, lenientRequest, problems );
+        Model parentModel = readFileModel( modelSource, lenientRequest, problems );
         
         parentModel = readRawModel( modelSource, null, lenientRequest, problems, parentModel );
 
