@@ -733,6 +733,10 @@ public class DefaultModelBuilder
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
             }
         }
+        else if ( fileModel == null )
+        {
+            rawModel = readFileModel( modelSource, request, problems );
+        }
         else
         {
             rawModel = fileModel.clone();
@@ -1096,8 +1100,7 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            candidateModel = readRawModel( candidateSource, null, request, problems,
-                                           readFileModel( candidateSource, request, problems ) );
+            candidateModel = readRawModel( candidateSource, null, request, problems, null );
         }
         else
         {
@@ -1299,9 +1302,7 @@ public class DefaultModelBuilder
             };
         }
 
-        Model parentModel = readFileModel( modelSource, lenientRequest, problems );
-        
-        parentModel = readRawModel( modelSource, null, lenientRequest, problems, parentModel );
+        Model parentModel = readRawModel( modelSource, null, lenientRequest, problems, null );
 
         if ( !parent.getVersion().equals( version ) )
         {
