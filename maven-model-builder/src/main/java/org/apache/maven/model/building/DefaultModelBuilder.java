@@ -347,9 +347,7 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        readRawModel( request, result, problems );
-        
-        Model inputModel = result.getRawModel();
+        Model inputModel = readRawModel( request, result, problems );
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -391,31 +389,30 @@ public class DefaultModelBuilder
                                                                                  profileActivationContext, problems );
             result.setActivePomProfiles( modelId, activePomProfiles );
             
-            Model tmpModel;
+            Model tmpModel = rawModel.clone();
+                
+            problems.setSource( tmpModel );
+
+            // model normalization
+            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+
+            Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
+            injectProfileActivations( tmpModel, interpolatedActivations );
+
+            // profile injection
+            for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
+            {
+                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+            }
+
             if ( currentData == resultData )
             {
-                // this instance will be enriched, not replaced.
-                result.setEffectiveModel( inputModel );
-                
-                tmpModel = result.getEffectiveModel();
-            }
-            else
-            {
-                tmpModel = rawModel.clone();
-                
-                problems.setSource( tmpModel );
-
-                // model normalization
-                modelNormalizer.mergeDuplicates( tmpModel, request, problems );
-
-                Map<String, Activation> interpolatedActivations = getProfileActivations( tmpModel, false );
-                injectProfileActivations( tmpModel, interpolatedActivations );
-
-                // profile injection
-                for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
+                for ( Profile activeProfile : activeExternalProfiles )
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
+                // this instance will be enriched, not replaced.
+                result.setEffectiveModel( tmpModel );
             }
             
             lineage.add( tmpModel );
