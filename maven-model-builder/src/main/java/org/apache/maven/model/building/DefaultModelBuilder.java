@@ -401,7 +401,7 @@ public class DefaultModelBuilder
             }
             else
             {
-                tmpModel = result.getRawModel( modelId ).clone();
+                tmpModel = rawModel.clone();
                 
                 problems.setSource( tmpModel );
 
@@ -427,7 +427,7 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            ModelData parentData = readParent( rawModel, currentData.getSource(), request, problems );
+            ModelData parentData = readParent( currentData.getModel(), currentData.getSource(), request, problems );
 
             if ( parentData == null )
             {
