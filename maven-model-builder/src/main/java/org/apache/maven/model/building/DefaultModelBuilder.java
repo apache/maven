@@ -746,7 +746,7 @@ public class DefaultModelBuilder
         }
 
         String groupId = getGroupId( rawModel );
-        String artifactId = fileModel.getArtifactId();
+        String artifactId = rawModel.getArtifactId();
         String version = getVersion( rawModel );
 
         ModelData modelData = new ModelData( modelSource, rawModel, groupId, artifactId, version );
