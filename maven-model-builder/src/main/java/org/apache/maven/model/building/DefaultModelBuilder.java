@@ -25,6 +25,7 @@ import static org.apache.maven.model.building.Result.newResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -254,6 +256,40 @@ public class DefaultModelBuilder
     {
         this.reportingConverter = reportingConverter;
         return this;
+    }
+    
+    @Override
+    public TransformerContext newTansformerContext( ModelBuildingRequest request )
+    {
+        return new TransformerContext()
+        {
+            @Override
+            public String getUserProperty( String key )
+            {
+                return request.getUserProperties().getProperty( key );
+            }
+            
+            @Override
+            public Model getRawModel( String groupId, String artifactId )
+                throws IllegalStateException
+            {
+                Source source = fromCache( request.getModelCache(), groupId, artifactId );
+                if ( source != null )
+                {
+                    ModelData data = fromCache( request.getModelCache(), source, ModelCacheTag.RAW );
+                    return Optional.ofNullable( data ).map( ModelData::getModel ).orElse( null );
+                }
+                return null;
+            }
+            
+            @Override
+            public Model getRawModel( Path p )
+            {
+                ModelData data =
+                    fromCache( request.getModelCache(), new FileModelSource( p.toFile() ), ModelCacheTag.RAW );
+                return Optional.ofNullable( data ).map( ModelData::getModel ).orElse( null );
+            }
+        };
     }
     
     @Override
@@ -691,6 +727,10 @@ public class DefaultModelBuilder
         }
 
         intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
+        if ( modelSource instanceof FileModelSource )
+        {
+            intoCache( request.getModelCache(), getGroupId( model ), model.getArtifactId(), modelSource );
+        }
 
         return model;
     }
@@ -1527,6 +1567,14 @@ public class DefaultModelBuilder
         }
     }
 
+    private <T> void intoCache( ModelCache modelCache, String groupId, String artifactId, Source source )
+     {
+         if ( modelCache != null )
+         {
+             modelCache.put( groupId, artifactId, source );
+         }
+     }
+
     private <T> void intoCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data )
     {
         if ( modelCache != null )
@@ -1535,7 +1583,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private <T> T fromCache( ModelCache modelCache, String groupId, String artifactId, String version,
+    private static <T> T fromCache( ModelCache modelCache, String groupId, String artifactId, String version,
                             ModelCacheTag<T> tag )
     {
         if ( modelCache != null )
@@ -1548,8 +1596,18 @@ public class DefaultModelBuilder
         }
         return null;
     }
+    
+    private static Source fromCache( ModelCache modelCache, String groupId, String artifactId )
+    {
+        if ( modelCache != null )
+        {
+            return modelCache.get( groupId, artifactId );
+        }
+        return null;
+    }
 
-    private <T> T fromCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
+
+    private static <T> T fromCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
     {
         if ( modelCache != null )
         {

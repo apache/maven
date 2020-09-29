@@ -22,8 +22,10 @@ package org.apache.maven.project;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,6 +38,8 @@ class ReactorModelCache
 {
 
     private final Map<Object, Object> models = new ConcurrentHashMap<>( 256 );
+    
+    private final Map<GACacheKey, Set<Source>> mappedSources = new ConcurrentHashMap<>( 64 );
 
     @Override
     public Object get( String groupId, String artifactId, String version, String tag )
@@ -47,6 +51,30 @@ class ReactorModelCache
     public void put( String groupId, String artifactId, String version, String tag, Object data )
     {
         models.put( new GavCacheKey( groupId, artifactId, version, tag ), data );
+    }
+    
+    @Override
+    public Source get( String groupId, String artifactId )
+    {
+        Set<Source> sources = mappedSources.get( new GACacheKey( groupId, artifactId ) );
+        if ( sources == null )
+        {
+            return null;
+        }
+        else 
+        {
+            return sources.stream().reduce( ( a, b ) -> 
+            {
+                throw new IllegalStateException( "No unique Source for " + groupId + ':' + artifactId 
+                      + ": " + a.getLocation() + " and " + b.getLocation() );
+            } ).orElse( null );
+        }
+    }
+    
+    @Override
+    public void put( String groupId, String artifactId, Source source )
+    {
+        mappedSources.computeIfAbsent( new GACacheKey( groupId, artifactId ), k -> new HashSet<>() ).add( source );
     }
 
     @Override
@@ -80,13 +108,7 @@ class ReactorModelCache
             this.artifactId = ( artifactId != null ) ? artifactId : "";
             this.version = ( version != null ) ? version : "";
             this.tag = ( tag != null ) ? tag : "";
-
-            int hash = 17;
-            hash = hash * 31 + this.groupId.hashCode();
-            hash = hash * 31 + this.artifactId.hashCode();
-            hash = hash * 31 + this.version.hashCode();
-            hash = hash * 31 + this.tag.hashCode();
-            hashCode = hash;
+            this.hashCode = Objects.hash( groupId, artifactId, version, tag );
         }
 
         @Override
@@ -113,7 +135,48 @@ class ReactorModelCache
         {
             return hashCode;
         }
+    }
+    
+    private static final class GACacheKey
+    {
+        private final String groupId;
+        
+        private final String artifactId;
+        
+        private final int hashCode;
 
+        GACacheKey( String groupId, String artifactId )
+        {
+            super();
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.hashCode = Objects.hash( groupId, artifactId );
+        }
+        
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash( artifactId, groupId, hashCode );
+        }
+
+        @Override
+        public boolean equals( Object obj )
+        {
+            if ( this == obj )
+            {
+                return true;
+            }
+            if ( obj == null )
+            {
+                return false;
+            }
+            if ( getClass() != obj.getClass() )
+            {
+                return false;
+            }
+            GACacheKey other = (GACacheKey) obj;
+            return Objects.equals( artifactId, other.artifactId ) && Objects.equals( groupId, other.groupId );
+        }
     }
     
     private static final class SourceCacheKey

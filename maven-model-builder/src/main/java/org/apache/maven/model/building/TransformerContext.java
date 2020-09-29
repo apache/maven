@@ -60,5 +60,5 @@ public interface TransformerContext
      * @return the model, otherwise {@code null}
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
-    Model getRawModel( String groupId, String artifactId ) throws IllegalStateException;
+    Model getRawModel( String groupId, String artifactId );
 }

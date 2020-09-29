@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -391,26 +390,7 @@ public class DefaultProjectBuilder
         
         if ( Features.buildConsumer().isActive() )
         {
-            final TransformerContext context = new TransformerContext()
-            {
-                @Override
-                public String getUserProperty( String key )
-                {
-                    return request.getUserProperties().getProperty( key );
-                }
-    
-                @Override
-                public Model getRawModel( Path p )
-                {
-                    return modelPool.get( p );
-                }
-    
-                @Override
-                public Model getRawModel( String groupId, String artifactId )
-                {
-                    return modelPool.get( groupId, artifactId, null );
-                }
-            };
+            final TransformerContext context = modelBuilder.newTansformerContext( getModelBuildingRequest( config ) );
             request.getRepositorySession().getData().set( TransformerContext.KEY, context );
         }
 
