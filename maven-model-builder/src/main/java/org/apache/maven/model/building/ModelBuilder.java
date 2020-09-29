@@ -59,5 +59,7 @@ public interface ModelBuilder
      * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
      */
     Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking );
+    
+    TransformerContext newTansformerContext( ModelBuildingRequest request );
 
 }
