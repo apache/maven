@@ -69,6 +69,7 @@ under the License.
     <exportedPackage>org.eclipse.aether.resolution</exportedPackage>
     <exportedPackage>org.eclipse.aether.spi</exportedPackage>
     <exportedPackage>org.eclipse.aether.transfer</exportedPackage>
+    <exportedPackage>org.eclipse.aether.transform</exportedPackage>
     <exportedPackage>org.eclipse.aether.version</exportedPackage>
 
     <!-- plexus-classworlds -->
