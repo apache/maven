@@ -605,9 +605,14 @@ public class DefaultProjectBuilder
                            RepositorySystemSession session )
     {
         boolean noErrors = true;
+        
+        final TransformerContext transformerContext =
+            (TransformerContext) request.getRepositorySession().getData().get( TransformerContext.KEY );
 
         for ( InterimResult interimResult : interimResults )
         {
+            interimResult.request.setTransformerContext( transformerContext );
+            
             MavenProject project = interimResult.listener.getProject();
             try
             {

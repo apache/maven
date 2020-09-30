@@ -749,6 +749,12 @@ public class DefaultModelBuilder
                              DefaultModelProblemCollector problems, Model fileModel )
         throws ModelBuildingException
     {
+        ModelData cachedData = fromCache( request.getModelCache(), modelSource, ModelCacheTag.RAW );
+        if ( cachedData != null )
+        {
+          return cachedData.getModel();    
+        }
+        
         Model rawModel;
         if ( Features.buildConsumer().isActive() && pomFile != null )
         {
@@ -792,11 +798,8 @@ public class DefaultModelBuilder
 
         ModelData modelData = new ModelData( modelSource, rawModel, groupId, artifactId, version );
         intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
-        
-        if ( "pom".equals( rawModel.getPackaging() ) )
-        {
-            intoCache( request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData );
-        }
+        intoCache( request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData );
+ 
         return rawModel;
     }
 
