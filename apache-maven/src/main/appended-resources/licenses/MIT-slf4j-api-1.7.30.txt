@@ -1,4 +1,4 @@
-https://raw.githubusercontent.com/qos-ch/slf4j/v_1.7.29/LICENSE.txt
+https://raw.githubusercontent.com/qos-ch/slf4j/v_1.7.30/LICENSE.txt
 
 Copyright (c) 2004-2017 QOS.ch
 All rights reserved.
