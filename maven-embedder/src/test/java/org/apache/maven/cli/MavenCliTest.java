@@ -22,6 +22,9 @@ package org.apache.maven.cli;
 import static java.util.Arrays.asList;
 import static org.apache.maven.cli.MavenCli.determineProfileActivation;
 import static org.apache.maven.cli.MavenCli.determineProjectActivation;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,8 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -47,6 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
@@ -55,6 +57,7 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.plexus.PlexusBeanModule;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -431,6 +434,36 @@ public class MavenCliTest
         String selector = cli.getResumeFromSelector( allProjects, failedProject );
 
         assertThat( selector, is( "group-a:module" ) );
+    }
+
+    @Test
+    public void verifyLocalRepositoryPath()
+    {
+        MavenCli cli = new MavenCli();
+        CliRequest request = new CliRequest( new String[] { }, null );
+        request.commandLine = new CommandLine.Builder().build();
+        MavenExecutionRequest executionRequest;
+
+        // Use default
+        executionRequest = cli.populateRequest( request );
+        assertThat( executionRequest.getLocalRepositoryPath(),
+                is( nullValue() ) );
+
+        // System-properties override default
+        request.getSystemProperties().setProperty( MavenCli.LOCAL_REPO_PROPERTY, "." + File.separatorChar + "custom1" );
+        executionRequest = cli.populateRequest( request );
+        assertThat( executionRequest.getLocalRepositoryPath(),
+                is( notNullValue() ) );
+        assertThat( executionRequest.getLocalRepositoryPath().toString(),
+                is( "." + File.separatorChar + "custom1" ) );
+
+        // User-properties override system properties
+        request.getUserProperties().setProperty( MavenCli.LOCAL_REPO_PROPERTY, "." + File.separatorChar + "custom2" );
+        executionRequest = cli.populateRequest( request );
+        assertThat( executionRequest.getLocalRepositoryPath(),
+                is( notNullValue() ) );
+        assertThat( executionRequest.getLocalRepositoryPath().toString(),
+                is( "." + File.separatorChar + "custom2" ) );
     }
 
     private MavenProject createMavenProject( String groupId, String artifactId )
