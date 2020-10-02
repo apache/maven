@@ -401,8 +401,6 @@ public class DefaultModelBuilder
 
         Collection<String> parentIds = new LinkedHashSet<>();
 
-        result.getModelIds().clear();
-        
         List<Model> lineage = new ArrayList<>();
 
         for ( ModelData currentData = resultData; currentData != null; )
