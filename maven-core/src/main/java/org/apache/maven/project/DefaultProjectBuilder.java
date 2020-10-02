@@ -478,7 +478,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = result.getRawModel();
+        Model model = result.getFileModel().clone();
         
         poolBuilder.put( model.getPomFile().toPath(),  model );
         
