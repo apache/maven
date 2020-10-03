@@ -71,6 +71,7 @@ import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
+import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.merge.ModelMerger;
@@ -754,11 +755,10 @@ public class DefaultModelBuilder
             
             try
             {
-                Model transformedFileModel =
-                    modelProcessor.read( pomFile,
-                               Collections.singletonMap( "transformerContext", request.getTransformerContext() ) );
+                Model transformedFileModel = modelProcessor.read( pomFile,
+                       Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, request.getTransformerContext() ) );
 
-                // fileModel with locationTrackers, required for proper feedback during validations
+                // rawModel with locationTrackers, required for proper feedback during validations
                 
                 // Apply enriched data
                 modelMerger.merge( rawModel, transformedFileModel, false, null );
