@@ -379,7 +379,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         Model inputModel =
-            readRawModel( request.getModelSource(), request.getPomFile(), request, problems, result.getFileModel() );
+            readRawModel( request.getModelSource(), request, problems, result.getFileModel() );
 
         problems.setRootModel( inputModel );
 
@@ -730,8 +730,8 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model readRawModel( Source modelSource, File pomFile, ModelBuildingRequest request,
-                             DefaultModelProblemCollector problems, Model fileModel )
+    private Model readRawModel( Source modelSource, ModelBuildingRequest request, DefaultModelProblemCollector problems,
+                             Model fileModel )
         throws ModelBuildingException
     {
         ModelData cachedData = fromCache( request.getModelCache(), modelSource, ModelCacheTag.RAW );
@@ -741,10 +741,11 @@ public class DefaultModelBuilder
         }
         
         Model rawModel;
-        if ( Features.buildConsumer().isActive() && pomFile != null )
+        if ( Features.buildConsumer().isActive() && modelSource instanceof FileModelSource )
         {
             rawModel = readFileModel( modelSource, request, problems );
-            
+            File pomFile = ( (FileModelSource) modelSource ).getFile();            
+
             try
             {
                 Model transformedFileModel = modelProcessor.read( pomFile,
@@ -1125,7 +1126,7 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            candidateModel = readRawModel( candidateSource, null, request, problems, null );
+            candidateModel = readRawModel( candidateSource, request, problems, null );
         }
         else
         {
@@ -1327,7 +1328,7 @@ public class DefaultModelBuilder
             };
         }
 
-        Model parentModel = readRawModel( modelSource, null, lenientRequest, problems, null );
+        Model parentModel = readRawModel( modelSource, lenientRequest, problems, null );
 
         if ( !parent.getVersion().equals( version ) )
         {
