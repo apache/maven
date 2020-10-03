@@ -378,7 +378,9 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model inputModel = readRawModel( request, result, problems );
+        Model inputModel =
+            readRawModel( request.getModelSource(), request.getPomFile(), request, problems, result.getFileModel() );
+
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
@@ -728,16 +730,6 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model readRawModel( ModelBuildingRequest request, ModelBuildingResult result,
-                                DefaultModelProblemCollector problems ) throws ModelBuildingException
-    {
-        Source modelSource = request.getModelSource();
-        File pomFile = request.getPomFile();
-        Model model = result.getFileModel();
-        
-        return readRawModel( modelSource, pomFile, request, problems, model );
-    }
-    
     private Model readRawModel( Source modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems, Model fileModel )
         throws ModelBuildingException
