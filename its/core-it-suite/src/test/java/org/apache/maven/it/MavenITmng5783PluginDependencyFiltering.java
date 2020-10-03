@@ -31,10 +31,20 @@ public class MavenITmng5783PluginDependencyFiltering
         // Note that plugin dependencies always include plugin itself and plexus-utils
 
         List<String> dependencies = verifier.loadLines( "target/dependencies.txt", "UTF-8" );
-        assertEquals( 3, dependencies.size() );
+        if ( matchesVersionRange( "(,3.7.0)" ) )
+        {
+            assertEquals( 3, dependencies.size() );
+        }
+        else
+        {
+            assertEquals( 2, dependencies.size() );
+        }
         assertEquals( "mng-5783-plugin-dependency-filtering:mng-5783-plugin-dependency-filtering-plugin:maven-plugin:0.1",
                       dependencies.get( 0 ) );
         assertEquals( "org.slf4j:slf4j-api:jar:1.7.5", dependencies.get( 1 ) );
-        assertEquals( "org.codehaus.plexus:plexus-utils:jar:1.1", dependencies.get( 2 ) );
+        if ( matchesVersionRange( "(,3.7.0)" ) )
+        {
+            assertEquals( "org.codehaus.plexus:plexus-utils:jar:1.1", dependencies.get( 2 ) );
+        }
     }
 }

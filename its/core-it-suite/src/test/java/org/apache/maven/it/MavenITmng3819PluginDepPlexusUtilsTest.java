@@ -37,7 +37,7 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
 
     public MavenITmng3819PluginDepPlexusUtilsTest()
     {
-        super( "(2.0.1,)" );
+        super( "(2.0.1,3.7.0)" );
     }
 
     /**
