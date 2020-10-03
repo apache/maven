@@ -374,7 +374,7 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void rawModels( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+    private Model readEffectiveModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -504,6 +504,8 @@ public class DefaultModelBuilder
 
         // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems, true );
+        
+        return resultModel;
     }
 
     @Override
@@ -521,10 +523,8 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
         
-        rawModels( request, result, problems );
-
         // phase 2
-        Model resultModel = result.getEffectiveModel();
+        Model resultModel = readEffectiveModel( request, result, problems );
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
@@ -766,6 +766,7 @@ public class DefaultModelBuilder
         }
         else
         {
+//            throw new UnsupportedOperationException();
             rawModel = fileModel.clone();
         }
 
