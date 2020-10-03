@@ -66,11 +66,7 @@ public class DefaultModelReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        TransformerContext context = null;
-        if ( options != null )
-        {
-            context = (TransformerContext) options.get( "transformerContext" );
-        }        
+        TransformerContext context = getTransformerContext( options );        
 
         final InputStream is;
         if ( context == null )
@@ -133,6 +129,12 @@ public class DefaultModelReader
     {
         Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
         return (InputSource) value;
+    }
+    
+    private TransformerContext getTransformerContext( Map<String, ?> options )
+    {
+        Object value = ( options != null ) ? options.get( TRANSFORMER_CONTEXT ) : null;
+        return (TransformerContext) value;
     }
 
     private Model read( Reader reader, boolean strict, InputSource source )
