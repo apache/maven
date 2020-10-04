@@ -277,8 +277,24 @@ public class DefaultModelBuilder
                 Source source = fromCache( request.getModelCache(), groupId, artifactId );
                 if ( source != null )
                 {
-                    ModelData data = fromCache( request.getModelCache(), source, ModelCacheTag.RAW );
-                    return Optional.ofNullable( data ).map( ModelData::getModel ).orElse( null );
+                    try
+                    {
+                        ModelBuildingRequest req = new FilterModelBuildingRequest( request ) 
+                        {
+                            public ModelSource getModelSource() 
+                            {
+                                return (ModelSource) source;
+                            };
+                        };
+                        // @todo use originals
+                        DefaultModelBuildingResult res = new DefaultModelBuildingResult();
+                        return readEffectiveModel( req, res, new DefaultModelProblemCollector( res ) );
+                    }
+                    catch ( ModelBuildingException e )
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
                 return null;
             }
