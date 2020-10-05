@@ -288,7 +288,7 @@ public class DefaultModelBuilder
                         };
                         // @todo use originals
                         DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                        return readEffectiveModel( req, res, new DefaultModelProblemCollector( res ) );
+                        return readRawModel( source, request, new DefaultModelProblemCollector( res ), null );
                     }
                     catch ( ModelBuildingException e )
                     {

@@ -266,11 +266,11 @@ public class DefaultProjectBuilder
         return profiles.stream().map( Profile::getId ).collect( Collectors.toList() );
     }
 
-    private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
+    private DefaultModelBuildingRequest getModelBuildingRequest( InternalConfig config )
     {
         ProjectBuildingRequest configuration = config.request;
 
-        ModelBuildingRequest request = new DefaultModelBuildingRequest();
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
         RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
@@ -390,8 +390,10 @@ public class DefaultProjectBuilder
         
         if ( Features.buildConsumer().isActive() )
         {
-            final TransformerContext context = modelBuilder.newTansformerContext( getModelBuildingRequest( config ) );
+            DefaultModelBuildingRequest buildingRequest = getModelBuildingRequest( config );
+            final TransformerContext context = modelBuilder.newTansformerContext( buildingRequest );
             request.getRepositorySession().getData().set( TransformerContext.KEY, context );
+            buildingRequest.setTransformerContext( context );
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
