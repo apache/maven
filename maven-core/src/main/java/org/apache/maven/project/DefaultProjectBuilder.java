@@ -391,7 +391,7 @@ public class DefaultProjectBuilder
         if ( Features.buildConsumer().isActive() )
         {
             DefaultModelBuildingRequest buildingRequest = getModelBuildingRequest( config );
-            final TransformerContext context = modelBuilder.newTansformerContext( buildingRequest );
+            final TransformerContext context = modelBuilder.newTransformerContext( buildingRequest );
             request.getRepositorySession().getData().set( TransformerContext.KEY, context );
             buildingRequest.setTransformerContext( context );
         }
