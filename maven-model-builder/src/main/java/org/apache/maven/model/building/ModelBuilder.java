@@ -60,6 +60,6 @@ public interface ModelBuilder
      */
     Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking );
     
-    TransformerContext newTansformerContext( ModelBuildingRequest request );
+    TransformerContext newTransformerContext( ModelBuildingRequest request );
 
 }

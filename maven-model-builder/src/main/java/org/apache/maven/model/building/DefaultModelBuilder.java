@@ -25,6 +25,7 @@ import static org.apache.maven.model.building.Result.newResult;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +36,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -72,6 +72,7 @@ import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.merge.ModelMerger;
@@ -117,6 +118,9 @@ public class DefaultModelBuilder
 
     @Inject
     private ModelPathTranslator modelPathTranslator;
+    
+    @Inject
+    private ModelLocator modelLocator;
 
     @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
@@ -260,7 +264,7 @@ public class DefaultModelBuilder
     }
     
     @Override
-    public TransformerContext newTansformerContext( ModelBuildingRequest request )
+    public TransformerContext newTransformerContext( ModelBuildingRequest request )
     {
         return new TransformerContext()
         {
@@ -302,9 +306,28 @@ public class DefaultModelBuilder
             @Override
             public Model getRawModel( Path p )
             {
-                ModelData data =
-                    fromCache( request.getModelCache(), new FileModelSource( p.toFile() ), ModelCacheTag.RAW );
-                return Optional.ofNullable( data ).map( ModelData::getModel ).orElse( null );
+                File pomFile;
+                if ( Files.isDirectory( p ) )
+                {
+                    pomFile = modelLocator.locatePom( p.toFile() );
+                }
+                else
+                {
+                    pomFile = p.toFile();
+                }
+                
+                DefaultModelBuildingResult res = new DefaultModelBuildingResult();
+                try
+                {
+                    return readRawModel( new FileModelSource( pomFile ), request,
+                                         new DefaultModelProblemCollector( res ), null );
+                }
+                catch ( ModelBuildingException e )
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return null;
             }
         };
     }
@@ -337,7 +360,6 @@ public class DefaultModelBuilder
         return result;
     }
     
-    @SuppressWarnings( "checkstyle:methodlength" )
     private void activateFileModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
@@ -458,7 +480,6 @@ public class DefaultModelBuilder
                 {
                     profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
-                // this instance will be enriched, not replaced.
                 result.setEffectiveModel( tmpModel );
             }
             
@@ -826,11 +847,6 @@ public class DefaultModelBuilder
         else
         {
             model = fromCache( cache, modelSource, ModelCacheTag.FILEMODEL );
-            
-            if ( model != null )
-            {
-                model = model.clone();
-            }
         }
         return model;
     }
@@ -1255,9 +1271,7 @@ public class DefaultModelBuilder
          * if ( version == null || !version.equals( parent.getVersion() ) ) { return null; }
          */
 
-        ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
-
-        return parentData;
+        return new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
     }
 
     private Source getParentPomFile( Model childModel, Source source )
@@ -1283,7 +1297,7 @@ public class DefaultModelBuilder
     {
         problems.setSource( childModel );
 
-        Parent parent = childModel.getParent().clone();
+        Parent parent = childModel.getParent();
 
         String groupId = parent.getGroupId();
         String artifactId = parent.getArtifactId();
@@ -1370,10 +1384,8 @@ public class DefaultModelBuilder
             // MNG-2199: What else to check here ?
         }
 
-        ModelData parentData = new ModelData( modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(),
-                                              parent.getVersion() );
-
-        return parentData;
+        return new ModelData( modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(),
+                              parent.getVersion() );
     }
 
     private Model getSuperModel()
