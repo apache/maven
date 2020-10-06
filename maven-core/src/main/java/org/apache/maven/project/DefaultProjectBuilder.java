@@ -266,7 +266,7 @@ public class DefaultProjectBuilder
         return profiles.stream().map( Profile::getId ).collect( Collectors.toList() );
     }
 
-    private DefaultModelBuildingRequest getModelBuildingRequest( InternalConfig config )
+    private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
     {
         ProjectBuildingRequest configuration = config.request;
 
@@ -390,7 +390,7 @@ public class DefaultProjectBuilder
         
         if ( Features.buildConsumer().isActive() )
         {
-            DefaultModelBuildingRequest buildingRequest = getModelBuildingRequest( config );
+            ModelBuildingRequest buildingRequest = getModelBuildingRequest( config );
             final TransformerContext context = modelBuilder.newTransformerContext( buildingRequest );
             request.getRepositorySession().getData().set( TransformerContext.KEY, context );
             buildingRequest.setTransformerContext( context );
