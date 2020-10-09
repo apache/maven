@@ -44,7 +44,7 @@ import java.util.List;
 @Singleton
 public class DefaultProjectsCollector implements ProjectsCollector
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectsCollector.class );
     private final ProjectBuilder projectBuilder;
 
     @Inject
@@ -57,7 +57,6 @@ public class DefaultProjectsCollector implements ProjectsCollector
     public void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException
     {
-        // TODO [mthmulders] Refactor so the result of the method is returned instead of passed to the method argument.
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
@@ -69,16 +68,16 @@ public class DefaultProjectsCollector implements ProjectsCollector
         {
             projects.add( result.getProject() );
 
-            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+            if ( !result.getProblems().isEmpty() && LOGGER.isWarnEnabled() )
             {
-                logger.warn( "" );
-                logger.warn( "Some problems were encountered while building the effective model for "
-                        + result.getProject().getId() );
+                LOGGER.warn( "" );
+                LOGGER.warn( "Some problems were encountered while building the effective model for {}",
+                        result.getProject().getId() );
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
                     String loc = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( loc ) ? " @ " + loc : "" ) );
+                    LOGGER.warn( "{}{}", problem.getMessage(), ( StringUtils.isNotEmpty( loc ) ? " @ " + loc : "" ) );
                 }
 
                 problems = true;
@@ -87,13 +86,13 @@ public class DefaultProjectsCollector implements ProjectsCollector
 
         if ( problems )
         {
-            logger.warn( "" );
-            logger.warn( "It is highly recommended to fix these problems"
+            LOGGER.warn( "" );
+            LOGGER.warn( "It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build." );
-            logger.warn( "" );
-            logger.warn( "For this reason, future Maven versions might no"
+            LOGGER.warn( "" );
+            LOGGER.warn( "For this reason, future Maven versions might no"
                     + " longer support building such malformed projects." );
-            logger.warn( "" );
+            LOGGER.warn( "" );
         }
     }
 }

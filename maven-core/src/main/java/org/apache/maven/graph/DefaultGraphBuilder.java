@@ -63,20 +63,21 @@ import static java.util.Comparator.comparing;
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultGraphBuilder.class );
+
     private final BuildResumptionDataRepository buildResumptionDataRepository;
-    private final ProjectlessCollectionStrategy projectlessCollectionStrategy;
+    private final PomlessCollectionStrategy pomlessCollectionStrategy;
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
     private final RequestPomCollectionStrategy requestPomCollectionStrategy;
 
     @Inject
     public DefaultGraphBuilder( BuildResumptionDataRepository buildResumptionDataRepository,
-                                ProjectlessCollectionStrategy projectlessCollectionStrategy,
+                                PomlessCollectionStrategy pomlessCollectionStrategy,
                                 MultiModuleCollectionStrategy multiModuleCollectionStrategy,
                                 RequestPomCollectionStrategy requestPomCollectionStrategy )
     {
         this.buildResumptionDataRepository = buildResumptionDataRepository;
-        this.projectlessCollectionStrategy = projectlessCollectionStrategy;
+        this.pomlessCollectionStrategy = pomlessCollectionStrategy;
         this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
         this.requestPomCollectionStrategy = requestPomCollectionStrategy;
     }
@@ -409,7 +410,7 @@ public class DefaultGraphBuilder
         // 1. Collect project for invocation without a POM.
         if ( request.getPom() == null )
         {
-            return projectlessCollectionStrategy.collectProjects( request );
+            return pomlessCollectionStrategy.collectProjects( request );
         }
 
         // 2. Collect projects for all modules in the multi-module project.
@@ -448,9 +449,8 @@ public class DefaultGraphBuilder
 
                     if ( projectsMap.containsKey( pluginKey ) )
                     {
-                        logger.warn( project.getName() + " uses " + plugin.getKey()
-                            + " as extensions, which is not possible within the same reactor build. "
-                            + "This plugin was pulled from the local repository!" );
+                        LOGGER.warn( "{} uses {} as extensions, which is not possible within the same reactor build. "
+                            + "This plugin was pulled from the local repository!", project.getName(), plugin.getKey() );
                     }
                 }
             }

@@ -37,15 +37,15 @@ import java.util.List;
 /**
  * Strategy to collect projects for building when the Maven invocation is not in a folder that contains a pom.xml.
  */
-@Named( "ProjectlessCollectionStrategy" )
+@Named( "PomlessCollectionStrategy" )
 @Singleton
-public class ProjectlessCollectionStrategy
+public class PomlessCollectionStrategy
     implements ProjectCollectionStrategy
 {
     private final ProjectBuilder projectBuilder;
 
     @Inject
-    public ProjectlessCollectionStrategy( ProjectBuilder projectBuilder )
+    public PomlessCollectionStrategy( ProjectBuilder projectBuilder )
     {
         this.projectBuilder = projectBuilder;
     }

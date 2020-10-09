@@ -92,7 +92,7 @@ public class DefaultGraphBuilderTest
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
     private final ModelLocator modelLocator = new DefaultModelLocator();
-    private final ProjectlessCollectionStrategy projectlessCollectionStrategy = new ProjectlessCollectionStrategy( projectBuilder );
+    private final PomlessCollectionStrategy pomlessCollectionStrategy = new PomlessCollectionStrategy( projectBuilder );
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( modelLocator, projectsCollector );
     private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectsCollector );
 
@@ -226,7 +226,7 @@ public class DefaultGraphBuilderTest
     {
         graphBuilder = new DefaultGraphBuilder(
                 mock( BuildResumptionDataRepository.class ),
-                projectlessCollectionStrategy,
+                pomlessCollectionStrategy,
                 multiModuleCollectionStrategy,
                 requestPomCollectionStrategy
         );
