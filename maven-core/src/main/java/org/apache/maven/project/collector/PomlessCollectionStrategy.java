@@ -1,4 +1,4 @@
-package org.apache.maven.graph;
+package org.apache.maven.project.collector;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

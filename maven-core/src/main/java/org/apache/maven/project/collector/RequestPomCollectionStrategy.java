@@ -1,4 +1,4 @@
-package org.apache.maven.graph;
+package org.apache.maven.project.collector;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,21 +23,35 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Facade to collect projects for a given set of pom.xml files.
+ * Strategy to collect projects based on the <code>-f</code> CLI parameter or the pom.xml in the working directory.
  */
-public interface ProjectsCollector
+@Named( "RequestPomCollectionStrategy" )
+@Singleton
+public class RequestPomCollectionStrategy implements ProjectCollectionStrategy
 {
-    /**
-     * Collect Maven projects from a list of POM files.
-     * @param projects List that will be filled with the found projects.
-     * @param files List of POM files.
-     * @param request The {@link MavenExecutionRequest}
-     * @throws ProjectBuildingException In case the POMs are not used.
-     */
-    void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-            throws ProjectBuildingException;
+    private final ProjectsCollector projectsCollector;
+
+    @Inject
+    public RequestPomCollectionStrategy( ProjectsCollector projectsCollector )
+    {
+        this.projectsCollector = projectsCollector;
+    }
+
+    @Override
+    public List<MavenProject> collectProjects( MavenExecutionRequest request ) throws ProjectBuildingException
+    {
+        List<File> files = Collections.singletonList( request.getPom().getAbsoluteFile() );
+        List<MavenProject> projects = new ArrayList<>();
+        projectsCollector.collectProjects( projects, files, request );
+        return projects;
+    }
 }
