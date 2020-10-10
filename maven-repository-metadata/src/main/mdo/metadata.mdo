@@ -207,8 +207,27 @@ under the License.
                     }
                     if (updateSnapshotVersions)
                     {
-                      v.setSnapshotVersions( new java.util.ArrayList<SnapshotVersion>( versioning.getSnapshotVersions() ) );
-                      changed = true;
+                        java.util.Map<String, SnapshotVersion> versions = new java.util.LinkedHashMap<>();
+                        if (v.getSnapshotVersions() != null)
+                        {
+                            for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
+                            {
+                                String key = sv.getClassifier() + ":" + sv.getExtension();
+                                versions.put( key, sv );
+                            }
+                        }
+
+                        for ( SnapshotVersion sv : v.getSnapshotVersions() )
+                        {
+                            String key = sv.getClassifier() + ":" + sv.getExtension();
+                            if ( !versions.containsKey( key ) )
+                            {
+                                versions.put( key, sv );
+                            }
+                        }
+
+                        v.setSnapshotVersions( new java.util.ArrayList<SnapshotVersion>( versions.values() ) );
+                        changed = true;
                     }
                 }
             }
