@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
@@ -38,9 +39,9 @@ abstract class MavenSnapshotMetadata
 
     protected final boolean legacyFormat;
 
-    protected MavenSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
+    protected MavenSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat, Date timestamp )
     {
-        super( metadata, file );
+        super( metadata, file, timestamp );
         this.legacyFormat = legacyFormat;
     }
 

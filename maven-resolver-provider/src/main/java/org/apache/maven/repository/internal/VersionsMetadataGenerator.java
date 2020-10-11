@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.impl.MetadataGenerator;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.util.ConfigUtils;
 
 /**
  * @author Benjamin Bentmann
@@ -42,6 +44,8 @@ class VersionsMetadataGenerator
     private Map<Object, VersionsMetadata> versions;
 
     private Map<Object, VersionsMetadata> processedVersions;
+
+    private final Date timestamp;
 
     VersionsMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
@@ -57,6 +61,7 @@ class VersionsMetadataGenerator
     {
         versions = new LinkedHashMap<>();
         processedVersions = new LinkedHashMap<>();
+        timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which
@@ -96,7 +101,7 @@ class VersionsMetadataGenerator
                 VersionsMetadata versionsMetadata = versions.get( key );
                 if ( versionsMetadata == null )
                 {
-                    versionsMetadata = new VersionsMetadata( artifact );
+                    versionsMetadata = new VersionsMetadata( artifact, timestamp );
                     versions.put( key, versionsMetadata );
                 }
             }
