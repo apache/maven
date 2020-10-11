@@ -102,6 +102,7 @@ public class DefaultRepositorySystemSessionFactory
         Map<Object, Object> configProps = new LinkedHashMap<>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
+        configProps.put( "maven.startTime", request.getStartTime() );
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
 

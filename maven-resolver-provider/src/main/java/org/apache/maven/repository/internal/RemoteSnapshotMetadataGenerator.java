@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -42,9 +43,13 @@ class RemoteSnapshotMetadataGenerator
 
     private final boolean legacyFormat;
 
+    private final Date timestamp;
+
     RemoteSnapshotMetadataGenerator( RepositorySystemSession session, DeployRequest request )
     {
-        legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
+        legacyFormat = ConfigUtils.getBoolean( session, false, "maven.metadata.legacy" );
+
+        timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
 
         snapshots = new LinkedHashMap<>();
 
@@ -74,7 +79,7 @@ class RemoteSnapshotMetadataGenerator
                 RemoteSnapshotMetadata snapshotMetadata = snapshots.get( key );
                 if ( snapshotMetadata == null )
                 {
-                    snapshotMetadata = new RemoteSnapshotMetadata( artifact, legacyFormat );
+                    snapshotMetadata = new RemoteSnapshotMetadata( artifact, legacyFormat, timestamp );
                     snapshots.put( key, snapshotMetadata );
                 }
                 snapshotMetadata.bind( artifact );
