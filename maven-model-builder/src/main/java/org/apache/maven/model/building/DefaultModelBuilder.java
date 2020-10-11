@@ -290,9 +290,19 @@ public class DefaultModelBuilder
                                 return (ModelSource) source;
                             };
                         };
+                        ModelBuildingRequest gaBuildingRequest = new FilterModelBuildingRequest( request ) 
+                        {
+                            @Override
+                            public ModelSource getModelSource()
+                            {
+                                return (ModelSource) source;
+                            }
+                            
+                        };
+                        
                         // @todo use originals
                         DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                        return readRawModel( source, request, new DefaultModelProblemCollector( res ), null );
+                        return readRawModel( source, gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
                     }
                     catch ( ModelBuildingException e )
                     {
@@ -316,10 +326,14 @@ public class DefaultModelBuilder
                     pomFile = p.toFile();
                 }
                 
+                DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
+                                .setPomFile( pomFile )
+                                .setModelSource( new FileModelSource( pomFile ) );
+                
                 DefaultModelBuildingResult res = new DefaultModelBuildingResult();
                 try
                 {
-                    return readRawModel( new FileModelSource( pomFile ), request,
+                    return readRawModel( new FileModelSource( pomFile ), req,
                                          new DefaultModelProblemCollector( res ), null );
                 }
                 catch ( ModelBuildingException e )
@@ -342,7 +356,7 @@ public class DefaultModelBuilder
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
         // read and validate raw model
-        Model inputModel = readFileModel( request.getModelSource(), request, problems );
+        Model inputModel = readFileModel( request, problems );
 
         result.setFileModel( inputModel );
         
@@ -636,7 +650,7 @@ public class DefaultModelBuilder
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
         {
-            return newResult( readFileModel( null, request, collector ), collector.getProblems() );
+            return newResult( readFileModel( request, collector ), collector.getProblems() );
         }
         catch ( ModelBuildingException e )
         {
@@ -645,11 +659,11 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model readFileModel( Source modelSource,
-                                 ModelBuildingRequest request,
+    private Model readFileModel( ModelBuildingRequest request,
                                  DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
+        ModelSource modelSource = request.getModelSource();
         Model model = getModelFromCache( modelSource, request.getModelCache() );
         if ( model != null )
         {
@@ -780,7 +794,7 @@ public class DefaultModelBuilder
         Model rawModel;
         if ( Features.buildConsumer().isActive() && modelSource instanceof FileModelSource )
         {
-            rawModel = readFileModel( modelSource, request, problems );
+            rawModel = readFileModel( request, problems );
             File pomFile = ( (FileModelSource) modelSource ).getFile();            
 
             try
@@ -800,7 +814,7 @@ public class DefaultModelBuilder
         }
         else if ( fileModel == null )
         {
-            rawModel = readFileModel( modelSource, request, problems );
+            rawModel = readFileModel( request, problems );
         }
         else
         {
@@ -1146,7 +1160,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         final Parent parent = childModel.getParent();
-        final Source candidateSource;
+        final ModelSource candidateSource;
         final Model candidateModel;
         final WorkspaceModelResolver resolver = request.getWorkspaceModelResolver();
         if ( resolver == null )
@@ -1157,8 +1171,17 @@ public class DefaultModelBuilder
             {
                 return null;
             }
+            
+            ModelBuildingRequest candidateBuildRequest = new FilterModelBuildingRequest( request ) 
+            {
+                  @Override
+                public ModelSource getModelSource()
+                {
+                    return candidateSource;
+                }  
+            };
 
-            candidateModel = readRawModel( candidateSource, request, problems, null );
+            candidateModel = readRawModel( candidateSource, candidateBuildRequest, problems, null );
         }
         else
         {
@@ -1274,7 +1297,7 @@ public class DefaultModelBuilder
         return new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
     }
 
-    private Source getParentPomFile( Model childModel, Source source )
+    private ModelSource getParentPomFile( Model childModel, Source source )
     {
         if ( !( source instanceof ModelSource2 ) )
         {
@@ -1345,18 +1368,21 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        ModelBuildingRequest lenientRequest = request;
-        if ( request.getValidationLevel() > ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        int validationLevel = Math.min( request.getValidationLevel(), ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
+        ModelBuildingRequest lenientRequest = new FilterModelBuildingRequest( request )
         {
-            lenientRequest = new FilterModelBuildingRequest( request )
+            @Override
+            public int getValidationLevel()
             {
-                @Override
-                public int getValidationLevel()
-                {
-                    return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
-                }
-            };
-        }
+                return validationLevel;
+            }
+            
+            @Override
+            public ModelSource getModelSource()
+            {
+                return modelSource;
+            }
+        };
 
         Model parentModel = readRawModel( modelSource, lenientRequest, problems, null );
 
