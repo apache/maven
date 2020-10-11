@@ -302,7 +302,7 @@ public class DefaultModelBuilder
                         
                         // @todo use originals
                         DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                        return readRawModel( source, gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
+                        return readRawModel( gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
                     }
                     catch ( ModelBuildingException e )
                     {
@@ -333,8 +333,8 @@ public class DefaultModelBuilder
                 DefaultModelBuildingResult res = new DefaultModelBuildingResult();
                 try
                 {
-                    return readRawModel( new FileModelSource( pomFile ), req,
-                                         new DefaultModelProblemCollector( res ), null );
+                    return readRawModel( req, new DefaultModelProblemCollector( res ),
+                                         null );
                 }
                 catch ( ModelBuildingException e )
                 {
@@ -431,7 +431,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         Model inputModel =
-            readRawModel( request.getModelSource(), request, problems, result.getFileModel() );
+            readRawModel( request, problems, result.getFileModel() );
 
         problems.setRootModel( inputModel );
 
@@ -781,10 +781,12 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model readRawModel( Source modelSource, ModelBuildingRequest request, DefaultModelProblemCollector problems,
-                             Model fileModel )
+    private Model readRawModel( ModelBuildingRequest request, DefaultModelProblemCollector problems,
+                                Model fileModel )
         throws ModelBuildingException
     {
+        ModelSource modelSource = request.getModelSource();
+        
         ModelData cachedData = fromCache( request.getModelCache(), modelSource, ModelCacheTag.RAW );
         if ( cachedData != null )
         {
@@ -1181,7 +1183,7 @@ public class DefaultModelBuilder
                 }  
             };
 
-            candidateModel = readRawModel( candidateSource, candidateBuildRequest, problems, null );
+            candidateModel = readRawModel( candidateBuildRequest, problems, null );
         }
         else
         {
@@ -1384,7 +1386,7 @@ public class DefaultModelBuilder
             }
         };
 
-        Model parentModel = readRawModel( modelSource, lenientRequest, problems, null );
+        Model parentModel = readRawModel( lenientRequest, problems, null );
 
         if ( !parent.getVersion().equals( version ) )
         {
