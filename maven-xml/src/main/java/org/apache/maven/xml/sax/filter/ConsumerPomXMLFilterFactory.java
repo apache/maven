@@ -20,7 +20,6 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -49,18 +48,6 @@ public class ConsumerPomXMLFilterFactory
         // Ensure that xs:any elements aren't touched by next filters
         AbstractSAXFilter filter = new FastForwardFilter( parent );
         
-        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter();
-        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
-        getRevision().ifPresent( ciFriendlyFilter::setRevision );
-        getSha1().ifPresent( ciFriendlyFilter::setSha1 );
-        
-        if ( ciFriendlyFilter.isSet() )
-        {
-            ciFriendlyFilter.setParent( parent );
-            ciFriendlyFilter.setLexicalHandler( parent );
-            filter = ciFriendlyFilter;
-        }
-        
         // Strip modules
         filter = new ModulesXMLFilter( filter );
         // Adjust relativePath
@@ -68,22 +55,4 @@ public class ConsumerPomXMLFilterFactory
         
         return new ConsumerPomXMLFilter( filter );
     }
-    
-    // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
-
-    protected Optional<String> getChangelist()
-    {
-        return Optional.empty();
-    }
-
-    protected Optional<String> getRevision()
-    {
-        return Optional.empty();
-    }
-
-    protected Optional<String> getSha1()
-    {
-        return Optional.empty();
-    }
-
 }

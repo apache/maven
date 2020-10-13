@@ -44,7 +44,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     @Override
     protected AbstractSAXFilter getFilter() throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
-        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory()
+        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory( true )
         {
             @Override
             protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
@@ -57,10 +57,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             {
                 return null;
             }
-        };
-        
-        ConsumerPomXMLFilter filter = new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
-        {
+            
             @Override
             protected Optional<String> getSha1()
             {
@@ -78,7 +75,11 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             {
                 return Optional.of( "CL" );
             }
-        }.get( Paths.get( "pom.xml" ) );
+
+        };
+        
+        ConsumerPomXMLFilter filter =
+            new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory ).get( Paths.get( "pom.xml" ) );
         filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         return filter;
     }

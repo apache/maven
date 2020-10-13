@@ -264,86 +264,9 @@ public class DefaultModelBuilder
     }
     
     @Override
-    public TransformerContext newTransformerContext( ModelBuildingRequest request )
+    public TransformerContextBuilder newTransformerContextBuilder()
     {
-        return new TransformerContext()
-        {
-            @Override
-            public String getUserProperty( String key )
-            {
-                return request.getUserProperties().getProperty( key );
-            }
-            
-            @Override
-            public Model getRawModel( String groupId, String artifactId )
-                throws IllegalStateException
-            {
-                Source source = fromCache( request.getModelCache(), groupId, artifactId );
-                if ( source != null )
-                {
-                    try
-                    {
-                        ModelBuildingRequest req = new FilterModelBuildingRequest( request ) 
-                        {
-                            public ModelSource getModelSource() 
-                            {
-                                return (ModelSource) source;
-                            };
-                        };
-                        ModelBuildingRequest gaBuildingRequest = new FilterModelBuildingRequest( request ) 
-                        {
-                            @Override
-                            public ModelSource getModelSource()
-                            {
-                                return (ModelSource) source;
-                            }
-                            
-                        };
-                        
-                        // @todo use originals
-                        DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                        return readRawModel( gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
-                    }
-                    catch ( ModelBuildingException e )
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-                return null;
-            }
-            
-            @Override
-            public Model getRawModel( Path p )
-            {
-                File pomFile;
-                if ( Files.isDirectory( p ) )
-                {
-                    pomFile = modelLocator.locatePom( p.toFile() );
-                }
-                else
-                {
-                    pomFile = p.toFile();
-                }
-                
-                DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
-                                .setPomFile( pomFile )
-                                .setModelSource( new FileModelSource( pomFile ) );
-                
-                DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                try
-                {
-                    return readRawModel( req, new DefaultModelProblemCollector( res ),
-                                         null );
-                }
-                catch ( ModelBuildingException e )
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
+        return new TransformerContextBuilder();
     }
     
     @Override
@@ -797,12 +720,19 @@ public class DefaultModelBuilder
         if ( Features.buildConsumer().isActive() && modelSource instanceof FileModelSource )
         {
             rawModel = readFileModel( request, problems );
-            File pomFile = ( (FileModelSource) modelSource ).getFile();            
-
+            File pomFile = ( (FileModelSource) modelSource ).getFile();
+            
+            TransformerContext context = null;
+            if ( request.getTransformerContextBuilder() != null )
+            {
+                context = request.getTransformerContextBuilder().initialize( request, null, problems );   
+            }
+            
             try
             {
+                // must implement TransformContext, but should use request to access system properties/modelcache
                 Model transformedFileModel = modelProcessor.read( pomFile,
-                       Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, request.getTransformerContext() ) );
+                   Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
 
                 // rawModel with locationTrackers, required for proper feedback during validations
                 
@@ -1864,5 +1794,114 @@ public class DefaultModelBuilder
         {
             // don't merge
         }
+    }
+    
+    /**
+     * Builds up the transformer context.
+     * After the buildplan is ready, the build()-method returns the immutable context useful during distribution
+     * 
+     * @author Robert Scholte
+     * @since 3.7.0
+     */
+    public class TransformerContextBuilder
+    {
+        private final DefaultTransformerContext context = new DefaultTransformerContext();
+        
+        private Properties userProperties;
+        
+        public TransformerContextBuilder setUserProperties( Properties userProperties )
+        {
+            this.userProperties = userProperties;
+            return this;
+        }
+        
+        TransformerContext initialize( ModelBuildingRequest request, DefaultModelBuildingResult result,
+                                       ModelProblemCollector problems )
+        {
+            return new TransformerContext()
+            {
+                @Override
+                public String getUserProperty( String key )
+                {
+                    return context.userProperties.computeIfAbsent( key,
+                                                                   k -> userProperties.getProperty( key ) );
+                }
+                
+                @Override
+                public Model getRawModel( String gId, String aId )
+                {
+                    return context.modelByGA.computeIfAbsent( new DefaultTransformerContext.GAKey( gId, aId ),
+                                                              k -> findRawModel( gId, aId ) );
+                }
+                
+                @Override
+                public Model getRawModel( Path path )
+                {
+                    return context.modelByPath.computeIfAbsent( path, k -> findRawModel( path ) );
+                }
+
+                private Model findRawModel( String groupId, String artifactId )
+                {
+                    Source source = fromCache( request.getModelCache(), groupId, artifactId );
+                    if ( source != null )
+                    {
+                        try
+                        {
+                            ModelBuildingRequest gaBuildingRequest = new FilterModelBuildingRequest( request ) 
+                            {
+                                @Override
+                                public ModelSource getModelSource()
+                                {
+                                    return (ModelSource) source;
+                                }
+                                
+                            };
+                            DefaultModelBuildingResult res = new DefaultModelBuildingResult();
+                            return readRawModel( gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
+                        }
+                        catch ( ModelBuildingException e )
+                        {
+                            // gathered with problem collector
+                        }
+                    }
+                    return null;
+                }
+                
+                private Model findRawModel( Path p )
+                {
+                    File pomFile;
+                    if ( Files.isDirectory( p ) )
+                    {
+                        pomFile = modelLocator.locatePom( p.toFile() );
+                    }
+                    else
+                    {
+                        pomFile = p.toFile();
+                    }
+                    
+                    DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
+                                    .setPomFile( pomFile )
+                                    .setModelSource( new FileModelSource( pomFile ) );
+                    
+                    DefaultModelBuildingResult res = new DefaultModelBuildingResult();
+                    try
+                    {
+                        return readRawModel( req, new DefaultModelProblemCollector( res ),
+                                             null );
+                    }
+                    catch ( ModelBuildingException e )
+                    {
+                        // gathered with problem collector
+
+                    }
+                    return null;
+                }
+            };
+        }
+
+        public TransformerContext build()
+        {
+            return context;
+        }        
     }
 }

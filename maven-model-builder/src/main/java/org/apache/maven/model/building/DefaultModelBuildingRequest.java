@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.DefaultModelBuilder.TransformerContextBuilder;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 
@@ -38,8 +39,6 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
-    private Model fileModel;
-
     private Model rawModel;
 
     private File pomFile;
@@ -74,7 +73,7 @@ public class DefaultModelBuildingRequest
 
     private WorkspaceModelResolver workspaceResolver;
     
-    private TransformerContext context;
+    private TransformerContextBuilder contextBuilder;
 
     /**
      * Creates an empty request.
@@ -104,7 +103,7 @@ public class DefaultModelBuildingRequest
         setModelResolver( request.getModelResolver() );
         setModelBuildingListener( request.getModelBuildingListener() );
         setModelCache( request.getModelCache() );
-        setTransformerContext( request.getTransformerContext() );
+        setTransformerContextBuilder( request.getTransformerContextBuilder() );
     }
 
     @Override
@@ -411,17 +410,18 @@ public class DefaultModelBuildingRequest
         this.workspaceResolver = workspaceResolver;
         return this;
     }
-    
+
     @Override
-    public TransformerContext getTransformerContext()
+    public TransformerContextBuilder getTransformerContextBuilder()
     {
-        return context;
+        return contextBuilder;
     }
     
     @Override
-    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    public ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder )
     {
-        this.context = context;
+        this.contextBuilder = contextBuilder;
         return this;
     }
+
 }
