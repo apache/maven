@@ -38,14 +38,10 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
 {
     private final TransformerContext context;
     
-    public DefaultBuildPomXMLFilterFactory( TransformerContext context )
+    public DefaultBuildPomXMLFilterFactory( TransformerContext context, boolean consume )
     {
+        super( consume );
         this.context = context;
-    }
-    
-    public final TransformerContext getContext()
-    {
-        return context;
     }
     
     @Override
@@ -60,6 +56,24 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
         return (g, a) -> Optional.ofNullable( context.getRawModel( g, a ) )
                             .map( m -> toVersion( m ) )
                             .orElse( null );
+    }
+    
+    @Override
+    protected Optional<String> getChangelist()
+    {
+        return Optional.ofNullable( context.getUserProperty( "changelist" ) );
+    }
+
+    @Override
+    protected Optional<String> getRevision()
+    {
+        return Optional.ofNullable( context.getUserProperty( "revision" ) );
+    }
+
+    @Override
+    protected Optional<String> getSha1()
+    {
+        return Optional.ofNullable( context.getUserProperty( "sha1" ) );
     }
 
     private static RelativeProject toRelativeProject( final Model m )

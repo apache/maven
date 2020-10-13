@@ -56,6 +56,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.ArtifactModelSource;
+import org.apache.maven.model.building.DefaultModelBuilder.TransformerContextBuilder;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -129,7 +130,7 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( pomFile, new FileModelSource( pomFile ),
-                new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
+                new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null ) );
     }
 
     private boolean useGlobalModelCache()
@@ -142,7 +143,7 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( null, modelSource,
-                 new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
+                 new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -288,7 +289,7 @@ public class DefaultProjectBuilder
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
         request.setModelCache( config.modelCache );
-        request.setTransformerContext( (TransformerContext) config.session.getData().get( TransformerContext.KEY ) );
+        request.setTransformerContextBuilder( config.transformerContextBuilder );
 
         return request;
     }
@@ -307,7 +308,8 @@ public class DefaultProjectBuilder
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
-        InternalConfig config = new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null );
+        InternalConfig config =
+            new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null );
 
         boolean localProject;
 
@@ -379,8 +381,9 @@ public class DefaultProjectBuilder
         ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
         final ReactorModelPool modelPool = poolBuilder.build();
         
-        InternalConfig config = new InternalConfig( request, modelPool,
-                useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
+        InternalConfig config =
+            new InternalConfig( request, modelPool, useGlobalModelCache() ? getModelCache() : new ReactorModelCache(),
+                        modelBuilder.newTransformerContextBuilder().setUserProperties( request.getUserProperties() ) );
 
         Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
@@ -390,10 +393,8 @@ public class DefaultProjectBuilder
         
         if ( Features.buildConsumer().isActive() )
         {
-            ModelBuildingRequest buildingRequest = getModelBuildingRequest( config );
-            final TransformerContext context = modelBuilder.newTransformerContext( buildingRequest );
-            request.getRepositorySession().getData().set( TransformerContext.KEY, context );
-            buildingRequest.setTransformerContext( context );
+            request.getRepositorySession().getData().set( TransformerContext.KEY,
+                                                          config.transformerContextBuilder.build() );
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -608,13 +609,8 @@ public class DefaultProjectBuilder
     {
         boolean noErrors = true;
         
-        final TransformerContext transformerContext =
-            (TransformerContext) request.getRepositorySession().getData().get( TransformerContext.KEY );
-
         for ( InterimResult interimResult : interimResults )
         {
-            interimResult.request.setTransformerContext( transformerContext );
-            
             MavenProject project = interimResult.listener.getProject();
             try
             {
@@ -1064,16 +1060,22 @@ public class DefaultProjectBuilder
         private final ReactorModelPool modelPool;
 
         private final ReactorModelCache modelCache;
+        
+        private final TransformerContextBuilder transformerContextBuilder;
 
-        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )
+        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache,
+                        TransformerContextBuilder transformerContextBuilder )
         {
             this.request = request;
             this.modelPool = modelPool;
             this.modelCache = modelCache;
+            this.transformerContextBuilder = transformerContextBuilder;
+            
             session =
                 LegacyLocalRepositoryManager.overlay( request.getLocalRepository(), request.getRepositorySession(),
                                                       repoSystem );
             repositories = RepositoryUtils.toRepos( request.getRemoteRepositories() );
+            
         }
 
     }

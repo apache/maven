@@ -42,6 +42,13 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
+    private final boolean consume;
+    
+    public BuildPomXMLFilterFactory( boolean consume )
+    {
+        this.consume = consume;
+    }
+    
     /**
      * 
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
@@ -73,6 +80,18 @@ public class BuildPomXMLFilterFactory
             parentFilter.setParent( parent );
             parentFilter.setLexicalHandler( parent );
             parent = parentFilter;
+        }
+        
+        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( consume );
+        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
+        getRevision().ifPresent( ciFriendlyFilter::setRevision );
+        getSha1().ifPresent( ciFriendlyFilter::setSha1 );
+        
+        if ( ciFriendlyFilter.isSet() )
+        {
+            ciFriendlyFilter.setParent( parent );
+            ciFriendlyFilter.setLexicalHandler( parent );
+            parent = ciFriendlyFilter;
         }
 
         return new BuildPomXMLFilter( parent );
@@ -109,4 +128,22 @@ public class BuildPomXMLFilterFactory
     {
         return null;
     }
+    
+    // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
+
+    protected Optional<String> getChangelist()
+    {
+        return Optional.empty();
+    }
+
+    protected Optional<String> getRevision()
+    {
+        return Optional.empty();
+    }
+
+    protected Optional<String> getSha1()
+    {
+        return Optional.empty();
+    }
+
 }

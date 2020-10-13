@@ -48,7 +48,8 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
     protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
-        return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context ) ).get( pomFile );
+        return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context,
+                                                                                            true ) ).get( pomFile );
     }
     
     /**
