@@ -354,7 +354,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         Model inputModel =
-            readRawModel( request, problems, result.getFileModel() );
+            readRawModel( request, result, problems, result.getFileModel() );
 
         problems.setRootModel( inputModel );
 
@@ -429,7 +429,8 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            ModelData parentData = readParent( currentData.getModel(), currentData.getSource(), request, problems );
+            ModelData parentData =
+                readParent( currentData.getModel(), currentData.getSource(), request, result, problems );
 
             if ( parentData == null )
             {
@@ -704,8 +705,8 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model readRawModel( ModelBuildingRequest request, DefaultModelProblemCollector problems,
-                                Model fileModel )
+    private Model readRawModel( ModelBuildingRequest request, ModelBuildingResult result,
+                                DefaultModelProblemCollector problems, Model fileModel )
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
@@ -725,7 +726,7 @@ public class DefaultModelBuilder
             TransformerContext context = null;
             if ( request.getTransformerContextBuilder() != null )
             {
-                context = request.getTransformerContextBuilder().initialize( request, null, problems );   
+                context = request.getTransformerContextBuilder().initialize( request, result, problems );   
             }
             
             try
@@ -1006,7 +1007,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParent( Model childModel, Source childSource, ModelBuildingRequest request,
-                                  DefaultModelProblemCollector problems )
+                                  ModelBuildingResult result, DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelData parentData = null;
@@ -1019,7 +1020,7 @@ public class DefaultModelBuilder
 
             if ( expectedParentSource != null )
             {
-                ModelData candidateData = readParentLocally( childModel, childSource, request, problems );
+                ModelData candidateData = readParentLocally( childModel, childSource, request, result, problems );
 
                 if ( candidateData != null )
                 {
@@ -1062,7 +1063,7 @@ public class DefaultModelBuilder
                 }
                 else
                 {
-                    parentData = readParentExternally( childModel, request, problems );
+                    parentData = readParentExternally( childModel, request, result, problems );
                     
                     intoCache( request.getModelCache(), 
                               parentData.getGroupId(), parentData.getArtifactId(),
@@ -1088,7 +1089,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParentLocally( Model childModel, Source childSource, ModelBuildingRequest request,
-                                         DefaultModelProblemCollector problems )
+                                         ModelBuildingResult result, DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         final Parent parent = childModel.getParent();
@@ -1113,7 +1114,7 @@ public class DefaultModelBuilder
                 }  
             };
 
-            candidateModel = readRawModel( candidateBuildRequest, problems, null );
+            candidateModel = readRawModel( candidateBuildRequest, result, problems, null );
         }
         else
         {
@@ -1247,7 +1248,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParentExternally( Model childModel, ModelBuildingRequest request,
-                                            DefaultModelProblemCollector problems )
+                                            ModelBuildingResult result, DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         problems.setSource( childModel );
@@ -1316,7 +1317,7 @@ public class DefaultModelBuilder
             }
         };
 
-        Model parentModel = readRawModel( lenientRequest, problems, null );
+        Model parentModel = readRawModel( lenientRequest, result, problems, null );
 
         if ( !parent.getVersion().equals( version ) )
         {
@@ -1815,7 +1816,7 @@ public class DefaultModelBuilder
             return this;
         }
         
-        TransformerContext initialize( ModelBuildingRequest request, DefaultModelBuildingResult result,
+        TransformerContext initialize( ModelBuildingRequest request, ModelBuildingResult result,
                                        ModelProblemCollector problems )
         {
             return new TransformerContext()
@@ -1856,8 +1857,8 @@ public class DefaultModelBuilder
                                 }
                                 
                             };
-                            DefaultModelBuildingResult res = new DefaultModelBuildingResult();
-                            return readRawModel( gaBuildingRequest, new DefaultModelProblemCollector( res ), null );
+                            return readRawModel( gaBuildingRequest, result, new DefaultModelProblemCollector( result ),
+                                                 null );
                         }
                         catch ( ModelBuildingException e )
                         {
@@ -1883,11 +1884,10 @@ public class DefaultModelBuilder
                                     .setPomFile( pomFile )
                                     .setModelSource( new FileModelSource( pomFile ) );
                     
-                    DefaultModelBuildingResult res = new DefaultModelBuildingResult();
                     try
                     {
-                        return readRawModel( req, new DefaultModelProblemCollector( res ),
-                                             null );
+                        return readRawModel( req, result,
+                                             new DefaultModelProblemCollector( result ), null );
                     }
                     catch ( ModelBuildingException e )
                     {
