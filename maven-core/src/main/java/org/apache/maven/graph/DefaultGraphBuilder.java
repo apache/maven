@@ -380,11 +380,12 @@ public class DefaultGraphBuilder
         }
 
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
-        collectProjects( projects, files, request );
+        final boolean problems = collectProjects( projects, files, request );
+        session.setProblems( problems );
         return projects;
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    private boolean collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
         throws ProjectBuildingException
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
@@ -424,6 +425,8 @@ public class DefaultGraphBuilder
                 + " longer support building such malformed projects." );
             logger.warn( "" );
         }
+
+        return problems;
     }
 
     private void validateProjects( List<MavenProject> projects )
