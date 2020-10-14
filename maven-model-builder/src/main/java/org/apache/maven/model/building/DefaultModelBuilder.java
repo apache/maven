@@ -279,9 +279,10 @@ public class DefaultModelBuilder
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
         // read and validate raw model
-        Model inputModel = readFileModel( request, problems );
+        Model fileModel = readFileModel( request, problems );
 
-        result.setFileModel( inputModel );
+        request.setFileModel( fileModel );
+        result.setFileModel( fileModel );
         
         activateFileModel( request, result, problems );
 
@@ -301,7 +302,7 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model inputModel = result.getFileModel();
+        Model inputModel = request.getFileModel();
         problems.setRootModel( inputModel );
 
         // profile activation
@@ -354,7 +355,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         Model inputModel =
-            readRawModel( request, result, problems, result.getFileModel() );
+            readRawModel( request, problems );
 
         problems.setRootModel( inputModel );
 
@@ -705,8 +706,7 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private Model readRawModel( ModelBuildingRequest request, ModelBuildingResult result,
-                                DefaultModelProblemCollector problems, Model fileModel )
+    private Model readRawModel( ModelBuildingRequest request, DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
@@ -726,7 +726,7 @@ public class DefaultModelBuilder
             TransformerContext context = null;
             if ( request.getTransformerContextBuilder() != null )
             {
-                context = request.getTransformerContextBuilder().initialize( request, result, problems );   
+                context = request.getTransformerContextBuilder().initialize( request, problems );   
             }
             
             try
@@ -745,14 +745,13 @@ public class DefaultModelBuilder
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
             }
         }
-        else if ( fileModel == null )
+        else if ( request.getFileModel() == null )
         {
             rawModel = readFileModel( request, problems );
         }
         else
         {
-//            throw new UnsupportedOperationException();
-            rawModel = fileModel.clone();
+            rawModel = request.getFileModel().clone();
         }
 
         modelValidator.validateRawModel( rawModel, request, problems );
@@ -1114,7 +1113,7 @@ public class DefaultModelBuilder
                 }  
             };
 
-            candidateModel = readRawModel( candidateBuildRequest, result, problems, null );
+            candidateModel = readRawModel( candidateBuildRequest, problems );
         }
         else
         {
@@ -1315,9 +1314,14 @@ public class DefaultModelBuilder
             {
                 return modelSource;
             }
+            @Override
+            public Model getFileModel()
+            {
+                return null;
+            }
         };
 
-        Model parentModel = readRawModel( lenientRequest, result, problems, null );
+        Model parentModel = readRawModel( lenientRequest, problems );
 
         if ( !parent.getVersion().equals( version ) )
         {
@@ -1816,8 +1820,7 @@ public class DefaultModelBuilder
             return this;
         }
         
-        TransformerContext initialize( ModelBuildingRequest request, ModelBuildingResult result,
-                                       ModelProblemCollector problems )
+        TransformerContext initialize( ModelBuildingRequest request, DefaultModelProblemCollector problems )
         {
             return new TransformerContext()
             {
@@ -1857,8 +1860,7 @@ public class DefaultModelBuilder
                                 }
                                 
                             };
-                            return readRawModel( gaBuildingRequest, result, new DefaultModelProblemCollector( result ),
-                                                 null );
+                            return readRawModel( gaBuildingRequest, problems );
                         }
                         catch ( ModelBuildingException e )
                         {
@@ -1886,13 +1888,11 @@ public class DefaultModelBuilder
                     
                     try
                     {
-                        return readRawModel( req, result,
-                                             new DefaultModelProblemCollector( result ), null );
+                        return readRawModel( req, problems );
                     }
                     catch ( ModelBuildingException e )
                     {
                         // gathered with problem collector
-
                     }
                     return null;
                 }
