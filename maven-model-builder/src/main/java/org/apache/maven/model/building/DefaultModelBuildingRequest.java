@@ -39,7 +39,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
-    private Model rawModel;
+    private Model fileModel;
 
     private File pomFile;
 
@@ -388,13 +388,25 @@ public class DefaultModelBuildingRequest
     @Override
     public Model getRawModel()
     {
-        return rawModel;
+        return null;
     }
 
     @Override
     public ModelBuildingRequest setRawModel( Model rawModel )
     {
-        this.rawModel = rawModel;
+        return this;
+    }
+    
+    @Override
+    public Model getFileModel()
+    {
+        return fileModel;
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        this.fileModel = fileModel;
         return this;
     }
 

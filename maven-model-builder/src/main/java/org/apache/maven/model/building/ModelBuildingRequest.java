@@ -64,19 +64,31 @@ public interface ModelBuildingRequest
      * Denotes strict validation as recommended by the current Maven version.
      */
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
-    
+
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
      *
      * @return The raw model to build or {@code null} if not set.
      */
-    Model getRawModel();
+    Model getFileModel();
 
     /**
      * Set raw model.
      *
      * @param rawModel
      */
+    ModelBuildingRequest setFileModel( Model fileModel );
+    
+    /**
+     * @deprecated rawModel is never set, instead the fileModel is set 
+     */
+    @Deprecated
+    Model getRawModel();
+
+    /**
+     * @deprecated setting the rawModel has no effect, instead the fileModel of phase one will be set
+     */
+    @Deprecated
     ModelBuildingRequest setRawModel( Model rawModel );
 
     /**

@@ -269,6 +269,19 @@ class FilterModelBuildingRequest
         request.setRawModel( rawModel );
         return this;
     }
+    
+    @Override
+    public Model getFileModel()
+    {
+        return request.getFileModel();
+    }
+    
+    @Override
+    public ModelBuildingRequest setFileModel( Model fileModel )
+    {
+        request.setFileModel( fileModel );
+        return this;
+    }
 
     @Override
     public WorkspaceModelResolver getWorkspaceModelResolver()
