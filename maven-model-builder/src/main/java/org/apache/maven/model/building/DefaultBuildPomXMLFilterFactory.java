@@ -30,6 +30,7 @@ import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.RelativeProject;
 
 /**
+ * A BuildPomXMLFilterFactory which is context aware 
  * 
  * @author Robert Scholte
  * @since 3.7.0
@@ -38,6 +39,11 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
 {
     private final TransformerContext context;
     
+    /**
+     * 
+     * @param context a set of data to extract values from as required for the build pom
+     * @param consume true is this factory used for creating the consumer pom, otherwise false
+     */
     public DefaultBuildPomXMLFilterFactory( TransformerContext context, boolean consume )
     {
         super( consume );
