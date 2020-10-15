@@ -1803,7 +1803,8 @@ public class DefaultModelBuilder
     
     /**
      * Builds up the transformer context.
-     * After the buildplan is ready, the build()-method returns the immutable context useful during distribution
+     * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
+     * This is an inner class, as it must be able to call readRawModel() 
      * 
      * @author Robert Scholte
      * @since 3.7.0
