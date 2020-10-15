@@ -38,10 +38,26 @@ Maven Model Builder
  The sequence is divided into 2 phases:
 
  * phase 1
-
+ 
    ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
    <<<$\{basedir}>>> (since Maven 3), System properties and request properties
+
+   ** file model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
+   with its <<<DefaultModelValidator>>> implementation
+   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
+
+   []
+
+ * phase 2, with optional plugin processing
+ 
+   ** Build up a raw model by re-reading the file and enrich it based on information available in the reactor. Some features:
+   
+      *** Resolve version of versionless parents based on realtivePath (including ci-friendly versions)
+   
+      *** Resolve version of versionless dependencies that are part of the reactor
+
+   []   
 
    ** raw model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation
@@ -64,10 +80,6 @@ Maven Model Builder
    ** url normalization: <<<UrlNormalizer>>> ({{{./apidocs/org/apache/maven/model/path/UrlNormalizer.html}javadoc}}),
    with its <<<DefaultUrlNormalizer>>> implementation
    ({{{./xref/org/apache/maven/model/path/DefaultUrlNormalizer.html}source}})
-
-   []
-
- * phase 2, with optional plugin processing
 
    ** model path translation: <<<ModelPathTranslator>>> ({{{./apidocs/org/apache/maven/model/path/ModelPathTranslator.html}javadoc}}),
    with its <<<DefaultModelPathTranslator>>> implementation
@@ -194,6 +206,11 @@ Maven Model Builder
 *----+------+------+
 | <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
 *----+------+------+
+| <<<changelist>>> \
+<<<revision>>> \
+<<<sha1>>> | CI friendly placeholders for the project version (see {{{/maven-ci-friendly.html}Maven CI Friendly Versions}}) | <<<1.0.0-$\{changelist\}-SNAPSHOT>>> |
+*----+------+------+
+
 
 **  Notice
 
