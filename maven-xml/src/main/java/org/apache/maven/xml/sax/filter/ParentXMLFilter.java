@@ -19,6 +19,7 @@ package org.apache.maven.xml.sax.filter;
  * under the License.
  */
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -59,6 +60,8 @@ class ParentXMLFilter
     private String relativePath;
 
     private boolean hasVersion;
+    
+    private boolean hasRelativePath;
     
     private Optional<RelativeProject> resolvedParent;
 
@@ -107,6 +110,9 @@ class ParentXMLFilter
             state = localName;
             
             hasVersion |= "version".equals( localName );
+            
+            // can be set to empty on purpose to enforce repository download
+            hasRelativePath |= "relativePath".equals( localName );
         }
         
         super.startElement( uri, localName, qName, atts );
@@ -153,10 +159,14 @@ class ParentXMLFilter
             switch ( localName )
             {
                 case "parent":
-                    if ( !hasVersion || relativePath != null )
+                    if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
                     {
                         resolvedParent =
                             resolveRelativePath( Paths.get( Objects.toString( relativePath, "../pom.xml" ) ) );
+                    }
+                    else
+                    {
+                        resolvedParent = Optional.empty();
                     }
                     
                     if ( !hasVersion && resolvedParent.isPresent() )
@@ -194,8 +204,13 @@ class ParentXMLFilter
 
     protected Optional<RelativeProject> resolveRelativePath( Path relativePath )
     {
-        Optional<RelativeProject> mappedProject =
-            relativePathMapper.apply( projectPath.resolve( relativePath ).normalize() );
+        Path pomPath = projectPath.resolve( relativePath );
+        if ( Files.isDirectory( pomPath ) )
+        {
+            pomPath = pomPath.resolve( "pom.xml" );
+        }
+        
+        Optional<RelativeProject> mappedProject = relativePathMapper.apply( pomPath.normalize() );
         
         if ( mappedProject.isPresent() )
         {

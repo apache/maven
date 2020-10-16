@@ -27,8 +27,6 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.maven.xml.sax.filter.ParentXMLFilter;
-import org.apache.maven.xml.sax.filter.RelativeProject;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -82,6 +80,31 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
                         + "<artifactId>ARTIFACTID</artifactId>"
                         + "<version>1.0.0</version>"
                         + "</parent>";
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
+    }
+
+    /**
+     * An empty relative path means it must downloaded from a repository.
+     * That implies that the version cannot be solved (if missing, Maven should complain)
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testEmptyRelativePathNoVersion() throws Exception
+    {
+        String input = "<parent>"
+            + "<groupId>GROUPID</groupId>"
+            + "<artifactId>ARTIFACTID</artifactId>"
+            + "<relativePath></relativePath>"
+            + "</parent>";
+        String expected = "<parent>"
+                        + "<groupId>GROUPID</groupId>"
+                        + "<artifactId>ARTIFACTID</artifactId>"
+                        + "<relativePath/>" // SAX optimization, however "" != null ...
+                        + "</parent>";;
 
         String actual = transform( input );
 
