@@ -1873,19 +1873,14 @@ public class DefaultModelBuilder
                 
                 private Model findRawModel( Path p )
                 {
-                    File pomFile;
-                    if ( Files.isDirectory( p ) )
+                    if ( !Files.isRegularFile( p ) )
                     {
-                        pomFile = modelLocator.locatePom( p.toFile() );
-                    }
-                    else
-                    {
-                        pomFile = p.toFile();
+                        throw new IllegalArgumentException( "Not a regular file" + p );
                     }
                     
                     DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
-                                    .setPomFile( pomFile )
-                                    .setModelSource( new FileModelSource( pomFile ) );
+                                    .setPomFile( p.toFile() )
+                                    .setModelSource( new FileModelSource( p.toFile() ) );
                     
                     try
                     {
