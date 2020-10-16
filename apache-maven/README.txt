@@ -66,7 +66,7 @@
 
   Please see the file called LICENSE.
 
-  Maven URLS
+  Maven URLs
   ----------
 
   Home Page:          https://maven.apache.org/

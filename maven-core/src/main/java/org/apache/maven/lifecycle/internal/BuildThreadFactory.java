@@ -34,6 +34,6 @@ public class BuildThreadFactory
 
     public Thread newThread( Runnable r )
     {
-        return new Thread( r, String.format( "%s %d", PREFIX, id.getAndIncrement() ) );
+        return new Thread( r, String.format( "%s-%d", PREFIX, id.getAndIncrement() ) );
     }
 }

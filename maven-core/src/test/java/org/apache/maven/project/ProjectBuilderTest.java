@@ -36,6 +36,7 @@ import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
@@ -329,5 +330,18 @@ public class ProjectBuilderTest
         assertEquals( 1, project.getCompileSourceRoots().size() );
         assertEquals( 1, project.getMailingLists().size() );
         assertEquals( 1, project.getResources().size() );
+    }
+
+    public void testPropertyInPluginManagementGroupId()
+            throws Exception
+    {
+        File pom = getProject( "MNG-6983" );
+
+        MavenSession session = createMavenSession( pom );
+        MavenProject project = session.getCurrentProject();
+
+        for (Plugin buildPlugin : project.getBuildPlugins()) {
+            assertNotNull( "Missing version for build plugin " + buildPlugin.getKey(), buildPlugin.getVersion() );
+        }
     }
 }

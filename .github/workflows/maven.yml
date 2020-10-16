@@ -67,22 +67,29 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 14]
+        java: [8, 11, 15, 16-ea]
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Collect environment context variables
         shell: bash
+        env:
+          PR_HEAD_LABEL: ${{ github.event.pull_request.head.label }}
         run: |
           set +e
           repo=maven-integration-testing
-          user=${GITHUB_REPOSITORY%/*}
-          branch=${GITHUB_REF#refs/heads/}
           target_branch=master
           target_user=apache
+          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+            user=${PR_HEAD_LABEL%:*}
+            branch=${PR_HEAD_LABEL#*:}
+          else
+            user=${GITHUB_REPOSITORY%/*}
+            branch=${GITHUB_REF#refs/heads/}
+          fi
           if [ $branch != "master" ]; then
-            git ls-remote https://github.com/$user/$repo.git | grep $GITHUB_REF > /dev/null
+            git ls-remote https://github.com/$user/$repo.git | grep "refs/heads/${branch}$" > /dev/null
             if [ $? -eq 0 ]; then
               echo "Found a branch \"$branch\" in fork \"$user/$repo\", configuring this for the integration tests to be run against."
               target_branch=$branch

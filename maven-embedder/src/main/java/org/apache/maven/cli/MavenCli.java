@@ -103,6 +103,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -112,6 +113,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,6 +148,8 @@ public class MavenCli
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
+
+    private static final String[] DEPRECATED_OPTIONS = { "up", "npu", "cpu", "npr" };
 
     private ClassWorld classWorld;
 
@@ -1334,286 +1338,62 @@ public class MavenCli
         return defaultLocation;
     }
 
-    private MavenExecutionRequest populateRequest( CliRequest cliRequest )
+    protected MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         return populateRequest( cliRequest, cliRequest.request );
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
-        boolean showErrors = cliRequest.showErrors;
-
-        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
-        for ( String deprecatedOption : deprecatedOptions )
-        {
-            if ( commandLine.hasOption( deprecatedOption ) )
-            {
-                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
-                        deprecatedOption );
-            }
-        }
-
-        // ----------------------------------------------------------------------
-        // Now that we have everything that we need we will fire up plexus and
-        // bring the maven component to life for use.
-        // ----------------------------------------------------------------------
-
-        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            request.setInteractiveMode( false );
-        }
-
-        boolean noSnapshotUpdates = false;
-        if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
-        {
-            noSnapshotUpdates = true;
-        }
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        List<String> goals = commandLine.getArgList();
-
-        boolean recursive = true;
-
-        // this is the default behavior.
-        String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-
-        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
-        {
-            recursive = false;
-        }
-
-        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
-        }
-
-        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
-        {
-            request.setOffline( true );
-        }
-
-        boolean updateSnapshots = false;
-
-        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
-        {
-            updateSnapshots = true;
-        }
-
-        String globalChecksumPolicy = null;
-
-        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        }
-        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
-        }
-
+        request.setShowErrors( cliRequest.showErrors ); // default: false
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
-        // ----------------------------------------------------------------------
-        // Profile Activation
-        // ----------------------------------------------------------------------
+        handleDeprecatedOptions( commandLine );
 
-        List<String> activeProfiles = new ArrayList<>();
-
-        List<String> inactiveProfiles = new ArrayList<>();
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
-            {
-                for ( String profileOptionValue : profileOptionValues )
-                {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
-                    {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            activeProfiles.add( profileAction );
-                        }
-                    }
-                }
-            }
-        }
-
-        TransferListener transferListener;
-
-        if ( quiet || cliRequest.commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
-        {
-            transferListener = new QuietMavenTransferListener();
-        }
-        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            //
-            // If we're logging to a file then we don't want the console transfer listener as it will spew
-            // download progress all over the place
-            //
-            transferListener = getConsoleTransferListener( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) );
-        }
-        else
-        {
-            transferListener = getBatchTransferListener();
-        }
-
-        ExecutionListener executionListener = new ExecutionEventLogger();
-        if ( eventSpyDispatcher != null )
-        {
-            executionListener = eventSpyDispatcher.chainListener( executionListener );
-        }
-
-        String alternatePomFile = null;
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
-        {
-            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
-        }
-
-        request.setBaseDirectory( baseDirectory ).setGoals( goals ).setSystemProperties(
-            cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties ).setReactorFailureBehavior(
-            reactorFailureBehaviour ) // default: fail fast
-            .setRecursive( recursive ) // default: true
-            .setShowErrors( showErrors ) // default: false
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
-            .setExecutionListener( executionListener ).setTransferListener(
-            transferListener ) // default: batch mode which goes along with interactive
-            .setUpdateSnapshots( updateSnapshots ) // default: false
-            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
-
-        if ( alternatePomFile != null )
-        {
-            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
-            if ( pom.isDirectory() )
-            {
-                pom = new File( pom, "pom.xml" );
-            }
-
-            request.setPom( pom );
-        }
-        else if ( modelProcessor != null )
-        {
-            File pom = modelProcessor.locatePom( baseDirectory );
-
-            if ( pom.isFile() )
-            {
-                request.setPom( pom );
-            }
-        }
+        disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
+        enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
+        request.setGoals( commandLine.getArgList() );
+        request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
+        disableOnPresentOption( commandLine, CLIManager.NON_RECURSIVE, request::setRecursive );
+        enableOnPresentOption( commandLine, CLIManager.OFFLINE, request::setOffline );
+        enableOnPresentOption( commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots );
+        request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
+        request.setBaseDirectory( baseDirectory );
+        request.setSystemProperties( cliRequest.systemProperties );
+        request.setUserProperties( cliRequest.userProperties );
+        request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
+        request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
+        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
+        request.setExecutionListener( determineExecutionListener() );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
         }
 
-        if ( commandLine.hasOption( CLIManager.RESUME ) )
-        {
-            request.setResume( true );
-        }
-
-        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
-        {
-            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
-        }
-
-        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
-        {
-            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
-
-            List<String> inclProjects = new ArrayList<>();
-            List<String> exclProjects = new ArrayList<>();
-
-            if ( projectOptionValues != null )
-            {
-                for ( String projectOptionValue : projectOptionValues )
-                {
-                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
-
-                    while ( projectTokens.hasMoreTokens() )
-                    {
-                        String projectAction = projectTokens.nextToken().trim();
-
-                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
-                        {
-                            exclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else if ( projectAction.startsWith( "+" ) )
-                        {
-                            inclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            inclProjects.add( projectAction );
-                        }
-                    }
-                }
-            }
-
-            request.setSelectedProjects( inclProjects );
-            request.setExcludedProjects( exclProjects );
-        }
-
-        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
-        }
-        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
-        }
-        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
-        }
-
-        String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-
-        if ( localRepoProperty == null )
-        {
-            localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-        }
-
-        if ( localRepoProperty != null )
-        {
-            request.setLocalRepositoryPath( localRepoProperty );
-        }
-
+        request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        enableOnPresentOption( commandLine, CLIManager.RESUME, request::setResume );
+        request.setMakeBehavior( determineMakeBehavior( commandLine ) );
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
+
+        final ProjectActivation projectActivation = determineProjectActivation( commandLine );
+        request.setSelectedProjects( projectActivation.activeProjects );
+        request.setExcludedProjects( projectActivation.inactiveProjects );
+
+        final ProfileActivation profileActivation = determineProfileActivation( commandLine );
+        request.addActiveProfiles( profileActivation.activeProfiles );
+        request.addInactiveProfiles( profileActivation.inactiveProfiles );
+
+        final String localRepositoryPath = determineLocalRepositoryPath( request );
+        if ( localRepositoryPath != null )
+        {
+            request.setLocalRepositoryPath( localRepositoryPath );
+        }
 
         //
         // Builder, concurrency and parallelism
@@ -1623,9 +1403,7 @@ public class MavenCli
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
         // extend the command line to accept its own configuration parameters.
         //
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
-            ? commandLine.getOptionValue( CLIManager.THREADS )
-            : null;
+        final String threadConfiguration = commandLine.getOptionValue( CLIManager.THREADS );
 
         if ( threadConfiguration != null )
         {
@@ -1647,12 +1425,276 @@ public class MavenCli
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        if ( commandLine.hasOption( CLIManager.BUILDER ) )
-        {
-            request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
-        }
+        request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER, request.getBuilderId() ) );
 
         return request;
+    }
+
+    private String determineLocalRepositoryPath( final MavenExecutionRequest request )
+    {
+        String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        if ( userDefinedLocalRepo != null )
+        {
+            return userDefinedLocalRepo;
+        }
+
+        return request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+    }
+
+    private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
+    {
+        String alternatePomFile = null;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+        {
+            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+        }
+
+        if ( alternatePomFile != null )
+        {
+            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+            if ( pom.isDirectory() )
+            {
+                pom = new File( pom, "pom.xml" );
+            }
+
+            return pom;
+        }
+        else if ( modelProcessor != null )
+        {
+            File pom = modelProcessor.locatePom( baseDirectory );
+
+            if ( pom.isFile() )
+            {
+                return pom;
+            }
+        }
+
+        return null;
+    }
+
+    // Visible for testing
+    static ProjectActivation determineProjectActivation ( final CommandLine commandLine )
+    {
+        final ProjectActivation projectActivation = new ProjectActivation();
+
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+
+            if ( projectOptionValues != null )
+            {
+                for ( String projectOptionValue : projectOptionValues )
+                {
+                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
+
+                    while ( projectTokens.hasMoreTokens() )
+                    {
+                        String projectAction = projectTokens.nextToken().trim();
+
+                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
+                        {
+                            projectActivation.deactivate( projectAction.substring( 1 ) );
+                        }
+                        else if ( projectAction.startsWith( "+" ) )
+                        {
+                            projectActivation.activate( projectAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            projectActivation.activate( projectAction );
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return projectActivation;
+    }
+
+    // Visible for testing
+    static ProfileActivation determineProfileActivation( final CommandLine commandLine )
+    {
+        final ProfileActivation result = new ProfileActivation();
+
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+            if ( profileOptionValues != null )
+            {
+                for ( String profileOptionValue : profileOptionValues )
+                {
+                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
+
+                    while ( profileTokens.hasMoreTokens() )
+                    {
+                        String profileAction = profileTokens.nextToken().trim();
+
+                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
+                        {
+                            result.deactivate( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "+" ) )
+                        {
+                            result.activate( profileAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            result.activate( profileAction );
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private ExecutionListener determineExecutionListener()
+    {
+        ExecutionListener executionListener = new ExecutionEventLogger();
+        if ( eventSpyDispatcher != null )
+        {
+            return eventSpyDispatcher.chainListener( executionListener );
+        }
+        else
+        {
+            return executionListener;
+        }
+    }
+
+    private void handleDeprecatedOptions( final CommandLine commandLine )
+    {
+        Arrays.stream( DEPRECATED_OPTIONS )
+                .filter( commandLine::hasOption )
+                .forEach( deprecatedOption -> slf4jLogger.warn(
+                        "Command line option -{} is deprecated and will be removed in future Maven versions.",
+                        deprecatedOption )
+                );
+    }
+
+    private String determineReactorFailureBehaviour( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_AT_END;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_NEVER;
+        }
+        else
+        {
+            // this is the default behavior.
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+    }
+
+    private TransferListener determineTransferListener( final boolean quiet,
+                                                        final CommandLine commandLine,
+                                                        final MavenExecutionRequest request )
+    {
+        if ( quiet || commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
+        {
+            return new QuietMavenTransferListener();
+        }
+        else if ( request.isInteractiveMode() && !commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            //
+            // If we're logging to a file then we don't want the console transfer listener as it will spew
+            // download progress all over the place
+            //
+            return getConsoleTransferListener( commandLine.hasOption( CLIManager.DEBUG ) );
+        }
+        else
+        {
+            // default: batch mode which goes along with interactive
+            return getBatchTransferListener();
+        }
+    }
+
+    private String determineMakeBehavior( final CommandLine cl )
+    {
+        if ( cl.hasOption( CLIManager.ALSO_MAKE ) && !cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
+        }
+        else if ( !cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
+        }
+        else if ( cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_BOTH;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String determineGlobalCheckPolicy( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final String option,
+                                         final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( false );
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final char option,
+                                         final Consumer<Boolean> setting )
+    {
+        disableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final String option,
+                                        final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
+        }
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final char option,
+                                        final Consumer<Boolean> setting )
+    {
+        enableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnAbsentOption( final CommandLine commandLine,
+                                       final char option,
+                                       final Consumer<Boolean> setting )
+    {
+        if ( !commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
+        }
     }
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
@@ -1768,5 +1810,47 @@ public class MavenCli
         throws ComponentLookupException
     {
         return container.lookup( ModelProcessor.class );
+    }
+
+    // Visible for testing
+    static class ProfileActivation
+    {
+        final List<String> activeProfiles = new ArrayList<>();
+        final List<String> inactiveProfiles = new ArrayList<>();
+
+        public void deactivate( final String profile )
+        {
+            inactiveProfiles.add( profile );
+        }
+
+        public void activate( final String profile )
+        {
+            activeProfiles.add( profile );
+        }
+    }
+
+    // Visible for testing
+    static class ProjectActivation
+    {
+        List<String> activeProjects;
+        List<String> inactiveProjects;
+
+        public void deactivate( final String project )
+        {
+            if ( inactiveProjects == null )
+            {
+                inactiveProjects = new ArrayList<>();
+            }
+            inactiveProjects.add( project );
+        }
+
+        public void activate( final String project )
+        {
+            if ( activeProjects == null )
+            {
+                activeProjects = new ArrayList<>();
+            }
+            activeProjects.add( project );
+        }
     }
 }
