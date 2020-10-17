@@ -43,6 +43,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public AbstractSAXFilter( AbstractSAXFilter parent )
     {
         setParent( parent );
+        parent.setLexicalHandler( this );
     }
     
     public LexicalHandler getLexicalHandler()

@@ -21,8 +21,6 @@ package org.apache.maven.xml.sax.filter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Remove all modules, this is just buildtime information
@@ -42,7 +40,7 @@ class ModulesXMLFilter
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> ModulesXMLFilter( T parent )
+    ModulesXMLFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }
