@@ -39,6 +39,16 @@ class CiFriendlyXMLFilter
     
     private boolean parseVersion;
     
+    CiFriendlyXMLFilter()
+    {
+        super();
+    }
+
+    CiFriendlyXMLFilter( AbstractSAXFilter parent )
+    {
+        super( parent );
+    }
+
     public CiFriendlyXMLFilter setChangelist( String changelist )
     {
         replaceChain = replaceChain.andThen( t -> t.replace( "${changelist}", changelist ) );

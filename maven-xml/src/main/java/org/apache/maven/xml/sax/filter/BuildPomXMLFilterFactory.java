@@ -26,8 +26,6 @@ import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.maven.xml.Factories;
 import org.xml.sax.SAXException;
@@ -42,6 +40,18 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
+    private final LexicalHandler lexicalHandler;
+    
+    public BuildPomXMLFilterFactory()
+    {
+        this( null ); 
+    }
+    
+    public BuildPomXMLFilterFactory( LexicalHandler lexicalHandler )
+    {
+        this.lexicalHandler = lexicalHandler;
+    }
+
     /**
      * 
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
@@ -55,7 +65,7 @@ public class BuildPomXMLFilterFactory
     {
         AbstractSAXFilter parent = new AbstractSAXFilter();
         parent.setParent( getXMLReader() );
-        parent.setLexicalHandler( getLexicalHander() );
+        parent.setLexicalHandler( lexicalHandler );
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
@@ -83,18 +93,6 @@ public class BuildPomXMLFilterFactory
         XMLReader xmlReader = Factories.newXMLReader();
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
         return xmlReader;
-    }
-    
-    private LexicalHandler getLexicalHander() throws TransformerConfigurationException 
-    {
-        TransformerFactory transformerFactory = Factories.newTransformerFactory();
-        if ( transformerFactory instanceof SAXTransformerFactory )
-        {
-            SAXTransformerFactory saxTransformerFactory = (SAXTransformerFactory) transformerFactory;
-            return saxTransformerFactory.newTransformerHandler();
-        }
-        throw new TransformerConfigurationException( "Failed to get LexicalHandler via TransformerFactory:"
-            + " it is not an instance of SAXTransformerFactory" );
     }
     
     /**

@@ -21,8 +21,6 @@ package org.apache.maven.xml.sax.filter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Remove relativePath element, has no value for consumer pom
@@ -42,7 +40,7 @@ class RelativePathXMLFilter
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> RelativePathXMLFilter( T parent )
+    RelativePathXMLFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }

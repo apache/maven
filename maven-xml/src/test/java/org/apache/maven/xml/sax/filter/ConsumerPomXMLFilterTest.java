@@ -30,6 +30,7 @@ import java.util.function.Function;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -228,6 +229,23 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             "</project>";
         String expected = input;
         
+        String actual = transform( input );
+        assertThat( actual ).and( expected ).areIdentical();
+    }
+    
+    @Test
+    @Ignore
+    public void lexicalHandler() throws Exception
+    {
+        String input = "<project><!--before--><modules>"
+                        + "<!--pre-in-->"
+                        + "<module><!--in-->ab</module>"
+                        + "<module>../cd</module>"
+                        + "<!--post-in-->"
+                        + "</modules>"
+                        + "<!--after--></project>";
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+                        "<project><!--before--><!--after--></project>";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
     }

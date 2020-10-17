@@ -29,8 +29,6 @@ import org.apache.maven.xml.sax.SAXEventFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Builds up a list of SAXEvents, which will be executed with {@link #executeEvents()}
@@ -64,7 +62,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> AbstractEventXMLFilter( T parent )
+    AbstractEventXMLFilter( AbstractSAXFilter parent )
     {
         setParent( parent );
     }
