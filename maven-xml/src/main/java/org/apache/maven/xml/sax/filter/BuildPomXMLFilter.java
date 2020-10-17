@@ -20,7 +20,6 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Filter to adjust pom on filesystem before being processed for effective pom.
@@ -39,7 +38,7 @@ public class BuildPomXMLFilter extends AbstractSAXFilter
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> BuildPomXMLFilter( T parent )
+    BuildPomXMLFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }

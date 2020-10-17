@@ -20,7 +20,6 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * XML Filter to transform pom.xml to consumer pom.
@@ -35,7 +34,7 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class ConsumerPomXMLFilter extends AbstractSAXFilter
 {
-    <T extends XMLReader & LexicalHandler> ConsumerPomXMLFilter( T filter )
+    ConsumerPomXMLFilter( AbstractSAXFilter filter )
     {
         super( filter );
     }
