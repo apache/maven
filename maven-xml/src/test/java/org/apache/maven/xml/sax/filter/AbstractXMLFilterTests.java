@@ -39,7 +39,6 @@ import org.apache.maven.xml.Factories;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 public abstract class AbstractXMLFilterTests
 {
@@ -141,7 +140,7 @@ public abstract class AbstractXMLFilterTests
             super();
         }
         
-        public <T extends XMLReader & LexicalHandler> PerCharXMLFilter( T parent )
+        public PerCharXMLFilter( AbstractSAXFilter parent )
         {
             super( parent );
         }
