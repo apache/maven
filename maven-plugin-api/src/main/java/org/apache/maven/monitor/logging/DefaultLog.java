@@ -24,7 +24,10 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * @author jdcasey
+ *
+ * @deprecated Use SLF4J directly
  */
+@Deprecated
 public class DefaultLog
     implements Log
 {

@@ -28,7 +28,10 @@ package org.apache.maven.plugin.logging;
  * rather than formatting first by calling <code>toString()</code>.
  *
  * @author jdcasey
+ *
+ * @deprecated Use SLF4J directly
  */
+@Deprecated
 public interface Log
 {
     /**
