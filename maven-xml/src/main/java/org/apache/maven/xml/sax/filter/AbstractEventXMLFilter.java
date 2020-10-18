@@ -64,7 +64,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
 
     AbstractEventXMLFilter( AbstractSAXFilter parent )
     {
-        setParent( parent );
+        super( parent );
     }
 
     private SAXEventFactory getEventFactory()

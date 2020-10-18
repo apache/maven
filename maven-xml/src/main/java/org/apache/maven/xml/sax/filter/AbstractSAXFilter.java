@@ -35,14 +35,14 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
 {
     private LexicalHandler lexicalHandler;
     
-    AbstractSAXFilter()
+    public AbstractSAXFilter()
     {
         super();
     }
 
     public AbstractSAXFilter( AbstractSAXFilter parent )
     {
-        setParent( parent );
+        super( parent );
         parent.setLexicalHandler( this );
     }
     

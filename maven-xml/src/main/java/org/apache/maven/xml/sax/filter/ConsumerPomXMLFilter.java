@@ -20,6 +20,7 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * XML Filter to transform pom.xml to consumer pom.
@@ -49,5 +50,11 @@ public class ConsumerPomXMLFilter extends AbstractSAXFilter
         {
             super.setParent( parent );
         }
+    }
+    
+    @Override
+    public LexicalHandler getLexicalHandler()
+    {
+        return ( (AbstractSAXFilter) getParent() ).getLexicalHandler();
     }
 }

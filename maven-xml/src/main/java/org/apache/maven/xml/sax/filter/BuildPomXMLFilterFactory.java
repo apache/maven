@@ -22,6 +22,7 @@ package org.apache.maven.xml.sax.filter;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,16 +41,16 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
-    private final LexicalHandler lexicalHandler;
+    private final Consumer<LexicalHandler> lexicalHandlerConsumer;
     
     public BuildPomXMLFilterFactory()
     {
         this( null ); 
     }
     
-    public BuildPomXMLFilterFactory( LexicalHandler lexicalHandler )
+    public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
     {
-        this.lexicalHandler = lexicalHandler;
+        this.lexicalHandlerConsumer = lexicalHandlerConsumer;
     }
 
     /**
@@ -65,7 +66,10 @@ public class BuildPomXMLFilterFactory
     {
         AbstractSAXFilter parent = new AbstractSAXFilter();
         parent.setParent( getXMLReader() );
-        parent.setLexicalHandler( lexicalHandler );
+        if ( lexicalHandlerConsumer != null )
+        {
+            lexicalHandlerConsumer.accept( parent );
+        }
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
