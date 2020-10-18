@@ -20,19 +20,24 @@ package org.apache.maven.xml.sax.filter;
  */
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import java.util.function.Consumer;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.junit.Test;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-    protected ReactorDependencyXMLFilter getFilter()
+    protected ReactorDependencyXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerException, SAXException, ParserConfigurationException
     {
-        return new ReactorDependencyXMLFilter( (g, a) -> "1.0.0" );
+        ReactorDependencyXMLFilter filter = new ReactorDependencyXMLFilter( (g, a) -> "1.0.0" );
+        lexicalHandlerConsumer.accept( filter );
+        return filter;
     }
 
     @Test

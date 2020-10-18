@@ -25,14 +25,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
@@ -43,9 +44,10 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     }
     
     @Override
-    protected AbstractSAXFilter getFilter() throws SAXException, ParserConfigurationException, TransformerConfigurationException
+    protected AbstractSAXFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
+        throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
-        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory()
+        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory( lexicalHandlerConsumer )
         {
             @Override
             protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
@@ -234,7 +236,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     }
     
     @Test
-    @Ignore
+//    @Ignore
     public void lexicalHandler() throws Exception
     {
         String input = "<project><!--before--><modules>"

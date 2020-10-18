@@ -21,15 +21,19 @@ package org.apache.maven.xml.sax.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-import org.apache.maven.xml.sax.filter.ModulesXMLFilter;
+import java.util.function.Consumer;
+
 import org.junit.Test;
+import org.xml.sax.ext.LexicalHandler;
 
 public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 
 	@Override
-	protected ModulesXMLFilter getFilter()
+	protected ModulesXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
 	{
-	    return new ModulesXMLFilter();
+	    ModulesXMLFilter filter = new ModulesXMLFilter();
+	    lexicalHandlerConsumer.accept( filter );
+	    return filter;
 	}
 	
 	@Test
