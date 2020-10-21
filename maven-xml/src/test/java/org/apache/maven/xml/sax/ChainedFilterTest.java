@@ -60,7 +60,6 @@ public class ChainedFilterTest
         StreamResult result = new StreamResult( writer );
         transformerHandler.setResult( result );
 
-        Transformer transformer = transformerFactory.newTransformer();
         SAXResult transformResult = new SAXResult( transformerHandler );
 
         // Watch the order of filters! In reverse order the values would be 'AweSome'
@@ -78,6 +77,7 @@ public class ChainedFilterTest
 
         SAXSource transformSource = new SAXSource( filter, new InputSource( new StringReader( input ) ) );
 
+        Transformer transformer = transformerFactory.newTransformer();
         transformer.transform( transformSource, transformResult );
 
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"

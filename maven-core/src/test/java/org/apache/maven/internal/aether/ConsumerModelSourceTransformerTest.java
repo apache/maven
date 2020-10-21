@@ -1,11 +1,5 @@
 package org.apache.maven.internal.aether;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,9 +19,10 @@ import java.nio.file.Files;
  * under the License.
  */
 
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.TransformerContext;
@@ -41,14 +36,13 @@ public class ConsumerModelSourceTransformerTest
     @Test
     public void test() throws Exception
     {
-        Path pomFile = Paths.get( "src/test/resources/projects/transform.pom").toAbsolutePath();
-        InputStream in = transformer.transform( pomFile, new NoTransformerContext() );
-        
-        String text =
-            new BufferedReader( new InputStreamReader( in,
-                                                       StandardCharsets.UTF_8 ) ).lines().collect( Collectors.joining( "\n" ) );
+        Path beforePomFile = Paths.get( "src/test/resources/projects/transform/before.pom").toAbsolutePath();
+        Path afterPomFile = Paths.get( "src/test/resources/projects/transform/after.pom").toAbsolutePath();
 
-        XmlAssert.assertThat( in ).and( Files.newInputStream( pomFile ) ).areIdentical();
+        try( InputStream in = transformer.transform( beforePomFile, new NoTransformerContext() ) )
+        {
+            XmlAssert.assertThat( in ).and( Files.newInputStream( afterPomFile ) ).areIdentical();
+        }
     }
 
     private static class NoTransformerContext implements TransformerContext
