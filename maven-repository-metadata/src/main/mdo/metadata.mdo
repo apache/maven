@@ -20,7 +20,7 @@ under the License.
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
   xsd.namespace="http://maven.apache.org/METADATA/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/metadata-${version}.xsd">
+  xml.schemaLocation="https://maven.apache.org/xsd/repository-metadata-${version}.xsd">
   <id>repository-metadata</id>
   <name>Metadata</name>
   <description><![CDATA[

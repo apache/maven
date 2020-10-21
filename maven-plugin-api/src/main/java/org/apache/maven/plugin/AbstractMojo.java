@@ -128,9 +128,9 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  *      </td>
  *   </tr>
  * </table>
- * <p>This is only a small set of all the options. A complete list can be found at 
+ * <p>This is only a small set of all the options. A complete list can be found at
  * <a href="https://maven.apache.org/components/plugin-tools/maven-plugin-tools-annotations/index.html" target="_blank">
- * Maven Plugin Tool for Annotations</a>. 
+ * Maven Plugin Tool for Annotations</a>.
  *
  * @see <a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" target="_blank">Guide to Developing Java Plugins</a>
  * @see <a href="https://maven.apache.org/guides/mini/guide-configuring-plugins.html" target="_blank">Guide to Configuring Plug-ins</a>
@@ -149,6 +149,10 @@ public abstract class AbstractMojo
     /** Plugin container context */
     private Map pluginContext;
 
+    /**
+     * @deprecated Use SLF4J directly
+     */
+    @Deprecated
     @Override
     public void setLog( Log log )
     {
@@ -167,7 +171,9 @@ public abstract class AbstractMojo
      * method directly whenever you need the logger, it is fast enough and needs no caching.
      *
      * @see org.apache.maven.plugin.Mojo#getLog()
+     * @deprecated Use SLF4J directly
      */
+    @Deprecated
     @Override
     public Log getLog()
     {

@@ -116,6 +116,11 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setPluginArtifactRepositories( getPluginArtifactRepositories() )
             .setGoals( Arrays.asList( "package" ) );
 
+        if ( pom != null )
+        {
+            request.setMultiModuleProjectDirectory( pom.getParentFile() );
+        }
+
         return request;
     }
 

@@ -21,7 +21,6 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -46,20 +44,17 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
-import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblemUtils;
-import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.Result;
-import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.logging.Logger;
+import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
+import org.apache.maven.project.collector.PomlessCollectionStrategy;
+import org.apache.maven.project.collector.RequestPomCollectionStrategy;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Comparator.comparing;
 
@@ -71,15 +66,24 @@ import static java.util.Comparator.comparing;
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultGraphBuilder.class );
+
+    private final BuildResumptionDataRepository buildResumptionDataRepository;
+    private final PomlessCollectionStrategy pomlessCollectionStrategy;
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
+    private final RequestPomCollectionStrategy requestPomCollectionStrategy;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    protected ProjectBuilder projectBuilder;
-
-    @Inject
-    private BuildResumptionDataRepository buildResumptionDataRepository;
+    public DefaultGraphBuilder( BuildResumptionDataRepository buildResumptionDataRepository,
+                                PomlessCollectionStrategy pomlessCollectionStrategy,
+                                MultiModuleCollectionStrategy multiModuleCollectionStrategy,
+                                RequestPomCollectionStrategy requestPomCollectionStrategy )
+    {
+        this.buildResumptionDataRepository = buildResumptionDataRepository;
+        this.pomlessCollectionStrategy = pomlessCollectionStrategy;
+        this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
+        this.requestPomCollectionStrategy = requestPomCollectionStrategy;
+    }
 
     @Override
     public Result<ProjectDependencyGraph> build( MavenSession session )
@@ -91,7 +95,7 @@ public class DefaultGraphBuilder
             if ( result == null )
             {
                 final List<MavenProject> projects = getProjectsForMavenReactor( session );
-                validateProjects( projects );
+                validateProjects( projects, session.getRequest() );
                 enrichRequestFromResumptionData( projects, session.getRequest() );
                 result = reactorDependencyGraph( session, projects );
             }
@@ -133,6 +137,7 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
+        activeProjects = trimProjectsToRequest( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
@@ -145,6 +150,26 @@ public class DefaultGraphBuilder
         return Result.success( projectDependencyGraph );
     }
 
+    private List<MavenProject> trimProjectsToRequest( List<MavenProject> activeProjects,
+                                                      ProjectDependencyGraph graph,
+                                                      MavenExecutionRequest request )
+            throws MavenExecutionException
+    {
+        List<MavenProject> result = activeProjects;
+
+        if ( request.getPom() != null )
+        {
+            result = getProjectsInRequestScope( request, activeProjects );
+
+            List<MavenProject> sortedProjects = graph.getSortedProjects();
+            result.sort( comparing( sortedProjects::indexOf ) );
+
+            result = includeAlsoMakeTransitively( result, request, graph );
+        }
+
+        return result;
+    }
+
     private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
                                                      MavenExecutionRequest request )
         throws MavenExecutionException
@@ -155,7 +180,7 @@ public class DefaultGraphBuilder
         {
             File reactorDirectory = getReactorDirectory( request );
 
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( request.getSelectedProjects().size(), 1 );
+            Collection<MavenProject> selectedProjects = new LinkedHashSet<>();
 
             for ( String selector : request.getSelectedProjects() )
             {
@@ -165,6 +190,12 @@ public class DefaultGraphBuilder
                         .orElseThrow( () -> new MavenExecutionException(
                                 "Could not find the selected project in the reactor: " + selector, request.getPom() ) );
                 selectedProjects.add( selectedProject );
+
+                List<MavenProject> children = selectedProject.getCollectedProjects();
+                if ( children != null )
+                {
+                    selectedProjects.addAll( children );
+                }
             }
 
             result = new ArrayList<>( selectedProjects );
@@ -287,6 +318,28 @@ public class DefaultGraphBuilder
         }
     }
 
+    private List<MavenProject> getProjectsInRequestScope( MavenExecutionRequest request, List<MavenProject> projects )
+            throws MavenExecutionException
+    {
+        if ( request.getPom() == null )
+        {
+            return projects;
+        }
+
+        MavenProject requestPomProject = projects.stream()
+                .filter( project -> request.getPom().equals( project.getFile() ) )
+                .findFirst()
+                .orElseThrow( () -> new MavenExecutionException(
+                        "Could not find a project in reactor matching the request POM", request.getPom() ) );
+
+        List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
+                ? requestPomProject.getCollectedProjects() : Collections.emptyList();
+
+        List<MavenProject> result = new ArrayList<>( modules );
+        result.add( requestPomProject );
+        return result;
+    }
+
     private String formatProjects( List<MavenProject> projects )
     {
         StringBuilder projectNames = new StringBuilder();
@@ -361,76 +414,32 @@ public class DefaultGraphBuilder
         throws ProjectBuildingException
     {
         MavenExecutionRequest request = session.getRequest();
-
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        List<MavenProject> projects = new ArrayList<>();
-
-        // We have no POM file.
-        //
+        // 1. Collect project for invocation without a POM.
         if ( request.getPom() == null )
         {
-            ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-            MavenProject project = projectBuilder.build( modelSource, request.getProjectBuildingRequest() )
-                .getProject();
-            project.setExecutionRoot( true );
-            projects.add( project );
-            request.setProjectPresent( false );
+            return pomlessCollectionStrategy.collectProjects( request );
+        }
+
+        // 2. Collect projects for all modules in the multi-module project.
+        List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects( request );
+        if ( !projects.isEmpty() )
+        {
             return projects;
         }
 
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
-        collectProjects( projects, files, request );
-        return projects;
+        // 3. Collect projects for explicitly requested POM.
+        return requestPomCollectionStrategy.collectProjects( request );
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-        throws ProjectBuildingException
-    {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
-
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
-                                                                    projectBuildingRequest );
-
-        boolean problems = false;
-
-        for ( ProjectBuildingResult result : results )
-        {
-            projects.add( result.getProject() );
-
-            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
-            {
-                logger.warn( "" );
-                logger.warn( "Some problems were encountered while building the effective model for "
-                    + result.getProject().getId() );
-
-                for ( ModelProblem problem : result.getProblems() )
-                {
-                    String loc = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( loc ) ? " @ " + loc : "" ) );
-                }
-
-                problems = true;
-            }
-        }
-
-        if ( problems )
-        {
-            logger.warn( "" );
-            logger.warn( "It is highly recommended to fix these problems"
-                + " because they threaten the stability of your build." );
-            logger.warn( "" );
-            logger.warn( "For this reason, future Maven versions might no"
-                + " longer support building such malformed projects." );
-            logger.warn( "" );
-        }
-    }
-
-    private void validateProjects( List<MavenProject> projects )
+    private void validateProjects( List<MavenProject> projects, MavenExecutionRequest request )
+            throws MavenExecutionException
     {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        for ( MavenProject p : projects )
+        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope( request, projects );
+        for ( MavenProject p : projectsInRequestScope )
         {
             String projectKey = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
 
@@ -449,9 +458,8 @@ public class DefaultGraphBuilder
 
                     if ( projectsMap.containsKey( pluginKey ) )
                     {
-                        logger.warn( project.getName() + " uses " + plugin.getKey()
-                            + " as extensions, which is not possible within the same reactor build. "
-                            + "This plugin was pulled from the local repository!" );
+                        LOGGER.warn( "{} uses {} as extensions, which is not possible within the same reactor build. "
+                            + "This plugin was pulled from the local repository!", project.getName(), plugin.getKey() );
                     }
                 }
             }
