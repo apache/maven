@@ -76,7 +76,7 @@ public class BuildPomXMLFilterFactory
             ReactorDependencyXMLFilter reactorDependencyXMLFilter =
                 new ReactorDependencyXMLFilter( getDependencyKeyToVersionMapper() );
             reactorDependencyXMLFilter.setParent( parent );
-            reactorDependencyXMLFilter.setLexicalHandler( parent );
+            parent.setLexicalHandler( reactorDependencyXMLFilter );
             parent = reactorDependencyXMLFilter;
         }
 
@@ -85,7 +85,7 @@ public class BuildPomXMLFilterFactory
             ParentXMLFilter parentFilter = new ParentXMLFilter( getRelativePathMapper() );
             parentFilter.setProjectPath( projectFile.getParent() );
             parentFilter.setParent( parent );
-            parentFilter.setLexicalHandler( parent );
+            parent.setLexicalHandler( parentFilter );
             parent = parentFilter;
         }
 

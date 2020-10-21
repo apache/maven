@@ -23,11 +23,13 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.RelativeProject;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * 
@@ -38,8 +40,10 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
 {
     private final TransformerContext context;
     
-    public DefaultBuildPomXMLFilterFactory( TransformerContext context )
+    public DefaultBuildPomXMLFilterFactory( TransformerContext context,
+                                            Consumer<LexicalHandler> lexicalHandlerConsumer )
     {
+        super( lexicalHandlerConsumer );
         this.context = context;
     }
     

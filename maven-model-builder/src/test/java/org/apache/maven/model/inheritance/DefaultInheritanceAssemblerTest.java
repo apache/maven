@@ -28,6 +28,7 @@ import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 import org.xmlunit.matchers.CompareMatcher;
 
 import junit.framework.TestCase;
@@ -35,11 +36,12 @@ import junit.framework.TestCase;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Hervé Boutemy
@@ -63,7 +65,8 @@ public class DefaultInheritanceAssemblerTest
         reader.setTransformer( new AbstractModelSourceTransformer()
         {
             @Override
-            protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
+            protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context,
+                                                      Consumer<LexicalHandler> lexicalHandlerConsumer )
                 throws TransformerConfigurationException, SAXException, ParserConfigurationException
             {
                 return null;
