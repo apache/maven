@@ -236,7 +236,6 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     }
     
     @Test
-//    @Ignore
     public void lexicalHandler() throws Exception
     {
         String input = "<project><!--before--><modules>"

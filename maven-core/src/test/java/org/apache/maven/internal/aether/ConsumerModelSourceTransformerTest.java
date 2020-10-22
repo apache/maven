@@ -34,14 +34,15 @@ public class ConsumerModelSourceTransformerTest
     private ConsumerModelSourceTransformer transformer = new ConsumerModelSourceTransformer();
 
     @Test
-    public void test() throws Exception
+    public void transform() throws Exception
     {
         Path beforePomFile = Paths.get( "src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile = Paths.get( "src/test/resources/projects/transform/after.pom").toAbsolutePath();
 
-        try( InputStream in = transformer.transform( beforePomFile, new NoTransformerContext() ) )
+        try( InputStream expected = Files.newInputStream( afterPomFile ); 
+             InputStream result = transformer.transform( beforePomFile, new NoTransformerContext() ) )
         {
-            XmlAssert.assertThat( in ).and( Files.newInputStream( afterPomFile ) ).areIdentical();
+            XmlAssert.assertThat( result ).and( expected ).areIdentical();
         }
     }
 
