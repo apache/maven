@@ -121,6 +121,9 @@ public class DefaultGraphBuilderTest
                 scenario( "Selected project" )
                         .selectedProjects( MODULE_B )
                         .expectResult( MODULE_B ),
+                scenario( "Selected project (including child modules)" )
+                        .selectedProjects( MODULE_C )
+                        .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
                 scenario( "Excluded project" )
                         .excludedProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
