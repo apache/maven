@@ -68,8 +68,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         List<File> files = Collections.singletonList( moduleProjectPomFile.getAbsoluteFile() );
         try
         {
-            List<MavenProject> projects = new ArrayList<>();
-            projectsCollector.collectProjects( projects, files, request );
+            List<MavenProject> projects = projectsCollector.collectProjects( files, request );
             boolean isRequestedProjectCollected = isRequestedProjectCollected( request, projects );
             if ( isRequestedProjectCollected )
             {

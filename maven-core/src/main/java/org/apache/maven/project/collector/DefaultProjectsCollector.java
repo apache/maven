@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,13 +55,15 @@ public class DefaultProjectsCollector implements ProjectsCollector
     }
 
     @Override
-    public void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    public List<MavenProject> collectProjects( List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
                 projectBuildingRequest );
+
+        List<MavenProject> projects = new ArrayList<>( results.size() );
 
         boolean problems = false;
 
@@ -94,5 +97,7 @@ public class DefaultProjectsCollector implements ProjectsCollector
                     + " longer support building such malformed projects." );
             LOGGER.warn( "" );
         }
+
+        return projects;
     }
 }

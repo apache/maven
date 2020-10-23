@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,8 +49,6 @@ public class RequestPomCollectionStrategy implements ProjectCollectionStrategy
     public List<MavenProject> collectProjects( MavenExecutionRequest request ) throws ProjectBuildingException
     {
         List<File> files = Collections.singletonList( request.getPom().getAbsoluteFile() );
-        List<MavenProject> projects = new ArrayList<>();
-        projectsCollector.collectProjects( projects, files, request );
-        return projects;
+        return projectsCollector.collectProjects( files, request );
     }
 }

@@ -33,11 +33,11 @@ public interface ProjectsCollector
 {
     /**
      * Collect Maven projects from a list of POM files.
-     * @param projects List that will be filled with the found projects.
      * @param files List of POM files.
      * @param request The {@link MavenExecutionRequest}
+     * @return A list of projects that have been found in the specified POM files.
      * @throws ProjectBuildingException In case the POMs are not used.
      */
-    void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    List<MavenProject> collectProjects(  List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException;
 }
