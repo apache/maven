@@ -100,8 +100,8 @@ jobs:
           else
             echo "Integration tests will run against $target_user/$repo for master builds."
           fi
-          echo "::set-env name=REPO_BRANCH::$target_branch"
-          echo "::set-env name=REPO_USER::$target_user"
+          echo "REPO_BRANCH=$target_branch" >> $GITHUB_ENV
+          echo "REPO_USER=$target_user" >> $GITHUB_ENV
 
       - name: Checkout maven-integration-testing
         uses: actions/checkout@v2
