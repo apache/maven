@@ -72,7 +72,6 @@ import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.merge.ModelMerger;
@@ -119,9 +118,6 @@ public class DefaultModelBuilder
     @Inject
     private ModelPathTranslator modelPathTranslator;
     
-    @Inject
-    private ModelLocator modelLocator;
-
     @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
     
@@ -264,9 +260,9 @@ public class DefaultModelBuilder
     }
     
     @Override
-    public TransformerContextBuilder newTransformerContextBuilder()
+    public DefaultTransformerContextBuilder newTransformerContextBuilder()
     {
-        return new TransformerContextBuilder();
+        return new DefaultTransformerContextBuilder();
     }
     
     @Override
@@ -1809,27 +1805,29 @@ public class DefaultModelBuilder
      * @author Robert Scholte
      * @since 3.7.0
      */
-    public class TransformerContextBuilder
+    private class DefaultTransformerContextBuilder implements TransformerContextBuilder
     {
         private final DefaultTransformerContext context = new DefaultTransformerContext();
         
-        private Properties userProperties;
-        
-        public TransformerContextBuilder setUserProperties( Properties userProperties )
+        /**
+         * If an interface could be extracted, DefaultModelProblemCollector should be ModelProblemCollectorExt
+         * 
+         * @param request
+         * @param problems
+         * @return
+         */
+        @Override
+        public TransformerContext initialize( ModelBuildingRequest request, ModelProblemCollector collector )
         {
-            this.userProperties = userProperties;
-            return this;
-        }
-        
-        TransformerContext initialize( ModelBuildingRequest request, DefaultModelProblemCollector problems )
-        {
+            // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
+            DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
             return new TransformerContext()
             {
                 @Override
                 public String getUserProperty( String key )
                 {
                     return context.userProperties.computeIfAbsent( key,
-                                                                   k -> userProperties.getProperty( key ) );
+                                                           k -> request.getUserProperties().getProperty( key ) );
                 }
                 
                 @Override

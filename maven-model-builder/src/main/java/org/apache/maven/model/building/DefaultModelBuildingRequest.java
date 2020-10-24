@@ -27,7 +27,6 @@ import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.DefaultModelBuilder.TransformerContextBuilder;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 

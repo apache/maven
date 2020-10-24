@@ -22,7 +22,6 @@ package org.apache.maven.model.building;
 import java.io.File;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuilder.TransformerContextBuilder;
 
 /**
  * Builds the effective model from a POM.
