@@ -693,7 +693,7 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILEMODEL, model );
+        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILE, model );
         if ( modelSource instanceof FileModelSource )
         {
             intoCache( request.getModelCache(), getGroupId( model ), model.getArtifactId(), modelSource );
@@ -788,7 +788,7 @@ public class DefaultModelBuilder
         }
         else
         {
-            model = fromCache( cache, modelSource, ModelCacheTag.FILEMODEL );
+            model = fromCache( cache, modelSource, ModelCacheTag.FILE );
         }
         return model;
     }
@@ -1893,6 +1893,7 @@ public class DefaultModelBuilder
             };
         }
 
+        @Override
         public TransformerContext build()
         {
             return context;
