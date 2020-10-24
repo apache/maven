@@ -56,7 +56,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.ArtifactModelSource;
-import org.apache.maven.model.building.DefaultModelBuilder.TransformerContextBuilder;
+import org.apache.maven.model.building.TransformerContextBuilder;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -383,7 +383,7 @@ public class DefaultProjectBuilder
         
         InternalConfig config =
             new InternalConfig( request, modelPool, useGlobalModelCache() ? getModelCache() : new ReactorModelCache(),
-                        modelBuilder.newTransformerContextBuilder().setUserProperties( request.getUserProperties() ) );
+                        modelBuilder.newTransformerContextBuilder() );
 
         Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
