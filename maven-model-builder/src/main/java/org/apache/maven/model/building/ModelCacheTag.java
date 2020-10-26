@@ -65,7 +65,7 @@ interface ModelCacheTag<T>
     T fromCache( T data );
 
     /**
-     * The tag used for the raw model with profile activation
+     * The tag used for the raw model without profile activation
      */
     ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>()
     {
@@ -130,7 +130,7 @@ interface ModelCacheTag<T>
     };
 
     /**
-     * The tag used for the file model with profile activation
+     * The tag used for the file model without profile activation
      * @since 3.7.0
      */
     ModelCacheTag<Model> FILE = new ModelCacheTag<Model>() 

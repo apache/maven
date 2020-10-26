@@ -387,20 +387,16 @@ public class DefaultProjectBuilder
 
         Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
+        // phase 1: get file Models from the reactor.
         boolean noErrors =
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
                    config, poolBuilder );
         
-        if ( Features.buildConsumer().isActive() )
-        {
-            request.getRepositorySession().getData().set( TransformerContext.KEY,
-                                                          config.transformerContextBuilder.build() );
-        }
-
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
+            // Phase 2: get effective from the reactor
             noErrors =
                 build( results, new ArrayList<>(), projectIndex, interimResults, request,
                         new HashMap<>(), config.session ) && noErrors;
@@ -408,6 +404,12 @@ public class DefaultProjectBuilder
         finally
         {
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
+        }
+
+        if ( Features.buildConsumer().isActive() )
+        {
+            request.getRepositorySession().getData().set( TransformerContext.KEY,
+                                                          config.transformerContextBuilder.build() );
         }
 
         if ( !noErrors )
