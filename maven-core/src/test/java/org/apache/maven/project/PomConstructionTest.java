@@ -973,7 +973,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "dependency-inheritance/sub" );
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
-        assertEquals( "4.13", pom.getValue( "dependencies[1]/version" ) );
+        assertEquals( "4.13.1", pom.getValue( "dependencies[1]/version" ) );
     }
 
     /** MNG-4034 */
