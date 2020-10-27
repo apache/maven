@@ -158,7 +158,7 @@ public class LifecycleExecutionPlanCalculatorStub
         return calculateExecutionPlan( session, project, tasks, true );
     }
 
-    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution )
+    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution, Set<MojoDescriptor> alreadyForkedExecutions )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException

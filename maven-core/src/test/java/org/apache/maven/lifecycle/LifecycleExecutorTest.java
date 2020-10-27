@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -386,7 +387,8 @@ public class LifecycleExecutorTest
         assertEquals(execution.toString(), "maven-it-plugin", execution.getArtifactId());
         assertNull(execution.getConfiguration());
 
-        lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution );
+        lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution,
+                new HashSet<>() );
         assertNotNull(execution.getConfiguration());
         assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
     }
