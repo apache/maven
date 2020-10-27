@@ -4,7 +4,7 @@
   <groupId>testing</groupId>
   <artifactId>plugin-level-dep</artifactId>
   <packaging>jar</packaging>
-  <version>3.8.1</version>
+  <version>4.13.1</version>
 
   <build>
     <plugins>
