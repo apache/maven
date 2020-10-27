@@ -171,22 +171,30 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         for ( MojoExecution execution : mojoExecutions )
         {
-            MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
-
-            if ( mojoDescriptor == null )
-            {
-                mojoDescriptor =
-                        pluginManager.getMojoDescriptor( execution.getPlugin(), execution.getGoal(),
-                                project.getRemotePluginRepositories(),
-                                session.getRepositorySession() );
-
-                execution.setMojoDescriptor( mojoDescriptor );
-            }
-
+            MojoDescriptor mojoDescriptor = fillMojoDescriptor( session, project, execution );
             descriptors.add( mojoDescriptor );
         }
 
         return descriptors;
+    }
+
+    private MojoDescriptor fillMojoDescriptor( MavenSession session, MavenProject project, MojoExecution execution )
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+            MojoNotFoundException, InvalidPluginDescriptorException
+    {
+        MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
+
+        if ( mojoDescriptor == null )
+        {
+            mojoDescriptor =
+                    pluginManager.getMojoDescriptor( execution.getPlugin(), execution.getGoal(),
+                            project.getRemotePluginRepositories(),
+                            session.getRepositorySession() );
+
+            execution.setMojoDescriptor( mojoDescriptor );
+        }
+
+        return mojoDescriptor;
     }
 
     @Override
@@ -196,6 +204,8 @@ public class DefaultLifecycleExecutionPlanCalculator
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
+        fillMojoDescriptor( session, project, mojoExecution );
+
         mojoExecutionConfigurator( mojoExecution ).configure( project,
                                                               mojoExecution,
                                                         MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
