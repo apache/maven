@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.ContentHandler;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -43,25 +44,14 @@ import org.xml.sax.ext.LexicalHandler;
 
 public abstract class AbstractXMLFilterTests
 {
-    public AbstractXMLFilterTests()
+    protected AbstractSAXFilter getFilter() throws TransformerException, SAXException, ParserConfigurationException
     {
-        super();
+        throw new UnsupportedOperationException( "Override one of the getFilter() methods" );
     }
     
-    protected abstract AbstractSAXFilter getFilter() throws TransformerException, SAXException, ParserConfigurationException;
-    
-    private void setParent( AbstractSAXFilter filter ) throws SAXException, ParserConfigurationException
+    protected AbstractSAXFilter getFilter( Consumer<LexicalHandler> result )  throws TransformerException, SAXException, ParserConfigurationException
     {
-        if( filter.getParent() == null )
-        {
-            XMLReader r = Factories.newXMLReader();
-            
-            AbstractSAXFilter perChar = new PerCharXMLFilter();
-            perChar.setParent( r );
-            
-            filter.setParent( perChar );
-            filter.setFeature( "http://xml.org/sax/features/namespaces", true );
-        }
+        return getFilter();
     }
     
     protected String omitXmlDeclaration() {
@@ -78,33 +68,24 @@ public abstract class AbstractXMLFilterTests
         return transform( new StringReader( input ) );
     }
 
-    protected String transform( Reader input ) throws TransformerException, SAXException, ParserConfigurationException
-    {
-        AbstractSAXFilter filter = getFilter();
-        setParent( filter );
-
-        return transform( input, filter );
-    }
-    
+    /**
+     * Use this method only for testing a single filter.
+     * 
+     * @param input
+     * @param filter
+     * @return
+     * @throws TransformerException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     */
     protected String transform( String input, AbstractSAXFilter filter ) 
         throws TransformerException, SAXException, ParserConfigurationException
     {
         setParent( filter );
-
-        filter = new PerCharXMLFilter( filter );
-
-        return transform( new StringReader( input ), filter );
-    }
-
-    protected String transform( Reader input, AbstractSAXFilter filter )
-        throws TransformerException, SAXException, ParserConfigurationException
-    {
-        Writer writer = new StringWriter();
-        StreamResult result = new StreamResult( writer );
-
+        
         SAXTransformerFactory transformerFactory = (SAXTransformerFactory) Factories.newTransformerFactory();
         TransformerHandler transformerHandler = transformerFactory.newTransformerHandler();
-        filter.setLexicalHandler( transformerHandler );
+        
         transformerHandler.getTransformer().setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration() );
         if ( indentAmount() != null )
         {
@@ -112,18 +93,73 @@ public abstract class AbstractXMLFilterTests
             transformerHandler.getTransformer().setOutputProperty( "{http://xml.apache.org/xslt}indent-amount",
                                                                    indentAmount() );
         }
-        transformerHandler.setResult( result );
+        
         Transformer transformer = transformerFactory.newTransformer();
         
-        SAXSource transformSource = new SAXSource( filter, new InputSource( input ) );
+        Writer writer = new StringWriter();
+        StreamResult result = new StreamResult( writer );
+        transformerHandler.setResult( result );
 
         SAXResult transformResult = new SAXResult( transformerHandler );
+        SAXSource transformSource = new SAXSource( filter, new InputSource( new StringReader( input ) ) );
+        
         transformResult.setLexicalHandler( filter );
+        transformer.transform( transformSource, transformResult );
+
+        return writer.toString();
+
+    }
+
+    protected String transform( Reader input )
+        throws TransformerException, SAXException, ParserConfigurationException
+    {
+        SAXTransformerFactory transformerFactory = (SAXTransformerFactory) Factories.newTransformerFactory();
+        TransformerHandler transformerHandler = transformerFactory.newTransformerHandler();
+        
+        transformerHandler.getTransformer().setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration() );
+        if ( indentAmount() != null )
+        {
+            transformerHandler.getTransformer().setOutputProperty( OutputKeys.INDENT, "yes" );
+            transformerHandler.getTransformer().setOutputProperty( "{http://xml.apache.org/xslt}indent-amount",
+                                                                   indentAmount() );
+        }
+        
+        Transformer transformer = transformerFactory.newTransformer();
+
+        Writer writer = new StringWriter();
+        StreamResult result = new StreamResult( writer );
+        transformerHandler.setResult( result );
+
+        SAXResult transformResult = new SAXResult( transformerHandler );
+        
+        AbstractSAXFilter filter = getFilter( l -> transformResult.setLexicalHandler( l ) );
+        setParent( filter );
+        
+        filter = new PerCharXMLFilter( filter );
+
+        filter.setLexicalHandler( transformerHandler );
+        
+        SAXSource transformSource = new SAXSource( filter, new InputSource( input ) );
+        
         transformer.transform( transformSource, transformResult );
 
         return writer.toString();
     }
     
+    private void setParent( AbstractSAXFilter filter ) throws SAXException, ParserConfigurationException
+    {
+        if( filter.getParent() == null )
+        {
+            XMLReader r = Factories.newXMLReader();
+            
+            AbstractSAXFilter perChar = new PerCharXMLFilter();
+            perChar.setParent( r );
+            
+            filter.setParent( perChar );
+            filter.setFeature( "http://xml.org/sax/features/namespaces", true );
+        }
+    }
+
     /**
      * From {@link ContentHandler}
      * <q>Your code should not assume that algorithms using char-at-a-time idioms will be working in characterunits; 
@@ -141,7 +177,7 @@ public abstract class AbstractXMLFilterTests
             super();
         }
         
-        public <T extends XMLReader & LexicalHandler> PerCharXMLFilter( T parent )
+        public PerCharXMLFilter( AbstractSAXFilter parent )
         {
             super( parent );
         }
@@ -153,16 +189,6 @@ public abstract class AbstractXMLFilterTests
             for ( int i = 0; i < length; i++ )
             {
                 super.characters( ch, start + i, 1 );
-            }
-        }
-        
-        @Override
-        public void comment( char[] ch, int start, int length )
-            throws SAXException
-        {
-            for ( int i = 0; i < length; i++ )
-            {
-                super.comment( ch, start + i, 1 );
             }
         }
         

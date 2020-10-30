@@ -35,17 +35,23 @@ class CiFriendlyXMLFilter
 {
     private final boolean replace;
     
-    CiFriendlyXMLFilter( boolean replace )
-    {
-        this.replace = replace;
-    }
-
     private Function<String, String> replaceChain = Function.identity();
     
     private String characters; 
     
     private boolean parseVersion;
-    
+
+    CiFriendlyXMLFilter( boolean replace )
+    {
+        this.replace = replace;
+    }
+
+    CiFriendlyXMLFilter( AbstractSAXFilter parent, boolean replace )
+    {
+        super( parent );
+        this.replace = replace;
+    }
+
     public CiFriendlyXMLFilter setChangelist( String changelist )
     {
         replaceChain = replaceChain.andThen( t -> t.replace( "${changelist}", changelist ) );

@@ -35,7 +35,7 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class ConsumerPomXMLFilter extends AbstractSAXFilter
 {
-    <T extends XMLReader & LexicalHandler> ConsumerPomXMLFilter( T filter )
+    ConsumerPomXMLFilter( AbstractSAXFilter filter )
     {
         super( filter );
     }
@@ -50,5 +50,11 @@ public class ConsumerPomXMLFilter extends AbstractSAXFilter
         {
             super.setParent( parent );
         }
+    }
+    
+    @Override
+    public LexicalHandler getLexicalHandler()
+    {
+        return ( (AbstractSAXFilter) getParent() ).getLexicalHandler();
     }
 }

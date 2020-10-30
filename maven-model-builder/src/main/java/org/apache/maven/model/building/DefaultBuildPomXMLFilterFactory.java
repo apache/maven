@@ -23,15 +23,17 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.RelativeProject;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
- * A BuildPomXMLFilterFactory which is context aware 
- * 
+ * A BuildPomXMLFilterFactory which is context aware
+ *
  * @author Robert Scholte
  * @since 3.7.0
  */
@@ -40,16 +42,19 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
     private final TransformerContext context;
     
     /**
-     * 
+     *
      * @param context a set of data to extract values from as required for the build pom
+     * @param lexicalHandlerConsumer the lexical handler consumer
      * @param consume true is this factory used for creating the consumer pom, otherwise false
      */
-    public DefaultBuildPomXMLFilterFactory( TransformerContext context, boolean consume )
+    public DefaultBuildPomXMLFilterFactory( TransformerContext context,
+                                            Consumer<LexicalHandler> lexicalHandlerConsumer, 
+                                            boolean consume )
     {
-        super( consume );
+        super( lexicalHandlerConsumer, consume );
         this.context = context;
     }
-    
+
     @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
@@ -63,7 +68,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
                             .map( m -> toVersion( m ) )
                             .orElse( null );
     }
-    
+
     @Override
     protected Optional<String> getChangelist()
     {

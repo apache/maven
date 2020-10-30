@@ -23,6 +23,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,7 @@ import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * ModelSourceTransformer for the build pom
@@ -50,10 +52,13 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
     @Nullable
     private BuildPomXMLFilterListener xmlFilterListener;
     
-    protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
+    protected AbstractSAXFilter getSAXFilter( Path pomFile,
+                                              TransformerContext context,
+                                              Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
-        BuildPomXMLFilterFactory buildPomXMLFilterFactory = new DefaultBuildPomXMLFilterFactory( context, false );
+        BuildPomXMLFilterFactory buildPomXMLFilterFactory =
+            new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer, false );
         
         return buildPomXMLFilterFactory.get( pomFile );
     }

@@ -20,7 +20,6 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
@@ -36,15 +35,15 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
 {
     private LexicalHandler lexicalHandler;
     
-    AbstractSAXFilter()
+    public AbstractSAXFilter()
     {
         super();
     }
 
-    public <T extends XMLReader & LexicalHandler> AbstractSAXFilter( T parent )
+    public AbstractSAXFilter( AbstractSAXFilter parent )
     {
-        setParent( parent );
-        setLexicalHandler( parent );
+        super( parent );
+        parent.setLexicalHandler( this );
     }
     
     public LexicalHandler getLexicalHandler()

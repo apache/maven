@@ -45,9 +45,10 @@ public class ConsumerPomXMLFilterFactory
     {
         BuildPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
         
+
         // Ensure that xs:any elements aren't touched by next filters
         AbstractSAXFilter filter = new FastForwardFilter( parent );
-        
+
         // Strip modules
         filter = new ModulesXMLFilter( filter );
         // Adjust relativePath
