@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -91,15 +92,11 @@ public class ProjectBuilderTest
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
 
-        try
-        {
-            lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
-            fail();
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // this is expected
-        }
+        ProjectBuildingException e = assertThrows( ProjectBuildingException.class,
+                      () -> lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
+        assertThat( e.getMessage(),
+                    containsString( "[ERROR] 'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing. "
+                        + "@ line 9, column 17" ) );
     }
 
     public void testResolveDependencies()
@@ -115,7 +112,9 @@ public class ProjectBuilderTest
         ProjectBuildingResult result = lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
         assertEquals( 1, result.getProject().getArtifacts().size() );
         // multi projects build entry point
-        List<ProjectBuildingResult> results = lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
+        List<ProjectBuildingResult> results =
+            lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false,
+                                                                           configuration );
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 1, mavenProject.getArtifacts().size() );
@@ -192,32 +191,25 @@ public class ProjectBuilderTest
             lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
-        try
-        {
-            projectBuilder.build( pomFile, configuration );
-        }
-        catch ( ProjectBuildingException ex )
-        {
-            assertEquals( 1, ex.getResults().size() );
-            MavenProject project = ex.getResults().get( 0 ).getProject();
-            assertNotNull( project );
-            assertEquals( "testArtifactMissingVersion", project.getArtifactId() );
-            assertEquals( pomFile, project.getFile() );
-        }
+        ProjectBuildingException ex1 =
+            assertThrows( ProjectBuildingException.class, () -> projectBuilder.build( pomFile, configuration ) );
+
+        assertEquals( 1, ex1.getResults().size() );
+        MavenProject project1 = ex1.getResults().get( 0 ).getProject();
+        assertNotNull( project1 );
+        assertEquals( "testArtifactMissingVersion", project1.getArtifactId() );
+        assertEquals( pomFile, project1.getFile() );
 
         // multi projects build entry point
-        try
-        {
-            projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
-        }
-        catch ( ProjectBuildingException ex )
-        {
-            assertEquals( 1, ex.getResults().size() );
-            MavenProject project = ex.getResults().get( 0 ).getProject();
-            assertNotNull( project );
-            assertEquals( "testArtifactMissingVersion", project.getArtifactId() );
-            assertEquals( pomFile, project.getFile() );
-        }
+        ProjectBuildingException ex2 =
+            assertThrows( ProjectBuildingException.class,
+                          () -> projectBuilder.build( Collections.singletonList( pomFile ), false, configuration ) );
+
+        assertEquals( 1, ex2.getResults().size() );
+        MavenProject project2 = ex2.getResults().get( 0 ).getProject();
+        assertNotNull( project2 );
+        assertEquals( "testArtifactMissingVersion", project2.getArtifactId() );
+        assertEquals( pomFile, project2.getFile() );
     }
 
     public void testReadInvalidPom()
@@ -232,27 +224,17 @@ public class ProjectBuilderTest
             lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
-        try
-        {
-            projectBuilder.build( pomFile, configuration );
-        }
-        catch ( Exception ex )
-        {
-             assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
-        }
+        Exception ex = assertThrows( Exception.class, () -> projectBuilder.build( pomFile, configuration ) );
+        assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
 
         // multi projects build entry point
-        try
-        {
-            projectBuilder.build( Collections.singletonList( pomFile ), false, configuration );
-        }
-        catch ( ProjectBuildingException ex )
-        {
-            assertEquals( 1, ex.getResults().size() );
-            assertNotNull( ex.getResults().get( 0 ).getPomFile() );
-            assertThat( ex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
-            assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
-        }
+        ProjectBuildingException pex =
+            assertThrows( ProjectBuildingException.class,
+                          () -> projectBuilder.build( Collections.singletonList( pomFile ), false, configuration ) );
+        assertEquals( 1, pex.getResults().size() );
+        assertNotNull( pex.getResults().get( 0 ).getPomFile() );
+        assertThat( pex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
+        assertThat( pex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
     }
 
     public void testReadParentAndChildWithRegularVersionSetParentFile()
