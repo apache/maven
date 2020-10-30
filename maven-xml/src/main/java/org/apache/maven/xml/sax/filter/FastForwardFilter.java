@@ -26,8 +26,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * This filter will skip all following filters and write directly to the output.
@@ -61,7 +59,7 @@ class FastForwardFilter extends AbstractSAXFilter
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> FastForwardFilter( T parent )
+    FastForwardFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }

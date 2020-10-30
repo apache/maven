@@ -46,18 +46,17 @@ public class ConsumerPomXMLFilterFactory
     {
         BuildPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
         
+        
         // Ensure that xs:any elements aren't touched by next filters
         AbstractSAXFilter filter = new FastForwardFilter( parent );
         
-        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter();
+        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( filter );
         getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
         getRevision().ifPresent( ciFriendlyFilter::setRevision );
         getSha1().ifPresent( ciFriendlyFilter::setSha1 );
         
         if ( ciFriendlyFilter.isSet() )
         {
-            ciFriendlyFilter.setParent( parent );
-            ciFriendlyFilter.setLexicalHandler( parent );
             filter = ciFriendlyFilter;
         }
         

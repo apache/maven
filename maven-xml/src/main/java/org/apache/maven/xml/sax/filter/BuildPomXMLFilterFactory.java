@@ -22,12 +22,11 @@ package org.apache.maven.xml.sax.filter;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.maven.xml.Factories;
 import org.xml.sax.SAXException;
@@ -42,6 +41,18 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
+    private final Consumer<LexicalHandler> lexicalHandlerConsumer;
+    
+    public BuildPomXMLFilterFactory()
+    {
+        this( null ); 
+    }
+    
+    public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
+    {
+        this.lexicalHandlerConsumer = lexicalHandlerConsumer;
+    }
+
     /**
      * 
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
@@ -55,14 +66,17 @@ public class BuildPomXMLFilterFactory
     {
         AbstractSAXFilter parent = new AbstractSAXFilter();
         parent.setParent( getXMLReader() );
-        parent.setLexicalHandler( getLexicalHander() );
+        if ( lexicalHandlerConsumer != null )
+        {
+            lexicalHandlerConsumer.accept( parent );
+        }
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
             ReactorDependencyXMLFilter reactorDependencyXMLFilter =
                 new ReactorDependencyXMLFilter( getDependencyKeyToVersionMapper() );
             reactorDependencyXMLFilter.setParent( parent );
-            reactorDependencyXMLFilter.setLexicalHandler( parent );
+            parent.setLexicalHandler( reactorDependencyXMLFilter );
             parent = reactorDependencyXMLFilter;
         }
 
@@ -71,7 +85,7 @@ public class BuildPomXMLFilterFactory
             ParentXMLFilter parentFilter = new ParentXMLFilter( getRelativePathMapper() );
             parentFilter.setProjectPath( projectFile.getParent() );
             parentFilter.setParent( parent );
-            parentFilter.setLexicalHandler( parent );
+            parent.setLexicalHandler( parentFilter );
             parent = parentFilter;
         }
 
@@ -83,18 +97,6 @@ public class BuildPomXMLFilterFactory
         XMLReader xmlReader = Factories.newXMLReader();
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
         return xmlReader;
-    }
-    
-    private LexicalHandler getLexicalHander() throws TransformerConfigurationException 
-    {
-        TransformerFactory transformerFactory = Factories.newTransformerFactory();
-        if ( transformerFactory instanceof SAXTransformerFactory )
-        {
-            SAXTransformerFactory saxTransformerFactory = (SAXTransformerFactory) transformerFactory;
-            return saxTransformerFactory.newTransformerHandler();
-        }
-        throw new TransformerConfigurationException( "Failed to get LexicalHandler via TransformerFactory:"
-            + " it is not an instance of SAXTransformerFactory" );
     }
     
     /**

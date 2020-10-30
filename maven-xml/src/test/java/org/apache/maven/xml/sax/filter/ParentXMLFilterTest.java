@@ -23,25 +23,26 @@ import static org.junit.Assert.assertEquals;
 
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.maven.xml.sax.filter.ParentXMLFilter;
-import org.apache.maven.xml.sax.filter.RelativeProject;
 import org.junit.Test;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 public class ParentXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-    protected ParentXMLFilter getFilter()
+    protected ParentXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerException, SAXException, ParserConfigurationException
     {
         ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.of( new RelativeProject( "GROUPID", 
                                                                                            "ARTIFACTID",
                                                                                            "1.0.0" ) ) );
         filter.setProjectPath( Paths.get( "pom.xml").toAbsolutePath() );
+        lexicalHandlerConsumer.accept( filter );
         
         return filter;
     }

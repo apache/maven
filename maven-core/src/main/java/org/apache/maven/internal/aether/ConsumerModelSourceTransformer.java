@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
@@ -37,18 +38,21 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.internal.DefaultConsumerPomXMLFilterFactory;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
 {
     @Override
-    protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
+    protected AbstractSAXFilter getSAXFilter( Path pomFile, 
+                                              TransformerContext context,
+                                              Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
-        return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context ) ).get( pomFile );
+        return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context,
+                                                                        lexicalHandlerConsumer ) ).get( pomFile );
     }
     
     /**
@@ -65,8 +69,7 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
     {
         final TransformerHandler transformerHandler;
         
-        final SAXTransformerFactory transformerFactory =
-                        (SAXTransformerFactory) Factories.newTransformerFactory();
+        final SAXTransformerFactory transformerFactory = getTransformerFactory();
         
         // Keep same encoding+version
         try ( InputStream input = Files.newInputStream( pomFile ) )
