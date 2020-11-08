@@ -44,5 +44,10 @@ under the License.
       <artifactId>plexus-utils</artifactId>
       <version>1.5.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>3.3</version>
+    </dependency>
   </dependencies>
 </project>
