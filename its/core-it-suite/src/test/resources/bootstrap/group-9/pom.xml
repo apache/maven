@@ -49,5 +49,10 @@ under the License.
       <artifactId>junit</artifactId>
       <version>4.12</version>
     </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>6.2</version>
+    </dependency>
   </dependencies>
 </project>
