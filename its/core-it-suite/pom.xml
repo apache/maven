@@ -36,34 +36,34 @@ under the License.
 
   <!--
   By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
-  
+
     mvn clean test -Prun-its
-  
+
   This will subject the Maven version running the build to the integration tests. If you would like to test a different
   Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
-  
+
     mvn clean test -Prun-its -DmavenHome=<maven-under-test>
-  
+
   Alternatively, you can just specify the version of a previously installed/deployed Maven distribution which will be
   downloaded, unpacked and tested:
 
     mvn clean test -Prun-its -DmavenVersion=2.2.1
-  
+
   It's also possible to point the ITs at an already downloaded Maven distribution:
-  
+
     mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
-  
+
   To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
-  
+
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
 
   To test with the maven wrapper, you should add the wrapperDistroDir too.
 
     mvn clean test -Prun-its -Dmaven.repo.local=<path-to-local-repo>  -DmavenDistro=<path-to-bin-archive> -DwrapperDistroDir=<path-to-wrapper-distro-directory> -DmavenWrapper=<path-to-wrapper-jar>
-	
+
   Tests can pick up the maven.wrapper.distrodir system property to unpack it into their testDir to verify the wrapper.
-  
+
   If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user, proxy.pass and
   proxy.nonProxyHosts to specify the required proxy setup for the ITs. Alternatively, set the system property
   maven.it.central to a URL of a local repository manager (anonymous authentication only) that proxies the
@@ -74,7 +74,7 @@ under the License.
     <surefireMemory>-Xmx384m</surefireMemory>
     <!-- The original Maven distribution to test. -->
     <mavenHome>${maven.home}</mavenHome>
-    <!-- The (possibly instrumented copy of the) Maven distribution we actually 
+    <!-- The (possibly instrumented copy of the) Maven distribution we actually
       use for the tests. -->
     <preparedMavenHome>${mavenHome}</preparedMavenHome>
     <!-- default properties used to filter the global settings -->
@@ -106,20 +106,20 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.5.8</version>
+      <version>3.3.0</version>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its</groupId>
       <artifactId>maven-it-helper</artifactId>
       <version>2.1-SNAPSHOT</version>
-      <!-- TODO: not transitive in tests artifact, so must be left in main 
+      <!-- TODO: not transitive in tests artifact, so must be left in main
         scope <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <!-- TODO: not transitive in tests artifact, so must be left in main 
+      <!-- TODO: not transitive in tests artifact, so must be left in main
         scope <scope>test</scope> -->
     </dependency>
     <dependency>
@@ -157,6 +157,11 @@ under the License.
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <version>0.3.4</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+      <version>3.6.3</version>
     </dependency>
   </dependencies>
 
@@ -283,7 +288,7 @@ under the License.
             <configuration>
               <systemProperties combine.children="append">
                 <property>
-                  <!-- Pass this through to the tests (if set!) to have them 
+                  <!-- Pass this through to the tests (if set!) to have them
                     pick the right repository -->
                   <name>maven.repo.local</name>
                   <value>${maven.repo.local}</value>
@@ -308,7 +313,7 @@ under the License.
             <configuration>
               <systemProperties combine.children="append">
                 <property>
-                  <!-- Pass this through to the tests (if set!) to have them 
+                  <!-- Pass this through to the tests (if set!) to have them
                     pick the right repository layout -->
                   <name>maven.repo.local.layout</name>
                   <value>${maven.repo.local.layout}</value>
@@ -327,7 +332,7 @@ under the License.
       <properties>
          <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
       </properties>
-    </profile> 
+    </profile>
     <profile>
       <id>embedded</id>
       <build>
@@ -339,7 +344,7 @@ under the License.
               <forkMode>once</forkMode>
               <argLine>${surefireMemory}
                 -Dcom.sun.management.jmxremote=true</argLine>
-              <!-- NOTE: Maven plugins have access to the system class path 
+              <!-- NOTE: Maven plugins have access to the system class path
                 so keep it clean -->
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemProperties combine.children="append">

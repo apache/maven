@@ -19,26 +19,25 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static java.util.Arrays.asList;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.it.util.ResourceExtractor;
+
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class MavenITmng6754TimestampInMultimoduleProject
         extends AbstractMavenIntegrationTestCase
 {
-    private static final Pattern LAST_UPDATED_LINE = Pattern.compile( "<lastUpdated>(\\d*)</lastUpdated>" );
     private static final String RESOURCE_PATH = "/mng-6754-version-timestamp-in-multimodule-build";
+    private static final String VERSION = "1.0-SNAPSHOT";
 
 
     public MavenITmng6754TimestampInMultimoduleProject()
@@ -57,68 +56,163 @@ public class MavenITmng6754TimestampInMultimoduleProject
         verifier.deleteDirectory( "repo" );
         verifier.deleteArtifacts ( "org.apache.maven.its.mng6754" );
         verifier.addCliOption( "-Drepodir=" + remoteRepoDir );
-        verifier.executeGoals( asList( "install", "deploy" ) );
+        verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
 
         final Properties props = verifier.loadProperties( "target/timestamp.properties" );
+        // Reference timestamp
         final String mavenBuildTimestamp = props.getProperty( "project.properties.timestamp" );
 
-        final String parentLastUpdatedLocal = getLastUpdatedFromMetadata( getLocalMetadataPath( localRepoDir, "parent" ) );
-        final String aLastUpdatedLocal = getLastUpdatedFromMetadata( getLocalMetadataPath( localRepoDir, "child-a" ) );
-        final String bLastUpdatedLocal = getLastUpdatedFromMetadata( getLocalMetadataPath( localRepoDir, "child-b" ) );
+        final Metadata parentMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "parent", null ) );
+        final Metadata aMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "child-a", null ) );
+        final Metadata bMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "child-b", null ) );
 
-        final String parentLastUpdatedRemote = getLastUpdatedFromMetadata( getRemoteMetadataPath( remoteRepoDir, "parent" ) );
-        final String aLastUpdatedRemote = getLastUpdatedFromMetadata( getRemoteMetadataPath( remoteRepoDir, "child-a" ) );
-        final String bLastUpdatedRemote = getLastUpdatedFromMetadata( getRemoteMetadataPath( remoteRepoDir, "child-b" ) );
+        final String parentLastUpdatedLocal = parentMetadataLocal.getVersioning().getLastUpdated();
+        final String aLastUpdatedLocal = aMetadataLocal.getVersioning().getLastUpdated();
+        final String bLastUpdatedLocal = bMetadataLocal.getVersioning().getLastUpdated();
 
-        assertEquals( "Installed child modules should have equal lastUpdated in maven-metadata-local.xml",
-                aLastUpdatedLocal, bLastUpdatedLocal );
-        assertEquals( "Installed parent module should have equal lastUpdated in maven-metadata-local.xml as their children",
-                aLastUpdatedLocal, parentLastUpdatedLocal );
-        assertEquals( "Deployed child modules should have equal lastUpdated in maven-metadata.xml",
-                aLastUpdatedRemote, bLastUpdatedRemote );
-        assertEquals( "Deployed parent module should have equal lastUpdated in maven-metadata.xml as their children",
-                aLastUpdatedRemote, parentLastUpdatedRemote );
-        assertEquals( "Installed parent module should have equal lastUpdated as deployed counterparts",
-                parentLastUpdatedLocal, parentLastUpdatedRemote );
-        assertEquals( "Installed child-a module should have equal lastUpdated as deployed counterparts",
-                aLastUpdatedLocal, aLastUpdatedRemote );
-        assertEquals( "Installed child-b module should have equal lastUpdated as deployed counterparts",
-                bLastUpdatedLocal, bLastUpdatedRemote );
-        assertEquals( "Installed parent module should have equal lastUpdated as the Maven build timestamp",
-                parentLastUpdatedLocal, mavenBuildTimestamp );
-        assertEquals( "Deployed parent module should have equal lastUpdated as the Maven build timestamp",
-                parentLastUpdatedRemote, mavenBuildTimestamp );
+        assertEquals ( "parent", "local", "lastUpdated", mavenBuildTimestamp, parentLastUpdatedLocal );
+        assertEquals ( "child-a", "local", "lastUpdated", mavenBuildTimestamp, aLastUpdatedLocal );
+        assertEquals ( "child-b", "local", "lastUpdated", mavenBuildTimestamp, bLastUpdatedLocal );
+
+        final Metadata parentVersionedMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "parent", VERSION ) );
+        final Metadata aVersionedMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "child-a", VERSION ) );
+        final Metadata bVersionedMetadataLocal = getMetadata( getLocalMetadataPath( localRepoDir, "child-b", VERSION ) );
+
+        final String parentVersionedLastUpdatedLocal = parentVersionedMetadataLocal.getVersioning().getLastUpdated();
+        final String parentVersionedSnapshotVersionUpdatedLocal = parentVersionedMetadataLocal.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String aLastVersionedUpdatedLocal = aVersionedMetadataLocal.getVersioning().getLastUpdated();
+        final String aVersionedSnapshotVersionUpdated1Local = aVersionedMetadataLocal.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String aVersionedSnapshotVersionUpdated2Local = aVersionedMetadataLocal.getVersioning().getSnapshotVersions().get( 1 ).getUpdated();
+        final String bLastVersionedUpdatedLocal = bVersionedMetadataLocal.getVersioning().getLastUpdated();
+        final String bVersionedSnapshotVersionUpdated1Local = bVersionedMetadataLocal.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String bVersionedSnapshotVersionUpdated2Local = bVersionedMetadataLocal.getVersioning().getSnapshotVersions().get( 1 ).getUpdated();
+
+        assertEquals ( "parent", "local", "lastUpdated", mavenBuildTimestamp, parentVersionedLastUpdatedLocal );
+        assertEquals ( "parent", "local", "snapshotVersion[0]/updated", mavenBuildTimestamp, parentVersionedSnapshotVersionUpdatedLocal );
+        assertEquals ( "child-a", "local", "lastUpdated", mavenBuildTimestamp, aLastVersionedUpdatedLocal );
+        assertEquals ( "child-a", "local", "snapshotVersion[0]/updated", mavenBuildTimestamp, aVersionedSnapshotVersionUpdated1Local );
+        assertEquals ( "child-a", "local", "snapshotVersion[1]/updated", mavenBuildTimestamp, aVersionedSnapshotVersionUpdated2Local );
+        assertEquals ( "child-b", "local", "lastUpdated", mavenBuildTimestamp, bLastVersionedUpdatedLocal );
+        assertEquals ( "child-b", "local", "snapshotVersion[0]/updated", mavenBuildTimestamp, bVersionedSnapshotVersionUpdated1Local );
+        assertEquals ( "child-b", "local", "snapshotVersion[1]/updated", mavenBuildTimestamp, bVersionedSnapshotVersionUpdated2Local );
+
+        final Metadata parentMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "parent", null ) );
+        final Metadata aMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "child-a", null ) );
+        final Metadata bMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "child-b", null ) );
+
+        final String parentLastUpdatedRemote = parentMetadataRemote.getVersioning().getLastUpdated();
+        final String aLastUpdatedRemote = aMetadataRemote.getVersioning().getLastUpdated();
+        final String bLastUpdatedRemote = bMetadataRemote.getVersioning().getLastUpdated();
+
+        assertEquals ( "parent", "remote", "lastUpdated", mavenBuildTimestamp, parentLastUpdatedRemote );
+        assertEquals ( "child-a", "remote", "lastUpdated", mavenBuildTimestamp, aLastUpdatedRemote );
+        assertEquals ( "child-b", "remote", "lastUpdated", mavenBuildTimestamp, bLastUpdatedRemote );
+
+        final Metadata parentVersionedMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "parent", VERSION ) );
+        final Metadata aVersionedMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "child-a", VERSION ) );
+        final Metadata bVersionedMetadataRemote = getMetadata( getRemoteMetadataPath( remoteRepoDir, "child-b", VERSION ) );
+
+        final String parentVersionedLastUpdatedRemote = parentVersionedMetadataRemote.getVersioning().getLastUpdated();
+        final String parentVersionedSnapshotTimestamp = parentVersionedMetadataRemote.getVersioning().getSnapshot().getTimestamp().replace( ".", "" );
+        final String parentVersionedSnapshotVersionUpdatedRemote = parentVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String parentVersionedSnapshotVersionValueRemote = parentVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getVersion();
+        final String aLastVersionedUpdatedRemote = aVersionedMetadataRemote.getVersioning().getLastUpdated();
+        final String aVersionedSnapshotTimestamp = aVersionedMetadataRemote.getVersioning().getSnapshot().getTimestamp().replace( ".", "" );
+        final String aVersionedSnapshotVersionUpdated1Remote = aVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String aVersionedSnapshotVersionValue1Remote = aVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getVersion();
+        final String aVersionedSnapshotVersionUpdated2Remote = aVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 1 ).getUpdated();
+        final String aVersionedSnapshotVersionValue2Remote = aVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 1 ).getVersion();
+        final String bLastVersionedUpdatedRemote = bVersionedMetadataRemote.getVersioning().getLastUpdated();
+        final String bVersionedSnapshotTimestamp = bVersionedMetadataRemote.getVersioning().getSnapshot().getTimestamp().replace( ".", "" );
+        final String bVersionedSnapshotVersionUpdated1Remote = bVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getUpdated();
+        final String bVersionedSnapshotVersionValue1Remote = bVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 0 ).getVersion();
+        final String bVersionedSnapshotVersionUpdated2Remote = bVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 1 ).getUpdated();
+        final String bVersionedSnapshotVersionValue2Remote = bVersionedMetadataRemote.getVersioning().getSnapshotVersions().get( 1 ).getVersion();
+
+        assertEquals ( "parent", "remote", "lastUpdated", mavenBuildTimestamp, parentVersionedLastUpdatedRemote );
+        assertEquals ( "parent", "remote", "snapshot/timestamp", mavenBuildTimestamp, parentVersionedSnapshotTimestamp );
+        assertEquals ( "parent", "remote", "snapshotVersion[0]/updated", mavenBuildTimestamp, parentVersionedSnapshotVersionUpdatedRemote );
+        assertEquals ( "parent", "remote", "snapshotVersion[0]/value", mavenBuildTimestamp, parentVersionedSnapshotVersionValueRemote.substring( 4, 19 ).replace( ".", "" ) );
+        assertEquals ( "child-a", "remote", "lastUpdated", mavenBuildTimestamp, aLastVersionedUpdatedRemote );
+        assertEquals ( "child-a", "remote", "snapshot/timestamp", mavenBuildTimestamp, aVersionedSnapshotTimestamp );
+        assertEquals ( "child-a", "remote", "snapshotVersion[0]/updated", mavenBuildTimestamp, aVersionedSnapshotVersionUpdated1Remote );
+        assertEquals ( "child-a", "remote", "snapshotVersion[0]/value", mavenBuildTimestamp, aVersionedSnapshotVersionValue1Remote.substring( 4, 19 ).replace( ".", "" ) );
+        assertEquals ( "child-a", "remote", "snapshotVersion[1]/updated", mavenBuildTimestamp, aVersionedSnapshotVersionUpdated2Remote );
+        assertEquals ( "child-a", "remote", "snapshotVersion[1]/value", mavenBuildTimestamp, aVersionedSnapshotVersionValue2Remote.substring( 4, 19 ).replace( ".", "" ) );
+        assertEquals ( "child-b", "remote", "lastUpdated", mavenBuildTimestamp, bLastVersionedUpdatedRemote );
+        assertEquals ( "child-b", "remote", "snapshot/timestamp", mavenBuildTimestamp, bVersionedSnapshotTimestamp );
+        assertEquals ( "child-b", "remote", "snapshotVersion[0]/updated", mavenBuildTimestamp, bVersionedSnapshotVersionUpdated1Remote );
+        assertEquals ( "child-b", "remote", "snapshotVersion[0]/value", mavenBuildTimestamp, bVersionedSnapshotVersionValue1Remote.substring( 4, 19 ).replace( ".", "" ) );
+        assertEquals ( "child-b", "remote", "snapshotVersion[1]/updated", mavenBuildTimestamp, bVersionedSnapshotVersionUpdated2Remote );
+        assertEquals ( "child-b", "remote", "snapshotVersion[1]/value", mavenBuildTimestamp, bVersionedSnapshotVersionValue2Remote.substring( 4, 19 ).replace( ".", "" ) );
+        assertPathExists( remoteRepoDir, "parent", "remote", VERSION, "parent-" + parentVersionedSnapshotVersionValueRemote + ".pom" );
+        assertPathExists( remoteRepoDir, "child-a", "remote", VERSION, "child-a-" + aVersionedSnapshotVersionValue1Remote + ".pom" );
+        assertPathExists( remoteRepoDir, "child-a", "remote", VERSION, "child-a-" + aVersionedSnapshotVersionValue2Remote + ".jar" );
+        assertPathExists( remoteRepoDir, "child-b", "remote", VERSION, "child-b-" + bVersionedSnapshotVersionValue1Remote + ".pom" );
+        assertPathExists( remoteRepoDir, "child-b", "remote", VERSION, "child-b-" + bVersionedSnapshotVersionValue2Remote + ".jar" );
     }
 
-    private Path getLocalMetadataPath( final Path repoDir, final String moduleName )
+    private Path getLocalMetadataPath( final Path repoDir, final String moduleName, String version )
+    {
+        return getRepoFile(repoDir, moduleName, version, "maven-metadata-local.xml" );
+    }
+
+    private Path getRemoteMetadataPath( final Path repoDir, final String moduleName, String version )
+    {
+        return getRepoFile(repoDir, moduleName, version, "maven-metadata.xml" );
+    }
+
+    private Path getRepoFile( final Path repoDir, final String moduleName, String version, String fileName )
     {
         final Path mng6754Path = Paths.get( "org", "apache", "maven", "its", "mng6754" );
-        final Path modulePath = repoDir.resolve( mng6754Path.resolve( moduleName ) );
-        return modulePath.resolve( "maven-metadata-local.xml" );
-    }
-
-    private Path getRemoteMetadataPath( final Path repoDir, final String moduleName )
-    {
-        final Path mng6754Path = Paths.get( "org", "apache", "maven", "its", "mng6754" );
-        final Path modulePath = repoDir.resolve( mng6754Path.resolve( moduleName ) );
-        return modulePath.resolve( "maven-metadata.xml" );
-    }
-
-    private String getLastUpdatedFromMetadata( final Path metadataFile ) throws IOException
-    {
-        final List<String> lines = Files.readAllLines( metadataFile, Charset.defaultCharset() );
-        for (final String line : lines )
+        Path modulePath = repoDir.resolve( mng6754Path.resolve( moduleName ) );
+        if ( version != null )
         {
-            final Matcher matcher = LAST_UPDATED_LINE.matcher( line );
-            if ( matcher.find() )
-            {
-                return matcher.group(1);
-            }
+            modulePath = modulePath.resolve( version );
         }
+        return modulePath.resolve( fileName );
+    }
 
-        // just in case, make sure the test will fail if there's no <lastUpdated>
-        // inside "maven-metadata.xml"
-        return "";
+    private Metadata getMetadata( final Path metadataFile ) throws IOException, XmlPullParserException
+    {
+        MetadataXpp3Reader r = new MetadataXpp3Reader();
+        try ( InputStream is = Files.newInputStream( metadataFile ) )
+        {
+            return r.read( is );
+        }
+    }
+
+    private void assertEquals( String moduleName, String location, String field, String expected, String actual )
+    {
+        String phase = null;
+        switch ( location )
+        {
+        case "local":
+            phase = "Installed";
+            break;
+        case "remote":
+            phase = "Deployed";
+            break;
+        }
+        assertEquals( String.format( "%s %s module should have equal %s %s with the Maven build timestamp",
+                 phase, moduleName, location, field ), expected, actual );
+    }
+
+    private void assertPathExists( Path repoDir, String moduleName, String location, String version, String fileName )
+    {
+        String phase = null;
+        switch ( location )
+        {
+        case "local":
+            phase = "Installed";
+            break;
+        case "remote":
+            phase = "Deployed";
+            break;
+        }
+        Path file = getRepoFile( repoDir, moduleName, version, fileName );
+        assertTrue( String.format( "%s %s module %s file %s should exist",
+                 phase, moduleName, location, file ), Files.exists( file ) );
     }
 }
