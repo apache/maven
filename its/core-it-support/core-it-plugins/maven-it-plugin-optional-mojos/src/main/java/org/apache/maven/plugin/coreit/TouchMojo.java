@@ -21,23 +21,21 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  * Creates an empty file to prove this goal was executed.
- * 
- *
- * @goal touch
  */
+@Mojo( name = "touch" )
 public class TouchMojo
     extends AbstractMojo
 {
 
-    /**
-     * @parameter default-value="${project.build.directory}/touch.txt"
-     */
+    @Parameter( defaultValue = "${project.build.directory}/touch.txt" )
     private File touchFile;
 
     public void execute()

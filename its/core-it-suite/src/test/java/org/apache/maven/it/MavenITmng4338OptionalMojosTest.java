@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4338">MNG-4338</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4338OptionalMojosTest
@@ -35,7 +35,7 @@ public class MavenITmng4338OptionalMojosTest
 
     public MavenITmng4338OptionalMojosTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.0,)" );
     }
 
     /**
