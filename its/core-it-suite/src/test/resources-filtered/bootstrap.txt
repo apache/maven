@@ -70,6 +70,7 @@ org.apache.maven.plugins:maven-compiler-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-compiler-plugin:2.0.2
 org.apache.maven.plugins:maven-compiler-plugin:3.1
 org.apache.maven.plugins:maven-compiler-plugin:3.8.1
+org.apache.maven.plugins:maven-compiler-plugin:3.10.1
 org.apache.maven.plugins:maven-dependency-plugin:2.7
 org.apache.maven.plugins:maven-dependency-plugin:2.8
 org.apache.maven.plugins:maven-deploy-plugin:${stubPluginVersion}

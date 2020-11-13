@@ -37,7 +37,7 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest
 
     public MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest()
     {
-        super( "[2.0.5,3.0-alpha-1),[3.0-alpha-7,)" );
+        super( "[2.0.5,3.0-alpha-1),[3.0-alpha-7,4.0.0-alpha-1)" );
     }
 
     /**

@@ -10,13 +10,13 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0.9</version>
+      <artifactId>maven-compat</artifactId>
+      <version>3.0-beta-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
+      <version>3.0-beta-3</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>2.0.9</version>
+      <version>3.0-beta-3</version>
     </dependency>
   </dependencies>
 </project>

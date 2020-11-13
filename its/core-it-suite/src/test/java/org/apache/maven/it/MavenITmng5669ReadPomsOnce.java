@@ -74,10 +74,10 @@ public class MavenITmng5669ReadPomsOnce
                 break;
             }
         }
-        assertEquals( logTxt.toString(), 168, logTxt.size() );
+        assertEquals( logTxt.toString(), 202, logTxt.size() );
 
         // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( 168 );
+        Set<String> uniqueBuildingSources = new HashSet<>( 202 );
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
         for ( String line : logTxt )
@@ -95,7 +95,7 @@ public class MavenITmng5669ReadPomsOnce
             }
             uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
         }
-        assertEquals( uniqueBuildingSources.size(), 167 /* is 168 minus superpom */ );
+        assertEquals( uniqueBuildingSources.size(), 201 /* is 202 minus superpom */ );
     }
 
     public void testWithBuildConsumer()
@@ -128,11 +128,11 @@ public class MavenITmng5669ReadPomsOnce
                 break;
             }
         }
-        assertEquals( logTxt.toString(), 168 + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
+        assertEquals( logTxt.toString(), 202 + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
                       logTxt.size() );
 
         // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( 168 );
+        Set<String> uniqueBuildingSources = new HashSet<>( 202 );
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
         for ( String line : logTxt )
@@ -150,7 +150,7 @@ public class MavenITmng5669ReadPomsOnce
             }
             uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
         }
-        assertEquals( uniqueBuildingSources.size(), 167 /* is 168 minus superpom */ );
+        assertEquals( uniqueBuildingSources.size(), 201 /* is 202 minus superpom */ );
     }
 
 }
