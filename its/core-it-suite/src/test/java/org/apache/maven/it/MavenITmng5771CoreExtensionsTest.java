@@ -60,7 +60,7 @@ public class MavenITmng5771CoreExtensionsTest
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication()
         throws Exception
     {
-        requiresMavenVersion( "[3.3.2-SNAPSHOT,)" );
+        requiresMavenVersion( "[3.3.2,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
 
