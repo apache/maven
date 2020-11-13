@@ -291,6 +291,10 @@ public class DefaultMaven
 
             validatePrerequisitesForNonMavenPluginProjects( session.getProjects() );
 
+            validateActivatedProfiles( session.getProjects(),
+                    request.getActiveProfiles(),
+                    request.getInactiveProfiles() );
+
             lifecycleStarter.execute( session );
 
             validateActivatedProfiles( session.getProjects(),
