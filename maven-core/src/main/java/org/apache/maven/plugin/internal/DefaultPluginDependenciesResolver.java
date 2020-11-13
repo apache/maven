@@ -41,7 +41,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
@@ -57,7 +56,6 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
-import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
@@ -182,11 +180,8 @@ public class DefaultPluginDependenciesResolver
 
         try
         {
-            DependencySelector selector =
-                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
-
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
-            pluginSession.setDependencySelector( selector );
+            pluginSession.setDependencySelector( session.getDependencySelector() );
             pluginSession.setDependencyGraphTransformer( session.getDependencyGraphTransformer() );
 
             CollectRequest request = new CollectRequest();
