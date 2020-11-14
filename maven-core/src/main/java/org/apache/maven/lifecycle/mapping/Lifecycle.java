@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.mapping;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -39,13 +38,6 @@ public class Lifecycle
      * Field phases
      */
     private Map<String, LifecyclePhase> lifecyclePhases;
-
-    /*
-     * NOTE: This exists merely for backward-compat with legacy-style lifecycle definitions and allows configuration
-     * injection to work instead of failing.
-     */
-    @SuppressWarnings( "unused" )
-    private List<String> optionalMojos;
 
     /**
      * Method getId
