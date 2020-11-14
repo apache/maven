@@ -76,9 +76,6 @@
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
               <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
             </phases>
-            <optional-mojos>
-              <optional-mojo>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</optional-mojo>
-            </optional-mojos>
             <!-- END SNIPPET: pom-lifecycle -->
           </lifecycle>
         </lifecycles>
@@ -101,9 +98,6 @@
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
               <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
             </phases>
-            <optional-mojos>
-              <optional-mojo>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</optional-mojo>
-            </optional-mojos>
             <!-- END SNIPPET: pom-lifecycle -->
           </lifecycle>
         </lifecycles>
