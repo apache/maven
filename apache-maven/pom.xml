@@ -153,7 +153,7 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <includeArtifactIds>jansi</includeArtifactIds>
-          <includes>META-INF/native/**</includes>
+          <includes>org/fusesource/jansi/internal/native/**</includes>
         </configuration>
         <executions>
           <execution>
