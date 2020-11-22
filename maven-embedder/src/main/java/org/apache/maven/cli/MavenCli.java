@@ -1030,9 +1030,15 @@ public class MavenCli
                 }
             }
 
+            String altPomFileArg = "";
+            if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+            {
+                String alternatePomFile = cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+                altPomFileArg = "-f " + alternatePomFile + " ";
+            }
             if ( result.canResume() )
             {
-                logBuildResumeHint( "mvn <args> -r" );
+                logBuildResumeHint( "mvn " + altPomFileArg + "<args> -r" );
             }
             else if ( !failedProjects.isEmpty() )
             {
@@ -1045,7 +1051,7 @@ public class MavenCli
                 if ( !firstFailedProject.equals( sortedProjects.get( 0 ) ) )
                 {
                     String resumeFromSelector = getResumeFromSelector( sortedProjects, firstFailedProject );
-                    logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                    logBuildResumeHint( "mvn " + altPomFileArg + "<args> -rf " + resumeFromSelector );
                 }
             }
 
