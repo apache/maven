@@ -388,7 +388,7 @@ public class DefaultModelBuilder
 
         List<Model> lineage = new ArrayList<>();
 
-        for ( ModelData currentData = resultData; currentData != null; )
+        for ( ModelData currentData = resultData; ; )
         {
             String modelId = currentData.getId();
             result.addModelId( modelId );
