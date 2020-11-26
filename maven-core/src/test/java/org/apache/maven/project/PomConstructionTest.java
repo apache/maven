@@ -56,7 +56,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -1689,15 +1689,9 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniqueArtifactRepositoryId()
         throws Exception
     {
-        try
-        {
-            buildPom( "unique-repo-id/artifact-repo" );
-            fail( "Non-unique repository ids did not cause validation error" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Non-unique repository ids did not cause validation error",
+                ProjectBuildingException.class,
+                () -> buildPom( "unique-repo-id/artifact-repo" ) );
     }
 
     /* MNG-4193 */
@@ -1705,15 +1699,9 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniquePluginRepositoryId()
         throws Exception
     {
-        try
-        {
-            buildPom( "unique-repo-id/plugin-repo" );
-            fail( "Non-unique repository ids did not cause validation error" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Non-unique repository ids did not cause validation error",
+                ProjectBuildingException.class,
+                () -> buildPom( "unique-repo-id/plugin-repo" ) );
     }
 
     /* MNG-4193 */
@@ -1721,15 +1709,9 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniqueArtifactRepositoryIdInProfile()
         throws Exception
     {
-        try
-        {
-            buildPom( "unique-repo-id/artifact-repo-in-profile" );
-            fail( "Non-unique repository ids did not cause validation error" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Non-unique repository ids did not cause validation error",
+                ProjectBuildingException.class,
+                () -> buildPom( "unique-repo-id/artifact-repo-in-profile" ) );
     }
 
     /* MNG-4193 */
@@ -1737,15 +1719,9 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniquePluginRepositoryIdInProfile()
         throws Exception
     {
-        try
-        {
-            buildPom( "unique-repo-id/plugin-repo-in-profile" );
-            fail( "Non-unique repository ids did not cause validation error" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Non-unique repository ids did not cause validation error",
+                ProjectBuildingException.class,
+                () -> buildPom( "unique-repo-id/plugin-repo-in-profile" ) );
     }
 
     /** MNG-3843 */
@@ -1824,15 +1800,9 @@ public class PomConstructionTest
     public void testParentPomPackagingMustBePom()
         throws Exception
     {
-        try
-        {
-            buildPom( "parent-pom-packaging/sub" );
-            fail( "Wrong packaging of parent POM was not rejected" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Wrong packaging of parent POM was not rejected",
+                ProjectBuildingException.class,
+                () -> buildPom( "parent-pom-packaging/sub" ) );
     }
 
     /** MNG-522, MNG-3018 */
@@ -1953,15 +1923,9 @@ public class PomConstructionTest
     public void testProjectArtifactIdIsNotInheritedButMandatory()
         throws Exception
     {
-        try
-        {
-            buildPom( "artifact-id-inheritance/child" );
-            fail( "Missing artifactId did not cause validation error" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // expected
-        }
+        assertThrows( "Missing artifactId did not cause validation error",
+                ProjectBuildingException.class,
+                () -> buildPom( "artifact-id-inheritance/child" ) );
     }
 
     private void assertPathSuffixEquals( String expected, Object actual )

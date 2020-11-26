@@ -26,12 +26,14 @@ import java.util.Map;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -139,33 +141,25 @@ public class ProjectInheritanceTest
         {
             String pluginArtifactId = plugin.getArtifactId();
 
-            if ( !validPluginCounts.containsKey( pluginArtifactId ) )
+            assertTrue( "Illegal plugin found: " + pluginArtifactId, validPluginCounts.containsKey( pluginArtifactId ) );
+
+            if ( pluginArtifactId.equals( testPluginArtifactId ) )
             {
-                fail( "Illegal plugin found: " + pluginArtifactId );
+                testPlugin = plugin;
             }
-            else
-            {
-                if ( pluginArtifactId.equals( testPluginArtifactId ) )
-                {
-                    testPlugin = plugin;
-                }
 
-                Integer count = validPluginCounts.get( pluginArtifactId );
+            Integer count = validPluginCounts.get( pluginArtifactId );
 
-                if ( count > 0 )
-                {
-                    fail( "Multiple copies of plugin: " + pluginArtifactId + " found in POM." );
-                }
-                else
-                {
-                    count = count + 1;
+            assertEquals( "Multiple copies of plugin: " + pluginArtifactId + " found in POM.", 0, (int) count );
 
-                    validPluginCounts.put( pluginArtifactId, count );
-                }
-            }
+            count = count + 1;
+
+            validPluginCounts.put( pluginArtifactId, count );
         }
 
-        List executions = testPlugin.getExecutions();
+        assertNotNull( testPlugin );
+
+        List<PluginExecution> executions = testPlugin.getExecutions();
 
         assertEquals( 1, executions.size() );
     }

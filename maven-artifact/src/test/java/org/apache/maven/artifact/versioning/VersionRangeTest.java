@@ -28,8 +28,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests version range construction.
@@ -699,15 +699,9 @@ public class VersionRangeTest
 
     private void checkInvalidRange( String version )
     {
-        try
-        {
-            VersionRange.createFromVersionSpec( version );
-            fail( "Version " + version + " should have failed to construct" );
-        }
-        catch ( InvalidVersionSpecificationException expected )
-        {
-            // expected
-        }
+        assertThrows( "Version " + version + " should have failed to construct",
+                InvalidVersionSpecificationException.class,
+                () -> VersionRange.createFromVersionSpec( version ) );
     }
 
     @Test

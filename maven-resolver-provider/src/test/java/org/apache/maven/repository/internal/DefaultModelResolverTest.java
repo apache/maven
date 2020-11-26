@@ -34,8 +34,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test cases for the default {@code ModelResolver} implementation.
@@ -62,16 +62,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         parent.setArtifactId( "artifact" );
         parent.setVersion( "0" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertNotNull( e.getMessage() );
+        assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
     }
 
     @Test
@@ -82,17 +77,12 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         parent.setArtifactId( "artifact" );
         parent.setVersion( "[2.0,2.1)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertNotNull( e.getMessage() );
+        assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
+                      e.getMessage() );
     }
 
     @Test
@@ -103,17 +93,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         parent.setArtifactId( "artifact" );
         parent.setVersion( "[1.0,)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "The requested parent version range '[1.0,)' does not specify an upper bound",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertEquals( "The requested parent version range '[1.0,)' does not specify an upper bound",
+                      e.getMessage() );
     }
 
     @Test
@@ -148,16 +132,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         dependency.setArtifactId( "artifact" );
         dependency.setVersion( "0" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertNotNull( e.getMessage() );
+        assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
     }
 
     @Test
@@ -168,17 +147,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         dependency.setArtifactId( "artifact" );
         dependency.setVersion( "[2.0,2.1)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
+                      e.getMessage() );
     }
 
     @Test
@@ -189,17 +162,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         dependency.setArtifactId( "artifact" );
         dependency.setVersion( "[1.0,)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "The requested dependency version range '[1.0,)' does not specify an upper bound",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertEquals( "The requested dependency version range '[1.0,)' does not specify an upper bound",
+                      e.getMessage() );
     }
 
     @Test

@@ -70,7 +70,8 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.junit.After;
 import org.junit.Before;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -198,10 +199,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        if ( !file.exists() )
-        {
-            fail( "Remote artifact " + file + " should be present." );
-        }
+        assertTrue( "Remote artifact " + file + " should be present.", file.exists() );
     }
 
     protected void assertLocalArtifactPresent( Artifact artifact )
@@ -213,10 +211,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        if ( !file.exists() )
-        {
-            fail( "Local artifact " + file + " should be present." );
-        }
+        assertTrue( "Local artifact " + file + " should be present.", file.exists() );
     }
 
     protected void assertRemoteArtifactNotPresent( Artifact artifact )
@@ -228,10 +223,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        if ( file.exists() )
-        {
-            fail( "Remote artifact " + file + " should not be present." );
-        }
+        assertFalse( "Remote artifact " + file + " should not be present.", file.exists() );
     }
 
     protected void assertLocalArtifactNotPresent( Artifact artifact )
@@ -243,10 +235,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        if ( file.exists() )
-        {
-            fail( "Local artifact " + file + " should not be present." );
-        }
+        assertFalse( "Local artifact " + file + " should not be present.", file.exists() );
     }
 
     // ----------------------------------------------------------------------

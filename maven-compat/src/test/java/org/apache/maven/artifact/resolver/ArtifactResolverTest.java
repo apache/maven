@@ -40,8 +40,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -170,15 +170,9 @@ public class ArtifactResolverTest
     {
         Artifact k = createArtifact( "k", "1.0" );
 
-        try
-        {
-            artifactResolver.resolve( k, remoteRepositories(), localRepository() );
-            fail( "Resolution succeeded when it should have failed" );
-        }
-        catch ( ArtifactNotFoundException expected )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Resolution succeeded when it should have failed",
+                ArtifactNotFoundException.class,
+                () -> artifactResolver.resolve( k, remoteRepositories(), localRepository() ) );
     }
 
     @Test

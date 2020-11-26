@@ -56,8 +56,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test the default artifact collector.
@@ -116,15 +116,9 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         b.addDependency( "a", "1.0" );
-        try
-        {
-            collect( a );
-            fail( "Should have failed on cyclic dependency not involving project" );
-        }
-        catch ( CyclicDependencyException expected )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Should have failed on cyclic dependency not involving project",
+                CyclicDependencyException.class,
+                () -> collect( a ) );
     }
 
     // works, but we don't fail on cycles presently
@@ -134,15 +128,9 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         b.addDependency( "project", "1.0" );
-        try
-        {
-            collect( a );
-            fail( "Should have failed on cyclic dependency involving project" );
-        }
-        catch ( CyclicDependencyException expected )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Should have failed on cyclic dependency not involving project",
+                CyclicDependencyException.class,
+                () -> collect( a ) );
     }
 
     @Test

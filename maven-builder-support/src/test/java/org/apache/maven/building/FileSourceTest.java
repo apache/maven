@@ -26,7 +26,7 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 public class FileSourceTest
 {
@@ -34,15 +34,10 @@ public class FileSourceTest
     @Test
     public void testFileSource()
     {
-        try
-        {
-            new FileSource( null );
-            fail( "Should fail, since you must specify a file" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "file cannot be null", e.getMessage() );
-        }
+        NullPointerException e = assertThrows( "Should fail, since you must specify a file",
+                NullPointerException.class,
+                () -> new FileSource( null ) );
+        assertEquals( "file cannot be null", e.getMessage() );
     }
 
     @Test

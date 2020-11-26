@@ -51,7 +51,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import javax.inject.Inject;
 
@@ -320,25 +320,15 @@ public class LifecycleExecutorTest
     {
         File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
-        try
-        {
-            getExecutions( calculateExecutionPlan( session, "resources:" ) );
-            fail( "expected a MojoNotFoundException" );
-        }
-        catch ( MojoNotFoundException e )
-        {
-            assertEquals( "", e.getGoal() );
-        }
+        MojoNotFoundException e = assertThrows( "expected a MojoNotFoundException",
+                MojoNotFoundException.class,
+                () -> getExecutions( calculateExecutionPlan( session, "resources:" ) ) );
+        assertEquals( "", e.getGoal() );
 
-        try
-        {
-            getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) );
-            fail( "expected a MojoNotFoundException" );
-        }
-        catch ( MojoNotFoundException e )
-        {
-            assertEquals( "resources:toomany", e.getGoal() );
-        }
+        e = assertThrows( "expected a MojoNotFoundException",
+                MojoNotFoundException.class,
+                () -> getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) ) );
+        assertEquals( "resources:toomany", e.getGoal() );
     }
 
 

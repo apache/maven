@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -66,16 +66,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         parent.setArtifactId( "apache" );
         parent.setVersion( "0" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertNotNull( e.getMessage() );
+        assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
     }
 
     @Test
@@ -86,17 +81,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         parent.setArtifactId( "apache" );
         parent.setVersion( "[2.0,2.1)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
+                      e.getMessage() );
     }
 
     @Test
@@ -107,17 +96,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         parent.setArtifactId( "apache" );
         parent.setVersion( "[1,)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( parent );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "The requested parent version range '[1,)' does not specify an upper bound",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( parent ) );
+        assertEquals( "The requested parent version range '[1,)' does not specify an upper bound",
+                      e.getMessage() );
     }
 
     @Test
@@ -152,16 +135,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         dependency.setArtifactId( "apache" );
         dependency.setVersion( "0" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertNotNull( e.getMessage() );
+        assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
     }
 
     @Test
@@ -172,17 +150,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         dependency.setArtifactId( "apache" );
         dependency.setVersion( "[2.0,2.1)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
+                      e.getMessage() );
     }
 
     @Test
@@ -193,17 +165,11 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         dependency.setArtifactId( "apache" );
         dependency.setVersion( "[1,)" );
 
-        try
-        {
-            this.newModelResolver().resolveModel( dependency );
-            fail( "Expected 'UnresolvableModelException' not thrown." );
-        }
-        catch ( final UnresolvableModelException e )
-        {
-            assertEquals( "The requested dependency version range '[1,)' does not specify an upper bound",
-                          e.getMessage() );
-
-        }
+        UnresolvableModelException e = assertThrows( "Expected 'UnresolvableModelException' not thrown.",
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel( dependency ) );
+        assertEquals( "The requested dependency version range '[1,)' does not specify an upper bound",
+                      e.getMessage() );
     }
 
     @Test

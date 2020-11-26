@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 public class MojoExecutionScopeTest
 {
@@ -50,14 +50,7 @@ public class MojoExecutionScopeTest
 
         scope.exit();
 
-        try
-        {
-            scope.exit();
-            fail();
-        }
-        catch ( IllegalStateException expected )
-        {
-        }
+        assertThrows( IllegalStateException.class, () -> scope.exit() );
     }
 
     @Test

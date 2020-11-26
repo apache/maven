@@ -43,8 +43,8 @@ import org.junit.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Hervé Boutemy
@@ -182,18 +182,14 @@ public class DefaultInheritanceAssemblerTest
         // parent references child with directory name (which is not artifact id)
         // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance( "tricky-flat-directory-urls", false );
-        try
-        {
-            testInheritance( "tricky-flat-directory-urls", true );
-            fail( "should have failed since module reference == directory name != artifactId" );
-        }
-        catch ( AssertionError afe )
-        {
-            // expected failure
-            assertTrue( afe.getMessage(), afe.getMessage().contains(
-                    "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
-                            "'http://www.apache.org/path/to/parent/child-artifact-id/'" ) );
-        }
+
+        AssertionError afe = assertThrows( "should have failed since module reference == directory name != artifactId",
+                AssertionError.class,
+                () -> testInheritance( "tricky-flat-directory-urls", true ) );
+        // expected failure
+        assertTrue( afe.getMessage(), afe.getMessage().contains(
+                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
+                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ) );
     }
 
     @Test

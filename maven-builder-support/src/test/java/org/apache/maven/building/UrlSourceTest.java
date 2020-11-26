@@ -27,7 +27,7 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 public class UrlSourceTest
 {
@@ -35,15 +35,10 @@ public class UrlSourceTest
     @Test
     public void testUrlSource()
     {
-        try
-        {
-            new UrlSource( null );
-            fail( "Should fail, since you must specify a url" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "url cannot be null", e.getMessage() );
-        }
+        NullPointerException e = assertThrows( "Should fail, since you must specify a url",
+                NullPointerException.class,
+                () -> new UrlSource( null ) );
+        assertEquals( "url cannot be null", e.getMessage() );
     }
 
     @Test

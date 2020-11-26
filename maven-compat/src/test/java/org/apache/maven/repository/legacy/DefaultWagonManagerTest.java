@@ -50,14 +50,15 @@ import org.apache.maven.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -151,16 +152,8 @@ public class DefaultWagonManagerTest
 
         ArtifactRepository repo = createStringRepo();
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-
-            fail();
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows( ResourceDoesNotExistException.class,
+                () -> wagonManager.getArtifact( artifact, repo, null, false ) );
 
         assertFalse( artifact.getFile().exists() );
     }
@@ -172,16 +165,8 @@ public class DefaultWagonManagerTest
 
         ArtifactRepository repo = createStringRepo();
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, true );
-
-            fail();
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows( ResourceDoesNotExistException.class,
+                () -> wagonManager.getArtifact( artifact, repo, null, true ) );
 
         assertFalse( artifact.getFile().exists() );
     }
@@ -276,17 +261,7 @@ public class DefaultWagonManagerTest
 
         assertWagon( "string" );
 
-        try
-        {
-            assertWagon( "d" );
-
-            fail( "Expected :" + UnsupportedProtocolException.class.getName() );
-        }
-        catch ( UnsupportedProtocolException e )
-        {
-            // ok
-            assertTrue( true );
-        }
+        assertThrows( UnsupportedProtocolException.class, () -> assertWagon( "d" ) );
     }
 
     /**
@@ -321,7 +296,9 @@ public class DefaultWagonManagerTest
     /**
      * Checks the verification of checksums.
      */
-    public void xtestChecksumVerification()
+    @Ignore
+    @Test
+    public void testChecksumVerification()
         throws Exception
     {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
@@ -338,82 +315,35 @@ public class DefaultWagonManagerTest
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, null, false );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "B7BB97D7D0B9244398D9B47296907F73313663E6" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, null, false );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.sha1", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-            fail( "Checksum verification did not fail" );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            // expected
-        }
+        assertThrows( "Checksum verification did not fail", ChecksumFailedException.class, () ->
+                wagonManager.getArtifact( artifact, repo, null, false ) );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.md5", "50b2cf50a103a965efac62b983035cac" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, null, false );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.md5", "842F568FCCFEB7E534DC72133D42FFDC" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, null, false );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.md5", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, null, false );
-            fail( "Checksum verification did not fail" );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            // expected
-        }
+        assertThrows( "Checksum verification did not fail",
+                ChecksumFailedException.class,
+                () -> wagonManager.getArtifact( artifact, repo, null, false ) );
     }
 
     @Test

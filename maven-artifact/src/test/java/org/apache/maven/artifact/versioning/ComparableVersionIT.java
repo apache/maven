@@ -20,6 +20,7 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +32,6 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ComparableVersionIT
 {
@@ -64,7 +64,7 @@ public class ComparableVersionIT
                     }
                     catch ( InterruptedException e )
                     {
-                        fail( e.getMessage() );
+                        throw new InterruptedIOException( e.toString() );
                     }
                     return FileVisitResult.TERMINATE;
                 }

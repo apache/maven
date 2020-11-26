@@ -28,8 +28,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -75,35 +75,17 @@ public class DefaultRuntimeInformationTest
         assertTrue( rtInfo.isMavenVersion( "[2.0.11,2.1.0),[3.0,)" ) );
         assertFalse( rtInfo.isMavenVersion( "[9.0,)" ) );
 
-        try
-        {
-            rtInfo.isMavenVersion( "[3.0," );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Bad version range wasn't rejected",
+                IllegalArgumentException.class,
+                () -> rtInfo.isMavenVersion( "[3.0," ) );
 
-        try
-        {
-            rtInfo.isMavenVersion( "" );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Bad version range wasn't rejected",
+                IllegalArgumentException.class,
+                () -> rtInfo.isMavenVersion( "" ) );
 
-        try
-        {
-            rtInfo.isMavenVersion( null );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows( "Bad version range wasn't rejected",
+                NullPointerException.class,
+                () -> rtInfo.isMavenVersion( null ) );
     }
 
 }

@@ -28,8 +28,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -149,15 +149,9 @@ public class MavenCliTest
         // -TC2.2
         assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
 
-        try
-        {
-            cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" );
-            fail( "Should have failed with a NumberFormatException" );
-        }
-        catch ( NumberFormatException e )
-        {
-            // carry on
-        }
+        assertThrows( "Should have failed with a NumberFormatException",
+                NumberFormatException.class,
+                () -> cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" ) );
     }
 
     @Test
@@ -189,15 +183,7 @@ public class MavenCliTest
         CliRequest request = new CliRequest( new String[0], null );
 
         cli.initialize( request );
-        try
-        {
-            cli.cli( request );
-            fail();
-        }
-        catch ( ParseException expected )
-        {
-
-        }
+        assertThrows( ParseException.class, () -> cli.cli( request ) );
     }
 
     /**
@@ -359,19 +345,12 @@ public class MavenCliTest
         cli.logging( request );
         assertTrue( MessageUtils.isColorEnabled() );
 
-        try
-        {
-            MessageUtils.setColorEnabled( false );
-            request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
-            cli.cli( request );
-            cli.properties( request );
-            cli.logging( request );
-            fail( "maybe is not a valid option" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // noop
-        }
+        MessageUtils.setColorEnabled( false );
+        CliRequest maybeColorRequest = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+        cli.cli( maybeColorRequest );
+        cli.properties( maybeColorRequest );
+        assertThrows( "maybe is not a valid option", IllegalArgumentException.class,
+                () -> cli.logging( maybeColorRequest ) );
     }
 
     /**
