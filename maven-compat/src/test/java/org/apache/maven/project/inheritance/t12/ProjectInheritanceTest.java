@@ -25,6 +25,10 @@ import java.util.Map;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Verifies that plugin execution sections in the parent POM that have
@@ -43,6 +47,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testFalsePluginExecutionInheritValue() throws Exception
     {
         File localRepo = getLocalRepositoryPath();

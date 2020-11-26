@@ -23,6 +23,12 @@ import java.util.Map;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verifies exclusions listed in dependencyManagement are valid for
@@ -56,6 +62,7 @@ public class ProjectInheritanceTest
      * We should see that the resulting size of collected artifacts is two:
      * a &amp; b only.
      */
+    @Test
     public void testDependencyManagementExclusionsExcludeTransitively()
         throws Exception
     {
@@ -92,6 +99,7 @@ public class ProjectInheritanceTest
      *
      * @throws Exception
      */
+    @Test
     public void testDependencyManagementExclusionDoesNotOverrideGloballyForTransitives()
         throws Exception
     {

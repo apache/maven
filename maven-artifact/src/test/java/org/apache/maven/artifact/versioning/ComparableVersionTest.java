@@ -21,7 +21,10 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.Locale;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test ComparableVersion.
@@ -30,7 +33,6 @@ import junit.framework.TestCase;
  */
 @SuppressWarnings( "unchecked" )
 public class ComparableVersionTest
-    extends TestCase
 {
     private Comparable newComparable( String version )
     {
@@ -101,16 +103,19 @@ public class ComparableVersionTest
         assertTrue( "expected " + v2 + " > " + v1, c2.compareTo( c1 ) > 0 );
     }
 
+    @Test
     public void testVersionsQualifier()
     {
         checkVersionsOrder( VERSIONS_QUALIFIER );
     }
 
+    @Test
     public void testVersionsNumber()
     {
         checkVersionsOrder( VERSIONS_NUMBER );
     }
 
+    @Test
     public void testVersionsEqual()
     {
         newComparable( "1.0-alpha" );
@@ -164,6 +169,7 @@ public class ComparableVersionTest
         checkVersionsEqual( "1m3", "1MILESTONE3" );
     }
 
+    @Test
     public void testVersionComparing()
     {
         checkVersionsOrder( "1", "2" );
@@ -202,6 +208,7 @@ public class ComparableVersionTest
      * see Netbeans issues <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
+    @Test
     public void testMng5568()
     {
         String a = "6.1.0";
@@ -216,6 +223,7 @@ public class ComparableVersionTest
     /**
      * Test <a href="https://jira.apache.org/jira/browse/MNG-6572">MNG-6572</a> optimization.
      */
+    @Test
     public void testMng6572()
     {
         String a = "20190126.230843"; // resembles a SNAPSHOT
@@ -235,6 +243,7 @@ public class ComparableVersionTest
      * Test all versions are equal when starting with many leading zeroes regardless of string length
      * (related to MNG-6572 optimization)
      */
+    @Test
     public void testVersionEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
@@ -267,6 +276,7 @@ public class ComparableVersionTest
      * Test all "0" versions are equal when starting with many leading zeroes regardless of string length
      * (related to MNG-6572 optimization)
      */
+    @Test
     public void testVersionZeroEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
@@ -299,6 +309,7 @@ public class ComparableVersionTest
      * Test <a href="https://issues.apache.org/jira/browse/MNG-6964">MNG-6964</a> edge cases
      * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
      */
+    @Test
     public void testMng6964()
     {
         String a = "1-0.alpha";
@@ -310,6 +321,7 @@ public class ComparableVersionTest
         checkVersionsOrder( a, b ); // Should still be true
     }
 
+    @Test
     public void testLocaleIndependent()
     {
         Locale orig = Locale.getDefault();
@@ -328,6 +340,7 @@ public class ComparableVersionTest
         }
     }
 
+    @Test
     public void testReuse()
     {
         ComparableVersion c1 = new ComparableVersion( "1" );

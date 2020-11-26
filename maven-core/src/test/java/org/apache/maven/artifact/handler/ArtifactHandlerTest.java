@@ -22,12 +22,16 @@ package org.apache.maven.artifact.handler;
 import java.io.File;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ArtifactHandlerTest
     extends PlexusTestCase
 {
+    @Test
     public void testAptConsistency()
         throws Exception
     {

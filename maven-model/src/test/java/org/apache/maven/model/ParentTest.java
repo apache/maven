@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code Parent}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ParentTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new Parent().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new Parent().equals( null ) );
@@ -42,12 +47,14 @@ public class ParentTest
         new Parent().equals( new Parent() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         Parent thing = new Parent();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new Parent().toString() );

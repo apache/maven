@@ -15,20 +15,23 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.MojoExecution;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Kristian Rosenvold
  */
-public class PhaseRecorderTest extends TestCase
+public class PhaseRecorderTest
 {
+    @Test
     public void testObserveExecution() throws Exception {
         PhaseRecorder phaseRecorder = new PhaseRecorder( ProjectDependencyGraphStub.A);
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();

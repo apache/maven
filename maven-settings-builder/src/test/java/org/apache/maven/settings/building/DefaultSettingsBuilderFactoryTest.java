@@ -21,13 +21,14 @@ package org.apache.maven.settings.building;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultSettingsBuilderFactoryTest
-    extends TestCase
 {
 
     private File getSettings( String name )
@@ -35,6 +36,7 @@ public class DefaultSettingsBuilderFactoryTest
         return new File( "src/test/resources/settings/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
+    @Test
     public void testCompleteWiring()
         throws Exception
     {

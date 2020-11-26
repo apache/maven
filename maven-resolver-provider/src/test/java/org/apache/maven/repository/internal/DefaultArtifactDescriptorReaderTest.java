@@ -19,21 +19,25 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class DefaultArtifactDescriptorReaderTest
     extends AbstractRepositoryTestCase
 {
 
+    @Test
     public void testMng5459()
         throws Exception
     {

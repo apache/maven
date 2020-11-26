@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.junit.Test;
 
 /**
  * Tests {@link PropertyProfileActivator}.
@@ -61,6 +62,7 @@ public class PropertyProfileActivatorTest
         return props;
     }
 
+    @Test
     public void testNullSafe()
         throws Exception
     {
@@ -73,6 +75,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, p, newContext( null, null ) );
     }
 
+    @Test
     public void testWithNameOnly_UserProperty()
         throws Exception
     {
@@ -85,6 +88,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
+    @Test
     public void testWithNameOnly_SystemProperty()
         throws Exception
     {
@@ -97,6 +101,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
+    @Test
     public void testWithNegatedNameOnly_UserProperty()
         throws Exception
     {
@@ -109,6 +114,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
+    @Test
     public void testWithNegatedNameOnly_SystemProperty()
         throws Exception
     {
@@ -121,6 +127,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
+    @Test
     public void testWithValue_UserProperty()
         throws Exception
     {
@@ -133,6 +140,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
+    @Test
     public void testWithValue_SystemProperty()
         throws Exception
     {
@@ -145,6 +153,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
+    @Test
     public void testWithNegatedValue_UserProperty()
         throws Exception
     {
@@ -157,6 +166,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
+    @Test
     public void testWithNegatedValue_SystemProperty()
         throws Exception
     {
@@ -169,6 +179,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
+    @Test
     public void testWithValue_UserPropertyDominantOverSystemProperty()
         throws Exception
     {

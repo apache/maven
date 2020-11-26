@@ -15,9 +15,6 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +42,16 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -72,6 +79,7 @@ public class LifecycleExecutorTest
     // Tests which exercise the lifecycle executor when it is dealing with default lifecycle phases.
     // -----------------------------------------------------------------------------------------------
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom()
         throws Exception
     {
@@ -92,6 +100,7 @@ public class LifecycleExecutorTest
         assertEquals( "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle()
         throws Exception
     {
@@ -111,6 +120,7 @@ public class LifecycleExecutorTest
         assertEquals( "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
         throws Exception
     {
@@ -233,6 +243,7 @@ public class LifecycleExecutorTest
                           "configuration/models[1]/model" ) );
     }
 
+    @Test
     public void testLifecycleQueryingUsingADefaultLifecyclePhase()
         throws Exception
     {
@@ -263,6 +274,7 @@ public class LifecycleExecutorTest
         assertEquals( "jar:jar", executionPlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
     }
 
+    @Test
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
         throws Exception
     {
@@ -272,6 +284,7 @@ public class LifecycleExecutorTest
         assertThat( plugins.toString(), plugins, hasSize( 9 ) );
     }
 
+    @Test
     public void testPluginConfigurationCreation()
         throws Exception
     {
@@ -301,6 +314,7 @@ public class LifecycleExecutorTest
                                                                         mergedSegment.getTasks() );
     }
 
+    @Test
     public void testInvalidGoalName()
         throws Exception
     {
@@ -328,6 +342,7 @@ public class LifecycleExecutorTest
     }
 
 
+    @Test
     public void testPluginPrefixRetrieval()
         throws Exception
     {
@@ -340,6 +355,7 @@ public class LifecycleExecutorTest
 
     // Prefixes
 
+    @Test
     public void testFindingPluginPrefixforCleanClean()
         throws Exception
     {
@@ -349,6 +365,7 @@ public class LifecycleExecutorTest
         assertNotNull( plugin );
     }
 
+    @Test
     public void testSetupMojoExecution()
         throws Exception
     {
@@ -371,6 +388,7 @@ public class LifecycleExecutorTest
         assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
     }
 
+    @Test
     public void testExecutionListeners()
         throws Exception
     {

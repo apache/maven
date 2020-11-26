@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code ActivationFile}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ActivationFileTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new ActivationFile().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new ActivationFile().equals( null ) );
@@ -42,12 +47,14 @@ public class ActivationFileTest
         new ActivationFile().equals( new ActivationFile() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         ActivationFile thing = new ActivationFile();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new ActivationFile().toString() );

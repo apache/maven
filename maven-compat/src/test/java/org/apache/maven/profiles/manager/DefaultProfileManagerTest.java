@@ -19,23 +19,21 @@ package org.apache.maven.profiles.manager;
  * under the License.
  */
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.PlexusTestCase;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.eclipse.aether.RepositorySystemSession;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase
@@ -49,6 +47,7 @@ public class DefaultProfileManagerTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Test
     public void testShouldActivateDefaultProfile()
         throws Exception
     {
@@ -84,6 +83,7 @@ public class DefaultProfileManagerTest
         assertEquals( "defaultActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
 
+    @Test
     public void testShouldNotActivateDefaultProfile()
         throws Exception
     {
@@ -123,6 +123,7 @@ public class DefaultProfileManagerTest
     }
 
 
+    @Test
     public void testShouldNotActivateReversalOfPresentSystemProperty()
         throws Exception
     {
@@ -150,6 +151,7 @@ public class DefaultProfileManagerTest
         assertEquals( 0, active.size() );
     }
 
+    @Test
     public void testShouldOverrideAndActivateInactiveProfile()
         throws Exception
     {
@@ -180,6 +182,7 @@ public class DefaultProfileManagerTest
         assertEquals( "syspropActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
 
+    @Test
     public void testShouldOverrideAndDeactivateActiveProfile()
         throws Exception
     {

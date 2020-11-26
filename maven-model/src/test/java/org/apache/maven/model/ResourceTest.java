@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code Resource}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ResourceTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new Resource().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new Resource().equals( null ) );
@@ -42,12 +47,14 @@ public class ResourceTest
         new Resource().equals( new Resource() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         Resource thing = new Resource();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new Resource().toString() );

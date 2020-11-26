@@ -19,10 +19,10 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.util.Scanner;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

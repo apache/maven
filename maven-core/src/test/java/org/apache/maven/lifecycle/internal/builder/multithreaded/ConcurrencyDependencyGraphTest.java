@@ -14,17 +14,20 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * the License.
  */
 
-import junit.framework.TestCase;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.project.MavenProject;
+import org.junit.Test;
 
-import java.util.List;
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
 
-public class ConcurrencyDependencyGraphTest extends TestCase {
+public class ConcurrencyDependencyGraphTest {
 
+    @Test
     public void testGraph() throws Exception {
 
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList(

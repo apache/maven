@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code Relocation}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class RelocationTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new Relocation().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new Relocation().equals( null ) );
@@ -42,12 +47,14 @@ public class RelocationTest
         new Relocation().equals( new Relocation() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         Relocation thing = new Relocation();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new Relocation().toString() );

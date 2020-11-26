@@ -26,7 +26,13 @@ import org.apache.maven.settings.Server;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import javax.inject.Inject;
 
@@ -49,8 +55,9 @@ public class LegacyRepositorySystemTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
@@ -60,6 +67,16 @@ public class LegacyRepositorySystemTest
                         binder ->  binder.requestInjection( this ) );
     }
 
+    @After
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        repositorySystem = null;
+        super.tearDown();
+    }
+
+    @Test
     public void testThatLocalRepositoryWithSpacesIsProperlyHandled()
         throws Exception
     {
@@ -68,6 +85,7 @@ public class LegacyRepositorySystemTest
         assertEquals( basedir, new File( repo.getBasedir() ) );
     }
 
+    @Test
     public void testAuthenticationHandling()
     {
         Server server = new Server();

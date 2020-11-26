@@ -48,11 +48,11 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.Before;
 
 import javax.inject.Inject;
 
@@ -66,7 +66,9 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
     @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp()
+            throws Exception
     {
         super.setUp();
         getContainer();
@@ -80,6 +82,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
                 binder -> binder.requestInjection( this ) );
     }
+
 
     abstract protected String getProjectsDirectory();
 

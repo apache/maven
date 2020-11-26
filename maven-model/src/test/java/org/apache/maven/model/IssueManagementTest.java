@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code IssueManagement}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class IssueManagementTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new IssueManagement().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new IssueManagement().equals( null ) );
@@ -42,12 +47,14 @@ public class IssueManagementTest
         new IssueManagement().equals( new IssueManagement() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         IssueManagement thing = new IssueManagement();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new IssueManagement().toString() );

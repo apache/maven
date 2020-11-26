@@ -32,6 +32,13 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -41,12 +48,12 @@ public class PluginManagerTest
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
-
     protected String getProjectsDirectory()
     {
         return "src/test/projects/plugin-manager";
     }
 
+    @Test
     public void testPluginLoading()
         throws Exception
     {
@@ -61,6 +68,7 @@ public class PluginManagerTest
         assertNotNull( pluginDescriptor );
     }
 
+    @Test
     public void testMojoDescriptorRetrieval()
         throws Exception
     {
@@ -97,6 +105,7 @@ public class PluginManagerTest
     //      only deal in concrete terms -- all version finding mumbo jumbo is a customization to base functionality
     //      the plugin manager provides.
 
+    @Test
     public void testRemoteResourcesPlugin()
         throws Exception
     {
@@ -150,6 +159,7 @@ public class PluginManagerTest
         */
     }
 
+    @Test
     public void testMojoConfigurationIsMergedCorrectly()
         throws Exception
     {
@@ -160,6 +170,7 @@ public class PluginManagerTest
      * is in the Antlr plugin which comes bundled with a version of Antlr but the user often times needs
      * to use a specific version. We need to make sure the version that they specify takes precedence.
      */
+    @Test
     public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject()
         throws Exception
     {
@@ -169,6 +180,7 @@ public class PluginManagerTest
      * The case where you have a plugin in the current build that you want to be used on projects in
      * the current build.
      */
+    @Test
     public void testMojoThatIsPresentInTheCurrentBuild()
         throws Exception
     {
@@ -178,6 +190,7 @@ public class PluginManagerTest
      * This is the case where the Mojo wants to execute on every project and then do something at the end
      * with the results of each project.
      */
+    @Test
     public void testAggregatorMojo()
         throws Exception
     {
@@ -187,6 +200,7 @@ public class PluginManagerTest
      * This is the case where a Mojo needs the lifecycle run to a certain phase before it can do
      * anything useful.
      */
+    @Test
     public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself()
         throws Exception
     {
@@ -198,6 +212,7 @@ public class PluginManagerTest
 
     // test a build where projects use different versions of the same plugin
 
+    @Test
     public void testThatPluginDependencyThatHasSystemScopeIsResolved()
         throws Exception
     {
@@ -241,6 +256,7 @@ public class PluginManagerTest
         assertEquals( version, pd.getVersion() );
     }
 
+    @Test
     public void testPluginRealmCache()
         throws Exception
     {
@@ -285,6 +301,7 @@ public class PluginManagerTest
         }
     }
 
+    @Test
     public void testBuildExtensionsPluginLoading()
         throws Exception
     {

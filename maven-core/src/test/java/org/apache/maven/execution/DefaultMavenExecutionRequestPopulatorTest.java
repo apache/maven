@@ -9,6 +9,7 @@ import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
 import org.eclipse.sisu.launch.InjectedTestCase;
+import org.junit.Test;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -35,6 +36,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
     @Inject
     MavenExecutionRequestPopulator testee;
 
+    @Test
     public void testPluginRepositoryInjection()
         throws Exception
     {

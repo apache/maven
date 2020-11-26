@@ -15,10 +15,10 @@ package org.apache.maven.repository.metadata;
  * the License.
  */
 
-import org.apache.maven.repository.metadata.GraphConflictResolutionPolicy;
-import org.apache.maven.repository.metadata.MetadataGraphEdge;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -27,23 +27,22 @@ import junit.framework.TestCase;
  */
 
 public class DefaultGraphConflictResolutionPolicyTest
-    extends TestCase
 {
     GraphConflictResolutionPolicy policy;
     MetadataGraphEdge e1;
     MetadataGraphEdge e2;
     MetadataGraphEdge e3;
     //------------------------------------------------------------------------------------------
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        policy = new DefaultGraphConflictResolutionPolicy();
-        e1 = new MetadataGraphEdge( "1.1", true, null, null, 2, 1 );
-        e2 = new MetadataGraphEdge( "1.2", true, null, null, 3, 2 );
-        e3 = new MetadataGraphEdge( "1.2", true, null, null, 2, 3 );
-    }
+	@Before
+    public void setUp() throws Exception
+	{
+		policy = new DefaultGraphConflictResolutionPolicy();
+    	e1 = new MetadataGraphEdge( "1.1", true, null, null, 2, 1 );
+    	e2 = new MetadataGraphEdge( "1.2", true, null, null, 3, 2 );
+    	e3 = new MetadataGraphEdge( "1.2", true, null, null, 2, 3 );
+	}
     //------------------------------------------------------------------------------------------
+	@Test
     public void testDefaultPolicy()
         throws Exception
     {

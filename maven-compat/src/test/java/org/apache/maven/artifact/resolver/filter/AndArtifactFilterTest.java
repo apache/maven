@@ -21,7 +21,11 @@ package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@link AndArtifactFilter}.
@@ -29,7 +33,6 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class AndArtifactFilterTest
-    extends TestCase
 {
 
     private ArtifactFilter newSubFilter()
@@ -37,6 +40,7 @@ public class AndArtifactFilterTest
         return artifact -> false;
     }
 
+    @Test
     public void testEquals()
     {
         AndArtifactFilter filter1 = new AndArtifactFilter();

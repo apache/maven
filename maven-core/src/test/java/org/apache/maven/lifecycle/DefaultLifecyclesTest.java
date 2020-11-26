@@ -15,25 +15,25 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.hasSize;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
+import org.apache.maven.PlexusTestCase;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 /**
  * @author Kristian Rosenvold
@@ -54,7 +54,9 @@ public class DefaultLifecyclesTest
     }
 
     @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp()
+        throws Exception
     {
         super.setUp();
         getContainer();
@@ -69,6 +71,7 @@ public class DefaultLifecyclesTest
                 binder -> binder.requestInjection( this ) );
     }
 
+    @Test
     public void testDefaultLifecycles()
     {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
@@ -76,6 +79,7 @@ public class DefaultLifecyclesTest
         assertThat( DefaultLifecycles.STANDARD_LIFECYCLES,  arrayWithSize( 4 ) );
     }
 
+    @Test
     public void testDefaultLifecycle()
     {
         final Lifecycle lifecycle = getLifeCycleById( "default" );
@@ -83,6 +87,7 @@ public class DefaultLifecyclesTest
         assertThat( lifecycle.getPhases(), hasSize( 23 ) );
     }
 
+    @Test
     public void testCleanLifecycle()
     {
         final Lifecycle lifecycle = getLifeCycleById( "clean" );
@@ -90,6 +95,7 @@ public class DefaultLifecyclesTest
         assertThat( lifecycle.getPhases(), hasSize( 3 ) );
     }
 
+    @Test
     public void testSiteLifecycle()
     {
         final Lifecycle lifecycle = getLifeCycleById( "site" );
@@ -97,6 +103,7 @@ public class DefaultLifecyclesTest
         assertThat( lifecycle.getPhases(), hasSize( 4 ) );
     }
 
+    @Test
     public void testWrapperLifecycle()
     {
         final Lifecycle lifecycle = getLifeCycleById( "wrapper" );
@@ -104,6 +111,7 @@ public class DefaultLifecyclesTest
         assertThat( lifecycle.getPhases(), hasSize( 1 ) );
     }
 
+    @Test
     public void testCustomLifecycle()
     {
         List<Lifecycle> myLifecycles = new ArrayList<>();

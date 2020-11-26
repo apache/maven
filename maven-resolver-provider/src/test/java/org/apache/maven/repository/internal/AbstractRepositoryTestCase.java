@@ -21,16 +21,18 @@ package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
 
+import org.apache.maven.PlexusTestCase;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.junit.After;
+import org.junit.Before;
 
 public abstract class AbstractRepositoryTestCase
     extends PlexusTestCase
@@ -47,8 +49,9 @@ public abstract class AbstractRepositoryTestCase
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -56,8 +59,9 @@ public abstract class AbstractRepositoryTestCase
         session = newMavenRepositorySystemSession( system );
     }
 
+    @After
     @Override
-    protected void tearDown()
+    public void tearDown()
         throws Exception
     {
         session = null;

@@ -19,10 +19,11 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import static org.junit.Assert.*;
-
 import org.apache.maven.building.Problem.Severity;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DefaultProblemCollectorTest
 {

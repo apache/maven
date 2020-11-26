@@ -29,32 +29,35 @@ import org.apache.maven.project.artifact.DefaultMavenMetadataCache.CacheKey;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.TestRepositorySystem;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 /**
  * @author Igor Fedorenko
  */
 public class DefaultMavenMetadataCacheTest
-    extends TestCase
 {
     private RepositorySystem repositorySystem;
 
-    protected void setUp()
+    @Before
+    public void setUp()
         throws Exception
     {
-        super.setUp();
         repositorySystem = new TestRepositorySystem( null, null );
     }
 
-    @Override
-    protected void tearDown()
+    @After
+    public void tearDown()
         throws Exception
     {
         repositorySystem = null;
-        super.tearDown();
     }
 
+    @Test
     public void testCacheKey()
         throws Exception
     {

@@ -23,7 +23,13 @@ import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -44,12 +50,6 @@ public class DefaultRuntimeInformationTest
     }
 
     @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-    @Override
     protected synchronized void setupContainer()
     {
         super.setupContainer();
@@ -58,6 +58,7 @@ public class DefaultRuntimeInformationTest
                 binder -> binder.requestInjection( this ) );
     }
 
+    @Test
     public void testGetMavenVersion()
     {
         String mavenVersion = rtInfo.getMavenVersion();
@@ -65,6 +66,7 @@ public class DefaultRuntimeInformationTest
         assertTrue( mavenVersion.length() > 0 );
     }
 
+    @Test
     public void testIsMavenVersion()
     {
         assertTrue( rtInfo.isMavenVersion( "2.0" ) );

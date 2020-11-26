@@ -21,13 +21,14 @@ package org.apache.maven.project.path;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 @SuppressWarnings( "deprecation" )
 public class DefaultPathTranslatorTest
-    extends TestCase
 {
 
+    @Test
     public void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue()
     {
         File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
@@ -37,6 +38,7 @@ public class DefaultPathTranslatorTest
         assertEquals( basedir.getAbsolutePath(), aligned );
     }
 
+    @Test
     public void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix()
     {
         File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
@@ -46,6 +48,7 @@ public class DefaultPathTranslatorTest
         assertEquals( new File( basedir, "dir" ).getAbsolutePath(), aligned );
     }
 
+    @Test
     public void testUnalignToBasedirWherePathEqualsBasedir()
     {
         File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();

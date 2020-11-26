@@ -31,8 +31,10 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.After;
+import org.junit.Before;
 
 import javax.inject.Inject;
 
@@ -64,7 +66,8 @@ public abstract class AbstractMavenProjectTestCase
                 binder -> binder.requestInjection( this ) );
     }
 
-    protected void setUp()
+    @Before
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -80,8 +83,8 @@ public abstract class AbstractMavenProjectTestCase
         }
     }
 
-    @Override
-    protected void tearDown()
+    @After
+    public void tearDown()
         throws Exception
     {
         projectBuilder = null;

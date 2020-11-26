@@ -16,17 +16,19 @@ package org.apache.maven.execution.scope.internal;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.inject.Key;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-import com.google.inject.Key;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 public class MojoExecutionScopeTest
-    extends TestCase
 {
+    @Test
     public void testNestedEnter()
         throws Exception
     {
@@ -58,6 +60,7 @@ public class MojoExecutionScopeTest
         }
     }
 
+    @Test
     public void testMultiKeyInstance()
         throws Exception
     {

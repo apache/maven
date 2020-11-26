@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code Site}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class SiteTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new Site().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new Site().equals( null ) );
@@ -42,12 +47,14 @@ public class SiteTest
         new Site().equals( new Site() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         Site thing = new Site();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new Site().toString() );

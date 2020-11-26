@@ -19,8 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import static org.junit.Assert.assertTrue;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -34,6 +32,8 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class RemoteSnapshotMetadataTest
 {

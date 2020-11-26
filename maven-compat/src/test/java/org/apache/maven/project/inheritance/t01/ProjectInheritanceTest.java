@@ -21,6 +21,9 @@ package org.apache.maven.project.inheritance.t01;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -46,6 +49,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testProjectInheritance()
         throws Exception
     {

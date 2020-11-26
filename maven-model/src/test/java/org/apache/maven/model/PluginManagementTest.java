@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code PluginManagement}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class PluginManagementTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new PluginManagement().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new PluginManagement().equals( null ) );
@@ -42,12 +47,14 @@ public class PluginManagementTest
         new PluginManagement().equals( new PluginManagement() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         PluginManagement thing = new PluginManagement();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new PluginManagement().toString() );

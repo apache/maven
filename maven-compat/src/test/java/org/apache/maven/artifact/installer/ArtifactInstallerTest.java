@@ -23,6 +23,8 @@ import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.inject.Inject;
 
@@ -35,11 +37,22 @@ public class ArtifactInstallerTest
     @Inject
     private ArtifactInstaller artifactInstaller;
 
+    @Before
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        artifactInstaller = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
+    }
+
     protected String component()
     {
         return "installer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {

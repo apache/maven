@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code Notifier}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class NotifierTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new Notifier().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new Notifier().equals( null ) );
@@ -42,12 +47,14 @@ public class NotifierTest
         new Notifier().equals( new Notifier() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         Notifier thing = new Notifier();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new Notifier().toString() );

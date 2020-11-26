@@ -21,9 +21,15 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.Artifact;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests version range construction.
@@ -31,7 +37,6 @@ import org.apache.maven.artifact.Artifact;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class VersionRangeTest
-    extends TestCase
 {
     private static final String CHECK_NUM_RESTRICTIONS = "check number of restrictions";
 
@@ -49,6 +54,7 @@ public class VersionRangeTest
 
     private static final String CHECK_SELECTED_VERSION = "check selected version";
 
+    @Test
     public void testRange()
         throws InvalidVersionSpecificationException, OverConstrainedVersionException
     {
@@ -154,6 +160,7 @@ public class VersionRangeTest
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "5.0.9.0" ) ) );
     }
 
+    @Test
     public void testInvalidRanges()
     {
         checkInvalidRange( "(1.0)" );
@@ -172,6 +179,7 @@ public class VersionRangeTest
         checkInvalidRange( "(1.1,1.2],[1.0,1.1)" );
     }
 
+    @Test
     public void testIntersections()
         throws InvalidVersionSpecificationException
     {
@@ -654,6 +662,7 @@ public class VersionRangeTest
         assertEquals( CHECK_NUM_RESTRICTIONS, 0, restrictions.size() );
     }
 
+    @Test
     public void testReleaseRangeBoundsContainsSnapshots()
         throws InvalidVersionSpecificationException
     {
@@ -664,6 +673,7 @@ public class VersionRangeTest
         assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
     }
 
+    @Test
     public void testSnapshotRangeBoundsCanContainSnapshots()
         throws InvalidVersionSpecificationException
     {
@@ -678,6 +688,7 @@ public class VersionRangeTest
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
     }
 
+    @Test
     public void testSnapshotSoftVersionCanContainSnapshot()
         throws InvalidVersionSpecificationException
     {
@@ -699,6 +710,7 @@ public class VersionRangeTest
         }
     }
 
+    @Test
     public void testContains() throws InvalidVersionSpecificationException
     {
         ArtifactVersion actualVersion = new DefaultArtifactVersion( "2.0.5" );
@@ -723,11 +735,13 @@ public class VersionRangeTest
         return vr.containsVersion( actualVersion );
     }
 
+    @Test
     public void testOrder0()
     {
         // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" ) ) > 0 );
     }
 
+    @Test
     public void testCache()
         throws InvalidVersionSpecificationException
     {

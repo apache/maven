@@ -17,14 +17,11 @@ package org.apache.maven;
 
 
 import org.apache.maven.exception.ExceptionHandler;
-import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.Collections;
+import org.junit.Test;
 
 public class MavenTest
     extends AbstractCoreMavenComponentTestCase
@@ -49,6 +46,7 @@ public class MavenTest
         return "src/test/projects/lifecycle-executor";
     }
 
+    @Test
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()
         throws Exception
     {

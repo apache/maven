@@ -19,20 +19,26 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * under the License.
  */
 
+import java.util.Collections;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.After;
+import org.junit.Before;
 
 import javax.inject.Inject;
 import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Provides a basis for testing conflict resolvers.
@@ -79,8 +85,12 @@ public abstract class AbstractConflictResolverTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    /*
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
@@ -99,7 +109,9 @@ public abstract class AbstractConflictResolverTest
     /*
      * @see org.codehaus.plexus.PlexusTestCase#tearDown()
      */
-    protected void tearDown() throws Exception
+    @After
+    @Override
+    public void tearDown() throws Exception
     {
         a1 = null;
         a2 = null;

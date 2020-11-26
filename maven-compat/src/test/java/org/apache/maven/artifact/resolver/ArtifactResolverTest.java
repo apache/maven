@@ -35,6 +35,13 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -55,8 +62,9 @@ public class ArtifactResolverTest
 
     private Artifact projectArtifact;
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -64,8 +72,9 @@ public class ArtifactResolverTest
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
+    @After
     @Override
-    protected void tearDown()
+    public void tearDown()
         throws Exception
     {
         projectArtifact = null;
@@ -78,6 +87,7 @@ public class ArtifactResolverTest
         return "resolver";
     }
 
+    @Test
     public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository()
         throws Exception
     {
@@ -88,6 +98,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( a );
     }
 
+    @Test
     public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
         throws Exception
     {
@@ -105,6 +116,7 @@ public class ArtifactResolverTest
         return super.createArtifact( groupId, artifactId, version, type );
     }
 
+    @Test
     public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository()
         throws Exception
     {
@@ -127,6 +139,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( h );
     }
 
+    @Test
     public void testTransitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
         throws Exception
     {
@@ -151,6 +164,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( j );
     }
 
+    @Test
     public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository()
         throws Exception
     {
@@ -167,6 +181,7 @@ public class ArtifactResolverTest
         }
     }
 
+    @Test
     public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood()
         throws Exception
     {
@@ -182,6 +197,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( l );
     }
 
+    @Test
     public void testTransitiveResolutionOrder()
         throws Exception
     {

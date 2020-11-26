@@ -22,14 +22,15 @@ package org.apache.maven.model.building;
 import java.io.File;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultModelBuilderFactoryTest
-    extends TestCase
 {
 
     private File getPom( String name )
@@ -37,6 +38,7 @@ public class DefaultModelBuilderFactoryTest
         return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
+    @Test
     public void testCompleteWiring()
         throws Exception
     {

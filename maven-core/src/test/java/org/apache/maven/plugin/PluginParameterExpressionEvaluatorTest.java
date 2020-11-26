@@ -46,6 +46,14 @@ import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import javax.inject.Inject;
 
@@ -60,14 +68,7 @@ public class PluginParameterExpressionEvaluatorTest
     @Inject
     private RepositorySystem factory;
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        factory = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testPluginDescriptorExpressionReference()
         throws Exception
     {
@@ -84,6 +85,7 @@ public class PluginParameterExpressionEvaluatorTest
                     result );
     }
 
+    @Test
     public void testPluginArtifactsExpressionReference()
         throws Exception
     {
@@ -109,6 +111,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertSame( "dependency artifact is wrong.", depArtifact, depResults.get( 0 ) );
     }
 
+    @Test
     public void testPluginArtifactMapExpressionReference()
         throws Exception
     {
@@ -136,6 +139,7 @@ public class PluginParameterExpressionEvaluatorTest
                     depResults.get( ArtifactUtils.versionlessKey( depArtifact ) ) );
     }
 
+    @Test
     public void testPluginArtifactIdExpressionReference()
         throws Exception
     {
@@ -152,6 +156,7 @@ public class PluginParameterExpressionEvaluatorTest
                     result );
     }
 
+    @Test
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {
@@ -174,6 +179,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
+    @Test
     public void testEscapedVariablePassthrough()
         throws Exception
     {
@@ -191,6 +197,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( var, value );
     }
 
+    @Test
     public void testEscapedVariablePassthroughInLargerExpression()
         throws Exception
     {
@@ -209,6 +216,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "${var} with version: 1", value );
     }
 
+    @Test
     public void testMultipleSubExpressionsInLargerExpression()
         throws Exception
     {
@@ -227,6 +235,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "test with version: 1", value );
     }
 
+    @Test
     public void testMissingPOMPropertyRefInLargerExpression()
         throws Exception
     {
@@ -241,6 +250,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expr, value );
     }
 
+    @Test
     public void testPOMPropertyExtractionWithMissingProject_WithDotNotation()
         throws Exception
     {
@@ -262,6 +272,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( checkValue, value );
     }
 
+    @Test
     public void testBasedirExtractionWithMissingProject()
         throws Exception
     {
@@ -272,6 +283,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( System.getProperty( "user.dir" ), value );
     }
 
+    @Test
     public void testValueExtractionFromSystemPropertiesWithMissingProject()
         throws Exception
     {
@@ -291,6 +303,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
+    @Test
     public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation()
         throws Exception
     {
@@ -323,6 +336,7 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList()  );
     }
 
+    @Test
     public void testLocalRepositoryExtraction()
         throws Exception
     {
@@ -333,6 +347,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "local", ( (ArtifactRepository) value ).getId() );
     }
 
+    @Test
     public void testTwoExpressions()
         throws Exception
     {
@@ -351,6 +366,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "expected-directory" + File.separatorChar + "expected-finalName", value );
     }
 
+    @Test
     public void testShouldExtractPluginArtifacts()
         throws Exception
     {

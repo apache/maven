@@ -15,6 +15,8 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
@@ -29,10 +31,15 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.junit.Test;
 
-import java.util.List;
-
-import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.*;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.A;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.B;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.C;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.X;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Y;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Z;
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.getProjectBuildList;
 
 /**
  * @author Kristian Rosenvold
@@ -40,6 +47,7 @@ import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStu
 public class ConcurrencyDependencyGraphTest
     extends junit.framework.TestCase
 {
+    @Test
     public void testConcurrencyGraphPrimaryVersion()
         throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
         NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
@@ -70,6 +78,7 @@ public class ConcurrencyDependencyGraphTest
         assertEquals( Z, cDescendants.get( 1 ) );
     }
 
+    @Test
     public void testConcurrencyGraphDifferentCompletionOrder()
         throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
         NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,

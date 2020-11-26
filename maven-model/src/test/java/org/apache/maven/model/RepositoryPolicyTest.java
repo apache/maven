@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code RepositoryPolicy}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class RepositoryPolicyTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new RepositoryPolicy().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new RepositoryPolicy().equals( null ) );
@@ -42,12 +47,14 @@ public class RepositoryPolicyTest
         new RepositoryPolicy().equals( new RepositoryPolicy() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         RepositoryPolicy thing = new RepositoryPolicy();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new RepositoryPolicy().toString() );

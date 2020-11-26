@@ -32,16 +32,21 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import javax.inject.Inject;
 
@@ -66,8 +71,9 @@ public class LegacyRepositorySystemTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
@@ -75,6 +81,16 @@ public class LegacyRepositorySystemTest
         ((DefaultPlexusContainer)getContainer())
                 .addPlexusInjector( Collections.emptyList(),
                         binder ->  binder.requestInjection( this ) );
+    }
+
+    @After
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        repositorySystem = null;
+        resolutionErrorHandler = null;
+        super.tearDown();
     }
 
     protected List<ArtifactRepository> getRemoteRepositories()
@@ -104,6 +120,7 @@ public class LegacyRepositorySystemTest
         return repositorySystem.createLocalRepository( repoDir );
     }
 
+    @Test
     public void testThatASystemScopedDependencyIsNotResolvedFromRepositories()
         throws Exception
     {
@@ -186,6 +203,7 @@ public class LegacyRepositorySystemTest
         }
     }
 
+    @Test
     public void testLocalRepositoryBasedir()
         throws Exception
     {

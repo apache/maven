@@ -28,6 +28,10 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -57,6 +61,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testProjectInheritance()
         throws Exception
     {

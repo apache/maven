@@ -25,6 +25,11 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verifies scope inheritance of direct and transitive dependencies.
@@ -52,6 +57,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementOverridesTransitiveDependencyVersion()
         throws Exception
     {

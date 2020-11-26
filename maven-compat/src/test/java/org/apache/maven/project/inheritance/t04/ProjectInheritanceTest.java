@@ -25,6 +25,11 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verifies the version of a dependency listed in a parent's
@@ -51,6 +56,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementOverridesTransitiveDependencyVersion()
         throws Exception
     {

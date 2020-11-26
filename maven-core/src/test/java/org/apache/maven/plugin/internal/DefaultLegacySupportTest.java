@@ -18,20 +18,23 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import java.util.concurrent.CountDownLatch;
+
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.junit.Test;
 
-import java.util.concurrent.CountDownLatch;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Kristian Rosenvold
  */
-public class DefaultLegacySupportTest extends TestCase {
+public class DefaultLegacySupportTest {
     final CountDownLatch latch = new CountDownLatch(1);
     final DefaultLegacySupport defaultLegacySupport = new DefaultLegacySupport();
 
+    @Test
     public void testSetSession() throws Exception {
 
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();

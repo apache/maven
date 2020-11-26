@@ -19,16 +19,20 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
@@ -36,27 +40,22 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ExtensionDescriptorBuilderTest
-    extends TestCase
 {
 
     private ExtensionDescriptorBuilder builder;
 
-    @Override
-    protected void setUp()
+    @Before
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         builder = new ExtensionDescriptorBuilder();
     }
 
-    @Override
-    protected void tearDown()
+    @After
+    public void tearDown()
         throws Exception
     {
         builder = null;
-
-        super.tearDown();
     }
 
     private InputStream toStream( String xml )
@@ -64,6 +63,7 @@ public class ExtensionDescriptorBuilderTest
         return new ByteArrayInputStream( xml.getBytes( StandardCharsets.UTF_8 ) );
     }
 
+    @Test
     public void testEmptyDescriptor()
         throws Exception
     {
@@ -78,6 +78,7 @@ public class ExtensionDescriptorBuilderTest
         assertThat( ed.getExportedArtifacts(), is( empty() ) );
     }
 
+    @Test
     public void testCompleteDescriptor()
         throws Exception
     {

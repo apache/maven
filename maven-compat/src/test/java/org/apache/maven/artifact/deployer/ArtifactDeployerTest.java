@@ -25,6 +25,11 @@ import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import javax.inject.Inject;
 
@@ -37,11 +42,22 @@ public class ArtifactDeployerTest
     @Inject
     private ArtifactDeployer artifactDeployer;
 
+    @Before
+    @Override
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        artifactDeployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
+    }
+
     protected String component()
     {
         return "deployer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {

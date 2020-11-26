@@ -23,11 +23,11 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.inject.Inject;
+
+import org.apache.maven.PlexusTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
@@ -35,11 +35,11 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystemSession;
+import org.junit.After;
+import org.junit.Before;
 
-import javax.inject.Inject;
+import static org.junit.Assert.fail;
 
 /**
  * @author Jason van Zyl
@@ -61,8 +61,9 @@ public abstract class AbstractMavenProjectTestCase
     }
 
     @Override
-    protected void setUp()
-            throws Exception
+    @Before
+    public void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -81,8 +82,8 @@ public abstract class AbstractMavenProjectTestCase
         }
     }
 
-    @Override
-    protected void tearDown()
+    @After
+    public void tearDown()
         throws Exception
     {
         projectBuilder = null;

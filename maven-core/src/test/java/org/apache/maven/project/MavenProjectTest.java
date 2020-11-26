@@ -28,11 +28,19 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
 {
 
+    @Test
     public void testShouldInterpretChildPathAdjustmentBasedOnModulePaths()
         throws IOException
     {
@@ -59,6 +67,7 @@ public class MavenProjectTest
         assertEquals( "..", adjustment );
     }
 
+    @Test
     public void testIdentityProtoInheritance()
     {
         Parent parent = new Parent();
@@ -82,6 +91,7 @@ public class MavenProjectTest
         project.getId();
     }
 
+    @Test
     public void testEmptyConstructor()
     {
         MavenProject project = new MavenProject();
@@ -90,6 +100,7 @@ public class MavenProjectTest
                         + MavenProject.EMPTY_PROJECT_VERSION, project.getId() );
     }
 
+    @Test
     public void testClone()
         throws Exception
     {
@@ -103,6 +114,7 @@ public class MavenProjectTest
         assertTrue( "ManagedVersionMap is not empty", clonedMap.isEmpty() );
     }
 
+    @Test
     public void testCloneWithDependencyManagement()
         throws Exception
     {
@@ -127,6 +139,7 @@ public class MavenProjectTest
                     clonedMap.containsKey( "maven-test:maven-test-b:jar" ) );
     }
 
+    @Test
     public void testGetModulePathAdjustment()
         throws IOException
     {
@@ -146,6 +159,7 @@ public class MavenProjectTest
         assertEquals( "..", pathAdjustment );
     }
 
+    @Test
     public void testCloneWithDistributionManagement()
         throws Exception
     {
@@ -157,6 +171,7 @@ public class MavenProjectTest
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
 
+    @Test
     public void testCloneWithActiveProfile()
         throws Exception
     {
@@ -177,6 +192,7 @@ public class MavenProjectTest
                        activeProfilesClone );
     }
 
+    @Test
     public void testCloneWithBaseDir()
         throws Exception
     {
@@ -188,6 +204,7 @@ public class MavenProjectTest
         assertEquals( "Base directory is preserved across clone", projectToClone.getBasedir(), clonedProject.getBasedir() );
     }
 
+    @Test
     public void testUndefinedOutputDirectory()
         throws Exception
     {
@@ -198,6 +215,7 @@ public class MavenProjectTest
         assertNoNulls( p.getTestClasspathElements() );
     }
 
+    @Test
     public void testAddDotFile()
     {
         MavenProject project = new MavenProject();

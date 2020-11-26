@@ -19,6 +19,20 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.maven.PlexusTestCase;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -31,7 +45,6 @@ import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -54,18 +67,10 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+import org.junit.After;
+import org.junit.Before;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -90,8 +95,8 @@ public abstract class AbstractArtifactComponentTestCase
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    @Override
-    protected void setUp()
+    @Before
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -107,8 +112,9 @@ public abstract class AbstractArtifactComponentTestCase
         legacySupport.setSession( session );
     }
 
+    @After
     @Override
-    protected void tearDown()
+    public void tearDown()
         throws Exception
     {
         release( artifactFactory );

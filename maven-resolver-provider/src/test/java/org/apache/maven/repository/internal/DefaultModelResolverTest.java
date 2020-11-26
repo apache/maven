@@ -30,6 +30,12 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for the default {@code ModelResolver} implementation.
@@ -48,6 +54,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         super();
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
     {
         final Parent parent = new Parent();
@@ -67,6 +74,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
     {
         final Parent parent = new Parent();
@@ -87,6 +95,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
     {
         final Parent parent = new Parent();
@@ -107,6 +116,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception
     {
         final Parent parent = new Parent();
@@ -118,6 +128,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         assertEquals( "1.0", parent.getVersion() );
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception
     {
         final Parent parent = new Parent();
@@ -129,6 +140,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         assertEquals( "1.0", parent.getVersion() );
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -148,6 +160,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -168,6 +181,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -188,6 +202,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         }
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -199,6 +214,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         assertEquals( "1.0", dependency.getVersion() );
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception
     {
         final Dependency dependency = new Dependency();

@@ -27,9 +27,16 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
-import org.apache.maven.repository.legacy.DefaultUpdateCheckManager;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultUpdateCheckManagerTest
     extends AbstractArtifactComponentTestCase
@@ -43,8 +50,9 @@ public class DefaultUpdateCheckManagerTest
         return "updateCheckManager";
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -52,6 +60,7 @@ public class DefaultUpdateCheckManagerTest
         updateCheckManager = new DefaultUpdateCheckManager( new ConsoleLogger( Logger.LEVEL_DEBUG, "test" ) );
     }
 
+    @Test
     public void testArtifact() throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
@@ -81,6 +90,7 @@ public class DefaultUpdateCheckManagerTest
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
 
+    @Test
     public void testMissingArtifact()
         throws Exception
     {
@@ -108,6 +118,7 @@ public class DefaultUpdateCheckManagerTest
                                                            updateCheckManager.getRepositoryKey( remoteRepository ) ) );
     }
 
+    @Test
     public void testPom() throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
@@ -137,6 +148,7 @@ public class DefaultUpdateCheckManagerTest
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
 
+    @Test
     public void testMissingPom()
         throws Exception
     {
@@ -164,6 +176,7 @@ public class DefaultUpdateCheckManagerTest
                                                            updateCheckManager.getRepositoryKey( remoteRepository ) ) );
     }
 
+    @Test
     public void testMetadata() throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
@@ -191,6 +204,7 @@ public class DefaultUpdateCheckManagerTest
         assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
     }
 
+    @Test
     public void testMissingMetadata() throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
@@ -216,6 +230,7 @@ public class DefaultUpdateCheckManagerTest
         assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
     }
 
+    @Test
     public void testArtifactTouchFileName() throws Exception
     {
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );

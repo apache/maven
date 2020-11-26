@@ -22,11 +22,13 @@ package org.apache.maven.model.interpolation;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class MavenBuildTimestampTest
-    extends TestCase
 {
+    @Test
     public void testMavenBuildTimestampUsesUTC()
     {
         Properties interpolationProperties = new Properties();

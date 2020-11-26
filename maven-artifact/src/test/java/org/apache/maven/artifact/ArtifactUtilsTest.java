@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link ArtifactUtils}.
@@ -33,7 +35,6 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ArtifactUtilsTest
-    extends TestCase
 {
 
     private Artifact newArtifact( String aid )
@@ -41,6 +42,7 @@ public class ArtifactUtilsTest
         return new DefaultArtifact( "group", aid, VersionRange.createFromVersion( "1.0" ), "test", "jar", "tests", null );
     }
 
+    @Test
     public void testIsSnapshot()
     {
         assertEquals( false, ArtifactUtils.isSnapshot( null ) );
@@ -52,6 +54,7 @@ public class ArtifactUtilsTest
         assertEquals( false, ArtifactUtils.isSnapshot( "1.2.3-20090413X094722-2"));
     }
 
+    @Test
     public void testToSnapshotVersion()
     {
         assertEquals( "1.2.3", ArtifactUtils.toSnapshotVersion( "1.2.3" ) );
@@ -63,6 +66,7 @@ public class ArtifactUtilsTest
     /**
      * Tests that the ordering of the map resembles the ordering of the input collection of artifacts.
      */
+    @Test
     public void testArtifactMapByVersionlessIdOrdering()
         throws Exception
     {

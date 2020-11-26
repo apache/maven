@@ -22,7 +22,9 @@ package org.apache.maven.artifact.resolver;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test the artifact resolution exception message
@@ -30,10 +32,10 @@ import junit.framework.TestCase;
  * @author Mauro Talevi
  */
 public class ArtifactResolutionExceptionTest
-    extends TestCase
 {
     private static final String LS = System.lineSeparator();
 
+    @Test
     public void testMissingArtifactMessageFormat()
     {
         String message = "Missing artifact";

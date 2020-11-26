@@ -22,13 +22,15 @@ package org.apache.maven.repository.internal;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MavenRepositorySystemUtilsTest
-    extends TestCase
 {
 
+    @Test
     public void testGetRepositorySystem()
     {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
@@ -36,6 +38,7 @@ public class MavenRepositorySystemUtilsTest
         assertNotNull( repoSys );
     }
 
+    @Test
     public void testGetMetadataGeneratorFactories()
     {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();

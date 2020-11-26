@@ -19,9 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +33,13 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.junit.Test;
+
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -54,6 +58,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         super();
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
     {
         final Parent parent = new Parent();
@@ -73,6 +78,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
     {
         final Parent parent = new Parent();
@@ -93,6 +99,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
     {
         final Parent parent = new Parent();
@@ -113,6 +120,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception
     {
         final Parent parent = new Parent();
@@ -124,6 +132,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         assertEquals( "1", parent.getVersion() );
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception
     {
         final Parent parent = new Parent();
@@ -135,6 +144,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         assertEquals( "1", parent.getVersion() );
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -154,6 +164,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -174,6 +185,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -194,6 +206,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception
     {
         final Dependency dependency = new Dependency();
@@ -205,6 +218,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         assertEquals( "1", dependency.getVersion() );
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception
     {
         final Dependency dependency = new Dependency();

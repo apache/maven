@@ -15,17 +15,20 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
-import junit.framework.TestCase;
+import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class BuildListCalculatorTest
-    extends TestCase
 {
 
+    @Test
     public void testCalculateProjectBuilds()
         throws Exception
     {

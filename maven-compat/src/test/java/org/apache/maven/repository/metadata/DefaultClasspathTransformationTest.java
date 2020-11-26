@@ -16,13 +16,12 @@ package org.apache.maven.repository.metadata;
  */
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.repository.metadata.ArtifactMetadata;
-import org.apache.maven.repository.metadata.ClasspathContainer;
-import org.apache.maven.repository.metadata.ClasspathTransformation;
-import org.apache.maven.repository.metadata.MetadataGraph;
-import org.apache.maven.repository.metadata.MetadataGraphEdge;
-import org.apache.maven.repository.metadata.MetadataGraphVertex;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
@@ -42,8 +41,9 @@ extends PlexusTestCase
     MetadataGraphVertex v3;
     MetadataGraphVertex v4;
     //------------------------------------------------------------------------------------------
+	@Before
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
         transform = (ClasspathTransformation) lookup( ClasspathTransformation.ROLE, "default" );
@@ -74,6 +74,7 @@ extends PlexusTestCase
         graph.addEdge(v3, v4, new MetadataGraphEdge( "1.2", true, ArtifactScopeEnum.test, null, 2, 2 ) );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testCompileClasspathTransform()
     throws Exception
     {
@@ -86,6 +87,7 @@ extends PlexusTestCase
         assertEquals("compile classpath should have 3 entries", 3, res.getClasspath().size() );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testRuntimeClasspathTransform()
     throws Exception
     {
@@ -101,6 +103,7 @@ extends PlexusTestCase
         assertEquals("runtime artifact version should be 1.1", "1.1", md.getVersion() );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testTestClasspathTransform()
     throws Exception
     {

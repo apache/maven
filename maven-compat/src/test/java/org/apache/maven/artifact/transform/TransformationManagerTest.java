@@ -26,7 +26,11 @@ import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformat
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import javax.inject.Inject;
 
@@ -46,7 +50,7 @@ public class TransformationManagerTest
     }
 
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
@@ -56,6 +60,7 @@ public class TransformationManagerTest
                         binder ->  binder.requestInjection( this ) );
     }
 
+    @Test
     public void testTransformationManager()
     {
         List<ArtifactTransformation> tms = tm.getArtifactTransformations();

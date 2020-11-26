@@ -34,6 +34,11 @@ import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
@@ -71,6 +76,7 @@ public class ProjectClasspathTest
         return null;
     }
 
+    @Test
     public void testProjectClasspath()
         throws Exception
     {

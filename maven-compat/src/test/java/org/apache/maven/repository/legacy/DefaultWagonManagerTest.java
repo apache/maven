@@ -30,16 +30,15 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
@@ -47,8 +46,18 @@ import org.apache.maven.wagon.observers.Debug;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.inject.Inject;
 
@@ -77,8 +86,9 @@ public class DefaultWagonManagerTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
@@ -88,6 +98,17 @@ public class DefaultWagonManagerTest
                         binder ->  binder.requestInjection( this ) );
     }
 
+    @After
+    @Override
+    public void tearDown()
+        throws Exception
+    {
+        wagonManager = null;
+        artifactFactory = null;
+        super.tearDown();
+    }
+
+    @Test
     public void testUnnecessaryRepositoryLookup()
         throws Exception
     {
@@ -123,6 +144,7 @@ public class DefaultWagonManagerTest
         assertEquals( 1, listener.events.size() );
     }
 
+    @Test
     public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
@@ -143,6 +165,7 @@ public class DefaultWagonManagerTest
         assertFalse( artifact.getFile().exists() );
     }
 
+    @Test
     public void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
@@ -163,6 +186,7 @@ public class DefaultWagonManagerTest
         assertFalse( artifact.getFile().exists() );
     }
 
+    @Test
     public void testGetRemoteJar()
         throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException
     {
@@ -240,6 +264,7 @@ public class DefaultWagonManagerTest
         return getRepo( id, "http://something" );
     }
 
+    @Test
     public void testDefaultWagonManager()
         throws Exception
     {
@@ -267,6 +292,7 @@ public class DefaultWagonManagerTest
     /**
      * Check that transfer listeners are properly removed after getArtifact and putArtifact
      */
+    @Test
     public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact()
         throws Exception
     {
@@ -390,6 +416,7 @@ public class DefaultWagonManagerTest
         }
     }
 
+    @Test
     public void testPerLookupInstantiation()
         throws Exception
     {

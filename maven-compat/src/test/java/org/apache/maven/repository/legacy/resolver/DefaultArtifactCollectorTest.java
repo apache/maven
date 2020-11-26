@@ -19,6 +19,16 @@ package org.apache.maven.repository.legacy.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -39,17 +49,15 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the default artifact collector.
@@ -77,8 +85,9 @@ public class DefaultArtifactCollectorTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
+    @Before
     @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -90,8 +99,9 @@ public class DefaultArtifactCollectorTest
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }
 
+    @After
     @Override
-    protected void tearDown()
+    public void tearDown()
         throws Exception
     {
         artifactCollector = null;
@@ -135,6 +145,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
+    @Test
     public void testResolveWithFilter()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -154,6 +165,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts() );
     }
 
+    @Test
     public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -212,6 +224,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveNearestNewestIsNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -227,6 +240,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveNearestOldestIsNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -242,6 +256,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveLocalNewestIsLocal()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -254,6 +269,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "3.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveLocalOldestIsLocal()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -266,6 +282,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveLocalWithNewerVersionButLesserScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -279,6 +296,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
 
+    @Test
     public void testResolveLocalWithNewerVersionButLesserScopeResolvedFirst()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -292,6 +310,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
 
+    @Test
     public void testResolveNearestWithRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -307,6 +326,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testResolveRangeWithManagedVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -321,6 +341,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "5.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testCompatibleRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -337,6 +358,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testIncompatibleRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -351,6 +373,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testUnboundedRangeWhenVersionUnavailable()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -364,6 +387,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testUnboundedRangeBelowLastRelease()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -379,6 +403,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
+    @Test
     public void testUnboundedRangeAboveLastRelease()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -391,6 +416,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testResolveManagedVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -404,6 +430,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedB } ), res.getArtifacts() );
     }
 
+    @Test
     public void testCollectChangesVersionOfOriginatingArtifactIfInDependencyManagementHasDifferentVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -421,6 +448,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Resolved version don't match original artifact version", "1.0", resolvedArtifact.getVersion() );
     }
 
+    @Test
     public void testResolveCompileScopeOverTestScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -439,6 +467,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
+    @Test
     public void testResolveRuntimeScopeOverTestScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -457,6 +486,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
+    @Test
     public void testResolveCompileScopeOverRuntimeScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -475,6 +505,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getScope() );
     }
 
+    @Test
     public void testResolveCompileScopeOverProvidedScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -493,6 +524,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
+    @Test
     public void testResolveRuntimeScopeOverProvidedScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -511,6 +543,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
+    @Test
     public void testProvidedScopeNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -522,6 +555,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
+    @Test
     public void testOptionalNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -533,6 +567,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
+    @Test
     public void testOptionalIncludedAtRoot()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -544,6 +579,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
+    @Test
     public void testScopeUpdate()
         throws InvalidVersionSpecificationException, ArtifactResolutionException
     {
@@ -674,6 +710,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "3.0", artifact.getVersion() );
     }
 
+    @Test
     public void testTestScopeNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -685,6 +722,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
+    @Test
     public void testSnapshotNotIncluded()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -703,6 +741,7 @@ public class DefaultArtifactCollectorTest
          */
     }
 
+    @Test
     public void testOverConstrainedVersionException()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {

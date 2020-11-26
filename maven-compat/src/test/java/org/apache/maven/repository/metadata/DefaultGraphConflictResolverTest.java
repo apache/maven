@@ -16,13 +16,13 @@ package org.apache.maven.repository.metadata;
  */
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.repository.metadata.ArtifactMetadata;
-import org.apache.maven.repository.metadata.GraphConflictResolver;
-import org.apache.maven.repository.metadata.MetadataGraph;
-import org.apache.maven.repository.metadata.MetadataGraphEdge;
-import org.apache.maven.repository.metadata.MetadataGraphVertex;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
@@ -44,8 +44,9 @@ extends PlexusTestCase
     MetadataGraphVertex v3;
     MetadataGraphVertex v4;
     //------------------------------------------------------------------------------------------
+	@Before
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
         resolver = (GraphConflictResolver) lookup( GraphConflictResolver.ROLE, "default" );
@@ -76,6 +77,7 @@ extends PlexusTestCase
         graph.addEdge(v3, v4, new MetadataGraphEdge( "1.2", true, ArtifactScopeEnum.provided, null, 2, 2 ) );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testCompileResolution()
     throws Exception
     {
@@ -101,6 +103,7 @@ extends PlexusTestCase
         assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v4).get(0).getVersion() );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testRuntimeResolution()
     throws Exception
     {
@@ -125,6 +128,7 @@ extends PlexusTestCase
         assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.1", res.getIncidentEdges(v4).get(0).getVersion() );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testTestResolution()
     throws Exception
     {

@@ -25,6 +25,11 @@ import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 
 import javax.inject.Inject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Just asserts that it's able to create those components. Handy when CDI container gets a nervous breakdown.
@@ -64,6 +69,7 @@ public class LifecycleExecutorSubModulesTest
         return "src/test/projects/lifecycle-executor";
     }
 
+    @Test
     public void testCreation()
         throws Exception
     {

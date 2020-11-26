@@ -29,6 +29,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class MavenLifecycleParticipantTest
     extends AbstractCoreMavenComponentTestCase
@@ -109,6 +113,7 @@ public class MavenLifecycleParticipantTest
         return "src/test/projects/lifecycle-listener";
     }
 
+    @Test
     public void testDependencyInjection()
         throws Exception
     {
@@ -138,6 +143,7 @@ public class MavenLifecycleParticipantTest
         assertEquals( INJECTED_ARTIFACT_ID, artifacts.get( 0 ).getArtifactId() );
     }
 
+    @Test
     public void testReactorDependencyInjection()
         throws Exception
     {

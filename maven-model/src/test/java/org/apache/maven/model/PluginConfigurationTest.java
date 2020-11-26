@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code PluginConfiguration}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class PluginConfigurationTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new PluginConfiguration().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new PluginConfiguration().equals( null ) );
@@ -42,12 +47,14 @@ public class PluginConfigurationTest
         new PluginConfiguration().equals( new PluginConfiguration() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         PluginConfiguration thing = new PluginConfiguration();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new PluginConfiguration().toString() );

@@ -15,23 +15,6 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * the License.
  */
 
-import junit.framework.TestCase;
-
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleNotFoundException;
-import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
-import org.apache.maven.lifecycle.internal.ProjectBuildList;
-import org.apache.maven.lifecycle.internal.ProjectSegment;
-import org.apache.maven.lifecycle.internal.builder.multithreaded.ThreadOutputMuxer;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.apache.maven.plugin.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.MojoNotFoundException;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -45,11 +28,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.internal.ProjectBuildList;
+import org.apache.maven.lifecycle.internal.ProjectSegment;
+import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Kristian Rosenvold
  */
 public class ThreadOutputMuxerTest
-    extends TestCase
 {
 
     final String paid = "Paid";
@@ -58,6 +57,7 @@ public class ThreadOutputMuxerTest
 
     final String full = "Full";
 
+    @Test
     public void testSingleThreaded()
         throws Exception
     {
@@ -86,6 +86,7 @@ public class ThreadOutputMuxerTest
         assertEquals( ( paid + in + full ).length(), byteArrayOutputStream.size() );
     }
 
+    @Test
     public void testMultiThreaded()
         throws Exception
     {

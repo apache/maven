@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@code License}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class LicenseTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new License().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new License().equals( null ) );
@@ -42,12 +47,14 @@ public class LicenseTest
         new License().equals( new License() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         License thing = new License();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new License().toString() );

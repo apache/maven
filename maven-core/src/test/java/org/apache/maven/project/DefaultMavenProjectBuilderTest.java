@@ -18,8 +18,6 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,8 +25,16 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
@@ -91,6 +97,7 @@ public class DefaultMavenProjectBuilderTest
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
      * @throws Exception
      */
+    @Test
     public void testBuildFromMiddlePom() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/grandchild-check/child/pom.xml");
@@ -103,6 +110,7 @@ public class DefaultMavenProjectBuilderTest
         getProject( f2 );
     }
 
+    @Test
     public void testDuplicatePluginDefinitionsMerged()
         throws Exception
     {
@@ -114,6 +122,7 @@ public class DefaultMavenProjectBuilderTest
         assertEquals( "first", project.getBuildPlugins().get( 0 ).getExecutions().get( 0 ).getId() );
     }
 
+    @Test
     public void testFutureModelVersion()
         throws Exception
     {
@@ -130,6 +139,7 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    @Test
     public void testPastModelVersion()
         throws Exception
     {
@@ -148,6 +158,7 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    @Test
     public void testFutureSchemaModelVersion()
         throws Exception
     {
@@ -174,6 +185,7 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    @Test
     public void testBuildStubModelForMissingRemotePom()
         throws Exception
     {
@@ -211,6 +223,7 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    @Test
     public void testPartialResultUponBadDependencyDeclaration()
         throws Exception
     {
@@ -243,6 +256,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildValidParentVersionRangeLocally() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/parent-version-range-local-valid/child/pom.xml" );
@@ -262,6 +276,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception
     {
         File f1 =
@@ -284,6 +299,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildVersionExpression() throws Exception
     {
         File f1 =
@@ -307,6 +323,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternally() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/parent-version-range-external-valid/pom.xml" );
@@ -326,6 +343,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception
     {
         File f1 =
@@ -349,6 +367,7 @@ public class DefaultMavenProjectBuilderTest
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildVersionExpression() throws Exception
     {
         File f1 =

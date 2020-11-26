@@ -23,6 +23,10 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
@@ -44,6 +48,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact()
         throws Exception
     {
