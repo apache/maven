@@ -1342,7 +1342,6 @@ public class DefaultModelBuilder
         return superPomProvider.getSuperModel( "4.0.0" ).clone();
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private void importDependencyManagement( Model model, ModelBuildingRequest request,
                                              DefaultModelProblemCollector problems, Collection<String> importIds )
     {
@@ -1357,11 +1356,6 @@ public class DefaultModelBuilder
 
         importIds.add( importing );
 
-        final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
-        final ModelResolver modelResolver = request.getModelResolver();
-
-        ModelBuildingRequest importRequest = null;
-
         List<DependencyManagement> importMgmts = null;
 
         for ( Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); )
@@ -1375,153 +1369,180 @@ public class DefaultModelBuilder
 
             it.remove();
 
-            String groupId = dependency.getGroupId();
-            String artifactId = dependency.getArtifactId();
-            String version = dependency.getVersion();
+            DependencyManagement importMgmt = loadDependencyManagement( model, request, problems,
+                                                                        dependency, importIds );
 
-            if ( groupId == null || groupId.length() <= 0 )
+            if ( importMgmt != null )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-            if ( artifactId == null || artifactId.length() <= 0 )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-            if ( version == null || version.length() <= 0 )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-
-            String imported = groupId + ':' + artifactId + ':' + version;
-
-            if ( importIds.contains( imported ) )
-            {
-                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
-                for ( String modelId : importIds )
+                if ( importMgmts == null )
                 {
-                    message += modelId + " -> ";
-                }
-                message += imported;
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
-
-                continue;
-            }
-
-            DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
-                                                        ModelCacheTag.IMPORT );
-
-            if ( importMgmt == null )
-            {
-                if ( workspaceResolver == null && modelResolver == null )
-                {
-                    throw new NullPointerException( String.format(
-                        "request.workspaceModelResolver and request.modelResolver cannot be null"
-                        + " (parent POM %s and POM %s)",
-                        ModelProblemUtils.toId( groupId, artifactId, version ),
-                        ModelProblemUtils.toSourceHint( model ) ) );
+                    importMgmts = new ArrayList<>();
                 }
 
-                Model importModel = null;
-                if ( workspaceResolver != null )
-                {
-                    try
-                    {
-                        importModel = workspaceResolver.resolveEffectiveModel( groupId, artifactId, version );
-                    }
-                    catch ( UnresolvableModelException e )
-                    {
-                        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                            .setMessage( e.getMessage() ).setException( e ) );
-                        continue;
-                    }
-                }
-
-                // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
-                if ( importModel == null )
-                {
-                    final ModelSource importSource;
-                    try
-                    {
-                        importSource = modelResolver.resolveModel( dependency );
-                    }
-                    catch ( UnresolvableModelException e )
-                    {
-                        StringBuilder buffer = new StringBuilder( 256 );
-                        buffer.append( "Non-resolvable import POM" );
-                        if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
-                        {
-                            buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
-                        }
-                        buffer.append( ": " ).append( e.getMessage() );
-
-                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                            .setMessage( buffer.toString() ).setLocation( dependency.getLocation( "" ) )
-                            .setException( e ) );
-                        continue;
-                    }
-
-                    if ( importRequest == null )
-                    {
-                        importRequest = new DefaultModelBuildingRequest();
-                        importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-                        importRequest.setModelCache( request.getModelCache() );
-                        importRequest.setSystemProperties( request.getSystemProperties() );
-                        importRequest.setUserProperties( request.getUserProperties() );
-                        importRequest.setLocationTracking( request.isLocationTracking() );
-                    }
-
-                    importRequest.setModelSource( importSource );
-                    importRequest.setModelResolver( modelResolver.newCopy() );
-
-                    final ModelBuildingResult importResult;
-                    try
-                    {
-                        importResult = build( importRequest, importIds );
-                    }
-                    catch ( ModelBuildingException e )
-                    {
-                        problems.addAll( e.getProblems() );
-                        continue;
-                    }
-
-                    problems.addAll( importResult.getProblems() );
-
-                    importModel = importResult.getEffectiveModel();
-                }
-
-                importMgmt = importModel.getDependencyManagement();
-
-                if ( importMgmt == null )
-                {
-                    importMgmt = new DependencyManagement();
-                }
-
-                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                importMgmts.add( importMgmt );
             }
-
-            if ( importMgmts == null )
-            {
-                importMgmts = new ArrayList<>();
-            }
-
-            importMgmts.add( importMgmt );
         }
 
         importIds.remove( importing );
 
         dependencyManagementImporter.importManagement( model, importMgmts, request, problems );
+    }
+
+    private DependencyManagement loadDependencyManagement( Model model, ModelBuildingRequest request,
+                                                           DefaultModelProblemCollector problems,
+                                                           Dependency dependency,
+                                                           Collection<String> importIds )
+    {
+        String groupId = dependency.getGroupId();
+        String artifactId = dependency.getArtifactId();
+        String version = dependency.getVersion();
+
+        if ( groupId == null || groupId.length() <= 0 )
+        {
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
+            return null;
+        }
+        if ( artifactId == null || artifactId.length() <= 0 )
+        {
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
+            return null;
+        }
+        if ( version == null || version.length() <= 0 )
+        {
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
+            return null;
+        }
+
+        String imported = groupId + ':' + artifactId + ':' + version;
+
+        if ( importIds.contains( imported ) )
+        {
+            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+            for ( String modelId : importIds )
+            {
+                message += modelId + " -> ";
+            }
+            message += imported;
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
+
+            return null;
+        }
+
+        DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
+                                                    ModelCacheTag.IMPORT );
+        if ( importMgmt == null )
+        {
+            importMgmt = doLoadDependencyManagement( model, request, problems, dependency,
+                                                     groupId, artifactId, version, importIds );
+            if ( importMgmt != null )
+            {
+                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+            }
+        }
+
+        return importMgmt;
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private DependencyManagement doLoadDependencyManagement( Model model, ModelBuildingRequest request,
+                                                             DefaultModelProblemCollector problems,
+                                                             Dependency dependency,
+                                                             String groupId,
+                                                             String artifactId,
+                                                             String version,
+                                                             Collection<String> importIds )
+    {
+        DependencyManagement importMgmt;
+        final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
+        final ModelResolver modelResolver = request.getModelResolver();
+        if ( workspaceResolver == null && modelResolver == null )
+        {
+            throw new NullPointerException( String.format(
+                "request.workspaceModelResolver and request.modelResolver cannot be null (parent POM %s and POM %s)",
+                ModelProblemUtils.toId( groupId, artifactId, version ),
+                ModelProblemUtils.toSourceHint( model ) ) );
+        }
+
+        Model importModel = null;
+        if ( workspaceResolver != null )
+        {
+            try
+            {
+                importModel = workspaceResolver.resolveEffectiveModel( groupId, artifactId, version );
+            }
+            catch ( UnresolvableModelException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
+                    .setMessage( e.getMessage() ).setException( e ) );
+                return null;
+            }
+        }
+
+        // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
+        if ( importModel == null )
+        {
+            final ModelSource importSource;
+            try
+            {
+                importSource = modelResolver.resolveModel( dependency );
+            }
+            catch ( UnresolvableModelException e )
+            {
+                StringBuilder buffer = new StringBuilder( 256 );
+                buffer.append( "Non-resolvable import POM" );
+                if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
+                {
+                    buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                }
+                buffer.append( ": " ).append( e.getMessage() );
+
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( buffer.toString() ).setLocation( dependency.getLocation( "" ) )
+                    .setException( e ) );
+                return null;
+            }
+
+            ModelBuildingRequest importRequest = new DefaultModelBuildingRequest();
+            importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+            importRequest.setModelCache( request.getModelCache() );
+            importRequest.setSystemProperties( request.getSystemProperties() );
+            importRequest.setUserProperties( request.getUserProperties() );
+            importRequest.setLocationTracking( request.isLocationTracking() );
+            importRequest.setModelSource( importSource );
+            importRequest.setModelResolver( modelResolver.newCopy() );
+
+            final ModelBuildingResult importResult;
+            try
+            {
+                importResult = build( importRequest, importIds );
+            }
+            catch ( ModelBuildingException e )
+            {
+                problems.addAll( e.getProblems() );
+                return null;
+            }
+
+            problems.addAll( importResult.getProblems() );
+
+            importModel = importResult.getEffectiveModel();
+        }
+
+        importMgmt = importModel.getDependencyManagement();
+
+        if ( importMgmt == null )
+        {
+            importMgmt = new DependencyManagement();
+        }
+        return importMgmt;
     }
 
     private <T> void intoCache( ModelCache modelCache, String groupId, String artifactId, String version,
