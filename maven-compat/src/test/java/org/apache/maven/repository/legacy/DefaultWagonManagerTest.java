@@ -101,7 +101,10 @@ public class DefaultWagonManagerTest
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repos.get( 0 ).getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repos.get( 0 ).getLayout().pathOf( artifact ) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac" );
         wagon.addExpectedContent( repos.get( 1 ).getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repos.get( 1 ).getLayout().pathOf( artifact ) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac" );
+
 
         class TransferListener
             extends AbstractTransferListener
@@ -170,6 +173,7 @@ public class DefaultWagonManagerTest
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac" );
 
         wagonManager.getArtifact( artifact, repo, null, false );
 
@@ -271,6 +275,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo = createStringRepo();
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac" );
 
         /* getArtifact */
         assertFalse( "Transfer listener is registered before test",

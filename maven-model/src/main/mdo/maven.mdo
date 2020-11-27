@@ -1995,12 +1995,11 @@
           <description>
             <![CDATA[
             What to do when verification of an artifact checksum fails. Valid values are
-            <code>ignore</code>
-            ,
+            <code>ignore</code>,
             <code>fail</code>
-            or
+            (default for Maven 4 and above) or
             <code>warn</code>
-            (the default).
+            (default for Maven 2 and 3)
             ]]>
           </description>
           <type>String</type>
