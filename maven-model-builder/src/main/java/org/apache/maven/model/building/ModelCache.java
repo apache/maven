@@ -82,4 +82,60 @@ public interface ModelCache
      */
     Object get( String groupId, String artifactId, String version, String tag );
 
+    /**
+     * Puts the specified data into the cache.
+     *
+     * @param path The path of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @param data The data to store in the cache, must not be {@code null}.
+     * @since 3.7.0
+     */
+    default <T> void put( Source path, ModelCacheTag<T> tag, T data )
+    {
+        put( path, tag.getName(), tag.intoCache( data ) );
+    }
+
+    /**
+     * Gets the specified data from the cache.
+     *
+     * @param path The path of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @return The requested data or {@code null} if none was present in the cache.
+     * @since 3.7.0
+     */
+    default <T> T get( Source path, ModelCacheTag<T> tag )
+    {
+        Object obj = get( path, tag.getName() );
+        return ( obj != null ) ? tag.fromCache( tag.getType().cast( obj ) ) : null;
+    }
+
+    /**
+     * Puts the specified data into the cache.
+     *
+     * @param groupId The group id of the cache record, must not be {@code null}.
+     * @param artifactId The artifact id of the cache record, must not be {@code null}.
+     * @param version The version of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @param data The data to store in the cache, must not be {@code null}.
+     */
+    default <T> void put( String groupId, String artifactId, String version, ModelCacheTag<T> tag, T data )
+    {
+        put( groupId, artifactId, version, tag.getName(), tag.intoCache( data ) );
+    }
+
+    /**
+     * Gets the specified data from the cache.
+     *
+     * @param groupId The group id of the cache record, must not be {@code null}.
+     * @param artifactId The artifact id of the cache record, must not be {@code null}.
+     * @param version The version of the cache record, must not be {@code null}.
+     * @param tag The tag of the cache record, must not be {@code null}.
+     * @return The requested data or {@code null} if none was present in the cache.
+     */
+    default <T> T get( String groupId, String artifactId, String version, ModelCacheTag<T> tag )
+    {
+        Object obj = get( groupId, artifactId, version, tag.getName() );
+        return ( obj != null ) ? tag.fromCache( tag.getType().cast( obj ) ) : null;
+    }
+
 }

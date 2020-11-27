@@ -1529,7 +1529,7 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            modelCache.put( groupId, artifactId, version, tag.getName(), tag.intoCache( data ) );
+            modelCache.put( groupId, artifactId, version, tag, data );
         }
     }
 
@@ -1537,7 +1537,7 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            modelCache.put( source, tag.getName(), tag.intoCache( data ) );
+            modelCache.put( source, tag, data );
         }
     }
 
@@ -1546,11 +1546,7 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            Object data = modelCache.get( groupId, artifactId, version, tag.getName() );
-            if ( data != null )
-            {
-                return tag.fromCache( tag.getType().cast( data ) );
-            }
+            return modelCache.get( groupId, artifactId, version, tag );
         }
         return null;
     }
@@ -1559,11 +1555,7 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            Object data = modelCache.get( source, tag.getName() );
-            if ( data != null )
-            {
-                return tag.fromCache( tag.getType().cast( data ) );
-            }
+            return modelCache.get( source, tag );
         }
         return null;
     }
