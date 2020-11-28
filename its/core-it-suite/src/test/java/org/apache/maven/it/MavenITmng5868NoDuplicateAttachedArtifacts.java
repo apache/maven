@@ -53,7 +53,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts
 
     public MavenITmng5868NoDuplicateAttachedArtifacts()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     @Override

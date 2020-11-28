@@ -30,7 +30,7 @@ public class MavenITmng6562WarnDefaultBindings
 
     public MavenITmng6562WarnDefaultBindings()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     public void testItShouldNotWarn()

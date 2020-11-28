@@ -42,7 +42,7 @@ public class MavenITmng5669ReadPomsOnce
 
     public MavenITmng5669ReadPomsOnce()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     public void testWithoutBuildConsumer()

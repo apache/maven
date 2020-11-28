@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.greaterThan;
 public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegrationTestCase {
     public MavenITmng4660OutdatedPackagedArtifact()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     /**

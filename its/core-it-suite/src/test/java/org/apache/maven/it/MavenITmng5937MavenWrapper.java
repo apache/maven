@@ -52,7 +52,7 @@ public class MavenITmng5937MavenWrapper
     public MavenITmng5937MavenWrapper()
         throws Exception
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
         
         String localRepo = System.getProperty("maven.repo.local");
         

@@ -13,7 +13,7 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest
 
     public MavenITmng6981ProjectListShouldIncludeChildrenTest()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     public void testProjectListShouldIncludeChildrenByDefault()

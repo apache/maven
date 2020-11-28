@@ -95,7 +95,7 @@ public class MavenITmng3843PomInheritanceTest
         assertPathEquals( basedir, "src/main/java", props.getProperty( "project.build.sourceDirectory" ) );
         assertPathEquals( basedir, "src/test/java", props.getProperty( "project.build.testSourceDirectory" ) );
         assertPathEquals( basedir, "src/main/scripts", props.getProperty( "project.build.scriptSourceDirectory" ) );
-        if ( matchesVersionRange( "[3.7.0,)" ) )
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
         {
             assertEquals( "2", props.getProperty( "project.build.resources" ) );
             assertEquals( "2", props.getProperty( "project.build.testResources" ) );
@@ -108,7 +108,7 @@ public class MavenITmng3843PomInheritanceTest
         assertPathEquals( basedir, "src/main/resources", props.getProperty( "project.build.resources.0.directory" ) );
         assertPathEquals( basedir, "src/test/resources",
                           props.getProperty( "project.build.testResources.0.directory" ) );
-        if ( matchesVersionRange( "[3.7.0,)" ) )
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
         {
             assertPathEquals( basedir, "src/main/resources-filtered", props.getProperty( "project.build.resources.1.directory" ) );
             assertPathEquals( basedir, "src/test/resources-filtered",

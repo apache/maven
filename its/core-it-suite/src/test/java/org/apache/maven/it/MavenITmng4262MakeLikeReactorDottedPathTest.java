@@ -35,7 +35,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
 
     public MavenITmng4262MakeLikeReactorDottedPathTest()
     {
-        super( "[3.0-alpha-3,3.7.0)" );
+        super( "[3.0-alpha-3,4.0.0-alpha-1)" );
     }
 
     private void clean( Verifier verifier )

@@ -45,7 +45,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
     private final File noProjectTestDir;
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
         this.parentDependentTestDir = ResourceExtractor.simpleExtractResources( getClass(),
                 "/mng-5760-resume-feature/parent-dependent" );
         this.parentIndependentTestDir = ResourceExtractor.simpleExtractResources( getClass(),

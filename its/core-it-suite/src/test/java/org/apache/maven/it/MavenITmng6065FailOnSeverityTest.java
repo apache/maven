@@ -36,7 +36,7 @@ public class MavenITmng6065FailOnSeverityTest
 
     public MavenITmng6065FailOnSeverityTest()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     public void testItShouldFailOnWarnLogMessages()

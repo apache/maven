@@ -32,7 +32,7 @@ import java.io.File;
 public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng4660ResumeFromTest()
     {
-        super( "[3.7.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     /**
