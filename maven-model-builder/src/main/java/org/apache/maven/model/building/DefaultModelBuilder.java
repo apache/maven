@@ -586,18 +586,38 @@ public class DefaultModelBuilder
         }
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private Model readFileModel( ModelBuildingRequest request,
                                  DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
         Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
-        if ( model != null )
+        if ( model == null )
         {
-            return model;
+            model = doReadFileModel( modelSource, request, problems );
+
+            intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILE, model );
         }
 
+        if ( modelSource instanceof FileModelSource )
+        {
+            if ( request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder )
+            {
+                DefaultTransformerContextBuilder contextBuilder =
+                        (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
+                contextBuilder.putSource( getGroupId( model ), model.getArtifactId(), modelSource );
+            }
+        }
+
+        return model;
+    }
+
+    @SuppressWarnings( "checkstyle:methodlength" )
+    private Model doReadFileModel( ModelSource modelSource, ModelBuildingRequest request,
+                                 DefaultModelProblemCollector problems )
+            throws ModelBuildingException
+    {
+        Model model;
         problems.setSource( modelSource.getLocation() );
         try
         {
@@ -698,17 +718,6 @@ public class DefaultModelBuilder
         if ( hasFatalErrors( problems ) )
         {
             throw problems.newModelBuildingException();
-        }
-
-        intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILE, model );
-        if ( modelSource instanceof FileModelSource )
-        {
-            if ( request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder )
-            {
-                DefaultTransformerContextBuilder contextBuilder =
-                        (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
-                contextBuilder.putSource( getGroupId( model ), model.getArtifactId(), modelSource );
-            }
         }
 
         return model;
