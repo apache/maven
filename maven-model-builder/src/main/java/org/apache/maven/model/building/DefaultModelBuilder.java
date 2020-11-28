@@ -592,7 +592,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
-        Model model = getModelFromCache( modelSource, request.getModelCache() );
+        Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
         if ( model != null )
         {
             return model;
@@ -778,31 +778,6 @@ public class DefaultModelBuilder
         intoCache( request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData );
 
         return rawModel;
-    }
-
-    private Model getModelFromCache( Source source, ModelCache cache )
-    {
-        Model model;
-        if ( source instanceof ArtifactModelSource )
-        {
-            ArtifactModelSource artifactModelSource = ( ArtifactModelSource ) source;
-            ModelData modelData = fromCache( cache, artifactModelSource.getGroupId(),
-                                            artifactModelSource.getArtifactId(),
-                                            artifactModelSource.getVersion(), ModelCacheTag.RAW );
-            if ( modelData != null )
-            {
-                model = modelData.getModel();
-            }
-            else
-            {
-                model = null;
-            }
-        }
-        else
-        {
-            model = fromCache( cache, source, ModelCacheTag.FILE );
-        }
-        return model;
     }
 
     private String getGroupId( Model model )
