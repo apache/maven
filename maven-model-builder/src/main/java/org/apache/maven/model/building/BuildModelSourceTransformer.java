@@ -42,7 +42,7 @@ import org.xml.sax.ext.LexicalHandler;
  * ModelSourceTransformer for the build pom
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 @Named
 @Singleton

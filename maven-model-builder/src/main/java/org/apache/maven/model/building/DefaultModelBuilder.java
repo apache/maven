@@ -1561,7 +1561,7 @@ public class DefaultModelBuilder
      * All others can simply be copied from source to target to restore the locationTracker 
      * 
      * @author Robert Scholte
-     * @since 3.7.0
+     * @since 4.0.0
      */
     class FileToRawModelMerger extends ModelMerger
     {

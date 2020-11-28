@@ -31,7 +31,7 @@ import org.xml.sax.ext.LexicalHandler;
  * - {@link org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory} when publishing pom files.
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class ConsumerPomXMLFilter extends AbstractSAXFilter
 {

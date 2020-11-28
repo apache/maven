@@ -28,7 +28,7 @@ import org.apache.maven.building.FileSource;
  * Represents a model pulled from a repository
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class ArtifactModelSource extends FileSource implements ModelSource
 {

@@ -28,7 +28,7 @@ import java.nio.file.Path;
  * Default ModelSourceTransformer, provides pomFile as inputStream and ignores the context 
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class DefaultModelSourceTransformer implements ModelSourceTransformer
 {

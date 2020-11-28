@@ -28,7 +28,7 @@ import org.xml.sax.ext.LexicalHandler;
  * Hence use this class in the LexicalHandler chain to do so 
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class CommentRenormalizer implements LexicalHandler
 {

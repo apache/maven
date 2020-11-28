@@ -39,7 +39,7 @@ public interface ModelCache
      * @param path The path of the cache record, must not be {@code null}.
      * @param tag The tag of the cache record, must not be {@code null}.
      * @param data The data to store in the cache, must not be {@code null}.
-     * @since 3.7.0
+     * @since 4.0.0
      */
     default void put( Source path, String tag, Object data ) 
     {
@@ -52,7 +52,7 @@ public interface ModelCache
      * @param path The path of the cache record, must not be {@code null}.
      * @param tag The tag of the cache record, must not be {@code null}.
      * @return The requested data or {@code null} if none was present in the cache.
-     * @since 3.7.0
+     * @since 4.0.0
      */
     default Object get( Source path, String tag ) 
     {

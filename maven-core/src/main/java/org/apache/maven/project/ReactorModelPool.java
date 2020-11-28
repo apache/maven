@@ -44,7 +44,7 @@ class ReactorModelPool
     private final Map<Path, Model> modelsByPath = new HashMap<>();
 
     /**
-     * Get the model by its GAV or (since 3.7.0) by its GA if there is only one.
+     * Get the model by its GAV or (since 4.0.0) by its GA if there is only one.
      *  
      * @param groupId, never {@code null}
      * @param artifactId, never {@code null}
@@ -68,7 +68,7 @@ class ReactorModelPool
      * 
      * @param path
      * @return the matching model or {@code null}
-     * @since 3.7.0
+     * @since 4.0.0
      */
     public Model get( Path path )
     {
