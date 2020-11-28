@@ -71,6 +71,7 @@ import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
+import org.apache.maven.repository.internal.DefaultModelCache;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -91,9 +92,6 @@ import org.eclipse.aether.resolution.ArtifactResult;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
-
-    public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
-            "maven.defaultProjectBuilder.disableGlobalModelCache";
 
     @Inject
     private Logger logger;
@@ -119,8 +117,6 @@ public class DefaultProjectBuilder
     @Inject
     private ProjectDependenciesResolver dependencyResolver;
 
-    private final ReactorModelCache modelCache = new ReactorModelCache();
-
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
@@ -130,12 +126,7 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( pomFile, new FileModelSource( pomFile ),
-                new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null ) );
-    }
-
-    private boolean useGlobalModelCache()
-    {
-        return !Boolean.getBoolean( DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY );
+                new InternalConfig( request, null, null ) );
     }
 
     @Override
@@ -143,7 +134,7 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( null, modelSource,
-                 new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null ) );
+                 new InternalConfig( request, null, null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -288,7 +279,7 @@ public class DefaultProjectBuilder
         request.setUserProperties( configuration.getUserProperties() );
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
-        request.setModelCache( config.modelCache );
+        request.setModelCache( DefaultModelCache.newInstance( config.session ) );
         request.setTransformerContextBuilder( config.transformerContextBuilder );
 
         return request;
@@ -309,7 +300,7 @@ public class DefaultProjectBuilder
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
         InternalConfig config =
-            new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null, null );
+            new InternalConfig( request, null, null );
 
         boolean localProject;
 
@@ -382,8 +373,7 @@ public class DefaultProjectBuilder
         final ReactorModelPool modelPool = poolBuilder.build();
 
         InternalConfig config =
-            new InternalConfig( request, modelPool, useGlobalModelCache() ? getModelCache() : new ReactorModelCache(),
-                        modelBuilder.newTransformerContextBuilder() );
+            new InternalConfig( request, modelPool, modelBuilder.newTransformerContextBuilder() );
 
         Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
@@ -1023,16 +1013,13 @@ public class DefaultProjectBuilder
 
         private final ReactorModelPool modelPool;
 
-        private final ReactorModelCache modelCache;
-
         private final TransformerContextBuilder transformerContextBuilder;
 
-        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache,
+        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool,
                         TransformerContextBuilder transformerContextBuilder )
         {
             this.request = request;
             this.modelPool = modelPool;
-            this.modelCache = modelCache;
             this.transformerContextBuilder = transformerContextBuilder;
 
             session =
@@ -1042,11 +1029,6 @@ public class DefaultProjectBuilder
 
         }
 
-    }
-
-    private ReactorModelCache getModelCache()
-    {
-        return this.modelCache;
     }
 
 }

@@ -150,7 +150,6 @@ public class ProjectBuilderTest
 
     @Test
     public void testReadModifiedPoms() throws Exception {
-        String initialValue = System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString( true ) );
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
@@ -177,14 +176,6 @@ public class ProjectBuilderTest
         }
         finally
         {
-            if ( initialValue == null )
-            {
-                System.clearProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY );
-            }
-            else
-            {
-                System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, initialValue );
-            }
             FileUtils.deleteDirectory( tempDir.toFile() );
         }
     }
