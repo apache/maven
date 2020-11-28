@@ -32,10 +32,10 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.apache.maven.project.collector.DefaultProjectsCollector;
+import org.apache.maven.project.collector.DefaultProjectsSelector;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
-import org.apache.maven.project.collector.ProjectsCollector;
+import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Before;
@@ -92,14 +92,14 @@ public class DefaultGraphBuilderTest
     private final MavenSession session = mock( MavenSession.class );
     private final MavenExecutionRequest mavenExecutionRequest = mock( MavenExecutionRequest.class );
 
-    private final ProjectsCollector projectsCollector = new DefaultProjectsCollector( projectBuilder );
+    private final ProjectsSelector projectsSelector = new DefaultProjectsSelector( projectBuilder );
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
     private final ModelLocator modelLocator = new DefaultModelLocator();
     private final PomlessCollectionStrategy pomlessCollectionStrategy = new PomlessCollectionStrategy( projectBuilder );
-    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( modelLocator, projectsCollector );
-    private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectsCollector );
+    private final MultiModuleCollectionStrategy multiModuleCollectionStrategy = new MultiModuleCollectionStrategy( modelLocator, projectsSelector );
+    private final RequestPomCollectionStrategy requestPomCollectionStrategy = new RequestPomCollectionStrategy( projectsSelector );
 
     private Map<String, MavenProject> artifactIdProjectMap;
 

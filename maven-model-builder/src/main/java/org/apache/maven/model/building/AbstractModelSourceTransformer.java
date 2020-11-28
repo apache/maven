@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -91,7 +90,6 @@ public abstract class AbstractModelSourceTransformer
         final TransformerHandler transformerHandler = getTransformerHandler( pomFile );
 
         final PipedOutputStream pout = new PipedOutputStream();
-        
         OutputStream out = filterOutputStream( pout, pomFile );
 
         final javax.xml.transform.Result result;
@@ -108,7 +106,6 @@ public abstract class AbstractModelSourceTransformer
             transformerHandler.setResult( new StreamResult( out ) );
         }
 
-        final Transformer transformer;
         final AbstractSAXFilter filter;
         try
         {
@@ -139,7 +136,6 @@ public abstract class AbstractModelSourceTransformer
                     throw exception;
                 }
             } );
-            transformer = transformerFactory.newTransformer();
         }
         catch ( TransformerConfigurationException | SAXException | ParserConfigurationException e )
         {
@@ -151,12 +147,14 @@ public abstract class AbstractModelSourceTransformer
 
         IOExceptionHandler eh = new IOExceptionHandler();
 
-        
+        // Ensure pipedStreams are connected before the transformThread starts!!
+        final PipedInputStream pipedInputStream = new PipedInputStream( pout );
+
         Thread transformThread = new Thread( () -> 
         {
             try ( PipedOutputStream pos = pout )
             {
-                transformer.transform( transformSource, result );
+                transformerFactory.newTransformer().transform( transformSource, result );
             }
             catch ( TransformerException | IOException e )
             {
@@ -167,7 +165,7 @@ public abstract class AbstractModelSourceTransformer
         transformThread.setDaemon( true );
         transformThread.start();
         
-        return new ThreadAwareInputStream( new PipedInputStream( pout ), eh );
+        return new ThreadAwareInputStream( pipedInputStream, eh );
     }
 
     private static class IOExceptionHandler

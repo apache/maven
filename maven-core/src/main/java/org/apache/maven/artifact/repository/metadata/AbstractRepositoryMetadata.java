@@ -164,7 +164,6 @@ public abstract class AbstractRepositoryMetadata
     {
         Versioning versioning = new Versioning();
         versioning.setSnapshot( snapshot );
-        versioning.updateTimestamp();
         return versioning;
     }
 

@@ -35,32 +35,35 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility to collect projects for a given set of pom.xml files.
+ * Utility to select projects for a given set of pom.xml files.
  */
 @Named
 @Singleton
-public class DefaultProjectsCollector implements ProjectsCollector
+public class DefaultProjectsSelector implements ProjectsSelector
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectsCollector.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectsSelector.class );
     private final ProjectBuilder projectBuilder;
 
     @Inject
-    public DefaultProjectsCollector( ProjectBuilder projectBuilder )
+    public DefaultProjectsSelector( ProjectBuilder projectBuilder )
     {
         this.projectBuilder = projectBuilder;
     }
 
     @Override
-    public void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    public List<MavenProject> selectProjects( List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
                 projectBuildingRequest );
+
+        List<MavenProject> projects = new ArrayList<>( results.size() );
 
         boolean problems = false;
 
@@ -94,5 +97,7 @@ public class DefaultProjectsCollector implements ProjectsCollector
                     + " longer support building such malformed projects." );
             LOGGER.warn( "" );
         }
+
+        return projects;
     }
 }

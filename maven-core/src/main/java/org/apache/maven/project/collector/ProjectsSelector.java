@@ -27,17 +27,17 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Facade to collect projects for a given set of pom.xml files.
+ * Facade to select projects for a given set of pom.xml files.
  */
-public interface ProjectsCollector
+public interface ProjectsSelector
 {
     /**
-     * Collect Maven projects from a list of POM files.
-     * @param projects List that will be filled with the found projects.
+     * Select Maven projects from a list of POM files.
      * @param files List of POM files.
      * @param request The {@link MavenExecutionRequest}
+     * @return A list of projects that have been found in the specified POM files.
      * @throws ProjectBuildingException In case the POMs are not used.
      */
-    void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    List<MavenProject> selectProjects( List<File> files, MavenExecutionRequest request )
             throws ProjectBuildingException;
 }

@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -42,15 +43,15 @@ final class LocalSnapshotMetadata
 
     private final boolean legacyFormat;
 
-    LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat )
+    LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat, Date timestamp )
     {
-        super( createMetadata( artifact, legacyFormat ), null );
+        super( createMetadata( artifact, legacyFormat ), null, timestamp );
         this.legacyFormat = legacyFormat;
     }
 
-    LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
+    LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat, Date timestamp )
     {
-        super( metadata, file );
+        super( metadata, file, timestamp );
         this.legacyFormat = legacyFormat;
     }
 
@@ -82,7 +83,7 @@ final class LocalSnapshotMetadata
 
     public MavenMetadata setFile( File file )
     {
-        return new LocalSnapshotMetadata( metadata, file, legacyFormat );
+        return new LocalSnapshotMetadata( metadata, file, legacyFormat, timestamp );
     }
 
     public Object getKey()
@@ -98,7 +99,7 @@ final class LocalSnapshotMetadata
     @Override
     protected void merge( Metadata recessive )
     {
-        metadata.getVersioning().updateTimestamp();
+        metadata.getVersioning().setLastUpdatedTimestamp( timestamp );
 
         if ( !legacyFormat )
         {
