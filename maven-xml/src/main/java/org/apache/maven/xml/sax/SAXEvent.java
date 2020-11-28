@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
  * Command pattern to gather events which can be executed later on.
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 @FunctionalInterface
 public interface SAXEvent

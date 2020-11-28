@@ -190,7 +190,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
             "  <parent>\n" + 
             "    <groupId>org.apache.maven</groupId>\n" + 
             "    <artifactId>maven</artifactId>\n" + 
-            "    <version>3.7.0-SNAPSHOT</version>\n" + 
+            "    <version>4.0.0-SNAPSHOT</version>\n" + 
             "  </parent>\n" + 
             "  <artifactId>maven-xml</artifactId>\n" + 
             "  <name>Maven XML</name>\n" + 

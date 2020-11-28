@@ -23,7 +23,7 @@ package org.apache.maven.feature;
  * Centralized class for feature information
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public final class Features
 {
@@ -42,7 +42,7 @@ public final class Features
      * Represents some feature
      * 
      * @author Robert Scholte
-     * @since 3.7.0
+     * @since 4.0.0
      */
     public static class Feature
     {

@@ -29,7 +29,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * Otherwise the LexicalHandler events might end up before all collected XMLReader events.
  * 
  * @author Robert Scholte
- * @since 3.7.0 
+ * @since 4.0.0 
  */
 public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
 {

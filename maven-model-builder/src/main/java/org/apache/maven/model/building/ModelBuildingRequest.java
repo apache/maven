@@ -67,7 +67,7 @@ public interface ModelBuildingRequest
     /**
      * 
      * @return the file model
-     * @since 3.7.0
+     * @since 4.0.0
      */
     Model getFileModel();
     
@@ -75,7 +75,7 @@ public interface ModelBuildingRequest
      * 
      * @param fileModel
      * @return This request, never {@code null}.
-     * @since 3.7.0
+     * @since 4.0.0
      */
     ModelBuildingRequest setFileModel( Model fileModel );
 

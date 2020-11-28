@@ -37,7 +37,7 @@ import org.xml.sax.ext.LexicalHandler;
  * Base implementation for providing the BuildPomXML.
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class BuildPomXMLFilterFactory
 {

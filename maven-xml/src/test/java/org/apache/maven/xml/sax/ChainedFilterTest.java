@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
  * A small example of a pipeline of 2 XML Filters, to understand how to get the expected result
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class ChainedFilterTest
 {
