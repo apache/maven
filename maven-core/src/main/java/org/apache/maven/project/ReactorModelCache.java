@@ -22,10 +22,8 @@ package org.apache.maven.project;
 import org.apache.maven.building.Source;
 import org.apache.maven.model.building.ModelCache;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,8 +37,6 @@ class ReactorModelCache
 
     private final Map<Object, Object> models = new ConcurrentHashMap<>( 256 );
     
-    private final Map<GACacheKey, Set<Source>> mappedSources = new ConcurrentHashMap<>( 64 );
-
     @Override
     public Object get( String groupId, String artifactId, String version, String tag )
     {
@@ -51,30 +47,6 @@ class ReactorModelCache
     public void put( String groupId, String artifactId, String version, String tag, Object data )
     {
         models.put( new GavCacheKey( groupId, artifactId, version, tag ), data );
-    }
-    
-    @Override
-    public Source get( String groupId, String artifactId )
-    {
-        Set<Source> sources = mappedSources.get( new GACacheKey( groupId, artifactId ) );
-        if ( sources == null )
-        {
-            return null;
-        }
-        else 
-        {
-            return sources.stream().reduce( ( a, b ) -> 
-            {
-                throw new IllegalStateException( "No unique Source for " + groupId + ':' + artifactId 
-                      + ": " + a.getLocation() + " and " + b.getLocation() );
-            } ).orElse( null );
-        }
-    }
-    
-    @Override
-    public void put( String groupId, String artifactId, Source source )
-    {
-        mappedSources.computeIfAbsent( new GACacheKey( groupId, artifactId ), k -> new HashSet<>() ).add( source );
     }
 
     @Override

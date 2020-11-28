@@ -59,30 +59,6 @@ public interface ModelCache
         // only useful for ReactorModelCache
         return null;
     }
-    
-    /**
-     * 
-     * @param groupId The groupId, must not be {@code null}.
-     * @param artifactId The artifactId, must not be {@code null}.
-     * @param source the source matching
-     * @throws IllegalArgumentException if the groupId + artifactId was already added before
-     */
-    default void put( String groupId, String artifactId, Source source )
-    {
-     // only useful for ReactorModelCache
-    }
-
-    /**
-     * 
-     * @param groupId The groupId, must not be {@code null}.
-     * @param artifactId The artifactId, must not be {@code null}.
-     * @return The requested source or {@code null} if none was present in the cache.
-     */
-    default Source get( String groupId, String artifactId )
-    {
-        // only useful for ReactorModelCache
-        return null;
-    }
 
     /**
      * Puts the specified data into the cache.

@@ -31,12 +31,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -696,7 +699,12 @@ public class DefaultModelBuilder
         intoCache( request.getModelCache(), modelSource, ModelCacheTag.FILE, model );
         if ( modelSource instanceof FileModelSource )
         {
-            intoCache( request.getModelCache(), getGroupId( model ), model.getArtifactId(), modelSource );
+            if ( request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder )
+            {
+                DefaultTransformerContextBuilder contextBuilder =
+                        (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
+                contextBuilder.putSource( getGroupId( model ), model.getArtifactId(), modelSource );
+            }
         }
 
         return model;
@@ -1543,14 +1551,6 @@ public class DefaultModelBuilder
         }
     }
 
-    private <T> void intoCache( ModelCache modelCache, String groupId, String artifactId, Source source )
-     {
-         if ( modelCache != null )
-         {
-             modelCache.put( groupId, artifactId, source );
-         }
-     }
-
     private <T> void intoCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data )
     {
         if ( modelCache != null )
@@ -1572,16 +1572,6 @@ public class DefaultModelBuilder
         }
         return null;
     }
-    
-    private static Source fromCache( ModelCache modelCache, String groupId, String artifactId )
-    {
-        if ( modelCache != null )
-        {
-            return modelCache.get( groupId, artifactId );
-        }
-        return null;
-    }
-
 
     private static <T> T fromCache( ModelCache modelCache, Source source, ModelCacheTag<T> tag )
     {
@@ -1808,12 +1798,15 @@ public class DefaultModelBuilder
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder
     {
         private final DefaultTransformerContext context = new DefaultTransformerContext();
-        
+
+        private final Map<DefaultTransformerContext.GAKey, Set<Source>> mappedSources
+                = new ConcurrentHashMap<>( 64 );
+
         /**
          * If an interface could be extracted, DefaultModelProblemCollector should be ModelProblemCollectorExt
          * 
          * @param request
-         * @param problems
+         * @param collector
          * @return
          */
         @Override
@@ -1845,7 +1838,7 @@ public class DefaultModelBuilder
 
                 private Model findRawModel( String groupId, String artifactId )
                 {
-                    Source source = fromCache( request.getModelCache(), groupId, artifactId );
+                    Source source = getSource( groupId, artifactId );
                     if ( source != null )
                     {
                         try
@@ -1897,6 +1890,27 @@ public class DefaultModelBuilder
         public TransformerContext build()
         {
             return context;
-        }        
+        }
+
+        public Source getSource( String groupId, String artifactId )
+        {
+            Set<Source> sources = mappedSources.get( new DefaultTransformerContext.GAKey( groupId, artifactId ) );
+            if ( sources == null )
+            {
+                return null;
+            }
+            return sources.stream().reduce( ( a, b ) ->
+            {
+                throw new IllegalStateException( "No unique Source for " + groupId + ':' + artifactId
+                        + ": " + a.getLocation() + " and " + b.getLocation() );
+            } ).orElse( null );
+        }
+
+        public void putSource( String groupId, String artifactId, Source source )
+        {
+            mappedSources.computeIfAbsent( new DefaultTransformerContext.GAKey( groupId, artifactId ),
+                    k -> new HashSet<>() ).add( source );
+        }
+
     }
 }
