@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
  * Remove relativePath element, has no value for consumer pom
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class RelativePathXMLFilter
     extends AbstractEventXMLFilter

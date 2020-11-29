@@ -32,7 +32,7 @@ import org.xml.sax.XMLFilter;
  * Should be used in case of a DOM that should not be effected by other filters, even though the elements match 
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class FastForwardFilter extends AbstractSAXFilter
 {

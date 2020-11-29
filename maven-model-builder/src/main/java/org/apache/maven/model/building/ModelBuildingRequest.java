@@ -69,6 +69,7 @@ public interface ModelBuildingRequest
      * If not set, model source will be used to load file model.
      *
      * @return The file model to build or {@code null} if not set.
+     * @since 4.0.0
      */
     Model getFileModel();
 
@@ -76,6 +77,8 @@ public interface ModelBuildingRequest
      * Set the file model with profile activation
      *
      * @param fileModel
+     * @return This request, never {@code null}.
+     * @since 4.0.0
      */
     ModelBuildingRequest setFileModel( Model fileModel );
     

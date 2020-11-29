@@ -28,7 +28,7 @@ import org.xml.sax.ext.LexicalHandler;
  * Factory for SAXEvents
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public final class SAXEventFactory
 {

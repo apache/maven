@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * Builds up a list of SAXEvents, which will be executed with {@link #executeEvents()}
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 abstract class AbstractEventXMLFilter extends AbstractSAXFilter
 {

@@ -33,7 +33,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Creates XML related factories with OWASP advices applied
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public final class Factories
 {

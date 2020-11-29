@@ -30,7 +30,7 @@ import java.nio.file.Path;
  * local pom is the the original source. 
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public interface ModelSourceTransformer
 {

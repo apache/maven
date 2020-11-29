@@ -25,7 +25,7 @@ import java.nio.file.Path;
  * Listener can be used to capture the result of the build pom
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 @FunctionalInterface
 public interface BuildPomXMLFilterListener

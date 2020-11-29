@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * Resolves all ci-friendly properties occurrences between version-tags
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class CiFriendlyXMLFilter
     extends AbstractSAXFilter
