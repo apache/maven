@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
-*.jar    -text -crlf
+*.jar    binary
+*.war    binary
+

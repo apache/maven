@@ -42,13 +42,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class MavenITmng3599useHttpProxyForWebDAVMk2Test
     extends AbstractMavenIntegrationTestCase
 {
-    private static final String LS = System.getProperty( "line.separator" );
-
     private Server server;
 
     private int port;
 
-    private static final String content = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+    private static final String CONTENT = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                             "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
                             "  <modelVersion>4.0.0</modelVersion>\n" +
                             "  <groupId>org.apache.maven.its.mng3599</groupId>\n" +
@@ -56,6 +54,8 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
                             "  <version>1.0-SNAPSHOT</version>\n" +
                             "  <name>MNG-3599</name>\n" +
                             "</project>";
+
+    private static final String CONTENT_CHECKSUM_SHA1 = "8c2562233bae8fa8aa40697d6bbd5115f9062a71";
 
     public MavenITmng3599useHttpProxyForWebDAVMk2Test()
     {
@@ -81,23 +81,38 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
                 if ( request.getHeader( "Proxy-Connection" ) != null )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( content );
+                    if ( request.getRequestURI().endsWith( ".sha1" ) )
+                    {
+                        response.getWriter().print( CONTENT_CHECKSUM_SHA1 );
+                    }
+                    else
+                    {
+                        response.getWriter().print( CONTENT );
+                    }
 
                     System.out.println( "Proxy-Connection found." );
                 }
                 /*
-                 * 2008-09-29 Oleg: "Proxy-Connection" is not part of http spec, but an extended header, and 
+                 * 2008-09-29 Oleg: "Proxy-Connection" is not part of http spec, but an extended header, and
                  * as such cannot be expected from all the clients.
                  * Changing the code to test for more generalized case: local proxy receives a request with
                  * correct server url and resource uri
                  */
-                else if( 
+                else if
+                (
                     request.getRequestURI().startsWith( "/org/apache/maven/its/mng3599/test-dependency" )
                     && request.getRequestURL().toString().startsWith( "http://www.example.com" )
                 )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( content );
+                    if ( request.getRequestURI().endsWith( ".sha1" ) )
+                    {
+                        response.getWriter().print( CONTENT_CHECKSUM_SHA1 );
+                    }
+                    else
+                    {
+                        response.getWriter().print( CONTENT );
+                    }
 
                     System.out.println( "Correct proxied request 'http://www.example.com' for resource '/org/apache/maven/its/mng3599/test-dependency' found." );
                 }
@@ -170,7 +185,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         content + LS );
+                                         CONTENT );
     }
 
     /**
@@ -212,6 +227,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         content + LS );
+                                         CONTENT );
     }
 }

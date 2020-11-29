@@ -1,2 +1,3 @@
-*.pom              -text -crlf
-*.xml              -text -crlf
+*.pom    text eol=lf
+maven-metadata.xml    text eol=lf
+

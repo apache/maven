@@ -8,7 +8,7 @@
   <distributionManagement>
     <snapshotRepository>
       <id>test.deployment.repository</id>
-      <url>file://localhost/${basedir}/target-repo</url>
+      <url>file://${basedir}/target-repo</url>
     </snapshotRepository>
   </distributionManagement>
 

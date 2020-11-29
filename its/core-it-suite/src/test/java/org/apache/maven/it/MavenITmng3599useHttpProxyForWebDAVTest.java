@@ -44,13 +44,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class MavenITmng3599useHttpProxyForWebDAVTest
     extends AbstractMavenIntegrationTestCase
 {
-    private static final String LS = System.getProperty( "line.separator" );
-    
     private Server server;
 
     private int port;
 
-    private static final String content = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+    private static final String CONTENT = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                             "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
                             "  <modelVersion>4.0.0</modelVersion>\n" +
                             "  <groupId>org.apache.maven.its.mng3599</groupId>\n" +
@@ -77,15 +75,15 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
             {
                 System.out.println( "Got request for URL: '" + request.getRequestURL() + "'" );
                 System.out.flush();
-                
+
                 response.setContentType( "text/plain" );
 
                 System.out.println( "Checking for 'Proxy-Connection' header..." );
                 if ( request.getHeader( "Proxy-Connection" ) != null )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( content );
-                    
+                    response.getWriter().print( CONTENT );
+
                     System.out.println( "Proxy-Connection found." );
                 }
                 /*
@@ -94,20 +92,21 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
                  * Changing the code to test for more generalized case: local proxy receives a request with
                  * correct server url and resource uri
                  */
-                else if( 
+                else if
+                (
                     request.getRequestURI().startsWith( "/org/apache/maven/its/mng3599/test-dependency" )
                     && request.getRequestURL().toString().startsWith( "http://www.example.com" )
                 )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( content );
-                    
+                    response.getWriter().print( CONTENT );
+
                     System.out.println( "Correct proxied request 'http://www.example.com' for resource '/org/apache/maven/its/mng3599/test-dependency' found." );
                 }
                 else
                 {
                     response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
-                    
+
                     System.out.println( "Proxy-Connection not found." );
                 }
 
@@ -173,7 +172,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         content + LS );
+                                         CONTENT );
     }
 
     /**
@@ -199,7 +198,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
-        
+
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
         verifier = newVerifier( testDir.getAbsolutePath() );
@@ -217,6 +216,6 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         content + LS );
+                                         CONTENT );
     }
 }

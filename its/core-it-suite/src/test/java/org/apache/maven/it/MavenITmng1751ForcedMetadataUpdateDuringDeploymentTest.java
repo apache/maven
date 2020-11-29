@@ -27,7 +27,7 @@ import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1751">MNG-1751</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
@@ -49,7 +49,11 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1751" );
 
         File dir = new File( testDir, "repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT" );
-        FileUtils.copyFile( new File( dir, "template-metadata.xml" ), new File( dir, "maven-metadata.xml" ) );
+        File templateMetadataFile = new File( dir, "template-metadata.xml" );
+        File metadataFile = new File( dir, "maven-metadata.xml" );
+        FileUtils.copyFile( templateMetadataFile, metadataFile );
+        String checksum = ItUtils.calcHash( metadataFile, "SHA-1" );
+        FileUtils.fileWrite( metadataFile.getPath() + ".sha1", checksum );
 
         // phase 1: deploy a new snapshot, this should update the metadata despite its future timestamp
         Verifier verifier = newVerifier( new File( testDir, "dep" ).getAbsolutePath() );

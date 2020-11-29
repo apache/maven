@@ -35,8 +35,8 @@ under the License.
 
     <repositories>
         <repository>
-            <id>repo2</id>
-            <url>@baseurl@/repo2</url>
+            <id>repo-2</id>
+            <url>@baseurl@/repo-2</url>
         </repository>
     </repositories>
 
