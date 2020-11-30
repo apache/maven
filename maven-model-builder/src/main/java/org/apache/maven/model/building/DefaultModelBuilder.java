@@ -1001,45 +1001,39 @@ public class DefaultModelBuilder
 
         if ( parent != null )
         {
-            Source expectedParentSource = getParentPomFile( childModel, childSource );
+            ModelData candidateData = readParentLocally( childModel, childSource, request, result, problems );
 
-            if ( expectedParentSource != null )
+            if ( candidateData != null )
             {
-                ModelData candidateData = readParentLocally( childModel, childSource, request, result, problems );
-
-                if ( candidateData != null )
+                /*
+                 * NOTE: This is a sanity check of the read. If the cached parent POM was locally resolved,
+                 * the child's GAV should match with that parent, too. If it doesn't, we ignore the cache and
+                 * resolve externally, to mimic the behavior if the cache didn't exist in the first place.
+                 * Otherwise, the cache would obscure a bad POM.
+                 */
+                try
                 {
-                    /*
-                     * NOTE: This is a sanity check of the cache hit. If the cached parent POM was locally resolved,
-                     * the child's GAV should match with that parent, too. If it doesn't, we ignore the cache and
-                     * resolve externally, to mimic the behavior if the cache didn't exist in the first place.
-                     * Otherwise, the cache would obscure a bad POM.
-                     */
-                    try
-                    {
-                        VersionRange parentVersion = VersionRange.createFromVersionSpec( parent.getVersion() );
-                        ArtifactVersion actualVersion = new DefaultArtifactVersion( candidateData.getVersion() );
+                    VersionRange parentVersion = VersionRange.createFromVersionSpec( parent.getVersion() );
+                    ArtifactVersion actualVersion = new DefaultArtifactVersion( candidateData.getVersion() );
 
-                        if ( parent.getGroupId().equals( candidateData.getGroupId() )
-                            && parent.getArtifactId().equals( candidateData.getArtifactId() )
-                            && parentVersion.containsVersion( actualVersion ) )
-                        {
-                            parentData = candidateData;
-                        }
-                    }
-                    catch ( InvalidVersionSpecificationException e )
+                    if ( parent.getGroupId().equals( candidateData.getGroupId() )
+                        && parent.getArtifactId().equals( candidateData.getArtifactId() )
+                        && parentVersion.containsVersion( actualVersion ) )
                     {
-                        // This should already been blocked during validation
+                        parentData = candidateData;
                     }
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    // This should already been blocked during validation
                 }
             }
 
             if ( parentData == null )
             {
-                ModelData candidateData = fromCache( request.getModelCache(),
-                                                     parent.getGroupId(), parent.getArtifactId(),
-                                                     parent.getVersion(), ModelCacheTag.RAW );
-
+                candidateData = fromCache( request.getModelCache(),
+                                           parent.getGroupId(), parent.getArtifactId(),
+                                           parent.getVersion(), ModelCacheTag.RAW );
 
                 if ( candidateData != null && candidateData.getSource() instanceof ArtifactModelSource )
                 {
@@ -1111,7 +1105,7 @@ public class DefaultModelBuilder
             catch ( UnresolvableModelException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ) //
-                .setMessage( e.getMessage() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
+                    .setMessage( e.getMessage() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
                 throw problems.newModelBuildingException();
             }
             if ( candidateModel == null )
