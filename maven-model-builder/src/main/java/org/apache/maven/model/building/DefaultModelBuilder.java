@@ -995,6 +995,10 @@ public class DefaultModelBuilder
         {
             ModelData candidateData = readParentLocally( childModel, childSource, request, result, problems );
 
+            String groupId = parent.getGroupId();
+            String artifactId = parent.getArtifactId();
+            String version = parent.getVersion();
+
             if ( candidateData != null )
             {
                 /*
@@ -1005,11 +1009,11 @@ public class DefaultModelBuilder
                  */
                 try
                 {
-                    VersionRange parentVersion = VersionRange.createFromVersionSpec( parent.getVersion() );
+                    VersionRange parentVersion = VersionRange.createFromVersionSpec( version );
                     ArtifactVersion actualVersion = new DefaultArtifactVersion( candidateData.getVersion() );
 
-                    if ( parent.getGroupId().equals( candidateData.getGroupId() )
-                        && parent.getArtifactId().equals( candidateData.getArtifactId() )
+                    if ( groupId.equals( candidateData.getGroupId() )
+                        && artifactId.equals( candidateData.getArtifactId() )
                         && parentVersion.containsVersion( actualVersion ) )
                     {
                         parentData = candidateData;
@@ -1023,9 +1027,7 @@ public class DefaultModelBuilder
 
             if ( parentData == null )
             {
-                candidateData = fromCache( request.getModelCache(),
-                                           parent.getGroupId(), parent.getArtifactId(),
-                                           parent.getVersion(), ModelCacheTag.RAW );
+                candidateData = fromCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW );
 
                 if ( candidateData != null && candidateData.getSource() instanceof ArtifactModelSource )
                 {
@@ -1036,9 +1038,7 @@ public class DefaultModelBuilder
                 {
                     parentData = readParentExternally( childModel, request, result, problems );
 
-                    intoCache( request.getModelCache(),
-                              parentData.getGroupId(), parentData.getArtifactId(),
-                              parentData.getVersion(), ModelCacheTag.RAW, parentData );
+                    intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, parentData );
                 }
             }
 
