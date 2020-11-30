@@ -773,7 +773,6 @@ public class DefaultModelBuilder
         String version = getVersion( rawModel );
 
         ModelData modelData = new ModelData( modelSource, rawModel, groupId, artifactId, version );
-        intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, modelData );
         intoCache( request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData );
 
         return rawModel;
