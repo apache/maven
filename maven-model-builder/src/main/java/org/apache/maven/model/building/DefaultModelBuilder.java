@@ -1076,14 +1076,8 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            ModelBuildingRequest candidateBuildRequest = new FilterModelBuildingRequest( request )
-            {
-                  @Override
-                public ModelSource getModelSource()
-                {
-                    return candidateSource;
-                }
-            };
+            ModelBuildingRequest candidateBuildRequest = new DefaultModelBuildingRequest( request )
+                .setModelSource( candidateSource );
 
             candidateModel = readRawModel( candidateBuildRequest, problems );
         }
@@ -1273,25 +1267,10 @@ public class DefaultModelBuilder
         }
 
         int validationLevel = Math.min( request.getValidationLevel(), ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
-        ModelBuildingRequest lenientRequest = new FilterModelBuildingRequest( request )
-        {
-            @Override
-            public int getValidationLevel()
-            {
-                return validationLevel;
-            }
-
-            @Override
-            public ModelSource getModelSource()
-            {
-                return modelSource;
-            }
-            @Override
-            public Model getFileModel()
-            {
-                return null;
-            }
-        };
+        ModelBuildingRequest lenientRequest = new DefaultModelBuildingRequest( request )
+                .setValidationLevel( validationLevel )
+                .setFileModel( null )
+                .setModelSource( modelSource );
 
         Model parentModel = readRawModel( lenientRequest, problems );
 
@@ -1824,15 +1803,8 @@ public class DefaultModelBuilder
                     {
                         try
                         {
-                            ModelBuildingRequest gaBuildingRequest = new FilterModelBuildingRequest( request )
-                            {
-                                @Override
-                                public ModelSource getModelSource()
-                                {
-                                    return (ModelSource) source;
-                                }
-
-                            };
+                            ModelBuildingRequest gaBuildingRequest = new DefaultModelBuildingRequest( request )
+                                .setModelSource( (ModelSource) source );
                             return readRawModel( gaBuildingRequest, problems );
                         }
                         catch ( ModelBuildingException e )
