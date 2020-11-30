@@ -1107,11 +1107,7 @@ public class DefaultModelBuilder
         // before because with parents as ranges it will never work in this scenario.
         //
 
-        String groupId = candidateModel.getGroupId();
-        if ( groupId == null && candidateModel.getParent() != null )
-        {
-            groupId = candidateModel.getParent().getGroupId();
-        }
+        String groupId = getGroupId( candidateModel );
         String artifactId = candidateModel.getArtifactId();
 
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
@@ -1133,11 +1129,7 @@ public class DefaultModelBuilder
             return null;
         }
 
-        String version = candidateModel.getVersion();
-        if ( version == null && candidateModel.getParent() != null )
-        {
-            version = candidateModel.getParent().getVersion();
-        }
+        String version = getVersion( candidateModel );
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
         {
             try
