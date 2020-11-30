@@ -723,7 +723,7 @@ public class DefaultModelBuilder
         ModelData cachedData = fromCache( request.getModelCache(), modelSource, ModelCacheTag.RAW );
         if ( cachedData != null )
         {
-          return cachedData.getModel();
+            return cachedData.getModel();
         }
 
         Model rawModel;
