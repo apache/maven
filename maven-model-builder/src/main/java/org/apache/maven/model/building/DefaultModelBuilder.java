@@ -660,18 +660,10 @@ public class DefaultModelBuilder
                     throw e;
                 }
 
-                if ( modelSource instanceof FileModelSource )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V20 )
-                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                        .setException( e ) );
-                }
-                else
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
-                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                        .setException( e ) );
-                }
+                Severity severity = ( modelSource instanceof FileModelSource ) ? Severity.ERROR : Severity.WARNING;
+                problems.add( new ModelProblemCollectorRequest( severity, Version.V20 )
+                    .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
+                    .setException( e ) );
             }
 
             if ( source != null )
