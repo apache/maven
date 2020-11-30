@@ -1417,18 +1417,14 @@ public class DefaultModelBuilder
                 return null;
             }
 
-            ModelBuildingRequest importRequest = new DefaultModelBuildingRequest();
-            importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-            importRequest.setModelCache( request.getModelCache() );
-            importRequest.setSystemProperties( request.getSystemProperties() );
-            importRequest.setUserProperties( request.getUserProperties() );
-            importRequest.setLocationTracking( request.isLocationTracking() );
-            importRequest.setModelSource( importSource );
-            importRequest.setModelResolver( modelResolver.newCopy() );
-
             final ModelBuildingResult importResult;
             try
             {
+                ModelBuildingRequest importRequest = new DefaultModelBuildingRequest( request )
+                        .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
+                        .setModelSource( importSource )
+                        .setModelResolver( modelResolver.newCopy() );
+
                 importResult = build( importRequest, importIds );
             }
             catch ( ModelBuildingException e )
