@@ -22,7 +22,6 @@ package org.apache.maven.model.building;
 import static org.apache.maven.model.building.Result.error;
 import static org.apache.maven.model.building.Result.newResult;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -990,69 +989,21 @@ public class DefaultModelBuilder
         ModelData parentData = null;
 
         Parent parent = childModel.getParent();
-
         if ( parent != null )
         {
-            ModelData candidateData = readParentLocally( childModel, childSource, request, result, problems );
-
-            String groupId = parent.getGroupId();
-            String artifactId = parent.getArtifactId();
-            String version = parent.getVersion();
-
-            if ( candidateData != null )
-            {
-                /*
-                 * NOTE: This is a sanity check of the read. If the cached parent POM was locally resolved,
-                 * the child's GAV should match with that parent, too. If it doesn't, we ignore the cache and
-                 * resolve externally, to mimic the behavior if the cache didn't exist in the first place.
-                 * Otherwise, the cache would obscure a bad POM.
-                 */
-                try
-                {
-                    VersionRange parentVersion = VersionRange.createFromVersionSpec( version );
-                    ArtifactVersion actualVersion = new DefaultArtifactVersion( candidateData.getVersion() );
-
-                    if ( groupId.equals( candidateData.getGroupId() )
-                        && artifactId.equals( candidateData.getArtifactId() )
-                        && parentVersion.containsVersion( actualVersion ) )
-                    {
-                        parentData = candidateData;
-                    }
-                }
-                catch ( InvalidVersionSpecificationException e )
-                {
-                    // This should already been blocked during validation
-                }
-            }
-
+            parentData = readParentLocally( childModel, childSource, request, result, problems );
             if ( parentData == null )
             {
-                candidateData = fromCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW );
-
-                if ( candidateData != null && candidateData.getSource() instanceof ArtifactModelSource )
-                {
-                    // ArtifactModelSource means repositorySource
-                    parentData = candidateData;
-                }
-                else
-                {
-                    parentData = readParentExternally( childModel, request, result, problems );
-
-                    intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, parentData );
-                }
+                parentData = readParentExternally( childModel, request, result, problems );
             }
-
-            if ( parentData != null )
+            
+            Model parentModel = parentData.getModel();
+            if ( !"pom".equals( parentModel.getPackaging() ) )
             {
-                Model parentModel = parentData.getModel();
-
-                if ( !"pom".equals( parentModel.getPackaging() ) )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                                         + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
-                        .setLocation( parentModel.getLocation( "packaging" ) ) );
-                }
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
+                    .setLocation( parentModel.getLocation( "packaging" ) ) );
             }
         }
 
