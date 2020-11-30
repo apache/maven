@@ -274,7 +274,6 @@ public class DefaultModelBuilder
         return build( request, new LinkedHashSet<>() );
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     protected ModelBuildingResult build( ModelBuildingRequest request, Collection<String> importIds )
         throws ModelBuildingException
     {
