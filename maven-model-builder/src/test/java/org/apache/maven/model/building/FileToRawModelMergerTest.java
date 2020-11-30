@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.model.building.DefaultModelBuilder.FileToRawModelMerger;
 import org.apache.maven.model.merge.ModelMerger;
 import org.junit.jupiter.api.Test;
 
