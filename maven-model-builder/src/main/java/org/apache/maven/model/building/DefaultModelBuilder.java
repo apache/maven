@@ -484,9 +484,6 @@ public class DefaultModelBuilder
 
         result.setEffectiveModel( resultModel );
 
-        // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver( request.getModelResolver(), resultModel, problems, true );
-
         return resultModel;
     }
 
@@ -843,12 +840,6 @@ public class DefaultModelBuilder
 
     private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems )
     {
-        configureResolver( modelResolver, model, problems, false );
-    }
-
-    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems,
-                                    boolean replaceRepositories )
-    {
         if ( modelResolver == null )
         {
             return;
@@ -862,7 +853,7 @@ public class DefaultModelBuilder
         {
             try
             {
-                modelResolver.addRepository( repository, replaceRepositories );
+                modelResolver.addRepository( repository, false );
             }
             catch ( InvalidRepositoryException e )
             {

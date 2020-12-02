@@ -93,9 +93,8 @@ public class ProjectModelResolver
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<>();
-        this.externalRepositories = Collections.unmodifiableList( new ArrayList<>( repositories ) );
-        this.repositories = new ArrayList<>();
-        this.repositories.addAll( externalRepositories );
+        this.externalRepositories = repositories;
+        this.repositories = repositories;
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<>();
         this.modelPool = modelPool;
