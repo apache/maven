@@ -43,8 +43,6 @@ public class ArtifactRepositoryPolicy
 
     public static final String CHECKSUM_POLICY_IGNORE = "ignore";
 
-    public static final String DEFAULT_CHECKSUM_POLICY = CHECKSUM_POLICY_FAIL;
-
     private boolean enabled;
 
     private String updatePolicy;
@@ -73,7 +71,7 @@ public class ArtifactRepositoryPolicy
 
         if ( checksumPolicy == null )
         {
-            checksumPolicy = DEFAULT_CHECKSUM_POLICY;
+            checksumPolicy = CHECKSUM_POLICY_WARN;
         }
         this.checksumPolicy = checksumPolicy;
     }
