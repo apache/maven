@@ -249,6 +249,12 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuVersion}</version>
+        <exclusions>
+          <exclusion> <!-- Way too easy to conflict with plugins to be in Maven and leak in plugins -->
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>

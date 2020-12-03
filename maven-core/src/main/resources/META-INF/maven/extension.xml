@@ -94,9 +94,11 @@ under the License.
 
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
-    <!-- javax.enterprise.inject (JSR-299) -->
+    <!-- javax.enterprise.inject (JSR-299): Must never be exported if needed at plugin level, plugin adds it
+         there is no justification to get it at Maven level and leaking it will conflict.
     <exportedPackage>javax.enterprise.util.*</exportedPackage>
     <exportedPackage>javax.enterprise.inject.*</exportedPackage>
+    -->
 
     <!-- javax.annotation (JSR-250) -->
     <exportedPackage>javax.annotation.*</exportedPackage>
