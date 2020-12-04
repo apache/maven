@@ -33,7 +33,7 @@ public class MavenITmng5639ImportScopePomResolutionTest
 
     public MavenITmng5639ImportScopePomResolutionTest()
     {
-        super( "[3.2.2,)" );
+        super( "[3.2.2,4.0.0-alpha-1)" );
     }
 
     public void testitMNG5639()
