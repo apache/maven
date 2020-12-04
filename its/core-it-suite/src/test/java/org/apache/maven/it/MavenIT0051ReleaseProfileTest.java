@@ -30,7 +30,7 @@ public class MavenIT0051ReleaseProfileTest
 
     public MavenIT0051ReleaseProfileTest()
     {
-        super( "(2.0.2,)" );
+        super( "(2.0.2,4.0.0-alpha-1)" );
     }
 
     /**
