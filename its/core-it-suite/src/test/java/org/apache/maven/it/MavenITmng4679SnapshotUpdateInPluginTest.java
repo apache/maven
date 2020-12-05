@@ -63,7 +63,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         verifier.verifyErrorFreeLog();
 
         assertChecksum( verifier, "jar", "2ea5c3d713bbaba7b87746449b91cd00e876703d" );
-        assertChecksum( verifier, "pom", "7de357a948a8bb2357759c7c585adb504e579bad" );
+        assertChecksum( verifier, "pom", "0b58dbbc61f81b85a70692ffdce88cf1892a8da4" );
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
@@ -76,7 +76,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         verifier.resetStreams();
 
         assertChecksum( verifier, "jar", "f3d46277c2ab45ff9bbd97605c942bed7fc27f97" );
-        assertChecksum( verifier, "pom", "8f17048dee72cc6ec33e9ab30fa00a910e1d6997" );
+        assertChecksum( verifier, "pom", "127f0dc26035352bb54890315ad7d2ada067756a" );
     }
 
     private void assertChecksum( Verifier verifier, String ext, String checksum )

@@ -65,7 +65,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "jar",
             "69c041c12f35894230c7c23c49cd245886c6fb6f" );
         assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom",
-            "10235b64a161e86e91cc6ff7245a4b9c6fdc7d5d" );
+            "f0abcb2aa6d99f045c013ecb2671a3a3e71bd715" );
         assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "tests", "jar",
             "69c041c12f35894230c7c23c49cd245886c6fb6f" );
         assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "sources", "jar",
@@ -78,7 +78,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "jar",
             "efb7c4046565774cd7e44645e02f06ecdf91098d" );
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "pom",
-            "1c816cc9eaaca1272f24887c461aa359503394f5" );
+            "a057baebe5cdae3978b530c0bfea8b523b3d4506" );
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "tests", "jar",
             "efb7c4046565774cd7e44645e02f06ecdf91098d" );
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "sources", "jar",
@@ -93,7 +93,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "jar",
             "1eb0d5a421b3074e8a69b0dcca7e325c0636a932" );
         assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "pom",
-            "bd9a24117d3ce4f8ef3b8fcfe79a08e5ea141a9b" );
+            "9c993bdebc7bd1b673891f203511fed9085996f3" );
         assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "tests", "jar",
             "1eb0d5a421b3074e8a69b0dcca7e325c0636a932" );
         assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "sources", "jar",
@@ -108,7 +108,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "jar",
             "3d606c564625a594165bcbbe4a24c8f11b18b5a0" );
         assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "pom",
-            "70a3c9795b2871fdd8a66e8fe312359f08d77c7d" );
+            "e7b6322cea42970e61316b161f79da690f042f7e" );
         assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "tests", "jar",
             "3d606c564625a594165bcbbe4a24c8f11b18b5a0" );
         assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "sources", "jar",
