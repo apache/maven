@@ -35,7 +35,7 @@ public class MavenITmng3641ProfileActivationWarningTest
 
     public MavenITmng3641ProfileActivationWarningTest()
     {
-        super( "[2.0.11,2.1.0-M1),[2.1.0,)" ); // only test in 2.0.11+, 2.1.0+
+        super( "[2.0.11,2.1.0-M1),[2.1.0,4.0.0-alpha-1)" ); // only test in 2.0.11+, 2.1.0+
     }
 
     public void testitMNG3641()

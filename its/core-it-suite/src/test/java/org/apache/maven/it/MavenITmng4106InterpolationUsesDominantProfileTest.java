@@ -54,7 +54,14 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b" );
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
+        {
+            verifier.addCliOption( "-Ppom-a,pom-b,settings-a,settings-b" );
+        }
+        else
+        {
+            verifier.addCliOption( "-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b" );
+        }
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -52,10 +51,19 @@ public class MavenITmng2309ProfileInjectionOrderTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-P"
-            + "pom-a,pom-b,pom-e,pom-c,pom-d"
-            + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
-            + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
+        {
+            verifier.addCliOption( "-P"
+                    + "pom-a,pom-b,pom-e,pom-c,pom-d"
+                    + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
+        }
+        else
+        {
+            verifier.addCliOption( "-P"
+                    + "pom-a,pom-b,pom-e,pom-c,pom-d"
+                    + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
+                    + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
+        }
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

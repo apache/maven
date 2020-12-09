@@ -56,7 +56,14 @@ public class MavenITmng3732ActiveProfilesTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-Ppom,profiles,settings" );
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
+        {
+            verifier.addCliOption( "-Ppom,settings" );
+        }
+        else
+        {
+            verifier.addCliOption( "-Ppom,profiles,settings" );
+        }
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
