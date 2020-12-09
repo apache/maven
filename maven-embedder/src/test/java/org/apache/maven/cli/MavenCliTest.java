@@ -20,7 +20,7 @@ package org.apache.maven.cli;
  */
 
 import static java.util.Arrays.asList;
-import static org.apache.maven.cli.MavenCli.determineProfileActivation;
+import static org.apache.maven.cli.MavenCli.performProfileActivation;
 import static org.apache.maven.cli.MavenCli.determineProjectActivation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,9 +47,11 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
@@ -88,25 +91,29 @@ public class MavenCliTest
     }
 
     @Test
-    public void testDetermineProfileActivation() throws ParseException
+    public void testPerformProfileActivation() throws ParseException
     {
-        MavenCli.ProfileActivation result;
-        Options options = new Options();
+        final Parser parser = new GnuParser();
+
+        final Options options = new Options();
         options.addOption( Option.builder( Character.toString( CLIManager.ACTIVATE_PROFILES ) ).hasArg().build() );
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "test1,+test2" } ) );
-        assertThat( result.activeProfiles.size(), is( 2 ) );
-        assertThat( result.activeProfiles, contains( "test1", "test2" ) );
+        ProfileActivation activation;
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "!test1,-test2" } ) );
-        assertThat( result.inactiveProfiles.size(), is( 2 ) );
-        assertThat( result.inactiveProfiles, contains( "test1", "test2" ) );
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "test1,+test2,?test3,+?test4" } ), activation );
+        assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalActiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "-test1,+test2" } ) );
-        assertThat( result.activeProfiles.size(), is( 1 ) );
-        assertThat( result.activeProfiles, contains( "test2" ) );
-        assertThat( result.inactiveProfiles.size(), is( 1 ) );
-        assertThat( result.inactiveProfiles, contains( "test1" ) );
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "!test1,-test2,-?test3,!?test4" } ), activation );
+        assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalInactiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
+
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "-test1,+test2" } ), activation );
+        assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test2" ) );
+        assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1" ) );
     }
 
     @Test

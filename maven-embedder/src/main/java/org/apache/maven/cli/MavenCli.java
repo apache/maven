@@ -54,6 +54,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -1379,9 +1380,7 @@ public class MavenCli
         request.setSelectedProjects( projectActivation.activeProjects );
         request.setExcludedProjects( projectActivation.inactiveProjects );
 
-        final ProfileActivation profileActivation = determineProfileActivation( commandLine );
-        request.addActiveProfiles( profileActivation.activeProfiles );
-        request.addInactiveProfiles( profileActivation.inactiveProfiles );
+        performProfileActivation( commandLine, request.getProfileActivation() );
 
         final String localRepositoryPath = determineLocalRepositoryPath( request );
         if ( localRepositoryPath != null )
@@ -1507,41 +1506,41 @@ public class MavenCli
     }
 
     // Visible for testing
-    static ProfileActivation determineProfileActivation( final CommandLine commandLine )
+    static void performProfileActivation( final CommandLine commandLine,
+                                          final ProfileActivation profileActivation )
     {
-        final ProfileActivation result = new ProfileActivation();
-
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
+            final String[] optionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+
+            if ( optionValues == null || optionValues.length == 0 )
             {
-                for ( String profileOptionValue : profileOptionValues )
+                return;
+            }
+
+            for ( final String optionValue : optionValues )
+            {
+                for ( String token : optionValue.split( "," ) )
                 {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
+                    String profileId = token.trim();
+                    boolean active = true;
+                    if ( profileId.charAt( 0 ) == '-' || profileId.charAt( 0 ) == '!' )
                     {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            result.deactivate( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            result.activate( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            result.activate( profileAction );
-                        }
+                        active = false;
+                        profileId = profileId.substring( 1 );
                     }
+                    else if ( token.charAt( 0 ) == '+' )
+                    {
+                        profileId = profileId.substring( 1 );
+                    }
+
+                    boolean optional = profileId.charAt( 0 ) == '?';
+                    profileId = profileId.substring( optional ? 1 : 0 );
+
+                    profileActivation.addProfileActivation( profileId, active, optional );
                 }
             }
         }
-
-        return result;
     }
 
     private ExecutionListener determineExecutionListener()
@@ -1794,23 +1793,6 @@ public class MavenCli
         throws ComponentLookupException
     {
         return container.lookup( ModelProcessor.class );
-    }
-
-    // Visible for testing
-    static class ProfileActivation
-    {
-        final List<String> activeProfiles = new ArrayList<>();
-        final List<String> inactiveProfiles = new ArrayList<>();
-
-        public void deactivate( final String profile )
-        {
-            inactiveProfiles.add( profile );
-        }
-
-        public void activate( final String profile )
-        {
-            activeProfiles.add( profile );
-        }
     }
 
     // Visible for testing

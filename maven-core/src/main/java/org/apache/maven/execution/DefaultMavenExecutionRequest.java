@@ -76,6 +76,8 @@ public class DefaultMavenExecutionRequest
 
     private List<Profile> profiles;
 
+    private final ProfileActivation profileActivation = new ProfileActivation();
+
     private List<String> pluginGroups;
 
     private boolean isProjectPresent = true;
@@ -129,10 +131,6 @@ public class DefaultMavenExecutionRequest
     private Date startTime;
 
     private boolean showErrors = false;
-
-    private List<String> activeProfiles;
-
-    private List<String> inactiveProfiles;
 
     private TransferListener transferListener;
 
@@ -343,11 +341,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( activeProfiles != null )
         {
-            this.activeProfiles = new ArrayList<>( activeProfiles );
-        }
-        else
-        {
-            this.activeProfiles = null;
+            this.profileActivation.overwriteActiveProfiles( activeProfiles );
         }
 
         return this;
@@ -358,14 +352,16 @@ public class DefaultMavenExecutionRequest
     {
         if ( inactiveProfiles != null )
         {
-            this.inactiveProfiles = new ArrayList<>( inactiveProfiles );
-        }
-        else
-        {
-            this.inactiveProfiles = null;
+            this.profileActivation.overwriteInactiveProfiles( inactiveProfiles );
         }
 
         return this;
+    }
+
+    @Override
+    public ProfileActivation getProfileActivation()
+    {
+        return this.profileActivation;
     }
 
     @Override
@@ -406,21 +402,13 @@ public class DefaultMavenExecutionRequest
     @Override
     public List<String> getActiveProfiles()
     {
-        if ( activeProfiles == null )
-        {
-            activeProfiles = new ArrayList<>();
-        }
-        return activeProfiles;
+        return this.profileActivation.getActiveProfiles();
     }
 
     @Override
     public List<String> getInactiveProfiles()
     {
-        if ( inactiveProfiles == null )
-        {
-            inactiveProfiles = new ArrayList<>();
-        }
-        return inactiveProfiles;
+        return this.profileActivation.getInactiveProfiles();
     }
 
     @Override

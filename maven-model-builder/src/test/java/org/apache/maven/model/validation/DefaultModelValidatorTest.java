@@ -403,6 +403,16 @@ public class DefaultModelValidatorTest
     }
 
     @Test
+    public void testInvalidProfileId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "invalid-profile-id.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "?invalid-id" ) );
+    }
+
     public void testDuplicateProfileId()
         throws Exception
     {

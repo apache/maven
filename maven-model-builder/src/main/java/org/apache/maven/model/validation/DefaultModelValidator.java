@@ -190,6 +190,8 @@ public class DefaultModelValidator
             {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
+                validateId( prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, m );
+
                 if ( !profileIds.add( profile.getId() ) )
                 {
                     addViolation( problems, errOn30, Version.V20, "profiles.profile.id", null,
