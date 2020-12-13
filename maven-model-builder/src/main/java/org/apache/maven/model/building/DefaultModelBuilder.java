@@ -1793,7 +1793,7 @@ public class DefaultModelBuilder
      * This is an inner class, as it must be able to call readRawModel() 
      * 
      * @author Robert Scholte
-     * @since 3.7.0
+     * @since 4.0.0
      */
     private class DefaultTransformerContextBuilder implements TransformerContextBuilder
     {

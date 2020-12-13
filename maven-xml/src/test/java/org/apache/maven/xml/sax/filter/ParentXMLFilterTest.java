@@ -107,7 +107,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
                         + "<relativePath/>" // SAX optimization, however "" != null ...
-                        + "</parent>";;
+                        + "</parent>";
 
         String actual = transform( input );
 

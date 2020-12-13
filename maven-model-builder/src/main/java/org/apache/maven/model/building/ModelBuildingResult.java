@@ -45,7 +45,7 @@ public interface ModelBuildingResult
     /**
      * 
      * @return the file model
-     * @since 3.7.0
+     * @since 4.0.0
      */
     Model getFileModel();
 

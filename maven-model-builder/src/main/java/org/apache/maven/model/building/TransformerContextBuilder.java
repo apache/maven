@@ -24,7 +24,7 @@ package org.apache.maven.model.building;
  * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
  * 
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public interface TransformerContextBuilder
 {

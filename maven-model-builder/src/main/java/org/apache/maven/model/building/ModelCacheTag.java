@@ -131,7 +131,7 @@ interface ModelCacheTag<T>
 
     /**
      * The tag used for the file model without profile activation
-     * @since 3.7.0
+     * @since 4.0.0
      */
     ModelCacheTag<Model> FILE = new ModelCacheTag<Model>() 
     {

@@ -271,7 +271,7 @@ public class DefaultProjectBuilder
     {
         ProjectBuildingRequest configuration = config.request;
 
-        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
         RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
@@ -391,12 +391,12 @@ public class DefaultProjectBuilder
         boolean noErrors =
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
                    config, poolBuilder );
-        
+
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
-            // Phase 2: get effective from the reactor
+            // Phase 2: get effective models from the reactor
             noErrors =
                 build( results, new ArrayList<>(), projectIndex, interimResults, request,
                         new HashMap<>(), config.session ) && noErrors;
@@ -489,7 +489,7 @@ public class DefaultProjectBuilder
         
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
-        
+
         if ( recursive )
         {
             File basedir = pomFile.getParentFile();
