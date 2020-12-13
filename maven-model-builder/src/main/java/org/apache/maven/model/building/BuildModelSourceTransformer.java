@@ -59,7 +59,7 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
     {
         BuildPomXMLFilterFactory buildPomXMLFilterFactory =
             new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer, false );
-        
+
         return buildPomXMLFilterFactory.get( pomFile );
     }
     

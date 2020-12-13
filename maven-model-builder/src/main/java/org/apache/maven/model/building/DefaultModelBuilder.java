@@ -120,7 +120,7 @@ public class DefaultModelBuilder
 
     @Inject
     private ModelPathTranslator modelPathTranslator;
-    
+
     @Inject
     private ModelUrlNormalizer modelUrlNormalizer;
     
@@ -776,12 +776,12 @@ public class DefaultModelBuilder
         return rawModel;
     }
 
-    private Model getModelFromCache( Source modelSource, ModelCache cache )
+    private Model getModelFromCache( Source source, ModelCache cache )
     {
         Model model;
-        if ( modelSource instanceof ArtifactModelSource )
+        if ( source instanceof ArtifactModelSource )
         {
-            ArtifactModelSource artifactModelSource = ( ArtifactModelSource ) modelSource;
+            ArtifactModelSource artifactModelSource = ( ArtifactModelSource ) source;
             ModelData modelData = fromCache( cache, artifactModelSource.getGroupId(),
                                             artifactModelSource.getArtifactId(),
                                             artifactModelSource.getVersion(), ModelCacheTag.RAW );
@@ -796,7 +796,7 @@ public class DefaultModelBuilder
         }
         else
         {
-            model = fromCache( cache, modelSource, ModelCacheTag.FILE );
+            model = fromCache( cache, source, ModelCacheTag.FILE );
         }
         return model;
     }
@@ -1866,7 +1866,7 @@ public class DefaultModelBuilder
                 {
                     if ( !Files.isRegularFile( p ) )
                     {
-                        throw new IllegalArgumentException( "Not a regular file" + p );
+                        throw new IllegalArgumentException( "Not a regular file: " + p );
                     }
                     
                     DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
@@ -1901,8 +1901,9 @@ public class DefaultModelBuilder
             }
             return sources.stream().reduce( ( a, b ) ->
             {
-                throw new IllegalStateException( "No unique Source for " + groupId + ':' + artifactId
-                        + ": " + a.getLocation() + " and " + b.getLocation() );
+                throw new IllegalStateException( String.format( "No unique Source for %s:%s: %s and %s ", 
+                                                                groupId, artifactId, 
+                                                                a.getLocation(), b.getLocation() ) );
             } ).orElse( null );
         }
 

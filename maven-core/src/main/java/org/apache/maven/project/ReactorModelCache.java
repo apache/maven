@@ -36,7 +36,7 @@ class ReactorModelCache
 {
 
     private final Map<Object, Object> models = new ConcurrentHashMap<>( 256 );
-    
+
     @Override
     public Object get( String groupId, String artifactId, String version, String tag )
     {

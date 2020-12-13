@@ -45,7 +45,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
      *
      * @param context a set of data to extract values from as required for the build pom
      * @param lexicalHandlerConsumer the lexical handler consumer
-     * @param consume true is this factory used for creating the consumer pom, otherwise false
+     * @param consume {@code true} if this factory is being used for creating the consumer pom, otherwise {@code false}
      */
     public DefaultBuildPomXMLFilterFactory( TransformerContext context,
                                             Consumer<LexicalHandler> lexicalHandlerConsumer, 

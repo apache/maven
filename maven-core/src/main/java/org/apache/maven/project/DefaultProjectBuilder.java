@@ -610,7 +610,7 @@ public class DefaultProjectBuilder
                            RepositorySystemSession session )
     {
         boolean noErrors = true;
-        
+
         for ( InterimResult interimResult : interimResults )
         {
             MavenProject project = interimResult.listener.getProject();
@@ -656,7 +656,6 @@ public class DefaultProjectBuilder
                 }
                 else
                 {
-                    // building effective model includes validation, make sure effectiveModel is available 
                     project.setModel( interimResult.result.getEffectiveModel() );
 
                     result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
