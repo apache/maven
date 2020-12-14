@@ -272,6 +272,13 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {
+        return build( request, new LinkedHashSet<>() );
+    }
+
+    @SuppressWarnings( "checkstyle:methodlength" )
+    protected ModelBuildingResult build( ModelBuildingRequest request, Collection<String> importIds )
+        throws ModelBuildingException
+    {
         // phase 1
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
@@ -287,7 +294,7 @@ public class DefaultModelBuilder
 
         if ( !request.isTwoPhaseBuilding() )
         {
-            return build( request, result );
+            return build( request, result, importIds );
         }
         else if ( hasModelErrors( problems ) )
         {
@@ -1506,7 +1513,7 @@ public class DefaultModelBuilder
                     final ModelBuildingResult importResult;
                     try
                     {
-                        importResult = build( importRequest );
+                        importResult = build( importRequest, importIds );
                     }
                     catch ( ModelBuildingException e )
                     {
