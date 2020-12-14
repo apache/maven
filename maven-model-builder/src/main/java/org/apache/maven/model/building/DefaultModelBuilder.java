@@ -1901,7 +1901,7 @@ public class DefaultModelBuilder
             }
             return sources.stream().reduce( ( a, b ) ->
             {
-                throw new IllegalStateException( String.format( "No unique Source for %s:%s: %s and %s ", 
+                throw new IllegalStateException( String.format( "No unique Source for %s:%s: %s and %s", 
                                                                 groupId, artifactId, 
                                                                 a.getLocation(), b.getLocation() ) );
             } ).orElse( null );

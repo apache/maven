@@ -65,7 +65,7 @@ public interface ModelBuildingRequest
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
 
     /**
-     * Gets the file model to build (with profile activatio). 
+     * Gets the file model to build (with profile activation). 
      * If not set, model source will be used to load file model.
      *
      * @return The file model to build or {@code null} if not set.
@@ -81,7 +81,7 @@ public interface ModelBuildingRequest
      * @since 4.0.0
      */
     ModelBuildingRequest setFileModel( Model fileModel );
-    
+
     /**
      * @deprecated rawModel is never set, instead the fileModel is set 
      */
