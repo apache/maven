@@ -107,6 +107,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng7045DropUselessAndOutdatedCdiApiTest.class );
         suite.addTestSuite( MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest.class );
         suite.addTestSuite( MavenITmng6754TimestampInMultimoduleProject.class );
         suite.addTestSuite( MavenITmng6981ProjectListShouldIncludeChildrenTest.class );
