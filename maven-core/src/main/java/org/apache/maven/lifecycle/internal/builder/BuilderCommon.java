@@ -19,7 +19,12 @@ package org.apache.maven.lifecycle.internal.builder;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,7 +47,9 @@ import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -50,11 +57,13 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
@@ -105,6 +114,18 @@ public class BuilderCommon
 
         lifecycleDebugLogger.debugProjectPlan( project, executionPlan );
 
+        findNonThreadSafePlugins( project, executionPlan, session );
+
+        findUnversionedPlugins( project, executionPlan );
+
+        findUnknownParameterNames( project, executionPlan );
+
+        return executionPlan;
+    }
+
+    private void findNonThreadSafePlugins( MavenProject project, MavenExecutionPlan executionPlan,
+                                               MavenSession session )
+    {
         if ( session.getRequest().getDegreeOfConcurrency() > 1 )
         {
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
@@ -140,7 +161,10 @@ public class BuilderCommon
                 logger.warn( "*****************************************************************" );
             }
         }
-        
+    }
+
+    private void findUnversionedPlugins( MavenProject project, MavenExecutionPlan executionPlan )
+    {
         final String defaulModelId = DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID;
         
         List<String> unversionedPlugins = executionPlan.getMojoExecutions().stream()
@@ -157,8 +181,63 @@ public class BuilderCommon
             logger.warn( "Version not locked for default bindings plugins " + unversionedPlugins
                 + ", you should define versions in pluginManagement section of your " + "pom.xml or parent" );
         }
+    }
 
-        return executionPlan;
+    private void findUnknownParameterNames( MavenProject project, MavenExecutionPlan executionPlan )
+    {
+        // Verify that all configured parameters in the pom match a parameter of the mojo
+        Map<Plugin, List<MojoExecution>> sharedExecutions = executionPlan.getMojoExecutions().stream()
+            .collect( Collectors.groupingBy( MojoExecution::getPlugin ) );
+        
+        for ( Map.Entry<Plugin, List<MojoExecution>> entry : sharedExecutions.entrySet() )
+        {
+            Map<String, Set<String>> validParametersPerExecutionId = new HashMap<>();
+            
+            entry.getValue().stream()
+                .filter( e -> e.getMojoDescriptor().getParameters() != null )
+                .forEach( e -> validParametersPerExecutionId.computeIfAbsent( e.getExecutionId(), 
+                      k -> new HashSet<>() ).addAll( parameterNames( e.getMojoDescriptor().getParameters() ) ) );
+
+            for ( Map.Entry<String, PluginExecution> pc : entry.getKey().getExecutionsAsMap().entrySet() )
+            {
+                Set<String> validParams =
+                    validParametersPerExecutionId.getOrDefault( pc.getKey(), Collections.emptySet() );
+                Xpp3Dom pluginConfiguration = (Xpp3Dom) pc.getValue().getConfiguration();
+                
+                if ( pluginConfiguration != null )
+                {
+                    List<Xpp3Dom> unknownParameters = Arrays.stream( pluginConfiguration.getChildren() )
+                                    .filter( e -> !validParams.contains( e.getName() ) )
+                                    .collect( Collectors.toList() );
+
+                    if ( !unknownParameters.isEmpty() )
+                    {
+                        logger.warn( String.format( "Unknown parameters for %s (%s):", 
+                                                   entry.getKey().getId(), pc.getKey(), unknownParameters ) );
+                        
+                        for ( Xpp3Dom param : unknownParameters )
+                        {
+                            InputLocation loc = (InputLocation) param.getInputLocation();
+                            
+                            // in case the parameter is defined in 'project', we could break the build
+                            logger.warn( String.format( "  <%s> @ %s, line %s", 
+                                        param.getName(), loc.getSource().getModelId(), loc.getLineNumber() ) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private Set<String> parameterNames( List<Parameter> parameters )
+    {
+        Set<String> names = new HashSet<>( parameters.size() * 2 );
+        for ( Parameter p : parameters )
+        {
+            names.add( p.getName() );
+            names.add( p.getAlias() );
+        }
+        return names;
     }
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
