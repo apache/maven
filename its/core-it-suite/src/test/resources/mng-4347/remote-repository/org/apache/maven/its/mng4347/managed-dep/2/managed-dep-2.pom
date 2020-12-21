@@ -22,27 +22,8 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it.mng4347</groupId>
-  <artifactId>dep-with-import</artifactId>
+  <groupId>org.apache.maven.its.mng4347</groupId>
+  <artifactId>managed-dep</artifactId>
   <packaging>jar</packaging>
-  <version>1</version>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.maven.it.mng4347</groupId>
-        <artifactId>import-dep</artifactId>
-        <version>1-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.it.mng4347</groupId>
-      <artifactId>managed-dep</artifactId>
-    </dependency>
-  </dependencies>
+  <version>2</version>
 </project>

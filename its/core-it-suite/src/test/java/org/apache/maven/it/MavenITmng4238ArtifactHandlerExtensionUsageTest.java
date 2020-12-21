@@ -34,7 +34,7 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    private static final String GID = "org.apache.maven.it.mng4238";
+    private static final String GID = "org.apache.maven.its.mng4238";
     private static final String AID = "mng-4238";
     private static final String VERSION = "1";
     private static final String TYPE = "jar";

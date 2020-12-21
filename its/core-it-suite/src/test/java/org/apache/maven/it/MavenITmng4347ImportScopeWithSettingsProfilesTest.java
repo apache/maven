@@ -51,7 +51,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.it.mng4347" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4347" );
         
         verifier.setAutoclean( false );
         

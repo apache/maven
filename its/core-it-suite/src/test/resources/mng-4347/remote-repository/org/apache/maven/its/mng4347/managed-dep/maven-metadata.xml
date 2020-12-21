@@ -20,7 +20,7 @@ under the License.
 -->
 
 <metadata>
-  <groupId>org.apache.maven.it.mng4347</groupId>
+  <groupId>org.apache.maven.its.mng4347</groupId>
   <artifactId>managed-dep</artifactId>
   <version>2</version>
   <versioning>

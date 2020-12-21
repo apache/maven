@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it.mng3203</groupId>
+  <groupId>org.apache.maven.its.mng3203</groupId>
   <artifactId>mng-3203</artifactId>
   <packaging>jar</packaging>
   <version>1</version>

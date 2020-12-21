@@ -19,11 +19,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.it.mng4347</groupId>
-  <artifactId>managed-dep</artifactId>
-  <packaging>jar</packaging>
-  <version>2</version>
-</project>
+<metadata>
+  <groupId>org.apache.maven.its.mng4347</groupId>
+  <artifactId>dep-with-import</artifactId>
+  <version>1</version>
+  <versioning>
+    <versions>
+      <version>1</version>
+    </versions>
+    <lastUpdated>20090909201015</lastUpdated>
+  </versioning>
+</metadata>

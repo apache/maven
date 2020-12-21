@@ -51,7 +51,7 @@ public class MavenITmng4148DepPomInterpWithSettingsProfilesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.it.mng4148" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4148" );
         
         verifier.setAutoclean( false );
         

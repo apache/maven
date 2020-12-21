@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-  <groupId>org.apache.maven.it.mng4347</groupId>
+  <groupId>org.apache.maven.its.mng4347</groupId>
   <artifactId>import-dep</artifactId>
   <version>1-SNAPSHOT</version>
   <versioning>
