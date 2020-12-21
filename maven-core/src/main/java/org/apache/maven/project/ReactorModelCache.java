@@ -109,48 +109,6 @@ class ReactorModelCache
         }
     }
     
-    private static final class GACacheKey
-    {
-        private final String groupId;
-        
-        private final String artifactId;
-        
-        private final int hashCode;
-
-        GACacheKey( String groupId, String artifactId )
-        {
-            super();
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.hashCode = Objects.hash( groupId, artifactId );
-        }
-        
-        @Override
-        public int hashCode()
-        {
-            return Objects.hash( artifactId, groupId, hashCode );
-        }
-
-        @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
-                return true;
-            }
-            if ( obj == null )
-            {
-                return false;
-            }
-            if ( getClass() != obj.getClass() )
-            {
-                return false;
-            }
-            GACacheKey other = (GACacheKey) obj;
-            return Objects.equals( artifactId, other.artifactId ) && Objects.equals( groupId, other.groupId );
-        }
-    }
-    
     private static final class SourceCacheKey
     {
         private final Source source;
