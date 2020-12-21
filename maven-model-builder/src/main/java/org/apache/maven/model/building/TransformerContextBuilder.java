@@ -19,29 +19,28 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-
 /**
- * The ModelSourceTransformer is a way to transform the local pom while streaming the input.
- *
- * The {@link #transform(Path, TransformerContext)} method uses a Path on purpose, to ensure the
- * local pom is the the original source.
+ * The transformerContextBuilder is responsible for initializing the TransformerContext.
+ * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public interface ModelSourceTransformer
+public interface TransformerContextBuilder
 {
     /**
+     * This method is used to initialize the TransformerContext
      *
-     * @param pomFile the pom file, cannot be null
-     * @param context the context, cannot be null
-     * @return the InputStream for the ModelReader
-     * @throws IOException if an I/O error occurs
-     * @throws TransformerException if the transformation fails
+     * @param request the modelBuildingRequest
+     * @param problems the problemCollector
+     * @return the mutable transformerContext
      */
-    InputStream transform( Path pomFile, TransformerContext context )
-        throws IOException, TransformerException;
+    TransformerContext initialize( ModelBuildingRequest request, ModelProblemCollector problems );
+
+    /**
+     * The immutable transformerContext, can be used after the buildplan is finished.
+     *
+     * @return the immutable transformerContext
+     */
+    TransformerContext build();
 }

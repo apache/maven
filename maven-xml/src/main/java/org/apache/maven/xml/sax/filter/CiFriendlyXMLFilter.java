@@ -26,27 +26,30 @@ import org.xml.sax.SAXException;
 
 /**
  * Resolves all ci-friendly properties occurrences between version-tags
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
 class CiFriendlyXMLFilter
     extends AbstractSAXFilter
 {
+    private final boolean replace;
+
     private Function<String, String> replaceChain = Function.identity();
-    
-    private String characters; 
-    
+
+    private String characters;
+
     private boolean parseVersion;
-    
-    CiFriendlyXMLFilter()
+
+    CiFriendlyXMLFilter( boolean replace )
     {
-        super();
+        this.replace = replace;
     }
 
-    CiFriendlyXMLFilter( AbstractSAXFilter parent )
+    CiFriendlyXMLFilter( AbstractSAXFilter parent, boolean replace )
     {
         super( parent );
+        this.replace = replace;
     }
 
     public CiFriendlyXMLFilter setChangelist( String changelist )
@@ -54,7 +57,7 @@ class CiFriendlyXMLFilter
         replaceChain = replaceChain.andThen( t -> t.replace( "${changelist}", changelist ) );
         return this;
     }
-    
+
     public CiFriendlyXMLFilter setRevision( String revision )
     {
         replaceChain = replaceChain.andThen( t -> t.replace( "${revision}", revision ) );
@@ -66,7 +69,7 @@ class CiFriendlyXMLFilter
         replaceChain = replaceChain.andThen( t -> t.replace( "${sha1}", sha1 ) );
         return this;
     }
-    
+
     /**
      * @return {@code true} is any of the ci properties is set, otherwise {@code false}
      */
@@ -74,7 +77,7 @@ class CiFriendlyXMLFilter
     {
         return !replaceChain.equals( Function.identity() );
     }
-    
+
     @Override
     public void characters( char[] ch, int start, int length )
         throws SAXException
@@ -100,7 +103,7 @@ class CiFriendlyXMLFilter
 
         super.startElement( uri, localName, qName, atts );
     }
-    
+
     @Override
     public void endElement( String uri, String localName, String qName )
         throws SAXException
@@ -108,7 +111,7 @@ class CiFriendlyXMLFilter
         if ( parseVersion )
         {
             // assuming this has the best performance
-            if ( characters != null && characters.contains( "${" ) )
+            if ( replace && characters != null && characters.contains( "${" ) )
             {
                 char[] ch = replaceChain.apply( characters ).toCharArray();
                 super.characters( ch, 0, ch.length );

@@ -35,7 +35,7 @@ public class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests
     @Before
     public void setUp()
     {
-        filter = new CiFriendlyXMLFilter();
+        filter = new CiFriendlyXMLFilter( true );
         filter.setChangelist( "CHANGELIST" );
     }
     

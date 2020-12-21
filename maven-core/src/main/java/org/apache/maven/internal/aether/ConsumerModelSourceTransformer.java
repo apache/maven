@@ -46,13 +46,13 @@ import org.xml.sax.ext.LexicalHandler;
 class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
 {
     @Override
-    protected AbstractSAXFilter getSAXFilter( Path pomFile, 
+    protected AbstractSAXFilter getSAXFilter( Path pomFile,
                                               TransformerContext context,
                                               Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
         return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context,
-                                                                        lexicalHandlerConsumer ) ).get( pomFile );
+                                                                        lexicalHandlerConsumer, true ) ).get( pomFile );
     }
     
     /**

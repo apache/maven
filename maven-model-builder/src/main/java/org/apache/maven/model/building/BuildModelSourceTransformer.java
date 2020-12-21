@@ -58,7 +58,7 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
         BuildPomXMLFilterFactory buildPomXMLFilterFactory =
-            new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer );
+            new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer, false );
 
         return buildPomXMLFilterFactory.get( pomFile );
     }

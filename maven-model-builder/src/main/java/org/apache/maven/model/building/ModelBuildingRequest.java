@@ -63,16 +63,19 @@ public interface ModelBuildingRequest
      * Denotes strict validation as recommended by the current Maven version.
      */
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
-    
+
     /**
-     * 
-     * @return the file model
+     * Gets the file model to build (with profile activation).
+     * If not set, model source will be used to load file model.
+     *
+     * @return The file model to build or {@code null} if not set.
      * @since 4.0.0
      */
     Model getFileModel();
-    
+
     /**
-     * 
+     * Set the file model with profile activation
+     *
      * @param fileModel
      * @return This request, never {@code null}.
      * @since 4.0.0
@@ -80,17 +83,15 @@ public interface ModelBuildingRequest
     ModelBuildingRequest setFileModel( Model fileModel );
 
     /**
-     * Gets the raw model to build. If not set, model source will be used to load raw model.
-     *
-     * @return The raw model to build or {@code null} if not set.
+     * @deprecated rawModel is never set, instead the fileModel is set
      */
+    @Deprecated
     Model getRawModel();
 
     /**
-     * Set raw model.
-     *
-     * @param rawModel
+     * @deprecated setting the rawModel has no effect, instead the fileModel of phase one will be set
      */
+    @Deprecated
     ModelBuildingRequest setRawModel( Model rawModel );
 
     /**
@@ -349,10 +350,9 @@ public interface ModelBuildingRequest
     WorkspaceModelResolver getWorkspaceModelResolver();
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
-    
-    TransformerContext getTransformerContext();
 
-    ModelBuildingRequest setTransformerContext( TransformerContext context );
-    
-    
+    TransformerContextBuilder getTransformerContextBuilder();
+
+    ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder );
+
 }

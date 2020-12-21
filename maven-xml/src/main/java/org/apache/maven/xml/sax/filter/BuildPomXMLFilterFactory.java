@@ -41,16 +41,19 @@ import org.xml.sax.ext.LexicalHandler;
  */
 public class BuildPomXMLFilterFactory
 {
+    private final boolean consume;
+
     private final Consumer<LexicalHandler> lexicalHandlerConsumer;
-    
-    public BuildPomXMLFilterFactory()
-    {
-        this( null ); 
-    }
-    
+
     public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
     {
+        this( lexicalHandlerConsumer, false );
+    }
+
+    public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer, boolean consume )
+    {
         this.lexicalHandlerConsumer = lexicalHandlerConsumer;
+        this.consume = consume;
     }
 
     /**
@@ -89,6 +92,18 @@ public class BuildPomXMLFilterFactory
             parent = parentFilter;
         }
 
+        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( consume );
+        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
+        getRevision().ifPresent( ciFriendlyFilter::setRevision );
+        getSha1().ifPresent( ciFriendlyFilter::setSha1 );
+
+        if ( ciFriendlyFilter.isSet() )
+        {
+            ciFriendlyFilter.setParent( parent );
+            parent.setLexicalHandler( ciFriendlyFilter );
+            parent = ciFriendlyFilter;
+        }
+
         return new BuildPomXMLFilter( parent );
     }
     
@@ -98,7 +113,7 @@ public class BuildPomXMLFilterFactory
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
         return xmlReader;
     }
-    
+
     /**
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */
@@ -111,4 +126,22 @@ public class BuildPomXMLFilterFactory
     {
         return null;
     }
+
+    // getters for the 3 magic properties of CIFriendly versions ( https://maven.apache.org/maven-ci-friendly.html )
+
+    protected Optional<String> getChangelist()
+    {
+        return Optional.empty();
+    }
+
+    protected Optional<String> getRevision()
+    {
+        return Optional.empty();
+    }
+
+    protected Optional<String> getSha1()
+    {
+        return Optional.empty();
+    }
+
 }

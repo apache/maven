@@ -19,6 +19,7 @@ package org.apache.maven.xml.sax.filter;
  * under the License.
  */
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -34,10 +35,10 @@ import org.xml.sax.SAXException;
  * <p>
  * Transforms relativePath to version.
  * We could decide to simply allow {@code <parent/>}, but let's require the GA for now for checking
- * This filter does NOT remove the relativePath (which is done by {@link RelativePathXMLFilter}, it will only 
- * optionally include the version based on the path 
+ * This filter does NOT remove the relativePath (which is done by {@link RelativePathXMLFilter}, it will only
+ * optionally include the version based on the path
  * </p>
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -51,24 +52,24 @@ class ParentXMLFilter
 
     // whiteSpace after <parent>, to be used to position <version>
     private String parentWhitespace = "";
-    
+
     private String groupId;
 
     private String artifactId;
-    
+
     private String relativePath;
 
     private boolean hasVersion;
-    
+
+    private boolean hasRelativePath;
+
     private Optional<RelativeProject> resolvedParent;
 
     private final Function<Path, Optional<RelativeProject>> relativePathMapper;
-    
+
     private Path projectPath;
 
     /**
-     * 
-     * 
      * @param relativePathMapper
      */
     ParentXMLFilter( Function<Path, Optional<RelativeProject>> relativePathMapper )
@@ -80,7 +81,7 @@ class ParentXMLFilter
     {
         this.projectPath = projectPath;
     }
-    
+
     @Override
     protected boolean isParsing()
     {
@@ -92,7 +93,7 @@ class ParentXMLFilter
     {
         return state;
     }
-    
+
     @Override
     public void startElement( String uri, final String localName, String qName, Attributes atts )
         throws SAXException
@@ -105,10 +106,13 @@ class ParentXMLFilter
         if ( parsingParent )
         {
             state = localName;
-            
+
             hasVersion |= "version".equals( localName );
+
+            // can be set to empty on purpose to enforce repository download
+            hasRelativePath |= "relativePath".equals( localName );
         }
-        
+
         super.startElement( uri, localName, qName, atts );
     }
 
@@ -119,9 +123,9 @@ class ParentXMLFilter
         if ( parsingParent )
         {
             final String eventState = state;
-            
+
             final String charSegment =  new String( ch, start, length );
-            
+
             switch ( eventState )
             {
                 case "parent":
@@ -140,7 +144,7 @@ class ParentXMLFilter
                     break;
             }
         }
-        
+
         super.characters( ch, start, length );
     }
 
@@ -153,33 +157,37 @@ class ParentXMLFilter
             switch ( localName )
             {
                 case "parent":
-                    if ( !hasVersion || relativePath != null )
+                    if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
                     {
                         resolvedParent =
                             resolveRelativePath( Paths.get( Objects.toString( relativePath, "../pom.xml" ) ) );
                     }
-                    
+                    else
+                    {
+                        resolvedParent = Optional.empty();
+                    }
+
                     if ( !hasVersion && resolvedParent.isPresent() )
                     {
                         try ( Includer i = super.include() )
                         {
                             super.characters( parentWhitespace.toCharArray(), 0,
                                               parentWhitespace.length() );
-                            
+
                             String versionQName = SAXEventUtils.renameQName( qName, "version" );
-                            
+
                             super.startElement( uri, "version", versionQName, null );
-                            
+
                             String resolvedParentVersion = resolvedParent.get().getVersion();
-                            
+
                             super.characters( resolvedParentVersion.toCharArray(), 0,
                                                           resolvedParentVersion.length() );
-                            
+
                             super.endElement( uri, "version", versionQName );
                         }
                     }
                     super.executeEvents();
-                    
+
                     parsingParent = false;
                     break;
                 default:
@@ -187,20 +195,25 @@ class ParentXMLFilter
                     break;
             }
         }
-        
+
         super.endElement( uri, localName, qName );
         state = "";
     }
 
     protected Optional<RelativeProject> resolveRelativePath( Path relativePath )
     {
-        Optional<RelativeProject> mappedProject =
-            relativePathMapper.apply( projectPath.resolve( relativePath ).normalize() );
-        
+        Path pomPath = projectPath.resolve( relativePath );
+        if ( Files.isDirectory( pomPath ) )
+        {
+            pomPath = pomPath.resolve( "pom.xml" );
+        }
+
+        Optional<RelativeProject> mappedProject = relativePathMapper.apply( pomPath.normalize() );
+
         if ( mappedProject.isPresent() )
         {
             RelativeProject project = mappedProject.get();
-            
+
             if ( Objects.equals( groupId, project.getGroupId() )
                 && Objects.equals( artifactId, project.getArtifactId() ) )
             {

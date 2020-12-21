@@ -47,10 +47,10 @@ public interface TransformerContext
     /**
      * Get the model based on the path, will be used to resolve the parent based on relativePath
      * 
-     * @param p the path
+     * @param pomFile the path to the pomFile
      * @return the model, otherwise {@code null}
      */
-    Model getRawModel( Path p );
+    Model getRawModel( Path pomFile );
     
     /**
      * Get the model from the reactor based on the groupId and artifactId, will be used for reactor dependencies
@@ -60,5 +60,5 @@ public interface TransformerContext
      * @return the model, otherwise {@code null}
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
-    Model getRawModel( String groupId, String artifactId ) throws IllegalStateException;
+    Model getRawModel( String groupId, String artifactId );
 }
