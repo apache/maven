@@ -109,6 +109,7 @@ public class MavenITmng5669ReadPomsOnce
                                       verifier.getArtifactPath( "mng-coreit", "javaagent", "1.0-SNAPSHOT", "jar" ) );
         verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
 
+        verifier.setLogFileName( "log-bc.txt" );
         verifier.setForkJvm( true ); // pick up agent
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
@@ -118,7 +119,7 @@ public class MavenITmng5669ReadPomsOnce
         verifier.executeGoals( Arrays.asList( "verify" ) );
         verifier.resetStreams();
 
-        List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
+        List<String> logTxt = verifier.loadLines( "log-bc.txt", "utf-8" );
         for ( String line : logTxt )
         {
             if ( line.startsWith( "Picked up JAVA_TOOL_OPTIONS:" ) )

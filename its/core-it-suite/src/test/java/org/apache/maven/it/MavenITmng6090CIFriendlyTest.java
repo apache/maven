@@ -50,7 +50,7 @@ public class MavenITmng6090CIFriendlyTest
      * install the projects and afterwards just build
      * a part of the whole reactor.
      */
-    public void testitShouldResolveTheDependencies()
+    public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6090-ci-friendly" );
@@ -60,6 +60,7 @@ public class MavenITmng6090CIFriendlyTest
         verifier.setAutoclean( false );
         
         verifier.addCliOption( "-Drevision=1.2" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.setLogFileName( "install-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean", "install" ) );
         verifier.verifyErrorFreeLog();
@@ -74,7 +75,33 @@ public class MavenITmng6090CIFriendlyTest
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+    }
 
+    public void testitShouldResolveTheDependenciesWithBuildConsumer()
+                    throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6090-ci-friendly" );
+        
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
+        verifier.setMavenDebug( false );
+        verifier.setAutoclean( false );
+        
+        verifier.addCliOption( "-Drevision=1.2" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.setLogFileName( "install-log.txt" );
+        verifier.executeGoals( Arrays.asList( "clean", "install" ) );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        verifier = newVerifier( testDir.getAbsolutePath(), false );
+        verifier.setMavenDebug( false );
+        verifier.setAutoclean( false );
+        
+        verifier.addCliOption( "-Drevision=1.2" );
+        verifier.addCliOption( "-pl module-3" );
+        verifier.executeGoal( "package" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
 }

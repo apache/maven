@@ -106,7 +106,7 @@ public class IntegrationTestSuite
         // Tests that don't run stable and need to be fixed
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
-
+        suite.addTestSuite( MavenITmng6957BuildConsumer.class );
         suite.addTestSuite( MavenITmng7045DropUselessAndOutdatedCdiApiTest.class );
         suite.addTestSuite( MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest.class );
         suite.addTestSuite( MavenITmng6754TimestampInMultimoduleProject.class );

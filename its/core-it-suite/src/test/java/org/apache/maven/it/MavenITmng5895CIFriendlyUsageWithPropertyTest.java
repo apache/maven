@@ -49,7 +49,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
      * of defining the property via command line which is
      * already defined inside the pom. 
      */
-    public void testitShouldResolveTheDependencies()
+    public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
@@ -60,6 +60,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
 
         //verifier.setLogFileName( "log-only.txt" );
         verifier.addCliOption( "-Drevision=1.2" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.executeGoal( "clean" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
@@ -67,4 +68,23 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
 
     }
 
+    public void testitShouldResolveTheDependenciesWithBuildConsumer()
+                    throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
+        
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
+        verifier.setMavenDebug( false );
+        verifier.setAutoclean( false );
+        
+        verifier.setLogFileName( "log-bc.txt" );
+        verifier.addCliOption( "-Drevision=1.2" );
+        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.executeGoal( "clean" );
+        verifier.executeGoal( "package" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+    }
+    
 }
