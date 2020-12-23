@@ -51,7 +51,7 @@ public class MavenITmng1701DuplicatePluginTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
         boolean foundWarning = false;
         for ( String line : lines )
@@ -62,7 +62,7 @@ public class MavenITmng1701DuplicatePluginTest
                 foundWarning = true;
             }
         }
-        
+
         assertTrue( "Duplicate plugin warning wasn't generated.", foundWarning );
     }
 

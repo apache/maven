@@ -46,19 +46,19 @@ public class LookupMojo extends AbstractMojo
      * @component
      */
     private ArtifactFactory artifactFactory;
-    
+
     /**
      * @parameter expression="${project.build.directory}"
      */
     private String buildDirectory;
-    
+
     /*
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         File file = new File( buildDirectory, "lookup.log" );
-        
+
         if ( !file.getParentFile().mkdirs() )
         {
             throw new MojoExecutionException( "Cannot create build directory" );

@@ -29,13 +29,13 @@ import java.text.SimpleDateFormat;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
- * 
+ *
  *
  */
 public class MavenITmng2562TimestampTest
     extends AbstractMavenIntegrationTestCase
 {
-    
+
     public MavenITmng2562TimestampTest()
     {
         super( "[2.1.0-M1,3.2.2)" ); // 2.1.0+ only

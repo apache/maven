@@ -27,7 +27,7 @@ under the License.
   <packaging>pom</packaging>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-680</name> 
+  <name>Maven Integration Test :: MNG-680</name>
   <description>Test that the basedir of the parent is set correctly.</description>
 
   <modules>

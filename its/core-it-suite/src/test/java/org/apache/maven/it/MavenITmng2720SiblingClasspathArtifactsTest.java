@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2720">MNG-2720</a>.
- * 
+ *
  * This test will ensure that running the 'package' phase on a multimodule build with child
  * interdependency will result in one child using the JAR of the other child in its compile
  * classpath, NOT the target/classes directory. This is critical, since sibling projects might
@@ -35,7 +35,7 @@ import java.util.List;
  * sibling were built on its own.
  *
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng2720SiblingClasspathArtifactsTest
     extends AbstractMavenIntegrationTestCase
@@ -58,7 +58,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         List<String> classPath;
 
         classPath = verifier.loadLines( "child2/target/compile.txt", "UTF-8" );
@@ -69,7 +69,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
 
         classPath = verifier.loadLines( "child2/target/test.txt", "UTF-8" );
         assertMainJar( classPath );
-        
+
         classPath = verifier.loadLines( "child3/target/compile.txt", "UTF-8" );
         assertTestJar( classPath );
 

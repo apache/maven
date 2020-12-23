@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0073</name> 
+  <name>Maven Integration Test :: it0073</name>
   <groupId>org.apache.maven.its.it0073</groupId>
   <artifactId>maven-it-it0073</artifactId>
   <description>Tests context passing between mojos in the same plugin.</description>

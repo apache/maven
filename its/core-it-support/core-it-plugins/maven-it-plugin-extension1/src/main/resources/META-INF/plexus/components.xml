@@ -30,7 +30,7 @@ under the License.
         <packaging>coreit-1</packaging>
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>coreit-1</role-hint>

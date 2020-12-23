@@ -27,9 +27,9 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4360</name> 
+  <name>Maven Integration Test :: MNG-4360</name>
   <description>
-    Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more 
+    Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
     that the Jackrabbit based wagon can be properly loaded and doesn't die due to some class realm issue.
   </description>
 

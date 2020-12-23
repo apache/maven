@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-4233</name> 
+  <name>Maven Integration Test :: MNG-4233</name>
   <description>
     Verify that artifact instances created directly by plugins (i.e. via the artifact factory) can be resolved
     from the reactor. This case is a subtle variation of MNG-2877, namely not using @requiresDependencyResolution

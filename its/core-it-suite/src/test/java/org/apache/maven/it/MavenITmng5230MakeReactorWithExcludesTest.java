@@ -34,7 +34,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     public MavenITmng5230MakeReactorWithExcludesTest()
     {
-        super( "[3.2,)" ); 
+        super( "[3.2,)" );
     }
 
      private void clean( Verifier verifier )
@@ -204,7 +204,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
     }
 
-    
+
     /**
      * Verify that the project list can also specify project ids for exclusion
      */
@@ -254,7 +254,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.assertFilePresent( "mod-c/target/touch.txt" );
         verifier.assertFilePresent( "mod-d/target/touch.txt" );
     }
-    
+
      /**
      * Verify that reactor is resumed from specified project with exclude
      */

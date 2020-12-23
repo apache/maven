@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0132</name> 
+  <name>Maven Integration Test :: it0132</name>
   <description>Test default binding of goals for "pom" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

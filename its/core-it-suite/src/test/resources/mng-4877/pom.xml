@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4877</name> 
+  <name>Maven Integration Test :: MNG-4877</name>
   <description>
     Verify that configured private key and passphrase are used for (SSH) deployment.
   </description>

@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4344</name> 
+  <name>Maven Integration Test :: MNG-4344</name>
   <description>
     Test that custom executions from managed plugins which are part of the default lifecycle bindings get
     executed after executions from plugins that are defined in the regular build section and bound to the

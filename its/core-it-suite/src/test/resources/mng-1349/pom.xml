@@ -27,7 +27,7 @@ under the License.
   <packaging>jar</packaging>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-1349</name> 
+  <name>Maven Integration Test :: MNG-1349</name>
   <description>
     Tests that different checksum formats are supported.
   </description>

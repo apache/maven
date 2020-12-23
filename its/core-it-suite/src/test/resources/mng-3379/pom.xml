@@ -27,7 +27,7 @@ under the License.
   <packaging>jar</packaging>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-3379</name> 
+  <name>Maven Integration Test :: MNG-3379</name>
   <description>
     Tests that parallel downloads of artifacts from both the same and from different group ids don't corrupt
     the local repo.

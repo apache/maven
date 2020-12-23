@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2921 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-2921 :: Parent</name>
   <description>
     Verify that attached project artifacts can be resolved from the reactor as active project artifacts for
     consumption on other module's class paths. Note the subtle difference of this test compared to the closely

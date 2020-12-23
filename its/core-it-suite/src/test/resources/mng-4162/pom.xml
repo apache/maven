@@ -32,7 +32,7 @@ under the License.
     Verify that the legacy reporting section is automatically converted into ordinary plugin configuration of the
     Maven Site Plugin to ease migration.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

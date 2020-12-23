@@ -29,10 +29,10 @@ import java.io.IOException;
 
 /**
  * Creates a text file in the project base directory.
- * 
+ *
  * @goal ejb
  * @phase package
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class EjbMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -51,14 +51,14 @@ public class EjbMojo
 
     /**
      * The path to the output file, relative to the project base directory directory.
-     * 
+     *
      * @parameter
      */
     private String pathname = "target/ejb-ejb.txt";
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */

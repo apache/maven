@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3877</name> 
+  <name>Maven Integration Test :: MNG-3877</name>
   <description>
     Verify that project directories are basedir aligned when inspected by plugins.
   </description>

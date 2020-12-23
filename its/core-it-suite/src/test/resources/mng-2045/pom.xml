@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2045</name> 
+  <name>Maven Integration Test :: MNG-2045</name>
   <description>
     Verify that during a multi-module build up to phase "install" the (compile) class path of a module that
     depends on another module's test JAR actually points to the test classes/JAR and not the main classes.

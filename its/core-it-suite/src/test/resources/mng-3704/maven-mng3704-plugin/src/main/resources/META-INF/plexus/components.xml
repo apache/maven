@@ -14,7 +14,7 @@
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
-        <!--  These are missing BY DESIGN. They are new requirements, which means 
+        <!--  These are missing BY DESIGN. They are new requirements, which means
               external implementations who extend the default will not have these
               requirements. The executor should try to compensate, to remain as
               compatible as possible.

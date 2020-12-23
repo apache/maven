@@ -40,9 +40,9 @@ public class Phase2GeneratorMojo
         throws MojoExecutionException
     {
         File generatorTargetDir = getGeneratorTargetDir();
-        
+
         project.addCompileSourceRoot( generatorTargetDir.getAbsolutePath() );
-        
+
         if ( !generatorTargetDir.exists() )
         {
             generatorTargetDir.mkdirs();

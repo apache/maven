@@ -27,7 +27,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal check-plugin
- * 
+ *
  * @phase validate
  */
 public class PluginParamInterpolationMojo
@@ -44,7 +44,7 @@ public class PluginParamInterpolationMojo
     {
         myDirectory = normalize( myDirectory );
         String value = normalize( new File( project.getBuild().getDirectory(), "foo" ).getAbsolutePath() );
-        
+
         if ( !myDirectory.equals( value ) )
         {
             throw new MojoExecutionException( "Directory supplied: " + myDirectory

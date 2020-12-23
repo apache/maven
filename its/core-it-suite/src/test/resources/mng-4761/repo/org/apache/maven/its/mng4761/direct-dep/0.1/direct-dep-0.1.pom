@@ -14,7 +14,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng4761</groupId>
@@ -33,7 +33,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <resources>
       <resource>

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-479</name> 
+  <name>Maven Integration Test :: MNG-479</name>
   <description>
     Verify that using the same repo id allows to override "central". This project checks that releases can be
     disabled and this policy is effective during resolution of dependencies.

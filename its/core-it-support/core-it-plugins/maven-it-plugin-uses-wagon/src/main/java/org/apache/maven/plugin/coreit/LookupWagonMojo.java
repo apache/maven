@@ -35,10 +35,10 @@ import java.util.Properties;
 /**
  * Loads resources from a class loader used to load a wagon provider. The wagon is merely used to access the extension
  * class loader it came from which is otherwise not accessible to a plugin.
- * 
+ *
  * @goal lookup-wagon
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -48,28 +48,28 @@ public class LookupWagonMojo
 
     /**
      * The Wagon manager used to retrieve wagon providers.
-     * 
+     *
      * @component
      */
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to track the results of the wagon lookups.
-     * 
+     *
      * @parameter property="wagon.outputFile"
      */
     private File outputFile;
 
     /**
      * The URLs for which to look up wagons.
-     * 
+     *
      * @parameter
      */
     private String[] urls;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the attached file has not been set.
      */
     public void execute()

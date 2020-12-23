@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4348</name> 
+  <name>Maven Integration Test :: MNG-4348</name>
   <description>
     Test that the (remote) repos are not accessed during execution of a mojo that does not require dependency
     resolution. In detail, Maven should neither touch POMs, JARs nor metadata.

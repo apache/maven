@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>child</artifactId>
 
-  <name>Maven Integration Test :: MNG-3925</name> 
+  <name>Maven Integration Test :: MNG-3925</name>
   <description>
     Test that plugin executions (in the same phase) are properly ordered after inheritance/merge with
     parent executions.

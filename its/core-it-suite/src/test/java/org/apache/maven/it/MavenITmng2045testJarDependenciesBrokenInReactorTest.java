@@ -27,15 +27,15 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2045">MNG-2045</a>:
- * Simple IT test invoking maven in a reactor with 2 projects -- 
- * first project produces a test-jar, which is required to 
- * compile second project. 
+ * Simple IT test invoking maven in a reactor with 2 projects --
+ * first project produces a test-jar, which is required to
+ * compile second project.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author mikko.koponen@ri.fi
  */
 public class MavenITmng2045testJarDependenciesBrokenInReactorTest
-    extends AbstractMavenIntegrationTestCase 
+    extends AbstractMavenIntegrationTestCase
 {
 
     public MavenITmng2045testJarDependenciesBrokenInReactorTest()
@@ -75,7 +75,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
          * Different Maven versions use the test-classes directory or the assembled test JAR but all that matters here
          * is merely that we have the test classes on the classpath.
          */
-        assertTrue( "test classes missing in " + classpath, 
+        assertTrue( "test classes missing in " + classpath,
             classpath.contains( "test" ) || classpath.contains( "test.jar" )
                 || classpath.contains( "test-jar-0.1-SNAPSHOT-tests.jar" ) );
     }
@@ -83,7 +83,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
     private void assertNotMainClasses( List<String> classpath )
     {
         // When depending on the test JAR of some module, we shouldn't get its main classes
-        assertFalse( "main classes present in " + classpath, 
+        assertFalse( "main classes present in " + classpath,
             classpath.contains( "main" ) );
     }
 

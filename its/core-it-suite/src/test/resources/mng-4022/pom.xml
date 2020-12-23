@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-4022</name> 
+  <name>Maven Integration Test :: MNG-4022</name>
   <description>
     Test that merging of equal plugin configuration is idempotent. This is especially interesting for lists with
     empty elements.

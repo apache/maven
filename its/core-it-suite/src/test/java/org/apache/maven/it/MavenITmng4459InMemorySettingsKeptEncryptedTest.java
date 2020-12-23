@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4459">MNG-4459</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4459InMemorySettingsKeptEncryptedTest
@@ -51,7 +51,7 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getSystemProperties().setProperty( "settings.security", 
+        verifier.getSystemProperties().setProperty( "settings.security",
             new File( testDir, "settings-security.xml" ).getAbsolutePath() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
@@ -60,7 +60,7 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/settings.properties" );
-        assertEquals( "{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}", 
+        assertEquals( "{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}",
             props.getProperty( "settings.servers.0.password", "" ) );
     }
 

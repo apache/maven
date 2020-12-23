@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-3575</name> 
+  <name>Maven Integration Test :: MNG-3575</name>
   <description>
     Verify that numeric plugin parameters can be configured using hexadecimal/octal notation.
   </description>

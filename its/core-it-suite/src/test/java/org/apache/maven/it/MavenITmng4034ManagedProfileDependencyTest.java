@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4034">MNG-4034</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

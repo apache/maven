@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4233 :: Dependency Provider</name> 
+  <name>Maven Integration Test :: MNG-4233 :: Dependency Provider</name>
 
   <build>
     <plugins>

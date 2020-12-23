@@ -10,7 +10,7 @@
 
   <artifactId>middle-dep</artifactId>
   <name>middle-dep</name>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -27,7 +27,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <resources>
       <resource>

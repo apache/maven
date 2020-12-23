@@ -6,7 +6,7 @@
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2196</name> 
+  <name>Maven Integration Test :: MNG-2196</name>
   <description>
   	Verify that multimodule builds where one project references another as
     a parent can build, even if that parent is not correctly referenced by

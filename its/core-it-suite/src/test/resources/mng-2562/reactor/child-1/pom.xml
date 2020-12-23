@@ -32,7 +32,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2562 :: Child 1</name> 
+  <name>Maven Integration Test :: MNG-2562 :: Child 1</name>
   <description>
     Verify that the timestamp is the same for all modules of a reactor build.
   </description>

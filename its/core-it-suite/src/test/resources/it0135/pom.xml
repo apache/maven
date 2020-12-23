@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>ejb</packaging>
 
-  <name>Maven Integration Test :: it0135</name> 
+  <name>Maven Integration Test :: it0135</name>
   <description>Test default binding of goals for "ejb" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

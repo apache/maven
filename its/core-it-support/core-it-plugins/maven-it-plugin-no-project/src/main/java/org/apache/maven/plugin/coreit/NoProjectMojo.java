@@ -28,10 +28,10 @@ import java.io.IOException;
 
 /**
  * Mojo which touches a file without requiring a project.
- * 
+ *
  * @goal light-touch
  * @requiresProject false
- * 
+ *
  */
 public class NoProjectMojo
     extends AbstractMojo
@@ -62,15 +62,15 @@ public class NoProjectMojo
              {
                  dir.mkdirs();
              }
-             
+
              File touch = new File( dir, file );
-             
+
              getLog().info( "Touching: " + touch );
-     
+
              FileWriter w = new FileWriter( touch );
-             
+
              w.write( file );
-             
+
              w.close();
         }
         catch ( IOException e )

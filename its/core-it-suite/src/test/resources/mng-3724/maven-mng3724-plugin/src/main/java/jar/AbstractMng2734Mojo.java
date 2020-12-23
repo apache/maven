@@ -14,7 +14,7 @@ public abstract class AbstractMng2734Mojo
      * @required
      */
     private File generatorTargetDir;
-    
+
     protected final File getGeneratorTargetDir()
     {
         return generatorTargetDir;

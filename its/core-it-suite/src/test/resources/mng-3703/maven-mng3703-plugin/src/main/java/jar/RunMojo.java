@@ -26,7 +26,7 @@ import org.apache.maven.project.MavenProject;
 public class RunMojo
     extends AbstractCheckMojo
 {
-    
+
     public void execute()
         throws MojoExecutionException
     {
@@ -35,7 +35,7 @@ public class RunMojo
             getLog().info( "Not running inside a forked execution; skipping this mojo's execution." );
             return;
         }
-        
+
         super.execute();
     }
 
@@ -48,6 +48,6 @@ public class RunMojo
     {
         return "main-project";
     }
-    
-    
+
+
 }

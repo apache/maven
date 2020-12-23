@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4342</name> 
+  <name>Maven Integration Test :: MNG-4342</name>
   <description>
     Test that multiple goals within a single execution get their default configuration properly injected. In
     particular, the default values for one goal should not influence the default values of the other goal.

@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3955">MNG-3955</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -62,7 +62,7 @@ public class MavenITmng3955EffectiveSettingsTest
         Properties props = verifier.loadProperties( "target/settings.properties" );
         assertEquals( "true", props.getProperty( "settings.offline" ) );
         assertEquals( "false", props.getProperty( "settings.interactiveMode" ) );
-        assertEquals( new File( verifier.getLocalRepository() ).getAbsoluteFile(), 
+        assertEquals( new File( verifier.getLocalRepository() ).getAbsoluteFile(),
             new File( props.getProperty( "settings.localRepository" ) ).getAbsoluteFile() );
     }
 

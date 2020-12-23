@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-1999</name> 
+  <name>Maven Integration Test :: MNG-1999</name>
   <description>
     Verify that default reports can be suppressed via inheritance from the parent unless children explicitly re-enable
     default reports.

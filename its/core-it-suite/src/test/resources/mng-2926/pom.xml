@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-2926</name> 
+  <name>Maven Integration Test :: MNG-2926</name>
   <description>
     Verify that when resolving plugin prefixes the group org.apache.maven.plugins is searched before
     org.codehaus.mojo and that custom groups from the settings are searched before these standard ones.

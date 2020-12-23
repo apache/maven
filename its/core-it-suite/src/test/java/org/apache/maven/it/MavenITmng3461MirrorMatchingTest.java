@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3461">MNG-3461</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

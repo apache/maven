@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3955</name> 
+  <name>Maven Integration Test :: MNG-3955</name>
   <description>
     Test that plugin parameter expressions referring to the settings reflect the actual core state, especially
     if settings have been overridden by CLI parameters.

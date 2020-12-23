@@ -38,7 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4781">MNG-4781</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4781DeploymentToNexusStagingRepoTest

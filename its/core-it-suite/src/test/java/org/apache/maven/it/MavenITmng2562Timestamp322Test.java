@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
- * 
+ *
  *
  */
 public class MavenITmng2562Timestamp322Test

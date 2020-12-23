@@ -5,7 +5,7 @@
       <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
       <role-hint>test</role-hint>
       <implementation>org.codehaus.plexus.component.configurator.BasicComponentConfigurator</implementation>
-    </component>        
+    </component>
     <component>
       <role>org.apache.maven.lifecycle.MojoExecutionConfigurator</role>
       <role-hint>test</role-hint>

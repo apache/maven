@@ -27,7 +27,7 @@ under the License.
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2054</name> 
+  <name>Maven Integration Test :: MNG-2054</name>
   <description>
     Test that plugin executions from &gt;1 step of inheritance don't run multiple times.
   </description>

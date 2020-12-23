@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-761</name> 
+  <name>Maven Integration Test :: MNG-761</name>
   <description>
     Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
     specified.

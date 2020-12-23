@@ -114,5 +114,5 @@ under the License.
   <reporting>
     <outputDirectory>target/doc</outputDirectory>
   </reporting>
-            
+
 </project>

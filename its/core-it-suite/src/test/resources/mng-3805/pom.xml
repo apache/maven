@@ -26,12 +26,12 @@ under the License.
   <artifactId>project</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3805</name> 
+  <name>Maven Integration Test :: MNG-3805</name>
   <description>
     Verify that the extension manager respects the ordering of the extension's dependencies when setting up the
     class realm.
   </description>
-  
+
   <build>
     <extensions>
       <!--

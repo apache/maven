@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3886</name> 
+  <name>Maven Integration Test :: MNG-3886</name>
   <description>
     Test that the goals from a plugin execution are executed in the order given by the POM.
   </description>

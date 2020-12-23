@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4292</name> 
+  <name>Maven Integration Test :: MNG-4292</name>
   <description>
     Test that mojo parameters can be configured with enums.
   </description>

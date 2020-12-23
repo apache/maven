@@ -32,10 +32,10 @@ import java.util.Properties;
 
 /**
  * Dumps the version info for a wagon provider to a properties file.
- * 
+ *
  * @goal dump-version
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DumpVersionMojo
@@ -44,7 +44,7 @@ public class DumpVersionMojo
 
     /**
      * Project base directory used for manual path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -52,42 +52,42 @@ public class DumpVersionMojo
 
     /**
      * The Wagon manager used to lookup the wagon of interest.
-     * 
+     *
      * @component
      */
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to dump the auth infos.
-     * 
+     *
      * @parameter property="wagon.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * The role hint for the provider of interest.
-     * 
+     *
      * @parameter property="wagon.providerHint"
      */
     private String providerHint;
 
     /**
      * The group id for the provider of interest.
-     * 
+     *
      * @parameter property="wagon.providerGroupId"
      */
     private String providerGroupId;
 
     /**
      * The artifact id for the provider of interest.
-     * 
+     *
      * @parameter property="wagon.providerArtifactId"
      */
     private String providerArtifactId;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

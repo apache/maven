@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>a</artifactId>
 
-  <name>Maven Integration Test :: MNG-1323 :: Module A</name> 
+  <name>Maven Integration Test :: MNG-1323 :: Module A</name>
 
   <build>
     <plugins>

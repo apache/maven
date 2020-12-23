@@ -11,12 +11,12 @@ public class MavenITmng5840RelativePathReactorMatching
     {
         super( ALL_MAVEN_VERSIONS );
     }
-    
+
     public void testRelativePathPointsToWrongVersion()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-reactor-matching" );
-        
+
         Verifier verifier = newVerifier( new File( testDir, "parent-1" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();

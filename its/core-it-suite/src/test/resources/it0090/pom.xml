@@ -26,7 +26,7 @@ under the License.
   <artifactId>maven-it-it0090</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: it0090</name> 
+  <name>Maven Integration Test :: it0090</name>
   <description>
     Test that ensures that envars are interpolated correctly into plugin
     configurations.

@@ -33,7 +33,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven IT Plugin :: mng-5958 extension</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

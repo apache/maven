@@ -4,14 +4,14 @@
   <artifactId>mng-3743-forkWithPluginManagement</artifactId>
   <version>1</version>
   <packaging>mng3743</packaging>
-  
+
   <name>Integration Test Project for MNG-3743</name>
   <description>
     This project verifies that MNG-3743 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3743Test
   </description>
-  
+
   <url>https://issues.apache.org/jira/browse/MNG-3743</url>
-  
+
   <build>
     <extensions>
       <extension>
@@ -20,7 +20,7 @@
         <version>1</version>
       </extension>
     </extensions>
-    
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -37,7 +37,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <reporting>
     <excludeDefaults>true</excludeDefaults>
     <plugins>

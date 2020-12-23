@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4776">MNG-4776</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4776ForkedReactorPluginVersionResolutionTest

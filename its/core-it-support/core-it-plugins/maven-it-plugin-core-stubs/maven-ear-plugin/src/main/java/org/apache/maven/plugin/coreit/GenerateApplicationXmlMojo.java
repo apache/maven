@@ -29,10 +29,10 @@ import java.io.IOException;
 
 /**
  * Creates a text file in the project base directory.
- * 
+ *
  * @goal generate-application-xml
  * @phase generate-resources
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class GenerateApplicationXmlMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -51,14 +51,14 @@ public class GenerateApplicationXmlMojo
 
     /**
      * The path to the output file, relative to the project base directory directory.
-     * 
+     *
      * @parameter
      */
     private String pathname = "target/ear-generate-application-xml.txt";
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */

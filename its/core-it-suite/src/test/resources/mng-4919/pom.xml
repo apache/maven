@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>same-goal-twice</packaging>
 
-  <name>Maven Integration Test :: MNG-4919</name> 
+  <name>Maven Integration Test :: MNG-4919</name>
   <description>
     Verify that lifecycle mappings can bind a goal twice, say in different phases.
   </description>

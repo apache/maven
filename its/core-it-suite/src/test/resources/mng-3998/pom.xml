@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3998</name> 
+  <name>Maven Integration Test :: MNG-3998</name>
   <description>
     Test that multiple plugin executions do not lose their configuration when plugin management is used.
   </description>

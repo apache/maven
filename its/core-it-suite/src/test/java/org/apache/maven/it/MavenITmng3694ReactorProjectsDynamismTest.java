@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3694">MNG-3694</a>:
  * Verify that any plugin injecting reactorProjects gets project instances that
  * have their concrete state calculated.
- * 
+ *
  * @author jdcasey
  */
 public class MavenITmng3694ReactorProjectsDynamismTest
@@ -46,13 +46,13 @@ public class MavenITmng3694ReactorProjectsDynamismTest
 
         File pluginDir = new File( testDir, "maven-mng3694-plugin" );
         File projectDir = new File( testDir, "projects" );
-        
+
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );

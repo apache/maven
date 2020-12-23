@@ -27,7 +27,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-836</name> 
+  <name>Maven Integration Test :: MNG-836</name>
   <description>
     Test that parent POMs referenced by a plugin POM can be resolved from ordinary repos, i.e. non-plugin repos.
     As a motivation for this, imagine the plugin repository hosts only snapshots while the ordinary repository

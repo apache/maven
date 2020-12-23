@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2577">MNG-2577</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2577SettingsXmlInterpolationTest

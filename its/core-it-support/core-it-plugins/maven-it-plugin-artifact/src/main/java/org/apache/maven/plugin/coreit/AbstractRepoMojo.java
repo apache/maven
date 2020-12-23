@@ -28,7 +28,7 @@ import java.util.Collection;
 
 /**
  * Provides common code for the install and deploy mojos.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -38,7 +38,7 @@ public abstract class AbstractRepoMojo
 
     /**
      * The project's main artifact.
-     * 
+     *
      * @parameter default-value="${project.artifact}"
      * @readonly
      * @required
@@ -47,7 +47,7 @@ public abstract class AbstractRepoMojo
 
     /**
      * The project's attached artifact.
-     * 
+     *
      * @parameter default-value="${project.attachedArtifacts}"
      * @readonly
      * @required
@@ -56,7 +56,7 @@ public abstract class AbstractRepoMojo
 
     /**
      * The packaging of the project.
-     * 
+     *
      * @parameter default-value="${project.packaging}"
      * @required
      * @readonly
@@ -65,7 +65,7 @@ public abstract class AbstractRepoMojo
 
     /**
      * The POM file of the project.
-     * 
+     *
      * @parameter default-value="${project.file}"
      * @required
      * @readonly
@@ -74,7 +74,7 @@ public abstract class AbstractRepoMojo
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required

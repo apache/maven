@@ -23,7 +23,7 @@ import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 
 /**
  * Simple alternative artifact factory implementation for testing.
- * 
+ *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
 public class CustomArtifactFactory

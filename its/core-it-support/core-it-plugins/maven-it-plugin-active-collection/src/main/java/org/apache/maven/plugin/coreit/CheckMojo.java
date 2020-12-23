@@ -34,10 +34,10 @@ import java.util.Properties;
 
 /**
  * Checks the general retrieval of components from active component collections.
- * 
+ *
  * @goal check
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class CheckMojo
@@ -46,7 +46,7 @@ public class CheckMojo
 
     /**
      * Project base directory used for manual path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -54,28 +54,28 @@ public class CheckMojo
 
     /**
      * The available components, as a map.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private Map componentMap;
 
     /**
      * The available components, as a list.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private List componentList;
 
     /**
      * The path to the properties file to create.
-     * 
+     *
      * @parameter property="collections.outputFile"
      */
     private File outputFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the output file could not be created.
      */
     public void execute()

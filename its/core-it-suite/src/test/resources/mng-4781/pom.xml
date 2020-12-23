@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4781</name> 
+  <name>Maven Integration Test :: MNG-4781</name>
   <description>
     Verify that deployment to a Nexus-like staging repository works. The subtle difference compared to an ordinary
     HTTP/WebDAV server is that those staging repos yield a HTTP 400 (and not 404) for every GET request until a

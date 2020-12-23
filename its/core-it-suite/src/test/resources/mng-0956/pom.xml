@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-956</name> 
+  <name>Maven Integration Test :: MNG-956</name>
   <description>
     Test component injection from project-level plugin dependencies.
   </description>

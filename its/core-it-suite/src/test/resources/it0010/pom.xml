@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0010</name> 
+  <name>Maven Integration Test :: it0010</name>
   <description>
     Since the artifact resolution does not use the project builder, we must
     ensure that the full hierarchy of all dependencies is resolved. This

@@ -26,7 +26,7 @@ import java.io.IOException;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3506">MNG-3506</a>.
- * 
+ *
  * @author John Casey
  *
  */
@@ -45,51 +45,51 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest
     {
         super( "(2.2.0,)" );
     }
-    
+
     public void testProjectPackagingUsage()
         throws IOException, VerificationException
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/" + AID );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        
+
         verifier.deleteArtifacts( GID );
-        
+
         verifier.executeGoal( "install" );
-        
+
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         // Now, if everything worked, we have .pom and a .jar in the local repo for each child, and a pom for the parent.
         // IF IT DIDN'T, we have a .pom and a .coreit-1 for child 1 AND/OR .pom and .coreit-2 for child 2 in the local repo...
-        
+
         // Parent POM
         String path = verifier.getArtifactPath( GID, AID, VERSION, "pom" );
         assertTrue( path + " should have been installed.", new File( path ).exists() );
-        
+
         // Child 1
         path = verifier.getArtifactPath( GID, AID + ".1", VERSION, TYPE );
         assertTrue( path + " should have been installed.", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".1", VERSION, "pom" );
         assertTrue( path + " should have been installed.", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".1", VERSION, BAD_TYPE1 );
         assertFalse( path + " should NOT have been installed.", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".1", VERSION, BAD_TYPE2 );
         assertFalse( path + " should _NEVER_ be installed!!!", new File( path ).exists() );
-        
+
         // Child 2
         path = verifier.getArtifactPath( GID, AID + ".2", VERSION, TYPE );
         assertTrue( path + " should have been installed.", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".2", VERSION, "pom" );
         assertTrue( path + " should have been installed.", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".2", VERSION, BAD_TYPE1 );
         assertFalse( path + " should _NEVER_ be installed!!!", new File( path ).exists() );
-        
+
         path = verifier.getArtifactPath( GID, AID + ".2", VERSION, BAD_TYPE2 );
         assertFalse( path + " should NOT have been installed.", new File( path ).exists() );
     }

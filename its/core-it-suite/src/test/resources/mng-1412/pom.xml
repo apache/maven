@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-1412</name> 
+  <name>Maven Integration Test :: MNG-1412</name>
   <description>
     Check that dependencies are available in classpath in same order as declared in POM.
   </description>

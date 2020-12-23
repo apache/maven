@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0027</name> 
+  <name>Maven Integration Test :: it0027</name>
   <groupId>org.apache.maven.its.it0027</groupId>
   <artifactId>maven-it-it0027</artifactId>
   <description>Test @execute with a custom lifecycle, including configuration</description>

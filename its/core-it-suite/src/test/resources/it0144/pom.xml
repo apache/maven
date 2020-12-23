@@ -27,11 +27,11 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0144</name> 
+  <name>Maven Integration Test :: it0144</name>
   <description>
     Test that the lifecycle phases execute in proper order.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

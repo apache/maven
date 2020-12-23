@@ -26,7 +26,7 @@ under the License.
   <artifactId>test-1b</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-2865 :: B</name> 
+  <name>Maven Integration Test :: MNG-2865 :: B</name>
   <description>
     Test that the mirror wildcard * matches any repo.
   </description>

@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-674">MNG-674</a> and
  * <a href="https://issues.apache.org/jira/browse/MNG-4997">MNG-4997</a>.
- * 
+ *
  * @author John Casey
  *
  */

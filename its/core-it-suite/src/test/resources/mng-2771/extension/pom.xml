@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0124</name> 
+  <name>Maven Integration Test :: it0124</name>
   <groupId>org.apache.maven.its.it0124</groupId>
   <artifactId>maven-it-it0124-extension</artifactId>
   <description>Project that provides an alternative ArtifactFactory implementation for testing.</description>

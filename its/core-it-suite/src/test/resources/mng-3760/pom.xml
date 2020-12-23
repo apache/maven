@@ -26,7 +26,7 @@ under the License.
   <artifactId>child</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3760</name> 
+  <name>Maven Integration Test :: MNG-3760</name>
   <description>
     Test project.baseUri property.
   </description>

@@ -26,7 +26,7 @@ under the License.
   <packaging>pom</packaging>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2562</name> 
+  <name>Maven Integration Test :: MNG-2562</name>
   <description>
     Verify that the timestamp is the same for all modules of a reactor build.
   </description>

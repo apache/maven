@@ -21,12 +21,12 @@ under the License.
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.apache.maven.its.mng4281</groupId>
   <artifactId>test</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4281 :: Project</name> 
+  <name>Maven Integration Test :: MNG-4281 :: Project</name>
   <description>
     Test that remote snapshots are not preferred over snapshots that have just been locally built.
   </description>

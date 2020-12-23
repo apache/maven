@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0009</name> 
+  <name>Maven Integration Test :: it0009</name>
   <description>
     Test plugin configuration and goal configuration that overrides what the
     mojo has specified.

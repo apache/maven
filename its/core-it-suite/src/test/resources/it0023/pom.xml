@@ -24,9 +24,9 @@ under the License.
 
   <groupId>org.apache.maven.its.it0023</groupId>
   <artifactId>maven-it-it0023</artifactId>
-  <version>1.0-SNAPSHOT</version>  
+  <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0023</name> 
+  <name>Maven Integration Test :: it0023</name>
   <description>Test profile inclusion from settings.xml (this one is activated by an id in the activeProfiles section).</description>
 
   <build>

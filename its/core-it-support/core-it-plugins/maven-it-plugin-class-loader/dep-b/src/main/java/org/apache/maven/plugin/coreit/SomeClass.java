@@ -22,7 +22,7 @@ package org.apache.maven.plugin.coreit;
 /**
  * A test class that is <em>not</em> unique to this artifact. Other artifacts will deliberately contain an equally named
  * class (with different members) to check class path ordering of dependencies.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

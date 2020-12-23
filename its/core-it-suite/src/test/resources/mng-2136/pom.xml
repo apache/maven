@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0102</name> 
+  <name>Maven Integration Test :: it0102</name>
   <description>
     Test that &lt;activeByDefault/&gt; calculations for profile activation only
     use profiles defined in the POM. [MNG-2136]

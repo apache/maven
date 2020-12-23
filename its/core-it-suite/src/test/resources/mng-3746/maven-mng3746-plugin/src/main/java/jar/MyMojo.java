@@ -32,31 +32,31 @@ public class MyMojo
      * @required
      */
     private String check;
-    
+
     /**
      * @parameter expression="${test.verification}"
      */
     private String verification;
-    
+
     /**
      * @parameter expression="${test.usingCliValue}" default-value="false"
      */
     private boolean usingCliValue;
-    
+
     /**
      * @parameter default-value="${project.properties}"
      * @readonly
      */
     private Properties properties;
-    
+
     public void execute()
         throws MojoExecutionException
     {
         String sysProp = System.getProperty( "java.version" );
         String pomProp = properties.getProperty( "java.version" );
-        
+
         boolean fail = false;
-        
+
         if ( !usingCliValue )
         {
             if ( check.equals( sysProp ) )
@@ -64,7 +64,7 @@ public class MyMojo
                 getLog().error( "Check value is the same as the system property; interpolation failed! (value: " + check + ")" );
                 fail = true;
             }
-            
+
             if ( !check.equals( pomProp ) )
             {
                 getLog().error( "Check value is NOT the same as the POM property; interpolation failed! (value: " + check + ")" );
@@ -76,7 +76,7 @@ public class MyMojo
             getLog().error( "Check value is NOT the same as the verification value; interpolation failed! (value: " + check + "; verification value: " + verification + ")" );
             fail = true;
         }
-        
+
         if ( fail )
         {
             throw new MojoExecutionException( "Failed to verify interpolation with POM override of a system property. See console output for more information." );

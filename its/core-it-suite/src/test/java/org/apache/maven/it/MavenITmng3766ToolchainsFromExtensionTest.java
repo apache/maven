@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3766">MNG-3766</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3766ToolchainsFromExtensionTest
@@ -46,7 +46,7 @@ public class MavenITmng3766ToolchainsFromExtensionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3766" );
-       
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

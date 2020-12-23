@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>it-packaging</packaging>
 
-  <name>Maven Integration Test :: MNG-4338</name> 
+  <name>Maven Integration Test :: MNG-4338</name>
   <description>
     Test that the optional-mojos element in custom lifecycle mappings is recognized and does not cause
     a configuration failure when loading the lifecycle.

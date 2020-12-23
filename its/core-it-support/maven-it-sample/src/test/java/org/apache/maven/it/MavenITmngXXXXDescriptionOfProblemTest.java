@@ -35,7 +35,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * project in the resources folder. It then checks the
  * results. This is a non-trivial example that shows two
  * phases. See more information inline in the code.
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  *
  */

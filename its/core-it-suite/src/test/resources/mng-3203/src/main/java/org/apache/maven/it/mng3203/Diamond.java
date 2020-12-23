@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Hello world!
  *
  */
-public class Diamond 
+public class Diamond
 {
     public static void main( String[] args )
     {

@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2123</name> 
+  <name>Maven Integration Test :: MNG-2123</name>
   <description>
     Verify that conflicts between a soft version and a version range are properly resolved.
   </description>

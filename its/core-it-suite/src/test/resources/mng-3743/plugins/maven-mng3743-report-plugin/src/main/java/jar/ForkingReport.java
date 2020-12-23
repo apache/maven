@@ -34,13 +34,13 @@ import org.apache.maven.reporting.MavenReportException;
 public class ForkingReport
     extends AbstractMavenReport
 {
-    
+
     /**
      * @parameter default-value="${project.build.directory}/report"
      * @readonly
      */
     private File outputDirectory;
-    
+
     /**
      * @parameter default-value="${project}"
      * @readonly

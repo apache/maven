@@ -26,7 +26,7 @@ under the License.
   <artifactId>test2</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2972</name> 
+  <name>Maven Integration Test :: MNG-2972</name>
   <description>
     Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.
   </description>

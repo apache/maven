@@ -27,10 +27,10 @@ import java.io.IOException;
 
 /**
  * Creates a text file.
- * 
+ *
  * @goal touch
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class TouchMojo
@@ -39,14 +39,14 @@ public class TouchMojo
 
     /**
      * The path to the output file, relative to the project base directory.
-     * 
+     *
      * @parameter expression="${touch.file}" default-value="target/touch.txt"
      */
     private File file;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

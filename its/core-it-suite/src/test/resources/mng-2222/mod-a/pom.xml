@@ -31,7 +31,7 @@ under the License.
   <artifactId>mod-a</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-2222 :: Module A</name> 
+  <name>Maven Integration Test :: MNG-2222 :: Module A</name>
   <description>
     Test that dependencies on reactor projects can be satisfied by their output directories even if those do not
     exist (e.g. due to non-existing sources). This ensures consistent build results for "mvn compile" and

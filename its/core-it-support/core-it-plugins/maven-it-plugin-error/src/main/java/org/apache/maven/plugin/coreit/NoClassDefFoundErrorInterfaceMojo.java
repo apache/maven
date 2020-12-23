@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  * Implements a class from a provided-scope dependency, so that the mojo class itself won't be
  * loadable when that dependency is missing (in the runtime environment).
- * 
+ *
  * @goal no-class-def-found-error-mojo
  * @requiresProject false
  */
@@ -37,7 +37,7 @@ public class NoClassDefFoundErrorInterfaceMojo
     extends TestCase
     implements Mojo
 {
-    
+
     private Log log;
 
     public void execute()

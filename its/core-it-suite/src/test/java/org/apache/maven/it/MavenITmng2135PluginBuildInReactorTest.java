@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2135">MNG-2135</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2135PluginBuildInReactorTest

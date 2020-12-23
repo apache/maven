@@ -26,11 +26,11 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2693</name> 
+  <name>Maven Integration Test :: MNG-2693</name>
   <description>
     Verify that a plugin class/resource can be loaded from the plugin realm, also during the site lifecycle.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3581">MNG-3581</a>.
- * 
+ *
  *
  */
 public class MavenITmng3581PluginUsesWagonDependencyTest

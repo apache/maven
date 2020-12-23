@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4470</name> 
+  <name>Maven Integration Test :: MNG-4470</name>
   <description>
     Test that deployment (of a snapshot) to a proxy that requires authentication works.
   </description>

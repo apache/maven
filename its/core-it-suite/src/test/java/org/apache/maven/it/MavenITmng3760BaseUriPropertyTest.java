@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3760">MNG-3760</a>.
- * 
+ *
  * @author Brett Porter
  *
  */

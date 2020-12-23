@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-956">MNG-956</a>.
- * 
+ *
  * @author Brett Porter
  *
  */

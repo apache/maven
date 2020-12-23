@@ -26,7 +26,7 @@ under the License.
   <artifactId>maven-it-it0031</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0031</name> 
+  <name>Maven Integration Test :: it0031</name>
   <description>
     Test usage of plugins.xml mapping file on the repository to resolve
     plugin artifactId from it's prefix using the pluginGroups in

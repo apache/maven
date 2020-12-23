@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-3838</name> 
+  <name>Maven Integration Test :: MNG-3838</name>
   <description>
     Verify that using the same dependency for different plugins doesn't blow up the project builder.
   </description>

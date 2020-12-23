@@ -37,7 +37,7 @@ under the License.
   <version>0.2</version>
   <packaging>jar</packaging>
 
-  <name>child-name</name> 
+  <name>child-name</name>
   <description>child-description</description>
   <url>http://child.url/</url>
   <inceptionYear>2009</inceptionYear>

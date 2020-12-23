@@ -26,7 +26,7 @@ under the License.
   <artifactId>parent</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-2843</name> 
+  <name>Maven Integration Test :: MNG-2843</name>
   <description>
     Test that plugins can have the project properties injected via ${project.properties}.
   </description>
@@ -45,11 +45,11 @@ under the License.
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
 
   <properties>
     <key>PASSED</key>
-  </properties> 
+  </properties>
 </project>

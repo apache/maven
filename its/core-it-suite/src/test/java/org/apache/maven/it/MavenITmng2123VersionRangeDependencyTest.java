@@ -31,12 +31,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng2123VersionRangeDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
-    
+
     public MavenITmng2123VersionRangeDependencyTest()
     {
         super( "(2.0.8,)" );
     }
-    
+
     public void testitMNG2123()
         throws Exception
     {

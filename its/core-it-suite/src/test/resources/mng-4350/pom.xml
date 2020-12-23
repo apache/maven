@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>multi-goal-per-phase</packaging>
 
-  <name>Maven Integration Test :: MNG-4350</name> 
+  <name>Maven Integration Test :: MNG-4350</name>
   <description>
     Test that multiple goals bound to the same phase by a lifecycle mapping execute in the order given by
     the lifecycle mapping. In particular, the order of plugin declarations in the POM should have no influence

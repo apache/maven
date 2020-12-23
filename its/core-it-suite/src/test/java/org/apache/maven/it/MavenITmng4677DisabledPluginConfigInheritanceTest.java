@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4677">MNG-4677</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4677DisabledPluginConfigInheritanceTest

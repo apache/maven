@@ -33,7 +33,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4009</name> 
+  <name>Maven Integration Test :: MNG-4009</name>
   <description>
     Verify that the effects of profiles on a parent are inherited by children.
   </description>

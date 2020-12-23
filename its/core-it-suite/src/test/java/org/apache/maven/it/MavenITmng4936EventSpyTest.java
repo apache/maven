@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4936">MNG-4936</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4936EventSpyTest
@@ -60,15 +60,15 @@ public class MavenITmng4936EventSpyTest
         List<String> lines = verifier.loadLines( "target/spy.log", "UTF-8" );
         assertTrue( lines.toString(), lines.get( 0 ).toString().startsWith( "init" ) );
         assertTrue( lines.toString(), lines.get( lines.size() - 1 ).toString().startsWith( "close" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.execution.DefaultMavenExecutionRequest" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.execution.DefaultMavenExecutionResult" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.lifecycle.internal.DefaultExecutionEvent" ) );
     }
 

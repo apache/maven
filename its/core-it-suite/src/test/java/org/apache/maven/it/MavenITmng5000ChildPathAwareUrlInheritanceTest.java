@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5000">MNG-5000</a>. Note this is a subtle
  * variation and not a duplicate of the test for MNG-2006.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

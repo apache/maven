@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2871">MNG-2871</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -57,7 +57,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertEquals( 2, compileClassPath.size() );
-        assertEquals( new File( testDir, "ejbs/target/classes" ).getCanonicalFile(), 
+        assertEquals( new File( testDir, "ejbs/target/classes" ).getCanonicalFile(),
             new File( compileClassPath.get( 1 ).toString() ).getCanonicalFile() );
     }
 

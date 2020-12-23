@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-5716</name> 
+  <name>Maven Integration Test :: MNG-5716</name>
   <description>Test Toolchain type returned by ToolchainManagerPrivate.getToolchainsForType()</description>
 
   <build>

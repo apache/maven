@@ -31,7 +31,7 @@ under the License.
   <description>
     Test that reporting configuration does not override build configuration during build lifecycle.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -45,7 +45,7 @@ under the License.
       </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>

@@ -26,7 +26,7 @@ under the License.
   <artifactId>child</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-2605</name> 
+  <name>Maven Integration Test :: MNG-2605</name>
   <description>
     Test that profiles are not accidentally activated when they have no activation element at all and
     the user did not request their activation via id.

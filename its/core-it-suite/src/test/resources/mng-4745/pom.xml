@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-4745</name> 
+  <name>Maven Integration Test :: MNG-4745</name>
   <description>
     Verify that checks for plugin updates can be controlled via repository update policy and command line (-U).
   </description>

@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4349">MNG-4349</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

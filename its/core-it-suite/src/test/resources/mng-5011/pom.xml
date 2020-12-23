@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-5011</name> 
+  <name>Maven Integration Test :: MNG-5011</name>
   <description>
     Verify that plugin parameters of type array/collection can be configured using system properties from the CLI.
   </description>

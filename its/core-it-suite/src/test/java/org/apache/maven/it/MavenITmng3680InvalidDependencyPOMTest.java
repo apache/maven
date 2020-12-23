@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3680">MNG-3680</a>.
- * 
+ *
  * @author jdcasey
  */
 public class MavenITmng3680InvalidDependencyPOMTest
@@ -46,7 +46,7 @@ public class MavenITmng3680InvalidDependencyPOMTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680" );
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

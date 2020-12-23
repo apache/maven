@@ -36,5 +36,5 @@ under the License.
     <profile>
       <id>mng-3641-it-provided-profile-child</id>
     </profile>
-  </profiles>  
+  </profiles>
 </project>

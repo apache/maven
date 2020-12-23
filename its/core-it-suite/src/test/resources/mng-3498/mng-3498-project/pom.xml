@@ -25,7 +25,7 @@ under the License.
   <artifactId>mng-3498-project</artifactId>
   <packaging>jar</packaging>
   <version>1</version>
-  
+
   <build>
     <plugins>
       <plugin>

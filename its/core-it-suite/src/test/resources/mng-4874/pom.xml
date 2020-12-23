@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test :: MNG-4874</name> 
+  <name>Maven Integration Test :: MNG-4874</name>
   <description>
     Verify that deployment of a plugin updates the metadata's "latest" field.
   </description>

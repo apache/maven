@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4007</name> 
+  <name>Maven Integration Test :: MNG-4007</name>
   <description>
     Verify that paths to project directories use the platform-specific file separator.
   </description>

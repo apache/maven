@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <version>1</version>
   <name>MNG-3331 Parent</name>
-  
+
   <modules>
     <module>mng3331 child</module>
   </modules>

@@ -4,14 +4,14 @@
   <artifactId>mng-3482</artifactId>
   <packaging>jar</packaging>
   <version>2</version>
-  
+
   <name>Integration Test Project for MNG-3482</name>
   <description>
     This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.it.MNG3482Test
   </description>
-  
+
   <url>https://issues.apache.org/jira/browse/MNG-3482</url>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng3482</groupId>

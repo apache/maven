@@ -21,13 +21,13 @@ under the License.
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.apache.maven.its.mng4281</groupId>
   <artifactId>dependency</artifactId>
   <!-- NOTE: It's essential part to use a snapshot version -->
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4281 :: Dependency</name> 
+  <name>Maven Integration Test :: MNG-4281 :: Dependency</name>
   <description>
     Test that remote snapshots are not preferred over snapshots that have just been locally built.
   </description>

@@ -27,7 +27,7 @@ import java.util.Collection;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-505">MNG-505</a>.
- * 
+ *
  * @author Brett Porter
  *
  */

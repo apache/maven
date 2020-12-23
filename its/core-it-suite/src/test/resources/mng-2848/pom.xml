@@ -26,11 +26,11 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-2848</name> 
+  <name>Maven Integration Test :: MNG-2848</name>
   <description>
     Test activation of a profile via environment variables.
   </description>
-  
+
   <profiles>
     <profile>
       <id>test</id>

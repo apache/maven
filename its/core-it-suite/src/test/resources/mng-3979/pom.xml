@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3979</name> 
+  <name>Maven Integration Test :: MNG-3979</name>
   <description>
     Test that during inheritance the merging/joining of sub trees with equal identifier doesn't crash if the parent
     POM has a non-empty element and the child POM has an empty element to join.

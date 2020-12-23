@@ -27,7 +27,7 @@ under the License.
   <packaging>jar</packaging>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-2744</name> 
+  <name>Maven Integration Test :: MNG-2744</name>
   <description>
     Tests that hex digits of checksums are compared without regard to case.
   </description>

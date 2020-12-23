@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test Plugin :: it0125</name> 
+  <name>Maven Integration Test Plugin :: it0125</name>
   <groupId>org.apache.maven.its.it0125</groupId>
   <artifactId>maven-it-it0125-plugin</artifactId>
   <packaging>maven-plugin</packaging>

@@ -23,16 +23,16 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.it0076</groupId>
-  <artifactId>maven-it-it0076</artifactId> 
+  <artifactId>maven-it-it0076</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0076</name> 
+  <name>Maven Integration Test :: it0076</name>
   <description>
     Test that plugins in pluginManagement aren't included in the build
     unless they are referenced by groupId/artifactId within the plugins
     section of a pom.
-  </description> 
+  </description>
 
   <build>
     <pluginManagement>

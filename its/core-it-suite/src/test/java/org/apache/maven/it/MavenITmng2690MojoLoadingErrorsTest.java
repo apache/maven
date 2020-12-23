@@ -30,11 +30,11 @@ import junit.framework.TestCase;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2690">MNG-2690</a>.
- * 
+ *
  * It checks, at the most basic level possible, that the plugin manager is intercepting things like
  * {@link NoClassDefFoundError} and ComponntLookupException, then throwing user-friendly errors when loading and
  * configuring a mojo.
- * 
+ *
  * @author jdcasey
  */
 public class MavenITmng2690MojoLoadingErrorsTest

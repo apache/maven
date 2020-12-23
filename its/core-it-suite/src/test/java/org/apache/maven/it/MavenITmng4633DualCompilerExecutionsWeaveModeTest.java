@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4633">MNG-4633</a>.
- * 
+ *
  *
  * @author Kristian Rosenvold
  */
@@ -55,5 +55,5 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
 }

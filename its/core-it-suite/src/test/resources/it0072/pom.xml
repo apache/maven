@@ -7,7 +7,7 @@
   <version>${m2.version}</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0072</name> 
+  <name>Maven Integration Test :: it0072</name>
   <description>
     Verifies that property references with dotted notation work within POM interpolation.
   </description>

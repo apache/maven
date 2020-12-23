@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3821">MNG-3821</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -34,7 +34,7 @@ public class MavenITmng3821EqualPluginExecIdsTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3821EqualPluginExecIdsTest() 
+    public MavenITmng3821EqualPluginExecIdsTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

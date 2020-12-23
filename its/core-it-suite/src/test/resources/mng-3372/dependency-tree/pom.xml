@@ -12,7 +12,7 @@
 	    <artifactId>maven-core</artifactId>
 	    <version>2.0.8</version>
 	  </dependency>
-	  
+	
 	  <!-- These are directly from MNG-3372, but we need something that can actually resolve.
 		<dependency>
 			<groupId>commons-beanutils</groupId>

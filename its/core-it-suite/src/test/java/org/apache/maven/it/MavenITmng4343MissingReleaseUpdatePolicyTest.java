@@ -43,7 +43,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4343">MNG-4343</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -88,9 +88,9 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
                 else
                 {
                     PrintWriter writer = response.getWriter();
-    
+
                     response.setStatus( HttpServletResponse.SC_OK );
-    
+
                     if ( request.getRequestURI().endsWith( ".pom" ) )
                     {
                         writer.println( "<project>" );
@@ -171,7 +171,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
             // expected
         }
 
-        assertTrue( requestedUris.toString(), 
+        assertTrue( requestedUris.toString(),
             requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         requestedUris.clear();
 
@@ -223,7 +223,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
             // expected
         }
 
-        assertTrue( requestedUris.toString(), 
+        assertTrue( requestedUris.toString(),
             requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         requestedUris.clear();
 

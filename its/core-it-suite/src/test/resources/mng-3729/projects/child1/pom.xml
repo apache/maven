@@ -10,7 +10,7 @@
   <artifactId>child1</artifactId>
   <version>1</version>
   <packaging>pom</packaging>
-  
+
   <build>
     <plugins>
       <plugin>

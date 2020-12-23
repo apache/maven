@@ -7,7 +7,7 @@
     <artifactId>parent</artifactId>
     <version>0.1</version>
   </parent>
-  
+
   <artifactId>maven-mng4761-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 

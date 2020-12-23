@@ -10,7 +10,7 @@
 
   <artifactId>project</artifactId>
 
-  <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Consumer</name> 
+  <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Consumer</name>
   <description>
     Verify that dependencies of plugins are considered by the project sorter for a reactor build.
   </description>

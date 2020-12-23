@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-4016</name> 
+  <name>Maven Integration Test :: MNG-4016</name>
   <description>
     Test that expressions with the special prefixes "project.", "pom." and "env." can be interpolated from
     properties that include the prefix.

@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3924</name> 
+  <name>Maven Integration Test :: MNG-3924</name>
   <description>
     Test that interpolation of properties that resolve to XML markup doesn't crash the project builder.
   </description>

@@ -15,12 +15,12 @@
     <name>Issue 2289</name>
     <version>SNAPSHOT</version>
     <description><![CDATA[Demonstration of issue 2289.]]></description>
-    
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

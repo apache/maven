@@ -28,10 +28,10 @@ public class MavenIT0051ReleaseProfileTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0051ReleaseProfileTest()                                                                                                                          
-    {                                                                                                                                                 
+    public MavenIT0051ReleaseProfileTest()
+    {
         super( "(2.0.2,)" );
-    }    
+    }
 
     /**
      * Test source attachment when -DperformRelease=true is specified.

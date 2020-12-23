@@ -29,7 +29,7 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
         // Making sure our configuration processor executes
-        verifier.verifyTextInLog( "[INFO] ConfigurationProcessorOne.process()" );  
+        verifier.verifyTextInLog( "[INFO] ConfigurationProcessorOne.process()" );
         // We have a property value injected by our configuration processor. Make sure it's correct
         verifier.assertFilePresent( "target/classes/result.properties" );
         Properties result = verifier.loadProperties( "target/classes/result.properties" );

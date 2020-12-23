@@ -15,7 +15,7 @@
     <build/>
     <profiles/>
     <reporting/>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -40,7 +40,7 @@
             <url>file:///tmp/repo-m2-snapshot</url>
         </repository>
     </repositories>
-    
+
     <!-- Define the locations for artifact distribution -->
     <distributionManagement>
         <snapshotRepository>

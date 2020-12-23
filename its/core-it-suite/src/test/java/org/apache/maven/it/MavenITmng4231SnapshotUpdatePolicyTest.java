@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4231">MNG-4231</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4231SnapshotUpdatePolicyTest

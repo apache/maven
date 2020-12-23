@@ -30,10 +30,10 @@ import java.io.File;
 
 /**
  * Attaches a POM to the main artifact.
- * 
+ *
  * @goal attach-pom
  * @phase package
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -43,7 +43,7 @@ public class AttachPomMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      * @required
@@ -53,7 +53,7 @@ public class AttachPomMojo
     /**
      * The path to the POM file to attach to the main artifact, relative to the project base directory. The plugin will
      * not validate this path.
-     * 
+     *
      * @parameter property="artifact.pomFile" default-value="${project.file.path}"
      * @required
      */
@@ -61,7 +61,7 @@ public class AttachPomMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()

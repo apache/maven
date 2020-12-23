@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test :: it0138</name> 
+  <name>Maven Integration Test :: it0138</name>
   <description>Test default binding of goals for "maven-plugin" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

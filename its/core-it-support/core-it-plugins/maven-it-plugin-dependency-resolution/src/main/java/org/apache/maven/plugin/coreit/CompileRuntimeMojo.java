@@ -26,10 +26,10 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Creates text files that list the dependencies with scope compile and runtime in the order returned from the Maven
  * core. The path parameters of this mojo support the token <code>&#64;idx&#64;</code> to dynamically insert a running
  * index in order to distinguish multiple executions of the same mojo.
- * 
+ *
  * @goal compile-runtime
  * @requiresDependencyResolution compile+runtime
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class CompileRuntimeMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the compile artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
-     * 
+     *
      * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
@@ -51,7 +51,7 @@ public class CompileRuntimeMojo
      * The path to the output file for the compile artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
-     * 
+     *
      * @parameter property="depres.compileArtifacts"
      */
     private String compileArtifacts;
@@ -60,7 +60,7 @@ public class CompileRuntimeMojo
      * The path to the output file for the compile class path, relative to the project base directory. Each line of
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
-     * 
+     *
      * @parameter property="depres.compileClassPath"
      */
     private String compileClassPath;
@@ -69,7 +69,7 @@ public class CompileRuntimeMojo
      * The path to the properties file for the checksums of the compile class path elements, relative to the project
      * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
      * the JAR. If not specified, the class path checksums will not be calculated.
-     * 
+     *
      * @parameter property="depres.compileClassPathChecksums"
      */
     private String compileClassPathChecksums;
@@ -78,7 +78,7 @@ public class CompileRuntimeMojo
      * The path to the output file for the runtime artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
-     * 
+     *
      * @parameter property="depres.runtimeArtifacts"
      */
     private String runtimeArtifacts;
@@ -87,7 +87,7 @@ public class CompileRuntimeMojo
      * The path to the output file for the runtime class path, relative to the project base directory. Each line of
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
-     * 
+     *
      * @parameter property="depres.runtimeClassPath"
      */
     private String runtimeClassPath;
@@ -96,14 +96,14 @@ public class CompileRuntimeMojo
      * The path to the properties file for the checksums of the runtime class path elements, relative to the project
      * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
      * the JAR. If not specified, the class path checksums will not be calculated.
-     * 
+     *
      * @parameter property="depres.runtimeClassPathChecksums"
      */
     private String runtimeClassPathChecksums;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
     public void execute()

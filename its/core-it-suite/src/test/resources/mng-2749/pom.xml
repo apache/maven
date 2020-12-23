@@ -26,7 +26,7 @@ under the License.
   <artifactId>maven-it-mng2749</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2749</name> 
+  <name>Maven Integration Test :: MNG-2749</name>
   <description>
     Verify that plugins can load classes/resources from a build extension.
   </description>

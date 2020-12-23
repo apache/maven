@@ -30,7 +30,7 @@ import org.apache.maven.plugin.MojoFailureException;
 public class MojoComponentLookupExceptionMojo
     extends AbstractMojo
 {
-    
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {

@@ -26,13 +26,13 @@ under the License.
   <artifactId>maven-it-it0018</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: it0018</name> 
+  <name>Maven Integration Test :: it0018</name>
   <description>
     Ensure that managed dependencies for dependency POMs are calculated
     correctly when resolved. Removes managed-dep-1.0.3 and checks it is
     redownloaded.
   </description>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.it0018</groupId>

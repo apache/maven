@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4254">MNG-4254</a>.
- * 
+ *
  * @author John Casey
  *
  */
@@ -75,7 +75,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-V" );
-        
+
         verifier.setLogFileName( "log-settings.txt" );
         verifier.executeGoal( "validate" );
 
@@ -96,7 +96,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.deleteDirectory( "target" );
 
         verifier.addCliOption( "-V" );
-        
+
         verifier.setLogFileName( "log-default-http.txt" );
         verifier.executeGoal( "validate" );
 
@@ -118,7 +118,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         verifier.addCliOption( "-V" );
         verifier.addCliOption( "-DwagonProtocol=https" );
-        
+
         verifier.setLogFileName( "log-default-https.txt" );
         verifier.executeGoal( "validate" );
 

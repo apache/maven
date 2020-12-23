@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1830">MNG-1830</a>.
- * 
+ *
  * @author Brett Porter
  * @version $Id: ba3c28edf533dba3dfa60e384a670575e0cd6901 $
  */
@@ -60,8 +60,8 @@ public class MavenITmng1830ShowVersionTest
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         for( String line : lines )
         {
-            if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) 
-             ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) 
+            if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" )
+             ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" )
              ||  line.matches( "^Apache Maven (.*?) \\([0-9a-z]{5,41}; .*\\)$" ) )
             {
                 apacheVersionInTheRightFormatWasFound = true;
@@ -73,7 +73,7 @@ public class MavenITmng1830ShowVersionTest
                 break;
             }
         }
-        
+
         assertTrue( apacheVersionInTheRightFormatWasFound );
-    }    
+    }
 }

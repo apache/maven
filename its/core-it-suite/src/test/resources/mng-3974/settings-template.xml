@@ -54,7 +54,7 @@ under the License.
   </activeProfiles>
 
   <mirrors>
-    <!-- 
+    <!--
     NOTE: The next block of mirrors matches the first test repo by exact id.
     -->
 
@@ -91,7 +91,7 @@ under the License.
       <mirrorOf>maven-core-it-a</mirrorOf>
     </mirror>
 
-    <!-- 
+    <!--
     NOTE: The next block of mirrors matches the second test repo by a pattern which is distinct for each mirror.
     -->
 

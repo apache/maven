@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0061</name> 
+  <name>Maven Integration Test :: it0061</name>
   <description>
     Verify that deployment of artifacts to a legacy-layout repository
     results in a groupId directory of 'the.full.group.id' instead of

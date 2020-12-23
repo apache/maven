@@ -15,7 +15,7 @@
         <groupId>org.apache.maven.its.mng3693</groupId>
         <artifactId>mavenit-mng3693-plugin</artifactId>
         <version>1</version>
-        
+
         <executions>
           <execution>
             <id>move-pom</id>

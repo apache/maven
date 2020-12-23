@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0075</name> 
+  <name>Maven Integration Test :: it0075</name>
   <description>
     Verify that direct invocation of a mojo from the command line still
     results in the processing of modules included via profiles.

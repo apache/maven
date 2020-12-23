@@ -58,7 +58,7 @@ public class SerializeMojo
             s.setOutput( writer );
 
             Xpp3Dom dom = new Xpp3Dom( "root" );
-            
+
             dom.writeToSerializer( "", s );
         }
         catch ( IOException e )

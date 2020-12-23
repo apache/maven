@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2254</name> 
+  <name>Maven Integration Test :: MNG-2254</name>
   <description>
     Verify that the encoding declaration of the POM is respected.
   </description>

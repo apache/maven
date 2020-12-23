@@ -6,12 +6,12 @@
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2130</name> 
+  <name>Maven Integration Test :: MNG-2130</name>
   <description>
     Test that parent-POMs cached during a build are available as parents
     to other POMs in the multimodule build.
   </description>
-  
+
   <modules>
     <module>child</module>
   </modules>

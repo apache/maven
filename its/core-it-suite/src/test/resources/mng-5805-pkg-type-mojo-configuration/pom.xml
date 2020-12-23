@@ -27,7 +27,7 @@ under the License.
   <artifactId>mng-5805-pkg-type-mojo-configuration-project</artifactId>
   <version>0.1</version>
   <packaging>mng5805</packaging>
-  
+
   <build>
     <extensions>
       <extension>

@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <name>Builder for Issue</name>
     <version>x-SNAPSHOT</version>
-    
+
     <modules>
         <module>application</module>
         <module>delegate</module>

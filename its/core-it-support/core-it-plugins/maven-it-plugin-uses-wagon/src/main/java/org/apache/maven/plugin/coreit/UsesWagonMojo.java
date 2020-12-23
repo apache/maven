@@ -38,7 +38,7 @@ public class UsesWagonMojo
      * @component
      */
     private WagonManager wagonManager;
-    
+
     public void execute()
         throws MojoExecutionException
     {

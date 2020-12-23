@@ -21,7 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 /**
  * A dummy component.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface Component

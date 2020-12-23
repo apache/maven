@@ -32,7 +32,7 @@ import java.util.Arrays;
  *   <li>parents can omit the version if the relative path points to the correct parent</li>
  *   <li>dependencies can omit the version if it is part of the reactor</li>
  * </ul>
- * 
+ *
  * During install the pom will be cleaned up
  * <ul>
  *   <li>the modules will be removed</li>
@@ -75,16 +75,16 @@ public class MavenITmng6656BuildConsumer
         verifier.verifyErrorFreeLog();
 
         String content;
-        content = FileUtils.fileRead( new File( testDir, "expected/parent.pom") ); 
+        content = FileUtils.fileRead( new File( testDir, "expected/parent.pom") );
         verifier.assertArtifactContents( "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6656-SNAPSHOT", "pom", content );
 
-        content = FileUtils.fileRead( new File( testDir, "expected/simple-parent.pom") ); 
+        content = FileUtils.fileRead( new File( testDir, "expected/simple-parent.pom") );
         verifier.assertArtifactContents( "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6656-SNAPSHOT", "pom", content );
 
-        content = FileUtils.fileRead( new File( testDir, "expected/simple-weather.pom") ); 
+        content = FileUtils.fileRead( new File( testDir, "expected/simple-weather.pom") );
         verifier.assertArtifactContents( "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6656-SNAPSHOT", "pom", content );
 
-        content = FileUtils.fileRead( new File( testDir, "expected/simple-webapp.pom") ); 
+        content = FileUtils.fileRead( new File( testDir, "expected/simple-webapp.pom") );
         verifier.assertArtifactContents( "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6656-SNAPSHOT", "pom", content );
     }
 

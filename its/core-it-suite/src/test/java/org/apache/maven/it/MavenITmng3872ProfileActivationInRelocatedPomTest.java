@@ -28,7 +28,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3872">MNG-3872</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3872ProfileActivationInRelocatedPomTest

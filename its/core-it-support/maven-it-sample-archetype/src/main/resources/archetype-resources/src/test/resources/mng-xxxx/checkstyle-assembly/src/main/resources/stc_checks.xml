@@ -80,8 +80,8 @@
     <module name="EmptyStatement"/>
 
 
-    <module name="GenericIllegalRegexp"> 
-      <!-- ${symbol_escape}s matches whitespace character, ${symbol_dollar} matches end of line. --> 
+    <module name="GenericIllegalRegexp">
+      <!-- ${symbol_escape}s matches whitespace character, ${symbol_dollar} matches end of line. -->
       <property name="format" value="(?:${symbol_escape}x66${symbol_escape}x75${symbol_escape}x63${symbol_escape}x6B)|(?:${symbol_escape}x73${symbol_escape}x68${symbol_escape}x69${symbol_escape}x74)|(?:${symbol_escape}x63${symbol_escape}x75${symbol_escape}x6E${symbol_escape}x74)"/>
       <property name="ignoreCase" value="true" />
       <property name="message" value="Code contains inappropriate language"/>
@@ -105,17 +105,17 @@
     <!-- http://checkstyle.sourceforge.net/config_coding.html${symbol_pound}IllegalCatch-->
    <!-- <module name="IllegalCatch">
       <property name="severity" value="warning"/>
-    </module>   
+    </module>
 
     <module name="IllegalThrows">
       <property name="severity" value="warning"/>
-    </module>  
+    </module>
 
     <module name="DefaultComesLast"/>
 
     <module name="FallThrough">
       <property name="severity" value="warning"/>
-    </module>  --> 
+    </module>  -->
 
 
 

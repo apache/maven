@@ -27,13 +27,13 @@ under the License.
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3043</name> 
+  <name>Maven Integration Test :: MNG-3043</name>
   <description>
     Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
     yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the
     projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.
   </description>
-  
+
   <modules>
     <module>dependency</module>
     <module>consumer-a</module>

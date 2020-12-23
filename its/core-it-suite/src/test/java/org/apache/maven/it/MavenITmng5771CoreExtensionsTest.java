@@ -8,7 +8,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5771">MNG-5771</a>:
  * check that Maven loads core extensions and components contributed by <code>.mvn/extensions.xml</code>
- * are available to regular plugins. 
+ * are available to regular plugins.
  */
 public class MavenITmng5771CoreExtensionsTest
     extends AbstractMavenIntegrationTestCase
@@ -53,7 +53,7 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
     //
     // https://issues.apache.org/jira/browse/MNG-5795: Maven extensions can not be retrieved from authenticated repositories
     //
@@ -71,7 +71,7 @@ public class MavenITmng5771CoreExtensionsTest
             .source(new File(testDir, "repo")) //
             .build();
         server.start();
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty("@port@", Integer.toString(server.port()));
@@ -85,7 +85,7 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         server.stop();
     }
 }

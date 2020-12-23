@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
- * 
+ *
  */
 public class MXSerializer
     implements XmlSerializer

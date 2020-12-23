@@ -33,7 +33,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4008</name> 
+  <name>Maven Integration Test :: MNG-4008</name>
   <description>
     Verify that filter definitions are properly merged.
   </description>

@@ -13,7 +13,7 @@
     get this version from the POM's pluginManagement section, even though the plugin's mojo call is coming from
     the default lifecycle bindings, and the plugin is not specified in the POM's build/plugins section.
   </description>
-  
+
   <build>
     <pluginManagement>
       <plugins>

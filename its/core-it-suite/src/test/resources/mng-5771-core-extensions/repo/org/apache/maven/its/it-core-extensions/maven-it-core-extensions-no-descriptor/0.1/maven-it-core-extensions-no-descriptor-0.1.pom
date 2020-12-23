@@ -31,8 +31,8 @@ under the License.
   <description>
     Maven core extensions components
   </description>
-  
-  <!-- 
+
+  <!--
     mvn clean deploy -DaltDeploymentRepository=default::default::file://
    -->
 

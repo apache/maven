@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3838">MNG-3838</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

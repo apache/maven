@@ -32,11 +32,11 @@ import java.util.Properties;
 
 /**
  * Lists the available/configured reports in a properties file.
- * 
+ *
  * @goal list
  * @phase initialize
  * @requiresReports true
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -48,14 +48,14 @@ public class ListMojo
      * The path to the properties file used to list the available reports. The properties file will have a key named
      * <code>reports</code> that gives the total count of reports. The keys <code>reports.0</code>,
      * <code>reports.1</code> etc. will be used to denote the qualified class names of the reports.
-     * 
+     *
      * @parameter property="site.properties" default-value="target/reports.properties"
      */
     private File reportsFile;
 
     /**
      * The reports configured for the current build.
-     * 
+     *
      * @parameter default-value="${reports}"
      * @required
      * @readonly
@@ -64,7 +64,7 @@ public class ListMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

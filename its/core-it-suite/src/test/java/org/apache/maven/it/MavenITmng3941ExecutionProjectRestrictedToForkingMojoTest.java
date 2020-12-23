@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3941">MNG-3941</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
@@ -36,7 +36,7 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
 
     public MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest()
     {
-        super( "[3.0-alpha-3,)" ); 
+        super( "[3.0-alpha-3,)" );
     }
 
     /**

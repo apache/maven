@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5481">MNG-5418</a>.
- * 
+ *
  * @author Olivier Lamy
  */
 public class MavenITmng5418FileProjectPropertiesActivatorTest

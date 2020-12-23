@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2994</name> 
+  <name>Maven Integration Test :: MNG-2994</name>
   <description>
     Test that snapshot repositories are checked for ranges with snapshot boundaries.
   </description>

@@ -31,7 +31,7 @@ under the License.
   <description>
     Test that reporting configuration applies to build plugins, too.
   </description>
-  
+
   <reporting>
     <plugins>
       <plugin>

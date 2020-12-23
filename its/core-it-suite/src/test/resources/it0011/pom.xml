@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0011</name> 
+  <name>Maven Integration Test :: it0011</name>
   <description>Test specification of dependency versions via &lt;dependencyManagement/&gt;.</description>
 
   <dependencies>

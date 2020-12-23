@@ -27,7 +27,7 @@ under the License.
   <packaging>pom</packaging>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-4112</name> 
+  <name>Maven Integration Test :: MNG-4112</name>
   <description>
     Test for ${maven.version} and ${maven.build.version} property
   </description>

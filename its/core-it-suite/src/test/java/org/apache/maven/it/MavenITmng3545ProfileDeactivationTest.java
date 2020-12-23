@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3545">MNG-3545</a>:
  * it tests activation and deactivation of profiles.
- * 
+ *
  */
 public class MavenITmng3545ProfileDeactivationTest
     extends AbstractMavenIntegrationTestCase
@@ -40,7 +40,7 @@ public class MavenITmng3545ProfileDeactivationTest
 
     /**
      * Test build with two active by default profiles
-     * 
+     *
      */
     public void testBasicBuildWithDefaultProfiles()
         throws Exception
@@ -66,7 +66,7 @@ public class MavenITmng3545ProfileDeactivationTest
 
     /**
      * Test command line deactivation of active by default profiles.
-     * 
+     *
      */
     public void testDeactivateDefaultProfilesHyphen()
         throws Exception
@@ -115,7 +115,7 @@ public class MavenITmng3545ProfileDeactivationTest
     /**
      * Test command line deactivation of a profile that was activated
      * by a property
-     * 
+     *
      */
     public void testDeactivateActivatedByProp()
         throws Exception
@@ -145,7 +145,7 @@ public class MavenITmng3545ProfileDeactivationTest
     /**
      * Test that deactivating from the command line takes priority over
      * activating from the command line.
-     * 
+     *
      */
     public void testActivateThenDeactivate()
         throws Exception
@@ -175,7 +175,7 @@ public class MavenITmng3545ProfileDeactivationTest
     /**
      * Test that default profiles are deactivated when another profile is
      * activated.
-     * 
+     *
      */
     public void testDefaultProfileAutoDeactivation()
         throws Exception

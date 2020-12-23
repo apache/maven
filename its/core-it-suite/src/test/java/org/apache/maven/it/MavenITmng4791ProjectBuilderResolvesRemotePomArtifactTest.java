@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4791">MNG-4791</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
@@ -61,7 +61,7 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
 
-        assertEquals( "0.1-20100902.190819-1", 
+        assertEquals( "0.1-20100902.190819-1",
             props.getProperty( "org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.version" ) );
         String path = props.getProperty( "org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.file" );
         assertTrue( path, path.endsWith( ".pom" ) );

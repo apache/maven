@@ -5,14 +5,14 @@
   <artifactId>mng-4254</artifactId>
   <version>1</version>
   <packaging>pom</packaging>
-  
+
   <distributionManagement>
     <repository>
       <id>test</id>
       <url>http://dummyhost.com/repository</url>
     </repository>
   </distributionManagement>
-  
+
   <build>
     <extensions>
       <extension>

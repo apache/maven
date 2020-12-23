@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>mng4654</packaging>
 
-  <name>Maven Integration Test :: MNG-4654</name> 
+  <name>Maven Integration Test :: MNG-4654</name>
   <description>
     Test that the artifact handler for the project main artifact is selected via the handler's type/roleHint
     and not via the handler's packaging (the packaging only applies to the legacy repo layout).

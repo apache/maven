@@ -8,7 +8,7 @@ public class Foo
 {
     public String getTimestamp( Locale aLocale )
     {
-        DateFormat format = DateFormat.getDateInstance( 
+        DateFormat format = DateFormat.getDateInstance(
                 DateFormat.LONG, aLocale );
 
         return format.format( new Date() );

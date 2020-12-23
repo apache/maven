@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5503">MNG-5418</a>.
- * 
+ *
  * @author jvz
  */
 public class MavenITmng5503ZipInReactorTest

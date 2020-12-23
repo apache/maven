@@ -36,7 +36,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4348">MNG-4348</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

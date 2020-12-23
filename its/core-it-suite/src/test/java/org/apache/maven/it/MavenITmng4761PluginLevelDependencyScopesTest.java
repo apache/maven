@@ -39,9 +39,9 @@ public class MavenITmng4761PluginLevelDependencyScopesTest
 
     /**
      * Verify that plugin-level dependencies specified in a user's pom.xml DO NOT use compile scope.
-     * Using any scope other than runtime for plugin dependencies may favor them and their transitive 
+     * Using any scope other than runtime for plugin dependencies may favor them and their transitive
      * dependencies inappropriately, leading to unpredictable results.
-     * 
+     *
      * Plugin-dependency scope should be DISREGARDED, and runtime scope should be forced.
      */
     public void testit()

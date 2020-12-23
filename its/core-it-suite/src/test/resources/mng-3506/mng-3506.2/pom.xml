@@ -37,14 +37,14 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-extension2</artifactId>
         <version>2.1-SNAPSHOT</version>
-        
+
         <!-- Loads the coreit-2 lifecycle/artifact-handler -->
         <extensions>true</extensions>
       </plugin>

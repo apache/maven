@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0032</name> 
+  <name>Maven Integration Test :: it0032</name>
   <description>Tests that a specified Maven version requirement that is lower doesn't cause any problems</description>
 
   <prerequisites>

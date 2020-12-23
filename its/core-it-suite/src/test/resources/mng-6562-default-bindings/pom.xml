@@ -27,11 +27,11 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-6562</name>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <build>
     <pluginManagement>
       <plugins>

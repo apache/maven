@@ -45,18 +45,18 @@ public class Mojo3563
             throw new MojoExecutionException("Test file does not exist: File = " + testFile.getAbsolutePath() + "Property = " + property);
         }
         getLog().info("Property = " + property);
-        
+
         File f = new File( project.getBuild().getOutputDirectory(), "foo.txt" );
         getLog().info( "Creating test file using project.getBuild().getDirectory(): " + f );
-        
+
         String testValue = "" + System.currentTimeMillis();
-        
+
         FileWriter w = null;
         try
         {
             f.getParentFile().mkdirs();
             w = new FileWriter( f );
-            
+
             w.write( testValue );
         }
         catch ( IOException e )
@@ -67,7 +67,7 @@ public class Mojo3563
         {
             IOUtil.close( w );
         }
-        
+
         getLog().info( "Attempting to read test file using path from plugin parameter: " + foo );
         BufferedReader r = null;
         try

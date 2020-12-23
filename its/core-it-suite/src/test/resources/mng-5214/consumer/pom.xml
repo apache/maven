@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>consumer</artifactId>
 
-  <name>Maven Integration Test :: MNG-5214 :: Consumer</name> 
+  <name>Maven Integration Test :: MNG-5214 :: Consumer</name>
   <description>
     Test that a dependency on a type other than jar/test-jar/ejb is not mapped to target/classes.
   </description>

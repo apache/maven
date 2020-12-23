@@ -15,11 +15,11 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <properties>
     <myDirectory>something</myDirectory>
   </properties>
-  
+
   <build>
     <plugins>
       <plugin>

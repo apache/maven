@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3475</name> 
+  <name>Maven Integration Test :: MNG-3475</name>
   <description>
     Verify that project directories are basedir aligned when queried by plugin parameter expressions.
   </description>

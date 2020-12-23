@@ -26,11 +26,11 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2892</name> 
+  <name>Maven Integration Test :: MNG-2892</name>
   <description>
     Verify that plugins can use their own version of plexus-utils and are not bound to the version bundled in the core.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

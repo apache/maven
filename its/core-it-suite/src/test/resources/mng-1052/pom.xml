@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0078</name> 
+  <name>Maven Integration Test :: it0078</name>
   <description>
     Test that configuration for a lifecycle-bound plugin is injected from
     PluginManagement section even when it's not explicitly defined in the

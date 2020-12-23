@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4326</name> 
+  <name>Maven Integration Test :: MNG-4326</name>
   <description>
     Verify that locally built/installed snapshot artifacts suppress remote update checks (as long as the local copy
     still satifies the update policy configured for the remote repository).

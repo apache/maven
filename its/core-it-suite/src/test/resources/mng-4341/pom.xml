@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4341</name> 
+  <name>Maven Integration Test :: MNG-4341</name>
   <description>
     Test that plugins bound to the same phase get executed in POM order even if one of the plugins participates
     in the default lifecycle bindings for the project's packaging.

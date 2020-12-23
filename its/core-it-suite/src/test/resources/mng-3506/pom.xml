@@ -28,14 +28,14 @@ under the License.
     <module>mng-3506.1</module>
     <module>mng-3506.2</module>
   </modules>
-  
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-extension1</artifactId>
         <version>2.1-SNAPSHOT</version>
-        
+
         <!-- Loads the coreit-1 lifecycle/artifact-handler -->
         <extensions>true</extensions>
       </plugin>

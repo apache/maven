@@ -3,7 +3,7 @@
   <groupId>org.apache.maven.its.mng3482</groupId>
   <artifactId>dep</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng3482</groupId>

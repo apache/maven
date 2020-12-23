@@ -7,9 +7,9 @@
     <artifactId>project-hierarchy</artifactId>
     <version>1</version>
   </parent>
-  
+
   <artifactId>child3</artifactId>
-  
+
   <name>MNG-2720 Project Hierarchy 1 Child 3</name>
 
   <dependencies>

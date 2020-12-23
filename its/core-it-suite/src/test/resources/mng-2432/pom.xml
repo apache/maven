@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-2432</name> 
+  <name>Maven Integration Test :: MNG-2432</name>
   <description>
     Verify that when resolving plugin prefixes the plugins from the POM are searched before the plugin groups
     from the settings.

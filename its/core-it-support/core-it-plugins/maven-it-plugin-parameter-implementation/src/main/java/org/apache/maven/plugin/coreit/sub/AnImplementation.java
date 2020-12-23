@@ -30,12 +30,12 @@ public class AnImplementation
 
     public String getField()
     {
-        return field; 
+        return field;
     }
 
     public void setField( String field )
     {
-        this.field = field; 
+        this.field = field;
     }
 
     public String toString()

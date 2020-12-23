@@ -6,7 +6,7 @@
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0064</name> 
+  <name>Maven Integration Test :: it0064</name>
   <description>
     Test the use of a mojo that uses setters instead of private fields
     for the population of configuration values.

@@ -27,7 +27,7 @@ under the License.
   <version>@version@</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4952</name> 
+  <name>Maven Integration Test :: MNG-4952</name>
   <description>
     Verify that the metadata's RELEASE field gets updated upon deployment of a new version.
   </description>

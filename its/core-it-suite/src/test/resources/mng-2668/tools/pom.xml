@@ -10,7 +10,7 @@
 
   <artifactId>tools</artifactId>
 
-  <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Provider</name> 
+  <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Provider</name>
   <description>
     Verify that dependencies of plugins are considered by the project sorter for a reactor build.
   </description>

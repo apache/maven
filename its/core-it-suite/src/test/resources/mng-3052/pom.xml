@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3052</name> 
+  <name>Maven Integration Test :: MNG-3052</name>
   <description>
     Test that the artifact collector considers repositories listed in dependency POMs when collecting transitive
     dependencies, especially snapshot versions.

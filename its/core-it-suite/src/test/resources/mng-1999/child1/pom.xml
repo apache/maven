@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>child1</artifactId>
 
-  <name>Maven Integration Test :: MNG-1999</name> 
+  <name>Maven Integration Test :: MNG-1999</name>
   <description>
     Verify that default reports can be suppressed via inheritance from the parent.
   </description>

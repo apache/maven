@@ -32,5 +32,5 @@ under the License.
   <artifactId>child</artifactId>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2068 :: Child</name> 
+  <name>Maven Integration Test :: MNG-2068 :: Child</name>
 </project>

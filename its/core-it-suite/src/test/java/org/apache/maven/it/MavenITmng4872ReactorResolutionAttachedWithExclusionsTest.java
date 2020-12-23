@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4872">MNG-4872</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest

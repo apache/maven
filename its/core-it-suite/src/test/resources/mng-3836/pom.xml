@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3836</name> 
+  <name>Maven Integration Test :: MNG-3836</name>
   <description>
     Verify that children can *override* inherited plugin configuration.
   </description>

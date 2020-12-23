@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -53,7 +53,7 @@ public class MavenIT0140InterpolationWithPomPrefixTest
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         Properties props = verifier.loadProperties( "target/interpolated.properties" );
         String prefix = "project.properties.";
 

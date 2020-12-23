@@ -5,7 +5,7 @@
   <artifactId>mng-5576</artifactId>
   <!-- interpolate here -->
   <version>1.0.0.${changelist}</version>
-  <name>Maven Integration Test :: mng-5576</name> 
+  <name>Maven Integration Test :: mng-5576</name>
   <description>
     Verifies that property references with dotted notation work within POM interpolation.
   </description>

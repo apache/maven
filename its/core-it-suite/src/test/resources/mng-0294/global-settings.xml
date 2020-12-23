@@ -2,13 +2,13 @@
   <profiles>
     <profile>
       <id>test-profile</id>
-      
+
       <activation>
         <property>
           <name>includeProfile</name>
         </property>
       </activation>
-      
+
       <properties>
         <test>test.txt</test>
       </properties>

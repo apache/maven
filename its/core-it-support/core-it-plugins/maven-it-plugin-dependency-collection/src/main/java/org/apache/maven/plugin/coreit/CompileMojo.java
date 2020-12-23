@@ -24,10 +24,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Creates text files that list the dependencies with scope compile in the order returned from the Maven core.
- * 
+ *
  * @goal compile
  * @requiresDependencyCollection compile
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -40,7 +40,7 @@ public class CompileMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the compile artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
-     * 
+     *
      * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
@@ -49,14 +49,14 @@ public class CompileMojo
      * The path to the output file for the compile artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
-     * 
+     *
      * @parameter property="depres.compileArtifacts"
      */
     private String compileArtifacts;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
     public void execute()

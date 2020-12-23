@@ -27,7 +27,7 @@ under the License.
   <version>0.2</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0039</name> 
+  <name>Maven Integration Test :: it0039</name>
   <description>
     Test that reactor uses release-pom.xml if available.
   </description>

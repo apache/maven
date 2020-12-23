@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3746">MNG-3746</a>.
- * 
+ *
  * @todo Fill in a better description of what this test verifies!
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
@@ -82,11 +82,11 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-cli.txt" );
-        
+
         verifier.addCliOption( "-Dtest.verification=cli" );
         verifier.addCliOption( "-Dtest.usingCliValue=true" );
         verifier.addCliOption( "-Djava.version=cli" );
-        
+
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

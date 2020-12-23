@@ -38,9 +38,9 @@ public class MyMojo
         throws MojoExecutionException
     {
         String parentBuildDir = project.getParent().getBuild().getDirectory();
-        
+
         getLog().info( "parent build dir is: " + parentBuildDir );
-        
+
         if ( parentBuildDir.indexOf( "${" ) > -1 )
         {
             throw new MojoExecutionException( "Parent-project's build dir is not interpolated." );

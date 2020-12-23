@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * @goal fork-lifecycle-no-project
  * @requiresProject false
- * 
+ *
  * @execute phase="generate-sources" lifecycle="foo"
  */
 public class ForkLifecycleNoProjectMojo

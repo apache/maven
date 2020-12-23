@@ -26,12 +26,12 @@ under the License.
   <artifactId>maven-it-it0086</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: it0086</name> 
+  <name>Maven Integration Test :: it0086</name>
   <description>
     Verify that a plugin dependency class can be loaded from both the plugin classloader and the context classloader
     available to the plugin.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

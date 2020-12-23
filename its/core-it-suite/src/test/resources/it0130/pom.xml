@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0130</name> 
+  <name>Maven Integration Test :: it0130</name>
   <description>Test default binding of goals for "clean" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

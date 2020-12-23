@@ -17,7 +17,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <modules>
     <module>assembly</module>
     <module>test</module>

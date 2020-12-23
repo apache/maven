@@ -27,7 +27,7 @@ under the License.
   <version>0.2</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0038</name> 
+  <name>Maven Integration Test :: it0038</name>
   <description>
     Test building project from outside the project directory using '-f' option
   </description>

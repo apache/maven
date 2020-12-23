@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2871 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-2871 :: Parent</name>
   <description>
     Verify that dependencies on not-yet-packaged sub artifacts in build phases prior to package can be satisfied
     from a module's output directory, i.e. with the loose class files.

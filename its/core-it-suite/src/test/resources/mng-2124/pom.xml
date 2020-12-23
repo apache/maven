@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0100</name> 
+  <name>Maven Integration Test :: it0100</name>
   <description>Test that ${parent.artifactId} resolves correctly. [MNG-2124]</description>
 
   <modules>

@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>ear</packaging>
 
-  <name>Maven Integration Test :: it0137</name> 
+  <name>Maven Integration Test :: it0137</name>
   <description>Test default binding of goals for "ear" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

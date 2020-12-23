@@ -26,7 +26,7 @@ under the License.
   <artifactId>consumer</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: it0143</name> 
+  <name>Maven Integration Test :: it0143</name>
   <description>
     Test that the different scopes of transitive dependencies end up on the right class paths.
   </description>

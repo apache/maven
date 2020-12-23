@@ -30,7 +30,7 @@ under the License.
   <name>Maven Integration Test :: it-core-extensions</name>
   <description>
     Verify that Maven loads core extensions and components contributed by the extensions are available to regular
-    plugins. 
+    plugins.
   </description>
 
 </project>

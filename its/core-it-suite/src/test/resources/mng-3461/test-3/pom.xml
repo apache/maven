@@ -26,7 +26,7 @@ under the License.
   <artifactId>test-3</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3461</name> 
+  <name>Maven Integration Test :: MNG-3461</name>
   <description>
     Test that mirror definitions are properly evaluated. In particular, the wildcards within a single mirrorOf
     spec should not be greedy.

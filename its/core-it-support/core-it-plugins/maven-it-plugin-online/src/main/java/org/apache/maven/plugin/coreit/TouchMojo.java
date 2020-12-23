@@ -27,11 +27,11 @@ import java.io.IOException;
 
 /**
  * Creates an empty file with a user-specified name. NOTE: This mojo requires online mode.
- * 
+ *
  * @goal touch
  * @phase validate
  * @requiresOnline true
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class TouchMojo
@@ -40,14 +40,14 @@ public class TouchMojo
 
     /**
      * The path to the output file.
-     * 
+     *
      * @parameter property="touch.outputFile" default-value="target/touch.txt"
      */
     private File outputFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

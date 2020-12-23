@@ -24,8 +24,8 @@ under the License.
 
   <groupId>org.apache.maven.its.mng2068</groupId>
   <artifactId>grand-parent</artifactId>
-  <version>2.2-SNAPSHOT</version> 
+  <version>2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2068 :: Grand Parent</name> 
+  <name>Maven Integration Test :: MNG-2068 :: Grand Parent</name>
 </project>

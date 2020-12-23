@@ -30,11 +30,11 @@ import java.util.List;
 /**
  * Loads classes and/or resources from a custom class loader that holds the project dependencies and records the results
  * in a properties file.
- * 
+ *
  * @goal load-dependencies
  * @phase initialize
  * @requiresDependencyResolution compile
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -44,7 +44,7 @@ public class LoadDependenciesMojo
 
     /**
      * The project's class path to load classes/resources from.
-     * 
+     *
      * @parameter default-value="${project.compileClasspathElements}"
      * @readonly
      */
@@ -53,14 +53,14 @@ public class LoadDependenciesMojo
     /**
      * The path to the properties file used to track the results of the class/resource loading via the project class
      * loader.
-     * 
+     *
      * @parameter property="clsldr.projectClassLoaderOutput"
      */
     private File projectClassLoaderOutput;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

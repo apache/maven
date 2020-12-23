@@ -15,7 +15,7 @@
     <packaging>ejb</packaging>
     <name>Issue EJB</name>
     <description><![CDATA[Demonstration of issue with EJB client.]]></description>
-    
+
     <build>
         <pluginManagement>
             <plugins>
@@ -32,12 +32,12 @@
             </plugins>
         </pluginManagement>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

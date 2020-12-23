@@ -27,7 +27,7 @@ import java.util.Collection;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-505">MNG-505</a>.
- * 
+ *
  * @author Brett Porter
  *
  */
@@ -35,7 +35,7 @@ public class MavenITmng0505VersionRangeTest
     extends AbstractMavenIntegrationTestCase
 {
     /**
-     * Oleg 2009.04.30: the same functionality but simpler - no multiple ranges - syntax 
+     * Oleg 2009.04.30: the same functionality but simpler - no multiple ranges - syntax
      * is tested in MNG-4150
      */
     public MavenITmng0505VersionRangeTest()

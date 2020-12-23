@@ -30,10 +30,10 @@ import java.io.File;
 /**
  * Sets the main artifact's file. This is the essence of the Maven JAR Plugin and all the other packaging plugins.
  * Creating the actual file for the main artifact is a specific plugin job and not related to the Maven core.
- * 
+ *
  * @goal set
  * @phase package
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -43,7 +43,7 @@ public class SetMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      * @required
@@ -53,7 +53,7 @@ public class SetMojo
     /**
      * The path to the file to set as the main artifact, relative to the project base directory. The plugin will not
      * validate this path.
-     * 
+     *
      * @parameter property="artifact.mainFile"
      * @required
      */
@@ -61,7 +61,7 @@ public class SetMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()

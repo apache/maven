@@ -26,7 +26,7 @@ under the License.
   <artifactId>property</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3810</name> 
+  <name>Maven Integration Test :: MNG-3810</name>
   <description>
     Test profiles that are malformed in the POM get a decent error message.
   </description>

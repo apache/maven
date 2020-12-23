@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2972">MNG-2972</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

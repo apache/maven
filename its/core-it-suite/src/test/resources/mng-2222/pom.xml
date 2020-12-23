@@ -27,13 +27,13 @@ under the License.
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2222</name> 
+  <name>Maven Integration Test :: MNG-2222</name>
   <description>
     Test that dependencies on reactor projects can be satisfied by their output directories even if those do not
     exist (e.g. due to non-existing sources). This ensures consistent build results for "mvn compile" and
     "mvn package".
   </description>
-  
+
   <modules>
     <module>mod-a</module>
     <module>mod-b</module>

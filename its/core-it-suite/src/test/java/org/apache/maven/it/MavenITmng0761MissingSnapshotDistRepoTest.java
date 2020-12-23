@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-761">MNG-761</a>.
- * 
+ *
  * @author Brett Porter
  *
  */

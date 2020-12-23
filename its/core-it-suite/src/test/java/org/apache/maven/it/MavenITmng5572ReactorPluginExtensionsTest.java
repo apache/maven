@@ -26,8 +26,8 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5572">MNG-5572</a>
  * as a response to <a href="https://issues.apache.org/jira/browse/MNG-1911">MNG-1911</a>
- * 
- * 
+ *
+ *
  * @author rfscholte
  */
 public class MavenITmng5572ReactorPluginExtensionsTest
@@ -40,7 +40,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest
     }
 
     /**
-     * Test that Maven warns when one reactor project contains a plugin, and another tries to use it with extensions 
+     * Test that Maven warns when one reactor project contains a plugin, and another tries to use it with extensions
      */
     public void testit()
         throws Exception

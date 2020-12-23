@@ -40,7 +40,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
 
     /**
      * Test that dependency resolution from the reactor is not too eager and does not resolve plugin artifacts from
-     * the build directory of their plugin project when the plugin project hasn't been built yet. The technical 
+     * the build directory of their plugin project when the plugin project hasn't been built yet. The technical
      * problem is that the mere existence of a project output directory like target/classes is no sufficient indicator
      * that we can use that for artifact resolution. The project's output directory might just be a left over from a
      * previous build and could be in any state, e.g. incomplete.

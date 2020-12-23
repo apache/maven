@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5898">MNG-5898</a>.
- * 
+ *
  * @author Karl Heinz Marbaise
  */
 public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest
@@ -38,7 +38,7 @@ public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest
     }
 
     /**
-     * 
+     *
      */
     public void testit()
         throws Exception

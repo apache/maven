@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-870">MNG-870</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

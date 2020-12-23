@@ -27,7 +27,7 @@ import java.io.IOException;
  * Goal which touches a timestamp file.
  *
  * @goal touch
- * 
+ *
  * @phase process-sources
  */
 public class MyMojo

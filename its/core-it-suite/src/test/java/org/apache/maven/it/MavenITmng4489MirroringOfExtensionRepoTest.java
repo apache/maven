@@ -41,7 +41,7 @@ import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4489">MNG-4489</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4489MirroringOfExtensionRepoTest

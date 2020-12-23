@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3831</name> 
+  <name>Maven Integration Test :: MNG-3831</name>
   <description>Test POM interpolation with expressions of the form $ { * } (ugly but real)</description>
 
   <modules>

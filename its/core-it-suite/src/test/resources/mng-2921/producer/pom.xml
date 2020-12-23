@@ -31,7 +31,7 @@ under the License.
   <artifactId>producer</artifactId>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2921 :: Dependency Provider</name> 
+  <name>Maven Integration Test :: MNG-2921 :: Dependency Provider</name>
 
   <build>
     <plugins>

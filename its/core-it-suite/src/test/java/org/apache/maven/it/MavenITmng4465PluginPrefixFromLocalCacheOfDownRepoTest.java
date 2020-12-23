@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4465">MNG-4465</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
@@ -68,7 +68,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
             Collections.singletonMap( "@baseurl@", "bad://localhost:63412" ) );
         verifier.setLogFileName( "log2.txt" );
         verifier.addCliOption( "-s" );

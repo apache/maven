@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3652">MNG-3652</a>.
- * 
+ *
  *
  */
 public class MavenITmng3652UserAgentHeaderTest
@@ -45,7 +45,7 @@ public class MavenITmng3652UserAgentHeaderTest
     private int port;
 
     private String userAgent;
-    
+
     private String customHeader;
 
     public MavenITmng3652UserAgentHeaderTest()
@@ -65,11 +65,11 @@ public class MavenITmng3652UserAgentHeaderTest
                 throws IOException
             {
                 System.out.println( "Handling URL: '" + request.getRequestURL() + "'" );
-                
+
                 userAgent = request.getHeader( "User-Agent" );
-                
+
                 customHeader = request.getHeader( "Custom-Header" );
-                
+
                 System.out.println( "Got User-Agent: '" + userAgent + "'" );
 
                 response.setContentType( "text/plain" );

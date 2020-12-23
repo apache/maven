@@ -25,10 +25,10 @@ import java.io.File;
 
 /**
  * Loads classes and/or resources from the plugin class path and records the results in a properties file.
- * 
+ *
  * @goal load
  * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -39,7 +39,7 @@ public class LoadMojo
     /**
      * The path to the properties file used to track the results of the class/resource loading via the plugin class
      * loader.
-     * 
+     *
      * @parameter property="clsldr.pluginClassLoaderOutput"
      */
     private File pluginClassLoaderOutput;
@@ -47,14 +47,14 @@ public class LoadMojo
     /**
      * The path to the properties file used to track the results of the class/resource loading via the thread's context
      * class loader.
-     * 
+     *
      * @parameter property="clsldr.contextClassLoaderOutput"
      */
     private File contextClassLoaderOutput;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

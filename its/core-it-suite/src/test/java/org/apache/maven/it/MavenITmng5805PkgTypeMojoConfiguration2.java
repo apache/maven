@@ -17,9 +17,9 @@ public class MavenITmng5805PkgTypeMojoConfiguration2
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5805-pkg-type-mojo-configuration2" );
-        
+
         Verifier verifier;
-        
+
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );

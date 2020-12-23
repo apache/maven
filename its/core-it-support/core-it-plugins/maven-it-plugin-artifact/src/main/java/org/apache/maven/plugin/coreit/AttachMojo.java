@@ -29,10 +29,10 @@ import java.io.File;
 
 /**
  * Attaches a secondary artifact to the current project. This mimics source/javadoc attachments or other assemblies.
- * 
+ *
  * @goal attach
  * @phase package
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class AttachMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      * @required
@@ -51,14 +51,14 @@ public class AttachMojo
 
     /**
      * The Maven project helper.
-     * 
+     *
      * @component
      */
     private MavenProjectHelper helper;
 
     /**
      * The path to the file to attach, relative to the project base directory. The plugin will not validate this path.
-     * 
+     *
      * @parameter property="artifact.attachedFile"
      * @required
      */
@@ -66,7 +66,7 @@ public class AttachMojo
 
     /**
      * The type of the artifact to attach.
-     * 
+     *
      * @parameter property="artifact.artifactType"
      */
     private String artifactType;
@@ -74,14 +74,14 @@ public class AttachMojo
     /**
      * The classifier for the attached artifact. If unspecified, the default classifier for the specified artifact type
      * is used.
-     * 
+     *
      * @parameter property="artifact.artifactClassifier"
      */
     private String artifactClassifier;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the attached file has not been set.
      */
     public void execute()

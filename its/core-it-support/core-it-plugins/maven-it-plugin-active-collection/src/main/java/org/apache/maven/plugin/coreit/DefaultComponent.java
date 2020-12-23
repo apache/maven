@@ -21,7 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 /**
  * A simple test component.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultComponent

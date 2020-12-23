@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3714">MNG-3714</a>.
- * 
+ *
  * @author Brett Porter
  *
  */
@@ -52,7 +52,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         new File( javaHome, "bin" ).mkdirs();
         new File( javaHome, "bin/javac").createNewFile();
         new File( javaHome, "bin/javac.exe").createNewFile();
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty( "@javaHome@", javaHome.getAbsolutePath() );

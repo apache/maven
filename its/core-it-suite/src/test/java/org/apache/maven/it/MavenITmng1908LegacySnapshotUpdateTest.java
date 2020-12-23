@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1908">MNG-1908</a>.
- * 
+ *
  * @author Brett Porter
  *
  */
@@ -39,7 +39,7 @@ public class MavenITmng1908LegacySnapshotUpdateTest
         // legacy layout no longer supported in Maven 3.x (see MNG-4204)
         super( "[2.0,3.0-alpha-3)" );
     }
-    
+
     /**
      * Test that legacy repositories with legacy snapshots (i.e. without metadata) download correctly.
      */

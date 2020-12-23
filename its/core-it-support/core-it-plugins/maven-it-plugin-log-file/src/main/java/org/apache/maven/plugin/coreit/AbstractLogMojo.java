@@ -31,7 +31,7 @@ import java.io.OutputStreamWriter;
 
 /**
  * Provides common services for the mojos of this plugin.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -41,7 +41,7 @@ public abstract class AbstractLogMojo
 
     /**
      * The project's base directory, used for manual path translation.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -49,7 +49,7 @@ public abstract class AbstractLogMojo
 
     /**
      * The path to the output file, relative to the project's base directory.
-     * 
+     *
      * @parameter property="log.logFile"
      */
     private File logFile;
@@ -61,7 +61,7 @@ public abstract class AbstractLogMojo
 
     /**
      * Gets the absolute path to the log file.
-     * 
+     *
      * @return The absolute path to the log file, never <code>null</code>.
      */
     private File getLogFile()
@@ -76,7 +76,7 @@ public abstract class AbstractLogMojo
      * Appends the string representation of the specified object to the log file. Logging <code>null</code> has no other
      * effect than touching the file. For each value different from <code>null</code>, a line terminator will be
      * appended to the value's string representation.
-     * 
+     *
      * @param value The object to log, may be <code>null</code>.
      * @throws MojoExecutionException If the log file could not be updated.
      */
@@ -120,7 +120,7 @@ public abstract class AbstractLogMojo
 
     /**
      * Clears the contents of the log file by creating a new empty log file.
-     * 
+     *
      * @throws MojoExecutionException If the log file could not be reset.
      */
     protected void reset()

@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>consumer-c</artifactId>
 
-  <name>Maven Integration Test :: MNG-3043 :: Consumer C</name> 
+  <name>Maven Integration Test :: MNG-3043 :: Consumer C</name>
   <description>
     Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
     yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the

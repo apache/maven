@@ -27,10 +27,10 @@ under the License.
     <artifactId>parent</artifactId>
     <version>1</version>
   </parent>
-  
+
   <artifactId>dependency</artifactId>
 
-  <name>Maven Integration Test :: MNG-3023 :: Dependency</name> 
+  <name>Maven Integration Test :: MNG-3023 :: Dependency</name>
   <description>Test that reactor projects are included in dependency resolution.</description>
 
   <build>

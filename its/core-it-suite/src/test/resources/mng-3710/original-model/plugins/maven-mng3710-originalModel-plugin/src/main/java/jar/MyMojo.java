@@ -43,19 +43,19 @@ public class MyMojo
     {
         Model originalModel = project.getOriginalModel();
         Build originalBuild = originalModel.getBuild();
-        
+
         Map originalPluginMap = originalBuild.getPluginsAsMap();
-        
+
         if ( originalPluginMap.containsKey( Plugin.constructKey( "org.apache.maven.its.mng3710", "maven-mng3710-directInvoke-plugin" ) ) )
         {
             throw new MojoExecutionException( "Project's original model has been polluted by an entry for a plugin that was invoked directly from the command line." );
         }
-        
+
         if ( originalPluginMap.containsKey( Plugin.constructKey( "org.apache.maven.plugins", "maven-compiler-plugin" ) ) )
         {
             throw new MojoExecutionException( "Project's original model has been polluted by an entry for a plugin that is specified in the lifecycle mapping for this project's packaging." );
         }
-        
+
         getLog().info( "Original-model verification completed successfully." );
     }
 }

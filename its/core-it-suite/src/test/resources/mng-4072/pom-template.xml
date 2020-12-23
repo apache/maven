@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4072</name> 
+  <name>Maven Integration Test :: MNG-4072</name>
   <description>
     Test that repositories from inactive profiles are actually not used for artifact resolution.
   </description>

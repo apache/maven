@@ -4,11 +4,11 @@
   <artifactId>projects</artifactId>
   <packaging>pom</packaging>
   <version>2</version>
-  
+
   <modules>
     <module>maven-mng3740-plugin</module>
   </modules>
-  
+
   <build>
     <plugins>
       <plugin>

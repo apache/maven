@@ -28,7 +28,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3297">MNG-3297</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3297DependenciesNotLeakedToMojoTest

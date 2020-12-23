@@ -27,10 +27,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3667">MNG-3667</a>.
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3667ResolveDepsWithBadPomVersionTest
     extends AbstractMavenIntegrationTestCase

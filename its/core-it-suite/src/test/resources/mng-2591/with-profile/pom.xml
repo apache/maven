@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2591</name> 
+  <name>Maven Integration Test :: MNG-2591</name>
   <description>
     Test aggregation of list configuration items for build plugins when using
     'combine.children=append' attribute.

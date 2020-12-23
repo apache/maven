@@ -26,11 +26,11 @@ under the License.
   <artifactId>maven-it-mng3271</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3271</name> 
+  <name>Maven Integration Test :: MNG-3271</name>
   <description>
     Verify that default reports can be suppressed.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

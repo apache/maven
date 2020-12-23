@@ -30,7 +30,7 @@ import java.io.Writer;
 /**
  * "Catch" a parameter "thrown" by the ThrowMojo through the plugin context, and
  * write a file based on it's value to the build output directory.
- * 
+ *
  * @goal catch
  */
 public class CatchMojo
@@ -43,12 +43,12 @@ public class CatchMojo
      * @readonly
      */
     private File outDir;
-    
+
     public File getOutDir()
     {
         return outDir;
     }
-    
+
     public void setOutDir( File outDir )
     {
         this.outDir = outDir;
@@ -63,16 +63,16 @@ public class CatchMojo
         {
             outDir.mkdirs();
         }
-        
+
         File outfile = new File( outDir, value );
 
         Writer writer = null;
         try
         {
             writer = new FileWriter( outfile );
-            
+
             writer.write( value );
-            
+
             writer.flush();
         }
         catch ( IOException e )

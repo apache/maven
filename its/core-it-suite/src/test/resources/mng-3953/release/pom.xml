@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3953</name> 
+  <name>Maven Integration Test :: MNG-3953</name>
   <description>
     Test that deployment (of a release) to a repository that requires authentification works.
   </description>

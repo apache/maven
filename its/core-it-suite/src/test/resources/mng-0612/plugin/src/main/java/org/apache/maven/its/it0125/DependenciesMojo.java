@@ -50,19 +50,19 @@ public class DependenciesMojo extends AbstractMojo
      * @parameter expression="${project.artifacts}"
      */
     private Set artifacts;
-    
+
     /**
      * @parameter expression="${project.build.directory}"
      */
     private String buildDirectory;
-    
+
     /*
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         File file = new File( buildDirectory, "dependencies.log" );
-        
+
         if ( !file.getParentFile().mkdirs() )
         {
             throw new MojoExecutionException( "Cannot create build directory" );
@@ -71,15 +71,15 @@ public class DependenciesMojo extends AbstractMojo
         try
         {
             BufferedWriter writer = new BufferedWriter( new FileWriter( file ) );
-            
+
             for ( Iterator iterator = artifacts.iterator(); iterator.hasNext(); )
             {
                 Artifact artifact = (Artifact) iterator.next();
-                
+
                 writer.write( artifact.toString() );
                 writer.newLine();
             }
-            
+
             writer.close();
         }
         catch ( IOException exception )

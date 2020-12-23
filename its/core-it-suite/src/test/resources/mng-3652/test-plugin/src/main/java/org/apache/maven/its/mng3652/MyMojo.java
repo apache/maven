@@ -29,64 +29,64 @@ import org.codehaus.plexus.util.IOUtil;
  * a file in the output directory, for comparison in the unit tests assertions.
  *
  * @goal touch
- * 
+ *
  * @phase validate
  */
 public class MyMojo
     extends AbstractMojo
 {
-    
+
     private static final String LS = System.getProperty( "line.separator" );
-    
+
     /**
      * @parameter default-value="${project.build.directory}/touch.txt"
      */
     private File touchFile;
-    
+
     /**
      * @component
      */
     private ArtifactResolver resolver;
-    
+
     /**
      * @component
      */
     private ArtifactFactory artifactFactory;
-    
+
     /**
      * @component
      */
     private ArtifactRepositoryFactory repositoryFactory;
-    
+
     /**
      * @component
      */
     private ArtifactRepositoryLayout layout;
-    
+
     /**
      * @component
      */
     private RuntimeInformation runtimeInformation;
-    
+
     /**
      * @parameter expression="${testProtocol}" default-value="http"
      * @required
      */
     private String testProtocol;
-    
+
     /**
      * @parameter expression="${testPort}"
      * @required
      */
     private String testPort;
-    
+
     /**
      * @parameter default-value="${project.build.directory}/local-repo"
      * @required
      * @readonly
      */
     private File localRepoDir;
-    
+
     public void execute()
         throws MojoExecutionException
     {
@@ -98,7 +98,7 @@ public class MyMojo
         ArtifactRepository remote =
             repositoryFactory.createArtifactRepository( "test", testProtocol + "://localhost:" + testPort, layout,
                                                         policy, policy );
-        
+
         Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );
 
         try
@@ -108,7 +108,7 @@ public class MyMojo
             ArtifactRepository local =
                 repositoryFactory.createArtifactRepository( "local", localRepoDir.toURL().toExternalForm(), layout,
                                                             null, null );
-        
+
             getLog().info( "Retrieving " + artifact + " from " + remote + " to " + local );
 
             resolver.resolveAlways( artifact, Collections.singletonList( remote ), local );
@@ -132,7 +132,7 @@ public class MyMojo
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
-        
+
         String artifactVersion;
         InputStream resourceAsStream = null;
         try
@@ -159,13 +159,13 @@ public class MyMojo
         {
             IOUtil.close( resourceAsStream );
         }
-        
+
         FileWriter w = null;
         try
         {
             touchFile.getParentFile().mkdirs();
             w = new FileWriter( touchFile );
-            
+
             w.write( runtimeInformation.getApplicationVersion().toString() );
             w.write( LS );
             w.write( System.getProperty( "java.version" ) );

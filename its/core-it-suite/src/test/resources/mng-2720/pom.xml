@@ -8,13 +8,13 @@
   <packaging>pom</packaging>
 
   <name>MNG-2720 Project Hierarchy</name>
-  
+
   <modules>
     <module>child1</module>
     <module>child2</module>
     <module>child3</module>
   </modules>
-  
+
   <build>
     <plugins>
       <plugin>

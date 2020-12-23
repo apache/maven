@@ -5,14 +5,14 @@
   <artifactId>import-dep</artifactId>
   <version>1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <distributionManagement>
     <snapshotRepository>
       <id>nexus</id>
       <url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -22,5 +22,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-        
+
 </project>

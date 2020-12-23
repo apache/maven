@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3819</name> 
+  <name>Maven Integration Test :: MNG-3819</name>
   <description>
     Verify that plexus-utils:1.1 is present on plugin class path if plexus-utils is not explicitly declared in
     plugin POM for backward-compat with Maven 2.0.5- (due to MNG-2892, plexus-utils is no longer part of the core

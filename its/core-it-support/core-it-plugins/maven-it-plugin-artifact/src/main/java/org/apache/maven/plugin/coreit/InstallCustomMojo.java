@@ -26,9 +26,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Installs the project artifacts into a local repository with a custom base directory and a custom layout.
- * 
+ *
  * @goal install-custom
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -43,14 +43,14 @@ public class InstallCustomMojo
 
     /**
      * The base directory of the local repository to install to.
-     * 
+     *
      * @parameter property="install.localRepoDir"
      */
     private File localRepoDir;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
     public void execute()

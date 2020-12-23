@@ -28,7 +28,7 @@ under the License.
   <!-- The packaging defined by the IT plugin -->
   <packaging>it-packaging</packaging>
 
-  <name>Maven Integration Test :: MNG-2831</name> 
+  <name>Maven Integration Test :: MNG-2831</name>
   <description>
     Test the use of a custom lifecycle from a plugin that is defined as a build extension.
   </description>

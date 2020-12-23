@@ -27,7 +27,7 @@ import java.util.Collections;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3139">MNG-3139</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -67,7 +67,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
             Collections.singletonMap( "@baseurl@", "http://localhost:63412" ) );
         verifier.setLogFileName( "log2.txt" );
         verifier.addCliOption( "--settings" );

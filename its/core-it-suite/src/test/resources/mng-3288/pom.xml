@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3288</name> 
+  <name>Maven Integration Test :: MNG-3288</name>
   <description>
     Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.
   </description>

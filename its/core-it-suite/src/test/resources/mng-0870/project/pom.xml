@@ -33,7 +33,7 @@ under the License.
   <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-870 :: Plugin Consumer</name> 
+  <name>Maven Integration Test :: MNG-870 :: Plugin Consumer</name>
   <description>
     Test that the reactor can resolve plugins that have just been built by a previous module and are not yet
     installed to the local repo.

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test3</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4053</name> 
+  <name>Maven Integration Test :: MNG-4053</name>
   <description>
     Verify that attributes in plugin configuration elements are not erroneously duplicated to other elements when
     plugin management and a profile are used.

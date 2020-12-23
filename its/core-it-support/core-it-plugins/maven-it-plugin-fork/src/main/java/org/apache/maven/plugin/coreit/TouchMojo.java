@@ -30,7 +30,7 @@ import java.io.IOException;
 
 /**
  * @goal touch
- * 
+ *
  * @phase process-sources
  */
 public class TouchMojo
@@ -73,15 +73,15 @@ public class TouchMojo
              {
                  dir.mkdirs();
              }
-             
+
              File touch = new File( dir, file );
 
              // NOTE: Using append mode to track execution count
              OutputStreamWriter w = new OutputStreamWriter( new FileOutputStream( touch, true ), "UTF-8" );
-             
+
              w.write( file );
              w.write( "\n" );
-             
+
              w.close();
         }
         catch ( IOException e )

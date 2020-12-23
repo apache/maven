@@ -27,7 +27,7 @@ import java.util.Collection;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1233">MNG-1233</a>.
- * 
+ *
  * @author Brett Porter
  *
  */
@@ -59,15 +59,15 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
         verifier.resetStreams();
 
         Collection<String> compileArtifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertTrue( compileArtifacts.toString(), 
+        assertTrue( compileArtifacts.toString(),
             compileArtifacts.contains( "org.apache.maven.its.it0083:direct-dep:jar:0.1" ) );
-        assertTrue( compileArtifacts.toString(), 
+        assertTrue( compileArtifacts.toString(),
             compileArtifacts.contains( "org.apache.maven.its.it0083:trans-dep:jar:0.1" ) );
 
         Collection<String> runtimeArtifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );
-        assertTrue( runtimeArtifacts.toString(), 
+        assertTrue( runtimeArtifacts.toString(),
             runtimeArtifacts.contains( "org.apache.maven.its.it0083:direct-dep:jar:0.1" ) );
-        assertFalse( runtimeArtifacts.toString(), 
+        assertFalse( runtimeArtifacts.toString(),
             runtimeArtifacts.contains( "org.apache.maven.its.it0083:trans-dep:jar:0.1" ) );
     }
 

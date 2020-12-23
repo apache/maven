@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-3951</name> 
+  <name>Maven Integration Test :: MNG-3951</name>
   <description>
     Test that the paths retrieved from the core are always absolute, in particular the drive-relative paths on
     Windows must be properly resolved.

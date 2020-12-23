@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3379">MNG-3379</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -74,7 +74,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
             "4d96e09f7e93870685a317c574f851b407224415" );
         assertMetadata( verifier, gid + "a", "x", "0.2-SNAPSHOT",
             "e1cfc3a77657fc46bb624dee25c61b290e5b4dd7" );
-        
+
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "jar",
             "efb7c4046565774cd7e44645e02f06ecdf91098d" );
         assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "pom",

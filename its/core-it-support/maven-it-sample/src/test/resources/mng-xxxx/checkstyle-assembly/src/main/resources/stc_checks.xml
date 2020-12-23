@@ -95,8 +95,8 @@ under the License.
     <module name="EmptyStatement"/>
 
 
-    <module name="GenericIllegalRegexp"> 
-      <!-- \s matches whitespace character, $ matches end of line. --> 
+    <module name="GenericIllegalRegexp">
+      <!-- \s matches whitespace character, $ matches end of line. -->
       <property name="format" value="(?:\x66\x75\x63\x6B)|(?:\x73\x68\x69\x74)|(?:\x63\x75\x6E\x74)"/>
       <property name="ignoreCase" value="true" />
       <property name="message" value="Code contains inappropriate language"/>
@@ -120,17 +120,17 @@ under the License.
     <!-- http://checkstyle.sourceforge.net/config_coding.html#IllegalCatch-->
    <!-- <module name="IllegalCatch">
       <property name="severity" value="warning"/>
-    </module>   
+    </module>
 
     <module name="IllegalThrows">
       <property name="severity" value="warning"/>
-    </module>  
+    </module>
 
     <module name="DefaultComesLast"/>
 
     <module name="FallThrough">
       <property name="severity" value="warning"/>
-    </module>  --> 
+    </module>  -->
 
 
 

@@ -7,7 +7,7 @@
   <packaging>jar</packaging>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-3680</name> 
+  <name>Maven Integration Test :: MNG-3680</name>
   <description>
     Verify that dependencies with invalid POMs can still be used without failing the build.
   </description>
@@ -20,7 +20,7 @@
       <version>0.1</version>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

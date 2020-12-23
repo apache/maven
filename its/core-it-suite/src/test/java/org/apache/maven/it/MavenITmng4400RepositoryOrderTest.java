@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4400">MNG-4400</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4400RepositoryOrderTest

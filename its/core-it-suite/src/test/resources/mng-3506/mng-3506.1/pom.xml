@@ -27,7 +27,7 @@ under the License.
     <version>1</version>
   </parent>
   <artifactId>mng-3506.1</artifactId>
-  
+
   <!-- This lifecycle and artifact handler are loaded in the parent POM -->
   <packaging>coreit-1</packaging>
 

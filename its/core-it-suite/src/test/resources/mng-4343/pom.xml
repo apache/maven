@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4343</name> 
+  <name>Maven Integration Test :: MNG-4343</name>
   <description>
     Verify that checking for *missing* release artifacts respects the update policy that is configured in the
     release section for the respective repository or set globally via "-U".

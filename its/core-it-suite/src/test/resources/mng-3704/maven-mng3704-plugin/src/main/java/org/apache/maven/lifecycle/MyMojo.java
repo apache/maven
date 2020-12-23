@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 /**
  * Tests that the lifecycle executor with the out-of-date component configuration (missing some new component
  * requirements) will still work...
- * 
+ *
  * @goal run
  * @phase validate
  */
@@ -91,7 +91,7 @@ public class MyMojo
 
         List tasks = new ArrayList();
         tasks.add( "compile" );
-        
+
         ReactorManager rm;
         try
         {
@@ -105,7 +105,7 @@ public class MyMojo
         {
             throw new MojoExecutionException( "Failed to construct ReactorManager instance prior to lifecycle execution.", e );
         }
-        
+
         MavenSession s =
             new MavenSession( session.getContainer(), session.getSettings(), session.getLocalRepository(),
                               new DefaultEventDispatcher(), rm, tasks, session.getExecutionRootDirectory(),

@@ -26,7 +26,7 @@ import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4309">MNG-4309</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4309StrictChecksumValidationForMetadataTest

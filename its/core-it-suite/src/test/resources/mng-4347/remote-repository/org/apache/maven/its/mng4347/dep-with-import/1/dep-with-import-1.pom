@@ -38,7 +38,7 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng4347</groupId>

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3890</name> 
+  <name>Maven Integration Test :: MNG-3890</name>
   <description>
     Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer
     remain in "provided" scope when depending on this consumer with scope "compile".

@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5137">MNG-5137</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng5137ReactorResolutionInForkedBuildTest
@@ -55,7 +55,7 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
         verifier.deleteDirectory( "producer/target" );
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5137" );
-        verifier.executeGoal( 
+        verifier.executeGoal(
                 "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2052</name> 
+  <name>Maven Integration Test :: MNG-2052</name>
   <description>
     Test that properties defined in an active profile in the user's
     settings are available for interpolation of systemPath in a dependency.

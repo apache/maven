@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>rar</packaging>
 
-  <name>Maven Integration Test :: it0136</name> 
+  <name>Maven Integration Test :: it0136</name>
   <description>Test default binding of goals for "rar" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

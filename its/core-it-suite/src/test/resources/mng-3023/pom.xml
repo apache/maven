@@ -27,9 +27,9 @@ under the License.
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3023</name> 
+  <name>Maven Integration Test :: MNG-3023</name>
   <description>Test that reactor projects are included in dependency resolution.</description>
-  
+
   <modules>
     <module>dependency</module>
     <module>consumer</module>

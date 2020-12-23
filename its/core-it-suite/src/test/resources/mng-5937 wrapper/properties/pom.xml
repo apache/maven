@@ -26,6 +26,6 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-5937</name> 
+  <name>Maven Integration Test :: MNG-5937</name>
 
 </project>

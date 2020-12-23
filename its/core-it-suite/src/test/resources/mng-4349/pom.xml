@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4349</name> 
+  <name>Maven Integration Test :: MNG-4349</name>
   <description>
     Test that relocation to an artifact with an invalid POM fails gracefully and still uses the relocated JAR
     (instead of the JAR for the unrelocated artifact).

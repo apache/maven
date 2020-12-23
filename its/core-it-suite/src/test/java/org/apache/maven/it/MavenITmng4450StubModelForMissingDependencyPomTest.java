@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4450">MNG-4450</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4450StubModelForMissingDependencyPomTest
@@ -60,9 +60,9 @@ public class MavenITmng4450StubModelForMissingDependencyPomTest
         Properties props = verifier.loadProperties( "target/pom.properties" );
 
         // NOTE: Some Maven versions generate faulty packaging for the stub model (always "pom"), not our business here
-        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
+        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1",
             props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.project.id" ).replaceAll( "pom", "jar" ) );
-        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
+        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1",
             props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.artifact.id" ).replaceAll( "pom", "jar" ) );
     }
 

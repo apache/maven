@@ -25,12 +25,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class CheckMojo
     extends AbstractMojo
 {
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean skipError;
-    
+
     public void execute()
         throws MojoExecutionException
     {

@@ -57,9 +57,9 @@ public class MavenITmng6558ToolchainsBuildingEventTest
         List<String> lines = verifier.loadLines( "target/spy.log", "UTF-8" );
         assertTrue( lines.toString(), lines.get( 0 ).startsWith( "init" ) );
         assertTrue( lines.toString(), lines.get( lines.size() - 1 ).startsWith( "close" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest" ) );
-        assertTrue( lines.toString(), 
+        assertTrue( lines.toString(),
             lines.contains( "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult" ) );
     }
 

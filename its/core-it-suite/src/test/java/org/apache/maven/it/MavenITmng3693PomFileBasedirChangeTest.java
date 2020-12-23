@@ -30,7 +30,7 @@ import org.apache.maven.shared.utils.io.FileUtils;
  * doesn't affect the basedir of the project instance for using that project's classes directory
  * in the classpath of another project's build...this happens when both projects are
  * built in the same reactor, and one project depends on the other.
- * 
+ *
  * @author jdcasey
  */
 public class MavenITmng3693PomFileBasedirChangeTest
@@ -45,17 +45,17 @@ public class MavenITmng3693PomFileBasedirChangeTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3693" );
-        
+
         File pluginDir = new File( testDir, "maven-mng3693-plugin" );
         File projectsDir = new File( testDir, "projects" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        
+
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         String depPath = verifier.getArtifactPath( "org.apache.maven.its.mng3693", "dep", "1", "pom" );
 
         File dep = new File( depPath );
@@ -65,7 +65,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
         FileUtils.deleteDirectory( dep );
 
         verifier = newVerifier( projectsDir.getAbsolutePath() );
-        
+
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();

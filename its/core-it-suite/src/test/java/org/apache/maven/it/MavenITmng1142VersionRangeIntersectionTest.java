@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1142">MNG-1142</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng1142VersionRangeIntersectionTest

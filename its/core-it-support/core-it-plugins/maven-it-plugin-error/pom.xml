@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>maven-it-plugin-error</artifactId>
   <packaging>maven-plugin</packaging>
-  
+
   <name>Maven IT Plugin :: Error Mojos</name>
   <description>
     A test plugin that throws various sorts of errors when loaded or executed. This plugin is designed to test Maven's ability
@@ -55,7 +55,7 @@ under the License.
       <scope>provided</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>

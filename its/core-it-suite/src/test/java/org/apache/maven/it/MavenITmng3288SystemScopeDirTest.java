@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test for <a href="https://issues.apache.org/jira/browse/MNG-3288">MNG-3288</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3288SystemScopeDirTest

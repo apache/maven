@@ -6,7 +6,7 @@ import org.jmock.MockObjectTestCase;
 
 public abstract class XStreamTestCase extends MockObjectTestCase
 {
-	private XStream xstream; 
+	private XStream xstream;
 
 	public void setUp()
 	{

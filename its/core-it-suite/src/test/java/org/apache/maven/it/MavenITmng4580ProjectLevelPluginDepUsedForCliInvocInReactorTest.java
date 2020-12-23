@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4580">MNG-4580</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest

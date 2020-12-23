@@ -28,10 +28,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3743">MNG-3743</a>.
  *
  * @todo Fill in a better description of what this test verifies!
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3743ForkWithPluginManagementTest
     extends AbstractMavenIntegrationTestCase
@@ -53,7 +53,7 @@ public class MavenITmng3743ForkWithPluginManagementTest
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "site" );
         verifier.verifyErrorFreeLog();

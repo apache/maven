@@ -30,9 +30,9 @@ import org.apache.maven.it.util.ResourceExtractor;
  * Verify that a multimodule build, built from the middle node in an inheritance hierarchy,
  * can find all parent POMs necessary to build each project in the reactor using ONLY the
  * relativePath from the parent specification (in this case, the implied one of '../pom.xml').
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng2068ReactorRelativeParentsTest
     extends AbstractMavenIntegrationTestCase

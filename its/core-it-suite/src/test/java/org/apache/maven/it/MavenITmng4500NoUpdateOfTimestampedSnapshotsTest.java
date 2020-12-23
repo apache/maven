@@ -38,7 +38,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4500">MNG-4500</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest

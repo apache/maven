@@ -26,11 +26,11 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-4196</name> 
+  <name>Maven Integration Test :: MNG-4196</name>
   <description>
     Verify that exclusions on a project-level plugin dependency are effective.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

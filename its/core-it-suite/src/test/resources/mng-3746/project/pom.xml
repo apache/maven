@@ -5,11 +5,11 @@
   <artifactId>project</artifactId>
   <version>1</version>
   <packaging>pom</packaging>
-  
+
   <properties>
     <java.version>overridden</java.version>
   </properties>
-  
+
   <build>
     <plugins>
       <plugin>

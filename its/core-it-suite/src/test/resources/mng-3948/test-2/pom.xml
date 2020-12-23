@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>test</artifactId>
 
-  <name>Maven Integration Test :: MNG-3948</name> 
+  <name>Maven Integration Test :: MNG-3948</name>
   <description>
     Test that parent POMs can be resolved from remote repositories defined by (active) profiles in the POM.
   </description>

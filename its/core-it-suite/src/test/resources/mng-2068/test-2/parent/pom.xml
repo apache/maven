@@ -34,7 +34,7 @@ under the License.
   <version>1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2068 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-2068 :: Parent</name>
 
   <modules>
     <module>child</module>

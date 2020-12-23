@@ -30,9 +30,9 @@ under the License.
   This ruleset checks EPHS code
   </description>
 
-  <rule ref="rulesets/finalizers.xml"/>  
+  <rule ref="rulesets/finalizers.xml"/>
 
-  
+
   <rule ref="rulesets/controversial.xml/UnnecessaryParentheses"/>
 
   <rule ref="rulesets/optimizations.xml/UseArrayListInsteadOfVector"/>
@@ -66,16 +66,16 @@ under the License.
  <!-- <rule ref="rulesets/basic.xml/NullPointerException"/> -->
   <rule ref="rulesets/basic.xml/AvoidThreadGroup"/>
  <!-- <rule ref="rulesets/basic.xml/BrokenNullCheck"/> -->
- 
+
   <rule ref="rulesets/sunsecure.xml"/>
   <rule ref="rulesets/strictexception.xml"/>
-  
+
   <rule ref="rulesets/codesize.xml/ExcessiveMethodLength"/>
   <rule ref="rulesets/codesize.xml/ExcessiveParameterList"/>
 
-  <rule ref="rulesets/design.xml/SimplifyBooleanReturns"/>  
-  
-  
+  <rule ref="rulesets/design.xml/SimplifyBooleanReturns"/>
+
+
   <rule ref="rulesets/design.xml/AvoidDeeplyNestedIfStmts"/>
   <rule ref="rulesets/design.xml/ConstructorCallsOverridableMethod"/>
   <rule ref="rulesets/design.xml/CloseResource"/>
@@ -116,17 +116,17 @@ under the License.
   <rule ref="rulesets/naming.xml/AvoidFieldNameMatchingTypeName"/>
   <rule ref="rulesets/naming.xml/AvoidFieldNameMatchingMethodName"/>
   <rule ref="rulesets/naming.xml/AvoidNonConstructorMethodsWithClassName"/>
-  
+
   <rule ref="rulesets/naming.xml/NoPackage"/>
-  <rule ref="rulesets/naming.xml/PackageCase"/>  
+  <rule ref="rulesets/naming.xml/PackageCase"/>
   <rule ref="rulesets/naming.xml/MisleadingVariableName"/>
 
 
   <rule ref="rulesets/logging-java.xml/SystemPrintln"/>
   <rule ref="rulesets/logging-java.xml/AvoidPrintStackTrace"/>
-  
+
   <rule ref="rulesets/logging-jakarta-commons.xml/UseCorrectExceptionLogging"/>
-  
+
 
   <rule ref="rulesets/braces.xml"/>
 

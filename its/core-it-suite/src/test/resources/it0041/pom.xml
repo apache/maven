@@ -26,9 +26,9 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0041</name> 
+  <name>Maven Integration Test :: it0041</name>
   <description>Test the use of a new type from a plugin</description>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

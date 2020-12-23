@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4461</name> 
+  <name>Maven Integration Test :: MNG-4461</name>
   <description>
     Test that deployment of an artifact gets logged via the transfer monitor.
   </description>

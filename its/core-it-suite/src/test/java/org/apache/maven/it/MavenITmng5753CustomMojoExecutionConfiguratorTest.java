@@ -35,7 +35,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
 
     public void testCustomMojoExecutionConfigurator()
         throws Exception
-    {        
+    {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5753-custom-mojo-execution-configurator" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "project" );
@@ -56,7 +56,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
         verifier.executeGoal( "validate" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
-        
+
         verifier.assertFilePresent( configurationFile.getCanonicalPath() );
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our

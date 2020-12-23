@@ -27,7 +27,7 @@ under the License.
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3284 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-3284 :: Parent</name>
   <description>
     Verify that the effective plugin versions used for a project are not influenced by other instances of this
     plugin in the reactor, i.e. each module gets exactly the plugin version it declares.

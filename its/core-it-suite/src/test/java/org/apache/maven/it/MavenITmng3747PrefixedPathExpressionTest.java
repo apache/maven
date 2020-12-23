@@ -29,10 +29,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3747">MNG-3747</a>.
  *
  * @todo Fill in a better description of what this test verifies!
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3747PrefixedPathExpressionTest
     extends AbstractMavenIntegrationTestCase
@@ -55,7 +55,7 @@ public class MavenITmng3747PrefixedPathExpressionTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "path is: " + new File( testDir, "relative" ).getCanonicalPath() + "/somepath", 
+        assertEquals( "path is: " + new File( testDir, "relative" ).getCanonicalPath() + "/somepath",
             props.getProperty( "stringParam" ) );
     }
 

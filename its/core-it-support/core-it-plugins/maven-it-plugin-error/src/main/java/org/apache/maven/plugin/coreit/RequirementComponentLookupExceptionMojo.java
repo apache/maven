@@ -31,7 +31,7 @@ import org.apache.maven.plugin.MojoFailureException;
 public class RequirementComponentLookupExceptionMojo
     extends AbstractMojo
 {
-    
+
     /**
      * @component role="missing-component" roleHint="triggers-error"
      */

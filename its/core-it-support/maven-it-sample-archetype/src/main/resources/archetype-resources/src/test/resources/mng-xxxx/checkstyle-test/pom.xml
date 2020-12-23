@@ -47,9 +47,9 @@ under the License.
     </extensions>
 
   <!-- Typically the tests will not rely on actual plugins and should be self-contained, in this case the problem was most
-  often experienced with Checkstyle so it makes it a valid test. Notice however that it is pinned to a known released version 
+  often experienced with Checkstyle so it makes it a valid test. Notice however that it is pinned to a known released version
   so the test won't randomly fail in the future if the plugin behavior changes.
-  
+
   If the extension listed above isn't correctly installed on the plugin classpath, this invocation will fail to find the custom rule -->
     <plugins>
       <plugin>

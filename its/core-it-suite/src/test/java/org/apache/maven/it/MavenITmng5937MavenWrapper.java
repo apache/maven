@@ -42,20 +42,20 @@ public class MavenITmng5937MavenWrapper
     extends AbstractMavenIntegrationTestCase
 {
     private Path wrapperDistro;
-    
+
     private final Map<String,String> envVars;
-    
+
     private final Path baseDir = Paths.get( "target/test-classes/mng-5937 wrapper" );
-    
+
     private ZipUnArchiver zipUnArchiver = new ZipUnArchiver();
-    
+
     public MavenITmng5937MavenWrapper()
         throws Exception
     {
         super( "[4.0.0-alpha-1,)" );
-        
+
         String localRepo = System.getProperty("maven.repo.local");
-        
+
         envVars = new HashMap<>( 4 );
         envVars.put( "MVNW_REPOURL", Paths.get( localRepo ).toUri().toURL().toString() );
         envVars.put( "MVNW_VERBOSE", "true" );
@@ -76,7 +76,7 @@ public class MavenITmng5937MavenWrapper
         {
             throw new IllegalStateException( "Missing maven.distro=${mavenDistro} parameter to test maven-wrapper: see run ITs instructions" );
         }
-        
+
         Verifier distInstaller = newVerifier( baseDir.toAbsolutePath().toFile().toString() );
         distInstaller.setSystemProperty( "file", mavenDist );
         distInstaller.setSystemProperty( "groupId", "org.apache.maven" );
@@ -85,7 +85,7 @@ public class MavenITmng5937MavenWrapper
         distInstaller.setSystemProperty( "classifier", "bin" );
         distInstaller.setSystemProperty( "packaging", "zip" );
         distInstaller.executeGoal( "org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file" );
-        
+
         String distroValue = System.getProperty( "maven.wrapper.distrodir" );
         if ( StringUtils.isEmpty( distroValue ) )
         {
@@ -98,7 +98,7 @@ public class MavenITmng5937MavenWrapper
         throws Exception
     {
         final File testDir = baseDir.resolve( "bin" ).toFile();
-        
+
         unpack( testDir.toPath(), "bin" );
 
         envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
@@ -115,9 +115,9 @@ public class MavenITmng5937MavenWrapper
                     throws Exception
     {
         final File testDir = baseDir.resolve( "script" ).toFile();
-        
+
         unpack( testDir.toPath(), "script" );
-        
+
         envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -132,9 +132,9 @@ public class MavenITmng5937MavenWrapper
                     throws Exception
     {
         final File testDir = baseDir.resolve( "source" ).toFile();
-        
+
         unpack( testDir.toPath(), "source" );
-        
+
         envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -149,9 +149,9 @@ public class MavenITmng5937MavenWrapper
                     throws Exception
     {
         final File testDir = baseDir.resolve( "properties" ).toFile();
-        
+
         unpack( testDir.toPath(), "bin" );
-        
+
         Path p = baseDir.resolve( "properties/.mvn/wrapper/maven-wrapper.properties" );
         try ( BufferedWriter out = Files.newBufferedWriter( p, StandardOpenOption.TRUNCATE_EXISTING ) )
         {
@@ -178,11 +178,11 @@ public class MavenITmng5937MavenWrapper
     private void unpack( Path target, String classifier ) throws IOException
     {
         Path distro = wrapperDistro.resolve( "apache-maven-wrapper-" + getMavenVersion() + '-' + classifier + ".zip" );
-        
+
         zipUnArchiver.setSourceFile( distro.toFile() );
         zipUnArchiver.setDestDirectory( target.toFile() );
         zipUnArchiver.enableLogging( new ConsoleLogger() );
-        
+
         zipUnArchiver.extract();
     }
 }

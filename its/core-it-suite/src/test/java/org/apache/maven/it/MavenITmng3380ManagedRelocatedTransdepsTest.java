@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3380">MNG-3380</a>.
- * 
+ *
  * expected project.getArtifacts() results:
  *
  * org.apache.maven.its.mng3380:direct:jar:1:compile
@@ -50,7 +50,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
      * Verify that dependency resolution considers dependency management also for relocated artifacts.
      */
     public void testitMNG3380()
-        throws Exception 
+        throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3380" );
 

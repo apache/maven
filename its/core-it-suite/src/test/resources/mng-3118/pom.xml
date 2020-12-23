@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3118</name> 
+  <name>Maven Integration Test :: MNG-3118</name>
   <description>
     Check that test classes appear before main classes on the test class path.
   </description>

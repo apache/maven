@@ -26,7 +26,7 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3852</name> 
+  <name>Maven Integration Test :: MNG-3852</name>
   <description>
     Verify that list-valued plugin parameters respect the ordering of their elements as given in the POM, even
     if these elements have different names.

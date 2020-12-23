@@ -32,7 +32,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 /**
- * 
+ *
  * @author Robert Scholte
  *
  */

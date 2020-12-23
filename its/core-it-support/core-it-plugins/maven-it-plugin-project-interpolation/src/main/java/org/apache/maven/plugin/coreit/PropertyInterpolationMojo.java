@@ -27,13 +27,13 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal check-property
- * 
+ *
  * @phase validate
  */
 public class PropertyInterpolationMojo
     extends AbstractMojo
 {
-    
+
     /** @parameter default-value="${project}" */
     private MavenProject project;
 
@@ -42,14 +42,14 @@ public class PropertyInterpolationMojo
     {
         String value = normalize( project.getProperties().getProperty( "myDirectory" ) );
         String targetValue = normalize( new File( project.getBuild().getDirectory(), "foo" ).getAbsolutePath() );
-        
+
         if ( !value.equals( targetValue ) )
         {
             throw new MojoExecutionException( "Property value of 'myDirectory': " + value
                 + " should equal the 'foo' subpath of the project build directory: " + targetValue );
         }
     }
-    
+
     private String normalize( String src )
     {
         return src.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );

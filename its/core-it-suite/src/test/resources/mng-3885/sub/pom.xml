@@ -31,7 +31,7 @@ under the License.
   <artifactId>sub</artifactId>
   <version>0.2-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3885 :: Child</name> 
+  <name>Maven Integration Test :: MNG-3885 :: Child</name>
   <description>
     Test that uniqueVersion defined by a parent profile is effective for child modules when building
     from the parent.

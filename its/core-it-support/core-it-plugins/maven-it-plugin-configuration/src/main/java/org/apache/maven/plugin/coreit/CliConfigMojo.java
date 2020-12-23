@@ -29,10 +29,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Dumps this mojo's configuration into a properties file.
- * 
+ *
  * @goal cli-config
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class CliConfigMojo
 
     /**
      * The current project's base directory, used for path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -50,56 +50,56 @@ public class CliConfigMojo
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     * 
+     *
      * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     * 
+     *
      * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     * 
+     *
      * @parameter property="config.fileParam"
      */
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
-     * 
+     *
      * @parameter property="config.stringParams"
      */
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
-     * 
+     *
      * @parameter property="config.fileParams"
      */
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
-     * 
+     *
      * @parameter property="config.listParam"
      */
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
-     * 
+     *
      * @parameter property="config.setParam"
      */
     private Set setParam;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -130,7 +130,7 @@ public class CliConfigMojo
 
     /**
      * Dumps the mojo configuration into the specified properties.
-     * 
+     *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
     private void dumpConfiguration( Properties props )

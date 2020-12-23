@@ -26,7 +26,7 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3314</name> 
+  <name>Maven Integration Test :: MNG-3314</name>
   <description>
     Verify that snapshot dependencies which are scheduled for an update don't fail the build when in offline mode.
   </description>

@@ -11,12 +11,12 @@ public class MavenITmng5840ParentVersionRanges
     {
         super( "[3.3,)" );
     }
-    
+
     public void testParentRangeRelativePathPointsToWrongVersion()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-range-negative" );
-        
+
         Verifier verifier = newVerifier( new File( testDir, "parent-1" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
@@ -27,12 +27,12 @@ public class MavenITmng5840ParentVersionRanges
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
     public void testParentRangeRelativePathPointsToCorrectVersion()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-range-positive" );
-        
+
         Verifier verifier = newVerifier( new File( testDir, "parent-1" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
@@ -43,5 +43,5 @@ public class MavenITmng5840ParentVersionRanges
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
 }

@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3600">MNG-3600</a>.
- * 
+ *
  *
  */
 public class MavenITmng3600DeploymentModeDefaultsTest

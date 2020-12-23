@@ -10,7 +10,7 @@
   <artifactId>subproject2</artifactId>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-95 : Project 2</name> 
+  <name>Maven Integration Test :: MNG-95 : Project 2</name>
 
   <!-- NOTE: This project does not depend on the failing project -->
 </project>

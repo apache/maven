@@ -1,12 +1,12 @@
 <settings>
-  <servers>        
+  <servers>
     <server>
       <id>repoman</id>
       <username>maven</username>
       <password>secret</password>
     </server>
   </servers>
-  
+
   <mirrors>
     <mirror>
       <id>repoman</id>
@@ -15,7 +15,7 @@
       <mirrorOf>external:*</mirrorOf>
     </mirror>
   </mirrors>
-  
+
   <profiles>
     <profile>
       <id>development</id>

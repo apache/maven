@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3769">MNG-3769</a>.
- * 
+ *
  *
  */
 public class MavenITmng3769ExclusionRelocatedTransdepsTest
@@ -45,7 +45,7 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest
      * Verify that dependency resolution considers dependency management also for relocated artifacts.
      */
     public void testitMNG3769()
-        throws Exception 
+        throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3769" );
 

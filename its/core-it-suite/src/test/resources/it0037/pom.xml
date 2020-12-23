@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0037</name> 
+  <name>Maven Integration Test :: it0037</name>
   <description>
     Test building with alternate pom file using '-f'
   </description>

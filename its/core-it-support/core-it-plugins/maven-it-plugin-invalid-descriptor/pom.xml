@@ -61,14 +61,14 @@ under the License.
             </goals>
             <configuration>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-              <resources>          
+              <resources>
                 <resource>
                   <directory>src/main/resources</directory>
                   <!-- forces overwrite of generated one -->
                   <filtering>true</filtering>
                 </resource>
-              </resources>              
-            </configuration>            
+              </resources>
+            </configuration>
           </execution>
         </executions>
       </plugin>

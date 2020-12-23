@@ -6,7 +6,7 @@
   <artifactId>mng-2539</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-2539</name> 
+  <name>Maven Integration Test :: MNG-2539</name>
   <description>
     Verify that dependencies specified in plugins are also retrieved from ordinary/non-plugin repositories.
   </description>

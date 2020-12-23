@@ -37,6 +37,6 @@ NOTE: This POM's XML declaration intentionally declares Latin-1 encoding.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2254 :: Latin-1</name> 
+  <name>Maven Integration Test :: MNG-2254 :: Latin-1</name>
   <description>TEST-CHARS: ִײÜהצüß</description>
 </project>

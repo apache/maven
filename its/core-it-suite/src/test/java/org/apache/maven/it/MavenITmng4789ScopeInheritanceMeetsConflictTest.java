@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4789">MNG-4789</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4789ScopeInheritanceMeetsConflictTest

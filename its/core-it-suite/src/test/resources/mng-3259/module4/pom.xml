@@ -55,5 +55,5 @@
        	    <artifactId>mng-module1-XXX</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

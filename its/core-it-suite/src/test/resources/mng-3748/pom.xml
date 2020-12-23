@@ -4,11 +4,11 @@
   <artifactId>mng-3748</artifactId>
   <packaging>pom</packaging>
   <version>1</version>
-  
+
   <name>Integration Test Project for MNG-3748</name>
   <description>
     This project verifies that MNG-3748 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3748Test
   </description>
-  
+
   <url>https://issues.apache.org/jira/browse/MNG-3748</url>
 </project>

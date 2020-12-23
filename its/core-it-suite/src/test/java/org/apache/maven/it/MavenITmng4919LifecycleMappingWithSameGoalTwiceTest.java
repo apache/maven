@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4919">MNG-4919</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest

@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-4126 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-4126 :: Parent</name>
   <description>
     Verify that effects of active profiles from the profiles.xml of a local parent are inherited by children when
     parent and child are build together during a reactor invocation. This boils down to the reactor cache not

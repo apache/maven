@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3740">MNG-3740</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3470StrictCheckumVerificationOfDependencyPomTest

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.3</version>
 
-  <name>Maven Integration Test :: MNG-3970</name> 
+  <name>Maven Integration Test :: MNG-3970</name>
   <description>
     Test that dependencies can be resolved from remote repositories defined by (active) profiles in settings.xml.
   </description>

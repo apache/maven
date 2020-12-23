@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenIT0145ReactorWithIncludesExcludesTest

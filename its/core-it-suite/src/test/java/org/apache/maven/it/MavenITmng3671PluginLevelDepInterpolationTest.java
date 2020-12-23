@@ -27,13 +27,13 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3671">MNG-3671</a>.
  *
- * Tests to make sure that custom plugin dependencies (defined in your local POM) have 
- * their information interpolated before they are injected into the plugin descriptor 
+ * Tests to make sure that custom plugin dependencies (defined in your local POM) have
+ * their information interpolated before they are injected into the plugin descriptor
  * for eventual resolution and inclusion in the plugin classpath. Otherwise, resolution
  * errors will occur and the plugin will fail to initialize.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3671PluginLevelDepInterpolationTest
     extends AbstractMavenIntegrationTestCase

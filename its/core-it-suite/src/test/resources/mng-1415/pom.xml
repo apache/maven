@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-1415</name> 
+  <name>Maven Integration Test :: MNG-1415</name>
   <description>
     Test that quoted system properties are processed correctly.
   </description>

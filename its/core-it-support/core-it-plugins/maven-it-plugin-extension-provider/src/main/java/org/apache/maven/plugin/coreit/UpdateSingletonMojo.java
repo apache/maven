@@ -28,10 +28,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Updates the state of the singleton component and optionally dumps the updated state to a properties file.
- * 
+ *
  * @goal update-singleton
  * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class UpdateSingletonMojo
@@ -60,7 +60,7 @@ public class UpdateSingletonMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()

@@ -36,7 +36,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4360">MNG-4360</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -50,7 +50,7 @@ public class MavenITmng4360WebDavSupportTest
     }
 
     /**
-     * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more 
+     * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
      * that the Jackrabbit based wagon can be properly loaded and doesn't die due to some class realm issue.
      */
     public void testitJackrabbitBasedImpl()
@@ -60,7 +60,7 @@ public class MavenITmng4360WebDavSupportTest
     }
 
     /**
-     * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more 
+     * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
      * that the Slide based wagon can be properly loaded and doesn't die due to some class realm issue.
      */
     public void testitSlideBasedImpl()

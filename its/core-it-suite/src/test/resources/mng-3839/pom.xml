@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3839</name> 
+  <name>Maven Integration Test :: MNG-3839</name>
   <description>
     Test that POM parsing properly coalesces text data.
   </description>

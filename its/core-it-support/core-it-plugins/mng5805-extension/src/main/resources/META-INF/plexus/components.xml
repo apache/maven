@@ -19,7 +19,7 @@ under the License.
 -->
 <component-set>
   <components>
-  
+
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>mng5805</role-hint>
@@ -53,7 +53,7 @@ under the License.
         </lifecycles>
       </configuration>
     </component>
-    
+
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>mng5805</role-hint>
@@ -66,6 +66,6 @@ under the License.
         <packaging>mng5805</packaging>
       </configuration>
     </component>
-    
+
   </components>
 </component-set>

@@ -57,16 +57,16 @@ public class MyReport
         Map failedComparisons = new HashMap();
 
         check( "project.build.directory", projectBuild.getDirectory(), build.getDirectory(), failedComparisons );
-        
+
         check( "project.build.outputDirectory", projectBuild.getOutputDirectory(), build.getOutputDirectory(),
                failedComparisons );
-        
+
         check( "project.build.sourceDirectory", projectBuild.getSourceDirectory(), build.getSourceDirectory(),
                failedComparisons );
-        
+
         check( "project.build.testSourceDirectory", projectBuild.getTestSourceDirectory(),
                build.getTestSourceDirectory(), failedComparisons );
-        
+
         check( "project.build.scriptSourceDirectory", projectBuild.getScriptSourceDirectory(),
                build.getScriptSourceDirectory(), failedComparisons );
 
@@ -82,7 +82,7 @@ public class MyReport
 
                 check( "project.build.resources[" + i + "].directory", projectRes.getDirectory(),
                        buildRes.getDirectory(), failedComparisons );
-                
+
                 check( "project.build.resources[" + i + "].targetPath", projectRes.getTargetPath(),
                        buildRes.getTargetPath(), failedComparisons );
             }
@@ -105,7 +105,7 @@ public class MyReport
                 buffer.append( "\n\tShould be: \'" ).append( value[0] );
                 buffer.append( "\'\n\t Was: \'" ).append( value[1] ).append( "\'\n" );
             }
-            
+
             throw new MavenReportException( buffer.toString() );
         }
     }

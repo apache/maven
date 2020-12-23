@@ -33,10 +33,10 @@ import java.io.File;
 
 /**
  * Deploys a user-supplied file to some repository. This mimics part of the Maven Deploy Plugin.
- * 
+ *
  * @goal deploy-file
  * @requiresProject false
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -46,77 +46,77 @@ public class DeployFileMojo
 
     /**
      * The file of the artifact to deploy.
-     * 
+     *
      * @parameter property="file"
      */
     private File file;
 
     /**
      * The group id of the artifact.
-     * 
+     *
      * @parameter property="groupId"
      */
     private String groupId;
 
     /**
      * The artifact id of the artifact.
-     * 
+     *
      * @parameter property="artifactId"
      */
     private String artifactId;
 
     /**
      * The version of the artifact.
-     * 
+     *
      * @parameter property="version"
      */
     private String version;
 
     /**
      * The URL of the repository to deploy to.
-     * 
+     *
      * @parameter property="repositoryUrl"
      */
     private String repositoryUrl;
 
     /**
      * The ID of the repository to deploy to.
-     * 
+     *
      * @parameter property="repositoryId"
      */
     private String repositoryId;
 
     /**
      * The repository factory.
-     * 
+     *
      * @component
      */
     private ArtifactRepositoryFactory repositoryFactory;
 
     /**
      * The repository layout.
-     * 
+     *
      * @component roleHint="default"
      */
     private ArtifactRepositoryLayout repositoryLayout;
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory artifactFactory;
 
     /**
      * The artifact deployer.
-     * 
+     *
      * @component
      */
     private ArtifactDeployer deployer;
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -125,7 +125,7 @@ public class DeployFileMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If any artifact could not be deployed.
      */
     public void execute()

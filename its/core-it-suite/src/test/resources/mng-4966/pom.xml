@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-4966</name> 
+  <name>Maven Integration Test :: MNG-4966</name>
   <description>
     Verify that URLs in the effective model retain successive slashes which are significant in certain domains.
   </description>

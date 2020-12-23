@@ -33,5 +33,5 @@ under the License.
   <artifactId>child</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-2068 :: Child</name> 
+  <name>Maven Integration Test :: MNG-2068 :: Child</name>
 </project>

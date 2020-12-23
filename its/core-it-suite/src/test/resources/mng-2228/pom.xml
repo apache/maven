@@ -26,10 +26,10 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2228</name> 
+  <name>Maven Integration Test :: MNG-2228</name>
   <description>
     Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
-    fields in case the field type is both provided by a plugin dependency and by a build extension. 
+    fields in case the field type is both provided by a plugin dependency and by a build extension.
   </description>
 
   <build>

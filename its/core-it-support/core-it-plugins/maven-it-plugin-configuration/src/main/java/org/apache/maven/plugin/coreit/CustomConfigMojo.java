@@ -30,11 +30,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Dumps this mojo's configuration into a properties file. Note that this mojo uses a custom component configurator.
- * 
+ *
  * @goal custom-config
  * @phase validate
  * @configurator coreit
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -44,7 +44,7 @@ public class CustomConfigMojo
 
     /**
      * The current project's base directory, used for path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -52,14 +52,14 @@ public class CustomConfigMojo
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     * 
+     *
      * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A parameter being set only by the custom configurator as a proof of its execution.
-     * 
+     *
      * @parameter
      */
     String customParam;
@@ -67,70 +67,70 @@ public class CustomConfigMojo
     /**
      * A parameter with a constant default value. <em>Note:</em> This has intentionally a different default value than
      * the equally named parameter from {@link ConfigMojo}.
-     * 
+     *
      * @parameter default-value="test"
      */
     private String defaultParam;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     * 
+     *
      * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     * 
+     *
      * @parameter property="config.fileParam"
      */
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
-     * 
+     *
      * @parameter
      */
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
-     * 
+     *
      * @parameter
      */
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
-     * 
+     *
      * @parameter
      */
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
-     * 
+     *
      * @parameter
      */
     private Set setParam;
 
     /**
      * A collection parameter of type {@link java.util.Map}.
-     * 
+     *
      * @parameter
      */
     private Map mapParam;
 
     /**
      * A collection parameter of type {@link java.util.Properties}.
-     * 
+     *
      * @parameter
      */
     private Properties propertiesParam;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -161,7 +161,7 @@ public class CustomConfigMojo
 
     /**
      * Dumps the mojo configuration into the specified properties.
-     * 
+     *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
     private void dumpConfiguration( Properties props )

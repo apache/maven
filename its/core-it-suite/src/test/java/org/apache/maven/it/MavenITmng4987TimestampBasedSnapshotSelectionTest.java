@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4987">MNG-4987</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4987TimestampBasedSnapshotSelectionTest

@@ -29,7 +29,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3475">MNG-3475</a> and
  * <a href="https://issues.apache.org/jira/browse/MNG-1927">MNG-1927</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */

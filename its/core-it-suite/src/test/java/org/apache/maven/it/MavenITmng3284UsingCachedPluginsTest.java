@@ -34,7 +34,7 @@ public class MavenITmng3284UsingCachedPluginsTest
 
     public MavenITmng3284UsingCachedPluginsTest()
     {
-        super( "[2.1.0-M2,)" ); 
+        super( "[2.1.0-M2,)" );
     }
 
     /**
@@ -71,7 +71,7 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.deleteDirectory( "mod-b/target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" ); 
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

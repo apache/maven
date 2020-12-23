@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3947</name> 
+  <name>Maven Integration Test :: MNG-3947</name>
   <description>
     Test that the configuration for a plugin execution with the identifier "default" does not pollute the
     configuration of standalone plugin executions from the CLI.

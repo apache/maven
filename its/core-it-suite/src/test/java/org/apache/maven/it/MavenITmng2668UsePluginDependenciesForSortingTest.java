@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2668">MNG-2668</a>.
- * 
+ *
  *
  */
 public class MavenITmng2668UsePluginDependenciesForSortingTest

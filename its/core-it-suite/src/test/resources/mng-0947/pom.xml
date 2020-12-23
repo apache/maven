@@ -26,7 +26,7 @@ under the License.
   <artifactId>consumer</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-947</name> 
+  <name>Maven Integration Test :: MNG-947</name>
   <description>
     Verify that direct optional dependencies are included in the project class paths while transitive optional
     dependencies are excluded.

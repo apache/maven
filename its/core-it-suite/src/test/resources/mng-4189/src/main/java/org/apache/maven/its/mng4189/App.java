@@ -24,13 +24,13 @@ import org.apache.maven.its.mng4189.dep.Calculator;
 /**
  * Sample project
  */
-public class App 
+public class App
 {
     public void testDependency()
     {
         Calculator calculator = new Calculator();
         int total = calculator.add( 1, 2 );
-        
+
         System.out.println( "Total : " + total );
     }
 }

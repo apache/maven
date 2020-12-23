@@ -21,7 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 /**
  * A simple interface for our test components.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface Component

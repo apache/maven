@@ -27,7 +27,7 @@ under the License.
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-1323 :: Parent</name> 
+  <name>Maven Integration Test :: MNG-1323 :: Parent</name>
   <description>
     Verify that project-level plugin dependencies actually apply to the current project only and not the entire reactor.
   </description>

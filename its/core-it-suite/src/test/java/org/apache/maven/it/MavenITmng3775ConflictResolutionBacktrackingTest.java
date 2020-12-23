@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3775">MNG-3775</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3775ConflictResolutionBacktrackingTest

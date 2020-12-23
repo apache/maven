@@ -52,7 +52,7 @@ public class MavenITmng4279WagonProviderFailoverTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
-        
+
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

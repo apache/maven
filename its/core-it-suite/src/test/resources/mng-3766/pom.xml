@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3766</name> 
+  <name>Maven Integration Test :: MNG-3766</name>
   <description>
     Test toolchain discovery from build extensions.
   </description>

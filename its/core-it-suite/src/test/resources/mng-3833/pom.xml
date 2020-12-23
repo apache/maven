@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3833</name> 
+  <name>Maven Integration Test :: MNG-3833</name>
   <description>
     Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
     A depends on property B, and property B depends on property C and so on.

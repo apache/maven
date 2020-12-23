@@ -13,14 +13,14 @@
   <modules>
   	<module>child</module>
   </modules>
-  
+
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.its.mng3710</groupId>
           <artifactId>mavenit-mng3710-pomInheritance-plugin</artifactId>
-          
+
           <executions>
             <execution>
               <id>touch</id>

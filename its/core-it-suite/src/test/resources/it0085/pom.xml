@@ -6,7 +6,7 @@
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0085</name> 
+  <name>Maven Integration Test :: it0085</name>
   <description>
     Verify that system-scoped dependencies get resolved with system scope
     when they are resolved transitively via another (non-system)

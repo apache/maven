@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>maven-it-plugin-extension1</artifactId>
   <packaging>maven-plugin</packaging>
-  
+
   <name>Maven IT Plugin :: Extension 1</name>
   <description>
     A test plugin that contribute an artifact handler.

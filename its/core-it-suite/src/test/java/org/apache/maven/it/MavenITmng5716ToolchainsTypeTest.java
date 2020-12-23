@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5716">MNG-5716</a>.
- * 
+ *
  * @author Hervé Boutemy
  */
 public class MavenITmng5716ToolchainsTypeTest
@@ -39,7 +39,7 @@ public class MavenITmng5716ToolchainsTypeTest
     }
 
     /**
-     * 
+     *
      */
     public void testitMNG5716()
         throws Exception
@@ -51,7 +51,7 @@ public class MavenITmng5716ToolchainsTypeTest
         new File( javaHome, "bin" ).mkdirs();
         new File( javaHome, "bin/javac").createNewFile();
         new File( javaHome, "bin/javac.exe").createNewFile();
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty( "@javaHome@", javaHome.getAbsolutePath() );

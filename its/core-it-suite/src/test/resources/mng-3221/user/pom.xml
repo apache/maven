@@ -33,11 +33,11 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     <profile>
       <id>site</id>
-      
+
       <reporting>
         <plugins>
           <plugin>
@@ -53,10 +53,10 @@ under the License.
         </plugins>
       </reporting>
     </profile>
-    
+
     <profile>
       <id>plugin</id>
-      
+
       <build>
         <plugins>
           <plugin>
@@ -78,5 +78,5 @@ under the License.
       </build>
     </profile>
   </profiles>
-  
+
 </project>

@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4779 :: B</name> 
+  <name>Maven Integration Test :: MNG-4779 :: B</name>
   <description>
     Test that dependency resolution doesn't error out when a dependency with a range satisfied from the local repo
     is seen more than once during the collection.

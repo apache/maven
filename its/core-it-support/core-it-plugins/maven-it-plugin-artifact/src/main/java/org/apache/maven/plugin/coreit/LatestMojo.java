@@ -27,10 +27,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Marks the project's artifact as the latest version.
- * 
+ *
  * @goal latest
  * @phase package
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LatestMojo
@@ -39,7 +39,7 @@ public class LatestMojo
 
     /**
      * The main project artifact.
-     * 
+     *
      * @parameter default-value="${project.artifact}"
      * @readonly
      * @required

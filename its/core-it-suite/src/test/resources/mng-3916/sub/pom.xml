@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>child</artifactId>
 
-  <name>Maven Integration Test :: MNG-3916</name> 
+  <name>Maven Integration Test :: MNG-3916</name>
   <description>
     Test that plugin executions are properly merged during inheritance, even if the child plugin section has no
     version.

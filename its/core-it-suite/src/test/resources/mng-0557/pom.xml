@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0044</name> 
+  <name>Maven Integration Test :: it0044</name>
   <groupId>org.apache.maven.its.it0044</groupId>
   <artifactId>maven-it-it0044</artifactId>
   <description>Test --settings CLI option</description>

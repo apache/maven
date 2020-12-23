@@ -26,9 +26,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3331">MNG-3331</a>.
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * 
+ *
  */
 public class MavenITmng3331ModulePathNormalizationTest
     extends AbstractMavenIntegrationTestCase

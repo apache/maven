@@ -41,10 +41,10 @@ public class MyMojo
         throws MojoExecutionException
     {
         File pomFile = project.getFile();
-        
+
         File movedPomFile = new File( project.getBuild().getDirectory(), "pom.xml" );
         movedPomFile.getParentFile().mkdirs();
-        
+
         try
         {
             FileUtils.copyFile( pomFile, movedPomFile );
@@ -53,7 +53,7 @@ public class MyMojo
         {
             throw new MojoExecutionException( "Failed to copy pom file: " + pomFile + " to: " + movedPomFile, e );
         }
-        
+
         project.setFile( movedPomFile );
     }
 }

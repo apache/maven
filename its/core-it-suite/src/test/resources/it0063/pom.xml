@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0063</name> 
+  <name>Maven Integration Test :: it0063</name>
   <description>Test the use of a system scoped dependency to a (fake) tools.jar.</description>
 
   <dependencies>

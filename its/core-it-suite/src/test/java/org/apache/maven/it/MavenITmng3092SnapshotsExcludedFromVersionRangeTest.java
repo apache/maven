@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3092">MNG-3092</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest

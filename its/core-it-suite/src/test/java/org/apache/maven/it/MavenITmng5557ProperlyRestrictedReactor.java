@@ -29,7 +29,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * multi-module project where only project-0, and project-1 are specified to be used. The project-0 has a dependency on
  * project-4 and in this constrained mode the dependency resolution should fail because project-4 is no longer placed in
  * the reactor.
- * 
+ *
  * @author jvanzyl
  */
 public class MavenITmng5557ProperlyRestrictedReactor

@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2309</name> 
+  <name>Maven Integration Test :: MNG-2309</name>
   <description>
     Test that profiles are injected in declaration order, with the last profile being the most dominant.
   </description>

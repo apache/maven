@@ -45,7 +45,7 @@ import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2305">MNG-2305</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2305MultipleProxiesTest

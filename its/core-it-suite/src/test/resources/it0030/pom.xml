@@ -1,9 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0030</name> 
+  <name>Maven Integration Test :: it0030</name>
   <groupId>org.apache.maven.its.it0030</groupId>
   <artifactId>maven-it-it0030</artifactId>
-  <description>Test for injection of dependencyManagement through parents of 
+  <description>Test for injection of dependencyManagement through parents of
         dependency poms.</description>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>

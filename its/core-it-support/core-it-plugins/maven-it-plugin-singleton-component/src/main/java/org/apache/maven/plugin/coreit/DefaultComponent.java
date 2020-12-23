@@ -23,7 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * A stateful singleton.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component ( role = org.apache.maven.plugin.coreit.Component.class )

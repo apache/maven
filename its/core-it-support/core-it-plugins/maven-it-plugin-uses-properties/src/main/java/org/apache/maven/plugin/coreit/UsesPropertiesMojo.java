@@ -37,7 +37,7 @@ public class UsesPropertiesMojo
      * @parameter default-value="${basedir}"
      */
     private File basedir;
-    
+
     /**
      * @parameter default-value="${project.properties}"
      */

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3769</name> 
+  <name>Maven Integration Test :: MNG-3769</name>
   <description>
     Verify that dependency resolution considers dependency management also for relocated artifacts.
   </description>

@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4328</name> 
+  <name>Maven Integration Test :: MNG-4328</name>
   <description>
     Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
     from expressions. In other words, the subtle difference between the runtime type of the expression value (which

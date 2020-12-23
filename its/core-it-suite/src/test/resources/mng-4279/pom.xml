@@ -32,14 +32,14 @@ under the License.
     Test that wagon provider selection fails gracefully and uses protocol for roleHint if protocol-provider roleHint
     isn't available.
   </description>
-  
+
   <distributionManagement>
     <repository>
       <id>test</id>
       <url>coreit://foo.com/deploy</url>
     </repository>
   </distributionManagement>
-  
+
   <build>
     <extensions>
       <extension>

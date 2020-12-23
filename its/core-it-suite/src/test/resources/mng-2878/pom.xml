@@ -26,11 +26,11 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-2878</name> 
+  <name>Maven Integration Test :: MNG-2878</name>
   <description>
     Verify that a plugin can load default-report.xml from the core.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

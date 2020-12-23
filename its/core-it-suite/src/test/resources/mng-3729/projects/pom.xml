@@ -8,7 +8,7 @@
   <modules>
     <module>child1</module>
   </modules>
-  
+
   <build>
     <plugins>
       <plugin>

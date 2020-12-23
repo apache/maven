@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3853</name> 
+  <name>Maven Integration Test :: MNG-3853</name>
   <description>
     Verify that distribution management repos injected by profiles are recognized by the MavenProject instance and
     that the resulting artifact repositories are available to plugins via the corresponding expressions. Note that

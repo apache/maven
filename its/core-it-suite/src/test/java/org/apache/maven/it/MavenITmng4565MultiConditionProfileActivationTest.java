@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4565">MNG-3106</a>:
- * 
+ *
  * When multiple activators are present in a profile they should be AND'd. All activator must
  * conditions must be satisfied in order for the profile to be activated.
  */
@@ -40,9 +40,9 @@ public class MavenITmng4565MultiConditionProfileActivationTest
 
     /**
      * Test build with two profiles, each with more than one activator.
-     * The profiles should be activated even though only one of the activators 
+     * The profiles should be activated even though only one of the activators
      * returns true.
-     * 
+     *
      */
     public void testProfilesWithMultipleActivators()
         throws Exception
@@ -58,7 +58,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest
         verifier.executeGoal( "validate" );
 
         //
-        // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so profile2 
+        // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so profile2
         // should not be activated. Only the profile1/touch.txt file should be generated.
         //
         verifier.verifyErrorFreeLog();

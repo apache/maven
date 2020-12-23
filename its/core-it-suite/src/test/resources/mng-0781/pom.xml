@@ -27,14 +27,14 @@ under the License.
   <artifactId>maven-it-it0074</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: it0074</name> 
+  <name>Maven Integration Test :: it0074</name>
   <description>
     Test that plugin-level configuration instances are not nullified by
     execution-level configuration instances.
   </description>
 
   <build>
-    <plugins> 
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -52,6 +52,6 @@ under the License.
           </execution>
         </executions>
       </plugin>
-    </plugins>    
+    </plugins>
   </build>
 </project>

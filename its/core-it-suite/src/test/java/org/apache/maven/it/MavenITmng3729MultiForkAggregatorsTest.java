@@ -43,7 +43,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * dependencies for the current project. This happened in 2.0.10-RC11 (which was the predecessor to 2.1.0-RC12, since
  * the version was renamed while the release process was in mid-execution). It did not happen in 2.0.9, and was fixed in
  * 2.1.0-RC12.
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  */
@@ -69,7 +69,7 @@ public class MavenITmng3729MultiForkAggregatorsTest
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "package" );

@@ -19,7 +19,7 @@ package org.apache.its.mng6118;
  * under the License.
  */
 
-public class App 
+public class App
 {
     public static void main( String[] args )
     {

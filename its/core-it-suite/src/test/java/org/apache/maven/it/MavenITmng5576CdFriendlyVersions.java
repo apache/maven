@@ -28,7 +28,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5576">MNG-5576</a>.
- * 
+ *
  * @author Jason van Zyl
  */
 public class MavenITmng5576CdFriendlyVersions
@@ -51,7 +51,7 @@ public class MavenITmng5576CdFriendlyVersions
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dchangelist=changelist" ); 
+        verifier.addCliOption( "-Dchangelist=changelist" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -59,7 +59,7 @@ public class MavenITmng5576CdFriendlyVersions
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );
-        
+
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
         for( String line : lines )
         {
@@ -80,7 +80,7 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.setLogFileName( "log-bc.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dchangelist=changelist" ); 
+        verifier.addCliOption( "-Dchangelist=changelist" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -88,7 +88,7 @@ public class MavenITmng5576CdFriendlyVersions
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );
-        
+
         List<String> lines = verifier.loadFile( new File( testDir, "log-bc.txt" ), false );
         for( String line : lines )
         {

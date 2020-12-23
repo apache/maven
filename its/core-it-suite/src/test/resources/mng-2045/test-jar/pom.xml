@@ -32,7 +32,7 @@ under the License.
   <artifactId>test-jar</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-2045 :: Test JAR Producer</name> 
+  <name>Maven Integration Test :: MNG-2045 :: Test JAR Producer</name>
   <description>
     Verify that during a multi-module build up to phase "install" the (compile) class path of a module that
     depends on another module's test JAR actually points to the test classes/JAR and not the main classes.

@@ -29,10 +29,10 @@ import java.io.IOException;
 
 /**
  * Creates a text file in the project base directory.
- * 
+ *
  * @goal clean
  * @phase clean
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -42,7 +42,7 @@ public class CleanMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -51,14 +51,14 @@ public class CleanMojo
 
     /**
      * The path to the output file, relative to the project base directory directory.
-     * 
+     *
      * @parameter
      */
     private String pathname = "target/clean-clean.txt";
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */

@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3684">MNG-3684</a>:
  * Verify that the Build instance injected as a plugin parameter contains
  * interpolated values for things like the various build paths, etc.
- * 
+ *
  * @author jdcasey
  */
 public class MavenITmng3684BuildPluginParameterTest
@@ -38,7 +38,7 @@ public class MavenITmng3684BuildPluginParameterTest
     {
         super( "(2.0.9,)" );
     }
-    
+
     public void testitMNG3684 ()
         throws Exception
     {
@@ -48,17 +48,17 @@ public class MavenITmng3684BuildPluginParameterTest
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        
+
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.setLogFileName( "log-validate.txt" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier.setLogFileName( "log-site.txt" );
         verifier.executeGoal( "site" );
 

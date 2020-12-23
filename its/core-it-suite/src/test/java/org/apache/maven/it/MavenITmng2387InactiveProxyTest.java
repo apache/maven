@@ -33,7 +33,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2387">MNG-2387</a>.
- * 
+ *
  * @author Brett Porter
  *
  */
@@ -117,8 +117,8 @@ public class MavenITmng2387InactiveProxyTest
         throws Exception
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        
-        Properties properties = verifier.newDefaultFilterProperties();        
+
+        Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
         properties.setProperty( "@port@", Integer.toString( port ) );
         properties.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );

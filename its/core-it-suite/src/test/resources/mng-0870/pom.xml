@@ -27,7 +27,7 @@ under the License.
   <version>1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-870</name> 
+  <name>Maven Integration Test :: MNG-870</name>
   <description>
     Test that the reactor can resolve plugins that have just been built by a previous module and are not yet
     installed to the local repo.

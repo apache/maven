@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>consumer</artifactId>
 
-  <name>Maven Integration Test :: MNG-3023 :: Consumer</name> 
+  <name>Maven Integration Test :: MNG-3023 :: Consumer</name>
   <description>Test that reactor projects are included in dependency resolution.</description>
 
   <dependencies>

@@ -11,7 +11,7 @@
     <name>Builder POM for issue XXX</name>
     <version>SNAPSHOT</version>
     <inceptionYear>2007</inceptionYear>
-    
+
     <modules>
         <module>module1</module>
         <module>module2</module>

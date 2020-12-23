@@ -31,7 +31,7 @@ under the License.
   <description>
     Check that using maven-site-plugin reportPlugins parameter causes a warning.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

@@ -27,10 +27,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Dumps this mojo's configuration into a properties file.
- * 
+ *
  * @goal required-config
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class RequiredConfigMojo
@@ -39,7 +39,7 @@ public class RequiredConfigMojo
 
     /**
      * The current project's base directory, used for path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -47,14 +47,14 @@ public class RequiredConfigMojo
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     * 
+     *
      * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A required parameter to be set via plugin configuration in POM or system property from CLI.
-     * 
+     *
      * @parameter property="config.requiredParam"
      * @required
      */
@@ -62,7 +62,7 @@ public class RequiredConfigMojo
 
     /**
      * A required parameter that defaults to a non-mandatory value from the POM.
-     * 
+     *
      * @parameter default-value="${project.url}"
      * @required
      */
@@ -70,7 +70,7 @@ public class RequiredConfigMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -101,7 +101,7 @@ public class RequiredConfigMojo
 
     /**
      * Dumps the mojo configuration into the specified properties.
-     * 
+     *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
     private void dumpConfiguration( Properties props )

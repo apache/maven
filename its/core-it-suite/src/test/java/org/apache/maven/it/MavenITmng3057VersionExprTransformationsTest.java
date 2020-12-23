@@ -33,10 +33,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3057">MNG-3057</a>.
  *
  * @todo Fill in a better description of what this test verifies!
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3057VersionExprTransformationsTest
     extends AbstractMavenIntegrationTestCase
@@ -53,7 +53,7 @@ public class MavenITmng3057VersionExprTransformationsTest
         requiresJavaVersion( "[1.5,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3057" );
-        
+
         File remoteRepo = new File( testDir, "target/deployment" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -62,7 +62,7 @@ public class MavenITmng3057VersionExprTransformationsTest
         verifier.deleteDirectory( "level2/target" );
         verifier.deleteDirectory( "level2/level3/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3057" );
-        
+
         Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty( "@deployTo@", remoteRepo.toURI().toURL().toExternalForm() );
 
@@ -79,7 +79,7 @@ public class MavenITmng3057VersionExprTransformationsTest
         assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "mng-3057", "1", "pom" ) ), "1", null );
         assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level2", "1", "pom" ) ), "1", "1" );
         assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level3", "1", "pom" ) ), "1", "1" );
-        
+
         assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ), "1", null );
         assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ), "1", "1" );
         assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ), "1", "1" );
@@ -88,7 +88,7 @@ public class MavenITmng3057VersionExprTransformationsTest
     private void assertVersions( File file, String version, String parentVersion )
         throws XmlPullParserException, IOException
     {
-        Xpp3Dom dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( file ) );        
+        Xpp3Dom dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( file ) );
         assertEquals( version, dom.getChild( "version" ).getValue() );
         Xpp3Dom parent = dom.getChild( "parent" );
         if ( parentVersion != null )
@@ -100,6 +100,6 @@ public class MavenITmng3057VersionExprTransformationsTest
         {
             assertNull( parent );
         }
-    }    
+    }
 
 }

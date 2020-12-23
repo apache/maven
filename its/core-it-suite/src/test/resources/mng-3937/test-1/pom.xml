@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3937</name> 
+  <name>Maven Integration Test :: MNG-3937</name>
   <description>
     Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
     ordered.

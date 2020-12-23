@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3004">MNG-3004</a>.
- * 
+ *
  * @author Dan Fabulich
  *
  */
@@ -136,7 +136,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.assertFilePresent( "subproject2/target/touch.txt" );
         verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
     }
-    
+
     /**
      * Test fail-never reactor behavior. Forces an exception to be thrown in
      * the first module, but checks that the second & third module is built and the overall build succeeds.
@@ -199,7 +199,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.assertFilePresent( "subproject2/target/touch.txt" );
         verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
     }
-    
+
     // DGF not testing fail fast with multiple real threads since that's a "best effort" attempt to halt the build
     // The whole build could have finished by the time you try to halt.
 

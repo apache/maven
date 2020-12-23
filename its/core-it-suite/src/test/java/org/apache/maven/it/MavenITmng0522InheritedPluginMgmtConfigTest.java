@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-522">MNG-522</a>.
- * 
+ *
  * @author John Casey
  *
  */

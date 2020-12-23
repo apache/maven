@@ -1,12 +1,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0040</name> 
+  <name>Maven Integration Test :: it0040</name>
   <groupId>org.apache.maven.its.it0040</groupId>
   <artifactId>maven-it-it0040</artifactId>
   <description>Test the use of a packaging from a plugin</description>
   <packaging>it-packaging</packaging>
   <version>1.0</version>
-  
+
   <build>
     <plugins>
       <plugin>

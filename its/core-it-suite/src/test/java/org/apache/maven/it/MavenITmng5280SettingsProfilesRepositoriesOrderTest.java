@@ -37,7 +37,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5280">MNG-5280</a>.
- * 
+ *
  * @author Anders Hammar
  */
 public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
@@ -163,7 +163,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
                     writer.println( "  <artifactId>fake-artifact</artifactId>" );
                     writer.println( "  <version>1.0</version>" );
                     writer.println( "</project>" );
-                    
+
                     response.setStatus( HttpServletResponse.SC_OK );
                 }
                 else if ( uri.endsWith( ".jar" ) )

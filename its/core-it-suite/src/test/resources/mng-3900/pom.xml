@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3900</name> 
+  <name>Maven Integration Test :: MNG-3900</name>
   <description>
     Test that build properties defined via active profiles are used for interpolation.
   </description>

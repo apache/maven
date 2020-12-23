@@ -27,11 +27,11 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-1701</name> 
+  <name>Maven Integration Test :: MNG-1701</name>
   <description>
     Verify that duplicate plugin declarations cause a warning/error.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

@@ -5,16 +5,16 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <profiles>
-    <profile> 
-      <id>bogus-profile</id> 
-      <activation> 
+    <profile>
+      <id>bogus-profile</id>
+      <activation>
         <os>
-          <family>bogus-family</family> 
-        </os> 
+          <family>bogus-family</family>
+        </os>
       </activation>
       <properties>
         <name>value</name>
       </properties>
     </profile>
-  </profiles>  
+  </profiles>
 </project>

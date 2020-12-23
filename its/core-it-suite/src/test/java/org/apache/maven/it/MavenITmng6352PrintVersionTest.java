@@ -31,9 +31,9 @@ import java.util.List;
  * An integration test to check the enhancements to print out version
  * information during the reactor summary output at the correct
  * positions.
- *  
+ *
  * <a href="https://issues.apache.org/jira/browse/MNG-6352">MNG-6352</a>.
- * 
+ *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
 public class MavenITmng6352PrintVersionTest
@@ -47,9 +47,9 @@ public class MavenITmng6352PrintVersionTest
 
     /**
      * Check that the resulting output is
-     * as expected for the root module and last 
+     * as expected for the root module and last
      * module in build but not for the intermediate
-     * modules. 
+     * modules.
      */
     public void testitShouldPrintVersionAtTopAndAtBottom()
         throws Exception
@@ -59,7 +59,7 @@ public class MavenITmng6352PrintVersionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        
+
         verifier.setLogFileName( "version-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean" ) );
         verifier.verifyErrorFreeLog();
@@ -76,13 +76,13 @@ public class MavenITmng6352PrintVersionTest
         assertTrue( resultingLines.get( 1 ).startsWith( "[INFO] module-1 ........................................... SUCCESS [" ) );
         assertTrue( resultingLines.get( 2 ).startsWith( "[INFO] module-2 ........................................... SUCCESS [" ) );
         assertTrue( resultingLines.get( 3 ).startsWith( "[INFO] module-3 1.3.0-SNAPSHOT ............................ SUCCESS [" ) );
-        
+
     }
 
     /**
      * Check that the resulting output is
      * as expected for all modules in case
-     * for an aggregator build. 
+     * for an aggregator build.
      */
     public void testitShouldPrintVersionInAllLines()
         throws Exception
@@ -92,7 +92,7 @@ public class MavenITmng6352PrintVersionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        
+
         verifier.setLogFileName( "version-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean" ) );
         verifier.verifyErrorFreeLog();
@@ -112,10 +112,10 @@ public class MavenITmng6352PrintVersionTest
 
     }
 
-    
+
     /**
      * Extract the lines at the end of the Maven output:
-     * 
+     *
      * <pre>
      * [INFO] Reactor Summary:
      * [INFO]

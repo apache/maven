@@ -33,20 +33,20 @@ public class MojoFailureExceptionMojo
      * Message used in {@link MojoFailureException#MojoFailureException(String)}, unless longMessage
      * is supplied; then, this becomes the short message in
      * {@link MojoFailureException#MojoFailureException(Object, String, String)}.
-     * 
+     *
      * @parameter property="error.message" default-value="Planned MojoExecutionException."
      * @required
      */
     private String message;
-    
+
     /**
      * If supplied, The form {@link MojoFailureException#MojoFailureException(Object, String, String)} will be used.
-     * 
+     *
      * @parameter property="error.longMessage"
      * @required
      */
     private String longMessage;
-    
+
     /**
      * @parameter property="error.source"
      */

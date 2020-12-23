@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>ear</packaging>
 
-  <name>Maven Integration Test :: it0080</name> 
+  <name>Maven Integration Test :: it0080</name>
   <description>
     Test that depending on a WAR doesn't also get its dependencies transitively.
   </description>

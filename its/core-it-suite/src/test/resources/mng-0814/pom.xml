@@ -26,9 +26,9 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-814</name> 
+  <name>Maven Integration Test :: MNG-814</name>
   <description>Test activation of a profile from the command line.</description>
-  
+
   <profiles>
     <profile>
       <id>test-profile</id>

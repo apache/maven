@@ -34,7 +34,7 @@ import org.apache.maven.toolchain.ToolchainManager;
 /**
  * Finds a tool from a previously selected toolchain. This tests the public API just like toolchain-enabled plugins
  * would do.
- * 
+ *
  * @goal find-tool
  * @phase validate
  */
@@ -49,7 +49,7 @@ public class FindToolMojo
 
     /**
      * The current Maven session holding the selected toolchain.
-     * 
+     *
      * @parameter default-value="${session}"
      * @required
      * @readonly
@@ -58,21 +58,21 @@ public class FindToolMojo
 
     /**
      * The path to the output file for the properties.
-     * 
+     *
      * @parameter property="toolchain.outputFile" default-value="${project.build.directory}/tool.properties"
      */
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
-     * 
+     *
      * @parameter property="toolchain.type"
      */
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
-     * 
+     *
      * @parameter property="toolchain.tool"
      */
     private String tool;

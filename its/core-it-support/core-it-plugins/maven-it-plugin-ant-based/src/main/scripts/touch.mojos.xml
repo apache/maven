@@ -26,7 +26,7 @@ under the License.
       <requiresProject>true</requiresProject>
       <parameters>
         <parameter>
-          <name>touch.outputFile</name> 
+          <name>touch.outputFile</name>
           <property>outputFile</property>
           <defaultValue>target/touch.txt</defaultValue>
           <type>java.io.File</type>

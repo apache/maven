@@ -23,7 +23,7 @@ under the License.
   <activeProfiles>
     <activeProfile>test-profile</activeProfile>
   </activeProfiles>
-  
+
   <profiles>
     <profile>
       <id>test-profile</id>

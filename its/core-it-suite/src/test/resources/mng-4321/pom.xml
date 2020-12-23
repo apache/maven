@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-4321</name> 
+  <name>Maven Integration Test :: MNG-4321</name>
   <description>
     Test that configuration from plugin management also applies to goals that are invoked directly from the
     CLI even when the invoked plugin is neither explicitly present in the build/plugins section nor part of

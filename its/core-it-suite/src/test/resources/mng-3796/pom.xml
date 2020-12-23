@@ -26,11 +26,11 @@ under the License.
   <artifactId>project</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3796</name> 
+  <name>Maven Integration Test :: MNG-3796</name>
   <description>
     Verify that classes shared with the Maven core realm are properly imported into the plugin realm.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

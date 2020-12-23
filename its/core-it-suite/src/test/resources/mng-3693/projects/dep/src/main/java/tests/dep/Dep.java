@@ -4,7 +4,7 @@ package tests.dep;
  * Hello world!
  *
  */
-public class Dep 
+public class Dep
 {
     public static void main( String[] args )
     {

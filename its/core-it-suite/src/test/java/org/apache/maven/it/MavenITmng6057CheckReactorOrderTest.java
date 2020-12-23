@@ -30,7 +30,7 @@ import java.util.List;
  * Using a <code>${revision}</code> in the version will change the reactor order before fixing
  * <a href="https://issues.apache.org/jira/browse/MNG-6057">MNG-6057</a>. Without the fix for this issue the order of
  * the reactor is changed in that way that the parent is ordered to the last position instead of the first position.
- * 
+ *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
  */
 public class MavenITmng6057CheckReactorOrderTest
@@ -76,7 +76,7 @@ public class MavenITmng6057CheckReactorOrderTest
 
     /**
      * Extract the lines at the beginning of the Maven output:
-     * 
+     *
      * <pre>
      * [INFO] Reactor Build Order:
      * [INFO]

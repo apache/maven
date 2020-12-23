@@ -44,7 +44,7 @@ import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-553">MNG-553</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng0553SettingsAuthzEncryptionTest
@@ -164,7 +164,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
-        verifier.getSystemProperties().setProperty( "settings.security", 
+        verifier.getSystemProperties().setProperty( "settings.security",
             new File( testDir, "settings~security.xml" ).getAbsolutePath() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
@@ -222,7 +222,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
                 return line;
             }
         }
-        
+
         return null;
     }
 

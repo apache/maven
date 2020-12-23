@@ -6,7 +6,7 @@
   <version>3.8.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2293</name> 
+  <name>Maven Integration Test :: MNG-2293</name>
   <description>
     Verify that default implementation of an implementation for a complex object works as expected.
   </description>

@@ -15,12 +15,12 @@
     <packaging>jar</packaging>
     <name>Issue Application</name>
     <description><![CDATA[Demonstration of issue with application.]]></description>
-    
+
     <dependencies>
         <dependency>
             <groupId>bugs.maven.issue</groupId>
 			<artifactId>delegate</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

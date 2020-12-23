@@ -27,7 +27,7 @@ under the License.
   <version>1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3814</name> 
+  <name>Maven Integration Test :: MNG-3814</name>
   <description>
     Verify that the reactor's project sorter considers artifact versions when checking for cycles.
   </description>

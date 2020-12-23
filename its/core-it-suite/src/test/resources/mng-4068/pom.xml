@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4068</name> 
+  <name>Maven Integration Test :: MNG-4068</name>
   <description>
     Test that downloading of release/snapshot artifacts from an authenticated mirror works. This basically
     boils down to using the proper id for the mirrored repository when looking up the credentials.

@@ -28,10 +28,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3724">MNG-3724</a>.
  *
  * @todo Fill in a better description of what this test verifies!
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3724ExecutionProjectSyncTest
     extends AbstractMavenIntegrationTestCase
@@ -55,7 +55,7 @@ public class MavenITmng3724ExecutionProjectSyncTest
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "package" );

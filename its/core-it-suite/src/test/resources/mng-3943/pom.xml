@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3943</name> 
+  <name>Maven Integration Test :: MNG-3943</name>
   <description>
     Test that plugin executions are properly merged during inheritance, even if the child uses a different
     plugin version than the parent.

@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0056</name> 
+  <name>Maven Integration Test :: it0056</name>
   <description>
     Test that multiple executions of a goal with different
     parameter values will succeed.

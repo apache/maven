@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-4335</name> 
+  <name>Maven Integration Test :: MNG-4335</name>
   <description>
     Test that offline mode is enabled when specified in the settings.xml
   </description>

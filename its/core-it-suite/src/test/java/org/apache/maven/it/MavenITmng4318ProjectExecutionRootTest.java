@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4318">MNG-4318</a> and
  * <a href="https://issues.apache.org/jira/browse/MNG-5014">MNG-5014</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4318ProjectExecutionRootTest

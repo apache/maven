@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4207">MNG-4207</a>.
- * 
+ *
  * @author John Casey
  */
 public class MavenITmng4207PluginWithLog4JTest

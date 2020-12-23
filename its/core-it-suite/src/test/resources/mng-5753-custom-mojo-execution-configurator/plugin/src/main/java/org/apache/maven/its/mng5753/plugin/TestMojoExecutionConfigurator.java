@@ -31,12 +31,12 @@ public class TestMojoExecutionConfigurator
     public void configure( MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig )
     {
         // We do exactly what the default mojo execution configurator does
-        super.configure( project, mojoExecution, allowPluginLevelConfig );        
-        
+        super.configure( project, mojoExecution, allowPluginLevelConfig );
+
         // And now we'll insert some additional configuration that we can assert was placed
         // in the configuration in our test
         Xpp3Dom mojoConfiguration = mojoExecution.getConfiguration();
-        
-        mojoConfiguration.getChild( "name" ).setValue( "TRANSFORMED" );        
+
+        mojoConfiguration.getChild( "name" ).setValue( "TRANSFORMED" );
     }
 }

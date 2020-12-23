@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * MNG-6030 reintroduced ReactorModelCache, but this ignores invalid relativePaths of parents
- * 
+ *
  * @author Robert Scholte
  */
 public class MavenITmng6330RelativePath
@@ -38,11 +38,11 @@ public class MavenITmng6330RelativePath
     {
         super( "(,3.5.0),(3.5.2,)" );
     }
-    
+
     public void testRelativePath() throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6330-relative-path" );
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setForkJvm( true );
 

@@ -24,10 +24,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Forks the "test" mojo to check interplay of forking and dependency resolution.
- * 
+ *
  * @goal fork-test
  * @execute goal="test"
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -37,7 +37,7 @@ public class ForkTestMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If an error occured.
      */
     public void execute()

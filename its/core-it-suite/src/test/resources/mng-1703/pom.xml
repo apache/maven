@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-1703</name> 
+  <name>Maven Integration Test :: MNG-1703</name>
   <description>
     Verify that a project-level plugin dependency class inherited from the parent can be loaded from both the plugin classloader
     and the context classloader available to the plugin.
@@ -36,7 +36,7 @@ under the License.
   <modules>
     <module>child</module>
   </modules>
-  
+
   <build>
     <pluginManagement>
       <plugins>

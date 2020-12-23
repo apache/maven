@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3701</name> 
+  <name>Maven Integration Test :: MNG-3701</name>
   <description>
     Verify that profiles without explicit id get a default id and in particular don't cause NPEs when
     they are active by default.

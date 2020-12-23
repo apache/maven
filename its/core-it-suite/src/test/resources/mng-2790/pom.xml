@@ -27,11 +27,11 @@ under the License.
   <!-- NOTE: It is part of the test design that this is a snapshot version -->
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-2790</name> 
+  <name>Maven Integration Test :: MNG-2790</name>
   <description>
     Verify that the field lastUpdated of existing local repo metadata is updated upon install of new a snapshot.
   </description>
-  
+
   <build>
     <plugins>
       <plugin>

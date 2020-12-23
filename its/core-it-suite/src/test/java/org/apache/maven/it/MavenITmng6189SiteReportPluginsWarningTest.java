@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6189">MNG-6189</a>:
  * using maven-site-plugin reportPlugins parameter must issue a warning.
- * 
+ *
  * @author Hervé Boutemy
  */
 public class MavenITmng6189SiteReportPluginsWarningTest

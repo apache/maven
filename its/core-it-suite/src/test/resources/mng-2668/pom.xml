@@ -7,7 +7,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2539</name> 
+  <name>Maven Integration Test :: MNG-2539</name>
   <description>
     Verify that dependencies of plugins are considered by the project sorter for a reactor build.
   </description>

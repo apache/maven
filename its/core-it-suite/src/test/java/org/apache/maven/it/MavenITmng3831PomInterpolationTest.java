@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3831">MNG-3831</a>.
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -53,7 +53,7 @@ public class MavenITmng3831PomInterpolationTest
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         Properties props = verifier.loadProperties( "target/interpolated.properties" );
         String prefix = "project.properties.";
 

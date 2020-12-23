@@ -28,10 +28,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3716">MNG-3716</a>.
  *
  * @todo Fill in a better description of what this test verifies!
- * 
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3716AggregatorForkingTest
     extends AbstractMavenIntegrationTestCase
@@ -55,7 +55,7 @@ public class MavenITmng3716AggregatorForkingTest
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectsDir.getAbsolutePath() );
         verifier.executeGoal( "org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run" );
 

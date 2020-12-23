@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2693">MNG-2693</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2693SitePluginRealmTest

@@ -39,9 +39,9 @@ public class Phase3ForkVerifierMojo
         throws MojoExecutionException
     {
         List sourceRoots = executedProject.getCompileSourceRoots();
-        
+
         String generatedDir = getGeneratorTargetDir().getAbsolutePath();
-        
+
         boolean foundGeneratedDir = false;
         for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
         {
@@ -52,7 +52,7 @@ public class Phase3ForkVerifierMojo
                 break;
             }
         }
-        
+
         if ( !foundGeneratedDir )
         {
             throw new MojoExecutionException( "Generated-source target directory not found in compile source roots of the execution project!" );

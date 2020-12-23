@@ -28,16 +28,16 @@ import org.apache.maven.project.MavenProject;
 public abstract class AbstractCheckMojo
     extends AbstractMojo
 {
-    
+
     protected static boolean forkHasRun = false;
-    
+
     /**
      * @parameter default-value="${project}"
      * @required
      * @readonly
      */
     private MavenProject project;
-    
+
     /**
      * @parameter default-value="${executedProject}"
      * @required
@@ -52,23 +52,23 @@ public abstract class AbstractCheckMojo
         {
             throw new MojoExecutionException( "Basedir is null on the main project instance." );
         }
-        
+
         if ( getTestProject().getBasedir() == null )
         {
             throw new MojoExecutionException( "Basedir is null on the " + getTestProjectLabel() + " instance (during mojo execution)." );
         }
-        
+
         String executionBasedir = getTestProject().getBasedir().getAbsolutePath();
-        
+
         Map failedPaths = new LinkedHashMap();
-        
+
         checkListOfPaths( getTestProject().getCompileSourceRoots(), executionBasedir, "compileSourceRoots", failedPaths );
         checkListOfPaths( getTestProject().getTestCompileSourceRoots(), executionBasedir, "testCompileSourceRoots", failedPaths );
 
         // MNG-3741: Don't worry about relative paths in scriptSourceRoots.
         // checkListOfPaths( getTestProject().getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
-        
-        
+
+
         if ( !failedPaths.isEmpty() )
         {
             StringBuffer buffer = new StringBuffer();
@@ -76,28 +76,28 @@ public abstract class AbstractCheckMojo
             for ( Iterator it = failedPaths.entrySet().iterator(); it.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) it.next();
-                
+
                 buffer.append( "\n-  " ).append( entry.getKey() ).append( ": '" ).append( entry.getValue() ).append( "'" );
             }
-            
+
             throw new MojoExecutionException( buffer.toString() );
         }
-        
+
         forkHasRun = true;
     }
-    
+
     protected MavenProject getMainProject()
     {
         return project;
     }
-    
+
     protected MavenProject getExecutionProject()
     {
         return executionProject;
     }
-    
+
     protected abstract MavenProject getTestProject();
-    
+
     protected abstract String getTestProjectLabel();
 
     private void checkListOfPaths( List paths, String base, String label, Map failedPaths )

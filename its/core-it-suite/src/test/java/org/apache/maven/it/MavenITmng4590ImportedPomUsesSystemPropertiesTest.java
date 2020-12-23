@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4590">MNG-4590</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
@@ -63,7 +63,7 @@ public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1", props.getProperty( "project.dependencyManagement.dependencies" ) );
         assertEquals( "dep-a", props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
-        assertEquals( new File( testDir, "pom.xml" ).getAbsoluteFile(), 
+        assertEquals( new File( testDir, "pom.xml" ).getAbsoluteFile(),
             new File( props.getProperty( "project.dependencyManagement.dependencies.0.systemPath" ) ) );
     }
 

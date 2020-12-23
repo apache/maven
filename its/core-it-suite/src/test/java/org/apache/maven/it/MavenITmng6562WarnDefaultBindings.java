@@ -37,7 +37,7 @@ public class MavenITmng6562WarnDefaultBindings
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "validate";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
@@ -49,13 +49,13 @@ public class MavenITmng6562WarnDefaultBindings
 
         verifier.verifyErrorFreeLog();
     }
-    
+
 
     public void testItShouldNotWarn2()
                     throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "process-resources";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
@@ -67,12 +67,12 @@ public class MavenITmng6562WarnDefaultBindings
 
         verifier.verifyErrorFreeLog();
     }
-                
+
     public void testItShouldWarnForCompilerPlugin()
                     throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "compile";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
@@ -83,12 +83,12 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
                 + ", you should define versions in pluginManagement section of your pom.xml or parent" );
     }
-    
+
     public void testItShouldWarnForCompilerPlugin2()
                     throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "process-test-resources";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
@@ -100,12 +100,12 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
                 + ", you should define versions in pluginManagement section of your pom.xml or parent" );
     }
-    
+
     public void testItShouldWarnForCompilerPlugin3()
                     throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "test-compile";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
@@ -117,12 +117,12 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
                 + ", you should define versions in pluginManagement section of your pom.xml or parent" );
     }
-    
+
     public void testItShouldWarnForCompilerPluginAndSurefirePlugin()
                     throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6562-default-bindings" );
-        
+
         String phase = "test";
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );

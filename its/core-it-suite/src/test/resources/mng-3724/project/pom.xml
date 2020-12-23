@@ -3,9 +3,9 @@
   <groupId>org.apache.maven.its.mng3724</groupId>
   <artifactId>project</artifactId>
   <version>1</version>
-  
+
   <packaging>pom</packaging>
-  
+
   <build>
     <plugins>
       <plugin>

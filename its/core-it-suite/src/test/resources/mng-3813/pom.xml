@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3813</name> 
+  <name>Maven Integration Test :: MNG-3813</name>
   <description>
     Verify that the ordering of the plugin class path matches the ordering of the dependencies as given in the POM.
   </description>

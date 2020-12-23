@@ -610,7 +610,7 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             // noop
         }
-        
+
         return verifier;
     }
 

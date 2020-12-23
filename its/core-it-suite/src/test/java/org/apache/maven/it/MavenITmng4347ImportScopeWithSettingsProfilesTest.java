@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4347">MNG-4347</a>.
- * 
+ *
  * @author John Casey
  */
 public class MavenITmng4347ImportScopeWithSettingsProfilesTest
@@ -49,19 +49,19 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4347" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        
+
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4347" );
-        
+
         verifier.setAutoclean( false );
-        
+
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        
+
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        
+
         verifier.executeGoal( "validate" );
-        
+
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

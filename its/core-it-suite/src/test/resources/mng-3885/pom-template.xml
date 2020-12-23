@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-3885</name> 
+  <name>Maven Integration Test :: MNG-3885</name>
   <description>
     Test that uniqueVersion defined by a parent profile is effective for child modules when building
     from the parent.

@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  *
  * The test POM references an import scope POM, which also has a dependency on an import scope POM.
  *
- * Both import POMs can only be found in the repository defined in the test POM. 
+ * Both import POMs can only be found in the repository defined in the test POM.
  * It has a parent POM that defines the same repository with a different location.
  * The test confirms that the dominant repository definition (child) wins while resolving the import POMs.
  *
@@ -58,7 +58,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
     // This will test the behavior using DefaultModelResolver
     public void testitInDependency()
         throws Exception
@@ -75,7 +75,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
+
     // central must not be defined in any settings.xml or super POM will never be in play.
     private void overrideGlobalSettings( final File testDir, final Verifier verifier )
     {

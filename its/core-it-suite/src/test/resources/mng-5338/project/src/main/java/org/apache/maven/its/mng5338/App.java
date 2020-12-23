@@ -23,7 +23,7 @@ package org.apache.maven.its.mng5338;
  * Hello world!
  *
  */
-public class App 
+public class App
 {
     public static void main( String[] args )
     {

@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4771">MNG-4771</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest

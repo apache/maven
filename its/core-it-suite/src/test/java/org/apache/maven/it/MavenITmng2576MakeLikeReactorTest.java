@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2576">MNG-2576</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2576MakeLikeReactorTest
@@ -35,7 +35,7 @@ public class MavenITmng2576MakeLikeReactorTest
 
     public MavenITmng2576MakeLikeReactorTest()
     {
-        super( "[2.1.0,)" ); 
+        super( "[2.1.0,)" );
     }
 
     private void clean( Verifier verifier )
@@ -186,7 +186,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         // as per MNG-5230
         requiresMavenVersion( "[3.2,)" );
-        
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );

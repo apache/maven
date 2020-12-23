@@ -27,7 +27,7 @@ under the License.
   <packaging>jar</packaging>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-2741</name> 
+  <name>Maven Integration Test :: MNG-2741</name>
   <description>
     Tests that plugin prefix/version metadata resolution errors tell the underlying transport issue.
   </description>

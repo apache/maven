@@ -30,10 +30,10 @@ import java.net.URL;
 
 /**
  * Creates a touch file if and only if a resource from the plugin dependency was successfully loaded, fails otherwise.
- * 
+ *
  * @goal load
  * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  *
  */
@@ -43,14 +43,14 @@ public class LoadMojo
 
     /**
      * The path to the output file, relative to the project base directory.
-     * 
+     *
      * @parameter expression="${touch.file}" default-value="target/touch.txt"
      */
     private File file;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */

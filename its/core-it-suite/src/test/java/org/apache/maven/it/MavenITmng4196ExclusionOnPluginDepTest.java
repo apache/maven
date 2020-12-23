@@ -27,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4196">MNG-4196</a>.
- * 
+ *
  * @author John Casey
  *
  */

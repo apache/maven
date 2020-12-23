@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>mod-b</artifactId>
 
-  <name>Maven Integration Test :: MNG-3284 :: Module B</name> 
+  <name>Maven Integration Test :: MNG-3284 :: Module B</name>
 
   <build>
     <plugins>

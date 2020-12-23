@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-773</name> 
+  <name>Maven Integration Test :: MNG-773</name>
   <description>
     Verify that profiles from settings.xml do not pollute module lists across projects in a reactorized build.
    </description>

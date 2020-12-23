@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4314">MNG-4314</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4314DirectInvocationOfAggregatorTest
@@ -53,7 +53,7 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteDirectory( "dependency/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4314" );
-        verifier.executeGoals( Arrays.asList( new String[] { "validate", 
+        verifier.executeGoals( Arrays.asList( new String[] { "validate",
             "org.apache.maven.its.plugins:maven-it-plugin-all:2.1-SNAPSHOT:aggregator-dependencies" } ) );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

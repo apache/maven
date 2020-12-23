@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2276</name> 
+  <name>Maven Integration Test :: MNG-2276</name>
   <description>
     Test that profiles in the POM can be activated by properties declared in active profiles from the settings.
   </description>

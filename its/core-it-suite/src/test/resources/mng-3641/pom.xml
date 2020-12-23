@@ -33,7 +33,7 @@ under the License.
     <profile>
       <id>mng-3641-it-provided-profile</id>
     </profile>
-  </profiles>  
+  </profiles>
 
   <modules>
     <module>child1</module>

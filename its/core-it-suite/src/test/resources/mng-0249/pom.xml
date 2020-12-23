@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-249</name> 
+  <name>Maven Integration Test :: MNG-249</name>
   <description>Test that the reactor can establish the artifact location of known projects for dependencies</description>
 
   <modules>

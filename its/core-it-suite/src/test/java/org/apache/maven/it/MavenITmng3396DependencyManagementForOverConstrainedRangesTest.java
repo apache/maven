@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3396">MNG-3396</a>.
- * 
+ *
  *
  */
 public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest
@@ -38,7 +38,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }
-    
+
     public void testitMNG3396()
         throws Exception
     {

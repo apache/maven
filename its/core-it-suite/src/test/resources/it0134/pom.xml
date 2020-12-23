@@ -27,9 +27,9 @@ under the License.
   <version>1.0</version>
   <packaging>war</packaging>
 
-  <name>Maven Integration Test :: it0134</name> 
+  <name>Maven Integration Test :: it0134</name>
   <description>Test default binding of goals for "war" lifecycle.</description>
-  
+
   <build>
     <plugins>
       <plugin>

@@ -46,7 +46,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
     public void testitMNG3394a ()
         throws Exception
     {
-        //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins 
+        //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );

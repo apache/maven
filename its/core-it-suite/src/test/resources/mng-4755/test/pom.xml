@@ -27,7 +27,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4755</name> 
+  <name>Maven Integration Test :: MNG-4755</name>
   <description>
     Verify that locally installed artifacts don't suppress fetching of g:a-level remote metadata which is required
     to locate alternative version (as required by version ranges).

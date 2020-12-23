@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4474</name> 
+  <name>Maven Integration Test :: MNG-4474</name>
   <description>
     Verify that the wagon manager does not erroneously cache/reuse wagon instances that use per-lookup instantiation.
   </description>

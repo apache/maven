@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4387">MNG-4387</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4387QuietLoggingTest
@@ -58,7 +58,7 @@ public class MavenITmng4387QuietLoggingTest
         verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );
-        
+
         for ( Iterator<String> it = lines.iterator(); it.hasNext(); )
         {
             String line = it.next();

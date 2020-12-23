@@ -27,10 +27,10 @@ under the License.
     <artifactId>parent</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>dependency</artifactId>
 
-  <name>Maven Integration Test :: MNG-5214 :: Dependency</name> 
+  <name>Maven Integration Test :: MNG-5214 :: Dependency</name>
   <description>A very dull project, which exists only so that its g:a:v is in the reactor.
   </description>
 

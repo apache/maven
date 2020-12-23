@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3927</name> 
+  <name>Maven Integration Test :: MNG-3927</name>
   <description>
     Test that the configuration for a plugin execution without an identifier does not pollute the configuration
     of default plugin executions introduced by the packaging.

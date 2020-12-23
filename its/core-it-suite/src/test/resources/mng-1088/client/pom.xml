@@ -27,7 +27,7 @@ under the License.
   <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name> 
+  <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name>
   <description>
     Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
     (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for

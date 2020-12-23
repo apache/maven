@@ -26,7 +26,7 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-1995</name> 
+  <name>Maven Integration Test :: MNG-1995</name>
   <description>
     Verify that POM fields that are of type boolean can be interpolated with expressions.
   </description>
@@ -53,7 +53,7 @@ under the License.
         <directory>src/main/resources</directory>
         <!-- That's the boolean POM field we would like to interpolate -->
         <filtering>${filter.resources}</filtering>
-      </resource>    
+      </resource>
     </resources>
     <plugins>
       <plugin>

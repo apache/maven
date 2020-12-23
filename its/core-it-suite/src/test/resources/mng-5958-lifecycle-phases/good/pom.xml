@@ -27,7 +27,7 @@ under the License.
   <artifactId>mng-5958-lifecycle-phases-project</artifactId>
   <version>0.1</version>
   <packaging>mng5958-good</packaging>
-  
+
   <build>
     <extensions>
       <extension>
@@ -49,5 +49,5 @@ under the License.
       </plugins>
     </pluginManagement>
   </build>
-  
+
 </project>

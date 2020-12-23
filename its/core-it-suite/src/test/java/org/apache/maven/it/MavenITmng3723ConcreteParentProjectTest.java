@@ -27,14 +27,14 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3723">MNG-3723</a>.
  *
- * Tests that the parent MavenProject instance of the current project has been 
+ * Tests that the parent MavenProject instance of the current project has been
  * transitioned into a concrete state before a mojo is executed. If this is true,
  * then injecting ${project} into the mojo and traversing to project.getParent().getBasedir()
- * should retrieve a File instance that is interpolated and exists (since we're 
+ * should retrieve a File instance that is interpolated and exists (since we're
  * going to be using a parent-child project set in the projects directory).
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public class MavenITmng3723ConcreteParentProjectTest
     extends AbstractMavenIntegrationTestCase
@@ -60,7 +60,7 @@ public class MavenITmng3723ConcreteParentProjectTest
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );

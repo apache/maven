@@ -3,5 +3,5 @@
   <groupId>org.apache.maven.its.mng3482</groupId>
   <artifactId>dep2</artifactId>
   <version>1</version>
-  
+
 </project>

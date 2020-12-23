@@ -38,13 +38,13 @@ public class TestMojo
 {
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
-    
+
     @Parameter
     private String name;
-    
+
     public void execute()
         throws MojoExecutionException
-    {        
+    {
         try
         {
             File file = new File( project.getBasedir(), "configuration.txt" );
@@ -63,6 +63,6 @@ public class TestMojo
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
-        
+
     }
 }

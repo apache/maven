@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3038">MNG-3038</a>
- * 
+ *
  * @author Joakim Erdfelt
  *
  */
@@ -39,7 +39,7 @@ public class MavenITmng3038TransitiveDepManVersionTest
     {
         super( ALL_MAVEN_VERSIONS );
     }
-    
+
     public void testitMNG3038()
         throws Exception
     {
@@ -49,7 +49,7 @@ public class MavenITmng3038TransitiveDepManVersionTest
         compileDDep( testDirBase, "D2", "2.0" );
 
         File testProjectDir = new File( testDirBase, "test-project" );
-        
+
         Verifier verifier = newVerifier( testProjectDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "jar" );

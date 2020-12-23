@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4189">MNG-4189</a>.
- * 
+ *
  *
  * @author <a href="mailto:oching@apache.org">Maria Odea Ching</a>
  */
@@ -52,7 +52,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
 
-        // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
+        // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -60,7 +60,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertEquals( "da2e54f69a9ba120f9211c476029f049967d840c", checksums.getProperty( "dep-1.0-SNAPSHOT.jar" ) );
 
-        // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar 
+        // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-f" );
         verifier.addCliOption( "dependent-on-newer-timestamp-pom.xml" );
@@ -71,7 +71,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         checksums = verifier.loadProperties( "target/checksum.properties" );
         assertEquals( "835979c28041014c5fd55daa15302d92976924a7", checksums.getProperty( "dep-1.0-SNAPSHOT.jar" ) );
 
-        // revert back to org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
+        // revert back to org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().remove( "-f" );
         verifier.getCliOptions().remove( "dependent-on-newer-timestamp-pom.xml" );

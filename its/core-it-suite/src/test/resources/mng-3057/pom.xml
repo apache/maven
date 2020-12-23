@@ -6,21 +6,21 @@
   <artifactId>mng-3057</artifactId>
   <version>${testVersion}</version>
   <packaging>pom</packaging>
-  
+
   <name>Integration Test Project for MNG-3057</name>
   <description>
     This project verifies that MNG-3057 is fixed.
   </description>
-  
+
   <distributionManagement>
     <repository>
       <id>test-repo</id>
       <url>@deployTo@</url>
     </repository>
   </distributionManagement>
-  
+
   <url>https://issues.apache.org/jira/browse/MNG-3057</url>
-  
+
   <modules>
     <module>level2</module>
   </modules>
@@ -35,7 +35,7 @@
           <execution>
             <!--
                This execution is technically INCORRECT, but should have no effect on the result
-               of the build. It is described in MCOMPILER-94, and could interact with the 
+               of the build. It is described in MCOMPILER-94, and could interact with the
                handling of POMs for install and deploy, when packaging == pom. Adding here
                to force the issue and make sure the POM transformation still happens correctly.
             -->

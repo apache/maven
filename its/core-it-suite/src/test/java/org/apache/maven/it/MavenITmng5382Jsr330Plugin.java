@@ -60,7 +60,7 @@ public class MavenITmng5382Jsr330Plugin
     {
         //
         // Build a plugin that uses a JSR330 plugin
-        //    
+        //
         Verifier v0 = newVerifier( testDir.getAbsolutePath(), "remote" );
         v0.setAutoclean( false );
         v0.deleteDirectory( "target" );
@@ -68,7 +68,7 @@ public class MavenITmng5382Jsr330Plugin
         v0.executeGoal( "install" );
         v0.verifyErrorFreeLog();
         v0.resetStreams();
-        
+
         //
         // Execute the JSR330 plugin
         //

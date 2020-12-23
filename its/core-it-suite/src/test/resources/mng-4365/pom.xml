@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4365</name> 
+  <name>Maven Integration Test :: MNG-4365</name>
   <description>
     Test that the POM parser doesn't choke on attribute values that contain entities which resolve to markup.
   </description>

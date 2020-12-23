@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2222">MNG-2222</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2222OutputDirectoryReactorResolutionTest
