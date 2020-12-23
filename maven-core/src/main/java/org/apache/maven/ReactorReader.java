@@ -267,8 +267,8 @@ class ReactorReader
                 if ( outputFileLastModified > artifactLastModified )
                 {
                     LOGGER.warn(
-                            "Packaged artifact for {} is not up-to-date compared to the build output directory; " +
-                            "file {} is more recent than {}.",
+                            "Packaged artifact for {} is not up-to-date compared to the build output directory; "
+                          + "file {} is more recent than {}.",
                             project.getArtifactId(),
                             relativizeOutputFile( outputFile ), relativizeOutputFile( packagedArtifactFile.toPath() )
                     );
