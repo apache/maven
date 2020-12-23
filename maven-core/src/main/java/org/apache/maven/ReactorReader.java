@@ -43,10 +43,11 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either as packaged
@@ -64,7 +65,7 @@ class ReactorReader
     private static final Collection<String> COMPILE_PHASE_TYPES =
         Arrays.asList( "jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client" );
 
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( ReactorReader.class );
 
     private MavenSession session;
 
@@ -75,9 +76,8 @@ class ReactorReader
     private WorkspaceRepository repository;
 
     @Inject
-    ReactorReader( MavenSession session, Logger logger )
+    ReactorReader( MavenSession session )
     {
-        this.logger = logger;
         this.session = session;
         this.projectsByGAV = new HashMap<>( session.getAllProjects().size() * 2 );
         session.getAllProjects().forEach( project ->
@@ -266,7 +266,12 @@ class ReactorReader
                 long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
                 if ( outputFileLastModified > artifactLastModified )
                 {
-                    logger.warn( "Packaged artifact is not up-to-date compared to the build output directory" );
+                    LOGGER.warn(
+                            "Packaged artifact for {} is not up-to-date compared to the build output directory; "
+                          + "file {} is more recent than {}.",
+                            project.getArtifactId(),
+                            relativizeOutputFile( outputFile ), relativizeOutputFile( packagedArtifactFile.toPath() )
+                    );
                     return false;
                 }
             }
@@ -275,7 +280,7 @@ class ReactorReader
         }
         catch ( IOException e )
         {
-            logger.warn( "An I/O error occurred while checking if the packaged artifact is up-to-date "
+            LOGGER.warn( "An I/O error occurred while checking if the packaged artifact is up-to-date "
                     + "against the build output directory. "
                     + "Continuing with the assumption that it is up-to-date.", e );
             return true;
@@ -286,6 +291,12 @@ class ReactorReader
     {
         return project.hasLifecyclePhase( "package" ) || project.hasLifecyclePhase( "install" )
             || project.hasLifecyclePhase( "deploy" );
+    }
+
+    private Path relativizeOutputFile( final Path outputFile )
+    {
+        Path projectBaseDirectory = Paths.get( session.getRequest().getMultiModuleProjectDirectory().toURI() );
+        return projectBaseDirectory.relativize( outputFile );
     }
 
     /**
