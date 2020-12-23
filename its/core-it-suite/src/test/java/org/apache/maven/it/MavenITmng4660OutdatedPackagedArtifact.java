@@ -23,12 +23,18 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+
+import static java.nio.file.FileVisitResult.CONTINUE;
 
 /**
  * This is a test case for a new check introduced with <a href="https://issues.apache.org/jira/browse/MNG-4660">MNG-4660</a>.
@@ -106,16 +112,62 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier3.verifyErrorFreeLog();
         try
         {
-            verifier3.verifyTextInLog( "Packaged artifact for module-a is not up-to-date" );
+            verifier3.verifyTextInLog( "File '"
+                    + Paths.get( "module-a", "target", "classes", "example.properties" )
+                    + "' is more recent than the packaged artifact for 'module-a'; "
+                    + "using '"
+                    + Paths.get( "module-a", "target","classes" )
+                    + "' instead"
+            );
         }
         catch ( VerificationException e )
         {
-            String message = e.getMessage() + System.lineSeparator();
-            message += "  " + module1Jar.getFileName() + " -> " + Files.getLastModifiedTime( module1Jar )
-                            + System.lineSeparator();
-            message += "  " + module1PropertiesFile.getFileName() + " -> " + Files.getLastModifiedTime( module1PropertiesFile )
-                            + System.lineSeparator();
-            throw new VerificationException( message, e.getCause() );
+            final StringBuilder message = new StringBuilder( e.getMessage() );
+            message.append( System.lineSeparator() );
+
+            message.append( "  " )
+                    .append( module1Jar.toAbsolutePath() )
+                    .append( " -> " )
+                    .append( Files.getLastModifiedTime( module1Jar ) )
+                    .append( System.lineSeparator() );
+
+            message.append( System.lineSeparator() );
+
+            Path outputDirectory = Paths.get( testDir.toString(), "module-a", "target",  "classes" );
+
+            Files.walkFileTree( outputDirectory, new FileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult preVisitDirectory( Path dir, BasicFileAttributes attrs )
+                {
+                    return CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile( Path file, BasicFileAttributes attrs )
+                {
+                    message.append( "  " )
+                            .append( file.toAbsolutePath() )
+                            .append( " -> " )
+                            .append( attrs.lastModifiedTime() )
+                            .append( System.lineSeparator() );
+                    return CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed( Path file, IOException exc )
+                {
+                    return CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory( Path dir, IOException exc )
+                {
+                    return CONTINUE;
+                }
+            } );
+
+            throw new VerificationException( message.toString(), e.getCause() );
         }
         verifier3.resetStreams();
     }
