@@ -433,6 +433,8 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
+            // MNG-7032: Also disable colours if in batch mode
+            disableColorsInLogfileOrBatch( cliRequest );
             System.out.println( CLIReportingUtils.showVersion() );
             throw new ExitException( 0 );
         }
@@ -518,10 +520,9 @@ public class MavenCli
             throw new IllegalArgumentException( "Invalid color configuration option [" + styleColor
                 + "]. Supported values are (auto|always|never)." );
         }
-        else if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
-            || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        else
         {
-            MessageUtils.setColorEnabled( false );
+            disableColorsInLogfileOrBatch( cliRequest );
         }
 
         // LOG STREAMS
@@ -566,6 +567,20 @@ public class MavenCli
                         + "The --fail-on-severity flag will not take effect.",
                         MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName() );
             }
+        }
+    }
+
+    /**
+     * Disables the colour output in the case that the {@link CLIManager#BATCH_MODE} option
+     * or {@link CLIManager#LOG_FILE} option was given (or both). In those cases, ANSI output is never feasible.
+     * @param cliRequest the arguments as request pojo.
+     */
+    private void disableColorsInLogfileOrBatch( CliRequest cliRequest )
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
+                || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            MessageUtils.setColorEnabled( false );
         }
     }
 
