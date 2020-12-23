@@ -178,7 +178,7 @@ class ReactorReader
         }
         // Check whether an earlier Maven run might have produced an artifact that is still on disk.
         else if ( packagedArtifactFile != null && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate( project, packagedArtifactFile ) )
+                && isPackagedArtifactUpToDate( project, packagedArtifactFile, artifact ) )
         {
             return packagedArtifactFile;
         }
@@ -186,33 +186,41 @@ class ReactorReader
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
+            return determineLooseDirectoryForArtifact( project, artifact );
+        }
 
-            if ( isTestArtifact( artifact ) )
+        // The fall-through indicates that the artifact cannot be found;
+        // for instance if package produced nothing or classifier problems.
+        return null;
+    }
+
+    private File determineLooseDirectoryForArtifact( final MavenProject project, final Artifact artifact )
+    {
+        if ( isTestArtifact( artifact ) )
+        {
+            if ( project.hasLifecyclePhase( "test-compile" ) )
             {
-                if ( project.hasLifecyclePhase( "test-compile" ) )
-                {
-                    return new File( project.getBuild().getTestOutputDirectory() );
-                }
+                return new File( project.getBuild().getTestOutputDirectory() );
             }
-            else
+        }
+        else
+        {
+            String type = artifact.getProperty( "type", "" );
+            File outputDirectory = new File( project.getBuild().getOutputDirectory() );
+
+            // Check if the project is being built during this session, and if we can expect any output.
+            // There is no need to check if the build has created any outputs, see MNG-2222.
+            boolean projectCompiledDuringThisSession
+                    = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
+
+            // Check if the project is part of the session (not filtered by -pl, -rf, etc). If so, we check
+            // if a possible earlier Maven invocation produced some output for that project which we can use.
+            boolean projectHasOutputFromPreviousSession
+                    = !session.getProjects().contains( project ) && outputDirectory.exists();
+
+            if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
             {
-                String type = artifact.getProperty( "type", "" );
-                File outputDirectory = new File( project.getBuild().getOutputDirectory() );
-
-                // Check if the project is being built during this session, and if we can expect any output.
-                // There is no need to check if the build has created any outputs, see MNG-2222.
-                boolean projectCompiledDuringThisSession
-                        = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
-
-                // Check if the project is part of the session (not filtered by -pl, -rf, etc). If so, we check
-                // if a possible earlier Maven invocation produced some output for that project which we can use.
-                boolean projectHasOutputFromPreviousSession
-                        = !session.getProjects().contains( project ) && outputDirectory.exists();
-
-                if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
-                {
-                    return outputDirectory;
-                }
+                return outputDirectory;
             }
         }
 
@@ -237,7 +245,7 @@ class ReactorReader
         return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
     }
 
-    private boolean isPackagedArtifactUpToDate( MavenProject project, File packagedArtifactFile )
+    private boolean isPackagedArtifactUpToDate( MavenProject project, File packagedArtifactFile, Artifact artifact )
     {
         Path outputDirectory = Paths.get( project.getBuild().getOutputDirectory() );
         if ( !outputDirectory.toFile().exists() )
@@ -266,12 +274,19 @@ class ReactorReader
                 long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
                 if ( outputFileLastModified > artifactLastModified )
                 {
-                    LOGGER.warn(
-                            "Packaged artifact for {} is not up-to-date compared to the build output directory; "
-                          + "file {} is more recent than {}.",
-                            project.getArtifactId(),
-                            relativizeOutputFile( outputFile ), relativizeOutputFile( packagedArtifactFile.toPath() )
-                    );
+                    File alternative = determineLooseDirectoryForArtifact( project, artifact );
+                    if ( alternative != null )
+                    {
+                        LOGGER.warn( "The file {} is more recent than the packaged artifact for {}; using {} instead",
+                                relativizeOutputFile( outputFile ), project.getArtifactId(),
+                                relativizeOutputFile( alternative.toPath() ) );
+                    }
+                    else
+                    {
+                        LOGGER.warn( "The file {} is more recent than the packaged artifact for {}; "
+                                + "cannot use a loose directory for this type of artifact",
+                                relativizeOutputFile( outputFile ), project.getArtifactId() );
+                    }
                     return false;
                 }
             }
