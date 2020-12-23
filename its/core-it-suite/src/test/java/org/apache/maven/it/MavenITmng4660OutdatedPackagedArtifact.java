@@ -106,7 +106,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier3.verifyErrorFreeLog();
         try
         {
-            verifier3.verifyTextInLog( "Packaged artifact is not up-to-date" );
+            verifier3.verifyTextInLog( "Packaged artifact for module-a is not up-to-date" );
         }
         catch ( VerificationException e )
         {
