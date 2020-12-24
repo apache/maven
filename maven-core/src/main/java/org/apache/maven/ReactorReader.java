@@ -290,7 +290,7 @@ class ReactorReader
                     else
                     {
                         LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; "
-                                + "cannot use a loose directory for this type of artifact",
+                                + "cannot use the build output directory for this type of artifact",
                                 relativizeOutputFile( outputFile ), project.getArtifactId() );
                     }
                     return false;
