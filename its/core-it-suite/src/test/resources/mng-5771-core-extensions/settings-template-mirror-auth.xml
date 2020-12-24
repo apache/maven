@@ -12,7 +12,7 @@
       <id>repoman</id>
       <name>Mirror</name>
       <url>http://localhost:@port@</url>
-      <mirrorOf>external:*</mirrorOf>
+      <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>
 
