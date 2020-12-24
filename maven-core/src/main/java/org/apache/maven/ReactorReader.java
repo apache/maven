@@ -283,13 +283,13 @@ class ReactorReader
                     File alternative = determineLooseDirectoryForArtifact( project, artifact );
                     if ( alternative != null )
                     {
-                        LOGGER.warn( "File {} is more recent than the packaged artifact for {}; using {} instead",
+                        LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; using '{}' instead",
                                 relativizeOutputFile( outputFile ), project.getArtifactId(),
                                 relativizeOutputFile( alternative.toPath() ) );
                     }
                     else
                     {
-                        LOGGER.warn( "File {} is more recent than the packaged artifact for {}; "
+                        LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; "
                                 + "cannot use a loose directory for this type of artifact",
                                 relativizeOutputFile( outputFile ), project.getArtifactId() );
                     }
