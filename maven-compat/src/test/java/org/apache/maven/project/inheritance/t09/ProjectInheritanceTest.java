@@ -41,7 +41,7 @@ public class ProjectInheritanceTest
     // or we can show it graphically as:
     //
     // p1 ---> p0 --> super model
-	//
+    //
     // ----------------------------------------------------------------------
 
     /**

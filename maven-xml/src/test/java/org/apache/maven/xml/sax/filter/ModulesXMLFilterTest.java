@@ -28,56 +28,56 @@ import org.xml.sax.ext.LexicalHandler;
 
 public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 
-	@Override
-	protected ModulesXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
-	{
-	    ModulesXMLFilter filter = new ModulesXMLFilter();
-	    lexicalHandlerConsumer.accept( filter );
-	    return filter;
-	}
-	
-	@Test
-	public void emptyModules() throws Exception {
-		String input = "<project><modules/></project>";
+    @Override
+    protected ModulesXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
+    {
+        ModulesXMLFilter filter = new ModulesXMLFilter();
+        lexicalHandlerConsumer.accept( filter );
+        return filter;
+    }
+
+    @Test
+    public void emptyModules() throws Exception {
+        String input = "<project><modules/></project>";
         String expected = "<project/>";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
-	}
+    }
 
-	@Test
-	public void setOfModules() throws Exception {
-		String input = "<project><modules>"
-				+ "<module>ab</module>"
-				+ "<module>../cd</module>"
-				+ "</modules></project>";
-		String expected = "<project/>";
-		String actual = transform( input );
-		assertThat( actual ).and( expected ).areIdentical();
-	}
-	
-	@Test
+    @Test
+    public void setOfModules() throws Exception {
+        String input = "<project><modules>"
+                + "<module>ab</module>"
+                + "<module>../cd</module>"
+                + "</modules></project>";
+        String expected = "<project/>";
+        String actual = transform( input );
+        assertThat( actual ).and( expected ).areIdentical();
+    }
+
+    @Test
     public void noModules() throws Exception {
         String input = "<project><name>NAME</name></project>";
         String expected = input;
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
     }
-	
-	@Test
-	public void comment() throws Exception {
-	
-	    String input = "<project><!--before--><modules>"
+
+    @Test
+    public void comment() throws Exception {
+
+        String input = "<project><!--before--><modules>"
                         + "<!--pre-in-->"
-	                    + "<module><!--in-->ab</module>"
-	                    + "<module>../cd</module>"
+                        + "<module><!--in-->ab</module>"
+                        + "<module>../cd</module>"
                         + "<!--post-in-->"
-	                    + "</modules>"
-	                    + "<!--after--></project>";
-	    String expected = "<project><!--before--><!--after--></project>";
-	    String actual = transform( input );
-	    assertThat( actual ).and( expected ).areIdentical();
-	}
-	
+                        + "</modules>"
+                        + "<!--after--></project>";
+        String expected = "<project><!--before--><!--after--></project>";
+        String actual = transform( input );
+        assertThat( actual ).and( expected ).areIdentical();
+    }
+
     @Test
     public void setOfModulesLF() throws Exception {
         String input = "<project>\n"
@@ -95,5 +95,5 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
             + "</project>\n";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
-    }	
+    }
 }

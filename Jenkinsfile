@@ -58,8 +58,8 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 invokerPublisher(disabled: true),
                 pipelineGraphPublisher(disabled: false)
             ], publisherStrategy: 'EXPLICIT') {
-			    // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
-			    sh "mvn clean"
+                // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
+                sh "mvn clean"
                 sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
             }
             dir ('apache-maven/target') {

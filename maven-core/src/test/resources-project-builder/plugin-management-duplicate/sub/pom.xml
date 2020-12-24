@@ -20,11 +20,11 @@ under the License.
 -->
 
 <project>
-	<parent>
-		<groupId>gid</groupId>
-		<artifactId>aid</artifactId>
-		<version>1.0</version>
-	</parent>
+  <parent>
+    <groupId>gid</groupId>
+    <artifactId>aid</artifactId>
+    <version>1.0</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4053</groupId>

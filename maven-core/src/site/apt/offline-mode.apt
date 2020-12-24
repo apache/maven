@@ -196,7 +196,7 @@ Offline Mode Design
          correctly.
 
   [false] <<(Default)>> Either status is acceptable for the mojo to
-  				execute. It doesn't care.
+          execute. It doesn't care.
 
   The majority of mojos will leave the requiresOnline == false,
   since online/offline status will be irrelevant, provided they have

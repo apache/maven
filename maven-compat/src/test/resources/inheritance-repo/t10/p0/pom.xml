@@ -27,12 +27,12 @@
         <scope>runtime</scope>
       </dependency>
 
-	  <dependency>
-	    <groupId>maven-test</groupId>
-	    <artifactId>t10-c</artifactId>
-	    <version>1.0</version>
-	    <scope>test</scope>
-	  </dependency>
+      <dependency>
+        <groupId>maven-test</groupId>
+        <artifactId>t10-c</artifactId>
+        <version>1.0</version>
+        <scope>test</scope>
+      </dependency>
 
     </dependencies>
 
