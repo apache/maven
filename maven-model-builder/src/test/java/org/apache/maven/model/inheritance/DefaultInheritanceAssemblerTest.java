@@ -189,12 +189,12 @@ public class DefaultInheritanceAssemblerTest
         }
     }
 
-    public void testWithEmptyUrl() 
+    public void testWithEmptyUrl()
         throws IOException
     {
         	testInheritance( "empty-urls", false );
     }
-    
+
     public void testInheritance( String baseName )
         throws IOException
     {

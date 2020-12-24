@@ -29,7 +29,7 @@ under the License.
   </parent>
   <artifactId>mng6300-war</artifactId>
   <packaging>war</packaging>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -41,7 +41,7 @@ under the License.
       </plugin>
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng6300</groupId>

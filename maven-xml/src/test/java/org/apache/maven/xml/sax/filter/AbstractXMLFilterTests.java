@@ -48,16 +48,16 @@ public abstract class AbstractXMLFilterTests
     {
         throw new UnsupportedOperationException( "Override one of the getFilter() methods" );
     }
-    
+
     protected AbstractSAXFilter getFilter( Consumer<LexicalHandler> result )  throws TransformerException, SAXException, ParserConfigurationException
     {
         return getFilter();
     }
-    
+
     protected String omitXmlDeclaration() {
         return "yes";
     }
-    
+
     protected String indentAmount() {
         return null;
     }
@@ -70,7 +70,7 @@ public abstract class AbstractXMLFilterTests
 
     /**
      * Use this method only for testing a single filter.
-     * 
+     *
      * @param input
      * @param filter
      * @return
@@ -78,14 +78,14 @@ public abstract class AbstractXMLFilterTests
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    protected String transform( String input, AbstractSAXFilter filter ) 
+    protected String transform( String input, AbstractSAXFilter filter )
         throws TransformerException, SAXException, ParserConfigurationException
     {
         setParent( filter );
-        
+
         SAXTransformerFactory transformerFactory = (SAXTransformerFactory) Factories.newTransformerFactory();
         TransformerHandler transformerHandler = transformerFactory.newTransformerHandler();
-        
+
         transformerHandler.getTransformer().setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration() );
         if ( indentAmount() != null )
         {
@@ -93,16 +93,16 @@ public abstract class AbstractXMLFilterTests
             transformerHandler.getTransformer().setOutputProperty( "{http://xml.apache.org/xslt}indent-amount",
                                                                    indentAmount() );
         }
-        
+
         Transformer transformer = transformerFactory.newTransformer();
-        
+
         Writer writer = new StringWriter();
         StreamResult result = new StreamResult( writer );
         transformerHandler.setResult( result );
 
         SAXResult transformResult = new SAXResult( transformerHandler );
         SAXSource transformSource = new SAXSource( filter, new InputSource( new StringReader( input ) ) );
-        
+
         transformResult.setLexicalHandler( filter );
         transformer.transform( transformSource, transformResult );
 
@@ -115,7 +115,7 @@ public abstract class AbstractXMLFilterTests
     {
         SAXTransformerFactory transformerFactory = (SAXTransformerFactory) Factories.newTransformerFactory();
         TransformerHandler transformerHandler = transformerFactory.newTransformerHandler();
-        
+
         transformerHandler.getTransformer().setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration() );
         if ( indentAmount() != null )
         {
@@ -123,7 +123,7 @@ public abstract class AbstractXMLFilterTests
             transformerHandler.getTransformer().setOutputProperty( "{http://xml.apache.org/xslt}indent-amount",
                                                                    indentAmount() );
         }
-        
+
         Transformer transformer = transformerFactory.newTransformer();
 
         Writer writer = new StringWriter();
@@ -131,30 +131,30 @@ public abstract class AbstractXMLFilterTests
         transformerHandler.setResult( result );
 
         SAXResult transformResult = new SAXResult( transformerHandler );
-        
+
         AbstractSAXFilter filter = getFilter( l -> transformResult.setLexicalHandler( l ) );
         setParent( filter );
-        
+
         filter = new PerCharXMLFilter( filter );
 
         filter.setLexicalHandler( transformerHandler );
-        
+
         SAXSource transformSource = new SAXSource( filter, new InputSource( input ) );
-        
+
         transformer.transform( transformSource, transformResult );
 
         return writer.toString();
     }
-    
+
     private void setParent( AbstractSAXFilter filter ) throws SAXException, ParserConfigurationException
     {
         if( filter.getParent() == null )
         {
             XMLReader r = Factories.newXMLReader();
-            
+
             AbstractSAXFilter perChar = new PerCharXMLFilter();
             perChar.setParent( r );
-            
+
             filter.setParent( perChar );
             filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         }
@@ -162,11 +162,11 @@ public abstract class AbstractXMLFilterTests
 
     /**
      * From {@link ContentHandler}
-     * <q>Your code should not assume that algorithms using char-at-a-time idioms will be working in characterunits; 
-     * in some cases they will split characters. This is relevant wherever XML permits arbitrary characters, such as 
-     * attribute values,processing instruction data, and comments as well as in data reported from this method. It's 
+     * <q>Your code should not assume that algorithms using char-at-a-time idioms will be working in characterunits;
+     * in some cases they will split characters. This is relevant wherever XML permits arbitrary characters, such as
+     * attribute values,processing instruction data, and comments as well as in data reported from this method. It's
      * also generally relevant whenever Java code manipulates internationalized text; the issue isn't unique to XML.</q>
-     *  
+     *
      * @author Robert Scholte
      */
     class PerCharXMLFilter
@@ -176,7 +176,7 @@ public abstract class AbstractXMLFilterTests
         {
             super();
         }
-        
+
         public PerCharXMLFilter( AbstractSAXFilter parent )
         {
             super( parent );
@@ -191,7 +191,7 @@ public abstract class AbstractXMLFilterTests
                 super.characters( ch, start + i, 1 );
             }
         }
-        
+
         @Override
         public void ignorableWhitespace( char[] ch, int start, int length )
             throws SAXException

@@ -39,7 +39,7 @@ public class ConsumerModelSourceTransformerTest
         Path beforePomFile = Paths.get( "src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile = Paths.get( "src/test/resources/projects/transform/after.pom").toAbsolutePath();
 
-        try( InputStream expected = Files.newInputStream( afterPomFile ); 
+        try( InputStream expected = Files.newInputStream( afterPomFile );
              InputStream result = transformer.transform( beforePomFile, new NoTransformerContext() ) )
         {
             XmlAssert.assertThat( result ).and( expected ).areIdentical();
@@ -53,14 +53,14 @@ public class ConsumerModelSourceTransformerTest
         {
             return null;
         }
-        
+
         @Override
         public Model getRawModel( String groupId, String artifactId )
             throws IllegalStateException
         {
             return null;
         }
-        
+
         @Override
         public Model getRawModel( Path p )
         {

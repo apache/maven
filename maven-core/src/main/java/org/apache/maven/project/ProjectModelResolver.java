@@ -273,7 +273,7 @@ public class ProjectModelResolver
             }
 
             dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
-            
+
             if ( modelPool != null )
             {
                 Model model =

@@ -51,7 +51,7 @@ import org.xml.sax.ext.LexicalHandler;
 /**
  * Offers a transformation implementation based on PipelineStreams.
  * Subclasses are responsible for providing the right SAXFilter.
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -59,10 +59,10 @@ public abstract class AbstractModelSourceTransformer
     implements ModelSourceTransformer
 {
     private static final AtomicInteger TRANSFORM_THREAD_COUNTER = new AtomicInteger();
-    
+
     private final TransformerFactory transformerFactory = Factories.newTransformerFactory();
-                    
-    protected abstract AbstractSAXFilter getSAXFilter( Path pomFile, 
+
+    protected abstract AbstractSAXFilter getSAXFilter( Path pomFile,
                                                        TransformerContext context,
                                                        Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException;
@@ -71,12 +71,12 @@ public abstract class AbstractModelSourceTransformer
     {
         return outputStream;
     }
-    
+
     public SAXTransformerFactory getTransformerFactory()
     {
         return ( SAXTransformerFactory ) transformerFactory;
     }
-    
+
     protected TransformerHandler getTransformerHandler( Path pomFile )
         throws IOException, org.apache.maven.model.building.TransformerException
     {
@@ -112,7 +112,7 @@ public abstract class AbstractModelSourceTransformer
             filter = getSAXFilter( pomFile, context, lexConsumer );
             filter.setLexicalHandler( transformerHandler );
             // By default errors are written to stderr.
-            // Hence set custom errorHandler to reduce noice 
+            // Hence set custom errorHandler to reduce noice
             filter.setErrorHandler( new ErrorHandler()
             {
                 @Override
@@ -121,14 +121,14 @@ public abstract class AbstractModelSourceTransformer
                 {
                     throw exception;
                 }
-                
+
                 @Override
                 public void fatalError( SAXParseException exception )
                     throws SAXException
                 {
                     throw exception;
                 }
-                
+
                 @Override
                 public void error( SAXParseException exception )
                     throws SAXException
@@ -141,7 +141,7 @@ public abstract class AbstractModelSourceTransformer
         {
             throw new org.apache.maven.model.building.TransformerException( e );
         }
-        
+
         final SAXSource transformSource =
             new SAXSource( filter, new org.xml.sax.InputSource( Files.newInputStream( pomFile ) ) );
 
@@ -150,7 +150,7 @@ public abstract class AbstractModelSourceTransformer
         // Ensure pipedStreams are connected before the transformThread starts!!
         final PipedInputStream pipedInputStream = new PipedInputStream( pout );
 
-        Thread transformThread = new Thread( () -> 
+        Thread transformThread = new Thread( () ->
         {
             try ( PipedOutputStream pos = pout )
             {
@@ -164,7 +164,7 @@ public abstract class AbstractModelSourceTransformer
         transformThread.setUncaughtExceptionHandler( eh );
         transformThread.setDaemon( true );
         transformThread.start();
-        
+
         return new ThreadAwareInputStream( pipedInputStream, eh );
     }
 

@@ -31,14 +31,14 @@ import org.xml.sax.SAXException;
 public class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests
 {
     private CiFriendlyXMLFilter filter;
-    
+
     @Before
     public void setUp()
     {
         filter = new CiFriendlyXMLFilter( true );
         filter.setChangelist( "CHANGELIST" );
     }
-    
+
     @Override
     protected AbstractSAXFilter getFilter()
         throws TransformerException, SAXException, ParserConfigurationException

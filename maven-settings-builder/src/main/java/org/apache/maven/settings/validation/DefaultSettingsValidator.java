@@ -151,7 +151,7 @@ public class DefaultSettingsValidator
         if ( proxies != null )
         {
             Set<String> proxyIds = new HashSet<>();
-            
+
             for ( Proxy proxy : proxies )
             {
                 if ( !proxyIds.add( proxy.getId() ) )

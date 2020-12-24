@@ -27,14 +27,14 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * XMLFilter with LexicalHandler.
  * Since some filters collect events before processing them, the LexicalHandler events must be collected too.
  * Otherwise the LexicalHandler events might end up before all collected XMLReader events.
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
 public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
 {
     private LexicalHandler lexicalHandler;
-    
+
     public AbstractSAXFilter()
     {
         super();
@@ -45,22 +45,22 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
         super( parent );
         parent.setLexicalHandler( this );
     }
-    
+
     public LexicalHandler getLexicalHandler()
     {
         return lexicalHandler;
     }
-    
+
     public void setLexicalHandler( LexicalHandler lexicalHandler )
     {
         this.lexicalHandler = lexicalHandler;
     }
-    
+
     @Override
     public void startDTD( String name, String publicId, String systemId )
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.startDTD( name, publicId, systemId );
         }
@@ -70,7 +70,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void endDTD()
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.endDTD();
         }
@@ -80,7 +80,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void startEntity( String name )
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.startEntity( name );
         }
@@ -90,7 +90,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void endEntity( String name )
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.endEntity( name );
         }
@@ -100,7 +100,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void startCDATA()
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.startCDATA();
         }
@@ -110,7 +110,7 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void endCDATA()
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.endCDATA();
         }
@@ -120,16 +120,16 @@ public class AbstractSAXFilter extends XMLFilterImpl implements LexicalHandler
     public void comment( char[] ch, int start, int length )
         throws SAXException
     {
-        if ( lexicalHandler != null ) 
+        if ( lexicalHandler != null )
         {
             lexicalHandler.comment( ch, start, length );
         }
     }
-    
-    
+
+
     protected static String nullSafeAppend( String originalValue, String charSegment )
     {
-        if ( originalValue == null ) 
+        if ( originalValue == null )
         {
             return charSegment;
         }

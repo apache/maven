@@ -30,7 +30,7 @@ public interface ArtifactFilterManager
 {
     /**
      * Returns a filter for core + extension artifacts.
-     * 
+     *
      * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core and plugin
      *             extensions.
      */
@@ -43,7 +43,7 @@ public interface ArtifactFilterManager
 
     /**
      * Exclude an extension artifact (doesn't affect getArtifactFilter's result, only getExtensionArtifactFilter).
-     * 
+     *
      * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core and plugin
      *             extensions.
      */

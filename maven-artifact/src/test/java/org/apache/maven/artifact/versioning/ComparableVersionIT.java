@@ -52,10 +52,10 @@ public class ComparableVersionIT
                 if ( mavenArtifactJar.matcher( filename ).matches() )
                 {
                     Process p = Runtime.getRuntime().exec( new String[] {
-                        Paths.get( System.getProperty( "java.home" ), "bin/java" ).toString(), 
+                        Paths.get( System.getProperty( "java.home" ), "bin/java" ).toString(),
                         "-jar",
-                        file.toAbsolutePath().toString(), 
-                        "5.32", 
+                        file.toAbsolutePath().toString(),
+                        "5.32",
                         "5.27" } );
 
                     try

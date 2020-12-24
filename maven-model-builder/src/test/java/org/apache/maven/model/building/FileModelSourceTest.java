@@ -38,7 +38,7 @@ public class FileModelSourceTest
      */
     @Test
     public void testEquals()
-            throws Exception 
+            throws Exception
     {
         File tempFile = createTempFile( "pomTest" );
         FileModelSource instance = new FileModelSource( tempFile );
@@ -50,19 +50,19 @@ public class FileModelSourceTest
     }
 
     @Test
-    public void testWindowsPaths() 
-            throws Exception 
+    public void testWindowsPaths()
+            throws Exception
     {
         assumeTrue( SystemUtils.IS_OS_WINDOWS );
 
         File upperCaseFile = createTempFile( "TESTE" );
         String absolutePath = upperCaseFile.getAbsolutePath();
         File lowerCaseFile = new File( absolutePath.toLowerCase() );
-        
+
         FileModelSource upperCaseFileSouce = new FileModelSource( upperCaseFile );
         FileModelSource lowerCaseFileSouce = new FileModelSource( lowerCaseFile );
 
-        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );        
+        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );
     }
 
     private File createTempFile( String name ) throws IOException

@@ -31,7 +31,7 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
     {
         return new RelativePathXMLFilter();
     }
-    
+
     @Test
     public void testRelativePath() throws Exception
     {
@@ -55,12 +55,12 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
            String actual = transform( input );
            assertThat( actual ).and( expected ).areIdentical();
     }
-    
+
     @Test
     public void testRelativePathNS() throws Exception
     {
-        String input = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" + 
-            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+        String input = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" +
+            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                         + "  <parent>\n"
                         + "    <groupId>GROUPID</groupId>\n"
@@ -70,8 +70,8 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
                         + "  </parent>\n"
                         + "  <artifactId>PROJECT</artifactId>\n"
                         + "</project>";
-           String expected = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" + 
-               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+           String expected = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" +
+               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                            + "  <parent>\n"
                            + "    <groupId>GROUPID</groupId>\n"
@@ -83,12 +83,12 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
            String actual = transform( input );
            assertThat( actual ).and( expected ).areIdentical();
     }
-    
+
     @Test
     public void testRelativePathPasNS() throws Exception
     {
-        String input = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" + 
-            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+        String input = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" +
+            "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
             "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                         + "  <p:parent>\n"
                         + "    <p:groupId>GROUPID</p:groupId>\n"
@@ -98,8 +98,8 @@ public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
                         + "  </p:parent>\n"
                         + "  <p:artifactId>PROJECT</p:artifactId>\n"
                         + "</p:project>";
-           String expected = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" + 
-               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+           String expected = "<p:project xmlns:p=\"http://maven.apache.org/POM/4.0.0\"\n" +
+               "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
                            + "  <p:parent>\n"
                            + "    <p:groupId>GROUPID</p:groupId>\n"

@@ -31,7 +31,7 @@ import java.util.TreeSet;
  * Context of dependency artifacts for a particular project.
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (class extract only)

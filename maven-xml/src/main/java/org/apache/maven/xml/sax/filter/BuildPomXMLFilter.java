@@ -26,12 +26,12 @@ import org.xml.sax.XMLReader;
  * There should only be 1 BuildPomXMLFilter, so the same is being used by both
  * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
  * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
- * 
- * 
+ *
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class BuildPomXMLFilter extends AbstractSAXFilter 
+public class BuildPomXMLFilter extends AbstractSAXFilter
 {
     BuildPomXMLFilter()
     {
@@ -42,7 +42,7 @@ public class BuildPomXMLFilter extends AbstractSAXFilter
     {
         super( parent );
     }
-    
+
     /**
      * Don't allow overwriting parent
      */

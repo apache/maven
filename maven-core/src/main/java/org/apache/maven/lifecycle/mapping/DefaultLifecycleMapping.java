@@ -110,7 +110,7 @@ public class DefaultLifecycleMapping
             return null;
         }
     }
-    
+
     @Deprecated
     public Map<String, String> getPhases( String lifecycle )
     {

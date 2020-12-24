@@ -64,11 +64,11 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
-        
+
         Model model =  read( pom );
 
         SimpleProblemCollector problems = new SimpleProblemCollector( model );
-        
+
         validator.validateEffectiveModel( model, request, problems );
 
         return problems;
@@ -80,11 +80,11 @@ public class DefaultModelValidatorTest
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
         Model model = read( pom );
-        
+
         SimpleProblemCollector problems = new SimpleProblemCollector( model );
 
         validator.validateFileModel( model, request, problems );
-        
+
         validator.validateRawModel( model, request, problems );
 
         return problems;

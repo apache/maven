@@ -138,7 +138,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     {
         return createMavenSession( pom, executionProperties, false );
     }
-    
+
     protected MavenSession createMavenSession( File pom, Properties executionProperties, boolean includeModules )
         throws Exception
     {
@@ -155,7 +155,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         if ( pom != null )
         {
             MavenProject project = projectBuilder.build( pom, configuration ).getProject();
-            
+
             projects.add( project );
             if ( includeModules )
             {

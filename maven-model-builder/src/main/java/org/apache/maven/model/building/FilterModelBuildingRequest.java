@@ -261,7 +261,7 @@ class FilterModelBuildingRequest
     {
         return request.getFileModel();
     }
-    
+
     @Override
     public ModelBuildingRequest setFileModel( Model fileModel )
     {
@@ -300,7 +300,7 @@ class FilterModelBuildingRequest
     {
         return request.getTransformerContextBuilder();
     }
-    
+
     @Override
     public ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder )
     {

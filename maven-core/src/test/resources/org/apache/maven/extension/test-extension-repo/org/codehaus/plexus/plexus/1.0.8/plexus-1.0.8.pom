@@ -23,7 +23,7 @@
           <port>6667</port>
           <channel>#plexus</channel>
         </configuration>
-      </notifier>      
+      </notifier>
     </notifiers>
   </ciManagement>
   <inceptionYear>2001</inceptionYear>
@@ -223,7 +223,7 @@
   </organization>
   <modules>
     <!--
-    
+
     Until the bug is fixed in Maven which is pulling in the trunk to the
     appserver build.
     <module>plexus-appserver</module>

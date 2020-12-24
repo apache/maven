@@ -25,7 +25,7 @@ import org.apache.maven.xml.sax.filter.ConsumerPomXMLFilterFactory;
 /**
  * The default implementation of the {@link ConsumerPomXMLFilterFactory}
  * It will provide several values for the consumer pom based on its context.
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */

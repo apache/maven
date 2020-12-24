@@ -108,13 +108,13 @@ class ReactorModelCache
             return hashCode;
         }
     }
-    
+
     private static final class SourceCacheKey
     {
         private final Source source;
-        
+
         private final String tag;
-        
+
         private final int hashCode;
 
         SourceCacheKey( Source source, String tag )
@@ -133,7 +133,7 @@ class ReactorModelCache
         @Override
         public boolean equals( Object obj )
         {
-            if ( this == obj ) 
+            if ( this == obj )
             {
                 return true;
             }
@@ -141,13 +141,13 @@ class ReactorModelCache
             {
                 return false;
             }
-            
+
             SourceCacheKey other = (SourceCacheKey) obj;
             if ( !Objects.equals( this.source, other.source ) )
             {
                     return false;
             }
-            
+
             if ( !Objects.equals( this.tag, other.tag ) )
             {
                     return false;

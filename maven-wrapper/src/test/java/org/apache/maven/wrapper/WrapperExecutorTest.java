@@ -57,7 +57,7 @@ public class WrapperExecutorTest
         throws Exception
     {
         mockInstallDir = testDir.newFolder( "mock-dir" ).toPath();
-        
+
         install = mock( Installer.class );
         when( install.createDist( Mockito.any( WrapperConfiguration.class ) ) ).thenReturn( mockInstallDir );
         start = mock( BootstrapMainStarter.class );

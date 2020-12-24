@@ -35,7 +35,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Base implementation for providing the BuildPomXML.
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -57,7 +57,7 @@ public class BuildPomXMLFilterFactory
     }
 
     /**
-     * 
+     *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
      * @return
      * @throws SAXException
@@ -106,8 +106,8 @@ public class BuildPomXMLFilterFactory
 
         return new BuildPomXMLFilter( parent );
     }
-    
-    private XMLReader getXMLReader() throws SAXException, ParserConfigurationException 
+
+    private XMLReader getXMLReader() throws SAXException, ParserConfigurationException
     {
         XMLReader xmlReader = Factories.newXMLReader();
         xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
@@ -121,7 +121,7 @@ public class BuildPomXMLFilterFactory
     {
         return null;
     }
-    
+
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
         return null;

@@ -73,7 +73,7 @@ public class MavenModelMergerTest
         Model model = new Model();
         modelMerger.mergeModel_Prerequisites( model, parent, false, null );
         assertNull( model.getPrerequisites() );
-        
+
         Prerequisites modelPrerequisites = new Prerequisites();
         modelPrerequisites.setMaven( "3.0" );
         model.setPrerequisites( modelPrerequisites );
@@ -90,7 +90,7 @@ public class MavenModelMergerTest
         Model model = new Model();
         modelMerger.mergeModel_Profiles( model, parent, false, null );
         assertEquals( 0, model.getProfiles().size() );
-        
+
         Profile modelProfile = new Profile();
         modelProfile.setId( "MODEL" );
         model.setProfiles( Collections.singletonList( modelProfile ) );

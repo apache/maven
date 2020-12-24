@@ -52,7 +52,7 @@ public class BootstrapMainStarter
         return Files.list( mavenHome.resolve( "boot" ) )
                         .filter( p -> p.getFileName().toString().matches( "plexus-classworlds-.*\\.jar" )  )
                         .findFirst()
-                        .orElseThrow( () -> new RuntimeException( 
+                        .orElseThrow( () -> new RuntimeException(
                                   String.format( "Couldn't locate the Maven launcher JAR in Maven distribution '%s'.",
                                    mavenHome ) ) );
     }

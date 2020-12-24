@@ -21,26 +21,26 @@ package org.apache.maven.feature;
 
 /**
  * Centralized class for feature information
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
 public final class Features
 {
-    private Features() 
+    private Features()
     {
     }
-    
+
     private static final Feature BUILDCONSUMER = new Feature( "maven.experimental.buildconsumer", "true" );
-    
+
     public static Feature buildConsumer()
     {
         return BUILDCONSUMER;
     }
-    
+
     /**
      * Represents some feature
-     * 
+     *
      * @author Robert Scholte
      * @since 4.0.0
      */
@@ -52,12 +52,12 @@ public final class Features
         {
             active = "true".equals( System.getProperty( name, defaultValue ) );
         }
-        
+
         public boolean isActive()
         {
-           return active; 
+           return active;
         }
-        
+
     }
-    
+
 }

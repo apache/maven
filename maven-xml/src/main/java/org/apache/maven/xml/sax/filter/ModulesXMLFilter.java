@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Remove all modules, this is just buildtime information
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -32,9 +32,9 @@ class ModulesXMLFilter
     extends AbstractEventXMLFilter
 {
     private boolean parsingModules;
-    
+
     private String state;
-    
+
     ModulesXMLFilter()
     {
         super();
@@ -58,10 +58,10 @@ class ModulesXMLFilter
         {
             state = localName;
         }
-        
+
         super.startElement( uri, localName, qName, atts );
     }
-    
+
     @Override
     public void endElement( String uri, String localName, String qName )
         throws SAXException
@@ -72,7 +72,7 @@ class ModulesXMLFilter
             {
                 case "modules":
                     executeEvents();
-                    
+
                     parsingModules = false;
                     break;
                 default:
@@ -84,11 +84,11 @@ class ModulesXMLFilter
         {
             super.endElement( uri, localName, qName );
         }
-        
+
         // for this simple structure resetting to modules it sufficient
-        state = "modules"; 
+        state = "modules";
     }
-    
+
     @Override
     protected boolean isParsing()
     {

@@ -37,7 +37,7 @@ public interface ToolchainManagerPrivate
 
     /**
      * Retrieves every toolchains of given type available in user settings.
-     * 
+     *
      * @param type the type, must not be {@code null}
      * @param context the Maven session, must not be {@code null}
      * @since 3.0 (addition of the <code>MavenSession</code> parameter)

@@ -40,15 +40,15 @@ import org.apache.maven.model.Repository;
 import org.junit.Test;
 
 /**
- * ModelMerger is based on same instances, subclasses should override KeyComputer per type 
- * 
+ * ModelMerger is based on same instances, subclasses should override KeyComputer per type
+ *
  * @author Robert Scholte
- * 
+ *
  */
 public class ModelMergerTest
 {
     private ModelMerger modelMerger = new ModelMerger();
-    
+
     @Test
     public void mergeArtifactId()
     {
@@ -57,7 +57,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setArtifactId( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getArtifactId(), is( "SOURCE" ) );
 
@@ -65,7 +65,7 @@ public class ModelMergerTest
         modelMerger.merge( target, source, false, null );
         assertThat( target.getArtifactId(), is( "TARGET" ) );
     }
-    
+
     @Test
     public void mergeSameContributors()
     {
@@ -77,7 +77,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setContributors( Arrays.asList( contributor ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getContributors(), contains( contributor ) );
@@ -90,18 +90,18 @@ public class ModelMergerTest
         dependency.setGroupId( "groupId" );
         dependency.setArtifactId( "artifactId" );
         dependency.setType( "type" );
-        
+
         Model target = new Model();
         target.setDependencies( Arrays.asList( dependency ) );
 
         Model source = new Model();
         source.setDependencies( Arrays.asList( dependency ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getDependencies(), contains( dependency ) );
     }
-    
+
     @Test
     public void mergeDescription()
     {
@@ -110,7 +110,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setDescription( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getDescription(), is( "SOURCE" ) );
 
@@ -118,19 +118,19 @@ public class ModelMergerTest
         modelMerger.merge( target, source, false, null );
         assertThat( target.getDescription(), is( "TARGET" ) );
     }
-    
+
     @Test
     public void mergeSameDevelopers()
     {
         Developer developer = new Developer();
         developer.setId( "devid" );
-        
+
         Model target = new Model();
         target.setDevelopers( Arrays.asList( developer ) );
 
         Model source = new Model();
         source.setDevelopers( Arrays.asList( developer ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getDevelopers(), contains( developer ) );
@@ -183,7 +183,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setGroupId( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getGroupId(), is( "SOURCE" ) );
 
@@ -191,7 +191,7 @@ public class ModelMergerTest
         modelMerger.merge( target, source, false, null );
         assertThat( target.getGroupId(), is( "TARGET" ) );
     }
-    
+
     @Test
     public void mergeInceptionYear()
     {
@@ -200,7 +200,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setInceptionYear( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getInceptionYear(), is( "SOURCE" ) );
 
@@ -227,18 +227,18 @@ public class ModelMergerTest
     {
         MailingList mailingList = new MailingList();
         mailingList.setName( "name" );
-        
+
         Model target = new Model();
         target.setMailingLists( Arrays.asList( mailingList ) );
 
         Model source = new Model();
         source.setMailingLists( Arrays.asList( mailingList ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getMailingLists(), contains( mailingList ) );
     }
-    
+
     @Test
     public void mergeModelVersion()
     {
@@ -247,7 +247,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setModelVersion( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getModelVersion(), is( "SOURCE" ) );
 
@@ -277,7 +277,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setName( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getName(), is( "SOURCE" ) );
 
@@ -307,7 +307,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setPackaging( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getPackaging(), is( "SOURCE" ) );
 
@@ -321,13 +321,13 @@ public class ModelMergerTest
     {
         Repository repository = new Repository();
         repository.setId( "repository" );
-        
+
         Model target = new Model();
         target.setPluginRepositories( Arrays.asList( repository ) );
 
         Model source = new Model();
         source.setPluginRepositories( Arrays.asList( repository ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getPluginRepositories(), contains( repository ) );
@@ -338,13 +338,13 @@ public class ModelMergerTest
     {
         Profile profile = new Profile();
         profile.setId( "profile" );
-        
+
         Model target = new Model();
         target.setProfiles( Arrays.asList( profile ) );
 
         Model source = new Model();
         source.setProfiles( Arrays.asList( profile ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getProfiles(), contains( profile ) );
@@ -368,13 +368,13 @@ public class ModelMergerTest
     {
         Repository repository = new Repository();
         repository.setId( "repository" );
-        
+
         Model target = new Model();
         target.setRepositories( Arrays.asList( repository ) );
 
         Model source = new Model();
         source.setRepositories( Arrays.asList( repository ) );
-        
+
         modelMerger.merge( target, source, true, null );
 
         assertThat( target.getRepositories(), contains( repository ) );
@@ -401,7 +401,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setUrl( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getUrl(), is( "SOURCE" ) );
 
@@ -418,7 +418,7 @@ public class ModelMergerTest
 
         Model source = new Model();
         source.setVersion( "SOURCE" );
-        
+
         modelMerger.merge( target, source, true, null );
         assertThat( target.getVersion(), is( "SOURCE" ) );
 

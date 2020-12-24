@@ -65,7 +65,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 	
 	@Test
 	public void comment() throws Exception {
-	    
+	
 	    String input = "<project><!--before--><modules>"
                         + "<!--pre-in-->"
 	                    + "<module><!--in-->ab</module>"

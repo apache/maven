@@ -45,5 +45,4 @@ ${project.name}
  * since 3.5.0, output is colorized by default, with color disabled in batch mode: see
    {{{/shared/maven-shared-utils/apidocs/org/apache/maven/shared/utils/logging/package-summary.html}styled message API}}
    for more details on adding color to a plugin output or customizing colors.
- 
-   
+

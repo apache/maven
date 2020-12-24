@@ -135,11 +135,11 @@ public class DefaultPluginRealmCache
 
             CacheKey that = (CacheKey) o;
 
-            return parentRealm == that.parentRealm 
+            return parentRealm == that.parentRealm
                 && CacheUtils.pluginEquals( plugin, that.plugin )
-                && Objects.equals( workspace, that.workspace ) 
+                && Objects.equals( workspace, that.workspace )
                 && Objects.equals( localRepo, that.localRepo )
-                && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories ) 
+                && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories )
                 && Objects.equals( filter, that.filter )
                 && Objects.equals( foreignImports, that.foreignImports );
         }

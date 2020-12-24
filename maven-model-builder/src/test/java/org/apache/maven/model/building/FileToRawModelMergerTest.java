@@ -45,7 +45,7 @@ public class FileToRawModelMergerTest
         List<String> methodNames =
             Stream.of( ModelMerger.class.getDeclaredMethods() )
                 .filter( m -> m.getName().startsWith( "merge" ) )
-                .filter( m -> 
+                .filter( m ->
                     {
                         String baseName = m.getName().substring( 5 /* merge */ );
                         String entity = baseName.substring( baseName.indexOf( '_' ) + 1 );
@@ -77,6 +77,6 @@ public class FileToRawModelMergerTest
 
         assertThat( overriddenMethods, hasItems( methodNames.toArray( new String[0] ) ) );
     }
-    
+
 
 }

@@ -50,7 +50,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
     private Logger logger;
 
     /**
-     * 
+     *
      * @param model the model, must not be {@code null}
      * @param logger the logger, must not be {@code null}
      */
@@ -62,7 +62,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
     }
 
     /**
-     * 
+     *
      * @param model the model, must not be {@code null}
      * @param type the type
      * @param logger the logger, must not be {@code null}
@@ -160,7 +160,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
         }
         return hashCode;
     }
-    
+
     @Override
     public String toString()
     {
@@ -178,9 +178,9 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
                 builder.append( ';' );
             }
         }
-        
+
         builder.append( '}' );
-        
+
         return builder.toString();
     }
 }

@@ -23,7 +23,7 @@ import java.nio.file.Path;
 
 /**
  * Listener can be used to capture the result of the build pom
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -32,7 +32,7 @@ public interface BuildPomXMLFilterListener
 {
     /**
      * Captures the result of the XML transformation
-     * 
+     *
      * @param pomFile the original to being transformed
      * @param b the byte array
      * @param off the offset

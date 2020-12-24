@@ -23,8 +23,8 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Component interface that allows per-project customization of Aether repository system sessions.
- * 
- * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice. 
+ *
+ * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */
 public interface RepositorySessionDecorator

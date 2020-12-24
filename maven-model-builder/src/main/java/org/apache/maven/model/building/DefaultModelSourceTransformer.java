@@ -25,8 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Default ModelSourceTransformer, provides pomFile as inputStream and ignores the context 
- * 
+ * Default ModelSourceTransformer, provides pomFile as inputStream and ignores the context
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */

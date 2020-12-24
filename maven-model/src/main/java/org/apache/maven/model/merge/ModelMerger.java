@@ -1494,8 +1494,8 @@ public class ModelMerger
     protected void mergeMailingList_OtherArchives( MailingList target, MailingList source, boolean sourceDominant,
                                                    Map<Object, Object> context )
     {
-        target.setOtherArchives( merge( target.getOtherArchives(), 
-                                        source.getOtherArchives(), 
+        target.setOtherArchives( merge( target.getOtherArchives(),
+                                        source.getOtherArchives(),
                                         sourceDominant,
                                         e -> e ) );
     }
@@ -2557,7 +2557,7 @@ public class ModelMerger
     {
         return exclusion;
     }
-    
+
     protected KeyComputer<Dependency> getDependencyKey()
     {
         return d -> d;
@@ -2710,8 +2710,8 @@ public class ModelMerger
         {
             if ( map == null )
             {
-                map = list.stream().collect( Collectors.toMap( keyComputer, 
-                                                               Function.identity(), 
+                map = list.stream().collect( Collectors.toMap( keyComputer,
+                                                               Function.identity(),
                                                                null,
                                                                LinkedHashMap::new ) );
 
@@ -2732,7 +2732,7 @@ public class ModelMerger
                 for ( V v : vs )
                 {
                     Object key = keyComputer.apply( v );
-                    
+
                     map.merge( key, v, remapping );
                 }
             }

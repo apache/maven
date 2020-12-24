@@ -1073,7 +1073,7 @@ public class MavenProject
         MavenProject that = (MavenProject) other;
 
         return Objects.equals( getArtifactId(), that.getArtifactId() )
-            && Objects.equals( getGroupId(), that.getGroupId() ) 
+            && Objects.equals( getGroupId(), that.getGroupId() )
             && Objects.equals( getVersion(), that.getVersion() );
     }
 

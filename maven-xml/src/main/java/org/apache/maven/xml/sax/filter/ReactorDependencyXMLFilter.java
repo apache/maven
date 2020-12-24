@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Will apply the version if the dependency is part of the reactor
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -37,7 +37,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
     // states
     private String state;
-    
+
     // whiteSpace after <dependency>, to be used to position <version>
     private String dependencyWhitespace;
 
@@ -62,7 +62,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
         {
             parsingDependency = true;
         }
-        
+
         if ( parsingDependency )
         {
             state = localName;
@@ -123,7 +123,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
                                 }
                                 String versionQName = SAXEventUtils.renameQName( qName, "version" );
-                                
+
                                 super.startElement( uri, "version", versionQName, null );
                                 super.characters( version.toCharArray(), 0, version.length() );
                                 super.endElement( uri, "version", versionQName );
@@ -131,23 +131,23 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
                         }
                     }
                     super.executeEvents();
-                    
+
                     parsingDependency = false;
-                    
+
                     // reset
                     hasVersion = false;
                     dependencyWhitespace = null;
                     groupId = null;
                     artifactId = null;
-                    
+
                     break;
-                default: 
+                default:
                     break;
             }
         }
 
         super.endElement( uri, localName, qName );
-        
+
         state = "";
     }
 
@@ -167,5 +167,5 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
     {
         return state;
     }
-    
+
 }

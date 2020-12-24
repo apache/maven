@@ -229,12 +229,12 @@ public class DefaultModelValidator
             }
         }
     }
-    
+
     @Override
     public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Parent parent = m.getParent();
-        
+
         if ( parent != null )
         {
             validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),

@@ -123,7 +123,7 @@ public class Installer
             dirs = listDirs( distDir );
             if ( dirs.isEmpty() )
             {
-                throw new RuntimeException( String.format( 
+                throw new RuntimeException( String.format(
                    "Maven distribution '%s' does not contain any directories. Expected to find exactly 1 directory.",
                    distributionUrl ) );
             }
@@ -131,7 +131,7 @@ public class Installer
         }
         if ( dirs.size() != 1 )
         {
-            throw new IllegalStateException( String.format( 
+            throw new IllegalStateException( String.format(
                    "Maven distribution '%s' contains too many directories. Expected to find exactly 1 directory.",
                    distributionUrl ) );
         }
@@ -214,7 +214,7 @@ public class Installer
                 Path targetFile = dest.resolve( entry.getName() ).normalize();
 
                 // prevent Zip Slip
-                if ( targetFile.startsWith( dest ) ) 
+                if ( targetFile.startsWith( dest ) )
                 {
                     Files.createDirectories( targetFile.getParent() );
 

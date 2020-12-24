@@ -140,18 +140,18 @@ public class BuilderCommon
                 logger.warn( "*****************************************************************" );
             }
         }
-        
+
         final String defaulModelId = DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID;
-        
+
         List<String> unversionedPlugins = executionPlan.getMojoExecutions().stream()
                          .map( MojoExecution::getPlugin )
                          .filter( p -> p.getLocation( "version" ) != null ) // versionless cli goal (?)
                          .filter( p -> p.getLocation( "version" ).getSource() != null ) // versionless in pom (?)
                          .filter( p -> defaulModelId.equals( p.getLocation( "version" ).getSource().getModelId() ) )
                          .distinct()
-                         .map( Plugin::getArtifactId ) // managed by us, groupId is always o.a.m.plugins 
+                         .map( Plugin::getArtifactId ) // managed by us, groupId is always o.a.m.plugins
                          .collect( Collectors.toList() );
-        
+
         if ( !unversionedPlugins.isEmpty() )
         {
             logger.warn( "Version not locked for default bindings plugins " + unversionedPlugins

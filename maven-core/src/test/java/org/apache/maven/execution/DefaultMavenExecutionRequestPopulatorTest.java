@@ -34,7 +34,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
 {
     @Inject
     MavenExecutionRequestPopulator testee;
-        
+
     public void testPluginRepositoryInjection()
         throws Exception
     {

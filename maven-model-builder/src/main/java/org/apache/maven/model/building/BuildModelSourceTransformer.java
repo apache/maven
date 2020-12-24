@@ -40,7 +40,7 @@ import org.xml.sax.ext.LexicalHandler;
 
 /**
  * ModelSourceTransformer for the build pom
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -51,7 +51,7 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
     @Inject
     @Nullable
     private BuildPomXMLFilterListener xmlFilterListener;
-    
+
     protected AbstractSAXFilter getSAXFilter( Path pomFile,
                                               TransformerContext context,
                                               Consumer<LexicalHandler> lexicalHandlerConsumer )
@@ -62,7 +62,7 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
 
         return buildPomXMLFilterFactory.get( pomFile );
     }
-    
+
     @Override
     protected OutputStream filterOutputStream( OutputStream outputStream, Path pomFile )
     {
@@ -77,7 +77,7 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
                 {
                     super.write( b, off, len );
                     xmlFilterListener.write( pomFile, b, off, len );
-                }  
+                }
             };
         }
         else

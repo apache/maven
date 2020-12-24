@@ -48,7 +48,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
      * @param consume {@code true} if this factory is being used for creating the consumer pom, otherwise {@code false}
      */
     public DefaultBuildPomXMLFilterFactory( TransformerContext context,
-                                            Consumer<LexicalHandler> lexicalHandlerConsumer, 
+                                            Consumer<LexicalHandler> lexicalHandlerConsumer,
                                             boolean consume )
     {
         super( lexicalHandlerConsumer, consume );

@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 
 public class DefaultProjectArtifactsCacheTest extends TestCase
 {
-    
+
     private ProjectArtifactsCache cache;
 
     @Override
@@ -41,32 +41,32 @@ public class DefaultProjectArtifactsCacheTest extends TestCase
         super.setUp();
         cache = new DefaultProjectArtifactsCache();
     }
-    
+
     public void testProjectDependencyOrder() throws Exception
     {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key(){};
-        
+
         Set<Artifact> artifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
-        
+
         cache.put( project1, artifacts );
-        
+
         assertArrayEquals( artifacts.toArray( new Artifact[0] ),
                            cache.get( project1 ).getArtifacts().toArray( new Artifact[0] ) );
-        
+
         ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key(){};
-        
+
         Set<Artifact> reversedArtifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
-        
+
         cache.put( project2, reversedArtifacts );
-        
+
         assertArrayEquals( reversedArtifacts.toArray( new Artifact[0] ),
                            cache.get( project2 ).getArtifacts().toArray( new Artifact[0] ) );
     }

@@ -212,7 +212,7 @@ public class LifecycleExecutionPlanCalculatorStub
     {
         InputSource defaultBindings = new InputSource();
         defaultBindings.setModelId( DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID );
-        
+
         final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
         plugin.setLocation( "version", new InputLocation( 12, 34, defaultBindings ) );
         MojoExecution result = new MojoExecution( plugin, goal, executionId );

@@ -54,7 +54,7 @@ public interface MavenExecutionRequestPopulator
         throws MavenExecutionRequestPopulationException;
 
     /*if_not[MAVEN4]*/
-    
+
     /**
      * Copies the values from the given settings into the specified execution request. This method will replace any
      * existing values in the execution request that are controlled by the settings. Hence, it is expected that this

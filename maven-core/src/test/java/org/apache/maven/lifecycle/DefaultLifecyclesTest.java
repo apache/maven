@@ -98,27 +98,27 @@ public class DefaultLifecyclesTest
         assertThat( lifecycle.getId(), is( "wrapper" )  );
         assertThat( lifecycle.getPhases(), hasSize( 1 ) );
     }
-    
+
     public void testCustomLifecycle()
     {
         List<Lifecycle> myLifecycles = new ArrayList<>();
-        Lifecycle myLifecycle = new Lifecycle( "etl", 
+        Lifecycle myLifecycle = new Lifecycle( "etl",
                                                Arrays.asList( "extract", "transform", "load" ),
                                                Collections.emptyMap() );
         myLifecycles.add( myLifecycle );
         myLifecycles.addAll( defaultLifeCycles.getLifeCycles() );
-        
+
         DefaultLifecycles dl = new DefaultLifecycles( myLifecycles.stream()
-                                                            .collect( Collectors.toMap( l -> l.getId(), l -> l ) ), 
+                                                            .collect( Collectors.toMap( l -> l.getId(), l -> l ) ),
                                                       null );
-        
+
         assertThat( dl.getLifeCycles().get( 0 ).getId(), is( "default" ) );
         assertThat( dl.getLifeCycles().get( 1 ).getId(), is( "clean" ) );
         assertThat( dl.getLifeCycles().get( 2 ).getId(), is( "site" ) );
         assertThat( dl.getLifeCycles().get( 3 ).getId(), is( "wrapper" ) );
         assertThat( dl.getLifeCycles().get( 4 ).getId(), is( "etl" ) );
     }
-    
+
     private Lifecycle getLifeCycleById( String id )
     {
         return defaultLifeCycles.getLifeCycles().stream()

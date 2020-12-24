@@ -54,13 +54,13 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
         return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context,
                                                                         lexicalHandlerConsumer, true ) ).get( pomFile );
     }
-    
+
     /**
      * This transformer will ensure that encoding and version are kept.
      * However, it cannot prevent:
      * <ul>
      *   <li>attributes will be on one line</li>
-     *   <li>Unnecessary whitespace before the rootelement will be removed</li> 
+     *   <li>Unnecessary whitespace before the rootelement will be removed</li>
      * </ul>
      */
     @Override
@@ -68,9 +68,9 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
         throws IOException, org.apache.maven.model.building.TransformerException
     {
         final TransformerHandler transformerHandler;
-        
+
         final SAXTransformerFactory transformerFactory = getTransformerFactory();
-        
+
         // Keep same encoding+version
         try ( InputStream input = Files.newInputStream( pomFile ) )
         {
@@ -81,7 +81,7 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
 
             final String encoding = streamReader.getCharacterEncodingScheme();
             final String version = streamReader.getVersion();
-            
+
             Transformer transformer = transformerHandler.getTransformer();
             transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
             if ( encoding == null && version == null )
@@ -104,7 +104,7 @@ class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
         }
         catch ( XMLStreamException | TransformerConfigurationException e )
         {
-            throw new org.apache.maven.model.building.TransformerException( 
+            throw new org.apache.maven.model.building.TransformerException(
                                "Failed to detect XML encoding and version", e );
         }
         return transformerHandler;

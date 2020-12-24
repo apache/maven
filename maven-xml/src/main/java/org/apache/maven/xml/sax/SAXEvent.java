@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Command pattern to gather events which can be executed later on.
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */

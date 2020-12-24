@@ -35,18 +35,18 @@ import org.xml.sax.ext.LexicalHandler;
 public class CommentRenormalizerTest
 {
     private LexicalHandler lexicalHandler;
-    
+
     private final String lineSeparator;
-    
+
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {     
-                 { "\n" }, 
-                 { "\r\n" },  
+        return Arrays.asList(new Object[][] {
+                 { "\n" },
+                 { "\r\n" },
                  { "\r" }
            });
     }
-    
+
     public CommentRenormalizerTest( String lineSeparator )
     {
         this.lineSeparator = lineSeparator;
@@ -65,7 +65,7 @@ public class CommentRenormalizerTest
 
         verify( lexicalHandler ).comment( ch, 0, ch.length );
     }
-    
+
     @Test
     public void multiLine()
         throws Exception

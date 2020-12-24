@@ -71,7 +71,7 @@ public class DefaultModelBuildingRequest
     private ModelCache modelCache;
 
     private WorkspaceModelResolver workspaceResolver;
-    
+
     private TransformerContextBuilder contextBuilder;
 
     /**
@@ -389,7 +389,7 @@ public class DefaultModelBuildingRequest
     {
         return fileModel;
     }
-    
+
     @Override
     public ModelBuildingRequest setFileModel( Model fileModel )
     {
@@ -427,7 +427,7 @@ public class DefaultModelBuildingRequest
     {
         return contextBuilder;
     }
-    
+
     @Override
     public ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder )
     {

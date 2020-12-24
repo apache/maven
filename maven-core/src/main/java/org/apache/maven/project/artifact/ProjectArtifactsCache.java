@@ -79,7 +79,7 @@ public interface ProjectArtifactsCache
         }
     }
 
-    Key createKey( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve, 
+    Key createKey( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
         boolean aggregating, RepositorySystemSession session );
 
     CacheRecord get( Key key ) throws LifecycleExecutionException;

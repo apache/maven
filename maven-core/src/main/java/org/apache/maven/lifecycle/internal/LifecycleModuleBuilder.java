@@ -42,7 +42,7 @@ import org.apache.maven.session.scope.internal.SessionScope;
  * Builds one or more lifecycles for a full module
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl

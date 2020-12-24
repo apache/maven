@@ -36,14 +36,14 @@ public class DefaultProblemTest
 
         problem = new DefaultProblem( null, Severity.FATAL, null, -1, -1, null );
         assertEquals( Severity.FATAL, problem.getSeverity() );
-        
+
         problem = new DefaultProblem( null, Severity.ERROR, null, -1, -1, null );
         assertEquals( Severity.ERROR, problem.getSeverity() );
 
         problem = new DefaultProblem( null, Severity.WARNING, null, -1, -1, null );
         assertEquals( Severity.WARNING, problem.getSeverity() );
     }
-    
+
     @Test
     public void testGetLineNumber()
     {
@@ -52,7 +52,7 @@ public class DefaultProblemTest
 
         problem = new DefaultProblem( null, null, null, 42, -1, null );
         assertEquals( 42, problem.getLineNumber() );
-        
+
         problem = new DefaultProblem( null, null, null, Integer.MAX_VALUE, -1, null );
         assertEquals( Integer.MAX_VALUE, problem.getLineNumber() );
 
@@ -60,7 +60,7 @@ public class DefaultProblemTest
         problem = new DefaultProblem( null, null, null, Integer.MIN_VALUE, -1, null );
         assertEquals( Integer.MIN_VALUE, problem.getLineNumber() );
     }
-    
+
     @Test
     public void testGetColumnNumber()
     {
@@ -69,7 +69,7 @@ public class DefaultProblemTest
 
         problem = new DefaultProblem( null, null, null, -1, 42, null );
         assertEquals( 42, problem.getColumnNumber() );
-        
+
         problem = new DefaultProblem( null, null, null, -1, Integer.MAX_VALUE, null );
         assertEquals( Integer.MAX_VALUE, problem.getColumnNumber() );
 
@@ -77,13 +77,13 @@ public class DefaultProblemTest
         problem = new DefaultProblem( null, null, null, -1, Integer.MIN_VALUE, null );
         assertEquals( Integer.MIN_VALUE, problem.getColumnNumber() );
     }
-    
+
     @Test
     public void testGetException()
     {
         DefaultProblem problem = new DefaultProblem( null, null, null, -1, -1, null );
         assertEquals( null, problem.getException() );
-        
+
         Exception e = new Exception();
         problem = new DefaultProblem( null, null, null, -1, -1, e );
         assertSame( e, problem.getException() );
@@ -94,7 +94,7 @@ public class DefaultProblemTest
     {
         DefaultProblem problem = new DefaultProblem( null, null, null, -1, -1, null );
         assertEquals( "", problem.getSource() );
-        
+
         problem = new DefaultProblem( null, null, "", -1, -1, null );
         assertEquals( "", problem.getSource() );
 
@@ -107,7 +107,7 @@ public class DefaultProblemTest
     {
         DefaultProblem problem = new DefaultProblem( null, null, null, -1, -1, null );
         assertEquals( "", problem.getLocation() );
-        
+
         problem = new DefaultProblem( null, null, "SOURCE", -1, -1, null );
         assertEquals( "SOURCE", problem.getLocation() );
 
@@ -120,7 +120,7 @@ public class DefaultProblemTest
         problem = new DefaultProblem( null, null, "SOURCE", 42, 127, null );
         assertEquals( "SOURCE, line 42, column 127", problem.getLocation() );
     }
-    
+
     @Test
     public void testGetMessage()
     {

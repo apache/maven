@@ -31,7 +31,7 @@ under the License.
   <description>
     Check that war packages the jar instead of a directory
   </description>
-  
+
   <reporting>
     <plugins>
       <plugin>
@@ -50,7 +50,7 @@ under the License.
       </plugin>
     </plugins>
   </reporting>
-  
+
   <modules>
     <module>lib</module>
     <module>war</module>

@@ -36,7 +36,7 @@ public class ProjectBuildListTest
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList( session );
         TaskSegment taskSegment = projectBuildList.get( 0 ).getTaskSegment();
-        assertThat( "This test assumes there are at least 6 elements in projectBuilds", 
+        assertThat( "This test assumes there are at least 6 elements in projectBuilds",
                     projectBuildList.size(), is( greaterThanOrEqualTo( 6 ) ) );
 
         final ProjectBuildList byTaskSegment = projectBuildList.getByTaskSegment( taskSegment );

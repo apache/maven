@@ -26,10 +26,10 @@ under the License.
     <artifactId>maven</artifactId>
     <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>maven-wrapper</artifactId>
   <name>Maven Wrapper</name>
-  
+
   <build>
     <finalName>${project.artifactId}</finalName> <!-- to simplify installation for maven-integration-testing -->
   </build>

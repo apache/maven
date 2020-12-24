@@ -209,7 +209,7 @@ public class ProjectSorterTest
         projects.add( project1 );
         MavenProject project2 = createProject( "groupId", "artifactId", "1.0" );
         projects.add( project2 );
-        
+
         expectedException.expect( DuplicateProjectException.class );
         expectedException.reportMissingExceptionWithMessage( "Duplicate projects should fail" );
 

@@ -42,7 +42,7 @@ public interface ToolchainsBuildingResult
 
     /**
      * Return a list of problems, if any.
-     * 
+     *
      * @return a list of problems, never {@code null}.
      */
     List<Problem> getProblems();

@@ -78,7 +78,7 @@ public class LifecycleDependencyResolver
 
     @Inject
     private EventSpyDispatcher eventSpyDispatcher;
-    
+
     @Inject
     private ProjectArtifactsCache projectArtifactsCache;
 
@@ -129,13 +129,13 @@ public class LifecycleDependencyResolver
                     throw new LifecycleExecutionException( e );
                 }
             }
-            
+
             Set<Artifact> resolvedArtifacts;
-            ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect, 
+            ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect,
                 scopesToResolve, aggregating, session.getRepositorySession() );
             ProjectArtifactsCache.CacheRecord recordArtifacts;
             recordArtifacts = projectArtifactsCache.get( cacheKey );
-            
+
             if ( recordArtifacts != null )
             {
                 resolvedArtifacts = recordArtifacts.getArtifacts();
@@ -167,7 +167,7 @@ public class LifecycleDependencyResolver
             for ( Artifact artifact : resolvedArtifacts )
             {
                 /**
-                 * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up to date 
+                 * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up to date
                  * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
                  * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */
@@ -179,9 +179,9 @@ public class LifecycleDependencyResolver
 
                 map.put( artifact.getDependencyConflictId(), artifact );
             }
-            
+
             project.setResolvedArtifacts( resolvedArtifacts );
-            
+
             for ( Artifact artifact : project.getDependencyArtifacts() )
             {
                 if ( artifact.getFile() == null )

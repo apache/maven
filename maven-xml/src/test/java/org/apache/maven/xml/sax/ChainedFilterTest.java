@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 
 /**
  * A small example of a pipeline of 2 XML Filters, to understand how to get the expected result
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -64,10 +64,10 @@ public class ChainedFilterTest
 
         // Watch the order of filters! In reverse order the values would be 'AweSome'
         AbstractSAXFilter filter = new Awesome();
-        
+
         // AbstractSAXFilter doesn't have a constructor with XMLReader, otherwise the LexicalHandler pipeline will be broken
         filter.setParent( Factories.newXMLReader() );
-        
+
         // LexicalHandler of transformerResult must be the first filter
         transformResult.setLexicalHandler( filter );
 

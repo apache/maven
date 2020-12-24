@@ -31,7 +31,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Creates XML related factories with OWASP advices applied
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -40,13 +40,13 @@ public final class Factories
     private Factories()
     {
     }
-    
+
     /**
-     * 
+     *
      * @return
      * @see https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#transformerfactory
      */
-    public static TransformerFactory newTransformerFactory() 
+    public static TransformerFactory newTransformerFactory()
     {
         TransformerFactory tf = TransformerFactory.newInstance();
         tf.setAttribute( XMLConstants.ACCESS_EXTERNAL_DTD, "" );
@@ -54,16 +54,16 @@ public final class Factories
 
         return tf;
     }
-    
+
     public static XMLReader newXMLReader() throws SAXException, ParserConfigurationException
     {
         XMLReader reader = XMLReaderFactory.createXMLReader();
-        
+
         try
         {
             // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
             // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
-       
+
             // Using the XMLReader's setFeature
             reader.setFeature( "http://xml.org/sax/features/external-general-entities", false );
         }

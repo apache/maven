@@ -36,7 +36,7 @@ public interface MojoExecutionConfigurator
     /**
      * Create the MojoExecution configuration based on configuration for a Mojo in the MavenProject and the
      * default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
-     * 
+     *
      * @param project
      * @param mojoExecution
      * @param allowPluginLevelConfig

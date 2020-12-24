@@ -32,36 +32,36 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class LifecyclePhase
 {
-    
+
     private List<LifecycleMojo> mojos;
-    
+
     public LifecyclePhase()
     {
     }
-    
+
     public LifecyclePhase( String goals )
     {
         set( goals );
     }
-    
+
     public List<LifecycleMojo> getMojos()
     {
         return mojos;
     }
-    
+
     public void setMojos( List<LifecycleMojo> mojos )
     {
         this.mojos = mojos;
     }
-    
+
     public void set( String goals )
     {
         mojos = new ArrayList<>();
-        
+
         if ( StringUtils.isNotEmpty( goals ) )
         {
             String[] mojoGoals = StringUtils.split( goals, "," );
-            
+
             for ( String mojoGoal: mojoGoals )
             {
                 LifecycleMojo lifecycleMojo = new LifecycleMojo();
@@ -70,7 +70,7 @@ public class LifecyclePhase
             }
         }
     }
-    
+
     @Override
     public String toString()
     {
@@ -94,7 +94,7 @@ public class LifecyclePhase
         }
         return sb.toString();
     }
-    
+
     @Deprecated
     public static Map<String, String> toLegacyMap( Map<String, LifecyclePhase> lifecyclePhases )
     {
@@ -102,12 +102,12 @@ public class LifecyclePhase
         {
             return null;
         }
-        
+
         if ( lifecyclePhases.isEmpty() )
         {
             return Collections.emptyMap();
         }
-        
+
         Map<String, String> phases = new LinkedHashMap<>();
         for ( Map.Entry<String, LifecyclePhase> e: lifecyclePhases.entrySet() )
         {
@@ -115,5 +115,5 @@ public class LifecyclePhase
         }
         return phases;
     }
-    
+
 }

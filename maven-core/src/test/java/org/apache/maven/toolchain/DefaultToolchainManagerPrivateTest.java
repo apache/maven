@@ -53,7 +53,7 @@ public class DefaultToolchainManagerPrivateTest
 
     @Mock
     private ToolchainFactory toolchainFactory_basicType;
-    
+
     @Mock
     private ToolchainFactory toolchainFactory_rareType;
 
@@ -112,7 +112,7 @@ public class DefaultToolchainManagerPrivateTest
         verify( logger ).error( "Missing toolchain factory for type: unknown. Possibly caused by misconfigured project." );
         assertEquals( 0, toolchains.length );
     }
-    
+
     @Test
     public void testToolchainsForConfiguredType()
         throws Exception

@@ -122,9 +122,9 @@ public class DefaultPluginArtifactsCache
 
             CacheKey that = (CacheKey) o;
 
-            return CacheUtils.pluginEquals( plugin, that.plugin ) 
+            return CacheUtils.pluginEquals( plugin, that.plugin )
                 && Objects.equals( workspace, that.workspace )
-                && Objects.equals( localRepo, that.localRepo ) 
+                && Objects.equals( localRepo, that.localRepo )
                 && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
                 && Objects.equals( filter, that.filter );
         }

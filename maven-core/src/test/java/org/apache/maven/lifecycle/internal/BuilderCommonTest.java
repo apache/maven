@@ -36,7 +36,7 @@ import java.util.HashSet;
 public class BuilderCommonTest
 {
     private Logger logger = mock( Logger.class );
-    
+
     @Test
     public void testResolveBuildPlan()
         throws Exception
@@ -53,7 +53,7 @@ public class BuilderCommonTest
                     new HashSet<>() );
         assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan().size(), plan.size() );
     }
-    
+
     @Test
     public void testDefaultBindingPluginsWarning()
         throws Exception
@@ -65,7 +65,7 @@ public class BuilderCommonTest
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
         getBuilderCommon().resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
-        
+
         verify( logger ).warn("Version not locked for default bindings plugins ["
             + "stub-plugin-initialize, "
             + "stub-plugin-process-resources, "
@@ -77,7 +77,7 @@ public class BuilderCommonTest
             + "stub-plugin-install], "
             + "you should define versions in pluginManagement section of your pom.xml or parent");
     }
-    
+
     public void testHandleBuildError()
         throws Exception
     {

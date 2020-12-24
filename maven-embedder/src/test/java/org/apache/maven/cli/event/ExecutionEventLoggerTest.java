@@ -37,7 +37,7 @@ public class ExecutionEventLoggerTest
     private ExecutionEventLogger executionEventLogger;
 
     @BeforeClass
-    public static void setUp() 
+    public static void setUp()
     {
         MessageUtils.setColorEnabled( false );
     }

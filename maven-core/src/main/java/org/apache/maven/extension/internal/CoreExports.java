@@ -31,7 +31,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by
  * Maven core itself and loaded Maven core extensions.
- * 
+ *
  * @since 3.3.0
  */
 public class CoreExports

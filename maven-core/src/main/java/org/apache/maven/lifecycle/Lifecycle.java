@@ -72,7 +72,7 @@ public class Lifecycle
     {
         return defaultPhases;
     }
-    
+
     @Deprecated
     public Map<String, String> getDefaultPhases()
     {

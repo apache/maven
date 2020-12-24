@@ -23,21 +23,21 @@ import java.util.regex.Pattern;
 
 /**
  * Utility class for SAXEvents
- * 
+ *
  * @author Robert Scholte
  * @since 4.0.0
  */
 public final class SAXEventUtils
 {
     private static final Pattern PATTERN = Pattern.compile( "[^:]+$" );
-    
+
     private SAXEventUtils()
     {
     }
-    
+
     /**
-     * Returns the newLocalName prefixed with the namespace of the oldQName if present 
-     * 
+     * Returns the newLocalName prefixed with the namespace of the oldQName if present
+     *
      * @param oldQName the QName, used for its namespace
      * @param newLocalName the preferred localName
      * @return the new QName

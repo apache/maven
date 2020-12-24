@@ -314,7 +314,7 @@ public class PluginManagerTest
             pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
                                       session.getRepositorySession() );
         ClassRealm pluginRealm = pluginManager.getPluginRealm( session, pluginDescriptor );
-        
+
         assertEquals(pluginRealm, pluginDescriptor.getComponents().get(0).getRealm());
     }
 }
