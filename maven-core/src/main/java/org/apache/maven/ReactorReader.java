@@ -186,7 +186,7 @@ class ReactorReader
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
-            return determineLooseDirectoryForArtifact( project, artifact );
+            return determineBuildOutputDirectoryForArtifact( project, artifact );
         }
 
         // The fall-through indicates that the artifact cannot be found;
@@ -194,7 +194,7 @@ class ReactorReader
         return null;
     }
 
-    private File determineLooseDirectoryForArtifact( final MavenProject project, final Artifact artifact )
+    private File determineBuildOutputDirectoryForArtifact( final MavenProject project, final Artifact artifact )
     {
         if ( isTestArtifact( artifact ) )
         {
@@ -280,7 +280,7 @@ class ReactorReader
                 long outputFileLastModified = Files.getLastModifiedTime( outputFile ).toMillis();
                 if ( outputFileLastModified > artifactLastModified )
                 {
-                    File alternative = determineLooseDirectoryForArtifact( project, artifact );
+                    File alternative = determineBuildOutputDirectoryForArtifact( project, artifact );
                     if ( alternative != null )
                     {
                         LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; using '{}' instead",
