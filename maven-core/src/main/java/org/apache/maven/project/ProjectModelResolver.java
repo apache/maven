@@ -110,7 +110,7 @@ public class ProjectModelResolver
         this.externalRepositories = original.externalRepositories;
         this.repositories = new ArrayList<>( original.repositories );
         this.repositoryMerging = original.repositoryMerging;
-        this.repositoryIds = new HashSet<>();
+        this.repositoryIds = new HashSet<>( original.repositoryIds );
         this.modelPool = original.modelPool;
     }
 

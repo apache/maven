@@ -99,7 +99,7 @@ class DefaultModelResolver
         this.versionRangeResolver = original.versionRangeResolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
         this.repositories = new ArrayList<>( original.repositories );
-        this.repositoryIds = new HashSet<>();
+        this.repositoryIds = new HashSet<>( original.repositoryIds );
     }
 
     @Override
