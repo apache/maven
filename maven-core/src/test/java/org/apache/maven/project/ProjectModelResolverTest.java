@@ -69,7 +69,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         catch ( final UnresolvableModelException e )
         {
             assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
+            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in remote" ) );
         }
     }
 
@@ -150,7 +150,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         catch ( final UnresolvableModelException e )
         {
             assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
+            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in remote" ) );
         }
     }
 
@@ -234,7 +234,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
     {
         final File repoDir = new File( getBasedir(), "src/test/remote-repo" ).getAbsoluteFile();
         final RemoteRepository remoteRepository =
-            new RemoteRepository.Builder( org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+            new RemoteRepository.Builder( "remote",
                                           "default", repoDir.toURI().toASCIIString() ).build();
 
         return Collections.singletonList( remoteRepository );

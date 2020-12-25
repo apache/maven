@@ -219,7 +219,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         policy.setUpdatePolicy( "always" );
 
         Repository repository = new Repository();
-        repository.setId( RepositorySystem.DEFAULT_REMOTE_REPO_ID );
+        repository.setId( "remote" );
         repository.setUrl( "file://" + repoDir.toURI().getPath() );
         repository.setReleases( policy );
         repository.setSnapshots( policy );

@@ -53,10 +53,6 @@ public interface RepositorySystem
     @SuppressWarnings( "checkstyle:constantname" )
     File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
-    String DEFAULT_REMOTE_REPO_ID = "central";
-
-    String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
-
     Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
@@ -71,9 +67,6 @@ public interface RepositorySystem
     Artifact createDependencyArtifact( Dependency dependency );
 
     ArtifactRepository buildArtifactRepository( Repository repository )
-        throws InvalidRepositoryException;
-
-    ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException;
 
     ArtifactRepository createDefaultLocalRepository()

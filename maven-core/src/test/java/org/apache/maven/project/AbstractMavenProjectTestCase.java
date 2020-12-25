@@ -23,6 +23,9 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
@@ -165,9 +168,17 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProjectFromRemoteRepository( final File pom )
         throws Exception
     {
+        final ArtifactRepository testRepository =
+            new MavenArtifactRepository( "test",
+                                         "file://" + new File( System.getProperty( "basedir", "" ),
+                                                               "src/test/remote-repo" ).toURI().getPath(),
+                                         new DefaultRepositoryLayout(),
+                                         new ArtifactRepositoryPolicy(),
+                                         new ArtifactRepositoryPolicy() );
+
         final ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( this.getLocalRepository() );
-        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        configuration.setRemoteRepositories( Arrays.asList( testRepository ) );
         initRepoSession( configuration );
 
         return projectBuilder.build( pom, configuration ).getProject();
