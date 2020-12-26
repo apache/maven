@@ -59,7 +59,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
      */
     public void testShouldSuggestToResumeWithoutArgs() throws Exception
     {
-        final Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-b.fail=true" );
 
         try
@@ -78,17 +78,18 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
 
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
-        verifier.getCliOptions().clear();
+        verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-r" );
         verifier.executeGoal( "test" );
         verifyTextNotInLog( verifier, "Building module-a 1.0" );
         verifier.verifyTextInLog( "Building module-b 1.0" );
         verifier.verifyTextInLog( "Building module-c 1.0" );
+        verifier.resetStreams();
     }
 
     public void testShouldSkipSuccessfulProjects() throws Exception
     {
-        final Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-a.fail=true" );
         verifier.addCliOption( "--fail-at-end");
 
@@ -106,9 +107,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
             verifier.resetStreams();
         }
 
-        verifier.getCliOptions().clear();
-
         // Let module-b and module-c fail, if they would have been built...
+        verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-b.fail=true" );
         verifier.addCliOption( "-Dmodule-c.fail=true" );
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
@@ -129,7 +129,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // In this multi-module project, the submodules are not dependent on the parent.
         // This results in the parent to be built last, and module-a to be built first.
         // This enables us to let the first module in the reactor (module-a) fail.
-        final Verifier verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-Dmodule-a.fail=true" );
         verifier.addCliOption( "--fail-at-end");
 
@@ -147,11 +147,12 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
             verifier.resetStreams();
         }
 
-        verifier.getCliOptions().clear();
+        verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-r" );
         verifier.executeGoal( "test" );
         verifier.verifyTextInLog( "Building module-a 1.0" );
         verifyTextNotInLog( verifier, "Building module-b 1.0" );
+        verifier.resetStreams();
     }
 
     public void testShouldNotCrashWithoutProject() throws Exception
