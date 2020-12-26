@@ -35,7 +35,7 @@ public class MavenITmng6972AllowAccessToGraphPackageTest
         super( "[4.0.0-alpha-1,)" );
     }
 
-    public void testitMNG6972()
+    public void testit()
         throws Exception
     {
 
@@ -51,17 +51,17 @@ public class MavenITmng6972AllowAccessToGraphPackageTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar" );
         verifier.deleteArtifact( "mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar" );
 
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "build-plugin" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir.getAbsolutePath(), "build-plugin" ).getAbsolutePath() );
         verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "using-module" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir.getAbsolutePath(), "using-module" ).getAbsolutePath() );
         verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
