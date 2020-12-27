@@ -46,9 +46,9 @@ class ReactorModelPool
     /**
      * Get the model by its GAV or (since 4.0.0) by its GA if there is only one.
      *
-     * @param groupId, never {@code null}
-     * @param artifactId, never {@code null}
-     * @param version, can be {@code null}
+     * @param groupId never {@code null}
+     * @param artifactId never {@code null}
+     * @param version can be {@code null}
      * @return the matching model or {@code null}
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      */
