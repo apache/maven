@@ -520,10 +520,6 @@ public class MavenCli
             throw new IllegalArgumentException( "Invalid color configuration option [" + styleColor
                 + "]. Supported values are (auto|always|never)." );
         }
-        else
-        {
-            applyColorMode( cliRequest );
-        }
 
         // LOG STREAMS
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
