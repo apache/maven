@@ -425,6 +425,8 @@ public class MavenCli
             throw e;
         }
 
+        applyColorMode( cliRequest );
+
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp( System.out );
@@ -433,8 +435,6 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            // MNG-7032: Also disable colours if in batch mode
-            disableColorsInLogfileOrBatch( cliRequest );
             System.out.println( CLIReportingUtils.showVersion() );
             throw new ExitException( 0 );
         }
@@ -522,7 +522,7 @@ public class MavenCli
         }
         else
         {
-            disableColorsInLogfileOrBatch( cliRequest );
+            applyColorMode( cliRequest );
         }
 
         // LOG STREAMS
@@ -575,7 +575,7 @@ public class MavenCli
      * or {@link CLIManager#LOG_FILE} option was given (or both). In those cases, ANSI output is never feasible.
      * @param cliRequest the arguments as request pojo.
      */
-    private void disableColorsInLogfileOrBatch( CliRequest cliRequest )
+    private void applyColorMode( CliRequest cliRequest )
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
                 || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
