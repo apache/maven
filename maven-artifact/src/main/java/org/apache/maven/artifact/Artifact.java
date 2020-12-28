@@ -20,6 +20,7 @@ package org.apache.maven.artifact;
  */
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -85,6 +86,16 @@ public interface Artifact
     File getFile();
 
     void setFile( File destination );
+
+    default Path getPath()
+    {
+        return this.getFile() == null ? null : this.getFile().toPath();
+    }
+
+    default void setPath( Path path )
+    {
+        this.setFile( path == null ? null : path.toFile() );
+    }
 
     String getBaseVersion();
 
