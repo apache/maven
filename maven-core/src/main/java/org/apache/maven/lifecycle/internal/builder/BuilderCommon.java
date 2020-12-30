@@ -33,6 +33,7 @@ import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.feature.Features;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -108,15 +109,20 @@ public class BuilderCommon
         // With Maven 4's build/consumer the POM will always rewrite during distribution.
         // The maven-gpg-plugin uses the original POM, causing an invalid signature.
         // Fail as long as there's no solution available yet
-        Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
-                .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() ) 
-                           && "org.apache.maven.plugins".equals( m.getGroupId() ) )
-                .findAny();
-
-        if ( gpgMojo.isPresent() )
+        if ( Features.buildConsumer().isActive() )
         {
-            throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
-                + " Verify if there is a compatible signing solution or use Maven 3" );
+            Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
+                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() ) 
+                                       && "org.apache.maven.plugins".equals( m.getGroupId() ) )
+                            .findAny();
+
+            if ( gpgMojo.isPresent() )
+            {
+                throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
+                    + " Verify if there is a compatible signing solution"
+                    + " or add -D" + Features.buildConsumer().propertyName() + "=false"
+                    + " or use Maven 3" );
+            }
         }
 
         if ( session.getRequest().getDegreeOfConcurrency() > 1 )
