@@ -1336,7 +1336,7 @@ public class DefaultModelBuilder
             }
             else
             {
-                if ( childModel.getVersion().contains( "${" ) )
+                if ( childModel.getVersion().equals( "${project.version}" ) )
                 {
                     // Message below is checked for in the MNG-2199 core IT.
                     problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
