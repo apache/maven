@@ -32,6 +32,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException
 {
+    private static final String LS = System.lineSeparator();
+
     private final List<Artifact> resolvedArtifacts;
     private final List<Artifact> missingArtifacts;
 
@@ -86,8 +88,8 @@ public class MultipleArtifactsNotFoundException
     {
         StringBuilder buffer = new StringBuilder( 256 );
 
-        buffer.append( "Missing:\n" );
-        buffer.append( "----------\n" );
+        buffer.append( "Missing:" ).append( LS );
+        buffer.append( "----------" ).append( LS );
 
         int counter = 0;
 
@@ -100,7 +102,7 @@ public class MultipleArtifactsNotFoundException
                     artifact.getDownloadUrl(), artifact.getDependencyTrail() ) );
         }
 
-        buffer.append( "----------\n" );
+        buffer.append( "----------" ).append( LS );
 
         int size = artifacts.size();
 
@@ -115,7 +117,7 @@ public class MultipleArtifactsNotFoundException
             buffer.append( " is" );
         }
 
-        buffer.append( " missing.\n\nfor artifact: " );
+        buffer.append( " missing." ).append( LS ).append( LS ).append( "for artifact: " );
 
         return buffer.toString();
     }

@@ -47,6 +47,8 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  */
 public class ArtifactResolutionResult
 {
+    private static final String LS = System.lineSeparator();
+
     private Artifact originatingArtifact;
 
     private List<Artifact> missingArtifacts;
@@ -359,14 +361,14 @@ public class ArtifactResolutionResult
         if ( artifacts != null )
         {
             int i = 1;
-            sb.append( "---------\n" );
-            sb.append( artifacts.size() ).append( '\n' );
+            sb.append( "---------" ).append( LS );
+            sb.append( artifacts.size() ).append( LS );
             for ( Artifact a : artifacts )
             {
-                sb.append( i ).append( ' ' ).append( a ).append( '\n' );
+                sb.append( i ).append( ' ' ).append( a ).append( LS );
                 i++;
             }
-            sb.append( "---------\n" );
+            sb.append( "---------" );
         }
 
         return sb.toString();
