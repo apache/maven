@@ -123,7 +123,8 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.err.println( "[error] " + content.toString() + "\n\n" + sWriter.toString() );
+        System.err.println( "[error] " + content.toString()
+                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
     }
 
     /**
@@ -194,6 +195,7 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.out.println( "[" + prefix + "] " + content.toString() + "\n\n" + sWriter.toString() );
+        System.out.println( "[" + prefix + "] " + content.toString()
+                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
     }
 }

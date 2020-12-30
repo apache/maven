@@ -1231,7 +1231,7 @@ public class MavenCli
             // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
             //
             StringBuilder sb = new StringBuilder(
-                String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n",
+                String.format( "%nThere can only be one user supplied ConfigurationProcessor, there are %s:%n%n",
                                userSuppliedConfigurationProcessorCount ) );
             for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
             {
@@ -1239,10 +1239,9 @@ public class MavenCli
                 if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
                 {
                     ConfigurationProcessor configurationProcessor = entry.getValue();
-                    sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
+                    sb.append( String.format( "%s%n", configurationProcessor.getClass().getName() ) );
                 }
             }
-            sb.append( "\n" );
             throw new Exception( sb.toString() );
         }
     }

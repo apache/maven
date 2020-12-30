@@ -29,6 +29,8 @@ import org.apache.maven.artifact.Artifact;
 public abstract class AbstractArtifactMetadata
     implements ArtifactMetadata
 {
+    private static final String LS = System.lineSeparator();
+
     protected Artifact artifact;
 
     protected AbstractArtifactMetadata( Artifact artifact )
@@ -55,10 +57,10 @@ public abstract class AbstractArtifactMetadata
     {
         StringBuilder buffer = new StringBuilder( 256 );
 
-        buffer.append( "\nArtifact Metadata\n--------------------------" );
-        buffer.append( "\nGroupId: " ).append( getGroupId() );
-        buffer.append( "\nArtifactId: " ).append( getArtifactId() );
-        buffer.append( "\nMetadata Type: " ).append( getClass().getName() );
+        buffer.append( LS ).append( "Artifact Metadata" ).append( LS ).append( "--------------------------" );
+        buffer.append( LS ).append( "GroupId: " ).append( getGroupId() );
+        buffer.append( LS ).append( "ArtifactId: " ).append( getArtifactId() );
+        buffer.append( LS ).append( "Metadata Type: " ).append( getClass().getName() );
 
         return buffer.toString();
     }

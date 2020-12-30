@@ -176,8 +176,10 @@ public class CLIManager
 
         HelpFormatter formatter = new HelpFormatter();
 
-        formatter.printHelp( pw, HelpFormatter.DEFAULT_WIDTH, "mvn [options] [<goal(s)>] [<phase(s)>]", "\nOptions:",
-                             options, HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD, "\n", false );
+        formatter.printHelp( pw, HelpFormatter.DEFAULT_WIDTH, "mvn [options] [<goal(s)>] [<phase(s)>]",
+                             System.lineSeparator() + "Options:", options,
+                             HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD,
+                             System.lineSeparator(), false );
 
         pw.flush();
     }

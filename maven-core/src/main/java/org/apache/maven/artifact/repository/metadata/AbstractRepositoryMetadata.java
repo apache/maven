@@ -42,6 +42,8 @@ import java.io.Writer;
 public abstract class AbstractRepositoryMetadata
     implements RepositoryMetadata
 {
+    private static final String LS = System.lineSeparator();
+
     private Metadata metadata;
 
     protected AbstractRepositoryMetadata( Metadata metadata )
@@ -197,10 +199,10 @@ public abstract class AbstractRepositoryMetadata
     {
         StringBuilder buffer = new StringBuilder( 256 );
 
-        buffer.append( "\nRepository Metadata\n--------------------------" );
-        buffer.append( "\nGroupId: " ).append( getGroupId() );
-        buffer.append( "\nArtifactId: " ).append( getArtifactId() );
-        buffer.append( "\nMetadata Type: " ).append( getClass().getName() );
+        buffer.append( LS ).append( "Repository Metadata" ).append( LS ).append( "--------------------------" );
+        buffer.append( LS ).append( "GroupId: " ).append( getGroupId() );
+        buffer.append( LS ).append( "ArtifactId: " ).append( getArtifactId() );
+        buffer.append( LS ).append( "Metadata Type: " ).append( getClass().getName() );
 
         return buffer.toString();
     }
