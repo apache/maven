@@ -119,9 +119,9 @@ public class BuilderCommon
             if ( gpgMojo.isPresent() )
             {
                 throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
-                    + " Verify if there is a compatible signing solution"
-                    + " or add -D" + Features.buildConsumer().propertyName() + "=false"
-                    + " or use Maven 3" );
+                    + " Verify if there is a compatible signing solution,"
+                    + " add -D" + Features.buildConsumer().propertyName() + "=false"
+                    + " or use Maven 3." );
             }
         }
 
