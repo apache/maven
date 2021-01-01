@@ -74,7 +74,7 @@ public class DefaultProjectsSelector implements ProjectsSelector
             if ( !result.getProblems().isEmpty() && LOGGER.isWarnEnabled() )
             {
                 LOGGER.warn( "" );
-                LOGGER.warn( "Some problems were encountered while building the effective model for {}",
+                LOGGER.warn( "Some problems were encountered while building the effective model for '{}'",
                         result.getProject().getId() );
 
                 for ( ModelProblem problem : result.getProblems() )

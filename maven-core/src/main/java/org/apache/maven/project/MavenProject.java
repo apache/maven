@@ -936,7 +936,7 @@ public class MavenProject
         int index = attachedArtifacts.indexOf( artifact );
         if ( index >= 0 )
         {
-            LOGGER.warn( "artifact {} already attached, replace previous instance", artifact );
+            LOGGER.warn( "artifact '{}' already attached, replacing previous instance", artifact );
             attachedArtifacts.set( index, artifact );
         }
         else

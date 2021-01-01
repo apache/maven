@@ -790,7 +790,7 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            slf4jLogger.warn( "Failed to read extensions descriptor {}: {}", extensionsFile, e.getMessage() );
+            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
         }
         return Collections.emptyList();
     }
@@ -818,11 +818,11 @@ public class MavenCli
 
             extRealm.setParentRealm( coreRealm );
 
-            slf4jLogger.debug( "Populating class realm {}", extRealm.getId() );
+            slf4jLogger.debug( "Populating class realm '{}'", extRealm.getId() );
 
             for ( File file : extClassPath )
             {
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 extRealm.addURL( file.toURI().toURL() );
             }
@@ -871,7 +871,7 @@ public class MavenCli
             {
                 File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 jars.add( file );
             }
@@ -1006,12 +1006,12 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the {} switch.",
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch.",
                         buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the {} switch to enable full debug logging.",
+                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable full debug logging.",
                         buffer().strong( "-X" ) );
             }
 
@@ -1299,9 +1299,9 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
-        slf4jLogger.debug( "Reading global toolchains from {}",
+        slf4jLogger.debug( "Reading global toolchains from '{}'",
                 getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
-        slf4jLogger.debug( "Reading user toolchains from {}",
+        slf4jLogger.debug( "Reading user toolchains from '{}'",
                 getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
 
         ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
