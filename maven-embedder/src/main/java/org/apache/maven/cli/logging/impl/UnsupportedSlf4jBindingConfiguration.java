@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class UnsupportedSlf4jBindingConfiguration
     extends BaseSlf4jConfiguration
 {
-    private final Logger logger = LoggerFactory.getLogger( UnsupportedSlf4jBindingConfiguration.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( UnsupportedSlf4jBindingConfiguration.class );
 
     private String slf4jBinding;
 
@@ -51,8 +51,8 @@ public class UnsupportedSlf4jBindingConfiguration
     @Override
     public void activate()
     {
-        logger.warn( "The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding );
-        logger.warn( "Maven supported bindings are:" );
+        LOGGER.warn( "The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding );
+        LOGGER.warn( "Maven supported bindings are:" );
 
         String ls = System.lineSeparator();
 
@@ -66,7 +66,7 @@ public class UnsupportedSlf4jBindingConfiguration
                 sb.append( ls ).append( "- " ).append( binding );
             }
 
-            logger.warn( sb.toString() );
+            LOGGER.warn( sb.toString() );
         }
     }
 }
