@@ -458,7 +458,7 @@ public class DefaultGraphBuilder
 
                     if ( projectsMap.containsKey( pluginKey ) )
                     {
-                        LOGGER.warn( "{} uses {} as extensions, which is not possible within the same reactor build. "
+                        LOGGER.warn( "'{}' uses '{}' as extension which is not possible within the same reactor build. "
                             + "This plugin was pulled from the local repository!", project.getName(), plugin.getKey() );
                     }
                 }

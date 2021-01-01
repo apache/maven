@@ -137,9 +137,9 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        logger.debug( "Reading global settings from {}",
+        logger.debug( "Reading global settings from '{}'",
             getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from {}",
+        logger.debug( "Reading user settings from '{}'",
             getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
