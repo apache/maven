@@ -132,6 +132,11 @@ under the License.
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
       <scope>test</scope>

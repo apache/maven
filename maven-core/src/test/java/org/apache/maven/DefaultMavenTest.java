@@ -1,17 +1,5 @@
 package org.apache.maven;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-
-import java.io.File;
-import java.nio.file.Files;
-
-import static java.util.Arrays.asList;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,14 +18,31 @@ import static java.util.Arrays.asList;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+
+import java.io.File;
+import java.nio.file.Files;
+
+import javax.inject.Inject;
+
+import static java.util.Arrays.asList;
+
 public class DefaultMavenTest
     extends AbstractCoreMavenComponentTestCase
 {
 
+    @Inject
+    private Maven maven;
+
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
             throws Exception
     {
-        Maven maven = getContainer().lookup( Maven.class );
         MavenExecutionRequest request = createMavenExecutionRequest( getProject( "cyclic-reference" ) ).setGoals( asList("validate") );
 
         MavenExecutionResult result = maven.execute( request );

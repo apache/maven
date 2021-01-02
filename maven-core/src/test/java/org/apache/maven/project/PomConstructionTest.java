@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,11 +35,14 @@ import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import javax.inject.Inject;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotEquals;
@@ -53,11 +57,22 @@ public class PomConstructionTest
 
     private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
+    @Inject
     private DefaultProjectBuilder projectBuilder;
 
+    @Inject
     private RepositorySystem repositorySystem;
 
     private File testDirectory;
+
+    @Override
+    protected synchronized void setupContainer()
+    {
+        super.setupContainer();
+
+        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
+                binder -> binder.requestInjection( this ) );
+    }
 
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
@@ -70,10 +85,9 @@ public class PomConstructionTest
     protected void setUp()
         throws Exception
     {
+        getContainer();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         new File( getBasedir(), BASE_MIXIN_DIR );
-        projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
-        repositorySystem = lookup( RepositorySystem.class );
     }
 
     @Override

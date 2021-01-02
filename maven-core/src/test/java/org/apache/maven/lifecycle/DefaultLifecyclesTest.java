@@ -27,9 +27,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kristian Rosenvold
@@ -38,7 +42,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultLifecyclesTest
     extends PlexusTestCase
 {
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
     @Override
@@ -49,19 +53,20 @@ public class DefaultLifecyclesTest
         configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    protected void setUp()
-        throws Exception
+    @Override
+    protected void setUp() throws Exception
     {
         super.setUp();
-        defaultLifeCycles = lookup( DefaultLifecycles.class );
+        getContainer();
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
+    protected synchronized void setupContainer()
     {
-        defaultLifeCycles = null;
-        super.tearDown();
+        super.setupContainer();
+
+        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
+                binder -> binder.requestInjection( this ) );
     }
 
     public void testDefaultLifecycles()

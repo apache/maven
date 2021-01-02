@@ -20,20 +20,34 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
 import org.junit.Ignore;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 @Ignore
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {
+    @Inject
     private RepositorySystem repositorySystem;
 
-    protected void setUp()
-        throws Exception
+    @Override
+    protected synchronized void setupContainer()
+    {
+        super.setupContainer();
+
+        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
+                binder -> binder.requestInjection( this ) );
+    }
+
+    @Override
+    protected void setUp() throws Exception
     {
         super.setUp();
-        repositorySystem = lookup( RepositorySystem.class );
+        getContainer();
     }
 
     @Override

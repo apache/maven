@@ -47,6 +47,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+import javax.inject.Inject;
+
 /**
  * @author Jason van Zyl
  */
@@ -55,14 +57,8 @@ public class PluginParameterExpressionEvaluatorTest
 {
     private static final String FS = File.separator;
 
+    @Inject
     private RepositorySystem factory;
-
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        factory = lookup( RepositorySystem.class );
-    }
 
     @Override
     protected void tearDown()

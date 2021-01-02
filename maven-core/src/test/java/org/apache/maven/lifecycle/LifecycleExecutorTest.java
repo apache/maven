@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
@@ -37,7 +36,6 @@ import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
-import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
@@ -46,44 +44,24 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import javax.inject.Inject;
 
 public class LifecycleExecutorTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private DefaultLifecycleExecutor lifecycleExecutor;
 
-    @Requirement
+    @Inject
     private DefaultLifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
 
-    @Requirement
+    @Inject
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
 
-    @Requirement
+    @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
-
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
-        lifeCycleTaskSegmentCalculator =
-            (DefaultLifecycleTaskSegmentCalculator) lookup( LifecycleTaskSegmentCalculator.class );
-        lifeCycleExecutionPlanCalculator = lookup( LifecycleExecutionPlanCalculator.class );
-        mojoDescriptorCreator = lookup( MojoDescriptorCreator.class );
-        lookup( ExceptionHandler.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        lifecycleExecutor = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory()
     {
