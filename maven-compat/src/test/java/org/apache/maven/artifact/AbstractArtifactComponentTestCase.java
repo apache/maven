@@ -29,6 +29,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -54,6 +55,7 @@ import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,6 +64,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,9 +73,14 @@ import java.util.List;
 public abstract class AbstractArtifactComponentTestCase
     extends PlexusTestCase
 {
+    @Inject
     protected ArtifactFactory artifactFactory;
 
+    @Inject
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
+
+    @Inject
+    LegacySupport legacySupport;
 
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
@@ -87,14 +95,15 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         super.setUp();
-        artifactFactory = lookup( ArtifactFactory.class );
-        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
+
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
 
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
                                                  new DefaultMavenExecutionResult() );
 
-        LegacySupport legacySupport = lookup( LegacySupport.class );
         legacySupport.setSession( session );
     }
 

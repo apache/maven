@@ -17,14 +17,18 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+
+import javax.inject.Inject;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -34,6 +38,7 @@ import org.codehaus.plexus.PlexusTestCase;
 public class LegacyRepositorySystemTest
     extends PlexusTestCase
 {
+    @Inject
     private RepositorySystem repositorySystem;
 
     @Override
@@ -46,18 +51,13 @@ public class LegacyRepositorySystemTest
 
     @Override
     protected void setUp()
-        throws Exception
+            throws Exception
     {
         super.setUp();
-        repositorySystem = lookup( RepositorySystem.class, "default" );
-    }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        super.tearDown();
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
     }
 
     public void testThatLocalRepositoryWithSpacesIsProperlyHandled()
@@ -69,7 +69,6 @@ public class LegacyRepositorySystemTest
     }
 
     public void testAuthenticationHandling()
-        throws Exception
     {
         Server server = new Server();
         server.setId( "repository" );

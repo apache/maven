@@ -26,21 +26,16 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
 
+import javax.inject.Inject;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public class ArtifactDeployerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactDeployer artifactDeployer;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactDeployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
-    }
 
     protected String component()
     {

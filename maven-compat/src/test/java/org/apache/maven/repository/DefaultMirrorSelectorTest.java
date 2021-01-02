@@ -21,18 +21,17 @@ package org.apache.maven.repository;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 public class DefaultMirrorSelectorTest
-    extends PlexusTestCase
 {
-
+    @Test
     public void testMirrorWithMirrorOfPatternContainingANegationIsNotSelected()
     {
         ArtifactRepository repository = new DefaultArtifactRepository( "snapshots.repo", "http://whatever", null );
         String pattern = "external:*, !snapshots.repo";
-        boolean matches = DefaultMirrorSelector.matchPattern( repository, pattern );
-        System.out.println( matches );
-        assertFalse( matches );
+        assertFalse( DefaultMirrorSelector.matchPattern( repository, pattern ) );
     }
 }

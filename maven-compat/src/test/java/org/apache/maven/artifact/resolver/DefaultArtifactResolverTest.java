@@ -25,10 +25,13 @@ import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
 
+import javax.inject.Inject;
+
 public class DefaultArtifactResolverTest
     extends AbstractArtifactComponentTestCase
 {
-    private DefaultArtifactResolver artifactResolver;
+    @Inject
+    private ArtifactResolver artifactResolver;
 
     private Artifact projectArtifact;
 
@@ -37,9 +40,6 @@ public class DefaultArtifactResolverTest
         throws Exception
     {
         super.setUp();
-
-        artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
-
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
@@ -47,7 +47,6 @@ public class DefaultArtifactResolverTest
     protected void tearDown()
         throws Exception
     {
-        artifactFactory = null;
         projectArtifact = null;
         super.tearDown();
     }

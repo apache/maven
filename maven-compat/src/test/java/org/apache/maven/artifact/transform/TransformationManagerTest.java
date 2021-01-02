@@ -15,20 +15,28 @@ package org.apache.maven.artifact.transform;
  * the License.
  */
 
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+
+import javax.inject.Inject;
 
 /** @author Jason van Zyl */
 public class TransformationManagerTest
     extends PlexusTestCase
 {
+    @Inject
+    ArtifactTransformationManager tm;
+
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
@@ -37,12 +45,20 @@ public class TransformationManagerTest
         containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
-    public void testTransformationManager()
-        throws Exception
+    @Override
+    protected void setUp()
+            throws Exception
     {
-        ArtifactTransformationManager tm = lookup( ArtifactTransformationManager.class );
+        super.setUp();
 
-        List tms = tm.getArtifactTransformations();
+        ((DefaultPlexusContainer)getContainer())
+                .addPlexusInjector( Collections.emptyList(),
+                        binder ->  binder.requestInjection( this ) );
+    }
+
+    public void testTransformationManager()
+    {
+        List<ArtifactTransformation> tms = tm.getArtifactTransformations();
 
         assertEquals( 3, tms.size() );
 
