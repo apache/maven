@@ -47,15 +47,23 @@ public final class Features
     public static class Feature
     {
         private final boolean active;
+        
+        private final String name;
 
         Feature( String name, String defaultValue )
         {
-            active = "true".equals( System.getProperty( name, defaultValue ) );
+            this.name = name;
+            this.active = "true".equals( System.getProperty( name, defaultValue ) );
         }
 
         public boolean isActive()
         {
            return active;
+        }
+        
+        public String propertyName()
+        {
+            return name;
         }
 
     }
