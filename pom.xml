@@ -58,6 +58,8 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.3</guiceVersion>
+    <guavaVersion>30.1-jre</guavaVersion>
+    <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <sisuVersion>0.3.5</sisuVersion>
     <wagonVersion>3.5.1</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
@@ -243,6 +245,50 @@ under the License.
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
         <classifier>no_aop</classifier>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- This is a transitive dep of com.google.inject:guice -->
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guavaVersion}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>failureaccess</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>listenablefuture</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.j2objc</groupId>
+            <artifactId>j2objc-annotations</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- This is a transitive dep of com.google.guava:guava -->
+        <groupId>com.google.guava</groupId>
+        <artifactId>failureaccess</artifactId>
+        <version>${guavafailureaccessVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
