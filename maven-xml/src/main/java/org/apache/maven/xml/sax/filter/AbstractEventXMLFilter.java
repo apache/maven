@@ -115,8 +115,6 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     /**
      * Should be used to include extra events before a closing element.
      * This is a lightweight solution to keep the correct indentation.
-     *
-     * @return
      */
     protected Includer include()
     {

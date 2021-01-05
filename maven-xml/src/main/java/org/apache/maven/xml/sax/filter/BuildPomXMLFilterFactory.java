@@ -59,7 +59,6 @@ public class BuildPomXMLFilterFactory
     /**
      *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
-     * @return
      * @throws SAXException
      * @throws ParserConfigurationException
      * @throws TransformerConfigurationException

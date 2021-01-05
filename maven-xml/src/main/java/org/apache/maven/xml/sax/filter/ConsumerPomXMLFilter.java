@@ -27,8 +27,8 @@ import org.xml.sax.ext.LexicalHandler;
  * This often means stripping of build-specific information.
  * When extra information is required during filtering it is probably a member of the BuildPomXMLFilter
  *
- * This filter is used at 1 locations:
- * - {@link org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory} when publishing pom files.
+ * This filter is used at one location:
+ * - org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory when publishing POM files.
  *
  * @author Robert Scholte
  * @since 4.0.0
