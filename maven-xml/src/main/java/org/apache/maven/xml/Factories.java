@@ -42,7 +42,8 @@ public final class Factories
     }
 
     /**
-     * See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#transformerfactory
+     * See
+     * https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#transformerfactory
      */
     public static TransformerFactory newTransformerFactory()
     {
