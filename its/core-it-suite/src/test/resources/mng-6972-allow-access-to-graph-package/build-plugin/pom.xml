@@ -29,7 +29,7 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+    <maven.compiler.target>1.8</maven.compiler.target>
 
     <plexus-component.version>1.5.5</plexus-component.version>
     <maven-version>3.3.1</maven-version>
