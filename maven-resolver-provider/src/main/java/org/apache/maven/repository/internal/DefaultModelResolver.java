@@ -132,7 +132,7 @@ class DefaultModelResolver
             Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
 
         this.repositories =
-            remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
+            remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true, true );
     }
 
     private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
