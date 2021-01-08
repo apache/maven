@@ -22,7 +22,7 @@ package org.apache.maven.artifact.handler;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 

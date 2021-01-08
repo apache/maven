@@ -16,7 +16,7 @@ package org.apache.maven.repository.metadata;
  */
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;

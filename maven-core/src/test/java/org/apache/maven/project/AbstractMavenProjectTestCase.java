@@ -31,7 +31,7 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.After;
 import org.junit.Before;

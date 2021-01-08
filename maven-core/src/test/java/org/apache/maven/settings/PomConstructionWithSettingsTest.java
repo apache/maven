@@ -32,24 +32,20 @@ import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;

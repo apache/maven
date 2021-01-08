@@ -25,7 +25,7 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;

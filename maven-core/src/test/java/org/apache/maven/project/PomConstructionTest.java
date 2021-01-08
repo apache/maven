@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;

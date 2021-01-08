@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.ContainerConfiguration;

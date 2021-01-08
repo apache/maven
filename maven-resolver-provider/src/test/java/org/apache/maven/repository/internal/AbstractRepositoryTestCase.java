@@ -21,7 +21,7 @@ package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.ContainerConfiguration;

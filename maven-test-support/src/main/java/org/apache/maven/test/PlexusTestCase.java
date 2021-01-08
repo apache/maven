@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.test;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -38,7 +38,6 @@ package org.apache.maven;
 import java.io.File;
 import java.io.InputStream;
 
-
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -54,7 +53,8 @@ import org.junit.Before;
 
 /**
  * This is a slightly modified version of the original plexus class
- * available at https://raw.githubusercontent.com/codehaus-plexus/plexus-containers/master/plexus-container-default/src/main/java/org/codehaus/plexus/PlexusTestCase.java
+ * available at https://raw.githubusercontent.com/codehaus-plexus/plexus-containers/master/plexus-container-default/
+ *              src/main/java/org/codehaus/plexus/PlexusTestCase.java
  * in order to migrate the tests to JUnit 4.
  *
  * @author Jason van Zyl
@@ -75,7 +75,7 @@ public abstract class PlexusTestCase
         basedir = getBasedir();
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressWarnings( "ResultOfMethodCallIgnored" )
     protected void setupContainer()
     {
         // ----------------------------------------------------------------------------
@@ -221,14 +221,14 @@ public abstract class PlexusTestCase
     // Container access
     // ----------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     protected <T> T lookup( String componentKey )
             throws ComponentLookupException
     {
         return (T) getContainer().lookup( componentKey );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     protected <T> T lookup( String role,
                             String roleHint )
             throws ComponentLookupException

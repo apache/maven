@@ -19,7 +19,7 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import org.apache.maven.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.junit.After;
