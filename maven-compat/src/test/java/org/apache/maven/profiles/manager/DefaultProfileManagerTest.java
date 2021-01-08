@@ -39,14 +39,6 @@ public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Test
     public void testShouldActivateDefaultProfile()
         throws Exception

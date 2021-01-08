@@ -79,36 +79,6 @@ public class DefaultWagonManagerTest
     @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Before
-    @Override
-    public void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        wagonManager = null;
-        artifactFactory = null;
-        super.tearDown();
-    }
-
     @Test
     public void testUnnecessaryRepositoryLookup()
         throws Exception

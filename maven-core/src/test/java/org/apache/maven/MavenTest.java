@@ -32,15 +32,6 @@ public class MavenTest
     @Inject
     private ExceptionHandler exceptionHandler;
 
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
     protected String getProjectsDirectory()
     {
         return "src/test/projects/lifecycle-executor";

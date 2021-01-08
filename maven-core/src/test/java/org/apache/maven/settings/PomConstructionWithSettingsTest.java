@@ -65,29 +65,11 @@ public class PomConstructionWithSettingsTest
 
     private File testDirectory;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
     @Before
     public void setUp()
         throws Exception
     {
         super.setUp();
-        getContainer();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
     }
 

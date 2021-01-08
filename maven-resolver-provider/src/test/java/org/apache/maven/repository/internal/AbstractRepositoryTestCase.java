@@ -41,14 +41,6 @@ public abstract class AbstractRepositoryTestCase
 
     protected RepositorySystemSession session;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Before
     @Override
     public void setUp()

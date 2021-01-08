@@ -45,32 +45,6 @@ public class DefaultLifecyclesTest
     @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
     @Test
     public void testDefaultLifecycles()
     {

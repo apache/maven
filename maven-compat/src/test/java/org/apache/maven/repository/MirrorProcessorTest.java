@@ -50,14 +50,6 @@ public class MirrorProcessorTest
     @Inject
     private ArtifactRepositoryFactory repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Before
     public void setUp()
         throws Exception
@@ -65,18 +57,6 @@ public class MirrorProcessorTest
         super.setUp();
         mirrorSelector = (DefaultMirrorSelector) lookup( MirrorSelector.class );
         repositorySystem = lookup( ArtifactRepositoryFactory.class );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
     }
 
     @Test

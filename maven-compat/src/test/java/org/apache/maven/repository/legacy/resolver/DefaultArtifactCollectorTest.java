@@ -77,14 +77,6 @@ public class DefaultArtifactCollectorTest
 
     private static final String GROUP_ID = "test";
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Before
     @Override
     public void setUp()

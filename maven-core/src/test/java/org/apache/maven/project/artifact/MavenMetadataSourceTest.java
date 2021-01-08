@@ -37,32 +37,6 @@ public class MavenMetadataSourceTest
     @Inject
     private RepositorySystem repositorySystem;
 
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
-    @Override
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-
-    @After
-    public void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        super.tearDown();
-    }
-
     @Test
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
         throws Exception

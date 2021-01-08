@@ -76,14 +76,6 @@ public abstract class AbstractConflictResolverTest
 
     // TestCase methods -------------------------------------------------------
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     /*
      * @see junit.framework.TestCase#setUp()
      */
@@ -93,10 +85,6 @@ public abstract class AbstractConflictResolverTest
             throws Exception
     {
         super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
 
         conflictResolver = (ConflictResolver) lookup( ConflictResolver.ROLE, roleHint );
 

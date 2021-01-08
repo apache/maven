@@ -63,36 +63,6 @@ public class LegacyRepositorySystemTest
     @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Before
-    @Override
-    public void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        resolutionErrorHandler = null;
-        super.tearDown();
-    }
-
     protected List<ArtifactRepository> getRemoteRepositories()
         throws Exception
     {

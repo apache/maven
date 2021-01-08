@@ -46,22 +46,10 @@ public class ProjectClasspathTest
     static final String dir = "projects/scope/";
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
     public void setUp()
             throws Exception
     {
         super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
 
         ArtifactResolver resolver = lookup( ArtifactResolver.class, "classpath" );
         DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)lookup(ArtifactDescriptorReader.class);

@@ -66,25 +66,6 @@ public abstract class AbstractCoreMavenComponentTestCase
     @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
-    @Override
-    @Before
-    public void setUp()
-            throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
-
     abstract protected String getProjectsDirectory();
 
     protected File getProject( String name )

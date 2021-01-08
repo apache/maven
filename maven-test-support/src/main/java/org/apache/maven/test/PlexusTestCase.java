@@ -37,10 +37,12 @@ package org.apache.maven.test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -73,6 +75,9 @@ public abstract class PlexusTestCase
             throws Exception
     {
         basedir = getBasedir();
+
+        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
+                binder -> binder.requestInjection( this ) );
     }
 
     @SuppressWarnings( "ResultOfMethodCallIgnored" )
@@ -143,6 +148,8 @@ public abstract class PlexusTestCase
      */
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     protected void customizeContext( Context context )

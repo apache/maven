@@ -88,23 +88,11 @@ public abstract class AbstractArtifactComponentTestCase
     @Inject
     LegacySupport legacySupport;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Before
     public void setUp()
         throws Exception
     {
         super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
 
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),

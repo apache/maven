@@ -75,28 +75,11 @@ public class PomConstructionTest
 
     private File testDirectory;
 
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
     @Before
     public void setUp()
         throws Exception
     {
-        getContainer();
+        super.setUp();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         new File( getBasedir(), BASE_MIXIN_DIR );
     }

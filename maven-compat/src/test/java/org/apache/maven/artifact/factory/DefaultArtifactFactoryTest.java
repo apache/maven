@@ -40,25 +40,6 @@ public class DefaultArtifactFactoryTest
     @Inject
     ArtifactFactory factory;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    public void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
     @Test
     public void testPropagationOfSystemScopeRegardlessOfInheritedScope()
     {

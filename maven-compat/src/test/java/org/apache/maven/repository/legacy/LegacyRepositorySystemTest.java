@@ -47,35 +47,6 @@ public class LegacyRepositorySystemTest
     @Inject
     private RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Before
-    @Override
-    public void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        super.tearDown();
-    }
-
     @Test
     public void testThatLocalRepositoryWithSpacesIsProperlyHandled()
         throws Exception

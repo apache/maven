@@ -50,23 +50,6 @@ public class DefaultRuntimeInformationTest
         configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
     @Test
     public void testGetMavenVersion()
     {
