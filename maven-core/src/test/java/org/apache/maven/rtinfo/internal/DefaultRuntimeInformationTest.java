@@ -24,6 +24,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.PlexusTestCase;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -47,6 +48,14 @@ public class DefaultRuntimeInformationTest
         super.customizeContainerConfiguration(configuration);
         configuration.setAutoWiring(true);
         configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        getContainer();
     }
 
     @Override

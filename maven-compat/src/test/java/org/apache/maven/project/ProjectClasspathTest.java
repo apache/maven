@@ -54,7 +54,7 @@ public class ProjectClasspathTest
     }
 
     @Override
-    protected void setUp()
+    public void setUp()
             throws Exception
     {
         super.setUp();
