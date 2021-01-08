@@ -21,6 +21,8 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -41,6 +43,9 @@ import static org.junit.Assert.assertTrue;
 public class DefaultUpdateCheckManagerTest
     extends AbstractArtifactComponentTestCase
 {
+
+    @Inject
+    private ArtifactFactory artifactFactory;
 
     DefaultUpdateCheckManager updateCheckManager;
 
@@ -233,8 +238,6 @@ public class DefaultUpdateCheckManagerTest
     @Test
     public void testArtifactTouchFileName() throws Exception
     {
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = artifactFactory.createArtifactWithClassifier( "groupdId", "a", "0.0.1-SNAPSHOT", "jar", null );

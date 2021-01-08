@@ -47,17 +47,9 @@ public class MirrorProcessorTest
 {
     @Inject
     private DefaultMirrorSelector mirrorSelector;
+
     @Inject
     private ArtifactRepositoryFactory repositorySystem;
-
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        mirrorSelector = (DefaultMirrorSelector) lookup( MirrorSelector.class );
-        repositorySystem = lookup( ArtifactRepositoryFactory.class );
-    }
 
     @Test
     public void testExternalURL()

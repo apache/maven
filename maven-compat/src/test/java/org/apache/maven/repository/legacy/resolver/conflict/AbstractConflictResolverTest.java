@@ -86,7 +86,7 @@ public abstract class AbstractConflictResolverTest
     {
         super.setUp();
 
-        conflictResolver = (ConflictResolver) lookup( ConflictResolver.ROLE, roleHint );
+        conflictResolver = lookup( ConflictResolver.ROLE, roleHint );
 
         a1 = createArtifact( "a", "1.0" );
         a2 = createArtifact( "a", "2.0" );

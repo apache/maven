@@ -19,6 +19,8 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import javax.inject.Inject;
+
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.VersionResolver;
@@ -33,26 +35,8 @@ import static org.junit.Assert.assertEquals;
 public class DefaultVersionResolverTest
     extends AbstractRepositoryTestCase
 {
+    @Inject
     private DefaultVersionResolver versionResolver;
-
-    @Before
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        // be sure we're testing the right class, i.e. DefaultVersionResolver.class
-        versionResolver = (DefaultVersionResolver) lookup( VersionResolver.class, "default" );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        versionResolver = null;
-        super.tearDown();
-    }
 
     @Test
     public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts()

@@ -42,16 +42,6 @@ public class ArtifactDeployerTest
     @Inject
     private ArtifactDeployer artifactDeployer;
 
-    @Before
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactDeployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
-    }
-
     protected String component()
     {
         return "deployer";

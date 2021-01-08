@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -88,6 +89,9 @@ public abstract class AbstractArtifactComponentTestCase
     @Inject
     LegacySupport legacySupport;
 
+    @Inject @Named( "default" )
+    ArtifactRepositoryLayout repoLayout;
+
     @Before
     public void setUp()
         throws Exception
@@ -99,16 +103,6 @@ public abstract class AbstractArtifactComponentTestCase
                                                  new DefaultMavenExecutionResult() );
 
         legacySupport.setSession( session );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        release( artifactFactory );
-
-        super.tearDown();
     }
 
     protected abstract String component();
@@ -127,9 +121,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         f.createNewFile();
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null,
                                                                    null );
     }
@@ -146,9 +137,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null,
                                                                    null );
     }
@@ -160,9 +148,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
                                                                    new ArtifactRepositoryPolicy(),
                                                                    new ArtifactRepositoryPolicy() );
@@ -171,9 +156,6 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository badRemoteRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout,
                                                                    null, null );
     }

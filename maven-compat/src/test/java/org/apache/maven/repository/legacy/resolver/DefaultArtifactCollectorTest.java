@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -52,6 +54,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.test.PlexusTestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -67,8 +70,10 @@ import static org.junit.Assert.assertTrue;
 public class DefaultArtifactCollectorTest
     extends PlexusTestCase
 {
+    @Inject
     private LegacyArtifactCollector artifactCollector;
 
+    @Inject
     private ArtifactFactory artifactFactory;
 
     private ArtifactSpec projectArtifact;
@@ -85,20 +90,8 @@ public class DefaultArtifactCollectorTest
         super.setUp();
 
         source = new Source();
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = lookup( LegacyArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        artifactCollector = null;
-        artifactFactory = null;
-        super.tearDown();
     }
 
     @Test

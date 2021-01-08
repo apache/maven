@@ -21,6 +21,8 @@ package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
 
+import javax.inject.Inject;
+
 import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
@@ -37,6 +39,7 @@ import org.junit.Before;
 public abstract class AbstractRepositoryTestCase
     extends PlexusTestCase
 {
+    @Inject
     protected RepositorySystem system;
 
     protected RepositorySystemSession session;
@@ -47,18 +50,7 @@ public abstract class AbstractRepositoryTestCase
         throws Exception
     {
         super.setUp();
-        system = lookup( RepositorySystem.class );
         session = newMavenRepositorySystemSession( system );
-    }
-
-    @After
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        session = null;
-        system = null;
-        super.tearDown();
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )

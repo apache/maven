@@ -48,14 +48,6 @@ public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentT
         return null;
     }
 
-    @Before
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        resolver = lookup( LifecycleDependencyResolver.class );
-    }
-
     @Test
     public void testCachedReactorProjectDependencies() throws Exception
     {

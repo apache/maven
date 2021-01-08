@@ -15,6 +15,9 @@ package org.apache.maven.repository.metadata;
  * the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.test.PlexusTestCase;
 import org.junit.Before;
@@ -32,6 +35,7 @@ import static org.junit.Assert.assertNotNull;
 public class DefaultClasspathTransformationTest
 extends PlexusTestCase
 {
+    @Inject
     ClasspathTransformation transform;
 
     MetadataGraph graph;
@@ -46,7 +50,6 @@ extends PlexusTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        transform = (ClasspathTransformation) lookup( ClasspathTransformation.ROLE, "default" );
 
         graph = new MetadataGraph( 4, 3 );
         /*

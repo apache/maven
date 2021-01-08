@@ -15,6 +15,8 @@ package org.apache.maven.repository.metadata;
  * the License.
  */
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
@@ -33,8 +35,7 @@ import static org.junit.Assert.assertNotNull;
 public class DefaultGraphConflictResolverTest
 extends PlexusTestCase
 {
-    Logger log;
-
+    @Inject
     GraphConflictResolver resolver;
 
     MetadataGraph graph;
@@ -49,7 +50,6 @@ extends PlexusTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        resolver = (GraphConflictResolver) lookup( GraphConflictResolver.ROLE, "default" );
 
         /*
          *       v2

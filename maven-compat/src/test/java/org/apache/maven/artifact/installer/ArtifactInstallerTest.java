@@ -37,16 +37,6 @@ public class ArtifactInstallerTest
     @Inject
     private ArtifactInstaller artifactInstaller;
 
-    @Before
-    @Override
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactInstaller = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
-    }
-
     protected String component()
     {
         return "installer";
