@@ -101,8 +101,9 @@ public class DefaultArtifactCollectorTest
         super.tearDown();
     }
 
-    // works, but we don't fail on cycles presently
-    public void disabledtestCircularDependencyNotIncludingCurrentProject()
+    @Test
+    @Ignore("works, but we don't fail on cycles presently")
+    public void testCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
@@ -113,8 +114,9 @@ public class DefaultArtifactCollectorTest
                 () -> collect( a ) );
     }
 
-    // works, but we don't fail on cycles presently
-    public void disabledtestCircularDependencyIncludingCurrentProject()
+    @Test
+    @Ignore("works, but we don't fail on cycles presently")
+    public void testCircularDependencyIncludingCurrentProject()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
@@ -164,7 +166,9 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "1.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
-    public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewest()
+    @Test
+    @Ignore
+    public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNewest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         // TODO use newest conflict resolver
@@ -183,7 +187,9 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
-    public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewestVersionReplaced()
+    @Test
+    @Ignore
+    public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNewestVersionReplaced()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         // TODO use newest conflict resolver
@@ -671,7 +677,9 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check version", "1.0", artifact.getVersion() );
     }
 
-    public void disabledtestOptionalNotTransitiveButVersionIsInfluential()
+    @Test
+    @Ignore
+    public void testOptionalNotTransitiveButVersionIsInfluential()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
