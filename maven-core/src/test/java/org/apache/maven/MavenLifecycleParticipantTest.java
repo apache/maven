@@ -29,10 +29,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MavenLifecycleParticipantTest
     extends AbstractCoreMavenComponentTestCase
@@ -131,7 +131,7 @@ public class MavenLifecycleParticipantTest
         request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
-        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
+        assertFalse( result.hasExceptions(), result.getExceptions().toString() );
 
         MavenProject project = result.getProject();
 
@@ -167,7 +167,7 @@ public class MavenLifecycleParticipantTest
         request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
-        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
+        assertFalse( result.hasExceptions(), result.getExceptions().toString() );
 
         List<String> order = new ArrayList<>();
         for ( MavenProject project : result.getTopologicallySortedProjects() )

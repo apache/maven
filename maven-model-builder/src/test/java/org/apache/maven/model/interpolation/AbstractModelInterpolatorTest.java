@@ -38,22 +38,21 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author jdcasey
  */
 public abstract class AbstractModelInterpolatorTest
 {
-    protected ModelInterpolator interpolator;
     private Properties context;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         context = new Properties();
@@ -64,16 +63,16 @@ public abstract class AbstractModelInterpolatorTest
 
     protected void assertProblemFree( SimpleProblemCollector collector )
     {
-        assertEquals( "Expected no errors", 0, collector.getErrors().size() );
-        assertEquals( "Expected no warnings", 0, collector.getWarnings().size() );
-        assertEquals( "Expected no fatals", 0, collector.getFatals().size() );
+        assertEquals( 0, collector.getErrors().size(), "Expected no errors" );
+        assertEquals( 0, collector.getWarnings().size(), "Expected no warnings" );
+        assertEquals( 0, collector.getFatals().size(), "Expected no fatals" );
     }
 
     protected void assertCollectorState( int numFatals, int numErrors, int numWarnings, SimpleProblemCollector collector )
     {
-        assertEquals( "Errors", numErrors, collector.getErrors().size() );
-        assertEquals( "Warnings", numWarnings, collector.getWarnings().size() );
-        assertEquals( "Fatals", numFatals, collector.getFatals().size() );
+        assertEquals( numErrors, collector.getErrors().size(), "Errors" );
+        assertEquals( numWarnings, collector.getWarnings().size(), "Warnings" );
+        assertEquals( numFatals, collector.getFatals().size(), "Fatals" );
     }
 
     private ModelBuildingRequest createModelBuildingRequest( Properties p )

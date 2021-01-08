@@ -24,11 +24,11 @@ import java.util.Collections;
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,7 @@ public class DefaultArtifactResolverTest
 
     private Artifact projectArtifact;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp()
         throws Exception
@@ -49,7 +49,7 @@ public class DefaultArtifactResolverTest
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
-    @After
+    @AfterEach
     @Override
     public void tearDown()
         throws Exception
@@ -102,12 +102,12 @@ public class DefaultArtifactResolverTest
             {
                 String name = active.getName();
                 boolean daemon = active.isDaemon();
-                assertTrue( name + " is no daemon Thread.", daemon );
+                assertTrue( daemon, name + " is no daemon Thread." );
             }
 
         }
 
-        assertTrue( "Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME, seen );
+        assertTrue( seen, "Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME );
     }
 
     @Test

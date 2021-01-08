@@ -41,9 +41,9 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
@@ -125,7 +125,7 @@ public class ThreadOutputMuxerTest
         threadOutputMuxer.close();
         final byte[] bytes = byteArrayOutputStream.toByteArray();
         String result = new String( bytes );
-        assertEquals( result, expectedLength, bytes.length );
+        assertEquals( expectedLength, bytes.length, result );
 
 
     }

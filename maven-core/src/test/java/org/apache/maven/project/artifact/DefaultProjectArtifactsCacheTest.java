@@ -24,16 +24,16 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 public class DefaultProjectArtifactsCacheTest
 {
 
     private ProjectArtifactsCache cache;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {

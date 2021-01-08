@@ -26,9 +26,9 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.
@@ -45,7 +45,7 @@ public class GlobalSettingsTest
         String basedir = System.getProperty( "basedir", System.getProperty( "user.dir" ) );
 
         File globalSettingsFile = new File( basedir, "src/assembly/maven/conf/settings.xml" );
-        assertTrue( globalSettingsFile.getAbsolutePath(), globalSettingsFile.isFile() );
+        assertTrue( globalSettingsFile.isFile(), globalSettingsFile.getAbsolutePath() );
 
         try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8) )
         {

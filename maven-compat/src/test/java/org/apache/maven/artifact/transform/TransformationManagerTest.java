@@ -15,7 +15,6 @@ package org.apache.maven.artifact.transform;
  * the License.
  */
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformation;
@@ -23,14 +22,11 @@ import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformat
 import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.test.PlexusTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
@@ -48,11 +44,11 @@ public class TransformationManagerTest
 
         assertEquals( 3, tms.size() );
 
-        assertTrue( "We expected the release transformation and got " + tms.get(0), tms.get(0) instanceof ReleaseArtifactTransformation );
+        assertTrue( tms.get(0) instanceof ReleaseArtifactTransformation, "We expected the release transformation and got " + tms.get(0) );
 
-        assertTrue( "We expected the latest transformation and got " + tms.get(1), tms.get(1) instanceof LatestArtifactTransformation );
+        assertTrue( tms.get(1) instanceof LatestArtifactTransformation, "We expected the latest transformation and got " + tms.get(1) );
 
-        assertTrue( "We expected the snapshot transformation and got " + tms.get(2), tms.get(2) instanceof SnapshotTransformation );
+        assertTrue( tms.get(2) instanceof SnapshotTransformation, "We expected the snapshot transformation and got " + tms.get(2) );
     }
 
 }

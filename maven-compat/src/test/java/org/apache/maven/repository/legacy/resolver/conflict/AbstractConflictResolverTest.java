@@ -27,17 +27,14 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.test.PlexusTestCase;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import javax.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Provides a basis for testing conflict resolvers.
@@ -79,7 +76,7 @@ public abstract class AbstractConflictResolverTest
     /*
      * @see junit.framework.TestCase#setUp()
      */
-    @Before
+    @BeforeEach
     @Override
     public void setUp()
             throws Exception
@@ -96,7 +93,7 @@ public abstract class AbstractConflictResolverTest
     /*
      * @see org.codehaus.plexus.PlexusTestCase#tearDown()
      */
-    @After
+    @AfterEach
     @Override
     public void tearDown() throws Exception
     {
@@ -120,8 +117,8 @@ public abstract class AbstractConflictResolverTest
     {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
 
-        assertNotNull( "Expected resolvable", resolvedNode );
-        assertEquals( "Resolution node", expectedNode, resolvedNode );
+        assertNotNull( resolvedNode, "Expected resolvable" );
+        assertEquals( expectedNode, resolvedNode, "Resolution node" );
     }
 
     protected Artifact createArtifact( String id, String version ) throws InvalidVersionSpecificationException

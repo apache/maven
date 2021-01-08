@@ -27,11 +27,11 @@ import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
@@ -41,14 +41,14 @@ public class DefaultBeanConfiguratorTest
 
     private BeanConfigurator configurator;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
         configurator = new DefaultBeanConfigurator();
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {

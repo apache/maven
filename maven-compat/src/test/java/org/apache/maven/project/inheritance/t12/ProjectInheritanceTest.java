@@ -25,10 +25,10 @@ import java.util.Map;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Verifies that plugin execution sections in the parent POM that have
@@ -65,6 +65,6 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase
         assertNotNull( compilerPlugin );
 
         Map executionMap = compilerPlugin.getExecutionsAsMap();
-        assertNull( "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!", executionMap.get( "test" ) );
+        assertNull( executionMap.get( "test" ), "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!" );
     }
 }

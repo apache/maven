@@ -27,7 +27,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,9 +42,6 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -68,11 +64,11 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -92,7 +88,7 @@ public abstract class AbstractArtifactComponentTestCase
     @Inject @Named( "default" )
     ArtifactRepositoryLayout repoLayout;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -169,7 +165,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        assertTrue( "Remote artifact " + file + " should be present.", file.exists() );
+        assertTrue( file.exists(), "Remote artifact " + file + " should be present." );
     }
 
     protected void assertLocalArtifactPresent( Artifact artifact )
@@ -181,7 +177,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        assertTrue( "Local artifact " + file + " should be present.", file.exists() );
+        assertTrue( file.exists(), "Local artifact " + file + " should be present." );
     }
 
     protected void assertRemoteArtifactNotPresent( Artifact artifact )
@@ -193,7 +189,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        assertFalse( "Remote artifact " + file + " should not be present.", file.exists() );
+        assertFalse( file.exists(), "Remote artifact " + file + " should not be present." );
     }
 
     protected void assertLocalArtifactNotPresent( Artifact artifact )
@@ -205,7 +201,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        assertFalse( "Local artifact " + file + " should not be present.", file.exists() );
+        assertFalse( file.exists(), "Local artifact " + file + " should not be present." );
     }
 
     // ----------------------------------------------------------------------

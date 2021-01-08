@@ -38,13 +38,13 @@ import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Hervé Boutemy
@@ -57,7 +57,7 @@ public class DefaultInheritanceAssemblerTest
 
     private InheritanceAssembler assembler;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -171,10 +171,10 @@ public class DefaultInheritanceAssemblerTest
         catch ( AssertionError afe )
         {
             // expected failure: wrong relative path calculation
-            assertTrue( afe.getMessage(),
-                        afe.getMessage().contains(
+            assertTrue( afe.getMessage().contains(
                                 "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ) );
+                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ),
+                        afe.getMessage() );
         }
         // but ok from repo: local disk is ignored
         testInheritance( "tricky-flat-artifactId-urls", true );
@@ -183,13 +183,15 @@ public class DefaultInheritanceAssemblerTest
         // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance( "tricky-flat-directory-urls", false );
 
-        AssertionError afe = assertThrows( "should have failed since module reference == directory name != artifactId",
+        AssertionError afe = assertThrows(
                 AssertionError.class,
-                () -> testInheritance( "tricky-flat-directory-urls", true ) );
+                () -> testInheritance( "tricky-flat-directory-urls", true ),
+                "should have failed since module reference == directory name != artifactId" );
         // expected failure
-        assertTrue( afe.getMessage(), afe.getMessage().contains(
-                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
-                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ) );
+        assertTrue( afe.getMessage().contains(
+                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
+                                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ),
+                    afe.getMessage() );
     }
 
     @Test

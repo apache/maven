@@ -20,16 +20,17 @@ package org.slf4j.impl;
  */
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenLoggerFactoryTest
 {
@@ -80,11 +81,12 @@ public class MavenLoggerFactoryTest
         assertTrue( logLevelRecorder.metThreshold() );
     }
 
-    @Test( expected = IllegalStateException.class )
+    @Test
     public void failOnSeverityThresholdCanOnlyBeSetOnce()
     {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
         mavenLoggerFactory.setLogLevelRecorder( new LogLevelRecorder( "WARN" ) );
-        mavenLoggerFactory.setLogLevelRecorder( new LogLevelRecorder( "ERROR" ) );
+        assertThrows( IllegalStateException.class,
+                      () -> mavenLoggerFactory.setLogLevelRecorder( new LogLevelRecorder( "ERROR" ) ) );
     }
 }

@@ -20,10 +20,10 @@ import java.util.List;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BuildListCalculatorTest
 {
@@ -38,8 +38,8 @@ public class BuildListCalculatorTest
         List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
         final ProjectBuildList buildList = buildListCalculator.calculateProjectBuilds( session, taskSegments );
         final ProjectBuildList segments = buildList.getByTaskSegment( taskSegments.get( 0 ) );
-        assertEquals( "Stub data contains 3 segments", 3, taskSegments.size() );
-        assertEquals( "Stub data contains 6 items", 6, segments.size() );
+        assertEquals( 3, taskSegments.size(), "Stub data contains 3 segments" );
+        assertEquals( 6, segments.size(), "Stub data contains 6 items" );
         final ProjectSegment build = segments.get( 0 );
         assertNotNull( build );
     }

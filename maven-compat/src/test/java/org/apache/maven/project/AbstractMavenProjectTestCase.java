@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -32,14 +31,11 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Jason van Zyl
@@ -53,7 +49,7 @@ public abstract class AbstractMavenProjectTestCase
     protected RepositorySystem repositorySystem;
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -70,7 +66,7 @@ public abstract class AbstractMavenProjectTestCase
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {

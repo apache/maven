@@ -29,11 +29,11 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -141,7 +141,7 @@ public class ProjectInheritanceTest
         {
             String pluginArtifactId = plugin.getArtifactId();
 
-            assertTrue( "Illegal plugin found: " + pluginArtifactId, validPluginCounts.containsKey( pluginArtifactId ) );
+            assertTrue( validPluginCounts.containsKey( pluginArtifactId ), "Illegal plugin found: " + pluginArtifactId );
 
             if ( pluginArtifactId.equals( testPluginArtifactId ) )
             {
@@ -150,7 +150,7 @@ public class ProjectInheritanceTest
 
             Integer count = validPluginCounts.get( pluginArtifactId );
 
-            assertEquals( "Multiple copies of plugin: " + pluginArtifactId + " found in POM.", 0, (int) count );
+            assertEquals( 0, (int) count, "Multiple copies of plugin: " + pluginArtifactId + " found in POM." );
 
             count = count + 1;
 

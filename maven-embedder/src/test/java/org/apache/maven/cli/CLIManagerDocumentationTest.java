@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code

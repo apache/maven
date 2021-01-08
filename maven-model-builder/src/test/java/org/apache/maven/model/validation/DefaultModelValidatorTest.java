@@ -27,13 +27,13 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -48,7 +48,7 @@ public class DefaultModelValidatorTest
     {
         String resource = "/poms/validation/" + pom;
         InputStream is = getClass().getResourceAsStream( resource );
-        assertNotNull( "missing resource: " + resource, is );
+        assertNotNull( is, "missing resource: " + resource );
         return new MavenXpp3Reader().read( is );
     }
 
@@ -96,17 +96,17 @@ public class DefaultModelValidatorTest
 
     private void assertContains( String msg, String substring )
     {
-        assertTrue( "\"" + substring + "\" was not found in: " + msg, msg.contains( substring ) );
+        assertTrue( msg.contains( substring ), "\"" + substring + "\" was not found in: " + msg );
     }
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
         validator = new DefaultModelValidator();
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -115,9 +115,9 @@ public class DefaultModelValidatorTest
 
     private void assertViolations( SimpleProblemCollector result, int fatals, int errors, int warnings )
     {
-        assertEquals( String.valueOf( result.getFatals() ), fatals, result.getFatals().size() );
-        assertEquals( String.valueOf( result.getErrors() ), errors, result.getErrors().size() );
-        assertEquals( String.valueOf( result.getWarnings() ), warnings, result.getWarnings().size() );
+        assertEquals( fatals, result.getFatals().size(), String.valueOf( result.getFatals() ) );
+        assertEquals( errors, result.getErrors().size(), String.valueOf( result.getErrors() ) );
+        assertEquals( warnings, result.getWarnings().size(), String.valueOf( result.getWarnings() ) );
     }
 
     @Test

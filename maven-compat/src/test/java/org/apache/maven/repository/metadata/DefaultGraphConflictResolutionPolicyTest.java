@@ -15,10 +15,10 @@ package org.apache.maven.repository.metadata;
  * the License.
  */
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -33,7 +33,7 @@ public class DefaultGraphConflictResolutionPolicyTest
     MetadataGraphEdge e2;
     MetadataGraphEdge e3;
     //------------------------------------------------------------------------------------------
-	@Before
+	@BeforeEach
     public void setUp() throws Exception
 	{
 		policy = new DefaultGraphConflictResolutionPolicy();
@@ -49,10 +49,10 @@ public class DefaultGraphConflictResolutionPolicyTest
         MetadataGraphEdge res;
 
         res = policy.apply( e1, e2 );
-        assertEquals( "Wrong depth edge selected", "1.1", res.getVersion() );
+        assertEquals( "1.1", res.getVersion(), "Wrong depth edge selected" );
 
         res = policy.apply( e1, e3 );
-        assertEquals( "Wrong version edge selected", "1.2", res.getVersion() );
+        assertEquals( "1.2", res.getVersion(), "Wrong version edge selected" );
     }
     //------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------

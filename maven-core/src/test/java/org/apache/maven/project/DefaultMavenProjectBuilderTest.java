@@ -26,16 +26,18 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
@@ -46,6 +48,7 @@ public class DefaultMavenProjectBuilderTest
     private File localRepoDir;
 
     @Override
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -60,6 +63,7 @@ public class DefaultMavenProjectBuilderTest
     }
 
     @Override
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -129,9 +133,10 @@ public class DefaultMavenProjectBuilderTest
     {
         File f1 = getTestFile( "src/test/resources/projects/future-model-version-pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected to fail for future versions",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProject( f1 ) );
+                () -> getProject( f1 ),
+                "Expected to fail for future versions" );
         assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
     }
 
@@ -143,9 +148,10 @@ public class DefaultMavenProjectBuilderTest
         // update the resource if we stop supporting modelVersion 4.0.0
         File f1 = getTestFile( "src/test/resources/projects/past-model-version-pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected to fail for past versions",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProject( f1 ) );
+                () -> getProject( f1 ),
+                "Expected to fail for past versions" );
         assertContains( "Building this project requires an older version of Maven", e.getMessage() );
     }
 
@@ -155,9 +161,10 @@ public class DefaultMavenProjectBuilderTest
     {
         File f1 = getTestFile( "src/test/resources/projects/future-schema-model-version-pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected to fail for future versions",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProject( f1 ) );
+                () -> getProject( f1 ),
+                "Expected to fail for future versions" );
         assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
     }
 
@@ -218,9 +225,10 @@ public class DefaultMavenProjectBuilderTest
         ProjectBuildingRequest request = newBuildingRequest();
         request.setProcessPlugins( false );
         request.setResolveDependencies( true );
-        ProjectBuildingException e = assertThrows( "Project building did not fail despite invalid POM",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> projectBuilder.build( pomFile, request ) );
+                () -> projectBuilder.build( pomFile, request ),
+                "Project building did not fail despite invalid POM" );
         List<ProjectBuildingResult> results = e.getResults();
         assertNotNull( results );
         assertEquals( 1, results.size() );
@@ -263,9 +271,10 @@ public class DefaultMavenProjectBuilderTest
         File f1 =
             getTestFile( "src/test/resources/projects/parent-version-range-local-child-without-version/child/pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected 'ProjectBuildingException' not thrown.",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProject( f1 ) );
+                () -> getProject( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
@@ -282,9 +291,10 @@ public class DefaultMavenProjectBuilderTest
             getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-version-expression/child/pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected 'ProjectBuildingException' not thrown.",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProject( f1 ) );
+                () -> getProject( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
@@ -321,9 +331,10 @@ public class DefaultMavenProjectBuilderTest
             getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-without-version/pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected 'ProjectBuildingException' not thrown.",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProjectFromRemoteRepository( f1 ) );
+                () -> getProjectFromRemoteRepository( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
@@ -340,9 +351,10 @@ public class DefaultMavenProjectBuilderTest
             getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-version-expression/pom.xml" );
 
-        ProjectBuildingException e = assertThrows( "Expected 'ProjectBuildingException' not thrown.",
+        ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class,
-                () -> getProjectFromRemoteRepository( f1 ) );
+                () -> getProjectFromRemoteRepository( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }

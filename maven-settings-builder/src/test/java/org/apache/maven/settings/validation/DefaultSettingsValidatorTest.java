@@ -30,12 +30,12 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mkleint
@@ -45,14 +45,14 @@ public class DefaultSettingsValidatorTest
 
     private DefaultSettingsValidator validator;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
         validator = new DefaultSettingsValidator();
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -61,7 +61,7 @@ public class DefaultSettingsValidatorTest
 
     private void assertContains( String msg, String substring )
     {
-        assertTrue( "\"" + substring + "\" was not found in: " + msg, msg.contains( substring ) );
+        assertTrue( msg.contains( substring ), "\"" + substring + "\" was not found in: " + msg );
     }
 
     @Test

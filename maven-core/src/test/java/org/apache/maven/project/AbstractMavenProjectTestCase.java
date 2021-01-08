@@ -21,20 +21,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.test.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import javax.inject.Inject;
 
@@ -49,7 +45,7 @@ public abstract class AbstractMavenProjectTestCase
     @Inject
     protected RepositorySystem repositorySystem;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -64,15 +60,6 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( ProjectBuilder.class );
         }
-    }
-
-    @After
-    public void tearDown()
-        throws Exception
-    {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     protected ProjectBuilder getProjectBuilder()

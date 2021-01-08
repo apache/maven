@@ -28,13 +28,13 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -83,9 +83,9 @@ public class MavenProjectTest
 
         MavenProject project = new MavenProject( model );
 
-        assertEquals( "groupId proto-inheritance failed.", "test-group", project.getGroupId() );
-        assertEquals( "artifactId is masked.", "real-artifact", project.getArtifactId() );
-        assertEquals( "version proto-inheritance failed.", "1000", project.getVersion() );
+        assertEquals( "test-group", project.getGroupId(), "groupId proto-inheritance failed." );
+        assertEquals( "real-artifact", project.getArtifactId(), "artifactId is masked." );
+        assertEquals( "1000", project.getVersion(), "version proto-inheritance failed." );
 
         // draw the NPE.
         project.getId();
@@ -110,8 +110,8 @@ public class MavenProjectTest
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
-        assertNotNull( "ManagedVersionMap not copied", clonedMap );
-        assertTrue( "ManagedVersionMap is not empty", clonedMap.isEmpty() );
+        assertNotNull( clonedMap, "ManagedVersionMap not copied" );
+        assertTrue( clonedMap.isEmpty(), "ManagedVersionMap is not empty" );
     }
 
     @Test
@@ -121,22 +121,21 @@ public class MavenProjectTest
         File f = getFileForClasspathResource( "dependencyManagement-pom.xml" );
         MavenProject projectToClone = getProjectWithDependencies( f );
         DependencyManagement dep = projectToClone.getDependencyManagement();
-        assertNotNull( "No dependencyManagement", dep );
+        assertNotNull( dep, "No dependencyManagement" );
         List<?> list = dep.getDependencies();
-        assertNotNull( "No dependencies", list );
-        assertTrue( "Empty dependency list", !list.isEmpty() );
+        assertNotNull( list, "No dependencies" );
+        assertTrue( !list.isEmpty(), "Empty dependency list" );
 
         Map<?, ?> map = projectToClone.getManagedVersionMap();
-        assertNotNull( "No ManagedVersionMap", map );
-        assertTrue( "ManagedVersionMap is empty", !map.isEmpty() );
+        assertNotNull( map, "No ManagedVersionMap" );
+        assertTrue( !map.isEmpty(), "ManagedVersionMap is empty" );
 
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
-        assertNotNull( "ManagedVersionMap not copied", clonedMap );
-        assertTrue( "ManagedVersionMap is empty", !clonedMap.isEmpty() );
-        assertTrue( "ManagedVersionMap does not contain test key",
-                    clonedMap.containsKey( "maven-test:maven-test-b:jar" ) );
+        assertNotNull( clonedMap, "ManagedVersionMap not copied" );
+        assertTrue( !clonedMap.isEmpty(), "ManagedVersionMap is empty" );
+        assertTrue( clonedMap.containsKey( "maven-test:maven-test-b:jar" ), "ManagedVersionMap does not contain test key" );
     }
 
     @Test
@@ -168,7 +167,7 @@ public class MavenProjectTest
         MavenProject projectToClone = getProject( f );
 
         MavenProject clonedProject = projectToClone.clone();
-        assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
+        assertNotNull( clonedProject.getDistributionManagementArtifactRepository(), "clonedProject - distributionManagement" );
     }
 
     @Test
@@ -180,16 +179,16 @@ public class MavenProjectTest
         MavenProject projectToClone = getProject( f );
         List<Profile> activeProfilesOrig = projectToClone.getActiveProfiles();
 
-        assertEquals( "Expecting 1 active profile", 1, activeProfilesOrig.size() );
+        assertEquals( 1, activeProfilesOrig.size(), "Expecting 1 active profile" );
 
         MavenProject clonedProject = projectToClone.clone();
 
         List<Profile> activeProfilesClone = clonedProject.getActiveProfiles();
 
-        assertEquals( "Expecting 1 active profile", 1, activeProfilesClone.size() );
+        assertEquals( 1, activeProfilesClone.size(), "Expecting 1 active profile" );
 
-        assertNotSame( "The list of active profiles should have been cloned too but is same", activeProfilesOrig,
-                       activeProfilesClone );
+        assertNotSame( activeProfilesOrig, activeProfilesClone,
+                      "The list of active profiles should have been cloned too but is same" );
     }
 
     @Test
@@ -200,8 +199,8 @@ public class MavenProjectTest
         MavenProject projectToClone = getProject( f );
         projectToClone.setPomFile( new File( new File( f.getParentFile(), "target" ), "flattened.xml" ) );
         MavenProject clonedProject = projectToClone.clone();
-        assertEquals( "POM file is preserved across clone", projectToClone.getFile(), clonedProject.getFile() );
-        assertEquals( "Base directory is preserved across clone", projectToClone.getBasedir(), clonedProject.getBasedir() );
+        assertEquals( projectToClone.getFile(), clonedProject.getFile(), "POM file is preserved across clone" );
+        assertEquals( projectToClone.getBasedir(), clonedProject.getBasedir(), "Base directory is preserved across clone" );
     }
 
     @Test

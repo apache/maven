@@ -20,25 +20,17 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
@@ -46,6 +38,7 @@ public class ProjectClasspathTest
     static final String dir = "projects/scope/";
 
     @Override
+    @BeforeEach
     public void setUp()
             throws Exception
     {
@@ -74,7 +67,7 @@ public class ProjectClasspathTest
 
         Artifact artifact;
 
-        assertNotNull( "Test project can't be null!", project );
+        assertNotNull( project, "Test project can't be null!" );
 
         checkArtifactIdScope( project, "provided", "provided" );
         checkArtifactIdScope( project, "test", "test" );
@@ -84,53 +77,53 @@ public class ProjectClasspathTest
 
         // check all transitive deps of a test dependency are test, except test and provided which is skipped
         artifact = getArtifact( project, "maven-test-test", "scope-provided" );
-        assertNull( "Check no provided dependencies are transitive", artifact );
+        assertNull( artifact, "Check no provided dependencies are transitive" );
         artifact = getArtifact( project, "maven-test-test", "scope-test" );
-        assertNull( "Check no test dependencies are transitive", artifact );
+        assertNull( artifact, "Check no test dependencies are transitive" );
 
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
         assertNotNull( artifact );
 
         System.out.println( "a = " + artifact );
         System.out.println( "b = " + artifact.getScope() );
-        assertEquals( "Check scope", "test", artifact.getScope() );
+        assertEquals( "test", artifact.getScope(), "Check scope" );
         artifact = getArtifact( project, "maven-test-test", "scope-default" );
-        assertEquals( "Check scope", "test", artifact.getScope() );
+        assertEquals( "test", artifact.getScope(), "Check scope" );
         artifact = getArtifact( project, "maven-test-test", "scope-runtime" );
-        assertEquals( "Check scope", "test", artifact.getScope() );
+        assertEquals( "test", artifact.getScope(), "Check scope" );
 
         // check all transitive deps of a provided dependency are provided scope, except for test
         checkGroupIdScope( project, "provided", "maven-test-provided" );
         artifact = getArtifact( project, "maven-test-provided", "scope-runtime" );
-        assertEquals( "Check scope", "provided", artifact.getScope() );
+        assertEquals( "provided", artifact.getScope(), "Check scope" );
 
         // check all transitive deps of a runtime dependency are runtime scope, except for test
         checkGroupIdScope( project, "runtime", "maven-test-runtime" );
         artifact = getArtifact( project, "maven-test-runtime", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        assertEquals( "runtime", artifact.getScope(), "Check scope" );
 
         // check all transitive deps of a compile dependency are compile scope, except for runtime and test
         checkGroupIdScope( project, "compile", "maven-test-compile" );
         artifact = getArtifact( project, "maven-test-compile", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        assertEquals( "runtime", artifact.getScope(), "Check scope" );
 
         // check all transitive deps of a default dependency are compile scope, except for runtime and test
         checkGroupIdScope( project, "compile", "maven-test-default" );
         artifact = getArtifact( project, "maven-test-default", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        assertEquals( "runtime", artifact.getScope(), "Check scope" );
     }
 
     private void checkGroupIdScope( MavenProject project, String scopeValue, String groupId )
     {
         Artifact artifact;
         artifact = getArtifact( project, groupId, "scope-compile" );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
+        assertEquals( scopeValue, artifact.getScope(), "Check scope" );
         artifact = getArtifact( project, groupId, "scope-test" );
-        assertNull( "Check test dependency is not transitive", artifact );
+        assertNull( artifact, "Check test dependency is not transitive" );
         artifact = getArtifact( project, groupId, "scope-provided" );
-        assertNull( "Check provided dependency is not transitive", artifact );
+        assertNull( artifact, "Check provided dependency is not transitive" );
         artifact = getArtifact( project, groupId, "scope-default" );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
+        assertEquals( scopeValue, artifact.getScope(), "Check scope" );
     }
 
     private void checkArtifactIdScope( MavenProject project, String scope, String scopeValue )
@@ -138,7 +131,7 @@ public class ProjectClasspathTest
         String artifactId = "scope-" + scope;
         Artifact artifact = getArtifact( project, "maven-test", artifactId );
         assertNotNull( artifact );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
+        assertEquals( scopeValue, artifact.getScope(), "Check scope" );
     }
 
     private Artifact getArtifact( MavenProject project, String groupId, String artifactId )

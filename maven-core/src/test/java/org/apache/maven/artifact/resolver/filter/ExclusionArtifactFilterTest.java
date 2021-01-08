@@ -21,14 +21,14 @@ package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +36,7 @@ public class ExclusionArtifactFilterTest
 {
     private Artifact artifact;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         artifact = mock( Artifact.class );

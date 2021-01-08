@@ -22,7 +22,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -37,26 +36,23 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -75,7 +71,7 @@ public class PomConstructionTest
 
     private File testDirectory;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
@@ -84,7 +80,7 @@ public class PomConstructionTest
         new File( getBasedir(), BASE_MIXIN_DIR );
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -1672,9 +1668,10 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniqueArtifactRepositoryId()
         throws Exception
     {
-        assertThrows( "Non-unique repository ids did not cause validation error",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "unique-repo-id/artifact-repo" ) );
+                () -> buildPom( "unique-repo-id/artifact-repo" ),
+                "Non-unique repository ids did not cause validation error" );
     }
 
     /* MNG-4193 */
@@ -1682,9 +1679,10 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniquePluginRepositoryId()
         throws Exception
     {
-        assertThrows( "Non-unique repository ids did not cause validation error",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "unique-repo-id/plugin-repo" ) );
+                () -> buildPom( "unique-repo-id/plugin-repo" ),
+                "Non-unique repository ids did not cause validation error" );
     }
 
     /* MNG-4193 */
@@ -1692,9 +1690,10 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniqueArtifactRepositoryIdInProfile()
         throws Exception
     {
-        assertThrows( "Non-unique repository ids did not cause validation error",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "unique-repo-id/artifact-repo-in-profile" ) );
+                () -> buildPom( "unique-repo-id/artifact-repo-in-profile" ),
+                "Non-unique repository ids did not cause validation error" );
     }
 
     /* MNG-4193 */
@@ -1702,9 +1701,10 @@ public class PomConstructionTest
     public void testValidationErrorUponNonUniquePluginRepositoryIdInProfile()
         throws Exception
     {
-        assertThrows( "Non-unique repository ids did not cause validation error",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "unique-repo-id/plugin-repo-in-profile" ) );
+                () -> buildPom( "unique-repo-id/plugin-repo-in-profile" ),
+                "Non-unique repository ids did not cause validation error" );
     }
 
     /** MNG-3843 */
@@ -1783,9 +1783,10 @@ public class PomConstructionTest
     public void testParentPomPackagingMustBePom()
         throws Exception
     {
-        assertThrows( "Wrong packaging of parent POM was not rejected",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "parent-pom-packaging/sub" ) );
+                () -> buildPom( "parent-pom-packaging/sub" ),
+                "Wrong packaging of parent POM was not rejected" );
     }
 
     /** MNG-522, MNG-3018 */
@@ -1839,7 +1840,7 @@ public class PomConstructionTest
                 customPlugin = i;
             }
         }
-        assertEquals( plugins.toString(), customPlugin, resourcesPlugin - 1 );
+        assertEquals( customPlugin, resourcesPlugin - 1, plugins.toString() );
     }
 
     /** MNG-4415 */
@@ -1906,9 +1907,10 @@ public class PomConstructionTest
     public void testProjectArtifactIdIsNotInheritedButMandatory()
         throws Exception
     {
-        assertThrows( "Missing artifactId did not cause validation error",
+        assertThrows(
                 ProjectBuildingException.class,
-                () -> buildPom( "artifact-id-inheritance/child" ) );
+                () -> buildPom( "artifact-id-inheritance/child" ),
+                "Missing artifactId did not cause validation error" );
     }
 
     private void assertPathSuffixEquals( String expected, Object actual )

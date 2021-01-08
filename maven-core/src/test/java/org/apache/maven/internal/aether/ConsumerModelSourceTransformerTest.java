@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.TransformerContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.assertj.XmlAssert;
 
 public class ConsumerModelSourceTransformerTest

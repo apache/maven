@@ -19,13 +19,13 @@ package org.apache.maven.logwrapper;
  * under the License.
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.event.Level;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LogLevelRecorderTest
 {
@@ -38,10 +38,10 @@ public class LogLevelRecorderTest
         assertTrue( logLevelRecorder.metThreshold() );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test
     public void failsOnLowerThanWarn ()
     {
-        new LogLevelRecorder( "INFO" );
+        assertThrows( IllegalArgumentException.class, () -> new LogLevelRecorder( "INFO" ) );
     }
 
     @Test

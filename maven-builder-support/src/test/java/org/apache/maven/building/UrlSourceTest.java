@@ -24,10 +24,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UrlSourceTest
 {
@@ -35,9 +35,10 @@ public class UrlSourceTest
     @Test
     public void testUrlSource()
     {
-        NullPointerException e = assertThrows( "Should fail, since you must specify a url",
+        NullPointerException e = assertThrows(
                 NullPointerException.class,
-                () -> new UrlSource( null ) );
+                () -> new UrlSource( null ),
+                "Should fail, since you must specify a url" );
         assertEquals( "url cannot be null", e.getMessage() );
     }
 

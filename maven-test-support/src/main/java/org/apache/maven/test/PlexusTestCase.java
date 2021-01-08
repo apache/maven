@@ -50,8 +50,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * This is a slightly modified version of the original plexus class
@@ -70,7 +70,7 @@ public abstract class PlexusTestCase
 
     private static String basedir;
 
-    @Before
+    @BeforeEach
     public void setUp()
             throws Exception
     {
@@ -161,7 +161,7 @@ public abstract class PlexusTestCase
         return null;
     }
 
-    @After
+    @AfterEach
     public void tearDown()
             throws Exception
     {

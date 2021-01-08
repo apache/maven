@@ -26,15 +26,13 @@ import javax.inject.Inject;
 import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractRepositoryTestCase
     extends PlexusTestCase
@@ -44,7 +42,7 @@ public abstract class AbstractRepositoryTestCase
 
     protected RepositorySystemSession session;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp()
         throws Exception

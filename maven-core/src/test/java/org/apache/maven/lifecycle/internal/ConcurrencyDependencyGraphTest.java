@@ -31,7 +31,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.A;
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.B;
@@ -40,12 +40,12 @@ import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStu
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Y;
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.Z;
 import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.getProjectBuildList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
  */
 public class ConcurrencyDependencyGraphTest
-    extends junit.framework.TestCase
 {
     @Test
     public void testConcurrencyGraphPrimaryVersion()

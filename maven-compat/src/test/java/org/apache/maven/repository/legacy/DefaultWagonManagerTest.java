@@ -22,7 +22,6 @@ package org.apache.maven.repository.legacy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -43,22 +42,19 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
@@ -248,25 +244,27 @@ public class DefaultWagonManagerTest
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac" );
 
         /* getArtifact */
-        assertFalse( "Transfer listener is registered before test",
-                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        assertFalse( wagon.getTransferEventSupport().hasTransferListener( transferListener ),
+                    "Transfer listener is registered before test" );
         wagonManager.getArtifact( artifact, repo, transferListener, false );
-        assertFalse( "Transfer listener still registered after getArtifact",
-                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        assertFalse( wagon.getTransferEventSupport().hasTransferListener( transferListener ),
+                    "Transfer listener still registered after getArtifact" );
 
         /* putArtifact */
         File sampleFile = getTestFile( "target/test-file" );
         FileUtils.fileWrite( sampleFile.getAbsolutePath(), "sample file" );
 
-        assertFalse( "Transfer listener is registered before test", wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        assertFalse( wagon.getTransferEventSupport().hasTransferListener( transferListener ),
+                    "Transfer listener is registered before test" );
         wagonManager.putArtifact( sampleFile, artifact, repo, transferListener );
-        assertFalse( "Transfer listener still registered after putArtifact", wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        assertFalse( wagon.getTransferEventSupport().hasTransferListener( transferListener ),
+                    "Transfer listener still registered after putArtifact" );
     }
 
     /**
      * Checks the verification of checksums.
      */
-    @Ignore
+    @Disabled
     @Test
     public void testChecksumVerification()
         throws Exception
@@ -295,8 +293,10 @@ public class DefaultWagonManagerTest
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.sha1", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-        assertThrows( "Checksum verification did not fail", ChecksumFailedException.class, () ->
-                wagonManager.getArtifact( artifact, repo, null, false ) );
+        assertThrows(
+                ChecksumFailedException.class, () ->
+                wagonManager.getArtifact( artifact, repo, null, false ),
+                "Checksum verification did not fail" );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
@@ -311,9 +311,10 @@ public class DefaultWagonManagerTest
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.md5", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-        assertThrows( "Checksum verification did not fail",
+        assertThrows(
                 ChecksumFailedException.class,
-                () -> wagonManager.getArtifact( artifact, repo, null, false ) );
+                () -> wagonManager.getArtifact( artifact, repo, null, false ),
+                "Checksum verification did not fail" );
     }
 
     @Test
@@ -333,7 +334,7 @@ public class DefaultWagonManagerTest
     {
         Wagon wagon = wagonManager.getWagon( protocol );
 
-        assertNotNull( "Check wagon, protocol=" + protocol, wagon );
+        assertNotNull( wagon, "Check wagon, protocol=" + protocol );
     }
 
     private final class ArtifactRepositoryLayoutStub

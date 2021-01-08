@@ -25,11 +25,11 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A test which demonstrates maven's dependency management
@@ -67,8 +67,8 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         Set set = project1.getArtifacts();
-        assertNotNull( "No artifacts", set );
-        assertTrue( "No Artifacts", set.size() > 0 );
+        assertNotNull( set, "No artifacts" );
+        assertTrue( set.size() > 0, "No Artifacts" );
 
         for ( Object aSet : set )
         {
@@ -76,8 +76,8 @@ public class ProjectInheritanceTest
             System.out.println(
                 "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() + " Scope: "
                     + artifact.getScope() );
-            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
-                        artifact.getVersion().equals( "1.0" ) );
+            assertTrue( artifact.getVersion().equals( "1.0" ),
+                        "Incorrect version for " + artifact.getDependencyConflictId() );
         }
 
     }

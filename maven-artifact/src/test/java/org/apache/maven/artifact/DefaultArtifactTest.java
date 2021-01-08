@@ -21,11 +21,11 @@ package org.apache.maven.artifact;
 
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultArtifactTest
 {
@@ -45,7 +45,7 @@ public class DefaultArtifactTest
 
     private ArtifactHandlerMock artifactHandler;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {

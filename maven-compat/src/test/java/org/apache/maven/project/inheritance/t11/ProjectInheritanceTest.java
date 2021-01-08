@@ -23,10 +23,10 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
@@ -63,7 +63,7 @@ public class ProjectInheritanceTest
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
-        assertNull( "dependencyManagement has overwritten the scope of the currently building child project",
-                    project1.getArtifact().getScope() );
+        assertNull( project1.getArtifact().getScope(),
+                    "dependencyManagement has overwritten the scope of the currently building child project" );
     }
 }

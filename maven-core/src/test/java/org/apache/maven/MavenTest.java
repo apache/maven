@@ -17,11 +17,9 @@ package org.apache.maven;
 
 
 import org.apache.maven.exception.ExceptionHandler;
-import org.codehaus.plexus.DefaultPlexusContainer;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.util.Collections;
-import org.junit.Test;
 
 public class MavenTest
     extends AbstractCoreMavenComponentTestCase

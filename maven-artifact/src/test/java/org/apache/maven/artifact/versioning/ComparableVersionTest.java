@@ -21,10 +21,10 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.Locale;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test ComparableVersion.
@@ -41,8 +41,8 @@ public class ComparableVersionTest
         String parsedCanonical = new ComparableVersion( canonical ).getCanonical();
 
         System.out.println( "canonical( " + version + " ) = " + canonical );
-        assertEquals( "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical, canonical,
-                      parsedCanonical );
+        assertEquals( canonical, parsedCanonical,
+                "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical );
 
         return ret;
     }
@@ -70,8 +70,8 @@ public class ComparableVersionTest
             for ( int j = i; j < versions.length; j++ )
             {
                 Comparable high = c[j];
-                assertTrue( "expected " + low + " < " + high, low.compareTo( high ) < 0 );
-                assertTrue( "expected " + high + " > " + low, high.compareTo( low ) > 0 );
+                assertTrue( low.compareTo( high ) < 0, "expected " + low + " < " + high );
+                assertTrue( high.compareTo( low ) > 0, "expected " + high + " > " + low );
             }
         }
     }
@@ -80,11 +80,11 @@ public class ComparableVersionTest
     {
         Comparable c1 = newComparable( v1 );
         Comparable c2 = newComparable( v2 );
-        assertTrue( "expected " + v1 + " == " + v2, c1.compareTo( c2 ) == 0 );
-        assertTrue( "expected " + v2 + " == " + v1, c2.compareTo( c1 ) == 0 );
-        assertTrue( "expected same hashcode for " + v1 + " and " + v2, c1.hashCode() == c2.hashCode() );
-        assertTrue( "expected " + v1 + ".equals( " + v2 + " )", c1.equals( c2 ) );
-        assertTrue( "expected " + v2 + ".equals( " + v1 + " )", c2.equals( c1 ) );
+        assertTrue( c1.compareTo( c2 ) == 0, "expected " + v1 + " == " + v2 );
+        assertTrue( c2.compareTo( c1 ) == 0, "expected " + v2 + " == " + v1 );
+        assertTrue( c1.hashCode() == c2.hashCode(), "expected same hashcode for " + v1 + " and " + v2 );
+        assertTrue( c1.equals( c2 ), "expected " + v1 + ".equals( " + v2 + " )" );
+        assertTrue( c2.equals( c1 ), "expected " + v2 + ".equals( " + v1 + " )" );
     }
 
     private void checkVersionsArrayEqual( String[] array )
@@ -99,8 +99,8 @@ public class ComparableVersionTest
     {
         Comparable c1 = newComparable( v1 );
         Comparable c2 = newComparable( v2 );
-        assertTrue( "expected " + v1 + " < " + v2, c1.compareTo( c2 ) < 0 );
-        assertTrue( "expected " + v2 + " > " + v1, c2.compareTo( c1 ) > 0 );
+        assertTrue( c1.compareTo( c2 ) < 0, "expected " + v1 + " < " + v2 );
+        assertTrue( c2.compareTo( c1 ) > 0, "expected " + v2 + " > " + v1 );
     }
 
     @Test
@@ -348,6 +348,6 @@ public class ComparableVersionTest
 
         Comparable c2 = newComparable( "2" );
 
-        assertEquals( "reused instance should be equivalent to new instance", c1, c2 );
+        assertEquals( c1, c2, "reused instance should be equivalent to new instance" );
     }
 }

@@ -21,16 +21,14 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.util.Collections;
 
-@Ignore
+@Disabled
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {
@@ -112,12 +110,12 @@ public class MavenMetadataSourceTest
 
         Map artifactMap = project.getArtifactMap();
 
-        assertNotNull( "artifact-map should not be null.", artifactMap );
+        assertNotNull( artifactMap, "artifact-map should not be null." );
         assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
-        assertNotNull( "dependency artifact not found in map.", artifact );
+        assertNotNull( artifact, "dependency artifact not found in map." );
         assertEquals( "dependency artifact has wrong scope.", Artifact.SCOPE_COMPILE, artifact.getScope() );
 
         //check for back-propagation of default scope.
@@ -164,12 +162,12 @@ public class MavenMetadataSourceTest
 
         Map artifactMap = project.getArtifactMap();
 
-        assertNotNull( "artifact-map should not be null.", artifactMap );
+        assertNotNull( artifactMap, "artifact-map should not be null." );
         assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
-        assertNotNull( "dependency artifact not found in map.", artifact );
+        assertNotNull( artifact, "dependency artifact not found in map." );
         assertEquals( "dependency artifact has wrong scope.", Artifact.SCOPE_TEST, artifact.getScope() );
 
         //check for back-propagation of default scope.

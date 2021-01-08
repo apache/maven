@@ -19,19 +19,14 @@ package org.apache.maven.artifact.factory;
  * under the License.
  */
 
-import java.util.Collections;
-
 import javax.inject.Inject;
 
 import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultArtifactFactoryTest
     extends PlexusTestCase

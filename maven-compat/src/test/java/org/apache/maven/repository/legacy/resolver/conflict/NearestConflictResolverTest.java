@@ -20,7 +20,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  */
 
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests <code>NearestConflictResolver</code>.

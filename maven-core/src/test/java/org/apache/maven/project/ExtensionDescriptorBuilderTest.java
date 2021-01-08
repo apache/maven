@@ -24,15 +24,15 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
@@ -44,14 +44,14 @@ public class ExtensionDescriptorBuilderTest
 
     private ExtensionDescriptorBuilder builder;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
         builder = new ExtensionDescriptorBuilder();
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {

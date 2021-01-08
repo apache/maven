@@ -42,16 +42,16 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import javax.inject.Inject;
 
@@ -320,14 +320,16 @@ public class LifecycleExecutorTest
     {
         File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
-        MojoNotFoundException e = assertThrows( "expected a MojoNotFoundException",
+        MojoNotFoundException e = assertThrows(
                 MojoNotFoundException.class,
-                () -> getExecutions( calculateExecutionPlan( session, "resources:" ) ) );
+                () -> getExecutions( calculateExecutionPlan( session, "resources:" ) ),
+                "expected a MojoNotFoundException" );
         assertEquals( "", e.getGoal() );
 
-        e = assertThrows( "expected a MojoNotFoundException",
+        e = assertThrows(
                 MojoNotFoundException.class,
-                () -> getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) ) );
+                () -> getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) ),
+                "expected a MojoNotFoundException" );
         assertEquals( "resources:toomany", e.getGoal() );
     }
 
@@ -369,7 +371,7 @@ public class LifecycleExecutorTest
                                                                      Arrays.asList( (Object) task ), false );
 
         MojoExecution execution = executionPlan.getMojoExecutions().get(0);
-        assertEquals(execution.toString(), "maven-it-plugin", execution.getArtifactId());
+        assertEquals( "maven-it-plugin", execution.getArtifactId(), execution.toString() );
         assertNull(execution.getConfiguration());
 
         lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution,

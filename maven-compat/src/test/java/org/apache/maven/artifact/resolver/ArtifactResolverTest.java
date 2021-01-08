@@ -29,19 +29,18 @@ import java.util.Set;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
@@ -62,7 +61,7 @@ public class ArtifactResolverTest
 
     private Artifact projectArtifact;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp()
         throws Exception
@@ -72,7 +71,7 @@ public class ArtifactResolverTest
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
-    @After
+    @AfterEach
     @Override
     public void tearDown()
         throws Exception
@@ -170,9 +169,10 @@ public class ArtifactResolverTest
     {
         Artifact k = createArtifact( "k", "1.0" );
 
-        assertThrows( "Resolution succeeded when it should have failed",
+        assertThrows(
                 ArtifactNotFoundException.class,
-                () -> artifactResolver.resolve( k, remoteRepositories(), localRepository() ) );
+                () -> artifactResolver.resolve( k, remoteRepositories(), localRepository() ),
+                "Resolution succeeded when it should have failed" );
     }
 
     @Test
@@ -247,8 +247,8 @@ public class ArtifactResolverTest
         printErrors( result );
 
         Iterator<Artifact> i = result.getArtifacts().iterator();
-        assertEquals( "n should be first", n, i.next() );
-        assertEquals( "m should be second", m, i.next() );
+        assertEquals( n, i.next(), "n should be first" );
+        assertEquals( m, i.next(), "m should be second" );
 
         // inverse order
         set = new LinkedHashSet<>();
@@ -261,8 +261,8 @@ public class ArtifactResolverTest
         printErrors( result );
 
         i = result.getArtifacts().iterator();
-        assertEquals( "m should be first", m, i.next() );
-        assertEquals( "n should be second", n, i.next() );
+        assertEquals( m, i.next(), "m should be first" );
+        assertEquals( n, i.next(), "n should be second" );
     }
 
     private void printErrors( ArtifactResolutionResult result )

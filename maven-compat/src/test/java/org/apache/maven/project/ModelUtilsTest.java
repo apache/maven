@@ -34,12 +34,12 @@ import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ModelUtilsTest
 {
@@ -549,7 +549,7 @@ public class ModelUtilsTest
         ModelUtils.mergePluginDefinitions( pChild, pParent, true );
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNull( "test execution should not be inherited from parent.", executionMap.get( testId ) );
+        assertNull( executionMap.get( testId ), "test execution should not be inherited from parent." );
     }
 
     @Test
@@ -590,7 +590,7 @@ public class ModelUtilsTest
         ModelUtils.mergePluginDefinitions( pChild, pParent, true );
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNull( "test execution should not be inherited from parent.", executionMap.get( testId ) );
+        assertNull( executionMap.get( testId ), "test execution should not be inherited from parent." );
     }
 
     @Test
@@ -631,7 +631,7 @@ public class ModelUtilsTest
         ModelUtils.mergePluginDefinitions( pChild, pParent, true );
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNotNull( "test execution should be inherited from parent.", executionMap.get( testId ) );
+        assertNotNull( executionMap.get( testId ), "test execution should be inherited from parent." );
     }
 
 }

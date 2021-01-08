@@ -38,13 +38,14 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * StringSearchModelInterpolatorTest - not in use
@@ -56,16 +57,9 @@ import static org.junit.Assert.assertNotNull;
 public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest
 {
-    @Override
-    public void setUp()
-    {
-        super.setUp();
-        interpolator = new StringSearchModelInterpolator();
-    }
-
     protected ModelInterpolator createInterpolator()
     {
-        return this.interpolator;
+        return new StringSearchModelInterpolator();
     }
 
     @Test

@@ -19,11 +19,11 @@ package org.apache.maven.wrapper;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,17 +35,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 public class WrapperExecutorTest
 {
-    @Rule
-    public TemporaryFolder testDir = new TemporaryFolder();
+    @TempDir
+    public Path testDir;
 
     private Installer install;
 
@@ -57,17 +55,17 @@ public class WrapperExecutorTest
 
     private Path mockInstallDir;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        mockInstallDir = testDir.newFolder( "mock-dir" ).toPath();
+        mockInstallDir = testDir.resolve( "mock-dir" );
 
         install = mock( Installer.class );
         when( install.createDist( Mockito.any( WrapperConfiguration.class ) ) ).thenReturn( mockInstallDir );
         start = mock( BootstrapMainStarter.class );
 
-        propertiesFile = testDir.newFolder( "maven", "wrapper" ).toPath().resolve( "maven-wrapper.properties" );
+        propertiesFile = testDir.resolve( "maven" ).resolve( "wrapper" ).resolve( "maven-wrapper.properties" );
 
         properties.put( "distributionUrl", "http://server/test/maven.zip" );
         properties.put( "distributionBase", "testDistBase" );
@@ -96,7 +94,7 @@ public class WrapperExecutorTest
     public void loadWrapperMetadataFromDirectory()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir.getRoot().toPath() );
+        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir );
 
         assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getDistribution() );
         assertEquals( new URI( "http://server/test/maven.zip" ), wrapper.getConfiguration().getDistribution() );
@@ -110,7 +108,7 @@ public class WrapperExecutorTest
     public void useDefaultMetadataNoProeprtiesFile()
         throws Exception
     {
-        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir.getRoot().toPath().resolve( "unknown" ) );
+        WrapperExecutor wrapper = WrapperExecutor.forProjectDirectory( testDir.resolve( "unknown" ) );
 
         assertNull( wrapper.getDistribution() );
         assertNull( wrapper.getConfiguration().getDistribution() );
@@ -157,9 +155,10 @@ public class WrapperExecutorTest
         properties = new Properties();
         writePropertiesFile( properties, propertiesFile, "header" );
 
-        RuntimeException e = assertThrows( "Expected RuntimeException",
+        RuntimeException e = assertThrows(
                 RuntimeException.class,
-                () -> WrapperExecutor.forWrapperPropertiesFile( propertiesFile ) );
+                () -> WrapperExecutor.forWrapperPropertiesFile( propertiesFile ),
+                "Expected RuntimeException" );
         assertEquals( "No value with key 'distributionUrl' specified in wrapper properties file '"
             + propertiesFile + "'.", e.getMessage() );
     }
@@ -167,11 +166,12 @@ public class WrapperExecutorTest
     @Test
     public void failWhenPropertiesFileDoesNotExist()
     {
-        propertiesFile = testDir.getRoot().toPath().resolve( "unknown.properties" );
+        propertiesFile = testDir.resolve( "unknown.properties" );
 
-        RuntimeException e = assertThrows( "Expected RuntimeException",
+        RuntimeException e = assertThrows(
                 RuntimeException.class,
-                () -> WrapperExecutor.forWrapperPropertiesFile( propertiesFile ) );
+                () -> WrapperExecutor.forWrapperPropertiesFile( propertiesFile ),
+                "Expected RuntimeException" );
         assertEquals( "Wrapper properties file '" + propertiesFile + "' does not exist.", e.getMessage() );
     }
 

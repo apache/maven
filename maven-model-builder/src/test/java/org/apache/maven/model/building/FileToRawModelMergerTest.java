@@ -28,10 +28,10 @@ import java.util.stream.Stream;
 
 import org.apache.maven.model.building.DefaultModelBuilder.FileToRawModelMerger;
 import org.apache.maven.model.merge.ModelMerger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.assertThat;
 
 public class FileToRawModelMergerTest
 {

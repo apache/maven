@@ -23,10 +23,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileSourceTest
 {
@@ -34,9 +34,10 @@ public class FileSourceTest
     @Test
     public void testFileSource()
     {
-        NullPointerException e = assertThrows( "Should fail, since you must specify a file",
+        NullPointerException e = assertThrows(
                 NullPointerException.class,
-                () -> new FileSource( null ) );
+                () -> new FileSource( null ),
+                "Should fail, since you must specify a file" );
         assertEquals( "file cannot be null", e.getMessage() );
     }
 

@@ -31,18 +31,18 @@ import java.util.Arrays;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Zip;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * @author Hans Dockter
  */
 public class InstallerTest
 {
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
     private Installer install;
 
@@ -62,7 +62,7 @@ public class InstallerTest
 
     private PathAssembler.LocalDistribution localDistribution;
 
-    @Before
+    @BeforeEach
     public void setup()
         throws Exception
     {
@@ -73,9 +73,11 @@ public class InstallerTest
         configuration.setDistribution( new URI( "http://server/maven-0.9.zip" ) );
         configuration.setAlwaysDownload( false );
         configuration.setAlwaysUnpack( false );
-        distributionDir = temporaryFolder.newFolder( "someDistPath" ).toPath();
+        distributionDir = temporaryFolder.resolve( "someDistPath" );
+        Files.createDirectories( distributionDir );
         mavenHomeDir = distributionDir.resolve( "maven-0.9" );
-        zipStore = temporaryFolder.newFolder( "zips" ).toPath();
+        zipStore = temporaryFolder.resolve( "zips" );
+        Files.createDirectories( zipStore );
         zipDestination = zipStore.resolve( "maven-0.9.zip" );
 
         download = mock( Downloader.class );
@@ -94,7 +96,7 @@ public class InstallerTest
     {
         Files.createDirectories( zipDestination.getParent() );
 
-        Path explodedZipDir = temporaryFolder.newFolder( "explodedZip" ).toPath();
+        Path explodedZipDir = temporaryFolder.resolve( "explodedZip" );
 
         Path mavenScript = explodedZipDir.resolve( "maven-0.9/bin/mvn" );
         Files.createDirectories( mavenScript.getParent() );
@@ -103,6 +105,8 @@ public class InstallerTest
         zipTo( explodedZipDir, zipDestination );
     }
 
+    @Test
+    @Disabled("not working")
     public void testCreateDist()
         throws Exception
     {
