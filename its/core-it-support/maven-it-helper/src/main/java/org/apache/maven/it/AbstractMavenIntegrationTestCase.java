@@ -590,13 +590,13 @@ public abstract class AbstractMavenIntegrationTestCase
 
         try
         {
-            // auto set source+target to lowest accepted value based on java version
+            // auto set source+target to lowest reasonable java version
             // Java9 requires at least 1.6
             if ( VersionRange.createFromVersionSpec( "[9,12)" ).containsVersion( getJavaVersion() ) )
             {
-                verifier.getSystemProperties().put( "maven.compiler.source", "1.6" );
-                verifier.getSystemProperties().put( "maven.compiler.target", "1.6" );
-                verifier.getSystemProperties().put( "maven.compiler.release", "6" );
+                verifier.getSystemProperties().put( "maven.compiler.source", "1.7" );
+                verifier.getSystemProperties().put( "maven.compiler.target", "1.7" );
+                verifier.getSystemProperties().put( "maven.compiler.release", "7" );
             }
             // Java12 requires at least 7
             if ( VersionRange.createFromVersionSpec( "[12,)" ).containsVersion( getJavaVersion() ) )
