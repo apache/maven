@@ -64,7 +64,7 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
-        return (g, a) -> Optional.ofNullable( context.getRawModel( g, a ) )
+        return ( g, a ) -> Optional.ofNullable( context.getRawModel( g, a ) )
                             .map( m -> toVersion( m ) )
                             .orElse( null );
     }
