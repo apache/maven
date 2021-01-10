@@ -20,6 +20,7 @@ package org.apache.maven.artifact;
  */
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -205,6 +206,16 @@ public class DefaultArtifact
     public File getFile()
     {
         return file;
+    }
+
+    public Path getPath()
+    {
+        return this.getFile() == null ? null : this.getFile().toPath();
+    }
+
+    public void setPath( Path path )
+    {
+        this.setFile ( path == null ? null : path.toFile() );
     }
 
     public ArtifactRepository getRepository()

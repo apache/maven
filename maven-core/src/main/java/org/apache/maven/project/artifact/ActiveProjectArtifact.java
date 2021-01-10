@@ -30,6 +30,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -63,6 +64,12 @@ public class ActiveProjectArtifact
     {
         // we need to get the latest file for the project, not the artifact that was created at one point in time
         return project.getArtifact().getFile();
+    }
+
+    /** {@inheritDoc} */
+    public Path getPath()
+    {
+        return this.getFile() == null ? null : this.getFile().toPath();
     }
 
     /** {@inheritDoc} */
@@ -118,6 +125,12 @@ public class ActiveProjectArtifact
     {
         artifact.setFile( destination );
         project.getArtifact().setFile( destination );
+    }
+
+    /** {@inheritDoc} */
+    public void setPath( Path path )
+    {
+        this.setFile( path == null ? null : path.toFile() );
     }
 
     /** {@inheritDoc} */

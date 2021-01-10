@@ -21,6 +21,9 @@ package org.apache.maven.artifact;
 
 import junit.framework.TestCase;
 
+import java.io.File;
+import java.nio.file.Path;
+
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
 
@@ -137,4 +140,10 @@ public class DefaultArtifactTest
         assertEquals( null, artifact.getBaseVersion() );
     }
 
+    public void testPathYieldsFile() {
+        artifact.setPath( Path.of( "testPath" ) );
+        assertEquals( new File( "testPath"), artifact.getFile() );
+        artifact.setFile( new File( "testFile" ) );
+        assertEquals( Path.of( "testFile"), artifact.getPath() );
+    }
 }
