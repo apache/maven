@@ -822,7 +822,7 @@ public class ComparableVersion
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }
 
-            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical() + "   " + c.items.toListString() );
+            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical() + "; tokens: " + c.items.toListString() );
 
             prev = c;
         }
