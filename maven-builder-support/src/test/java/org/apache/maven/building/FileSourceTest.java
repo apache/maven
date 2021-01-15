@@ -19,14 +19,14 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import org.junit.Test;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileSourceTest
 {
@@ -34,15 +34,11 @@ public class FileSourceTest
     @Test
     public void testFileSource()
     {
-        try
-        {
-            new FileSource( null );
-            fail( "Should fail, since you must specify a file" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "file cannot be null", e.getMessage() );
-        }
+        NullPointerException e = assertThrows(
+                NullPointerException.class,
+                () -> new FileSource( null ),
+                "Should fail, since you must specify a file" );
+        assertEquals( "file cannot be null", e.getMessage() );
     }
 
     @Test

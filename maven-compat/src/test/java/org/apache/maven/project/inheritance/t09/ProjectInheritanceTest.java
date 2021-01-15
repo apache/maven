@@ -23,6 +23,12 @@ import java.util.Map;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verifies exclusions listed in dependencyManagement are valid for
@@ -56,6 +62,7 @@ public class ProjectInheritanceTest
      * We should see that the resulting size of collected artifacts is two:
      * a &amp; b only.
      */
+    @Test
     public void testDependencyManagementExclusionsExcludeTransitively()
         throws Exception
     {
@@ -69,17 +76,17 @@ public class ProjectInheritanceTest
         MavenProject project0 = getProjectWithDependencies( pom0 );
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertNotNull("Parent is null", project1.getParent());
+        assertNotNull( project1.getParent(), "Parent is null" );
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         Map map = project1.getArtifactMap();
 
-        assertNotNull("No artifacts", map);
-        assertTrue("No Artifacts", map.size() > 0);
-        assertTrue("Set size should be 2, is " + map.size(), map.size() == 2);
+        assertNotNull( map, "No artifacts" );
+        assertTrue( map.size() > 0, "No Artifacts" );
+        assertTrue( map.size() == 2, "Set size should be 2, is " + map.size() );
 
-        assertTrue("maven-test:t09-a is not in the project", map.containsKey( "maven-test:t09-a" ));
-        assertTrue("maven-test:t09-b is not in the project", map.containsKey( "maven-test:t09-b" ));
-        assertFalse("maven-test:t09-c is in the project", map.containsKey( "maven-test:t09-c" ));
+        assertTrue( map.containsKey( "maven-test:t09-a" ), "maven-test:t09-a is not in the project" );
+        assertTrue( map.containsKey( "maven-test:t09-b" ), "maven-test:t09-b is not in the project" );
+        assertFalse( map.containsKey( "maven-test:t09-c" ), "maven-test:t09-c is in the project" );
     }
 
     /**
@@ -92,6 +99,7 @@ public class ProjectInheritanceTest
      *
      * @throws Exception
      */
+    @Test
     public void testDependencyManagementExclusionDoesNotOverrideGloballyForTransitives()
         throws Exception
     {
@@ -107,13 +115,13 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project2.getParent().getBasedir() );
         Map map = project2.getArtifactMap();
-        assertNotNull( "No artifacts", map );
-        assertTrue( "No Artifacts", map.size() > 0 );
-        assertTrue( "Set size should be 4, is " + map.size(), map.size() == 4 );
+        assertNotNull( map, "No artifacts" );
+        assertTrue( map.size() > 0, "No Artifacts" );
+        assertTrue( map.size() == 4, "Set size should be 4, is " + map.size() );
 
-        assertTrue( "maven-test:t09-a is not in the project", map.containsKey( "maven-test:t09-a" ) );
-        assertTrue( "maven-test:t09-b is not in the project", map.containsKey( "maven-test:t09-b" ) );
-        assertTrue( "maven-test:t09-c is not in the project", map.containsKey( "maven-test:t09-c" ) );
-        assertTrue( "maven-test:t09-d is not in the project", map.containsKey( "maven-test:t09-d" ) );
+        assertTrue( map.containsKey( "maven-test:t09-a" ), "maven-test:t09-a is not in the project" );
+        assertTrue( map.containsKey( "maven-test:t09-b" ), "maven-test:t09-b is not in the project" );
+        assertTrue( map.containsKey( "maven-test:t09-c" ), "maven-test:t09-c is not in the project" );
+        assertTrue( map.containsKey( "maven-test:t09-d" ), "maven-test:t09-d is not in the project" );
     }
 }

@@ -20,10 +20,12 @@ package org.apache.maven.artifact.repository;
  */
 
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenArtifactRepositoryTest
-    extends TestCase
 {
     private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository
     {
@@ -41,6 +43,7 @@ public class MavenArtifactRepositoryTest
         }
     }
 
+    @Test
     public void testHashCodeEquals()
     {
         MavenArtifactRepositorySubclass r1 = new MavenArtifactRepositorySubclass( "foo" );

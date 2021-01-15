@@ -19,14 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +34,18 @@ import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ProjectBuilderTest
@@ -53,6 +57,7 @@ public class ProjectBuilderTest
         return "src/test/projects/project-builder";
     }
 
+    @Test
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
         throws Exception
     {
@@ -70,6 +75,7 @@ public class ProjectBuilderTest
         project.getCompileClasspathElements();
     }
 
+    @Test
     public void testBuildFromModelSource()
         throws Exception
     {
@@ -84,6 +90,7 @@ public class ProjectBuilderTest
         assertNotNull( result.getProject().getParentFile() );
     }
 
+    @Test
     public void testVersionlessManagedDependency()
         throws Exception
     {
@@ -99,6 +106,7 @@ public class ProjectBuilderTest
                         + "@ line 9, column 17" ) );
     }
 
+    @Test
     public void testResolveDependencies()
         throws Exception
     {
@@ -120,6 +128,7 @@ public class ProjectBuilderTest
         assertEquals( 1, mavenProject.getArtifacts().size() );
     }
 
+    @Test
     public void testDontResolveDependencies()
         throws Exception
     {
@@ -139,6 +148,7 @@ public class ProjectBuilderTest
         assertEquals( 0, mavenProject.getArtifacts().size() );
     }
 
+    @Test
     public void testReadModifiedPoms() throws Exception {
         String initialValue = System.setProperty( DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString( true ) );
         // TODO a similar test should be created to test the dependency management (basically all usages
@@ -179,6 +189,7 @@ public class ProjectBuilderTest
         }
     }
 
+    @Test
     public void testReadErroneousMavenProjectContainsReference()
         throws Exception
     {
@@ -212,6 +223,7 @@ public class ProjectBuilderTest
         assertEquals( pomFile, project2.getFile() );
     }
 
+    @Test
     public void testReadInvalidPom()
         throws Exception
     {
@@ -237,6 +249,7 @@ public class ProjectBuilderTest
         assertThat( pex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
     }
 
+    @Test
     public void testReadParentAndChildWithRegularVersionSetParentFile()
         throws Exception
     {
@@ -297,6 +310,7 @@ public class ProjectBuilderTest
         }
     }
 
+    @Test
     public void testBuildProperties()
             throws Exception
     {
@@ -314,6 +328,7 @@ public class ProjectBuilderTest
         assertEquals( 1, project.getResources().size() );
     }
 
+    @Test
     public void testPropertyInPluginManagementGroupId()
             throws Exception
     {

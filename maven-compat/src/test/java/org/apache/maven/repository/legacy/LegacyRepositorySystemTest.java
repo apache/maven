@@ -17,16 +17,18 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import javax.inject.Inject;
 
@@ -41,25 +43,7 @@ public class LegacyRepositorySystemTest
     @Inject
     private RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
+    @Test
     public void testThatLocalRepositoryWithSpacesIsProperlyHandled()
         throws Exception
     {
@@ -68,6 +52,7 @@ public class LegacyRepositorySystemTest
         assertEquals( basedir, new File( repo.getBasedir() ) );
     }
 
+    @Test
     public void testAuthenticationHandling()
     {
         Server server = new Server();

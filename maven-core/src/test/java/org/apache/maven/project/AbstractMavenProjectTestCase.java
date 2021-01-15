@@ -21,18 +21,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import javax.inject.Inject;
 
@@ -47,24 +45,8 @@ public abstract class AbstractMavenProjectTestCase
     @Inject
     protected RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -78,15 +60,6 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( ProjectBuilder.class );
         }
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     protected ProjectBuilder getProjectBuilder()

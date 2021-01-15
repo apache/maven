@@ -17,14 +17,9 @@ package org.apache.maven;
 
 
 import org.apache.maven.exception.ExceptionHandler;
-import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.codehaus.plexus.DefaultPlexusContainer;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.util.Collections;
 
 public class MavenTest
     extends AbstractCoreMavenComponentTestCase
@@ -35,20 +30,12 @@ public class MavenTest
     @Inject
     private ExceptionHandler exceptionHandler;
 
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
     protected String getProjectsDirectory()
     {
         return "src/test/projects/lifecycle-executor";
     }
 
+    @Test
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()
         throws Exception
     {

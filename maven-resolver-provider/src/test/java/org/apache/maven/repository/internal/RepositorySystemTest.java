@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.Dependency;
@@ -31,11 +32,18 @@ import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.artifact.DefaultArtifact;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RepositorySystemTest
     extends AbstractRepositoryTestCase
 {
+    @Test
     public void testResolveVersionRange()
         throws Exception
     {
@@ -44,6 +52,7 @@ public class RepositorySystemTest
 
     }
 
+    @Test
     public void testResolveVersion()
         throws Exception
     {
@@ -51,6 +60,7 @@ public class RepositorySystemTest
         //                throws VersionResolutionException;
     }
 
+    @Test
     public void testReadArtifactDescriptor()
         throws Exception
     {
@@ -109,6 +119,7 @@ public class RepositorySystemTest
         assertEquals( 4, depArtifact.getProperties().size() );
     }
 
+    @Test
     public void testCollectDependencies()
         throws Exception
     {
@@ -126,6 +137,7 @@ public class RepositorySystemTest
         checkUtSimpleArtifactDependencies( nodes.get( 0 ).getDependency(), nodes.get( 1 ).getDependency() );
     }
 
+    @Test
     public void testResolveArtifact()
         throws Exception
     {
@@ -158,6 +170,7 @@ public class RepositorySystemTest
         assertEquals( filename, artifact.getFile().getName() );
     }
 
+    @Test
     public void testResolveArtifacts()
         throws Exception
     {
@@ -183,6 +196,7 @@ public class RepositorySystemTest
         checkArtifactResult( results.get( 2 ), "artifact-1.0-classifier.zip" );
     }
 
+    @Test
     public void testResolveMetadata()
         throws Exception
     {
@@ -190,6 +204,7 @@ public class RepositorySystemTest
         //                                      Collection<? extends MetadataRequest> requests );
     }
 
+    @Test
     public void testInstall()
         throws Exception
     {
@@ -198,6 +213,7 @@ public class RepositorySystemTest
         // release, snapshot unique ou non unique, attachment
     }
 
+    @Test
     public void testDeploy()
         throws Exception
     {
@@ -205,12 +221,14 @@ public class RepositorySystemTest
         //                throws DeploymentException;
     }
 
+    @Test
     public void testNewLocalRepositoryManager()
         throws Exception
     {
         //LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
     }
 
+    @Test
     public void testNewSyncContext()
         throws Exception
     {

@@ -19,7 +19,7 @@ package org.apache.maven.wrapper;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -27,15 +27,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class DownloaderTest
 {
-    @Rule
-    public TemporaryFolder testDir = new TemporaryFolder();
+    @TempDir
+    public Path testDir;
 
     private DefaultDownloader download;
 
@@ -47,14 +46,14 @@ public class DownloaderTest
 
     private Path remoteFile;
 
-    @Before
+    @BeforeEach
     public void setUp()
         throws Exception
     {
         download = new DefaultDownloader( "mvnw", "aVersion" );
-        rootDir = testDir.newFolder( "root" ).toPath();
+        rootDir = testDir.resolve( "root" );
         downloadFile = rootDir.resolve( "file" );
-        remoteFile = testDir.newFile( "remoteFile" ).toPath();
+        remoteFile = testDir.resolve( "remoteFile" );
         Files.write( remoteFile, Arrays.asList( "sometext" ) );
         sourceRoot = remoteFile.toUri();
     }

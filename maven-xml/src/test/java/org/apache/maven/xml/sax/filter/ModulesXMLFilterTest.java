@@ -23,7 +23,7 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import java.util.function.Consumer;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.ext.LexicalHandler;
 
 public class ModulesXMLFilterTest extends AbstractXMLFilterTests {

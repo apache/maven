@@ -19,29 +19,28 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import static org.junit.Assert.assertArrayEquals;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
-
-public class DefaultProjectArtifactsCacheTest extends TestCase
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+public class DefaultProjectArtifactsCacheTest
 {
 
     private ProjectArtifactsCache cache;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
         cache = new DefaultProjectArtifactsCache();
     }
 
+    @Test
     public void testProjectDependencyOrder() throws Exception
     {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key(){};

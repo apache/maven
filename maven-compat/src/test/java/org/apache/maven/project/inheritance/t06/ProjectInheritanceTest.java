@@ -26,6 +26,11 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A test which demonstrates maven's dependency management
@@ -46,6 +51,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagement()
         throws Exception
     {
@@ -62,18 +68,18 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         Set set = project1.getArtifacts();
-        assertNotNull( "No artifacts", set );
-        assertTrue( "No Artifacts", set.size() > 0 );
+        assertNotNull( set, "No artifacts" );
+        assertTrue( set.size() > 0, "No Artifacts" );
         Iterator iter = set.iterator();
-        assertTrue( "Set size should be 4, is " + set.size(), set.size() == 4 );
+        assertTrue( set.size() == 4, "Set size should be 4, is " + set.size() );
 
         while ( iter.hasNext() )
         {
             Artifact artifact = (Artifact) iter.next();
             System.out.println( "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
               + " Optional=" + ( artifact.isOptional() ? "true" : "false" ) );
-            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
-                        artifact.getVersion().equals( "1.0" ) );
+            assertTrue( artifact.getVersion().equals( "1.0" ),
+                        "Incorrect version for " + artifact.getDependencyConflictId() );
         }
 
     }

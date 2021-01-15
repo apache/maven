@@ -21,12 +21,17 @@ package org.apache.maven.rtinfo.internal;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
-import java.util.Collections;
 
 public class DefaultRuntimeInformationTest
     extends PlexusTestCase
@@ -43,21 +48,7 @@ public class DefaultRuntimeInformationTest
         configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        getContainer();
-    }
-    @Override
-    protected synchronized void setupContainer()
-    {
-        super.setupContainer();
-
-        ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
-    }
-
+    @Test
     public void testGetMavenVersion()
     {
         String mavenVersion = rtInfo.getMavenVersion();
@@ -65,6 +56,7 @@ public class DefaultRuntimeInformationTest
         assertTrue( mavenVersion.length() > 0 );
     }
 
+    @Test
     public void testIsMavenVersion()
     {
         assertTrue( rtInfo.isMavenVersion( "2.0" ) );
@@ -73,35 +65,20 @@ public class DefaultRuntimeInformationTest
         assertTrue( rtInfo.isMavenVersion( "[2.0.11,2.1.0),[3.0,)" ) );
         assertFalse( rtInfo.isMavenVersion( "[9.0,)" ) );
 
-        try
-        {
-            rtInfo.isMavenVersion( "[3.0," );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> rtInfo.isMavenVersion( "[3.0," ),
+                "Bad version range wasn't rejected" );
 
-        try
-        {
-            rtInfo.isMavenVersion( "" );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> rtInfo.isMavenVersion( "" ),
+                "Bad version range wasn't rejected" );
 
-        try
-        {
-            rtInfo.isMavenVersion( null );
-            fail( "Bad version range wasn't rejected" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertTrue( true );
-        }
+        assertThrows(
+                NullPointerException.class,
+                () -> rtInfo.isMavenVersion( null ),
+                "Bad version range wasn't rejected" );
     }
 
 }

@@ -25,18 +25,19 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.apache.maven.test.Parameter;
+import org.apache.maven.test.Parameterized;
+import org.apache.maven.test.Parameters;
+import org.apache.maven.test.Test;
 import org.xml.sax.ext.LexicalHandler;
 
-@RunWith( Parameterized.class )
+@Parameterized
 public class CommentRenormalizerTest
 {
-    private LexicalHandler lexicalHandler;
+    private LexicalHandler lexicalHandler = mock( LexicalHandler.class );
 
-    private final String lineSeparator;
+    @Parameter
+    private String lineSeparator;
 
     @Parameters
     public static Collection<Object[]> data() {
@@ -45,12 +46,6 @@ public class CommentRenormalizerTest
                  { "\r\n" },
                  { "\r" }
            });
-    }
-
-    public CommentRenormalizerTest( String lineSeparator )
-    {
-        this.lineSeparator = lineSeparator;
-        this.lexicalHandler = mock( LexicalHandler.class );
     }
 
     @Test

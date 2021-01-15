@@ -34,7 +34,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

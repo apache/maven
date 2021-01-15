@@ -21,7 +21,10 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.Locale;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test ComparableVersion.
@@ -30,7 +33,6 @@ import junit.framework.TestCase;
  */
 @SuppressWarnings( "unchecked" )
 public class ComparableVersionTest
-    extends TestCase
 {
     private Comparable newComparable( String version )
     {
@@ -39,8 +41,8 @@ public class ComparableVersionTest
         String parsedCanonical = new ComparableVersion( canonical ).getCanonical();
 
         System.out.println( "canonical( " + version + " ) = " + canonical );
-        assertEquals( "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical, canonical,
-                      parsedCanonical );
+        assertEquals( canonical, parsedCanonical,
+                "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical );
 
         return ret;
     }
@@ -68,8 +70,8 @@ public class ComparableVersionTest
             for ( int j = i; j < versions.length; j++ )
             {
                 Comparable high = c[j];
-                assertTrue( "expected " + low + " < " + high, low.compareTo( high ) < 0 );
-                assertTrue( "expected " + high + " > " + low, high.compareTo( low ) > 0 );
+                assertTrue( low.compareTo( high ) < 0, "expected " + low + " < " + high );
+                assertTrue( high.compareTo( low ) > 0, "expected " + high + " > " + low );
             }
         }
     }
@@ -78,11 +80,11 @@ public class ComparableVersionTest
     {
         Comparable c1 = newComparable( v1 );
         Comparable c2 = newComparable( v2 );
-        assertTrue( "expected " + v1 + " == " + v2, c1.compareTo( c2 ) == 0 );
-        assertTrue( "expected " + v2 + " == " + v1, c2.compareTo( c1 ) == 0 );
-        assertTrue( "expected same hashcode for " + v1 + " and " + v2, c1.hashCode() == c2.hashCode() );
-        assertTrue( "expected " + v1 + ".equals( " + v2 + " )", c1.equals( c2 ) );
-        assertTrue( "expected " + v2 + ".equals( " + v1 + " )", c2.equals( c1 ) );
+        assertTrue( c1.compareTo( c2 ) == 0, "expected " + v1 + " == " + v2 );
+        assertTrue( c2.compareTo( c1 ) == 0, "expected " + v2 + " == " + v1 );
+        assertTrue( c1.hashCode() == c2.hashCode(), "expected same hashcode for " + v1 + " and " + v2 );
+        assertTrue( c1.equals( c2 ), "expected " + v1 + ".equals( " + v2 + " )" );
+        assertTrue( c2.equals( c1 ), "expected " + v2 + ".equals( " + v1 + " )" );
     }
 
     private void checkVersionsArrayEqual( String[] array )
@@ -97,20 +99,23 @@ public class ComparableVersionTest
     {
         Comparable c1 = newComparable( v1 );
         Comparable c2 = newComparable( v2 );
-        assertTrue( "expected " + v1 + " < " + v2, c1.compareTo( c2 ) < 0 );
-        assertTrue( "expected " + v2 + " > " + v1, c2.compareTo( c1 ) > 0 );
+        assertTrue( c1.compareTo( c2 ) < 0, "expected " + v1 + " < " + v2 );
+        assertTrue( c2.compareTo( c1 ) > 0, "expected " + v2 + " > " + v1 );
     }
 
+    @Test
     public void testVersionsQualifier()
     {
         checkVersionsOrder( VERSIONS_QUALIFIER );
     }
 
+    @Test
     public void testVersionsNumber()
     {
         checkVersionsOrder( VERSIONS_NUMBER );
     }
 
+    @Test
     public void testVersionsEqual()
     {
         newComparable( "1.0-alpha" );
@@ -164,6 +169,7 @@ public class ComparableVersionTest
         checkVersionsEqual( "1m3", "1MILESTONE3" );
     }
 
+    @Test
     public void testVersionComparing()
     {
         checkVersionsOrder( "1", "2" );
@@ -202,6 +208,7 @@ public class ComparableVersionTest
      * see Netbeans issues <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
+    @Test
     public void testMng5568()
     {
         String a = "6.1.0";
@@ -216,6 +223,7 @@ public class ComparableVersionTest
     /**
      * Test <a href="https://jira.apache.org/jira/browse/MNG-6572">MNG-6572</a> optimization.
      */
+    @Test
     public void testMng6572()
     {
         String a = "20190126.230843"; // resembles a SNAPSHOT
@@ -235,6 +243,7 @@ public class ComparableVersionTest
      * Test all versions are equal when starting with many leading zeroes regardless of string length
      * (related to MNG-6572 optimization)
      */
+    @Test
     public void testVersionEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
@@ -267,6 +276,7 @@ public class ComparableVersionTest
      * Test all "0" versions are equal when starting with many leading zeroes regardless of string length
      * (related to MNG-6572 optimization)
      */
+    @Test
     public void testVersionZeroEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
@@ -299,6 +309,7 @@ public class ComparableVersionTest
      * Test <a href="https://issues.apache.org/jira/browse/MNG-6964">MNG-6964</a> edge cases
      * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
      */
+    @Test
     public void testMng6964()
     {
         String a = "1-0.alpha";
@@ -310,6 +321,7 @@ public class ComparableVersionTest
         checkVersionsOrder( a, b ); // Should still be true
     }
 
+    @Test
     public void testLocaleIndependent()
     {
         Locale orig = Locale.getDefault();
@@ -328,6 +340,7 @@ public class ComparableVersionTest
         }
     }
 
+    @Test
     public void testReuse()
     {
         ComparableVersion c1 = new ComparableVersion( "1" );
@@ -335,6 +348,6 @@ public class ComparableVersionTest
 
         Comparable c2 = newComparable( "2" );
 
-        assertEquals( "reused instance should be equivalent to new instance", c1, c2 );
+        assertEquals( c1, c2, "reused instance should be equivalent to new instance" );
     }
 }

@@ -23,6 +23,8 @@ import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
@@ -40,6 +42,7 @@ public class ArtifactInstallerTest
         return "installer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {

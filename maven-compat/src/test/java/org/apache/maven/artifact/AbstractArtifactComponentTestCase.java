@@ -19,6 +19,20 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -28,10 +42,6 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -54,18 +64,11 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -82,38 +85,20 @@ public abstract class AbstractArtifactComponentTestCase
     @Inject
     LegacySupport legacySupport;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
+    @Inject @Named( "default" )
+    ArtifactRepositoryLayout repoLayout;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
         super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
 
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
                                                  new DefaultMavenExecutionResult() );
 
         legacySupport.setSession( session );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        release( artifactFactory );
-
-        super.tearDown();
     }
 
     protected abstract String component();
@@ -132,9 +117,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         f.createNewFile();
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null,
                                                                    null );
     }
@@ -151,9 +133,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null,
                                                                    null );
     }
@@ -165,9 +144,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
                                                                    new ArtifactRepositoryPolicy(),
                                                                    new ArtifactRepositoryPolicy() );
@@ -176,9 +152,6 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository badRemoteRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
         return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout,
                                                                    null, null );
     }
@@ -192,10 +165,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        if ( !file.exists() )
-        {
-            fail( "Remote artifact " + file + " should be present." );
-        }
+        assertTrue( file.exists(), "Remote artifact " + file + " should be present." );
     }
 
     protected void assertLocalArtifactPresent( Artifact artifact )
@@ -207,10 +177,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        if ( !file.exists() )
-        {
-            fail( "Local artifact " + file + " should be present." );
-        }
+        assertTrue( file.exists(), "Local artifact " + file + " should be present." );
     }
 
     protected void assertRemoteArtifactNotPresent( Artifact artifact )
@@ -222,10 +189,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( remoteRepo.getBasedir(), path );
 
-        if ( file.exists() )
-        {
-            fail( "Remote artifact " + file + " should not be present." );
-        }
+        assertFalse( file.exists(), "Remote artifact " + file + " should not be present." );
     }
 
     protected void assertLocalArtifactNotPresent( Artifact artifact )
@@ -237,10 +201,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         File file = new File( localRepo.getBasedir(), path );
 
-        if ( file.exists() )
-        {
-            fail( "Local artifact " + file + " should not be present." );
-        }
+        assertFalse( file.exists(), "Local artifact " + file + " should not be present." );
     }
 
     // ----------------------------------------------------------------------

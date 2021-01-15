@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,12 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import java.io.File;
+import java.nio.file.Files;
+
+import javax.inject.Inject;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -25,13 +29,10 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-
-import java.io.File;
-import java.nio.file.Files;
-
-import javax.inject.Inject;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultMavenTest
     extends AbstractCoreMavenComponentTestCase
@@ -40,6 +41,14 @@ public class DefaultMavenTest
     @Inject
     private Maven maven;
 
+    @Override
+    protected String getProjectsDirectory()
+    {
+        return "src/test/projects/default-maven";
+    }
+
+
+    @Test
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
             throws Exception
     {
@@ -50,13 +59,7 @@ public class DefaultMavenTest
         assertEquals( ProjectCycleException.class, result.getExceptions().get( 0 ).getClass() );
     }
 
-    @Override
-    protected String getProjectsDirectory()
-    {
-        return "src/test/projects/default-maven";
-    }
-
-
+    @Test
     public void testMavenProjectNoDuplicateArtifacts()
         throws Exception
     {

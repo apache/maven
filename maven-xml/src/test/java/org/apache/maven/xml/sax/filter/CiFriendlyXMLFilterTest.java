@@ -19,20 +19,21 @@ package org.apache.maven.xml.sax.filter;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
 import org.xml.sax.SAXException;
 
 public class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests
 {
     private CiFriendlyXMLFilter filter;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         filter = new CiFriendlyXMLFilter( true );

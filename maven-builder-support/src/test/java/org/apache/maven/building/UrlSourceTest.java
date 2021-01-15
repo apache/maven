@@ -19,15 +19,15 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import org.junit.Test;
-
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UrlSourceTest
 {
@@ -35,15 +35,11 @@ public class UrlSourceTest
     @Test
     public void testUrlSource()
     {
-        try
-        {
-            new UrlSource( null );
-            fail( "Should fail, since you must specify a url" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "url cannot be null", e.getMessage() );
-        }
+        NullPointerException e = assertThrows(
+                NullPointerException.class,
+                () -> new UrlSource( null ),
+                "Should fail, since you must specify a url" );
+        assertEquals( "url cannot be null", e.getMessage() );
     }
 
     @Test

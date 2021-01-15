@@ -1,5 +1,6 @@
 package org.apache.maven.model.merge;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
@@ -22,8 +23,6 @@ import static org.hamcrest.Matchers.is;
  * under the License.
  */
 
-import static org.junit.Assert.assertThat;
-
 import java.util.Arrays;
 
 import org.apache.maven.model.Build;
@@ -37,7 +36,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Repository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * ModelMerger is based on same instances, subclasses should override KeyComputer per type

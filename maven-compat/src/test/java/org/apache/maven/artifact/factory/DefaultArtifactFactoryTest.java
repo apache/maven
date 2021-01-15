@@ -19,19 +19,14 @@ package org.apache.maven.artifact.factory;
  * under the License.
  */
 
+import javax.inject.Inject;
+
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.eclipse.aether.RepositorySystemSession;
+import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultArtifactFactoryTest
     extends PlexusTestCase
@@ -40,25 +35,7 @@ public class DefaultArtifactFactoryTest
     @Inject
     ArtifactFactory factory;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected void setUp()
-            throws Exception
-    {
-        super.setUp();
-
-        ((DefaultPlexusContainer)getContainer())
-                .addPlexusInjector( Collections.emptyList(),
-                        binder ->  binder.requestInjection( this ) );
-    }
-
+    @Test
     public void testPropagationOfSystemScopeRegardlessOfInheritedScope()
     {
         Artifact artifact = factory.createDependencyArtifact( "test-grp", "test-artifact", VersionRange.createFromVersion("1.0"), "type", null, "system", "provided" );

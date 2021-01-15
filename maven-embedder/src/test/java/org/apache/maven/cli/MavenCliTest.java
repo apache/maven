@@ -26,11 +26,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.inOrder;
@@ -55,15 +55,10 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.sisu.plexus.PlexusBeanModule;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
-
-import com.google.inject.Binder;
-import com.google.inject.Module;
 
 public class MavenCliTest
 {
@@ -71,14 +66,14 @@ public class MavenCliTest
 
     private String origBasedir;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         cli = new MavenCli();
         origBasedir = System.getProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -149,15 +144,10 @@ public class MavenCliTest
         // -TC2.2
         assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
 
-        try
-        {
-            cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" );
-            fail( "Should have failed with a NumberFormatException" );
-        }
-        catch ( NumberFormatException e )
-        {
-            // carry on
-        }
+        assertThrows(
+                NumberFormatException.class,
+                () -> cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" ),
+                "Should have failed with a NumberFormatException" );
     }
 
     @Test
@@ -189,15 +179,7 @@ public class MavenCliTest
         CliRequest request = new CliRequest( new String[0], null );
 
         cli.initialize( request );
-        try
-        {
-            cli.cli( request );
-            fail();
-        }
-        catch ( ParseException expected )
-        {
-
-        }
+        assertThrows( ParseException.class, () -> cli.cli( request ) );
     }
 
     /**
@@ -321,7 +303,7 @@ public class MavenCliTest
     public void testStyleColors()
         throws Exception
     {
-        assumeTrue( "ANSI not supported", MessageUtils.isColorEnabled() );
+        assumeTrue( MessageUtils.isColorEnabled(), "ANSI not supported" );
         CliRequest request;
 
         MessageUtils.setColorEnabled( true );
@@ -359,19 +341,14 @@ public class MavenCliTest
         cli.logging( request );
         assertTrue( MessageUtils.isColorEnabled() );
 
-        try
-        {
-            MessageUtils.setColorEnabled( false );
-            request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
-            cli.cli( request );
-            cli.properties( request );
-            cli.logging( request );
-            fail( "maybe is not a valid option" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // noop
-        }
+        MessageUtils.setColorEnabled( false );
+        CliRequest maybeColorRequest = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+        cli.cli( maybeColorRequest );
+        cli.properties( maybeColorRequest );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> cli.logging( maybeColorRequest ),
+                "maybe is not a valid option" );
     }
 
     /**

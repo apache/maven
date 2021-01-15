@@ -21,8 +21,7 @@ package org.apache.maven.xml.sax.filter;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-import org.apache.maven.xml.sax.filter.RelativePathXMLFilter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RelativePathXMLFilterTest extends AbstractXMLFilterTests
 {
