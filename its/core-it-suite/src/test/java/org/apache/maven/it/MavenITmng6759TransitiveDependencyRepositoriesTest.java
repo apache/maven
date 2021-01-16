@@ -55,7 +55,14 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         Verifier verifier = newVerifier( dependencyCProjectDir.getAbsolutePath() );
 
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
+        if ( getMavenVersion().getMajorVersion() <= 3 )
+        {
+            verifier.addCliOption( "-DaltDeploymentRepository=customRepo::default::" + customRepoUri );
+        }
+        else
+        {
+            verifier.addCliOption( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
+        }
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
         return customRepoUri;

@@ -37,7 +37,12 @@ CALL :maven && CALL :maven-integration-testing
  CALL mvn clean verify -DdistributionFileName=${project.artifactId} -f "%_MAVENCODEBASE%" || exit /B
 
 :maven-integration-testing
+if exist "%_MAVENCODEBASE%\maven-wrapper\target\maven-wrapper.jar" (
  CALL mvn clean install -Prun-its,embedded -Dmaven.repo.local="%cd%\repo" -DmavenDistro="%_MAVENCODEBASE%\apache-maven\target\apache-maven-bin.zip" -DwrapperDistroDir="%_MAVENCODEBASE%\apache-maven\target" -DmavenWrapper="%_MAVENCODEBASE%\maven-wrapper\target\maven-wrapper.jar" || exit /B
+)
+else (
+ CALL mvn clean install -Prun-its,embedded,!maven-wrapper -Dmaven.repo.local="%cd%\repo" -DmavenDistro="%_MAVENCODEBASE%\apache-maven\target\apache-maven-bin.zip" || exit /B
+)
 
 :normalizePath
  SET _MAVENCODEBASE=%~dpfn1

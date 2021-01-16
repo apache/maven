@@ -61,7 +61,14 @@ public class MavenITmng5572ReactorPluginExtensionsTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] 'project' uses 'org.apache.maven.its.mng5572:plugin' as extension which is not possible within the same reactor build. This plugin was pulled from the local repository!" );
+        if ( getMavenVersion().getMajorVersion() <= 3 )
+        {
+            verifier.verifyTextInLog( "[WARNING] project uses org.apache.maven.its.mng5572:plugin as extensions, which is not possible within the same reactor build. This plugin was pulled from the local repository!" );
+        }
+        else
+        {
+            verifier.verifyTextInLog( "[WARNING] 'project' uses 'org.apache.maven.its.mng5572:plugin' as extension which is not possible within the same reactor build. This plugin was pulled from the local repository!" );
+        }
         verifier.resetStreams();
     }
 

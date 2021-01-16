@@ -54,23 +54,34 @@ public class MavenITmng5937MavenWrapper
     {
         super( "[4.0.0-alpha-1,)" );
 
-        String localRepo = System.getProperty("maven.repo.local");
-
         envVars = new HashMap<>( 4 );
-        envVars.put( "MVNW_REPOURL", Paths.get( localRepo ).toUri().toURL().toString() );
-        envVars.put( "MVNW_VERBOSE", "true" );
-        String javaHome = System.getenv( "JAVA_HOME" );
-        if ( javaHome != null )
+
+        if ( !isSkipped() )
         {
-            // source needs to call the javac executable.
-            // if JAVA_HOME is not set, ForkedLauncher sets it to java.home, which is the JRE home
-            envVars.put( "JAVA_HOME", javaHome );
+            String localRepo = System.getProperty( "maven.repo.local" );
+            if ( localRepo != null )
+            {
+                envVars.put( "MVNW_REPOURL", Paths.get( localRepo ).toUri().toURL().toString() );
+                envVars.put( "MVNW_VERBOSE", "true" );
+            }
+            String javaHome = System.getenv( "JAVA_HOME" );
+            if ( javaHome != null )
+            {
+                // source needs to call the javac executable.
+                // if JAVA_HOME is not set, ForkedLauncher sets it to java.home, which is the JRE home
+                envVars.put( "JAVA_HOME", javaHome );
+            }
         }
     }
 
     public void setUp()
         throws Exception
     {
+        if ( isSkipped() )
+        {
+            return;
+        }
+
         String mavenDist = System.getProperty( "maven.distro" );
         if ( StringUtils.isEmpty( mavenDist ) )
         {

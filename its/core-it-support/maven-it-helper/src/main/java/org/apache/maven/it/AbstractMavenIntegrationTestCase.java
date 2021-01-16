@@ -202,6 +202,16 @@ public abstract class AbstractMavenIntegrationTestCase
         }
     }
 
+    /**
+     * Can be called by version specific setUp calls
+     *
+     * @return
+     */
+    protected final boolean isSkipped()
+    {
+        return skip;
+    }
+
     protected void runTest()
         throws Throwable
     {
