@@ -23,6 +23,9 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verifies SCM inheritance uses modules statement from parent.
@@ -43,6 +46,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testScmInfoCalculatedCorrectlyOnParentAndChildRead()
         throws Exception
     {
@@ -76,6 +80,7 @@ public class ProjectInheritanceTest
                                                                   + "/modules/p1" );
     }
 
+    @Test
     public void testScmInfoCalculatedCorrectlyOnChildOnlyRead()
         throws Exception
     {

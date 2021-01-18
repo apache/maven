@@ -28,7 +28,7 @@ Apache Maven is a software project management and comprehension tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
-If you think you have found a bug, please file an issue in the [Maven Issue Tracker][jira]].
+If you think you have found a bug, please file an issue in the [Maven Issue Tracker][jira].
 
 Documentation
 -------------
@@ -55,7 +55,7 @@ License
 -------
 This code is under the [Apache License, Version 2.0, January 2004][license].
 
-See the `NOTICE` file for required notices and attributions.
+See the [`NOTICE`](./NOTICE) file for required notices and attributions.
 
 Donations
 ---------
@@ -67,9 +67,9 @@ If you want to bootstrap Maven, you'll need:
 - Java 1.8+
 - Maven 3.0.5 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
-```
-mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.7.x-SNAPSHOT" clean package
-```
+    ```
+    mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-3.7.x-SNAPSHOT" clean package
+    ```
 
 
 [home]: https://maven.apache.org/

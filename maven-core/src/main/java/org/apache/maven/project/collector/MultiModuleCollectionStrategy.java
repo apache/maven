@@ -50,7 +50,7 @@ import java.util.function.Predicate;
 @Singleton
 public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 {
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( MultiModuleCollectionStrategy.class );
     private final ModelLocator modelLocator;
     private final ProjectsSelector projectsSelector;
 
@@ -76,7 +76,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             }
             else
             {
-                logger.debug( "Multi module project collection failed: {}"
+                LOGGER.debug( "Multi module project collection failed:{}"
                         + "Detected a POM file next to a .mvn folder in a parent directory ({}). "
                         + "Maven assumed that POM file to be the parent of the requested project ({}), but it turned "
                         + "out that it was not. Another project collection strategy will be executed as result.",
@@ -91,7 +91,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 
             if ( fallThrough )
             {
-                logger.debug( "Multi module project collection failed: {}"
+                LOGGER.debug( "Multi module project collection failed:{}"
                         + "Detected that one of the modules of this multi module project uses another module as "
                         + "plugin extension which still needed to be built. This is not possible within the same "
                         + "reactor build. Another project collection strategy will be executed as result.",
@@ -114,10 +114,10 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             File multiModuleProjectPom = modelLocator.locatePom( request.getMultiModuleProjectDirectory() );
             if ( !multiModuleProjectPom.exists() )
             {
-                logger.info( "Maven detected that the requested POM file is part of a multi module project, "
-                        + "but could not find a pom.xml file in the multi module root directory: '"
-                        + request.getMultiModuleProjectDirectory() + "'. " );
-                logger.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
+                LOGGER.info( "Maven detected that the requested POM file is part of a multi module project, "
+                        + "but could not find a pom.xml file in the multi module root directory '{}'.",
+                        request.getMultiModuleProjectDirectory() );
+                LOGGER.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
                 return request.getPom();
             }
 

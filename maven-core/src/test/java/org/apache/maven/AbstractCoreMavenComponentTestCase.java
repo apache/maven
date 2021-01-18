@@ -44,39 +44,25 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.test.PlexusTestCase;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.jupiter.api.BeforeEach;
+
+import javax.inject.Inject;
 
 public abstract class AbstractCoreMavenComponentTestCase
     extends PlexusTestCase
 {
-    @Requirement
+    @Inject
     protected RepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
-
-    protected void setUp()
-        throws Exception
-    {
-        repositorySystem = lookup( RepositorySystem.class );
-        projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        projectBuilder = null;
-        super.tearDown();
-    }
 
     abstract protected String getProjectsDirectory();
 

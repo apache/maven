@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
 public class BaseSlf4jConfiguration
     implements Slf4jConfiguration
 {
-    private final Logger logger = LoggerFactory.getLogger( BaseSlf4jConfiguration.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( BaseSlf4jConfiguration.class );
 
     public void setRootLoggerLevel( Level level )
     {
-        logger.warn( "setRootLoggerLevel: operation not supported" );
+        LOGGER.warn( "setRootLoggerLevel: operation not supported" );
     }
 
     public void activate()
     {
-        logger.warn( "reset(): operation not supported" );
+        LOGGER.warn( "reset(): operation not supported" );
     }
 }

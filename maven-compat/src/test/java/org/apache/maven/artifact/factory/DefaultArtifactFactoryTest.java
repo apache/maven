@@ -19,28 +19,25 @@ package org.apache.maven.artifact.factory;
  * under the License.
  */
 
+import javax.inject.Inject;
+
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultArtifactFactoryTest
     extends PlexusTestCase
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
+    @Inject
+    ArtifactFactory factory;
 
-    public void testPropagationOfSystemScopeRegardlessOfInheritedScope() throws Exception
+    @Test
+    public void testPropagationOfSystemScopeRegardlessOfInheritedScope()
     {
-        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-
         Artifact artifact = factory.createDependencyArtifact( "test-grp", "test-artifact", VersionRange.createFromVersion("1.0"), "type", null, "system", "provided" );
         Artifact artifact2 = factory.createDependencyArtifact( "test-grp", "test-artifact-2", VersionRange.createFromVersion("1.0"), "type", null, "system", "test" );
         Artifact artifact3 = factory.createDependencyArtifact( "test-grp", "test-artifact-3", VersionRange.createFromVersion("1.0"), "type", null, "system", "runtime" );

@@ -23,6 +23,9 @@ import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
 import org.apache.maven.lifecycle.internal.stub.PluginPrefixResolverStub;
 import org.apache.maven.lifecycle.internal.stub.PluginVersionResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
@@ -31,6 +34,7 @@ public class LifecycleExecutionPlanCalculatorTest
     extends AbstractCoreMavenComponentTestCase
 {
 
+    @Test
     public void testCalculateExecutionPlanWithGoalTasks()
         throws Exception
     {

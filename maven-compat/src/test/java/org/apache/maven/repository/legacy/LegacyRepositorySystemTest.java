@@ -22,9 +22,15 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import javax.inject.Inject;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -34,32 +40,10 @@ import org.codehaus.plexus.PlexusTestCase;
 public class LegacyRepositorySystemTest
     extends PlexusTestCase
 {
+    @Inject
     private RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        repositorySystem = lookup( RepositorySystem.class, "default" );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testThatLocalRepositoryWithSpacesIsProperlyHandled()
         throws Exception
     {
@@ -68,8 +52,8 @@ public class LegacyRepositorySystemTest
         assertEquals( basedir, new File( repo.getBasedir() ) );
     }
 
+    @Test
     public void testAuthenticationHandling()
-        throws Exception
     {
         Server server = new Server();
         server.setId( "repository" );

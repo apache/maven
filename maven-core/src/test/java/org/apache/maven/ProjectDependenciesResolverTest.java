@@ -15,9 +15,6 @@ package org.apache.maven;
  * the License.
  */
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -27,28 +24,19 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
+
+import javax.inject.Inject;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ProjectDependenciesResolverTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver resolver;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        resolver = lookup( ProjectDependenciesResolver.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        resolver = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory()
     {
@@ -56,6 +44,7 @@ public class ProjectDependenciesResolverTest
     }
 
     /*
+    @Test
     public void testExclusionsInDependencies()
         throws Exception
     {
@@ -79,6 +68,7 @@ public class ProjectDependenciesResolverTest
     }
     */
 
+    @Test
     public void testSystemScopeDependencies()
         throws Exception
     {
@@ -93,6 +83,7 @@ public class ProjectDependenciesResolverTest
         assertEquals( 1, artifactDependencies.size() );
     }
 
+    @Test
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
         throws Exception
     {

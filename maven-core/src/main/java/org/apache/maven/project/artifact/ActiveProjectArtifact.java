@@ -304,7 +304,7 @@ public class ActiveProjectArtifact
     /** {@inheritDoc} */
     public String toString()
     {
-        return "active project artifact:\n\tartifact = " + artifact + ";\n\tproject: " + project;
+        return "active project artifact[artifact: " + artifact + ", project: " + project + "]";
     }
 
     /** {@inheritDoc} */

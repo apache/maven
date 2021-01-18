@@ -103,7 +103,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -148,8 +147,6 @@ public class MavenCli
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
-
-    private static final String[] DEPRECATED_OPTIONS = { "up", "npu", "cpu", "npr" };
 
     private ClassWorld classWorld;
 
@@ -793,7 +790,7 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            slf4jLogger.warn( "Failed to read extensions descriptor {}: {}", extensionsFile, e.getMessage() );
+            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
         }
         return Collections.emptyList();
     }
@@ -821,11 +818,11 @@ public class MavenCli
 
             extRealm.setParentRealm( coreRealm );
 
-            slf4jLogger.debug( "Populating class realm {}", extRealm.getId() );
+            slf4jLogger.debug( "Populating class realm '{}'", extRealm.getId() );
 
             for ( File file : extClassPath )
             {
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 extRealm.addURL( file.toURI().toURL() );
             }
@@ -874,7 +871,7 @@ public class MavenCli
             {
                 File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 jars.add( file );
             }
@@ -1009,12 +1006,12 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the {} switch.",
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch.",
                         buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the {} switch to enable full debug logging.",
+                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable full debug logging.",
                         buffer().strong( "-X" ) );
             }
 
@@ -1231,7 +1228,7 @@ public class MavenCli
             // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
             //
             StringBuilder sb = new StringBuilder(
-                String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n",
+                String.format( "%nThere can only be one user supplied ConfigurationProcessor, there are %s:%n%n",
                                userSuppliedConfigurationProcessorCount ) );
             for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
             {
@@ -1239,10 +1236,9 @@ public class MavenCli
                 if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
                 {
                     ConfigurationProcessor configurationProcessor = entry.getValue();
-                    sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
+                    sb.append( String.format( "%s%n", configurationProcessor.getClass().getName() ) );
                 }
             }
-            sb.append( "\n" );
             throw new Exception( sb.toString() );
         }
     }
@@ -1303,9 +1299,9 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
-        slf4jLogger.debug( "Reading global toolchains from {}",
+        slf4jLogger.debug( "Reading global toolchains from '{}'",
                 getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
-        slf4jLogger.debug( "Reading user toolchains from {}",
+        slf4jLogger.debug( "Reading user toolchains from '{}'",
                 getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
 
         ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
@@ -1351,8 +1347,6 @@ public class MavenCli
         boolean quiet = cliRequest.quiet;
         request.setShowErrors( cliRequest.showErrors ); // default: false
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
-
-        handleDeprecatedOptions( commandLine );
 
         disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
         enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
@@ -1561,16 +1555,6 @@ public class MavenCli
         {
             return executionListener;
         }
-    }
-
-    private void handleDeprecatedOptions( final CommandLine commandLine )
-    {
-        Arrays.stream( DEPRECATED_OPTIONS )
-                .filter( commandLine::hasOption )
-                .forEach( deprecatedOption -> slf4jLogger.warn(
-                        "Command line option -{} is deprecated and will be removed in future Maven versions.",
-                        deprecatedOption )
-                );
     }
 
     private String determineReactorFailureBehaviour( final CommandLine commandLine )

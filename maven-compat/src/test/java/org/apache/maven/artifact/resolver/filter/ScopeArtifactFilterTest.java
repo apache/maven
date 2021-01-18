@@ -21,8 +21,10 @@ package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link ScopeArtifactFilter}.
@@ -30,7 +32,6 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ScopeArtifactFilterTest
-    extends TestCase
 {
 
     private Artifact newArtifact( String scope )
@@ -38,6 +39,7 @@ public class ScopeArtifactFilterTest
         return new DefaultArtifact( "g", "a", "1.0", scope, "jar", "", null );
     }
 
+    @Test
     public void testInclude_Compile()
     {
         ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
@@ -49,6 +51,7 @@ public class ScopeArtifactFilterTest
         assertFalse( filter.include( newArtifact( Artifact.SCOPE_TEST ) ) );
     }
 
+    @Test
     public void testInclude_CompilePlusRuntime()
     {
         ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE_PLUS_RUNTIME );
@@ -60,6 +63,7 @@ public class ScopeArtifactFilterTest
         assertFalse( filter.include( newArtifact( Artifact.SCOPE_TEST ) ) );
     }
 
+    @Test
     public void testInclude_Runtime()
     {
         ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
@@ -71,6 +75,7 @@ public class ScopeArtifactFilterTest
         assertFalse( filter.include( newArtifact( Artifact.SCOPE_TEST ) ) );
     }
 
+    @Test
     public void testInclude_RuntimePlusSystem()
     {
         ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
@@ -82,6 +87,7 @@ public class ScopeArtifactFilterTest
         assertFalse( filter.include( newArtifact( Artifact.SCOPE_TEST ) ) );
     }
 
+    @Test
     public void testInclude_Test()
     {
         ScopeArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_TEST );

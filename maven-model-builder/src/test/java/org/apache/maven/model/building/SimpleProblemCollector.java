@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.maven.model.Model;
 
-
 /**
  * A simple model problem collector for testing the model building components.
  *

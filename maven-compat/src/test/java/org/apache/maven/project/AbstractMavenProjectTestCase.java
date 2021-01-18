@@ -22,16 +22,20 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import javax.inject.Inject;
+
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Jason van Zyl
@@ -41,17 +45,12 @@ public abstract class AbstractMavenProjectTestCase
 {
     protected ProjectBuilder projectBuilder;
 
+    @Inject
     protected RepositorySystem repositorySystem;
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
         super.setUp();
@@ -65,12 +64,10 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( ProjectBuilder.class );
         }
-
-        repositorySystem = lookup( RepositorySystem.class );
     }
 
-    @Override
-    protected void tearDown()
+    @AfterEach
+    public void tearDown()
         throws Exception
     {
         projectBuilder = null;

@@ -19,13 +19,10 @@ package org.apache.maven.xml.sax;
  * under the License.
  */
 
-import static org.junit.Assert.assertThat;
-
-import org.apache.maven.xml.sax.SAXEventUtils;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SAXEventUtilsTest
 {

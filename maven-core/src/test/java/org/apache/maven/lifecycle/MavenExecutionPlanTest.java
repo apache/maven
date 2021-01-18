@@ -15,21 +15,24 @@
 
 package org.apache.maven.lifecycle;
 
-import junit.framework.TestCase;
+import java.util.Set;
 
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.model.Plugin;
+import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Kristian Rosenvold
  */
 public class MavenExecutionPlanTest
-    extends TestCase
 {
 
+    @Test
     public void testFindLastInPhase()
         throws Exception
     {
@@ -41,6 +44,7 @@ public class MavenExecutionPlanTest
         assertNotNull( expected );
     }
 
+    @Test
     public void testThreadSafeMojos()
         throws Exception
     {
@@ -52,6 +56,7 @@ public class MavenExecutionPlanTest
     }
 
 
+    @Test
     public void testFindLastWhenFirst()
         throws Exception
     {
@@ -62,6 +67,7 @@ public class MavenExecutionPlanTest
         assertNull( beerPhase );
     }
 
+    @Test
     public void testFindLastInPhaseMisc()
         throws Exception
     {

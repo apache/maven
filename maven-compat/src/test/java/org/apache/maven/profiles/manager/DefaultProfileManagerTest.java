@@ -22,27 +22,22 @@ package org.apache.maven.profiles.manager;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
-
+    @Test
     public void testShouldActivateDefaultProfile()
         throws Exception
     {
@@ -78,6 +73,7 @@ public class DefaultProfileManagerTest
         assertEquals( "defaultActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
 
+    @Test
     public void testShouldNotActivateDefaultProfile()
         throws Exception
     {
@@ -117,6 +113,7 @@ public class DefaultProfileManagerTest
     }
 
 
+    @Test
     public void testShouldNotActivateReversalOfPresentSystemProperty()
         throws Exception
     {
@@ -144,6 +141,7 @@ public class DefaultProfileManagerTest
         assertEquals( 0, active.size() );
     }
 
+    @Test
     public void testShouldOverrideAndActivateInactiveProfile()
         throws Exception
     {
@@ -174,6 +172,7 @@ public class DefaultProfileManagerTest
         assertEquals( "syspropActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
 
+    @Test
     public void testShouldOverrideAndDeactivateActiveProfile()
         throws Exception
     {

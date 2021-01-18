@@ -1,5 +1,7 @@
 package org.apache.maven.artifact;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,8 +21,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,8 +28,11 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.nio.file.Path;
 
-public class ArtifactTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class ArtifactTest {
+
+    @Test
     public void testPathYieldsFile() {
         final Artifact artifact = spy( Artifact.class );
         artifact.setPath( Path.of( "testPath" ) );

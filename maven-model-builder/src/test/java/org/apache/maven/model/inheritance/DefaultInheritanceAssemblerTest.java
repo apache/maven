@@ -19,20 +19,6 @@ package org.apache.maven.model.inheritance;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.building.AbstractModelSourceTransformer;
-import org.apache.maven.model.building.SimpleProblemCollector;
-import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.io.DefaultModelReader;
-import org.apache.maven.model.io.DefaultModelWriter;
-import org.apache.maven.model.io.ModelWriter;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xmlunit.matchers.CompareMatcher;
-
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,13 +27,29 @@ import java.util.function.Consumer;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.AbstractModelSourceTransformer;
+import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.io.DefaultModelReader;
+import org.apache.maven.model.io.DefaultModelWriter;
+import org.apache.maven.model.io.ModelWriter;
+import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.matchers.CompareMatcher;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Hervé Boutemy
  */
 public class DefaultInheritanceAssemblerTest
-    extends TestCase
 {
     private DefaultModelReader reader;
 
@@ -55,12 +57,10 @@ public class DefaultInheritanceAssemblerTest
 
     private InheritanceAssembler assembler;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         reader = new DefaultModelReader();
         reader.setTransformer( new AbstractModelSourceTransformer()
         {
@@ -87,6 +87,7 @@ public class DefaultInheritanceAssemblerTest
         return reader.read( getPom( name ), null );
     }
 
+    @Test
     public void testPluginConfiguration()
         throws Exception
     {
@@ -98,6 +99,7 @@ public class DefaultInheritanceAssemblerTest
      * and child directory == artifactId
      * @throws IOException Model read problem
      */
+    @Test
     public void testUrls()
         throws Exception
     {
@@ -108,6 +110,7 @@ public class DefaultInheritanceAssemblerTest
      * Flat directory structure: parent &amp; child POMs in sibling directories, child directory == artifactId.
      * @throws IOException Model read problem
      */
+    @Test
     public void testFlatUrls()
         throws IOException
     {
@@ -118,6 +121,7 @@ public class DefaultInheritanceAssemblerTest
      * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls()
         throws Exception
     {
@@ -128,6 +132,7 @@ public class DefaultInheritanceAssemblerTest
      * MNG-5951 special case test: inherit with partial override
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls2()
         throws Exception
     {
@@ -138,6 +143,7 @@ public class DefaultInheritanceAssemblerTest
      * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls3()
         throws Exception
     {
@@ -150,6 +156,7 @@ public class DefaultInheritanceAssemblerTest
      * This is why MNG-5000 fix in code is marked as bad practice (uses file names)
      * @throws IOException Model read problem
      */
+    @Test
     public void testFlatTrickyUrls()
         throws IOException
     {
@@ -164,10 +171,10 @@ public class DefaultInheritanceAssemblerTest
         catch ( AssertionError afe )
         {
             // expected failure: wrong relative path calculation
-            assertTrue( afe.getMessage(),
-                        afe.getMessage().contains(
+            assertTrue( afe.getMessage().contains(
                                 "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ) );
+                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ),
+                        afe.getMessage() );
         }
         // but ok from repo: local disk is ignored
         testInheritance( "tricky-flat-artifactId-urls", true );
@@ -175,20 +182,19 @@ public class DefaultInheritanceAssemblerTest
         // parent references child with directory name (which is not artifact id)
         // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance( "tricky-flat-directory-urls", false );
-        try
-        {
-            testInheritance( "tricky-flat-directory-urls", true );
-            fail( "should have failed since module reference == directory name != artifactId" );
-        }
-        catch ( AssertionError afe )
-        {
-            // expected failure
-            assertTrue( afe.getMessage(), afe.getMessage().contains(
-                    "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
-                            "'http://www.apache.org/path/to/parent/child-artifact-id/'" ) );
-        }
+
+        AssertionError afe = assertThrows(
+                AssertionError.class,
+                () -> testInheritance( "tricky-flat-directory-urls", true ),
+                "should have failed since module reference == directory name != artifactId" );
+        // expected failure
+        assertTrue( afe.getMessage().contains(
+                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
+                                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ),
+                    afe.getMessage() );
     }
 
+    @Test
     public void testWithEmptyUrl()
         throws IOException
     {
@@ -232,6 +238,7 @@ public class DefaultInheritanceAssemblerTest
         assertThat( actual, CompareMatcher.isIdenticalTo( expected ).ignoreComments().ignoreWhitespace() );
     }
 
+    @Test
     public void testModulePathNotArtifactId()
         throws IOException
     {

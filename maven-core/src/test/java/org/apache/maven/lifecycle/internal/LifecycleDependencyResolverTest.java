@@ -30,26 +30,22 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.junit.Test;
+
+import javax.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver resolver;
 
     @Override
     protected String getProjectsDirectory()
     {
         return null;
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        resolver = lookup( LifecycleDependencyResolver.class );
     }
 
     @Test

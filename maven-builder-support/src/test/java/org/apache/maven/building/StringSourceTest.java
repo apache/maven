@@ -19,12 +19,12 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StringSourceTest
 {

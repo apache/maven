@@ -19,31 +19,23 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import org.apache.maven.test.PlexusTestCase;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.PlexusTestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+import javax.inject.Inject;
+
+@Disabled
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {
+    @Inject
     private RepositorySystem repositorySystem;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        repositorySystem = lookup( RepositorySystem.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
         throws Exception
     {
@@ -118,18 +110,19 @@ public class MavenMetadataSourceTest
 
         Map artifactMap = project.getArtifactMap();
 
-        assertNotNull( "artifact-map should not be null.", artifactMap );
+        assertNotNull( artifactMap, "artifact-map should not be null." );
         assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
-        assertNotNull( "dependency artifact not found in map.", artifact );
+        assertNotNull( artifact, "dependency artifact not found in map." );
         assertEquals( "dependency artifact has wrong scope.", Artifact.SCOPE_COMPILE, artifact.getScope() );
 
         //check for back-propagation of default scope.
         assertEquals( "default scope NOT back-propagated to dependency.", Artifact.SCOPE_COMPILE, dep.getScope() );
     }
 
+    @Test
     public void testShouldUseInjectedTestScopeFromDependencyManagement()
         throws Exception
     {
@@ -169,12 +162,12 @@ public class MavenMetadataSourceTest
 
         Map artifactMap = project.getArtifactMap();
 
-        assertNotNull( "artifact-map should not be null.", artifactMap );
+        assertNotNull( artifactMap, "artifact-map should not be null." );
         assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
-        assertNotNull( "dependency artifact not found in map.", artifact );
+        assertNotNull( artifact, "dependency artifact not found in map." );
         assertEquals( "dependency artifact has wrong scope.", Artifact.SCOPE_TEST, artifact.getScope() );
 
         //check for back-propagation of default scope.

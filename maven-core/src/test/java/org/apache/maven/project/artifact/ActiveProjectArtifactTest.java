@@ -1,5 +1,7 @@
 package org.apache.maven.project.artifact;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,12 +32,12 @@ import java.nio.file.Path;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import junit.framework.TestCase;
+public class ActiveProjectArtifactTest {
 
-public class ActiveProjectArtifactTest extends TestCase {
-
+    @Test
     public void testPathYieldsFile() {
         final Artifact a = spy( Artifact.class );
         final ArgumentCaptor<File> file = ArgumentCaptor.forClass( File.class );
@@ -48,7 +50,7 @@ public class ActiveProjectArtifactTest extends TestCase {
 
         final ActiveProjectArtifact artifact = new ActiveProjectArtifact( p, a );
         artifact.setPath( Path.of( "testPath" ) );
-        assertEquals( new File("testPath" ), artifact.getFile() );
+        assertEquals( new File( "testPath" ), artifact.getFile() );
         artifact.setFile( new File( "testFile" ) );
         assertEquals( Path.of( "testFile" ), artifact.getPath() );
     }

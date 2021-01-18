@@ -26,9 +26,9 @@ import static org.mockito.Mockito.when;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 
@@ -36,13 +36,13 @@ public class ExecutionEventLoggerTest
 {
     private ExecutionEventLogger executionEventLogger;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         MessageUtils.setColorEnabled( false );
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown()
     {
         MessageUtils.setColorEnabled( true );

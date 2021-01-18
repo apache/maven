@@ -1,7 +1,5 @@
 package org.apache.maven.model.profile.activation;
 
-import java.util.Objects;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,14 +19,17 @@ import java.util.Objects;
  * under the License.
  */
 
+import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
@@ -36,7 +37,6 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
-    extends TestCase
 {
 
     private Class<T> activatorClass;
@@ -48,22 +48,18 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
         this.activatorClass = Objects.requireNonNull( activatorClass, "activatorClass cannot be null" );;
     }
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         activator = activatorClass.getConstructor().newInstance();
     }
 
-    @Override
-    protected void tearDown()
+    @AfterEach
+    public void tearDown()
         throws Exception
     {
         activator = null;
-
-        super.tearDown();
     }
 
     protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties )
@@ -78,8 +74,8 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
 
         assertEquals( active, activator.isActive( profile, context, problems ) );
 
-        assertEquals( problems.getErrors().toString(), 0, problems.getErrors().size() );
-        assertEquals( problems.getWarnings().toString(), 0, problems.getWarnings().size() );
+        assertEquals( 0, problems.getErrors().size(), problems.getErrors().toString() );
+        assertEquals( 0, problems.getWarnings().size(), problems.getWarnings().toString() );
     }
 
 }

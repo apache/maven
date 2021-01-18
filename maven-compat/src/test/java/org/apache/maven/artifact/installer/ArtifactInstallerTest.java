@@ -23,6 +23,10 @@ import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -30,21 +34,15 @@ import org.apache.maven.artifact.Artifact;
 public class ArtifactInstallerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactInstaller artifactInstaller;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactInstaller = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
-    }
 
     protected String component()
     {
         return "installer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {

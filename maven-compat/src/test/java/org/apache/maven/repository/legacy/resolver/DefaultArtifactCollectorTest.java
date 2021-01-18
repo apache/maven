@@ -19,6 +19,18 @@ package org.apache.maven.repository.legacy.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -37,19 +49,16 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the default artifact collector.
@@ -59,8 +68,10 @@ import java.util.Set;
 public class DefaultArtifactCollectorTest
     extends PlexusTestCase
 {
+    @Inject
     private LegacyArtifactCollector artifactCollector;
 
+    @Inject
     private ArtifactFactory artifactFactory;
 
     private ArtifactSpec projectArtifact;
@@ -69,72 +80,47 @@ public class DefaultArtifactCollectorTest
 
     private static final String GROUP_ID = "test";
 
+    @BeforeEach
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-
-    @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
 
         source = new Source();
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = lookup( LegacyArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }
 
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        artifactCollector = null;
-        artifactFactory = null;
-        super.tearDown();
-    }
-
-    // works, but we don't fail on cycles presently
-    public void disabledtestCircularDependencyNotIncludingCurrentProject()
+    @Test
+    @Disabled("works, but we don't fail on cycles presently")
+    public void testCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         b.addDependency( "a", "1.0" );
-        try
-        {
-            collect( a );
-            fail( "Should have failed on cyclic dependency not involving project" );
-        }
-        catch ( CyclicDependencyException expected )
-        {
-            assertTrue( true );
-        }
+        assertThrows(
+                CyclicDependencyException.class,
+                () -> collect( a ),
+                "Should have failed on cyclic dependency not involving project" );
     }
 
-    // works, but we don't fail on cycles presently
-    public void disabledtestCircularDependencyIncludingCurrentProject()
+    @Test
+    @Disabled("works, but we don't fail on cycles presently")
+    public void testCircularDependencyIncludingCurrentProject()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         b.addDependency( "project", "1.0" );
-        try
-        {
-            collect( a );
-            fail( "Should have failed on cyclic dependency involving project" );
-        }
-        catch ( CyclicDependencyException expected )
-        {
-            assertTrue( true );
-        }
+        assertThrows(
+                CyclicDependencyException.class,
+                () -> collect( a ),
+                "Should have failed on cyclic dependency not involving project" );
     }
 
+    @Test
     public void testResolveWithFilter()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -146,14 +132,15 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec d = b.addDependency( "d", "4.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list",
-                      createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact } ), res.getArtifacts(),
+                    "Check artifact list" );
 
         ArtifactFilter filter = new ExclusionSetFilter( new String[] { "b" } );
         res = collect( a, filter );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -167,12 +154,14 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec f = c1.addDependency( "f", "1.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, e.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, e.artifact, c1.artifact,
-            f.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "1.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, e.artifact, c1.artifact, f.artifact } ), 
+                      res.getArtifacts(), "Check artifact list" );
+        assertEquals( "1.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
-    public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewest()
+    @Test
+    @Disabled
+    public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNewest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         // TODO use newest conflict resolver
@@ -186,12 +175,13 @@ public class DefaultArtifactCollectorTest
         c1.addDependency( "f", "1.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, e.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, e.artifact, c2.artifact,
-            d.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, e.artifact, c2.artifact, d.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
-    public void disabledtestResolveCorrectDependenciesWhenDifferentDependenciesOnNewestVersionReplaced()
+    @Test
+    @Disabled
+    public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNewestVersionReplaced()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         // TODO use newest conflict resolver
@@ -207,11 +197,12 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact } ) );
         Object[] artifacts = new Object[] { a.artifact, c.artifact, d1.artifact, b2.artifact, e.artifact, g.artifact };
-        assertEquals( "Check artifact list", createSet( artifacts ), res.getArtifacts() );
-        assertEquals( "Check version", "1.0", getArtifact( "d", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( artifacts ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "1.0", getArtifact( "d", res.getArtifacts() ).getVersion(), "Check version" );
+        assertEquals( "2.0", getArtifact( "b", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveNearestNewestIsNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -222,11 +213,11 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "2.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "3.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveNearestOldestIsNearest()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -237,11 +228,11 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "3.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveLocalNewestIsLocal()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -250,10 +241,11 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = createArtifactSpec( "b", "3.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "3.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "3.0", getArtifact( "b", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveLocalOldestIsLocal()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -262,10 +254,11 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = createArtifactSpec( "b", "2.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.0", getArtifact( "b", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveLocalWithNewerVersionButLesserScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -274,11 +267,12 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = createArtifactSpec( "junit", "3.8.1", Artifact.SCOPE_TEST );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion(), "Check version" );
+        assertEquals( Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveLocalWithNewerVersionButLesserScopeResolvedFirst()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -287,11 +281,12 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "junit", "3.7" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion(), "Check version" );
+        assertEquals( Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveNearestWithRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -302,11 +297,11 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "[1.0,3.0]" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testResolveRangeWithManagedVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -316,11 +311,11 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec managedB = createArtifactSpec( "b", "5.0" );
 
         ArtifactResolutionResult res = collect( a, managedB.artifact );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, managedB.artifact } ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "5.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, managedB.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "5.0", getArtifact( "b", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testCompatibleRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -332,11 +327,11 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a );
 
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ),
-                      res.getArtifacts() );
-        assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.5", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testIncompatibleRanges()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -351,6 +346,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testUnboundedRangeWhenVersionUnavailable()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -364,6 +360,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testUnboundedRangeBelowLastRelease()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -375,10 +372,11 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a );
 
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts() );
-        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+        assertEquals( createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts(), "Check artifact list" );
+        assertEquals( "2.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }
 
+    @Test
     public void testUnboundedRangeAboveLastRelease()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -391,6 +389,7 @@ public class DefaultArtifactCollectorTest
         assertTrue( res.hasVersionRangeViolations() );
     }
 
+    @Test
     public void testResolveManagedVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -401,9 +400,10 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedB = createArtifactSpec( "b", "5.0", Artifact.SCOPE_RUNTIME ).artifact;
 
         ArtifactResolutionResult res = collect( a, managedVersion );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedB } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, modifiedB } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testCollectChangesVersionOfOriginatingArtifactIfInDependencyManagementHasDifferentVersion()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -414,13 +414,14 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult result = collect( a, managedVersion );
 
-        assertEquals( "collect has modified version in originating artifact", "1.0", artifact.getVersion() );
+        assertEquals( "1.0", artifact.getVersion(), "collect has modified version in originating artifact" );
 
         Artifact resolvedArtifact = result.getArtifacts().iterator().next();
 
-        assertEquals( "Resolved version don't match original artifact version", "1.0", resolvedArtifact.getVersion() );
+        assertEquals( "1.0", resolvedArtifact.getVersion(), "Resolved version don't match original artifact version" );
     }
 
+    @Test
     public void testResolveCompileScopeOverTestScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -432,13 +433,14 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-        // assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getArtifactScope() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
+        // assertEquals( Artifact.SCOPE_COMPILE, artifact.getArtifactScope(), "Check artifactScope" );
+        assertEquals( Artifact.SCOPE_TEST, artifact.getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveRuntimeScopeOverTestScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -450,13 +452,14 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-        // assertEquals( "Check artifactScope", Artifact.SCOPE_RUNTIME, artifact.getArtifactScope() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
+        // assertEquals( Artifact.SCOPE_RUNTIME, artifact.getArtifactScope(), "Check artifactScope" );
+        assertEquals( Artifact.SCOPE_TEST, artifact.getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveCompileScopeOverRuntimeScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -469,12 +472,12 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { root.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, root.artifact, modifiedC } ),
-                      res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, root.artifact, modifiedC } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        assertEquals( Artifact.SCOPE_COMPILE, artifact.getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveCompileScopeOverProvidedScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -486,13 +489,14 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-        // assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getArtifactScope() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
+        // assertEquals( Artifact.SCOPE_COMPILE, artifact.getArtifactScope(), "Check artifactScope" );
+        assertEquals( Artifact.SCOPE_PROVIDED, artifact.getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testResolveRuntimeScopeOverProvidedScope()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -504,13 +508,14 @@ public class DefaultArtifactCollectorTest
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-        // assertEquals( "Check artifactScope", Artifact.SCOPE_RUNTIME, artifact.getArtifactScope() );
-        assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
+        // assertEquals( Artifact.SCOPE_RUNTIME, artifact.getArtifactScope(), "Check artifactScope" );
+        assertEquals( Artifact.SCOPE_PROVIDED, artifact.getScope(), "Check artifactScope" );
     }
 
+    @Test
     public void testProvidedScopeNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -519,9 +524,10 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "3.0", Artifact.SCOPE_PROVIDED );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testOptionalNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -530,9 +536,10 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "3.0", true );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testOptionalIncludedAtRoot()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -541,9 +548,10 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = createArtifactSpec( "b", "1.0", true );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testScopeUpdate()
         throws InvalidVersionSpecificationException, ArtifactResolutionException
     {
@@ -643,19 +651,21 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ), filter );
         Artifact artifact = getArtifact( "d", res.getArtifacts() );
-        assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
-        assertEquals( "Check artifactScope", expectedScope, artifact.getScope() );
-        assertEquals( "Check version", expectedVersion, artifact.getVersion() );
+        assertNotNull( artifact, "MNG-1895 Dependency was not added to resolution" );
+        assertEquals( expectedScope, artifact.getScope(), "Check artifactScope" );
+        assertEquals( expectedVersion, artifact.getVersion(), "Check version" );
 
         ArtifactSpec d = createArtifactSpec( "d", "1.0" );
         res = collect( createSet( new Object[] { a.artifact, b.artifact, d.artifact } ), filter );
         artifact = getArtifact( "d", res.getArtifacts() );
-        assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
-        assertEquals( "Check artifactScope", d.artifact.getScope(), artifact.getScope() );
-        assertEquals( "Check version", "1.0", artifact.getVersion() );
+        assertNotNull( artifact, "MNG-1895 Dependency was not added to resolution" );
+        assertEquals( d.artifact.getScope(), artifact.getScope(), "Check artifactScope" );
+        assertEquals( "1.0", artifact.getVersion(), "Check version" );
     }
 
-    public void disabledtestOptionalNotTransitiveButVersionIsInfluential()
+    @Test
+    @Disabled
+    public void testOptionalNotTransitiveButVersionIsInfluential()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ArtifactSpec a = createArtifactSpec( "a", "1.0" );
@@ -668,12 +678,12 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec c = createArtifactSpec( "c", "3.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact,
-            e.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact, e.artifact } ), res.getArtifacts(), "Check artifact list" );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check version", "3.0", artifact.getVersion() );
+        assertEquals( "3.0", artifact.getVersion(), "Check version" );
     }
 
+    @Test
     public void testTestScopeNotTransitive()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -682,9 +692,10 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts(), "Check artifact list" );
     }
 
+    @Test
     public void testSnapshotNotIncluded()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -703,6 +714,8 @@ public class DefaultArtifactCollectorTest
          */
     }
 
+    @Test
+    @Disabled("that one does not work")
     public void testOverConstrainedVersionException()
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -715,15 +728,11 @@ public class DefaultArtifactCollectorTest
 
         ArtifactSpec c = createArtifactSpec( "c", "3.2.1-v3235e" );
 
-        try
-        {
-            ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact } ) );
-        }
-        catch ( OverConstrainedVersionException e )
-        {
-            assertTrue( "Versions unordered", e.getMessage().contains( "[3.2.1-v3235e, 3.3.0-v3346]" ) );
-            assertTrue( "DependencyTrail unresolved", e.getMessage().contains( "Path to dependency:" ) );
-        }
+        OverConstrainedVersionException e = assertThrows(
+                OverConstrainedVersionException.class,
+                () -> collect( createSet( new Object[] { a.artifact } ) ) );
+        assertTrue( e.getMessage().contains( "[3.2.1-v3235e, 3.3.0-v3346]" ), "Versions unordered" );
+        assertTrue( e.getMessage().contains( "Path to dependency:" ), "DependencyTrail unresolved" );
     }
 
     private Artifact getArtifact( String id, Set artifacts )

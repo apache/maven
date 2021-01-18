@@ -21,9 +21,7 @@ package org.apache.maven.execution;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
-@RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumptionDataRepositoryTest
 {
     private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();

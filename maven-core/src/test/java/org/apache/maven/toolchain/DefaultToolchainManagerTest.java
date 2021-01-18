@@ -19,7 +19,7 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,8 +36,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -58,7 +58,7 @@ public class DefaultToolchainManagerTest
     @Mock
     private ToolchainFactory toolchainFactory_rareType;
 
-    @Before
+    @BeforeEach
     public void onSetup() throws Exception
     {
         toolchainManager = new DefaultToolchainManager();

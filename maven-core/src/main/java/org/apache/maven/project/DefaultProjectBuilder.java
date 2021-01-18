@@ -705,16 +705,6 @@ public class DefaultProjectBuilder
             project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
         }
 
-        String modelId = findProfilesXml( result, profilesXmls );
-        if ( modelId != null )
-        {
-            ModelProblem problem =
-                new DefaultModelProblem( "Detected profiles.xml alongside " + modelId
-                    + ", this file is no longer supported and was ignored" + ", please use the settings.xml instead",
-                                         ModelProblem.Severity.WARNING, ModelProblem.Version.V30, model, -1, -1, null );
-            result.getProblems().add( problem );
-        }
-
         //
         // All the parts that were taken out of MavenProject for Maven 4.0.0
         //
@@ -1017,33 +1007,6 @@ public class DefaultProjectBuilder
         }
 
         return version;
-    }
-
-    private String findProfilesXml( ModelBuildingResult result, Map<File, Boolean> profilesXmls )
-    {
-        for ( String modelId : result.getModelIds() )
-        {
-            Model model = result.getRawModel( modelId );
-
-            File basedir = model.getProjectDirectory();
-            if ( basedir == null )
-            {
-                break;
-            }
-
-            Boolean profilesXml = profilesXmls.get( basedir );
-            if ( profilesXml == null )
-            {
-                profilesXml = new File( basedir, "profiles.xml" ).exists();
-                profilesXmls.put( basedir, profilesXml );
-            }
-            if ( profilesXml )
-            {
-                return modelId;
-            }
-        }
-
-        return null;
     }
 
     /**

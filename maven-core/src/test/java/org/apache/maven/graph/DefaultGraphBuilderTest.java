@@ -37,12 +37,12 @@ import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
+import org.apache.maven.test.Parameter;
+import org.apache.maven.test.Parameterized;
+import org.apache.maven.test.Parameters;
+import org.apache.maven.test.Test;
 import org.codehaus.plexus.util.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,15 +56,15 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
-import static junit.framework.TestCase.assertEquals;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
 import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith( Parameterized.class )
+@Parameterized
 public class DefaultGraphBuilderTest
 {
     /*
@@ -104,13 +104,20 @@ public class DefaultGraphBuilderTest
     private Map<String, MavenProject> artifactIdProjectMap;
 
     // Parameters for the test
-    private final String parameterDescription;
-    private final List<String> parameterSelectedProjects;
-    private final List<String> parameterExcludedProjects;
-    private final String parameterResumeFrom;
-    private final String parameterMakeBehavior;
-    private final List<String> parameterExpectedResult;
-    private final File parameterRequestedPom;
+    @Parameter( 0 )
+    private String parameterDescription;
+    @Parameter( 1 )
+    private List<String> parameterSelectedProjects;
+    @Parameter( 2 )
+    private List<String> parameterExcludedProjects;
+    @Parameter( 3 )
+    private String parameterResumeFrom;
+    @Parameter( 4 )
+    private String parameterMakeBehavior;
+    @Parameter( 5 )
+    private List<String> parameterExpectedResult;
+    @Parameter( 6 )
+    private File parameterRequestedPom;
 
     @Parameters(name = "{index}. {0}")
     public static Collection<Object[]> parameters()
@@ -191,17 +198,6 @@ public class DefaultGraphBuilderTest
         );
     }
 
-    public DefaultGraphBuilderTest( String description, List<String> selectedProjects, List<String> excludedProjects, String resumedFrom, String makeBehavior, List<String> expectedReactorProjects, File requestedPom )
-    {
-        this.parameterDescription = description;
-        this.parameterSelectedProjects = selectedProjects;
-        this.parameterExcludedProjects = excludedProjects;
-        this.parameterResumeFrom = resumedFrom;
-        this.parameterMakeBehavior = makeBehavior;
-        this.parameterExpectedResult = expectedReactorProjects;
-        this.parameterRequestedPom = requestedPom;
-    }
-
     @Test
     public void testGetReactorProjects()
     {
@@ -226,10 +222,10 @@ public class DefaultGraphBuilderTest
         List<MavenProject> expectedReactorProjects = parameterExpectedResult.stream()
                 .map( artifactIdProjectMap::get )
                 .collect( Collectors.toList());
-        assertEquals( parameterDescription, expectedReactorProjects, actualReactorProjects );
+        assertEquals( expectedReactorProjects, actualReactorProjects, parameterDescription );
     }
 
-    @Before
+    @BeforeEach
     public void before() throws Exception
     {
         graphBuilder = new DefaultGraphBuilder(

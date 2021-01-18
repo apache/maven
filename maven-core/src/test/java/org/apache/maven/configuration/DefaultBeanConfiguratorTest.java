@@ -27,34 +27,32 @@ import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultBeanConfiguratorTest
-    extends TestCase
 {
 
     private BeanConfigurator configurator;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         configurator = new DefaultBeanConfigurator();
     }
 
-    @Override
-    protected void tearDown()
+    @AfterEach
+    public void tearDown()
         throws Exception
     {
         configurator = null;
-
-        super.tearDown();
     }
 
     private Xpp3Dom toConfig( String xml )
@@ -69,6 +67,7 @@ public class DefaultBeanConfiguratorTest
         }
     }
 
+    @Test
     public void testMinimal()
         throws BeanConfigurationException
     {
@@ -84,6 +83,7 @@ public class DefaultBeanConfiguratorTest
         assertEquals( new File( "test" ), bean.file );
     }
 
+    @Test
     public void testPreAndPostProcessing()
         throws BeanConfigurationException
     {
@@ -111,6 +111,7 @@ public class DefaultBeanConfiguratorTest
         assertEquals( new File( "base/test" ).getAbsoluteFile(), bean.file );
     }
 
+    @Test
     public void testChildConfigurationElement()
         throws BeanConfigurationException
     {

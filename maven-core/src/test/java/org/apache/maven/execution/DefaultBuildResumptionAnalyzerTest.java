@@ -22,8 +22,8 @@ package org.apache.maven.execution;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -40,7 +40,7 @@ public class DefaultBuildResumptionAnalyzerTest
 
     private MavenExecutionResult executionResult;
 
-    @Before
+    @BeforeEach
     public void before() {
         executionResult = new DefaultMavenExecutionResult();
     }

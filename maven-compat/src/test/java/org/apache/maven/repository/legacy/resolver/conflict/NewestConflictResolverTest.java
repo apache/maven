@@ -20,6 +20,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  */
 
 import org.apache.maven.artifact.resolver.ResolutionNode;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests <code>NewestConflictResolver</code>.
@@ -47,6 +48,7 @@ public class NewestConflictResolverTest
      * b:1.0 -&gt; a:2.0
      * </pre>
      */
+    @Test
     public void testDepth()
     {
         ResolutionNode a1n = createResolutionNode( a1 );
@@ -63,6 +65,7 @@ public class NewestConflictResolverTest
      * a:1.0
      * </pre>
      */
+    @Test
     public void testDepthReversed()
     {
         ResolutionNode b1n = createResolutionNode( b1 );
@@ -79,6 +82,7 @@ public class NewestConflictResolverTest
      * a:2.0
      * </pre>
      */
+    @Test
     public void testEqual()
     {
         ResolutionNode a1n = createResolutionNode( a1 );
@@ -94,6 +98,7 @@ public class NewestConflictResolverTest
      * a:1.0
      * </pre>
      */
+    @Test
     public void testEqualReversed()
     {
         ResolutionNode a2n = createResolutionNode( a2 );

@@ -25,6 +25,13 @@ import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -32,21 +39,15 @@ import org.codehaus.plexus.util.FileUtils;
 public class ArtifactDeployerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactDeployer artifactDeployer;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactDeployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
-    }
 
     protected String component()
     {
         return "deployer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {

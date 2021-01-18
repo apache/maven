@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.ArtifactResolver;
@@ -34,10 +33,14 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = ArtifactResolver.class, hint = "classpath" )
+@Named( "classpath" )
+@Singleton
 public class ClasspathArtifactResolver
     implements ArtifactResolver
 {

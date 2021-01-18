@@ -15,14 +15,15 @@ package org.apache.maven.repository.metadata;
  * the License.
  */
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.repository.metadata.ArtifactMetadata;
-import org.apache.maven.repository.metadata.ClasspathContainer;
-import org.apache.maven.repository.metadata.ClasspathTransformation;
-import org.apache.maven.repository.metadata.MetadataGraph;
-import org.apache.maven.repository.metadata.MetadataGraphEdge;
-import org.apache.maven.repository.metadata.MetadataGraphVertex;
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.test.PlexusTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  *
@@ -33,6 +34,7 @@ import org.codehaus.plexus.PlexusTestCase;
 public class DefaultClasspathTransformationTest
 extends PlexusTestCase
 {
+    @Inject
     ClasspathTransformation transform;
 
     MetadataGraph graph;
@@ -42,11 +44,11 @@ extends PlexusTestCase
     MetadataGraphVertex v3;
     MetadataGraphVertex v4;
     //------------------------------------------------------------------------------------------
+	@BeforeEach
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
-        transform = (ClasspathTransformation) lookup( ClasspathTransformation.ROLE, "default" );
 
         graph = new MetadataGraph( 4, 3 );
         /*
@@ -74,6 +76,7 @@ extends PlexusTestCase
         graph.addEdge(v3, v4, new MetadataGraphEdge( "1.2", true, ArtifactScopeEnum.test, null, 2, 2 ) );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testCompileClasspathTransform()
     throws Exception
     {
@@ -81,11 +84,12 @@ extends PlexusTestCase
 
         res = transform.transform( graph, ArtifactScopeEnum.compile, false );
 
-        assertNotNull("null classpath container after compile transform", res );
-        assertNotNull("null classpath after compile transform", res.getClasspath() );
-        assertEquals("compile classpath should have 3 entries", 3, res.getClasspath().size() );
+        assertNotNull( res, "null classpath container after compile transform" );
+        assertNotNull( res.getClasspath(), "null classpath after compile transform" );
+        assertEquals( 3, res.getClasspath().size(), "compile classpath should have 3 entries" );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testRuntimeClasspathTransform()
     throws Exception
     {
@@ -93,14 +97,15 @@ extends PlexusTestCase
 
         res = transform.transform( graph, ArtifactScopeEnum.runtime, false );
 
-        assertNotNull("null classpath container after runtime transform", res );
-        assertNotNull("null classpath after runtime transform", res.getClasspath() );
-        assertEquals("runtime classpath should have 4 entries", 4, res.getClasspath().size() );
+        assertNotNull( res, "null classpath container after runtime transform" );
+        assertNotNull( res.getClasspath(), "null classpath after runtime transform" );
+        assertEquals( 4, res.getClasspath().size(), "runtime classpath should have 4 entries" );
 
         ArtifactMetadata md = res.getClasspath().get(3);
-        assertEquals("runtime artifact version should be 1.1", "1.1", md.getVersion() );
+        assertEquals("1.1", md.getVersion(), "runtime artifact version should be 1.1" );
     }
     //------------------------------------------------------------------------------------------
+	@Test
     public void testTestClasspathTransform()
     throws Exception
     {
@@ -108,12 +113,12 @@ extends PlexusTestCase
 
         res = transform.transform( graph, ArtifactScopeEnum.test, false );
 
-        assertNotNull("null classpath container after runtime transform", res );
-        assertNotNull("null classpath after runtime transform", res.getClasspath() );
-        assertEquals("runtime classpath should have 4 entries", 4, res.getClasspath().size() );
+        assertNotNull( res, "null classpath container after test transform" );
+        assertNotNull( res.getClasspath(), "null classpath after test transform" );
+        assertEquals( 4, res.getClasspath().size(), "test classpath should have 4 entries" );
 
         ArtifactMetadata md = res.getClasspath().get(3);
-        assertEquals("test artifact version should be 1.2", "1.2", md.getVersion() );
+        assertEquals("1.2", md.getVersion(), "test artifact version should be 1.2" );
     }
     //------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------

@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code CiManagement}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class CiManagementTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new CiManagement().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new CiManagement().equals( null ) );
@@ -42,12 +47,14 @@ public class CiManagementTest
         new CiManagement().equals( new CiManagement() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         CiManagement thing = new CiManagement();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new CiManagement().toString() );

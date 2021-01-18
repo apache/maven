@@ -42,6 +42,7 @@ import org.apache.maven.settings.Server;
 public class ArtifactResolutionRequest
     implements RepositoryRequest
 {
+    private static final String LS = System.lineSeparator();
 
     private Artifact artifact;
 
@@ -234,11 +235,11 @@ public class ArtifactResolutionRequest
     public String toString()
     {
         StringBuilder sb = new StringBuilder()
-                .append( "REQUEST: " ).append(  "\n" )
-                .append( "artifact: " ).append( artifact ).append(  "\n" )
-                .append( artifactDependencies ).append(  "\n" )
-                .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
-                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" );
+                .append( "REQUEST: " ).append( LS )
+                .append( "artifact: " ).append( artifact ).append( LS )
+                .append( artifactDependencies ).append( LS )
+                .append( "localRepository: " ).append( localRepository ).append( LS )
+                .append( "remoteRepositories: " ).append( remoteRepositories );
 
         return sb.toString();
     }

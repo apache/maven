@@ -20,18 +20,18 @@ package org.apache.maven.cli;
  */
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.cli.CommandLine;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CLIManagerTest
 {
     private CLIManager cliManager;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         cliManager = new CLIManager();

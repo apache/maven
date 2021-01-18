@@ -36,6 +36,8 @@ public class PluginParameterException
     extends PluginConfigurationException
 {
 
+    private static final String LS = System.lineSeparator();
+
     private final List<Parameter> parameters;
 
     private final MojoDescriptor mojo;
@@ -105,50 +107,53 @@ public class PluginParameterException
 
             messageBuffer.append( "Inside the definition for plugin \'" );
             messageBuffer.append( mojo.getPluginDescriptor().getArtifactId() );
-            messageBuffer.append( "\', specify the following:\n\n<configuration>\n  ...\n" );
+            messageBuffer.append( "\', specify the following:" ).append( LS ).append( LS );
+            messageBuffer.append( "<configuration>" ).append( LS ).append( "  ..." ).append( LS );
             messageBuffer.append( "  <" ).append( param.getName() ).append( '>' );
             if ( isArray || isCollection )
             {
-                messageBuffer.append( '\n' );
+                messageBuffer.append( LS );
                 messageBuffer.append( "    <item>" );
             }
             else if ( isProperties )
             {
-                messageBuffer.append( '\n' );
-                messageBuffer.append( "    <property>\n" );
-                messageBuffer.append( "      <name>KEY</name>\n" );
+                messageBuffer.append( LS );
+                messageBuffer.append( "    <property>" ).append( LS );
+                messageBuffer.append( "      <name>KEY</name>" ).append( LS );
                 messageBuffer.append( "      <value>" );
             }
             else if ( isMap )
             {
-                messageBuffer.append( '\n' );
+                messageBuffer.append( LS );
                 messageBuffer.append( "    <KEY>" );
             }
             messageBuffer.append( "VALUE" );
             if ( isArray || isCollection )
             {
-                messageBuffer.append( "</item>\n" );
+                messageBuffer.append( "</item>" ).append( LS );
                 messageBuffer.append( "  " );
             }
             else if ( isProperties )
             {
-                messageBuffer.append( "</value>\n" );
-                messageBuffer.append( "    </property>\n" );
+                messageBuffer.append( "</value>" ).append( LS );
+                messageBuffer.append( "    </property>" ).append( LS );
                 messageBuffer.append( "  " );
             }
             else if ( isMap )
             {
-                messageBuffer.append( "</KEY>\n" );
+                messageBuffer.append( "</KEY>" ).append( LS );
                 messageBuffer.append( "  " );
             }
-            messageBuffer.append( "</" ).append( param.getName() ).append( ">\n" );
+            messageBuffer.append( "</" ).append( param.getName() ).append( ">" ).append( LS );
             messageBuffer.append( "</configuration>" );
 
             String alias = param.getAlias();
             if ( StringUtils.isNotEmpty( alias ) && !alias.equals( param.getName() ) )
             {
-                messageBuffer.append( "\n\n-OR-\n\n<configuration>\n  ...\n  <" ).append( alias ).append(
-                    ">VALUE</" ).append( alias ).append( ">\n</configuration>\n" );
+                messageBuffer.append( LS ).append( LS ).append( "-OR-" ).append( LS ).append( LS );
+                messageBuffer.append( "<configuration>" ).append( LS ).append( "  ..." ).append( LS );
+                messageBuffer.append( "  <" ).append( alias ).append(
+                    ">VALUE</" ).append( alias ).append( ">" ).append( LS ).append( "</configuration>" ).append( LS );
             }
         }
 
@@ -160,7 +165,7 @@ public class PluginParameterException
         {
             if ( param.isEditable() )
             {
-                messageBuffer.append( "\n\n-OR-\n\n" );
+                messageBuffer.append( LS ).append( LS ).append( "-OR-" ).append( LS ).append( LS );
             }
 
             //addParameterUsageInfo( expression, messageBuffer );
@@ -176,18 +181,18 @@ public class PluginParameterException
 
         messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" )
             .append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ':' ).append( mojo.getGoal() )
-            .append( "\'\n" );
+            .append( "\'" ).append( LS );
 
         int idx = 0;
         for ( Iterator<Parameter> it = params.iterator(); it.hasNext(); idx++ )
         {
             Parameter param = it.next();
 
-            messageBuffer.append( "\n[" ).append( idx ).append( "] " );
+            messageBuffer.append( LS ).append( "[" ).append( idx ).append( "] " );
 
             decomposeParameterIntoUserInstructions( mojo, param, messageBuffer );
 
-            messageBuffer.append( '\n' );
+            messageBuffer.append( LS );
         }
 
         return messageBuffer.toString();
