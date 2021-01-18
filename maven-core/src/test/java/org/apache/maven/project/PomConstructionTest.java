@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -43,6 +43,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.test.PlexusExtension.getBasedir;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.lessThan;
@@ -54,8 +55,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@PlexusTest
 public class PomConstructionTest
-    extends PlexusTestCase
 {
     private static String BASE_DIR = "src/test";
 
@@ -75,18 +76,8 @@ public class PomConstructionTest
     public void setUp()
         throws Exception
     {
-        super.setUp();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         new File( getBasedir(), BASE_MIXIN_DIR );
-    }
-
-    @AfterEach
-    public void tearDown()
-        throws Exception
-    {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     /**

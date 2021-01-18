@@ -8,7 +8,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,9 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+@PlexusTest
 public class DefaultMavenExecutionRequestPopulatorTest
-    extends PlexusTestCase
 {
     @Inject
     MavenExecutionRequestPopulator testee;

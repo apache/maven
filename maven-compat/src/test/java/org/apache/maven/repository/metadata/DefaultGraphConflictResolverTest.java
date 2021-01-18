@@ -18,7 +18,7 @@ package org.apache.maven.repository.metadata;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-
+@PlexusTest
 public class DefaultGraphConflictResolverTest
-extends PlexusTestCase
 {
     @Inject
     GraphConflictResolver resolver;
@@ -45,11 +44,8 @@ extends PlexusTestCase
     MetadataGraphVertex v4;
     //------------------------------------------------------------------------------------------
 	@BeforeEach
-    @Override
     public void setUp() throws Exception
     {
-        super.setUp();
-
         /*
          *       v2
          *   v1<

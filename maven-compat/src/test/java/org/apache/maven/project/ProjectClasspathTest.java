@@ -44,17 +44,11 @@ public class ProjectClasspathTest
     {
         super.setUp();
 
-        ArtifactResolver resolver = lookup( ArtifactResolver.class, "classpath" );
-        DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)lookup(ArtifactDescriptorReader.class);
+        ArtifactResolver resolver = getContainer().lookup( ArtifactResolver.class, "classpath" );
+        DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)getContainer().lookup(ArtifactDescriptorReader.class);
         pomReader.setArtifactResolver( resolver );
 
-        projectBuilder = lookup( ProjectBuilder.class, "classpath" );
-    }
-
-    @Override
-    protected String getCustomConfigurationName()
-    {
-        return null;
+        projectBuilder = getContainer().lookup( ProjectBuilder.class, "classpath" );
     }
 
     @Test

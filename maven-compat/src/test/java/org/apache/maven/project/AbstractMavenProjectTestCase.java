@@ -24,13 +24,14 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,52 +41,39 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Jason van Zyl
  */
+@PlexusTest
 public abstract class AbstractMavenProjectTestCase
-    extends PlexusTestCase
 {
     protected ProjectBuilder projectBuilder;
 
     @Inject
     protected RepositorySystem repositorySystem;
 
-    @Override
+    @Inject
+    protected PlexusContainer container;
+
+    public PlexusContainer getContainer() {
+        return container;
+    }
+
     @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
         {
-            projectBuilder = lookup( ProjectBuilder.class, "test" );
+            projectBuilder = getContainer().lookup( ProjectBuilder.class, "test" );
         }
         else
         {
             // default over to the main project builder...
-            projectBuilder = lookup( ProjectBuilder.class );
+            projectBuilder = getContainer().lookup( ProjectBuilder.class );
         }
-    }
-
-    @AfterEach
-    public void tearDown()
-        throws Exception
-    {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     protected ProjectBuilder getProjectBuilder()
     {
         return projectBuilder;
-    }
-
-    @Override
-    protected String getCustomConfigurationName()
-    {
-        String name = AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
-        System.out.println( name );
-        return name;
     }
 
     // ----------------------------------------------------------------------
@@ -118,7 +106,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class );
+        ArtifactRepositoryLayout repoLayout = getContainer().lookup( ArtifactRepositoryLayout.class );
 
         ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null );
 

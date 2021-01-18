@@ -50,8 +50,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * This is a slightly modified version of the original plexus class
@@ -64,20 +65,24 @@ import org.junit.jupiter.api.BeforeEach;
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
  * @author Guillaume Nodet
  */
-public abstract class PlexusTestCase
+public class PlexusExtension implements BeforeEachCallback, AfterEachCallback
 {
+    private ExtensionContext context;
     private PlexusContainer container;
 
     private static String basedir;
 
-    @BeforeEach
-    public void setUp()
+    @Override
+    public void beforeEach( ExtensionContext context )
             throws Exception
     {
         basedir = getBasedir();
+        this.context = context;
+
+        getContainer().addComponent( getContainer(), PlexusContainer.class.getName() );
 
         ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( Collections.emptyList(),
-                binder -> binder.requestInjection( this ) );
+                binder -> binder.requestInjection( context.getRequiredTestInstance() ) );
     }
 
     @SuppressWarnings( "ResultOfMethodCallIgnored" )
@@ -161,8 +166,8 @@ public abstract class PlexusTestCase
         return null;
     }
 
-    @AfterEach
-    public void tearDown()
+    @Override
+    public void afterEach( ExtensionContext context )
             throws Exception
     {
         if ( container != null )
@@ -173,7 +178,7 @@ public abstract class PlexusTestCase
         }
     }
 
-    protected PlexusContainer getContainer()
+    public PlexusContainer getContainer()
     {
         if ( container == null )
         {
@@ -211,17 +216,28 @@ public abstract class PlexusTestCase
      */
     protected String getConfigurationName( String subname )
     {
-        return getClass().getName().replace( '.', '/' ) + ".xml";
+        Class<?> testClass = context.getRequiredTestClass();
+        for ( Class<?> clazz = testClass;
+              clazz != null;
+              clazz = clazz.getSuperclass() )
+        {
+            String name = clazz.getName().replace( '.', '/' ) + ".xml";
+            if ( testClass.getClassLoader().getResource( name ) != null )
+            {
+                return name;
+            }
+        }
+        return null;
     }
 
     protected InputStream getResourceAsStream( String resource )
     {
-        return getClass().getResourceAsStream( resource );
+        return context.getRequiredTestClass().getResourceAsStream( resource );
     }
 
     protected ClassLoader getClassLoader()
     {
-        return getClass().getClassLoader();
+        return context.getRequiredTestClass().getClassLoader();
     }
 
     // ----------------------------------------------------------------------
@@ -313,7 +329,7 @@ public abstract class PlexusTestCase
 
     public String getTestConfiguration()
     {
-        return getTestConfiguration( getClass() );
+        return getTestConfiguration( context.getRequiredTestClass() );
     }
 
     public static String getTestConfiguration( Class<?> clazz )

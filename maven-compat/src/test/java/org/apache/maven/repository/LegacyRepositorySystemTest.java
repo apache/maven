@@ -32,7 +32,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.test.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,13 +53,15 @@ import javax.inject.Inject;
  *
  * @author Benjamin Bentmann
  */
+@PlexusTest
 public class LegacyRepositorySystemTest
-    extends PlexusTestCase
 {
     @Inject
     private RepositorySystem repositorySystem;
     @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
+    @Inject
+    private PlexusContainer container;
 
     protected List<ArtifactRepository> getRemoteRepositories()
         throws Exception
@@ -110,8 +114,8 @@ public class LegacyRepositorySystemTest
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
         session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
-        LegacySupport legacySupport = lookup( LegacySupport.class );
-        legacySupport.setSession( new MavenSession( getContainer(), session, new DefaultMavenExecutionRequest(),
+        LegacySupport legacySupport = container.lookup( LegacySupport.class );
+        legacySupport.setSession( new MavenSession( container, session, new DefaultMavenExecutionRequest(),
                                                     new DefaultMavenExecutionResult() ) );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );

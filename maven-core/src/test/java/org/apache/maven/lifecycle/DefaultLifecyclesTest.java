@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +35,8 @@ import static org.hamcrest.Matchers.is;
 /**
  * @author Kristian Rosenvold
  */
-
+@PlexusTest
 public class DefaultLifecyclesTest
-    extends PlexusTestCase
 {
     @Inject
     private DefaultLifecycles defaultLifeCycles;

@@ -32,7 +32,7 @@ import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -43,10 +43,11 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
+import static org.apache.maven.test.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@PlexusTest
 public class PomConstructionWithSettingsTest
-    extends PlexusTestCase
 {
     private static final String BASE_DIR = "src/test";
 
@@ -64,7 +65,6 @@ public class PomConstructionWithSettingsTest
     public void setUp()
         throws Exception
     {
-        super.setUp();
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
     }
 

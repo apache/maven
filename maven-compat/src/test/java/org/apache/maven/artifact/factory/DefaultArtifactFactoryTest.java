@@ -21,15 +21,15 @@ package org.apache.maven.artifact.factory;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@PlexusTest
 public class DefaultArtifactFactoryTest
-    extends PlexusTestCase
 {
 
     @Inject

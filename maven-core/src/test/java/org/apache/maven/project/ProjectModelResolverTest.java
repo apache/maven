@@ -35,6 +35,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.test.PlexusExtension.getBasedir;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -208,8 +209,8 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         final DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
 
-        return new ProjectModelResolver( repoSession, null, lookup( RepositorySystem.class ),
-                                         lookup( RemoteRepositoryManager.class ),
+        return new ProjectModelResolver( repoSession, null, getContainer().lookup( RepositorySystem.class ),
+                                         getContainer().lookup( RemoteRepositoryManager.class ),
                                          this.getRemoteRepositories(),
                                          ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT, null );
 
