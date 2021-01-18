@@ -37,12 +37,11 @@ import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.apache.maven.test.Parameter;
-import org.apache.maven.test.Parameterized;
-import org.apache.maven.test.Parameters;
-import org.apache.maven.test.Test;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,11 +59,12 @@ import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_DOWN
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
 import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Parameterized
 public class DefaultGraphBuilderTest
 {
     /*
@@ -103,26 +103,9 @@ public class DefaultGraphBuilderTest
 
     private Map<String, MavenProject> artifactIdProjectMap;
 
-    // Parameters for the test
-    @Parameter( 0 )
-    private String parameterDescription;
-    @Parameter( 1 )
-    private List<String> parameterSelectedProjects;
-    @Parameter( 2 )
-    private List<String> parameterExcludedProjects;
-    @Parameter( 3 )
-    private String parameterResumeFrom;
-    @Parameter( 4 )
-    private String parameterMakeBehavior;
-    @Parameter( 5 )
-    private List<String> parameterExpectedResult;
-    @Parameter( 6 )
-    private File parameterRequestedPom;
-
-    @Parameters(name = "{index}. {0}")
-    public static Collection<Object[]> parameters()
+    public static Stream<Arguments> parameters()
     {
-        return asList(
+        return Stream.of(
                 scenario( "Full reactor in order" )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected project" )
@@ -198,8 +181,16 @@ public class DefaultGraphBuilderTest
         );
     }
 
-    @Test
-    public void testGetReactorProjects()
+    @ParameterizedTest
+    @MethodSource("parameters")
+    public void testGetReactorProjects(
+            String parameterDescription,
+            List<String> parameterSelectedProjects,
+            List<String> parameterExcludedProjects,
+            String parameterResumeFrom,
+            String parameterMakeBehavior,
+            List<String> parameterExpectedResult,
+            File parameterRequestedPom)
     {
         // Given
         List<String> selectedProjects = parameterSelectedProjects.stream().map( p -> ":" + p ).collect( Collectors.toList() );
@@ -350,11 +341,11 @@ public class DefaultGraphBuilderTest
             return this;
         }
 
-        public Object[] expectResult( String... expectedReactorProjects )
+        public Arguments expectResult( String... expectedReactorProjects )
         {
-            return new Object[] {
+            return Arguments.arguments(
                     description, selectedProjects, excludedProjects, resumeFrom, makeBehavior, asList( expectedReactorProjects ), requestedPom
-            };
+            );
         }
     }
 }
