@@ -1,7 +1,5 @@
 package org.apache.maven.project.artifact;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * under the License.
  */
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
@@ -49,9 +49,9 @@ public class ActiveProjectArtifactTest {
         when( p.getArtifact() ).thenReturn( a );
 
         final ActiveProjectArtifact artifact = new ActiveProjectArtifact( p, a );
-        artifact.setPath( Path.of( "testPath" ) );
+        artifact.setPath( Paths.get( "testPath" ) );
         assertEquals( new File( "testPath" ), artifact.getFile() );
         artifact.setFile( new File( "testFile" ) );
-        assertEquals( Path.of( "testFile" ), artifact.getPath() );
+        assertEquals( Paths.get( "testFile" ), artifact.getPath() );
     }
 }

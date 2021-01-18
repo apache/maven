@@ -20,7 +20,7 @@ package org.apache.maven.artifact;
  */
 
 import java.io.File;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -155,9 +155,9 @@ public class DefaultArtifactTest
 
     @Test
     public void testPathYieldsFile() {
-        artifact.setPath( Path.of( "testPath" ) );
+        artifact.setPath( Paths.get( "testPath" ) );
         assertEquals( new File( "testPath" ), artifact.getFile() );
         artifact.setFile( new File( "testFile" ) );
-        assertEquals( Path.of( "testFile" ), artifact.getPath() );
+        assertEquals( Paths.get( "testFile" ), artifact.getPath() );
     }
 }
