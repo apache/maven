@@ -1415,6 +1415,7 @@ public class DefaultModelBuilder
             try
             {
                 ModelBuildingRequest importRequest = new DefaultModelBuildingRequest( request )
+                        .setTwoPhaseBuilding( false )
                         .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
                         .setModelSource( importSource )
                         .setModelResolver( modelResolver.newCopy() );
