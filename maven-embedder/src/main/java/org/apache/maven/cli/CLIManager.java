@@ -29,6 +29,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 
 /**
  * @author Jason van Zyl
@@ -170,7 +171,13 @@ public class CLIManager
 
         HelpFormatter formatter = new HelpFormatter();
 
-        formatter.printHelp( pw, HelpFormatter.DEFAULT_WIDTH, "mvn [options] [<goal(s)>] [<phase(s)>]",
+        int width = MessageUtils.getTerminalWidth();
+        if ( width <= 0 )
+        {
+            width = HelpFormatter.DEFAULT_WIDTH;
+        }
+
+        formatter.printHelp( pw, width, "mvn [options] [<goal(s)>] [<phase(s)>]",
                              System.lineSeparator() + "Options:", options,
                              HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD,
                              System.lineSeparator(), false );
