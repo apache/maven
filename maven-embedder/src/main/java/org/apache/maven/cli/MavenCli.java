@@ -173,6 +173,8 @@ public class MavenCli
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
+    private CLIManager cliManager;
+
     public MavenCli()
     {
         this( null );
@@ -285,6 +287,7 @@ public class MavenCli
             cli( cliRequest );
             properties( cliRequest );
             logging( cliRequest );
+            informativeCommands( cliRequest );
             version( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
@@ -374,7 +377,7 @@ public class MavenCli
         //
         slf4jLogger = new Slf4jStdoutLogger();
 
-        CLIManager cliManager = new CLIManager();
+        cliManager = new CLIManager();
 
         List<String> args = new ArrayList<>();
         CommandLine mavenConfig = null;
@@ -424,7 +427,10 @@ public class MavenCli
             cliManager.displayHelp( System.out );
             throw e;
         }
+    }
 
+    private void informativeCommands( CliRequest cliRequest ) throws ExitException
+    {
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp( System.out );
