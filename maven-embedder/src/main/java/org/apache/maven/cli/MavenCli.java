@@ -113,6 +113,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -504,6 +505,7 @@ public class MavenCli
 
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
+        styleColor = cliRequest.commandLine.getOptionValue( COLOR, styleColor );
         if ( "always".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( true );
