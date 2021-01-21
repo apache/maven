@@ -37,7 +37,10 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -444,6 +447,38 @@ public class MavenCliTest
                 is( notNullValue() ) );
         assertThat( executionRequest.getLocalRepositoryPath().toString(),
                 is( "." + File.separatorChar + "custom2" ) );
+    }
+
+    /**
+     * MNG-7032: Disable colours for {@code --version} if {@code --batch-mode} is also given.
+     * @throws Exception cli invocation.
+     */
+    @Test
+    public void testVersionStringWithoutAnsi() throws Exception
+    {
+        // given
+        // - request with version and batch mode
+        CliRequest cliRequest = new CliRequest( new String[] {
+                "--version",
+                "--batch-mode"
+        }, null );
+        ByteArrayOutputStream systemOut = new ByteArrayOutputStream();
+        PrintStream oldOut = System.out;
+        System.setOut( new PrintStream( systemOut ) );
+
+        // when
+        try {
+            cli.cli( cliRequest );
+        } catch ( MavenCli.ExitException exitException ) {
+            // expected
+        } finally {
+            // restore sysout
+            System.setOut( oldOut );
+        }
+        String versionOut = new String( systemOut.toByteArray(), StandardCharsets.UTF_8 );
+
+        // then
+        assertEquals( MessageUtils.stripAnsiCodes( versionOut ), versionOut );
     }
 
     private MavenProject createMavenProject( String groupId, String artifactId )
