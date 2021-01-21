@@ -108,6 +108,8 @@ public class CLIManager
 
     public static final String NO_TRANSFER_PROGRESS = "ntp";
 
+    public static final String COLOR = "color";
+
     protected Options options;
 
     @SuppressWarnings( "checkstyle:linelength" )
@@ -150,6 +152,7 @@ public class CLIManager
         options.addOption( Option.builder( LEGACY_LOCAL_REPOSITORY ).longOpt( "legacy-local-repository" ).desc( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).build() );
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
+        options.addOption( Option.builder().longOpt( COLOR ).hasArg().desc( "Defines the color mode of the output. Available options are auto/always/never" ).build() );
     }
 
     public CommandLine parse( String[] args )

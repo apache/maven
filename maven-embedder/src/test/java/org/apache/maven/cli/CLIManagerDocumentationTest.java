@@ -44,7 +44,9 @@ public class CLIManagerDocumentationTest
     {
         public int compare( Option opt1, Option opt2 )
         {
-            return opt1.getOpt().compareToIgnoreCase( opt2.getOpt() );
+            String s1 = opt1.getOpt() != null ? opt1.getOpt() : opt1.getLongOpt();
+            String s2 = opt2.getOpt() != null ? opt2.getOpt() : opt2.getLongOpt();
+            return s1.compareToIgnoreCase( s2 );
         }
     }
 
