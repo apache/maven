@@ -614,10 +614,10 @@ public abstract class AbstractMavenIntegrationTestCase
         return verifier;
     }
 
-    private boolean hasDotMvnSubfolder( Path path )
+    private boolean hasDotMvnSubDirectory( Path path )
     {
-        final Path probablySubfolder = path.resolve( ".mvn" );
-        return Files.exists( probablySubfolder ) && Files.isDirectory( probablySubfolder );
+        final Path probablySubDirectory = path.resolve( ".mvn" );
+        return Files.exists( probablySubDirectory ) && Files.isDirectory( probablySubDirectory );
     }
 
     private String findMultiModuleProjectDirectory( String basedir )
@@ -633,7 +633,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         while ( !fileSystemRoots.contains( path ) )
         {
-            if ( hasDotMvnSubfolder( path ) )
+            if ( hasDotMvnSubDirectory( path ) )
             {
                 result = path;
                 break;

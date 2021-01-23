@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6256">MNG-6256</a>: check that directories
  * passed via <code>-f/--file</code> containing special characters do not break the script. E.g
- * <code>-f "folderWithClosing)Bracket/pom.xml"</code>.
+ * <code>-f "directoryWithClosing)Bracket/pom.xml"</code>.
  */
 public class MavenITmng6256SpecialCharsAlternatePOMLocation
     extends AbstractMavenIntegrationTestCase
@@ -42,23 +42,23 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
     }
 
     /**
-     * check script is working when path to POM is set to <code>folder-with- -space</code>
+     * check script is working when path to POM is set to <code>directory-with- -space</code>
      */
-    public void testFolderWithSpace()
+    public void testDirectoryWithSpace()
         throws Exception
     {
-        runWithMvnFileLongOption( "folder-with- -space" );
-        runWithMvnFileShortOption( "folder-with- -space" );
+        runWithMvnFileLongOption( "directory-with- -space" );
+        runWithMvnFileShortOption( "directory-with- -space" );
     }
 
     /**
-     * check script is working when path to POM is set to <code>folder-with-)-closing-bracket</code>
+     * check script is working when path to POM is set to <code>directory-with-)-closing-bracket</code>
      */
-    public void testFolderWithClosingBracket()
+    public void testDirectoryWithClosingBracket()
         throws Exception
     {
-        runWithMvnFileLongOption( "folder-with-)-closing-bracket" );
-        runWithMvnFileShortOption( "folder-with-)-closing-bracket" );
+        runWithMvnFileLongOption( "directory-with-)-closing-bracket" );
+        runWithMvnFileShortOption( "directory-with-)-closing-bracket" );
     }
 
     private void runWithMvnFileLongOption( String subDir )
