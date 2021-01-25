@@ -19,6 +19,8 @@ package org.apache.maven.plugin.logging;
  * under the License.
  */
 
+import java.util.function.Supplier;
+
 /**
  * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
  * <code>Maven</code> channels.<br>
@@ -64,6 +66,20 @@ public interface Log
     void debug( Throwable error );
 
     /**
+     * Send a message to the user in the <b>debug</b> error level by computing the message
+     * only when needed. The supplier will be called only if @see #isDebugEnabled() is <b>true</b>.
+     * 
+     * @param messageSupplier a non null Supplier of the message to use
+     */
+    default void debug( Supplier<String> messageSupplier )
+    {
+        if ( isDebugEnabled() )
+        {
+            debug( messageSupplier.get() );
+        }
+    }
+
+    /**
      * @return true if the <b>info</b> error level is enabled
      */
     boolean isInfoEnabled();
@@ -91,6 +107,20 @@ public interface Log
      * @param error
      */
     void info( Throwable error );
+
+    /**
+     * Send a message to the user in the <b>info</b> error level by computing the message
+     * only when needed. The supplier will be called only if @see #isInfoEnabled() is <b>true</b>.
+     *
+     * @param messageSupplier a non null Supplier of the message to use
+     */
+    default void info( Supplier<String> messageSupplier )
+    {
+        if ( isInfoEnabled() )
+        {
+            info( messageSupplier.get() );
+        }
+    }
 
     /**
      * @return true if the <b>warn</b> error level is enabled
@@ -122,6 +152,20 @@ public interface Log
     void warn( Throwable error );
 
     /**
+     * Send a message to the user in the <b>warn</b> error level by computing the message
+     * only when needed. The supplier will be called only if @see #isWarnEnabled() is <b>true</b>.
+     *
+     * @param messageSupplier a non null Supplier of the message to use
+     */
+    default void warn( Supplier<String> messageSupplier )
+    {
+        if ( isWarnEnabled() )
+        {
+            warn( messageSupplier.get() );
+        }
+    }
+
+    /**
      * @return true if the <b>error</b> error level is enabled
      */
     boolean isErrorEnabled();
@@ -149,4 +193,18 @@ public interface Log
      * @param error
      */
     void error( Throwable error );
+
+    /**
+     * Send a message to the user in the <b>error</b> error level by computing the message
+     * only when needed. The supplier will be called only if @see #isErrorEnabled() is <b>true</b>.
+     *
+     * @param messageSupplier a non null Supplier of the message to use
+     */
+    default void error( Supplier<String> messageSupplier )
+    {
+        if ( isErrorEnabled() )
+        {
+            error( messageSupplier.get() );
+        }
+    }
 }
