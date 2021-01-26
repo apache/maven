@@ -33,7 +33,7 @@ public class SystemStreamLogTest
 
   /*
    * As SystemStreamLog log levels are hardcoded (only info/warn/error are active), this test checks that
-   * a message supplier is really called/executed when logging at those levels 
+   * a message supplier is really called/executed when logging at those levels.
    */
   @Test
   public void testLazyMessageIsEvaluatedForActiveLogLevelsOnly()
@@ -41,13 +41,21 @@ public class SystemStreamLogTest
     Supplier messageSupplier = Mockito.mock(Supplier.class);
     Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
 
+    Throwable fakeError = new RuntimeException();
+    
     Log logger = new SystemStreamLog();
     
     logger.debug(messageSupplier);
     logger.info(messageSupplier);
     logger.warn(messageSupplier);
     logger.error(messageSupplier);
-    
-    Mockito.verify(messageSupplier, Mockito.times(3)).get();
+
+    logger.debug(messageSupplier, fakeError);
+    logger.info(messageSupplier, fakeError);
+    logger.warn(messageSupplier, fakeError);
+    logger.error(messageSupplier, fakeError);
+
+    // calls at debug log level should have not lead to a Supplier call
+    Mockito.verify(messageSupplier, Mockito.times(6)).get();
   }
 }

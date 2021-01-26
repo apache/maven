@@ -35,6 +35,8 @@ public class DefaultLogTest
   {
     Supplier messageSupplier = Mockito.mock(Supplier.class);
     Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
+    
+    Throwable fakeError = new RuntimeException();
 
     Logger mockPlexusLogger = Mockito.mock(Logger.class);
     Mockito.when(mockPlexusLogger.isDebugEnabled()).thenReturn(Boolean.TRUE);
@@ -43,12 +45,18 @@ public class DefaultLogTest
     Mockito.when(mockPlexusLogger.isErrorEnabled()).thenReturn(Boolean.TRUE);
 
     Log logger = new DefaultLog(mockPlexusLogger);
+    
     logger.debug(messageSupplier);
     logger.info(messageSupplier);
     logger.warn(messageSupplier);
     logger.error(messageSupplier);
 
-    Mockito.verify(messageSupplier, Mockito.times(4)).get();
+    logger.debug(messageSupplier, fakeError);
+    logger.info(messageSupplier, fakeError);
+    logger.warn(messageSupplier, fakeError);
+    logger.error(messageSupplier, fakeError);
+
+    Mockito.verify(messageSupplier, Mockito.times(8)).get();
   }
   
   @Test
@@ -57,6 +65,8 @@ public class DefaultLogTest
     Supplier messageSupplier = Mockito.mock(Supplier.class);
     Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
 
+    Throwable fakeError = new RuntimeException();
+
     Logger mockPlexusLogger = Mockito.mock(Logger.class);
     Mockito.when(mockPlexusLogger.isDebugEnabled()).thenReturn(Boolean.FALSE);
     Mockito.when(mockPlexusLogger.isInfoEnabled()).thenReturn(Boolean.FALSE);
@@ -64,10 +74,16 @@ public class DefaultLogTest
     Mockito.when(mockPlexusLogger.isErrorEnabled()).thenReturn(Boolean.FALSE);
 
     Log logger = new DefaultLog(mockPlexusLogger);
+    
     logger.debug(messageSupplier);
     logger.info(messageSupplier);
     logger.warn(messageSupplier);
     logger.error(messageSupplier);
+
+    logger.debug(messageSupplier, fakeError);
+    logger.info(messageSupplier, fakeError);
+    logger.warn(messageSupplier, fakeError);
+    logger.error(messageSupplier, fakeError);
 
     Mockito.verify(messageSupplier, Mockito.never()).get();
   }
