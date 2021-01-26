@@ -19,12 +19,12 @@ package org.apache.maven.monitor.logging;
  * under the License.
  */
 
+import org.apache.maven.plugin.logging.CountingCallsSupplier;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import java.util.function.Supplier;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultLogTest
 {
@@ -33,18 +33,11 @@ public class DefaultLogTest
   @Test
   public void testLazyMessageIsEvaluatedForActiveLogLevels() 
   {
-    Supplier messageSupplier = Mockito.mock(Supplier.class);
-    Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
+    CountingCallsSupplier<String> messageSupplier = CountingCallsSupplier.of(EXPECTED_MESSAGE);
     
     Throwable fakeError = new RuntimeException();
 
-    Logger mockPlexusLogger = Mockito.mock(Logger.class);
-    Mockito.when(mockPlexusLogger.isDebugEnabled()).thenReturn(Boolean.TRUE);
-    Mockito.when(mockPlexusLogger.isInfoEnabled()).thenReturn(Boolean.TRUE);
-    Mockito.when(mockPlexusLogger.isWarnEnabled()).thenReturn(Boolean.TRUE);
-    Mockito.when(mockPlexusLogger.isErrorEnabled()).thenReturn(Boolean.TRUE);
-
-    Log logger = new DefaultLog(mockPlexusLogger);
+    Log logger = new DefaultLog(new NoOpLogger(Logger.LEVEL_DEBUG));
     
     logger.debug(messageSupplier);
     logger.info(messageSupplier);
@@ -56,24 +49,18 @@ public class DefaultLogTest
     logger.warn(messageSupplier, fakeError);
     logger.error(messageSupplier, fakeError);
 
-    Mockito.verify(messageSupplier, Mockito.times(8)).get();
+    // all log calls should have lead to a supplier call
+    assertEquals(8, messageSupplier.getNumberOfCalls(), "wrong number of calls to the message supplier");
   }
   
   @Test
   public void testLazyMessageIsNotEvaluatedForNonActiveLogLevels()
   {
-    Supplier messageSupplier = Mockito.mock(Supplier.class);
-    Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
+    CountingCallsSupplier<String> messageSupplier = CountingCallsSupplier.of(EXPECTED_MESSAGE);
 
     Throwable fakeError = new RuntimeException();
 
-    Logger mockPlexusLogger = Mockito.mock(Logger.class);
-    Mockito.when(mockPlexusLogger.isDebugEnabled()).thenReturn(Boolean.FALSE);
-    Mockito.when(mockPlexusLogger.isInfoEnabled()).thenReturn(Boolean.FALSE);
-    Mockito.when(mockPlexusLogger.isWarnEnabled()).thenReturn(Boolean.FALSE);
-    Mockito.when(mockPlexusLogger.isErrorEnabled()).thenReturn(Boolean.FALSE);
-
-    Log logger = new DefaultLog(mockPlexusLogger);
+    Log logger = new DefaultLog(new NoOpLogger(Logger.LEVEL_DISABLED));
     
     logger.debug(messageSupplier);
     logger.info(messageSupplier);
@@ -85,6 +72,7 @@ public class DefaultLogTest
     logger.warn(messageSupplier, fakeError);
     logger.error(messageSupplier, fakeError);
 
-    Mockito.verify(messageSupplier, Mockito.never()).get();
+    // no log calls should have lead to any supplier call
+    assertEquals(0, messageSupplier.getNumberOfCalls(), "wrong number of calls to the message supplier");
   }
 }

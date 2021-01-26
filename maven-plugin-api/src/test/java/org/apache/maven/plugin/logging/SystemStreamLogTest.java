@@ -20,9 +20,8 @@ package org.apache.maven.plugin.logging;
  */
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import java.util.function.Supplier;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link SystemStreamLog} 
@@ -38,8 +37,7 @@ public class SystemStreamLogTest
   @Test
   public void testLazyMessageIsEvaluatedForActiveLogLevelsOnly()
   {
-    Supplier messageSupplier = Mockito.mock(Supplier.class);
-    Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
+    CountingCallsSupplier<String> messageSupplier = CountingCallsSupplier.of(EXPECTED_MESSAGE);
 
     Throwable fakeError = new RuntimeException();
     
@@ -56,6 +54,6 @@ public class SystemStreamLogTest
     logger.error(messageSupplier, fakeError);
 
     // calls at debug log level should have not lead to a Supplier call
-    Mockito.verify(messageSupplier, Mockito.times(6)).get();
+    assertEquals(6, messageSupplier.getNumberOfCalls(), "wrong number of calls to the message supplier");
   }
 }
