@@ -19,6 +19,7 @@ package org.apache.maven.monitor.logging;
  * under the License.
  */
 
+import org.apache.maven.plugin.logging.AbstractLog;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.logging.Logger;
 
@@ -28,7 +29,7 @@ import org.codehaus.plexus.logging.Logger;
  * @deprecated Use SLF4J directly
  */
 @Deprecated
-public class DefaultLog
+public class DefaultLog extends AbstractLog
     implements Log
 {
 

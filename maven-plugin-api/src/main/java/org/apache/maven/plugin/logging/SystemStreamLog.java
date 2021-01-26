@@ -30,7 +30,7 @@ import java.io.StringWriter;
  * @deprecated Use SLF4J directly
  */
 @Deprecated
-public class SystemStreamLog
+public class SystemStreamLog extends AbstractLog
     implements Log
 {
     /**

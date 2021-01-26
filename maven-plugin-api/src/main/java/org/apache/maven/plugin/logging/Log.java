@@ -71,13 +71,7 @@ public interface Log
      * 
      * @param messageSupplier a non null Supplier of the message to use
      */
-    default void debug( Supplier<String> messageSupplier )
-    {
-        if ( isDebugEnabled() )
-        {
-            debug( messageSupplier.get() );
-        }
-    }
+    void debug( Supplier<String> messageSupplier );
 
     /**
      * Send a message to the user in the <b>debug</b> error level by computing the message
@@ -86,13 +80,7 @@ public interface Log
      * @param messageSupplier a non null Supplier of the message to use
      * @param error the error that occurred and for which the log applies 
      */
-    default void debug( Supplier<String> messageSupplier, Throwable error )
-    {
-        if ( isDebugEnabled() )
-        {
-            debug( messageSupplier.get(), error );
-        }
-    }
+    void debug( Supplier<String> messageSupplier, Throwable error );
 
     /**
      * @return true if the <b>info</b> error level is enabled
@@ -129,13 +117,7 @@ public interface Log
      *
      * @param messageSupplier a non null Supplier of the message to use
      */
-    default void info( Supplier<String> messageSupplier )
-    {
-        if ( isInfoEnabled() )
-        {
-            info( messageSupplier.get() );
-        }
-    }
+    void info( Supplier<String> messageSupplier );
 
     /**
      * Send a message to the user in the <b>info</b> error level by computing the message
@@ -144,13 +126,7 @@ public interface Log
      * @param messageSupplier a non null Supplier of the message to use
      * @param error the error that occurred and for which the log applies 
      */
-    default void info( Supplier<String> messageSupplier, Throwable error )
-    {
-        if ( isInfoEnabled() )
-        {
-            info( messageSupplier.get(), error );
-        }
-    }
+    void info( Supplier<String> messageSupplier, Throwable error );
 
     /**
      * @return true if the <b>warn</b> error level is enabled
@@ -187,13 +163,7 @@ public interface Log
      *
      * @param messageSupplier a non null Supplier of the message to use
      */
-    default void warn( Supplier<String> messageSupplier )
-    {
-        if ( isWarnEnabled() )
-        {
-            warn( messageSupplier.get() );
-        }
-    }
+    void warn( Supplier<String> messageSupplier );
 
     /**
      * Send a message to the user in the <b>warn</b> error level by computing the message
@@ -202,13 +172,7 @@ public interface Log
      * @param messageSupplier a non null Supplier of the message to use
      * @param error the error that occurred and for which the log applies 
      */
-    default void warn( Supplier<String> messageSupplier, Throwable error )
-    {
-        if ( isWarnEnabled() )
-        {
-            warn( messageSupplier.get(), error );
-        }
-    }
+    void warn( Supplier<String> messageSupplier, Throwable error );
 
     /**
      * @return true if the <b>error</b> error level is enabled
@@ -245,13 +209,7 @@ public interface Log
      *
      * @param messageSupplier a non null Supplier of the message to use
      */
-    default void error( Supplier<String> messageSupplier )
-    {
-        if ( isErrorEnabled() )
-        {
-            error( messageSupplier.get() );
-        }
-    }
+    void error( Supplier<String> messageSupplier );
 
     /**
      * Send a message to the user in the <b>error</b> error level by computing the message
@@ -260,11 +218,5 @@ public interface Log
      * @param messageSupplier a non null Supplier of the message to use
      * @param error the error that occurred and for which the log applies 
      */
-    default void error( Supplier<String> messageSupplier, Throwable error )
-    {
-        if ( isErrorEnabled() )
-        {
-            error( messageSupplier.get(), error );
-        }
-    }
+    void error( Supplier<String> messageSupplier, Throwable error );
 }
