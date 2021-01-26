@@ -19,13 +19,9 @@ package org.apache.maven.plugin.logging;
  * under the License.
  */
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.io.PrintStream;
 import java.util.function.Supplier;
 
 /**
@@ -34,61 +30,24 @@ import java.util.function.Supplier;
 public class SystemStreamLogTest 
 {
   private static final String EXPECTED_MESSAGE = "expected message";
-  private static PrintStream outStream;
-  private static PrintStream errStream;
-  private static PrintStream mockOut;
-  private static PrintStream mockErr;
 
   /*
-   * As SystemStreamLog info/warn/error log levels are active, this test checks that
+   * As SystemStreamLog log levels are hardcoded (only info/warn/error are active), this test checks that
    * a message supplier is really called/executed when logging at those levels 
    */
   @Test
-  public void testLazyMessageIsEvaluatedForActiveLogLevels()
+  public void testLazyMessageIsEvaluatedForActiveLogLevelsOnly()
   {
     Supplier messageSupplier = Mockito.mock(Supplier.class);
     Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
 
     Log logger = new SystemStreamLog();
+    
+    logger.debug(messageSupplier);
     logger.info(messageSupplier);
     logger.warn(messageSupplier);
     logger.error(messageSupplier);
     
     Mockito.verify(messageSupplier, Mockito.times(3)).get();
-  }
-
-  /*
-   * As SystemStreamLog debug log level is inactive, this test checks that
-   * a message supplier is not called/executed when logging at debug level
-   */
-  @Test
-  public void testDebugLazyMessageIsNotEvaluated()
-  {
-    Supplier messageSupplier = Mockito.mock(Supplier.class);
-    Mockito.when(messageSupplier.get()).thenReturn(EXPECTED_MESSAGE);
-
-    Log logger = new SystemStreamLog();
-    logger.debug(messageSupplier);
-
-    Mockito.verify(messageSupplier, Mockito.never()).get();
-  }
-
-  @BeforeAll
-  public static void initialize()
-  {
-    outStream = System.out;
-    errStream = System.err;
-
-    mockOut = Mockito.mock(PrintStream.class);
-    System.setOut(mockOut);
-    mockErr = Mockito.mock(PrintStream.class);
-    System.setErr(mockErr);
-  }
-  
-  @AfterAll
-  public static void cleanup()
-  {
-    System.setOut(outStream);
-    System.setErr(errStream);
   }
 }
