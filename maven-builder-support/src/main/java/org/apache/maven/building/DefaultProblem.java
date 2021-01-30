@@ -153,7 +153,13 @@ class DefaultProblem
 
         buffer.append( '[' ).append( getSeverity() ).append( "] " );
         buffer.append( getMessage() );
-        buffer.append( " @ " ).append( getLocation() );
+        String location = getLocation();
+        if ( !location.isEmpty() )
+        {
+             buffer.append( " @ " );
+             buffer.append( location );
+        }
+
 
         return buffer.toString();
     }

@@ -163,7 +163,7 @@ public class DefaultExceptionHandler
 
             String location = ModelProblemUtils.formatLocation( problem, projectId );
 
-            if ( StringUtils.isNotEmpty( location ) )
+            if ( !location.isEmpty() )
             {
                 message += " @ " + location;
             }
