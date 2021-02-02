@@ -51,10 +51,8 @@ public final class MavenResolverModule
         bind( VersionRangeResolver.class ).to( DefaultVersionRangeResolver.class ).in( Singleton.class );
         bind( MetadataGeneratorFactory.class ).annotatedWith( Names.named( "snapshot" ) )
             .to( SnapshotMetadataGeneratorFactory.class ).in( Singleton.class );
-
         bind( MetadataGeneratorFactory.class ).annotatedWith( Names.named( "versions" ) )
             .to( VersionsMetadataGeneratorFactory.class ).in( Singleton.class );
-
         bind( ModelBuilder.class ).toInstance( new DefaultModelBuilderFactory().newInstance() );
     }
 

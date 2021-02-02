@@ -27,11 +27,6 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.impl.ArtifactDescriptorReader;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.impl.MetadataGeneratorFactory;
-import org.eclipse.aether.impl.VersionRangeResolver;
-import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
@@ -61,23 +56,6 @@ public final class MavenRepositorySystemUtils
     private MavenRepositorySystemUtils()
     {
         // hide constructor
-    }
-
-    /**
-     * Creates a new service locator that already knows about all service implementations included in this library. To
-     * acquire a complete repository system, clients need to add some repository connectors for remote transfers.
-     *
-     * @return The new service locator, never {@code null}.
-     */
-    public static DefaultServiceLocator newServiceLocator()
-    {
-        DefaultServiceLocator locator = new DefaultServiceLocator();
-        locator.addService( ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class );
-        locator.addService( VersionResolver.class, DefaultVersionResolver.class );
-        locator.addService( VersionRangeResolver.class, DefaultVersionRangeResolver.class );
-        locator.addService( MetadataGeneratorFactory.class, SnapshotMetadataGeneratorFactory.class );
-        locator.addService( MetadataGeneratorFactory.class, VersionsMetadataGeneratorFactory.class );
-        return locator;
     }
 
     /**
