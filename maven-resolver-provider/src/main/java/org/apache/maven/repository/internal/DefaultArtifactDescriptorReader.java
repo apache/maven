@@ -33,7 +33,6 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ArtifactModelSource;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -93,9 +92,12 @@ public class DefaultArtifactDescriptorReader
     }
 
     @Inject
-    public DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
-                                     VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
-                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher )
+    public DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager,
+                                            VersionResolver versionResolver,
+                                            VersionRangeResolver versionRangeResolver,
+                                            ArtifactResolver artifactResolver,
+                                            ModelBuilder modelBuilder,
+                                            RepositoryEventDispatcher repositoryEventDispatcher )
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
