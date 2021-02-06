@@ -41,6 +41,29 @@ public abstract class AbstractMojoExecutionException
         super( message, cause );
     }
 
+    /**
+     * Construct a new exception providing the source for a formatted message.
+     *
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args See {@link String#format(String, Object...)}.
+     */
+    public AbstractMojoExecutionException( String format, Object... args )
+    {
+        super( String.format( format, args ) );
+    }
+
+    /**
+     * Construct a new exception providing the source for a formatted message.
+     *
+     * @param the cause of this exception.
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args See {@link String#format(String, Object...)}.
+     */
+    public AbstractMojoExecutionException( Throwable cause, String format, Object... args )
+    {
+        super( String.format( format, args ), cause );
+    }
+
     public String getLongMessage()
     {
         return longMessage;

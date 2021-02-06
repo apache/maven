@@ -76,4 +76,30 @@ public class MojoExecutionException
     {
         super( message );
     }
+
+    /**
+     * Construct a new <code>MojoExecutionException</code> exception providing the source for a formatted message:
+     * these messages are used to improve the message written at the end of Maven build.
+     *
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args  See {@link String#format(String, Object...)}.
+     */
+    public MojoExecutionException( String format, Object... args )
+    {
+        super( format, args );
+    }
+
+    /**
+     * Construct a new <code>MojoExecutionException</code> exception providing the source for a formatted message:
+     * these messages are used to improve the message written at the end of Maven build.
+     *
+     * @param the cause of this exception.
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args  See {@link String#format(String, Object...)}.
+     */
+    public MojoExecutionException( Throwable cause, String format, Object... args )
+    {
+        super( cause, format, args );
+    }
+
 }

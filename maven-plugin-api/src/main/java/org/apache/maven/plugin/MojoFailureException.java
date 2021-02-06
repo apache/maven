@@ -65,4 +65,29 @@ public class MojoFailureException
     {
         super( message, cause );
     }
+
+
+    /**
+     * Construct a new <code>MojoFailureException</code> exception providing the source for a formatted message.
+     *
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args  See {@link String#format(String, Object...)}.
+     */
+    public MojoFailureException( String format, Object... args )
+    {
+        super( format, args );
+    }
+
+    /**
+     * Construct a new <code>MojoFailureException</code> exception providing the source for a formatted message.
+     *
+     * @param the cause of this exception.
+     * @param format See {@link String#format(String, Object...)}.
+     * @param args  See {@link String#format(String, Object...)}.
+     */
+    public MojoFailureException( Throwable cause, String format, Object... args )
+    {
+        super( cause, format, args );
+    }
+
 }
