@@ -627,6 +627,8 @@ under the License.
               -->
               <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/MIT-jsoup-1.12.1.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
