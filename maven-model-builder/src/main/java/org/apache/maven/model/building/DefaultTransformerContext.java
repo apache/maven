@@ -20,9 +20,9 @@ package org.apache.maven.model.building;
  */
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Model;
 
@@ -33,11 +33,11 @@ import org.apache.maven.model.Model;
  */
 class DefaultTransformerContext implements TransformerContext
 {
-    final Map<String, String> userProperties = new HashMap<>();
+    final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
-    final Map<Path, Model> modelByPath = new HashMap<>();
+    final Map<Path, Model> modelByPath = new ConcurrentHashMap<>();
 
-    final Map<GAKey, Model> modelByGA = new HashMap<>();
+    final Map<GAKey, Model> modelByGA = new ConcurrentHashMap<>();
 
     @Override
     public String getUserProperty( String key )
