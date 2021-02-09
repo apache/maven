@@ -20,9 +20,6 @@ package org.apache.maven.execution;
  */
 
 import java.util.List;
-import java.util.Optional;
-
-import static java.util.Collections.emptyList;
 
 /**
  * This class holds the information required to enable resuming a Maven build with {@code --resume}.
@@ -32,36 +29,20 @@ public class BuildResumptionData
     /**
      * The project where the next build could resume from.
      */
-    private final String resumeFrom;
+    private final List<String> projectList;
 
-    /**
-     * List of projects to skip.
-     */
-    private final List<String> projectsToSkip;
-
-    public BuildResumptionData ( final String resumeFrom, final List<String> projectsToSkip )
+    public BuildResumptionData ( final List<String> projectList )
     {
-        this.resumeFrom = resumeFrom;
-        this.projectsToSkip = projectsToSkip;
+        this.projectList = projectList;
     }
 
     /**
-     * Returns the project where the next build can resume from.
-     * This is usually the first failed project in the order of the reactor.
-     * @return An optional containing the group and artifact id of the project. It does not make sense to resume
-     *   the build when the first project of the reactor has failed, so then it will return an empty optional.
+     * Returns the projects that still need to be build when resuming.
+     * @return A list containing the group and artifact id of the projects.
      */
-    public Optional<String> getResumeFrom()
+    public List<String> getProjectList()
     {
-        return Optional.ofNullable( this.resumeFrom );
+        return this.projectList;
     }
 
-    /**
-     * A list of projects which can be skipped in the next build.
-     * @return A list of group and artifact ids. Can be empty when no projects can be skipped.
-     */
-    public List<String> getProjectsToSkip()
-    {
-        return ( projectsToSkip != null ) ? projectsToSkip : emptyList();
-    }
 }

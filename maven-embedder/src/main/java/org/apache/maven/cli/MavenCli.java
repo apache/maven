@@ -117,7 +117,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.Comparator.comparing;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -1031,20 +1030,6 @@ public class MavenCli
             if ( result.canResume() )
             {
                 logBuildResumeHint( "mvn <args> -r" );
-            }
-            else if ( !failedProjects.isEmpty() )
-            {
-                List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
-
-                // Sort the failedProjects list in the topologically sorted order.
-                failedProjects.sort( comparing( sortedProjects::indexOf ) );
-
-                MavenProject firstFailedProject = failedProjects.get( 0 );
-                if ( !firstFailedProject.equals( sortedProjects.get( 0 ) ) )
-                {
-                    String resumeFromSelector = getResumeFromSelector( sortedProjects, firstFailedProject );
-                    logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
-                }
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
