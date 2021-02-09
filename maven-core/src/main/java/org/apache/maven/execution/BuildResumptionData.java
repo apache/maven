@@ -20,9 +20,6 @@ package org.apache.maven.execution;
  */
 
 import java.util.List;
-import java.util.Optional;
-
-import static java.util.Collections.emptyList;
 
 /**
  * This class holds the information required to enable resuming a Maven build with {@code --resume}.
@@ -30,38 +27,22 @@ import static java.util.Collections.emptyList;
 public class BuildResumptionData
 {
     /**
-     * The project where the next build could resume from.
+     * The list of projects that remain to be built.
      */
-    private final String resumeFrom;
+    private final List<String> remainingProjects;
 
-    /**
-     * List of projects to skip.
-     */
-    private final List<String> projectsToSkip;
-
-    public BuildResumptionData ( final String resumeFrom, final List<String> projectsToSkip )
+    public BuildResumptionData ( final List<String> remainingProjects )
     {
-        this.resumeFrom = resumeFrom;
-        this.projectsToSkip = projectsToSkip;
+        this.remainingProjects = remainingProjects;
     }
 
     /**
-     * Returns the project where the next build can resume from.
-     * This is usually the first failed project in the order of the reactor.
-     * @return An optional containing the group and artifact id of the project. It does not make sense to resume
-     *   the build when the first project of the reactor has failed, so then it will return an empty optional.
+     * Returns the projects that still need to be built when resuming.
+     * @return A list containing the group and artifact id of the projects.
      */
-    public Optional<String> getResumeFrom()
+    public List<String> getRemainingProjects()
     {
-        return Optional.ofNullable( this.resumeFrom );
+        return this.remainingProjects;
     }
 
-    /**
-     * A list of projects which can be skipped in the next build.
-     * @return A list of group and artifact ids. Can be empty when no projects can be skipped.
-     */
-    public List<String> getProjectsToSkip()
-    {
-        return ( projectsToSkip != null ) ? projectsToSkip : emptyList();
-    }
 }

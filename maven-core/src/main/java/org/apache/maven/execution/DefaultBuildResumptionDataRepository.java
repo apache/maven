@@ -32,8 +32,8 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * This implementation of {@link BuildResumptionDataRepository} persists information in a properties file. The file is
@@ -44,8 +44,7 @@ import java.util.Properties;
 public class DefaultBuildResumptionDataRepository implements BuildResumptionDataRepository
 {
     private static final String RESUME_PROPERTIES_FILENAME = "resume.properties";
-    private static final String RESUME_FROM_PROPERTY = "resumeFrom";
-    private static final String EXCLUDED_PROJECTS_PROPERTY = "excludedProjects";
+    private static final String REMAINING_PROJECTS = "remainingProjects";
     private static final String PROPERTY_DELIMITER = ", ";
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
@@ -75,14 +74,8 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     {
         Properties properties = new Properties();
 
-        buildResumptionData.getResumeFrom()
-                .ifPresent( resumeFrom -> properties.setProperty( RESUME_FROM_PROPERTY, resumeFrom ) );
-
-        if ( !buildResumptionData.getProjectsToSkip().isEmpty() )
-        {
-            String excludedProjects = String.join( PROPERTY_DELIMITER, buildResumptionData.getProjectsToSkip() );
-            properties.setProperty( EXCLUDED_PROJECTS_PROPERTY, excludedProjects );
-        }
+        String value = String.join( PROPERTY_DELIMITER, buildResumptionData.getRemainingProjects() );
+        properties.setProperty( REMAINING_PROJECTS, value );
 
         return properties;
     }
@@ -133,22 +126,14 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     // This method is made package-private for testing purposes
     void applyResumptionProperties( MavenExecutionRequest request, Properties properties )
     {
-        if ( properties.containsKey( RESUME_FROM_PROPERTY ) && StringUtils.isEmpty( request.getResumeFrom() ) )
+        if ( properties.containsKey( REMAINING_PROJECTS )
+                && StringUtils.isEmpty( request.getResumeFrom() ) )
         {
-            String propertyValue = properties.getProperty( RESUME_FROM_PROPERTY );
-            request.setResumeFrom( propertyValue );
+            String propertyValue = properties.getProperty( REMAINING_PROJECTS );
+            Stream.of( propertyValue.split( PROPERTY_DELIMITER ) )
+                    .filter( StringUtils::isNotEmpty )
+                    .forEach( request.getSelectedProjects()::add );
             LOGGER.info( "Resuming from {} due to the --resume / -r feature.", propertyValue );
-        }
-
-        if ( properties.containsKey( EXCLUDED_PROJECTS_PROPERTY ) )
-        {
-            String propertyValue = properties.getProperty( EXCLUDED_PROJECTS_PROPERTY );
-            if ( !StringUtils.isEmpty( propertyValue ) )
-            {
-                String[] excludedProjects = propertyValue.split( PROPERTY_DELIMITER );
-                request.getExcludedProjects().addAll( Arrays.asList( excludedProjects ) );
-                LOGGER.info( "Additionally excluding projects '{}' due to the --resume / -r feature.", propertyValue );
-            }
         }
     }
 }
