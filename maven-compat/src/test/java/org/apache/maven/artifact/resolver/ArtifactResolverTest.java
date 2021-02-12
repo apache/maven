@@ -34,7 +34,6 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,15 +68,6 @@ public class ArtifactResolverTest
         super.setUp();
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
-    }
-
-    @AfterEach
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        projectArtifact = null;
-        super.tearDown();
     }
 
     @Override

@@ -202,8 +202,8 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
     private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException
     {
         return new DefaultModelResolver( this.session, null, this.getClass().getName(),
-                                         lookup( ArtifactResolver.class ), lookup( VersionRangeResolver.class ),
-                                         lookup( RemoteRepositoryManager.class ),
+                                         getContainer().lookup( ArtifactResolver.class ), getContainer().lookup( VersionRangeResolver.class ),
+                                         getContainer().lookup( RemoteRepositoryManager.class ),
                                          Arrays.asList( newTestRepository() ) );
 
     }

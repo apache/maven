@@ -30,6 +30,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.test.PlexusExtension.getTestFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +55,7 @@ public class DefaultMavenProjectBuilderTest
     {
         super.setUp();
 
-        projectBuilder = lookup( ProjectBuilder.class );
+        projectBuilder = getContainer().lookup( ProjectBuilder.class );
 
         localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
         localRepoDir.mkdirs();
@@ -62,13 +63,10 @@ public class DefaultMavenProjectBuilderTest
         filesToDelete.add( localRepoDir );
     }
 
-    @Override
     @AfterEach
     public void tearDown()
         throws Exception
     {
-        super.tearDown();
-
         if ( !filesToDelete.isEmpty() )
         {
             for ( File file : filesToDelete )

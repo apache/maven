@@ -49,7 +49,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -65,8 +65,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
+@PlexusTest
 public class DefaultArtifactCollectorTest
-    extends PlexusTestCase
 {
     @Inject
     private LegacyArtifactCollector artifactCollector;
@@ -81,12 +81,9 @@ public class DefaultArtifactCollectorTest
     private static final String GROUP_ID = "test";
 
     @BeforeEach
-    @Override
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         source = new Source();
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );

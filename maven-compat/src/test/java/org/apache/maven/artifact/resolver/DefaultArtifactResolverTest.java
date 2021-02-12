@@ -49,15 +49,6 @@ public class DefaultArtifactResolverTest
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
-    @AfterEach
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        projectArtifact = null;
-        super.tearDown();
-    }
-
     @Override
     protected String component()
     {
@@ -114,6 +105,6 @@ public class DefaultArtifactResolverTest
     public void testLookup()
         throws Exception
     {
-        ArtifactResolver resolver = lookup( ArtifactResolver.class, "default" );
+        ArtifactResolver resolver = getContainer().lookup( ArtifactResolver.class, "default" );
     }
 }

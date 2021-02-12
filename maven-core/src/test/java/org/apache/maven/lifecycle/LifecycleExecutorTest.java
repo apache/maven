@@ -500,8 +500,8 @@ public class LifecycleExecutorTest
                 log.add( "afterProjectExecutionFailure " + event.getProject().getArtifactId() );
             }
         };
-        lookup( DelegatingProjectExecutionListener.class ).addProjectExecutionListener( projectListener );
-        lookup( DelegatingMojoExecutionListener.class ).addMojoExecutionListener( mojoListener );
+        getContainer().lookup( DelegatingProjectExecutionListener.class ).addProjectExecutionListener( projectListener );
+        getContainer().lookup( DelegatingMojoExecutionListener.class ).addMojoExecutionListener( mojoListener );
 
         try
         {
@@ -509,8 +509,8 @@ public class LifecycleExecutorTest
         }
         finally
         {
-            lookup( DelegatingProjectExecutionListener.class ).removeProjectExecutionListener( projectListener );
-            lookup( DelegatingMojoExecutionListener.class ).removeMojoExecutionListener( mojoListener );
+            getContainer().lookup( DelegatingProjectExecutionListener.class ).removeProjectExecutionListener( projectListener );
+            getContainer().lookup( DelegatingMojoExecutionListener.class ).removeMojoExecutionListener( mojoListener );
         }
 
         List<String> expectedLog = Arrays.asList( "beforeProjectExecution project-basic", //

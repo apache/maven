@@ -27,7 +27,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.test.PlexusTestCase;
+import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -41,8 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
+@PlexusTest
 public abstract class AbstractConflictResolverTest
-    extends PlexusTestCase
 {
     // constants --------------------------------------------------------------
 
@@ -63,6 +64,9 @@ public abstract class AbstractConflictResolverTest
 
     private ConflictResolver conflictResolver;
 
+    @Inject
+    protected PlexusContainer container;
+
     // constructors -----------------------------------------------------------
 
     public AbstractConflictResolverTest( String roleHint )
@@ -77,33 +81,14 @@ public abstract class AbstractConflictResolverTest
      * @see junit.framework.TestCase#setUp()
      */
     @BeforeEach
-    @Override
     public void setUp()
             throws Exception
     {
-        super.setUp();
-
-        conflictResolver = lookup( ConflictResolver.ROLE, roleHint );
+        conflictResolver = (ConflictResolver) container.lookup( ConflictResolver.ROLE, roleHint );
 
         a1 = createArtifact( "a", "1.0" );
         a2 = createArtifact( "a", "2.0" );
         b1 = createArtifact( "b", "1.0" );
-    }
-
-    /*
-     * @see org.codehaus.plexus.PlexusTestCase#tearDown()
-     */
-    @AfterEach
-    @Override
-    public void tearDown() throws Exception
-    {
-        a1 = null;
-        a2 = null;
-        b1 = null;
-
-        conflictResolver = null;
-
-        super.tearDown();
     }
 
     // protected methods ------------------------------------------------------

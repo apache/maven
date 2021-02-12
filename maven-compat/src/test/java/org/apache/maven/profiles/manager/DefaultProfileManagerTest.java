@@ -22,20 +22,31 @@ package org.apache.maven.profiles.manager;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.test.PlexusTestCase;
+import javax.inject.Inject;
+
+import org.apache.maven.test.PlexusTest;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
+import org.codehaus.plexus.PlexusContainer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@PlexusTest
 public class DefaultProfileManagerTest
-    extends PlexusTestCase
 {
+
+    @Inject
+    PlexusContainer container;
+
+    protected PlexusContainer getContainer() {
+        return container;
+    }
 
     @Test
     public void testShouldActivateDefaultProfile()
@@ -201,10 +212,13 @@ public class DefaultProfileManagerTest
         assertNotNull( active );
         assertEquals( 0, active.size() );
     }
-/*
+
+    @Test
+    @Disabled
     public void testOsActivationProfile()
         throws Exception
     {
+        /*
         Profile osActivated = new Profile();
         osActivated.setId( "os-profile" );
 
@@ -229,7 +243,7 @@ public class DefaultProfileManagerTest
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
+        */
     }
-    */
 
 }

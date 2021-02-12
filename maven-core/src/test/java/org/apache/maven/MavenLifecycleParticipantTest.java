@@ -102,12 +102,6 @@ public class MavenLifecycleParticipantTest
     }
 
     @Override
-    protected void setupContainer()
-    {
-        super.setupContainer();
-    }
-
-    @Override
     protected String getProjectsDirectory()
     {
         return "src/test/projects/lifecycle-listener";

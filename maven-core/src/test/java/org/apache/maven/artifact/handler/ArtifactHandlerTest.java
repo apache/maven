@@ -22,15 +22,23 @@ package org.apache.maven.artifact.handler;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.test.PlexusTestCase;
+import javax.inject.Inject;
+
+import org.apache.maven.test.PlexusExtension;
+import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.test.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@PlexusTest
 public class ArtifactHandlerTest
-    extends PlexusTestCase
 {
+    @Inject
+    PlexusContainer container;
+
     @Test
     public void testAptConsistency()
         throws Exception
@@ -66,7 +74,7 @@ public class ArtifactHandlerTest
                 String addedToClasspath = trimApt( cols[6] );
                 String includesDependencies = trimApt( cols[7] );
 
-                ArtifactHandler handler = lookup( ArtifactHandler.class, type );
+                ArtifactHandler handler = container.lookup( ArtifactHandler.class, type );
                 assertEquals( handler.getExtension(), extension, type + " extension" );
                 assertEquals( handler.getPackaging(), packaging, type + " packaging" );
                 assertEquals( handler.getClassifier(), classifier, type + " classifier" );

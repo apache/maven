@@ -19,23 +19,25 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import org.apache.maven.test.PlexusTestCase;
+import javax.inject.Inject;
+
 import org.apache.maven.repository.RepositorySystem;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-
-@Disabled
+@PlexusTest
 public class MavenMetadataSourceTest
-    extends PlexusTestCase
 {
     @Inject
     private RepositorySystem repositorySystem;
 
+    @Inject
+    PlexusContainer container;
+
     @Test
+    @Disabled
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
         throws Exception
     {
@@ -58,21 +60,21 @@ public class MavenMetadataSourceTest
         dep2.setVersion( "1" );
         dep2.setType( "jar" );
 
-        List deps = new ArrayList();
+        List<Dependency> deps = new ArrayList<>();
         deps.add( dep1 );
         deps.add( dep2 );
 
-        ArtifactFactory factory = lookup( ArtifactFactory.class );
+        ArtifactFactory factory = container.lookup( ArtifactFactory.class );
 
         ArtifactFilter dependencyFilter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
 
         MavenProject project = new MavenProject( new Model() );
 
-        Set result = project.createArtifacts( dependencyFilter );
+        Set<Artifact> result = project.createArtifacts( dependencyFilter );
 
-        for ( Iterator it = result.iterator(); it.hasNext(); )
+        for (Iterator<Artifact> it = result.iterator(); it.hasNext(); )
         {
-            Artifact artifact = ( Artifact ) it.next();
+            Artifact artifact = it.next();
 
             if ( "test-artifact2".equals( artifact.getArtifactId() ) )
             {
@@ -84,11 +86,12 @@ public class MavenMetadataSourceTest
         */
     }
 
-    //TODO restore these if it makes sense
-    /*
+    @Test
+    @Disabled("TODO restore these if it makes sense")
     public void testShouldUseCompileScopeIfDependencyScopeEmpty()
         throws Exception
     {
+        /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";
 
@@ -111,21 +114,24 @@ public class MavenMetadataSourceTest
         Map artifactMap = project.getArtifactMap();
 
         assertNotNull( artifactMap, "artifact-map should not be null." );
-        assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
+        assertEquals( 1, artifactMap.size(), "artifact-map should contain 1 element." );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
         assertNotNull( artifact, "dependency artifact not found in map." );
-        assertEquals( "dependency artifact has wrong scope.", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        assertEquals( Artifact.SCOPE_COMPILE, artifact.getScope(), "dependency artifact has wrong scope." );
 
         //check for back-propagation of default scope.
-        assertEquals( "default scope NOT back-propagated to dependency.", Artifact.SCOPE_COMPILE, dep.getScope() );
+        assertEquals( Artifact.SCOPE_COMPILE, dep.getScope(), "default scope NOT back-propagated to dependency." );
+        */
     }
 
     @Test
+    @Disabled
     public void testShouldUseInjectedTestScopeFromDependencyManagement()
         throws Exception
     {
+        /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";
 
@@ -163,7 +169,7 @@ public class MavenMetadataSourceTest
         Map artifactMap = project.getArtifactMap();
 
         assertNotNull( artifactMap, "artifact-map should not be null." );
-        assertEquals( "artifact-map should contain 1 element.", 1, artifactMap.size() );
+        assertEquals( 1, artifactMap.size(), "artifact-map should contain 1 element." );
 
         Artifact artifact = (Artifact) artifactMap.get( key );
 
@@ -172,7 +178,7 @@ public class MavenMetadataSourceTest
 
         //check for back-propagation of default scope.
         assertEquals( "default scope NOT back-propagated to dependency.", Artifact.SCOPE_TEST, dep.getScope() );
+        */
     }
-    */
 
 }
