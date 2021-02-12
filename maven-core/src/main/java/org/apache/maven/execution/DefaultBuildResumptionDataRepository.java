@@ -132,7 +132,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
             String propertyValue = properties.getProperty( REMAINING_PROJECTS );
             Stream.of( propertyValue.split( PROPERTY_DELIMITER ) )
                     .filter( StringUtils::isNotEmpty )
-                    .forEach( request.getSelectedProjects()::add );
+                    .forEach( request.getProjectActivation()::deactivateOptionalProject );
             LOGGER.info( "Resuming from {} due to the --resume / -r feature.", propertyValue );
         }
     }

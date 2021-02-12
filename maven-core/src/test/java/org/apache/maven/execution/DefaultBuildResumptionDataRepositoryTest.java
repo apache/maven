@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
@@ -74,7 +74,7 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getSelectedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
+        assertThat( request.getSelectedProjects(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
     }
 
     @Test
@@ -100,6 +100,6 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionData( request,  rootProject );
 
-        assertThat( request.getSelectedProjects(), contains( "example:module-c" ) );
+        assertThat( request.getSelectedProjects(), containsInAnyOrder( "example:module-c" ) );
     }
 }
