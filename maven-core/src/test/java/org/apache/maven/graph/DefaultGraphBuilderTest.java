@@ -22,6 +22,7 @@ package org.apache.maven.graph;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
@@ -109,23 +110,23 @@ public class DefaultGraphBuilderTest
                 scenario( "Full reactor in order" )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected project" )
-                        .selectedProjects( MODULE_B )
+                        .activeRequiredProjects( MODULE_B )
                         .expectResult( MODULE_B ),
                 scenario( "Selected project (including child modules)" )
-                        .selectedProjects( MODULE_C )
+                        .activeRequiredProjects( MODULE_C )
                         .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
                 scenario( "Excluded project" )
-                        .excludedProjects( MODULE_B )
+                        .inactiveRequiredProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Resuming from project" )
                         .resumeFrom( MODULE_B )
                         .expectResult( MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected project with also make dependencies" )
-                        .selectedProjects( MODULE_C_2 )
+                        .activeRequiredProjects( MODULE_C_2 )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_A, MODULE_B, MODULE_C_2 ),
                 scenario( "Selected project with also make dependents" )
-                        .selectedProjects( MODULE_B )
+                        .activeRequiredProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
                         .expectResult( MODULE_B, MODULE_C_2 ),
                 scenario( "Resuming from project with also make dependencies" )
@@ -133,18 +134,18 @@ public class DefaultGraphBuilderTest
                         .resumeFrom( MODULE_C_2 )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected project with resume from and also make dependency (MNG-4960 IT#1)" )
-                        .selectedProjects( MODULE_C_2 )
+                        .activeRequiredProjects( MODULE_C_2 )
                         .resumeFrom( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_A, MODULE_B, MODULE_C_2 ),
                 scenario( "Selected project with resume from and also make dependent (MNG-4960 IT#2)" )
-                        .selectedProjects( MODULE_B )
+                        .activeRequiredProjects( MODULE_B )
                         .resumeFrom( MODULE_C_2 )
                         .makeBehavior( REACTOR_MAKE_DOWNSTREAM )
                         .expectResult( MODULE_C_2 ),
                 scenario( "Excluding an also make dependency from selectedProject does take its transitive dependency" )
-                        .selectedProjects( MODULE_C_2 )
-                        .excludedProjects( MODULE_B )
+                        .activeRequiredProjects( MODULE_C_2 )
+                        .inactiveRequiredProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_A, MODULE_C_2 ),
                 scenario( "Excluding a project also excludes its children" )
@@ -152,23 +153,23 @@ public class DefaultGraphBuilderTest
                         .expectResult( PARENT_MODULE, MODULE_A, MODULE_B, INDEPENDENT_MODULE ),
                 scenario( "Excluding an also make dependency from resumeFrom does take its transitive dependency" )
                         .resumeFrom( MODULE_C_2 )
-                        .excludedProjects( MODULE_B )
+                        .inactiveRequiredProjects( MODULE_B )
                         .makeBehavior( REACTOR_MAKE_UPSTREAM )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Resume from exclude project downstream" )
                         .resumeFrom( MODULE_A )
-                        .excludedProjects( MODULE_B )
+                        .inactiveRequiredProjects( MODULE_B )
                         .expectResult( MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Exclude the project we are resuming from (as proposed in MNG-6676)" )
                         .resumeFrom( MODULE_B )
-                        .excludedProjects( MODULE_B )
+                        .inactiveRequiredProjects( MODULE_B )
                         .expectResult( MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected projects in wrong order are resumed correctly in order" )
-                        .selectedProjects( MODULE_C_2, MODULE_B, MODULE_A )
+                        .activeRequiredProjects( MODULE_C_2, MODULE_B, MODULE_A )
                         .resumeFrom( MODULE_B )
                         .expectResult( MODULE_B, MODULE_C_2 ),
                 scenario( "Duplicate projects are filtered out" )
-                        .selectedProjects( MODULE_A, MODULE_A )
+                        .activeRequiredProjects( MODULE_A, MODULE_A )
                         .expectResult( MODULE_A ),
                 scenario( "Select reactor by specific pom" )
                         .requestedPom( MODULE_C )
@@ -188,19 +189,23 @@ public class DefaultGraphBuilderTest
     @MethodSource("parameters")
     public void testGetReactorProjects(
             String parameterDescription,
-            List<String> parameterSelectedProjects,
-            List<String> parameterExcludedProjects,
+            List<String> parameterActiveRequiredProjects,
+            List<String> parameterActiveOptionalProjects,
+            List<String> parameterInactiveRequiredProjects,
+            List<String> parameterInactiveOptionalProjects,
             String parameterResumeFrom,
             String parameterMakeBehavior,
             List<String> parameterExpectedResult,
             File parameterRequestedPom)
     {
         // Given
-        List<String> selectedProjects = parameterSelectedProjects.stream().map( p -> ":" + p ).collect( Collectors.toList() );
-        List<String> excludedProjects = parameterExcludedProjects.stream().map( p -> ":" + p ).collect( Collectors.toList() );
+        ProjectActivation projectActivation = new ProjectActivation();
+        parameterActiveRequiredProjects.forEach( projectActivation::activateRequiredProject );
+        parameterActiveOptionalProjects.forEach( projectActivation::activateOptionalProject );
+        parameterInactiveRequiredProjects.forEach( projectActivation::deactivateRequiredProject );
+        parameterInactiveOptionalProjects.forEach( projectActivation::deactivateOptionalProject );
 
-        when( mavenExecutionRequest.getSelectedProjects() ).thenReturn( selectedProjects );
-        when( mavenExecutionRequest.getExcludedProjects() ).thenReturn( excludedProjects );
+        when( mavenExecutionRequest.getProjectActivation() ).thenReturn( projectActivation );
         when( mavenExecutionRequest.getMakeBehavior() ).thenReturn( parameterMakeBehavior );
         when( mavenExecutionRequest.getPom() ).thenReturn( parameterRequestedPom );
         if ( StringUtils.isNotEmpty( parameterResumeFrom ) )
@@ -299,8 +304,10 @@ public class DefaultGraphBuilderTest
     static class ScenarioBuilder
     {
         private String description;
-        private List<String> selectedProjects = emptyList();
-        private List<String> excludedProjects = emptyList();
+        private List<String> activeRequiredProjects = emptyList();
+        private List<String> activeOptionalProjects = emptyList();
+        private List<String> inactiveRequiredProjects = emptyList();
+        private List<String> inactiveOptionalProjects = emptyList();
         private String resumeFrom = "";
         private String makeBehavior = "";
         private File requestedPom = new File( PARENT_MODULE, "pom.xml" );
@@ -314,15 +321,27 @@ public class DefaultGraphBuilderTest
             return scenarioBuilder;
         }
 
-        public ScenarioBuilder selectedProjects( String... selectedProjects )
+        public ScenarioBuilder activeRequiredProjects( String... activeRequiredProjects )
         {
-            this.selectedProjects = asList( selectedProjects );
+            this.activeRequiredProjects = asList( activeRequiredProjects );
             return this;
         }
 
-        public ScenarioBuilder excludedProjects( String... excludedProjects )
+        public ScenarioBuilder activeOptionalProjects( String... activeOptionalProjects )
         {
-            this.excludedProjects = asList( excludedProjects );
+            this.activeOptionalProjects = asList( activeOptionalProjects );
+            return this;
+        }
+
+        public ScenarioBuilder inactiveRequiredProjects( String... inactiveRequiredProjects )
+        {
+            this.inactiveRequiredProjects = asList( inactiveRequiredProjects );
+            return this;
+        }
+
+        public ScenarioBuilder inactiveOptionalProjects( String... inactiveOptionalProjects )
+        {
+            this.inactiveOptionalProjects = asList( inactiveOptionalProjects );
             return this;
         }
 
@@ -347,7 +366,7 @@ public class DefaultGraphBuilderTest
         public Arguments expectResult( String... expectedReactorProjects )
         {
             return Arguments.arguments(
-                    description, selectedProjects, excludedProjects, resumeFrom, makeBehavior, asList( expectedReactorProjects ), requestedPom
+                    description, activeRequiredProjects, activeOptionalProjects, inactiveRequiredProjects, inactiveOptionalProjects, resumeFrom, makeBehavior, asList( expectedReactorProjects ), requestedPom
             );
         }
     }
