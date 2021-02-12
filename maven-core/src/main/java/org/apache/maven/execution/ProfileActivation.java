@@ -35,37 +35,6 @@ import static java.util.stream.Collectors.toSet;
  */
 public class ProfileActivation
 {
-    private enum ActivationSettings
-    {
-        ACTIVATION_OPTIONAL( true, true ),
-        ACTIVATION_REQUIRED( true, false ),
-        DEACTIVATION_OPTIONAL( false, true ),
-        DEACTIVATION_REQUIRED( false, false );
-
-        /** Should the profile be active? */
-        final boolean active;
-        /** Should the build continue if the profile is not present? */
-        final boolean optional;
-
-        ActivationSettings( final boolean active, final boolean optional )
-        {
-            this.active = active;
-            this.optional = optional;
-        }
-
-        static ActivationSettings of( final boolean active, final boolean optional )
-        {
-            if ( optional )
-            {
-                return active ? ACTIVATION_OPTIONAL : DEACTIVATION_OPTIONAL;
-            }
-            else
-            {
-                return active ? ACTIVATION_REQUIRED : DEACTIVATION_REQUIRED;
-            }
-        }
-    }
-
     private final Map<String, ActivationSettings> activations = new HashMap<>();
 
     /**
