@@ -20,6 +20,7 @@ package org.apache.maven.execution;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class ProfileActivation
     @Deprecated
     public List<String> getActiveProfiles()
     {
-        return new ArrayList<>( getProfileIds( pa -> pa.active ) );
+        return Collections.unmodifiableList( new ArrayList<>( getProfileIds( pa -> pa.active ) ) );
     }
 
     /**
@@ -84,7 +85,7 @@ public class ProfileActivation
     @Deprecated
     public List<String> getInactiveProfiles()
     {
-        return new ArrayList<>( getProfileIds( pa -> !pa.active ) );
+        return Collections.unmodifiableList( new ArrayList<>( getProfileIds( pa -> !pa.active ) ) );
     }
 
     /**

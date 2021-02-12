@@ -278,51 +278,51 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setProfiles( List<Profile> profiles );
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest addActiveProfile( String profile );
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest setActiveProfiles( List<String> profiles );
 
     /**
      * @return The list of profiles that the user wants to activate.
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     List<String> getActiveProfiles();
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest addInactiveProfile( String profile );
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
 
     /**
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     MavenExecutionRequest setInactiveProfiles( List<String> profiles );
 
     /**
      * @return The list of profiles that the user wants to de-activate.
-     * @deprecated Use {@link #getProfileActivation()}.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
      */
     @Deprecated
     List<String> getInactiveProfiles();
