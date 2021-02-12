@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 public class DefaultBuildResumptionDataRepository implements BuildResumptionDataRepository
 {
     private static final String RESUME_PROPERTIES_FILENAME = "resume.properties";
-    private static final String RESUME_PROJECT_LIST = "projectList";
+    private static final String REMAINING_PROJECTS = "remainingProjects";
     private static final String PROPERTY_DELIMITER = ", ";
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
@@ -74,8 +74,8 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     {
         Properties properties = new Properties();
 
-        String value = String.join( PROPERTY_DELIMITER, buildResumptionData.getProjectList() );
-        properties.setProperty( RESUME_PROJECT_LIST, value );
+        String value = String.join( PROPERTY_DELIMITER, buildResumptionData.getRemainingProjects() );
+        properties.setProperty( REMAINING_PROJECTS, value );
 
         return properties;
     }
@@ -126,10 +126,10 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     // This method is made package-private for testing purposes
     void applyResumptionProperties( MavenExecutionRequest request, Properties properties )
     {
-        if ( properties.containsKey( RESUME_PROJECT_LIST )
+        if ( properties.containsKey( REMAINING_PROJECTS )
                 && StringUtils.isEmpty( request.getResumeFrom() ) )
         {
-            String propertyValue = properties.getProperty( RESUME_PROJECT_LIST );
+            String propertyValue = properties.getProperty( REMAINING_PROJECTS );
             Stream.of( propertyValue.split( PROPERTY_DELIMITER ) )
                     .filter( StringUtils::isNotEmpty )
                     .forEach( request.getSelectedProjects():: add );

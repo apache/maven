@@ -42,7 +42,7 @@ public class DefaultBuildResumptionDataRepositoryTest
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Properties properties = new Properties();
-        properties.setProperty( "projectList", ":module-a" );
+        properties.setProperty( "remainingProjects", ":module-a" );
 
         repository.applyResumptionProperties( request, properties );
 
@@ -55,7 +55,7 @@ public class DefaultBuildResumptionDataRepositoryTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setResumeFrom( ":module-b" );
         Properties properties = new Properties();
-        properties.setProperty( "projectList", ":module-a" );
+        properties.setProperty( "remainingProjects", ":module-a" );
 
         repository.applyResumptionProperties( request, properties );
 
@@ -70,7 +70,7 @@ public class DefaultBuildResumptionDataRepositoryTest
         selectedProjects.add( ":module-a" );
         request.setSelectedProjects( selectedProjects );
         Properties properties = new Properties();
-        properties.setProperty( "projectList", ":module-b, :module-c" );
+        properties.setProperty( "remainingProjects", ":module-b, :module-c" );
 
         repository.applyResumptionProperties( request, properties );
 
@@ -78,11 +78,11 @@ public class DefaultBuildResumptionDataRepositoryTest
     }
 
     @Test
-    public void SELECTEDProjectsAreNotAddedWhenPropertyValueIsEmpty()
+    public void selectedProjectsAreNotAddedWhenPropertyValueIsEmpty()
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Properties properties = new Properties();
-        properties.setProperty( "projectList", "" );
+        properties.setProperty( "remainingProjects", "" );
 
         repository.applyResumptionProperties( request, properties );
 

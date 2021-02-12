@@ -53,7 +53,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getProjectList(), is( asList ( "test:B" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList ( "test:B" ) ) );
     }
 
     @Test
@@ -79,7 +79,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getProjectList(), is( asList( "test:B" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList( "test:B" ) ) );
     }
 
     @Test
@@ -94,7 +94,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getProjectList(), is( asList( "test:B", "test:C" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList( "test:B", "test:C" ) ) );
     }
 
     @Test
@@ -109,7 +109,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getProjectList(), is( asList ( "test:B", "test:D" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList ( "test:B", "test:D" ) ) );
     }
 
     private MavenProject createMavenProject( String artifactId )
@@ -131,8 +131,7 @@ public class DefaultBuildResumptionAnalyzerTest
 
     private MavenProject createSkippedMavenProject( String artifactId )
     {
-        MavenProject project = createMavenProject( artifactId );
-        return project;
+        return createMavenProject( artifactId );
     }
 
     private MavenProject createSucceededMavenProject( String artifactId )

@@ -57,31 +57,35 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
             return Optional.empty();
         }
 
-        List<MavenProject> projects = sortedProjects.stream()
+        List<MavenProject> notSucceededProjects = sortedProjects.stream()
                 .filter( project -> result.getBuildSummary( project ) == null
                         || result.getBuildSummary( project ) instanceof BuildFailure )
                 .collect( Collectors.toList() );
+        // When a project is selected to be built, all children projects will be automatically
+        // added {@see org.apache.maven.graph.DefaultGraphBuilder#trimSelectedProjects}
+        // This loop will remove all children from projects in this list
         while ( true )
         {
-            List<MavenProject> children = projects.stream()
+            List<MavenProject> children = notSucceededProjects.stream()
                     .filter( project -> project.getCollectedProjects() != null )
                     .flatMap( project -> project.getCollectedProjects().stream() )
                     .collect( Collectors.toList() );
-            if ( !projects.removeAll( children ) )
+            if ( !notSucceededProjects.removeAll( children ) )
             {
+                // if we haven't removed any child project, we're good to go so exit this loop
                 break;
             }
         }
 
-        List<String> projectList = projects.stream()
-                .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
-                .collect( Collectors.toList() );
-
-        if ( projectList.isEmpty() )
+        if ( notSucceededProjects.isEmpty() )
         {
             LOGGER.info( "No failed projects found, resuming the build would not make sense." );
             return Optional.empty();
         }
+
+        List<String> projectList = notSucceededProjects.stream()
+                .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
+                .collect( Collectors.toList() );
 
         return Optional.of( new BuildResumptionData( projectList ) );
     }
