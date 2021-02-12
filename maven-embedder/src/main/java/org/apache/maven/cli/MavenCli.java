@@ -55,6 +55,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -113,7 +114,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1382,10 +1382,7 @@ public class MavenCli
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
 
-        final ProjectActivation projectActivation = determineProjectActivation( commandLine );
-        request.setSelectedProjects( projectActivation.activeProjects );
-        request.setExcludedProjects( projectActivation.inactiveProjects );
-
+        performProjectActivation( commandLine, request.getProjectActivation() );
         performProfileActivation( commandLine, request.getProfileActivation() );
 
         final String localRepositoryPath = determineLocalRepositoryPath( request );
@@ -1472,48 +1469,44 @@ public class MavenCli
     }
 
     // Visible for testing
-    static ProjectActivation determineProjectActivation ( final CommandLine commandLine )
+    static void performProjectActivation( final CommandLine commandLine, final ProjectActivation projectActivation )
     {
-        final ProjectActivation projectActivation = new ProjectActivation();
-
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
-            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+            final String[] optionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
 
-            if ( projectOptionValues != null )
+            if ( optionValues == null || optionValues.length == 0 )
             {
-                for ( String projectOptionValue : projectOptionValues )
-                {
-                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
-
-                    while ( projectTokens.hasMoreTokens() )
-                    {
-                        String projectAction = projectTokens.nextToken().trim();
-
-                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
-                        {
-                            projectActivation.deactivate( projectAction.substring( 1 ) );
-                        }
-                        else if ( projectAction.startsWith( "+" ) )
-                        {
-                            projectActivation.activate( projectAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            projectActivation.activate( projectAction );
-                        }
-                    }
-                }
+                return;
             }
 
-        }
+            for ( final String optionValue : optionValues )
+            {
+                for ( String token : optionValue.split( "," ) )
+                {
+                    String selector = token.trim();
+                    boolean active = true;
+                    if ( selector.charAt( 0 ) == '-' || selector.charAt( 0 ) == '!' )
+                    {
+                        active = false;
+                        selector = selector.substring( 1 );
+                    }
+                    else if ( token.charAt( 0 ) == '+' )
+                    {
+                        selector = selector.substring( 1 );
+                    }
 
-        return projectActivation;
+                    boolean optional = selector.charAt( 0 ) == '?';
+                    selector = selector.substring( optional ? 1 : 0 );
+
+                    projectActivation.addProjectActivation( selector, active, optional );
+                }
+            }
+        }
     }
 
     // Visible for testing
-    static void performProfileActivation( final CommandLine commandLine,
-                                          final ProfileActivation profileActivation )
+    static void performProfileActivation( final CommandLine commandLine, final ProfileActivation profileActivation )
     {
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
@@ -1799,30 +1792,5 @@ public class MavenCli
         throws ComponentLookupException
     {
         return container.lookup( ModelProcessor.class );
-    }
-
-    // Visible for testing
-    static class ProjectActivation
-    {
-        List<String> activeProjects;
-        List<String> inactiveProjects;
-
-        public void deactivate( final String project )
-        {
-            if ( inactiveProjects == null )
-            {
-                inactiveProjects = new ArrayList<>();
-            }
-            inactiveProjects.add( project );
-        }
-
-        public void activate( final String project )
-        {
-            if ( activeProjects == null )
-            {
-                activeProjects = new ArrayList<>();
-            }
-            activeProjects.add( project );
-        }
     }
 }

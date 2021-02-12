@@ -76,6 +76,7 @@ public class DefaultMavenExecutionRequest
 
     private List<Profile> profiles;
 
+    private final ProjectActivation projectActivation = new ProjectActivation();
     private final ProfileActivation profileActivation = new ProfileActivation();
 
     private List<String> pluginGroups;
@@ -113,10 +114,6 @@ public class DefaultMavenExecutionRequest
     private File pom;
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
-
-    private List<String> selectedProjects;
-
-    private List<String> excludedProjects;
 
     private boolean resume = false;
 
@@ -281,23 +278,13 @@ public class DefaultMavenExecutionRequest
     @Override
     public List<String> getSelectedProjects()
     {
-        if ( selectedProjects == null )
-        {
-            selectedProjects = new ArrayList<>();
-        }
-
-        return selectedProjects;
+        return this.projectActivation.getSelectedProjects();
     }
 
     @Override
     public List<String> getExcludedProjects()
     {
-        if ( excludedProjects == null )
-        {
-            excludedProjects = new ArrayList<>();
-        }
-
-        return excludedProjects;
+        return this.projectActivation.getExcludedProjects();
     }
 
     @Override
@@ -356,6 +343,12 @@ public class DefaultMavenExecutionRequest
         }
 
         return this;
+    }
+
+    @Override
+    public ProjectActivation getProjectActivation()
+    {
+        return this.projectActivation;
     }
 
     @Override
@@ -569,11 +562,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( selectedProjects != null )
         {
-            this.selectedProjects = new ArrayList<>( selectedProjects );
-        }
-        else
-        {
-            this.selectedProjects = null;
+            this.projectActivation.overwriteActiveProjects( selectedProjects );
         }
 
         return this;
@@ -584,11 +573,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( excludedProjects != null )
         {
-            this.excludedProjects = new ArrayList<>( excludedProjects );
-        }
-        else
-        {
-            this.excludedProjects = null;
+            this.projectActivation.overwriteInactiveProjects( excludedProjects );
         }
 
         return this;
