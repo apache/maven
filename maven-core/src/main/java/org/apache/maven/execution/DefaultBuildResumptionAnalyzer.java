@@ -48,46 +48,27 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
 
         List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
 
-        long succeeded = sortedProjects.stream()
-                .filter( project -> result.getBuildSummary( project ) instanceof BuildSuccess )
-                .count();
+        boolean hasNoSuccess = sortedProjects.stream()
+                .noneMatch( project -> result.getBuildSummary( project ) instanceof BuildSuccess );
 
-        if ( succeeded == 0 )
+        if ( hasNoSuccess )
         {
             return Optional.empty();
         }
 
-        List<MavenProject> notSucceededProjects = sortedProjects.stream()
+        List<String> remainingProjects = sortedProjects.stream()
                 .filter( project -> result.getBuildSummary( project ) == null
                         || result.getBuildSummary( project ) instanceof BuildFailure )
-                .collect( Collectors.toList() );
-        // When a project is selected to be built, all children projects will be automatically
-        // added {@see org.apache.maven.graph.DefaultGraphBuilder#trimSelectedProjects}
-        // This loop will remove all children from projects in this list
-        while ( true )
-        {
-            List<MavenProject> children = notSucceededProjects.stream()
-                    .filter( project -> project.getCollectedProjects() != null )
-                    .flatMap( project -> project.getCollectedProjects().stream() )
-                    .collect( Collectors.toList() );
-            if ( !notSucceededProjects.removeAll( children ) )
-            {
-                // if we haven't removed any child project, we're good to go so exit this loop
-                break;
-            }
-        }
-
-        if ( notSucceededProjects.isEmpty() )
-        {
-            LOGGER.info( "No failed projects found, resuming the build would not make sense." );
-            return Optional.empty();
-        }
-
-        List<String> projectList = notSucceededProjects.stream()
                 .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
                 .collect( Collectors.toList() );
 
-        return Optional.of( new BuildResumptionData( projectList ) );
+        if ( remainingProjects.isEmpty() )
+        {
+            LOGGER.info( "No remaining projects found, resuming the build would not make sense." );
+            return Optional.empty();
+        }
+
+        return Optional.of( new BuildResumptionData( remainingProjects ) );
     }
 
 }
