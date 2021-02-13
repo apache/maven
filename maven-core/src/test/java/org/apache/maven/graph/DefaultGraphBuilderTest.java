@@ -46,6 +46,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,27 @@ public class DefaultGraphBuilderTest
                 scenario( "Selected project (including child modules)" )
                         .activeRequiredProjects( MODULE_C )
                         .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
+                scenario( "Selected optional project" )
+                        .activeOptionalProjects( MODULE_B )
+                        .expectResult( MODULE_B ),
+                scenario( "Selected missing optional project" )
+                        .activeOptionalProjects( "missing-module" )
+                        .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Selected missing optional and required project" )
+                        .activeOptionalProjects( "missing-module" )
+                        .activeRequiredProjects( MODULE_B )
+                        .expectResult( MODULE_B ),
                 scenario( "Excluded project" )
+                        .inactiveRequiredProjects( MODULE_B )
+                        .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Excluded optional project" )
+                        .inactiveOptionalProjects( MODULE_B )
+                        .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Excluded missing optional project" )
+                        .inactiveOptionalProjects( "missing-module" )
+                        .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Excluded missing optional and required project" )
+                        .inactiveOptionalProjects( "missing-module" )
                         .inactiveRequiredProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Resuming from project" )
@@ -323,25 +344,25 @@ public class DefaultGraphBuilderTest
 
         public ScenarioBuilder activeRequiredProjects( String... activeRequiredProjects )
         {
-            this.activeRequiredProjects = asList( activeRequiredProjects );
+            this.activeRequiredProjects = prependWithColon( activeRequiredProjects );
             return this;
         }
 
         public ScenarioBuilder activeOptionalProjects( String... activeOptionalProjects )
         {
-            this.activeOptionalProjects = asList( activeOptionalProjects );
+            this.activeOptionalProjects = prependWithColon( activeOptionalProjects );
             return this;
         }
 
         public ScenarioBuilder inactiveRequiredProjects( String... inactiveRequiredProjects )
         {
-            this.inactiveRequiredProjects = asList( inactiveRequiredProjects );
+            this.inactiveRequiredProjects = prependWithColon( inactiveRequiredProjects );
             return this;
         }
 
         public ScenarioBuilder inactiveOptionalProjects( String... inactiveOptionalProjects )
         {
-            this.inactiveOptionalProjects = asList( inactiveOptionalProjects );
+            this.inactiveOptionalProjects = prependWithColon( inactiveOptionalProjects );
             return this;
         }
 
@@ -368,6 +389,11 @@ public class DefaultGraphBuilderTest
             return Arguments.arguments(
                     description, activeRequiredProjects, activeOptionalProjects, inactiveRequiredProjects, inactiveOptionalProjects, resumeFrom, makeBehavior, asList( expectedReactorProjects ), requestedPom
             );
+        }
+
+        private List<String> prependWithColon( String[] activeRequiredProjects )
+        {
+            return Arrays.stream( activeRequiredProjects ).map( p -> ":" + p ).collect( Collectors.toList() );
         }
     }
 }
