@@ -21,7 +21,6 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -41,6 +41,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
@@ -176,38 +177,69 @@ public class DefaultGraphBuilder
     {
         List<MavenProject> result = projects;
 
-        if ( !request.getSelectedProjects().isEmpty() )
+        ProjectActivation projectActivation = request.getProjectActivation();
+        Set<String> requiredSelectors = projectActivation.getRequiredActiveProjectSelectors();
+        Set<String> optionalSelectors = projectActivation.getOptionalActiveProjectSelectors();
+        if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
         {
-            File reactorDirectory = getReactorDirectory( request );
+            Set<MavenProject> selectedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
+            selectedProjects.addAll( getProjectsBySelectors( request, projects, requiredSelectors, true ) );
+            selectedProjects.addAll( getProjectsBySelectors( request, projects, optionalSelectors, false ) );
 
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<>();
-
-            for ( String selector : request.getSelectedProjects() )
+            // it can be empty when an optional project is missing from the reactor, fallback to returning all projects
+            if ( !selectedProjects.isEmpty() )
             {
-                MavenProject selectedProject = projects.stream()
-                        .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
-                        .findFirst()
-                        .orElseThrow( () -> new MavenExecutionException(
-                                "Could not find the selected project in the reactor: " + selector, request.getPom() ) );
-                selectedProjects.add( selectedProject );
+                result = new ArrayList<>( selectedProjects );
 
-                List<MavenProject> children = selectedProject.getCollectedProjects();
-                if ( children != null )
-                {
-                    selectedProjects.addAll( children );
-                }
+                result = includeAlsoMakeTransitively( result, request, graph );
+
+                // Order the new list in the original order
+                List<MavenProject> sortedProjects = graph.getSortedProjects();
+                result.sort( comparing( sortedProjects::indexOf ) );
             }
-
-            result = new ArrayList<>( selectedProjects );
-
-            result = includeAlsoMakeTransitively( result, request, graph );
-
-            // Order the new list in the original order
-            List<MavenProject> sortedProjects = graph.getSortedProjects();
-            result.sort( comparing( sortedProjects::indexOf ) );
         }
 
         return result;
+    }
+
+    private Set<MavenProject> getProjectsBySelectors( MavenExecutionRequest request, List<MavenProject> projects,
+                                                      Set<String> projectSelectors, boolean required )
+            throws MavenExecutionException
+    {
+        Set<MavenProject> selectedProjects = new LinkedHashSet<>();
+        File reactorDirectory = getReactorDirectory( request );
+
+        for ( String selector : projectSelectors )
+        {
+            Optional<MavenProject> optSelectedProject = projects.stream()
+                    .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                    .findFirst();
+            if ( !optSelectedProject.isPresent() )
+            {
+                String message = "Could not find the selected project in the reactor: " + selector;
+                if ( required )
+                {
+                    throw new MavenExecutionException( message, request.getPom() );
+                }
+                else
+                {
+                    LOGGER.warn( message );
+                    break;
+                }
+            }
+
+            MavenProject selectedProject = optSelectedProject.get();
+
+            selectedProjects.add( selectedProject );
+
+            List<MavenProject> children = selectedProject.getCollectedProjects();
+            if ( children != null )
+            {
+                selectedProjects.addAll( children );
+            }
+        }
+
+        return selectedProjects;
     }
 
     private List<MavenProject> trimResumedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
@@ -242,20 +274,19 @@ public class DefaultGraphBuilder
     {
         List<MavenProject> result = projects;
 
-        if ( !request.getExcludedProjects().isEmpty() )
+        ProjectActivation projectActivation = request.getProjectActivation();
+        Set<String> requiredSelectors = projectActivation.getRequiredInactiveProjectSelectors();
+        Set<String> optionalSelectors = projectActivation.getOptionalInactiveProjectSelectors();
+        if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
         {
-            File reactorDirectory = getReactorDirectory( request );
+            Set<MavenProject> excludedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
+            excludedProjects.addAll( getProjectsBySelectors( request, projects, requiredSelectors, true ) );
+            excludedProjects.addAll( getProjectsBySelectors( request, projects, optionalSelectors, false ) );
 
             result = new ArrayList<>( projects );
 
-            for ( String selector : request.getExcludedProjects() )
+            for ( MavenProject excludedProject : excludedProjects )
             {
-                MavenProject excludedProject = projects.stream()
-                        .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
-                        .findFirst()
-                        .orElseThrow( () -> new MavenExecutionException( "Could not find the selected project in "
-                                + "the reactor: " + selector, request.getPom() ) );
-
                 boolean isExcludedProjectRemoved = result.remove( excludedProject );
 
                 if ( isExcludedProjectRemoved )
