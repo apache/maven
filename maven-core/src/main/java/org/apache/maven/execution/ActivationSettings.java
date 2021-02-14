@@ -20,7 +20,7 @@ package org.apache.maven.execution;
  */
 
 /**
- * Describes whether something (a profile or a project) should be activated or not, and if that is required or optional.
+ * Describes whether a target should be activated or not, and if that is required or optional.
  */
 enum ActivationSettings
 {
