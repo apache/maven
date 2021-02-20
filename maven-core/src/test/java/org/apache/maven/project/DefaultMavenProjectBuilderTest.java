@@ -307,33 +307,34 @@ public class DefaultMavenProjectBuilderTest
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
     
-    /**
-     * Ensure that when re-reading a pom, it should not use the cached Model
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void rereadPom_mng7063() throws Exception
-    {
-        final Path pom = projectRoot.resolve( "pom.xml" );
-
-        try ( InputStream pomResource =
-            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom1.xml" ) )
+        /**
+         * Ensure that when re-reading a pom, it should not use the cached Model
+         * 
+         * @throws Exception
+         */
+        @Test
+        public void rereadPom_mng7063() throws Exception
         {
-            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
+            final Path pom = projectRoot.resolve( "pom.xml" );
+            final ProjectBuildingRequest buildingRequest = newBuildingRequest();
+    
+            try ( InputStream pomResource =
+                DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom1.xml" ) )
+            {
+                Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
+            }
+            
+            MavenProject project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+            assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
+            
+            try ( InputStream pomResource =
+                DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
+            {
+                Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
+            }
+    
+            project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+            assertThat( project.getName(), is( "PROJECT NAME" ) );
         }
-        
-        MavenProject project = getProject( pom.toFile() );
-        assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
-        
-        try ( InputStream pomResource =
-            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
-        {
-            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
-        }
-
-        project = getProject( pom.toFile() );
-        assertThat( project.getName(), is( "PROJECT NAME" ) );
-    }
 
 }

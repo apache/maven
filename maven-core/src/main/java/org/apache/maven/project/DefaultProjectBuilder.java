@@ -279,7 +279,11 @@ public class DefaultProjectBuilder
         request.setUserProperties( configuration.getUserProperties() );
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
-        request.setModelCache( DefaultModelCache.newInstance( config.session ) );
+        // this is a hint that we want to build 1 file, so don't cache. See MNG-7063
+        if ( config.modelPool != null )
+        {
+            request.setModelCache( DefaultModelCache.newInstance( config.session ) );
+        }
         request.setTransformerContextBuilder( config.transformerContextBuilder );
 
         return request;
