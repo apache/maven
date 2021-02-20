@@ -255,7 +255,17 @@ public class DefaultGraphBuilder
                         .findFirst()
                         .orElseThrow( () -> new MavenExecutionException( "Could not find the selected project in "
                                 + "the reactor: " + selector, request.getPom() ) );
-                result.remove( excludedProject );
+
+                boolean isExcludedProjectRemoved = result.remove( excludedProject );
+
+                if ( isExcludedProjectRemoved )
+                {
+                    List<MavenProject> children = excludedProject.getCollectedProjects();
+                    if ( children != null )
+                    {
+                        result.removeAll( children );
+                    }
+                }
             }
         }
 
