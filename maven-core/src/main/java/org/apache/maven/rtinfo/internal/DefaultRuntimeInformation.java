@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.logging.Logger;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -31,6 +30,7 @@ import org.eclipse.aether.version.VersionScheme;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -45,64 +45,73 @@ import javax.inject.Singleton;
 public class DefaultRuntimeInformation
     implements RuntimeInformation
 {
+    private final Logger logger;
+
+    private final VersionScheme versionScheme;
+
+    private final String mavenVersion;
 
     @Inject
-    private Logger logger;
-
-    private String mavenVersion;
-
-    public String getMavenVersion()
+    public DefaultRuntimeInformation( final Logger logger,
+                                      final VersionScheme versionScheme )
     {
-        if ( mavenVersion == null )
+        this.logger = Objects.requireNonNull( logger );
+        this.versionScheme = Objects.requireNonNull( versionScheme );
+        this.mavenVersion = locateMavenVersion();
+    }
+
+    private String locateMavenVersion()
+    {
+        Properties props = new Properties();
+
+        String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
+
+        try ( InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ) )
         {
-            Properties props = new Properties();
-
-            String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
-
-            try ( InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ) )
+            if ( is != null )
             {
-                if ( is != null )
-                {
-                    props.load( is );
-                }
-                else
-                {
-                    logger.warn(
-                        "Could not locate " + resource + " on classpath, Maven runtime information not available" );
-                }
-            }
-            catch ( IOException e )
-            {
-                String msg = "Could not parse " + resource + ", Maven runtime information not available";
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( msg, e );
-                }
-                else
-                {
-                    logger.warn( msg );
-                }
-            }
-
-            String version = props.getProperty( "version", "" ).trim();
-
-            if ( !version.startsWith( "${" ) )
-            {
-                mavenVersion = version;
+                props.load( is );
             }
             else
             {
-                mavenVersion = "";
+                logger.warn(
+                    "Could not locate " + resource + " on classpath, Maven runtime information not available" );
+            }
+        }
+        catch ( IOException e )
+        {
+            String msg = "Could not parse " + resource + ", Maven runtime information not available";
+            if ( logger.isDebugEnabled() )
+            {
+                logger.warn( msg, e );
+            }
+            else
+            {
+                logger.warn( msg );
             }
         }
 
+        String version = props.getProperty( "version", "" ).trim();
+
+        if ( !version.startsWith( "${" ) )
+        {
+            return version;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    @Override
+    public String getMavenVersion()
+    {
         return mavenVersion;
     }
 
+    @Override
     public boolean isMavenVersion( String versionRange )
     {
-        VersionScheme versionScheme = new GenericVersionScheme();
-
         Validate.notBlank( versionRange, "versionRange can neither be null, empty nor blank" );
 
         VersionConstraint constraint;

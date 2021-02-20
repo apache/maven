@@ -78,18 +78,22 @@ public class DefaultVersionRangeResolver
 
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    private final VersionScheme versionScheme;
+
     public DefaultVersionRangeResolver()
     {
         // enable default constructor
+        this.versionScheme = new GenericVersionScheme();
     }
 
     @Inject
     DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                                 RepositoryEventDispatcher repositoryEventDispatcher )
+                                 RepositoryEventDispatcher repositoryEventDispatcher, VersionScheme versionScheme )
     {
         setMetadataResolver( metadataResolver );
         setSyncContextFactory( syncContextFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
+        this.versionScheme = Objects.requireNonNull( versionScheme );
     }
 
     public void initService( ServiceLocator locator )
@@ -123,8 +127,6 @@ public class DefaultVersionRangeResolver
         throws VersionRangeResolutionException
     {
         VersionRangeResult result = new VersionRangeResult( request );
-
-        VersionScheme versionScheme = new GenericVersionScheme();
 
         VersionConstraint versionConstraint;
         try

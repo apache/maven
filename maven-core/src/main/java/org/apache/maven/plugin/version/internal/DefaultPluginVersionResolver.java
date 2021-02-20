@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -56,7 +57,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
@@ -75,17 +75,29 @@ public class DefaultPluginVersionResolver
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+
+    private final RepositorySystem repositorySystem;
+
+    private final MetadataReader metadataReader;
+
+    private final MavenPluginManager pluginManager;
+
+    private final VersionScheme versionScheme;
 
     @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MetadataReader metadataReader;
-
-    @Inject
-    private MavenPluginManager pluginManager;
+    public DefaultPluginVersionResolver( final Logger logger,
+                                         final RepositorySystem repositorySystem,
+                                         final MetadataReader metadataReader,
+                                         final MavenPluginManager pluginManager,
+                                         final VersionScheme versionScheme )
+    {
+        this.logger = Objects.requireNonNull( logger );
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.metadataReader = Objects.requireNonNull( metadataReader );
+        this.pluginManager = Objects.requireNonNull( pluginManager );
+        this.versionScheme = Objects.requireNonNull( versionScheme );
+    }
 
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
@@ -175,8 +187,6 @@ public class DefaultPluginVersionResolver
 
         if ( version == null )
         {
-            VersionScheme versionScheme = new GenericVersionScheme();
-
             TreeSet<Version> releases = new TreeSet<>( Collections.reverseOrder() );
             TreeSet<Version> snapshots = new TreeSet<>( Collections.reverseOrder() );
 
