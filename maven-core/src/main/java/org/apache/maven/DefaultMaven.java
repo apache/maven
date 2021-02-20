@@ -227,12 +227,7 @@ public class DefaultMaven
     {
         try
         {
-            // CHECKSTYLE_OFF: LineLength
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
-            {
-                listener.afterSessionStart( session );
-            }
-            // CHECKSTYLE_ON: LineLength
+            afterSessionStart( session );
         }
         catch ( MavenExecutionException e )
         {
@@ -279,23 +274,13 @@ public class DefaultMaven
 
         repoSession.setReadOnly();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterProjectsRead( session );
-            }
+            afterProjectsRead( session );
         }
         catch ( MavenExecutionException e )
         {
             return addExceptionToResult( result, e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
         //
@@ -366,6 +351,36 @@ public class DefaultMaven
         }
 
         return result;
+    }
+
+    private void afterSessionStart( MavenSession session )
+        throws MavenExecutionException
+    {
+        // CHECKSTYLE_OFF: LineLength
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        // CHECKSTYLE_ON: LineLength
+        {
+            listener.afterSessionStart( session );
+        }
+    }
+
+    private void afterProjectsRead( MavenSession session )
+        throws MavenExecutionException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                listener.afterProjectsRead( session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
     }
 
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
