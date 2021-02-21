@@ -19,16 +19,6 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -62,6 +52,15 @@ import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility class that
  * is only public for technical reasons, it is not part of the public API. In particular, this class can be changed or
@@ -75,14 +74,23 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 public class DefaultPluginDependenciesResolver
     implements PluginDependenciesResolver
 {
-
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+
+    private final RepositorySystem repoSystem;
+
+    private final PluginDependenciesExcluder pluginDependenciesExcluder;
 
     @Inject
-    private RepositorySystem repoSystem;
+    public DefaultPluginDependenciesResolver( final Logger logger,
+                                              final RepositorySystem repoSystem,
+                                              final PluginDependenciesExcluder pluginDependenciesExcluder )
+    {
+        this.logger = Objects.requireNonNull( logger );
+        this.repoSystem = Objects.requireNonNull( repoSystem );
+        this.pluginDependenciesExcluder = Objects.requireNonNull( pluginDependenciesExcluder );
+    }
 
     private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
     {
@@ -167,14 +175,19 @@ public class DefaultPluginDependenciesResolver
         }
 
         DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
-        DependencyFilter resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, dependencyFilter );
+        DependencyFilter resolutionFilter = AndDependencyFilter.newInstance(
+            AndDependencyFilter.newInstance( collectionFilter, dependencyFilter ),
+            pluginDependenciesExcluder.coreDependencyFilter()
+        );
 
         DependencyNode node;
 
         try
         {
-            DependencySelector selector =
-                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
+            DependencySelector selector = AndDependencySelector.newInstance(
+                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() ),
+                pluginDependenciesExcluder.coreDependencySelector()
+            );
 
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
             pluginSession.setDependencySelector( selector );

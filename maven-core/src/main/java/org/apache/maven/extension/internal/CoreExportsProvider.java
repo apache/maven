@@ -27,7 +27,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Nullable;
 
 /**
- * CoreExportsProvider
+ * CoreExportsProvider, that CANNOT be <tty>javax.inject.Provider</tty> as ctor would have circular dep.
+ * Hence, despite "provider" in name, it is NOT provider as one would expect.
  */
 @Named
 @Singleton
@@ -37,7 +38,7 @@ public class CoreExportsProvider
     private final CoreExports exports;
 
     @Inject
-    public CoreExportsProvider( PlexusContainer container, @Nullable CoreExports exports )
+    public CoreExportsProvider( final PlexusContainer container, final @Nullable CoreExports exports )
     {
         if ( exports == null )
         {
