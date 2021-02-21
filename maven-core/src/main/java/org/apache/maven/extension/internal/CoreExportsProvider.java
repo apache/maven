@@ -27,7 +27,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.sisu.Nullable;
 
 /**
- * CoreExportsProvider, that CANNOT be <tty>javax.inject.Provider</tty> as ctor would have circular dep.
+ * CoreExportsProvider, that CANNOT be {@link javax.inject.Provider} as ctor would introduce circular dependency.
  * Hence, despite "provider" in name, it is NOT provider as one would expect.
  */
 @Named
