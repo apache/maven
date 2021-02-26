@@ -30,17 +30,22 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * Container for storing the request from the user to activate or de-activate certain projects and optionally fail the
+ * Container for storing the request from the user to activate or deactivate certain projects and optionally fail the
  * build if those projects do not exist.
  */
 public class ProjectActivation
 {
+    /**
+     * List of activated and deactivated projects.
+     *
+     * Key: selector of the project. This can be the project directory, [groupId]:[artifactId] or :[artifactId].
+     * Value: describes how/when to active or deactivate the project.
+     */
     private final Map<String, ActivationSettings> activations = new HashMap<>();
 
     /**
      * Adds a project activation to the request.
      * @param selector The selector of the project.
-     *                 This can be the project directory, [groupId]:[artifactId] or :[artifactId].
      * @param active Should the project be activated?
      * @param optional Can the build continue if the project does not exist?
      */
@@ -60,7 +65,6 @@ public class ProjectActivation
 
     /**
      * @return Required active project selectors, never {@code null}.
-     * The selector can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public Set<String> getRequiredActiveProjectSelectors()
     {
@@ -69,7 +73,6 @@ public class ProjectActivation
 
     /**
      * @return Optional active project selectors, never {@code null}.
-     * The selector can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public Set<String> getOptionalActiveProjectSelectors()
     {
@@ -78,7 +81,6 @@ public class ProjectActivation
 
     /**
      * @return Required inactive project selectors, never {@code null}.
-     * The selector can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public Set<String> getRequiredInactiveProjectSelectors()
     {
@@ -87,7 +89,6 @@ public class ProjectActivation
 
     /**
      * @return Optional inactive project selectors, never {@code null}.
-     * The selector can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public Set<String> getOptionalInactiveProjectSelectors()
     {
@@ -143,7 +144,6 @@ public class ProjectActivation
     /**
      * Mark a project as required and activated.
      * @param selector The selector of the project.
-     *                 It can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public void activateRequiredProject( String selector )
     {
@@ -153,7 +153,6 @@ public class ProjectActivation
     /**
      * Mark a project as optional and activated.
      * @param selector The selector of the project.
-     *                 It can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public void activateOptionalProject( String selector )
     {
@@ -163,7 +162,6 @@ public class ProjectActivation
     /**
      * Mark a project as required and deactivated.
      * @param selector The selector of the project.
-     *                 It can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public void deactivateRequiredProject( String selector )
     {
@@ -173,7 +171,6 @@ public class ProjectActivation
     /**
      * Mark a project as optional and deactivated.
      * @param selector The selector of the project.
-     *                 It can be the project directory, [groupId]:[artifactId] or :[artifactId].
      */
     public void deactivateOptionalProject( String selector )
     {
