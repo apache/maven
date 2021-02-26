@@ -85,7 +85,9 @@ public class DefaultModelValidator
 
     private static final String EMPTY = "";
 
-    private final Set<String> validIds = new HashSet<>();
+    private final Set<String> validCoordinateIds = new HashSet<>();
+
+    private final Set<String> validProfileIds = new HashSet<>();
 
     @Override
     public void validateFileModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
@@ -190,7 +192,7 @@ public class DefaultModelValidator
             {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
-                validateId( prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, m );
+                validateProfileId( prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, m );
 
                 if ( !profileIds.add( profile.getId() ) )
                 {
@@ -358,9 +360,9 @@ public class DefaultModelValidator
     {
         validateStringNotEmpty( "modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m );
 
-        validateId( "groupId", problems, m.getGroupId(), m );
+        validateCoordinateId( "groupId", problems, m.getGroupId(), m );
 
-        validateId( "artifactId", problems, m.getArtifactId(), m );
+        validateCoordinateId( "artifactId", problems, m.getArtifactId(), m );
 
         validateStringNotEmpty( "packaging", problems, Severity.ERROR, Version.BASE, m.getPackaging(), m );
 
@@ -668,10 +670,10 @@ public class DefaultModelValidator
     private void validateEffectiveDependency( ModelProblemCollector problems, Dependency d, boolean management,
                                               String prefix, ModelBuildingRequest request )
     {
-        validateId( prefix, "artifactId", problems, Severity.ERROR, Version.BASE, d.getArtifactId(),
+        validateCoordinateId( prefix, "artifactId", problems, Severity.ERROR, Version.BASE, d.getArtifactId(),
                     d.getManagementKey(), d );
 
-        validateId( prefix, "groupId", problems, Severity.ERROR, Version.BASE, d.getGroupId(),
+        validateCoordinateId( prefix, "groupId", problems, Severity.ERROR, Version.BASE, d.getGroupId(),
                     d.getManagementKey(), d );
 
         if ( !management )
@@ -727,19 +729,21 @@ public class DefaultModelValidator
             {
                 if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 )
                 {
-                    validateId( prefix, "exclusions.exclusion.groupId", problems, Severity.WARNING, Version.V20,
-                                exclusion.getGroupId(), d.getManagementKey(), exclusion );
+                    validateCoordinateId( prefix, "exclusions.exclusion.groupId", problems, Severity.WARNING,
+                                          Version.V20, exclusion.getGroupId(), d.getManagementKey(), exclusion );
 
-                    validateId( prefix, "exclusions.exclusion.artifactId", problems, Severity.WARNING, Version.V20,
-                                exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+                    validateCoordinateId( prefix, "exclusions.exclusion.artifactId", problems, Severity.WARNING,
+                                          Version.V20, exclusion.getArtifactId(), d.getManagementKey(), exclusion );
                 }
                 else
                 {
-                    validateIdWithWildcards( prefix, "exclusions.exclusion.groupId", problems, Severity.WARNING,
-                                             Version.V30, exclusion.getGroupId(), d.getManagementKey(), exclusion );
+                    validateCoordinateIdWithWildcards( prefix, "exclusions.exclusion.groupId", problems,
+                                                       Severity.WARNING, Version.V30, exclusion.getGroupId(),
+                                                       d.getManagementKey(), exclusion );
 
-                    validateIdWithWildcards( prefix, "exclusions.exclusion.artifactId", problems, Severity.WARNING,
-                                             Version.V30, exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+                    validateCoordinateIdWithWildcards( prefix, "exclusions.exclusion.artifactId", problems,
+                                                       Severity.WARNING, Version.V30, exclusion.getArtifactId(),
+                                                       d.getManagementKey(), exclusion );
                 }
             }
         }
@@ -830,17 +834,18 @@ public class DefaultModelValidator
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateId( String fieldName, ModelProblemCollector problems, String id,
-                                InputLocationTracker tracker )
+    private boolean validateCoordinateId( String fieldName, ModelProblemCollector problems, String id,
+                                          InputLocationTracker tracker )
     {
-        return validateId( EMPTY, fieldName, problems, Severity.ERROR, Version.BASE, id, null, tracker );
+        return validateCoordinateId( EMPTY, fieldName, problems, Severity.ERROR, Version.BASE, id, null, tracker );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    private boolean validateId( String prefix, String fieldName, ModelProblemCollector problems, Severity severity,
-                                Version version, String id, String sourceHint, InputLocationTracker tracker )
+    private boolean validateCoordinateId( String prefix, String fieldName, ModelProblemCollector problems,
+                                          Severity severity, Version version, String id, String sourceHint,
+                                          InputLocationTracker tracker )
     {
-        if ( validIds.contains( id ) )
+        if ( validCoordinateIds.contains( id ) )
         {
             return true;
         }
@@ -850,23 +855,23 @@ public class DefaultModelValidator
         }
         else
         {
-            if ( !isValidId( id ) )
+            if ( !isValidCoordinateId( id ) )
             {
                 addViolation( problems, severity, version, prefix + fieldName, sourceHint,
-                              "with value '" + id + "' does not match a valid id pattern.", tracker );
+                              "with value '" + id + "' does not match a valid coordinate id pattern.", tracker );
                 return false;
             }
-            validIds.add( id );
+            validCoordinateIds.add( id );
             return true;
         }
     }
 
-    private boolean isValidId( String id )
+    private boolean isValidCoordinateId( String id )
     {
         for ( int i = 0; i < id.length(); i++ )
         {
             char c = id.charAt( i );
-            if ( !isValidIdCharacter( c ) )
+            if ( !isValidCoordinateIdCharacter( c ) )
             {
                 return false;
             }
@@ -874,16 +879,55 @@ public class DefaultModelValidator
         return true;
     }
 
-
-    private boolean isValidIdCharacter( char c )
+    private boolean isValidCoordinateIdCharacter( char c )
     {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.';
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    private boolean validateIdWithWildcards( String prefix, String fieldName, ModelProblemCollector problems,
-                                             Severity severity, Version version, String id, String sourceHint,
-                                             InputLocationTracker tracker )
+    private boolean validateProfileId( String prefix, String fieldName, ModelProblemCollector problems,
+                                       Severity severity, Version version, String id, String sourceHint,
+                                       InputLocationTracker tracker )
+    {
+        if ( validProfileIds.contains( id ) )
+        {
+            return true;
+        }
+        if ( !validateStringNotEmpty( prefix, fieldName, problems, severity, version, id, sourceHint, tracker ) )
+        {
+            return false;
+        }
+        else
+        {
+            if ( !isValidProfileId( id ) )
+            {
+                addViolation( problems, severity, version, prefix + fieldName, sourceHint,
+                              "with value '" + id + "' does not match a valid profile id pattern.", tracker );
+                return false;
+            }
+            validProfileIds.add( id );
+            return true;
+        }
+    }
+
+    private boolean isValidProfileId( String id )
+    {
+        switch ( id.charAt( 0 ) )
+        { // avoid first character that has special CLI meaning in "mvn -P xxx"
+            case '+': // activate
+            case '-': // deactivate
+            case '!': // deactivate
+            case '?': // optional
+                return false;
+            default:
+        }
+        return true;
+    }
+
+    @SuppressWarnings( "checkstyle:parameternumber" )
+    private boolean validateCoordinateIdWithWildcards( String prefix, String fieldName, ModelProblemCollector problems,
+                                                       Severity severity, Version version, String id, String sourceHint,
+                                                       InputLocationTracker tracker )
     {
         if ( !validateStringNotEmpty( prefix, fieldName, problems, severity, version, id, sourceHint, tracker ) )
         {
@@ -891,22 +935,22 @@ public class DefaultModelValidator
         }
         else
         {
-            if ( !isValidIdWithWildCards( id ) )
+            if ( !isValidCoordinateIdWithWildCards( id ) )
             {
                 addViolation( problems, severity, version, prefix + fieldName, sourceHint,
-                              "with value '" + id + "' does not match a valid id pattern.", tracker );
+                              "with value '" + id + "' does not match a valid coordinate id pattern.", tracker );
                 return false;
             }
             return true;
         }
     }
 
-    private boolean isValidIdWithWildCards( String id )
+    private boolean isValidCoordinateIdWithWildCards( String id )
     {
         for ( int i = 0; i < id.length(); i++ )
         {
             char c = id.charAt( i );
-            if ( !isValidIdWithWildCardCharacter( c ) )
+            if ( !isValidCoordinateIdWithWildCardCharacter( c ) )
             {
                 return false;
             }
@@ -914,9 +958,9 @@ public class DefaultModelValidator
         return true;
     }
 
-    private boolean isValidIdWithWildCardCharacter( char c )
+    private boolean isValidCoordinateIdWithWildCardCharacter( char c )
     {
-        return isValidIdCharacter( c ) || c == '?' || c == '*';
+        return isValidCoordinateIdCharacter( c ) || c == '?' || c == '*';
     }
 
     private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,

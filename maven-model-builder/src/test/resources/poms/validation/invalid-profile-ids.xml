@@ -26,7 +26,22 @@ under the License.
 
     <profiles>
         <profile>
+            <id>+invalid-id</id>
+        </profile>
+        <profile>
+            <id>-invalid-id</id>
+        </profile>
+        <profile>
+            <id>!invalid-id</id>
+        </profile>
+        <profile>
             <id>?invalid-id</id>
+        </profile>
+        <profile>
+            <id>valid-id</id>
+        </profile>
+        <profile>
+            <id>valid?-jdk9+!</id>
         </profile>
     </profiles>
 </project>

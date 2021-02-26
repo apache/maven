@@ -166,16 +166,17 @@ public class DefaultModelValidatorTest
     }
 
     @Test
-    public void testInvalidIds()
+    public void testInvalidCoordinateIds()
         throws Exception
     {
-        SimpleProblemCollector result = validate( "invalid-ids-pom.xml" );
+        SimpleProblemCollector result = validate( "invalid-coordinate-ids-pom.xml" );
 
         assertViolations( result, 0, 2, 0 );
 
-        assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getErrors().get( 0 ) );
+        assertEquals( "'groupId' with value 'o/a/m' does not match a valid coordinate id pattern.",
+                      result.getErrors().get( 0 ) );
 
-        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.",
+        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid coordinate id pattern.",
                       result.getErrors().get( 1 ) );
     }
 
@@ -406,11 +407,14 @@ public class DefaultModelValidatorTest
     public void testInvalidProfileId()
         throws Exception
     {
-        SimpleProblemCollector result = validateRaw( "invalid-profile-id.xml" );
+        SimpleProblemCollector result = validateRaw( "invalid-profile-ids.xml" );
 
-        assertViolations( result, 0, 1, 0 );
+        assertViolations( result, 0, 4, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains( "?invalid-id" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "+invalid-id" ) );
+        assertTrue( result.getErrors().get( 1 ).contains( "-invalid-id" ) );
+        assertTrue( result.getErrors().get( 2 ).contains( "!invalid-id" ) );
+        assertTrue( result.getErrors().get( 3 ).contains( "?invalid-id" ) );
     }
 
     public void testDuplicateProfileId()
