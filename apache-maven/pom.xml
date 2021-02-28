@@ -319,6 +319,12 @@ under the License.
           </plugin>
         </plugins>
       </build>
+  </profile>
+  <profile>
+    <id>versionlessMavenDist</id>
+      <build>
+        <finalName>${project.artifactId}</finalName>
+      </build>
     </profile>
   </profiles>
 </project>
