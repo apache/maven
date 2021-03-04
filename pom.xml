@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.6.3</version>
+  <version>3.6.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
