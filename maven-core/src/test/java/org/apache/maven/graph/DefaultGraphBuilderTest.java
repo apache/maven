@@ -145,6 +145,10 @@ class DefaultGraphBuilderTest
                         .activeRequiredProjects( MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
                         .expectResult( MavenExecutionException.class ),
+                scenario( "Selected and excluded same project, but also selected another project" )
+                        .activeRequiredProjects( MODULE_A, MODULE_B )
+                        .inactiveRequiredProjects( MODULE_A )
+                        .expectResult( MODULE_B ),
                 scenario( "Resuming from project" )
                         .resumeFrom( MODULE_B )
                         .expectResult( MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
