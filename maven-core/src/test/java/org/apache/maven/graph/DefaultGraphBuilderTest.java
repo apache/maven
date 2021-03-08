@@ -144,7 +144,7 @@ class DefaultGraphBuilderTest
                 scenario( "Selected and excluded same project" )
                         .activeRequiredProjects( MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
-                        .expectResult( MavenExecutionException.class ),
+                        .expectResult( MavenExecutionException.class, "empty reactor" ),
                 scenario( "Selected and excluded same project, but also selected another project" )
                         .activeRequiredProjects( MODULE_A, MODULE_B )
                         .inactiveRequiredProjects( MODULE_A )
@@ -229,10 +229,12 @@ class DefaultGraphBuilderTest
     }
     static class ExceptionThrown implements ExpectedResult {
         final Class<? extends Throwable> expected;
+        final String partOfMessage;
 
-        public ExceptionThrown( final Class<? extends Throwable> expected )
+        public ExceptionThrown( final Class<? extends Throwable> expected, final String partOfMessage )
         {
             this.expected = expected;
+            this.partOfMessage = partOfMessage;
         }
     }
 
@@ -282,9 +284,12 @@ class DefaultGraphBuilderTest
         {
             assertThat( result.hasErrors() ).isTrue();
             Class<? extends Throwable> expectedException = ((ExceptionThrown) parameterExpectedResult).expected;
+            String partOfMessage = ((ExceptionThrown) parameterExpectedResult).partOfMessage;
 
             assertThat( result.getProblems() ).hasSize( 1 );
-            result.getProblems().forEach( p -> assertThat( p.getException() ).isInstanceOf( expectedException ) );
+            result.getProblems().forEach( p ->
+                assertThat( p.getException() ).isInstanceOf( expectedException ).hasMessageContaining( partOfMessage )
+            );
         }
     }
 
@@ -433,9 +438,9 @@ class DefaultGraphBuilderTest
             return createTestArguments( expectedResult );
         }
 
-        public Arguments expectResult( Class<? extends Exception> expected )
+        public Arguments expectResult( Class<? extends Exception> expected, final String partOfMessage )
         {
-            ExpectedResult expectedResult = new ExceptionThrown( expected );
+            ExpectedResult expectedResult = new ExceptionThrown( expected, partOfMessage );
             return createTestArguments( expectedResult );
         }
 
