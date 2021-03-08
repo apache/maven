@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
 
@@ -35,9 +36,64 @@ class DefaultTransformerContext implements TransformerContext
 {
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
-    final Map<Path, Model> modelByPath = new ConcurrentHashMap<>();
+    final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
 
-    final Map<GAKey, Model> modelByGA = new ConcurrentHashMap<>();
+    final Map<GAKey, Holder> modelByGA = new ConcurrentHashMap<>();
+
+    public static class Holder
+    {
+        private volatile boolean set;
+        private volatile Model model;
+
+        Holder()
+        {
+        }
+
+        public static Model deref( Holder holder )
+        {
+            return holder != null ? holder.get() : null;
+        }
+
+        public Model get()
+        {
+            if ( !set )
+            {
+                synchronized ( this )
+                {
+                    if ( !set )
+                    {
+                        try
+                        {
+                            this.wait();
+                        }
+                        catch ( InterruptedException e )
+                        {
+                            // Ignore
+                        }
+                    }
+                }
+            }
+            return model;
+        }
+
+        public Model computeIfAbsent( Supplier<Model> supplier )
+        {
+            if ( !set )
+            {
+                synchronized ( this )
+                {
+                    if ( !set )
+                    {
+                        this.set = true;
+                        this.model = supplier.get();
+                        this.notifyAll();
+                    }
+                }
+            }
+            return model;
+        }
+
+    }
 
     @Override
     public String getUserProperty( String key )
@@ -48,13 +104,13 @@ class DefaultTransformerContext implements TransformerContext
     @Override
     public Model getRawModel( Path p )
     {
-        return modelByPath.get( p );
+        return Holder.deref( modelByPath.get( p ) );
     }
 
     @Override
     public Model getRawModel( String groupId, String artifactId )
     {
-        return modelByGA.get( new GAKey( groupId, artifactId ) );
+        return Holder.deref( modelByGA.get( new GAKey( groupId, artifactId ) ) );
     }
 
     static class GAKey

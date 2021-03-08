@@ -1825,13 +1825,16 @@ public class DefaultModelBuilder
                 public Model getRawModel( String gId, String aId )
                 {
                     return context.modelByGA.computeIfAbsent( new DefaultTransformerContext.GAKey( gId, aId ),
-                                                              k -> findRawModel( gId, aId ) );
+                                                              k -> new DefaultTransformerContext.Holder() )
+                            .computeIfAbsent( () -> findRawModel( gId, aId ) );
                 }
 
                 @Override
                 public Model getRawModel( Path path )
                 {
-                    return context.modelByPath.computeIfAbsent( path, k -> findRawModel( path ) );
+                    return context.modelByPath.computeIfAbsent( path,
+                                                                k -> new DefaultTransformerContext.Holder() )
+                            .computeIfAbsent( () -> findRawModel( path ) );
                 }
 
                 private Model findRawModel( String groupId, String artifactId )
