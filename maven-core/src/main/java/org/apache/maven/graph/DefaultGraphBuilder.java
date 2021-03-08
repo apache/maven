@@ -223,7 +223,7 @@ public class DefaultGraphBuilder
                 }
                 else
                 {
-                    LOGGER.warn( message );
+                    LOGGER.info( message );
                     break;
                 }
             }
