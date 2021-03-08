@@ -301,8 +301,9 @@ public class DefaultGraphBuilder
 
             if ( result.isEmpty() )
             {
+                boolean isPlural = excludedProjects.size() > 1;
                 String message = String.format( "The project exclusion%s in --projects/-pl resulted in an "
-                        + "empty reactor, please correct them.", excludedProjects.size() > 1 ? "s" : "" );
+                        + "empty reactor, please correct %s.", isPlural ? "s" : "", isPlural ? "them" : "it" );
                 throw new MavenExecutionException( message, request.getPom() );
             }
         }
