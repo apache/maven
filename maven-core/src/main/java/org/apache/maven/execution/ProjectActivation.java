@@ -47,7 +47,7 @@ public class ProjectActivation
          */
         final ActivationSettings activationSettings;
 
-        public ProjectActivationSettings( String selector, ActivationSettings activationSettings )
+        ProjectActivationSettings( String selector, ActivationSettings activationSettings )
         {
             this.selector = selector;
             this.activationSettings = activationSettings;
