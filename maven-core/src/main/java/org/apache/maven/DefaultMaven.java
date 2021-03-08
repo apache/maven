@@ -611,7 +611,7 @@ public class DefaultMaven
                     "The requested optional profiles [%s] could not be activated or deactivated because they "
                             + "do not exist.", String.join( ", ", notFoundOptionalProfiles )
             );
-            logger.warn( message );
+            logger.info( message );
         }
     }
 
