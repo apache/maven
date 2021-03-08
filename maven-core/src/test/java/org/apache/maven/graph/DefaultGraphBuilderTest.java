@@ -58,6 +58,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
 import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
@@ -82,6 +83,7 @@ class DefaultGraphBuilderTest
          └─── module-c-1
               module-c-2        (depends on module-b)
      */
+    private static final String GROUP_ID = "unittest";
     private static final String PARENT_MODULE = "module-parent";
     private static final String INDEPENDENT_MODULE = "module-independent";
     private static final String MODULE_A = "module-a";
@@ -143,6 +145,10 @@ class DefaultGraphBuilderTest
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected and excluded same project" )
                         .activeRequiredProjects( MODULE_A )
+                        .inactiveRequiredProjects( MODULE_A )
+                        .expectResult( MavenExecutionException.class, "empty reactor" ),
+                scenario( "Project selected with different selector resolves to same project" )
+                        .activeRequiredProjects( GROUP_ID + ":" + MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
                         .expectResult( MavenExecutionException.class, "empty reactor" ),
                 scenario( "Selected and excluded same project, but also selected another project" )
@@ -281,7 +287,7 @@ class DefaultGraphBuilderTest
             List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
             List<MavenProject> expectedReactorProjects = expectedProjectNames.stream()
                     .map( artifactIdProjectMap::get )
-                    .collect( Collectors.toList() );
+                    .collect( toList() );
             assertEquals( expectedReactorProjects, actualReactorProjects, parameterDescription );
         }
         else
@@ -346,7 +352,7 @@ class DefaultGraphBuilderTest
     private MavenProject getMavenProject( String artifactId )
     {
         MavenProject mavenProject = new MavenProject();
-        mavenProject.setGroupId( "unittest" );
+        mavenProject.setGroupId( GROUP_ID );
         mavenProject.setArtifactId( artifactId );
         mavenProject.setVersion( "1.0" );
         mavenProject.setPomFile( new File ( artifactId, "pom.xml" ) );
@@ -371,7 +377,7 @@ class DefaultGraphBuilderTest
                     when( result.getProject() ).thenReturn( project );
                     return result;
                 } )
-                .collect( Collectors.toList() );
+                .collect( toList() );
     }
 
     static class ScenarioBuilder
@@ -396,25 +402,25 @@ class DefaultGraphBuilderTest
 
         public ScenarioBuilder activeRequiredProjects( String... activeRequiredProjects )
         {
-            this.activeRequiredProjects = prependWithColon( activeRequiredProjects );
+            this.activeRequiredProjects = prependWithColonIfNeeded( activeRequiredProjects );
             return this;
         }
 
         public ScenarioBuilder activeOptionalProjects( String... activeOptionalProjects )
         {
-            this.activeOptionalProjects = prependWithColon( activeOptionalProjects );
+            this.activeOptionalProjects = prependWithColonIfNeeded( activeOptionalProjects );
             return this;
         }
 
         public ScenarioBuilder inactiveRequiredProjects( String... inactiveRequiredProjects )
         {
-            this.inactiveRequiredProjects = prependWithColon( inactiveRequiredProjects );
+            this.inactiveRequiredProjects = prependWithColonIfNeeded( inactiveRequiredProjects );
             return this;
         }
 
         public ScenarioBuilder inactiveOptionalProjects( String... inactiveOptionalProjects )
         {
-            this.inactiveOptionalProjects = prependWithColon( inactiveOptionalProjects );
+            this.inactiveOptionalProjects = prependWithColonIfNeeded( inactiveOptionalProjects );
             return this;
         }
 
@@ -455,9 +461,15 @@ class DefaultGraphBuilderTest
                     requestedPom );
         }
 
-        private List<String> prependWithColon( String[] activeRequiredProjects )
+        private List<String> prependWithColonIfNeeded( String[] selectors )
         {
-            return Arrays.stream( activeRequiredProjects ).map( p -> ":" + p ).collect( Collectors.toList() );
+            return Arrays.stream( selectors )
+                    .map( this::prependWithColonIfNeeded )
+                    .collect( toList() );
+        }
+
+        private String prependWithColonIfNeeded( String selector ) {
+            return selector.indexOf( ':' ) == -1 ? ":" + selector : selector;
         }
     }
 }
