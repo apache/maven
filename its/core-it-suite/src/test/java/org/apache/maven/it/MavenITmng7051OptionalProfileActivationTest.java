@@ -72,7 +72,7 @@ public class MavenITmng7051OptionalProfileActivationTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
+        verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
 
     /**
@@ -89,7 +89,7 @@ public class MavenITmng7051OptionalProfileActivationTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
+        verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
 
     /**
@@ -106,7 +106,7 @@ public class MavenITmng7051OptionalProfileActivationTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
+        verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
 
     /**
@@ -123,6 +123,6 @@ public class MavenITmng7051OptionalProfileActivationTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog( "[WARNING] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
+        verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
 }
