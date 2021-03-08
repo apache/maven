@@ -122,10 +122,10 @@ class DefaultGraphBuilderTest
                         .activeOptionalProjects( MODULE_B )
                         .expectResult( MODULE_B ),
                 scenario( "Selected missing optional project" )
-                        .activeOptionalProjects( "missing-module" )
+                        .activeOptionalProjects( "non-existing-module" )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected missing optional and required project" )
-                        .activeOptionalProjects( "missing-module" )
+                        .activeOptionalProjects( "non-existing-module" )
                         .activeRequiredProjects( MODULE_B )
                         .expectResult( MODULE_B ),
                 scenario( "Excluded project" )
@@ -135,10 +135,10 @@ class DefaultGraphBuilderTest
                         .inactiveOptionalProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Excluded missing optional project" )
-                        .inactiveOptionalProjects( "missing-module" )
+                        .inactiveOptionalProjects( "non-existing-module" )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Excluded missing optional and required project" )
-                        .inactiveOptionalProjects( "missing-module" )
+                        .inactiveOptionalProjects( "non-existing-module" )
                         .inactiveRequiredProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected and excluded same project" )
@@ -149,6 +149,10 @@ class DefaultGraphBuilderTest
                         .activeRequiredProjects( MODULE_A, MODULE_B )
                         .inactiveRequiredProjects( MODULE_A )
                         .expectResult( MODULE_B ),
+                scenario( "Selected missing project as required and as optional" )
+                        .activeRequiredProjects( "non-existing-module" )
+                        .activeOptionalProjects( "non-existing-module" )
+                        .expectResult( MavenExecutionException.class, "not find the selected project" ),
                 scenario( "Resuming from project" )
                         .resumeFrom( MODULE_B )
                         .expectResult( MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
