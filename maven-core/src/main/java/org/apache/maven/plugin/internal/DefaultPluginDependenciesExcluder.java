@@ -19,7 +19,6 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionContext;
@@ -44,25 +43,24 @@ import java.util.Set;
 @Singleton
 public class DefaultPluginDependenciesExcluder implements PluginDependenciesExcluder
 {
-    private final CoreExports coreExports;
+    private final CoreExportsProvider coreExportsProvider;
 
     @Inject
     public DefaultPluginDependenciesExcluder( final CoreExportsProvider coreExportsProvider )
     {
-        Objects.requireNonNull( coreExportsProvider );
-        this.coreExports = coreExportsProvider.get();
+        this.coreExportsProvider = Objects.requireNonNull( coreExportsProvider );
     }
 
     @Override
     public DependencyFilter coreDependencyFilter()
     {
-        return new CoreDependencyFilter( coreExports.getExportedArtifacts() );
+        return new CoreDependencyFilter( coreExportsProvider.get().getExportedArtifacts() );
     }
 
     @Override
     public DependencySelector coreDependencySelector()
     {
-        return new CoreDependencySelector( coreExports.getExportedArtifacts() );
+        return new CoreDependencySelector( coreExportsProvider.get().getExportedArtifacts() );
     }
 
     private static class CoreDependencyFilter
