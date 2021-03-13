@@ -41,6 +41,8 @@ public class DefaultMirrorSelector
 
     private static final String EXTERNAL_WILDCARD = "external:*";
 
+    private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
+
     public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
     {
         String repoId = repository.getId();
@@ -72,6 +74,7 @@ public class DefaultMirrorSelector
      * <ul>
      * <li>{@code *} = everything,</li>
      * <li>{@code external:*} = everything not on the localhost and not file based,</li>
+     * <li>{@code external:http:*} = any repository not on the localhost using HTTP,</li>
      * <li>{@code repo,repo1} = {@code repo} or {@code repo1},</li>
      * <li>{@code *,!repo1} = everything except {@code repo1}.</li>
      * </ul>
@@ -119,6 +122,12 @@ public class DefaultMirrorSelector
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
                 }
+                // check for external:http:*
+                else if ( EXTERNAL_HTTP_WILDCARD.equals( repo ) && isExternalHttpRepo( originalRepository ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
                 else if ( WILDCARD.equals( repo ) )
                 {
                     result = true;
@@ -140,8 +149,7 @@ public class DefaultMirrorSelector
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" )
-                            || url.getProtocol().equals( "file" ) );
+            return !( isLocal( url.getHost() ) || url.getProtocol().equals( "file" ) );
         }
         catch ( MalformedURLException e )
         {
@@ -150,7 +158,34 @@ public class DefaultMirrorSelector
         }
     }
 
-    static boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
+    private static boolean isLocal( String host )
+    {
+        return "localhost".equals( host ) || "127.0.0.1".equals( host );
+    }
+
+    /**
+     * Checks the URL to see if this repository refers to a non-localhost repository using HTTP.
+     *
+     * @param originalRepository
+     * @return true if external.
+     */
+    static boolean isExternalHttpRepo( ArtifactRepository originalRepository )
+    {
+        try
+        {
+            URL url = new URL( originalRepository.getUrl() );
+            return ( "http".equalsIgnoreCase( url.getProtocol() ) || "dav".equalsIgnoreCase( url.getProtocol() )
+                || "dav:http".equalsIgnoreCase( url.getProtocol() )
+                || "dav+http".equalsIgnoreCase( url.getProtocol() ) ) && !isLocal( url.getHost() );
+        }
+        catch ( MalformedURLException e )
+        {
+            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
+            return false;
+        }
+    }
+
+   static boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
     {
         return matchesLayout( RepositoryUtils.getLayout( repository ), mirror.getMirrorOfLayouts() );
     }
