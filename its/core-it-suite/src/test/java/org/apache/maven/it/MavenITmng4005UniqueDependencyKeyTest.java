@@ -83,21 +83,36 @@ public class MavenITmng4005UniqueDependencyKeyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
+        try {
+            verifier.executeGoal( "validate" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected with Maven 4+
+        }
         verifier.resetStreams();
 
+        String logLevel;
+        if ( matchesVersionRange( "(,4.0.0-alpha-1)" ) )
+        {
+            logLevel = "WARNING";
+        }
+        else
+        {
+            logLevel = "ERROR";
+        }
+
         List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
-        boolean foundWarning = false;
+        boolean foundMessage = false;
         for ( String line : lines )
         {
-            if ( line.startsWith( "[WARNING]" ) && line.indexOf( "must be unique: junit:junit:jar" ) > 0 )
+            if ( line.startsWith( "[" + logLevel + "]" ) && line.indexOf( "must be unique: junit:junit:jar" ) > 0 )
             {
-                foundWarning = true;
+                foundMessage = true;
             }
         }
 
-        assertTrue( "Duplicate dependency warning wasn't generated.", foundWarning );
+        assertTrue( "Duplicate dependency message wasn't generated.", foundMessage );
     }
 
 }

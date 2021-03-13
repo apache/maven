@@ -38,7 +38,7 @@ public class MavenITmng3719PomExecutionOrderingTest
 
     public MavenITmng3719PomExecutionOrderingTest()
     {
-        super( "[2.0.11,2.1.0-M1),[2.1.0-M2,)" );
+        super( "[2.0.11,2.1.0-M1),[2.1.0-M2,4.0.0-alpha-1)" );
     }
 
     /**

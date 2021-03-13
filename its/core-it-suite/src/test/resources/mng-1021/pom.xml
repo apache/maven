@@ -24,7 +24,7 @@ under the License.
 
   <groupId>org.apache.maven.its.mng1021</groupId>
   <artifactId>test</artifactId>
-  <version>SNAPSHOT</version>
+  <version>1-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-1021</name>
   <description>

@@ -9,7 +9,7 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <name>Parent POM for issue</name>
-    <version>SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <inceptionYear>2007</inceptionYear>
 
 	<build>

@@ -9,7 +9,7 @@
     <artifactId>builder</artifactId>
     <packaging>pom</packaging>
     <name>Builder POM for issue XXX</name>
-    <version>SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <inceptionYear>2007</inceptionYear>
 
     <modules>
