@@ -633,6 +633,15 @@
             of the mirror to repositories with a matching layout (apart from a matching id). Since Maven 3.
           </description>
         </field>
+        <field>
+          <name>blocked</name>
+          <version>1.2.0+</version>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+          <description>
+            Whether this mirror should be blocked from any download request but fail the download process, explaining why.
+          </description>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -648,6 +657,10 @@
         sb.append( ",mirrorOf=" ).append( mirrorOf );
         sb.append( ",url=" ).append( this.url );
         sb.append( ",name=" ).append( this.name );
+        if ( isBlocked() )
+        {
+            sb.append( ",blocked" );
+        }
         sb.append( "]" );
         return sb.toString();
     }
