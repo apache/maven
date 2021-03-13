@@ -81,7 +81,7 @@ Maven Model Builder
    with its <<<DefaultLifecycleBindingsInjector>>> implementation in maven-core
    ({{{./maven-core/xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
-   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+   ** dependency management import (for dependencies of type <<<pom>>> and scope <<<import>>> in the <<<\<dependencyManagement\>>>> section)
 
    ** dependency management injection: <<<DependencyManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/DependencyManagementInjector.html}javadoc}}),
    with its <<<DefaultDependencyManagementInjector>>> implementation
