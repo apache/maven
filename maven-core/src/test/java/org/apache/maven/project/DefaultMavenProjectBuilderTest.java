@@ -39,6 +39,7 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -87,6 +88,7 @@ public class DefaultMavenProjectBuilderTest
         getProject( f2 );
     }
 
+    @Disabled( "Maven 4 does not allow duplicate plugin declarations" )
     @Test
     public void testDuplicatePluginDefinitionsMerged()
         throws Exception
