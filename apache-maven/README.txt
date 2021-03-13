@@ -22,7 +22,7 @@
   -------------------
 
   JDK:
-    1.7 or above (this is to execute Maven - it still allows you to build against 1.3
+    8 or above (this is to execute Maven - it still allows you to build against 1.3
     and prior JDK's).
   Memory:
     No minimum requirement.
@@ -42,18 +42,18 @@
   1) Unpack the archive where you would like to store the binaries, e.g.:
 
     Unix-based operating systems (Linux, Solaris and Mac OS X)
-      tar zxvf apache-maven-3.x.y.tar.gz
+      tar zxvf apache-maven-4.x.y.tar.gz
     Windows
-      unzip apache-maven-3.x.y.zip
+      unzip apache-maven-4.x.y.zip
 
-  2) A directory called "apache-maven-3.x.y" will be created.
+  2) A directory called "apache-maven-4.x.y" will be created.
 
   3) Add the bin directory to your PATH, e.g.:
 
     Unix-based operating systems (Linux, Solaris and Mac OS X)
-      export PATH=/usr/local/apache-maven-3.x.y/bin:$PATH
+      export PATH=/usr/local/apache-maven-4.x.y/bin:$PATH
     Windows
-      set PATH="c:\program files\apache-maven-3.x.y\bin";%PATH%
+      set PATH="c:\program files\apache-maven-4.x.y\bin";%PATH%
 
   4) Make sure JAVA_HOME is set to the location of your JDK
 
