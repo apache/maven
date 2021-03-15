@@ -23,11 +23,13 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-1-SNAPSHOT</version>
+    <artifactId>maven-parent</artifactId>
+    <version>34</version>
+    <relativePath />
   </parent>
-  <artifactId>maven-dependencies</artifactId>
-  <packaging>jar</packaging>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-bom</artifactId>
+  <version>4.0.0-alpha-1-SNAPSHOT</version>
 
   <name>Maven Dependecies BOM</name>
   <description>Bill Of Materials for Apache Maven dependencies</description>
@@ -47,7 +49,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>builder-support</artifactId>
+        <artifactId>maven-builder-support</artifactId>
         <version>4.0.0-alpha-1-SNAPSHOT</version>
       </dependency>
       <dependency>
