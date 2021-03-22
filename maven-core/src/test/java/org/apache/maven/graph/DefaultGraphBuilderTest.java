@@ -117,9 +117,14 @@ class DefaultGraphBuilderTest
                 scenario( "Selected project" )
                         .activeRequiredProjects( MODULE_B )
                         .expectResult( MODULE_B ),
-                scenario( "Selected project (including child modules)" )
+                scenario( "Selected aggregator project (including child modules)" )
                         .activeRequiredProjects( MODULE_C )
                         .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
+                scenario( "Selected aggregator project with non-recursive" )
+                        .activeRequiredProjects( MODULE_C )
+                        .setNonRecursive()
+                        .expectResult( MODULE_C ),
+                // TODO: When MNG-7102 is merged, add testcase for -pl !<proj> -N
                 scenario( "Selected optional project" )
                         .activeOptionalProjects( MODULE_B )
                         .expectResult( MODULE_B ),
@@ -263,7 +268,8 @@ class DefaultGraphBuilderTest
             String parameterResumeFrom,
             String parameterMakeBehavior,
             ExpectedResult parameterExpectedResult,
-            File parameterRequestedPom)
+            File parameterRequestedPom,
+            boolean isRecursive)
     {
         // Given
         ProjectActivation projectActivation = new ProjectActivation();
@@ -275,6 +281,7 @@ class DefaultGraphBuilderTest
         when( mavenExecutionRequest.getProjectActivation() ).thenReturn( projectActivation );
         when( mavenExecutionRequest.getMakeBehavior() ).thenReturn( parameterMakeBehavior );
         when( mavenExecutionRequest.getPom() ).thenReturn( parameterRequestedPom );
+        when( mavenExecutionRequest.isRecursive() ).thenReturn( isRecursive );
         if ( StringUtils.isNotEmpty( parameterResumeFrom ) )
         {
             when( mavenExecutionRequest.getResumeFrom() ).thenReturn( ":" + parameterResumeFrom );
@@ -394,6 +401,7 @@ class DefaultGraphBuilderTest
         private String resumeFrom = "";
         private String makeBehavior = "";
         private File requestedPom = new File( PARENT_MODULE, "pom.xml" );
+        private boolean isRecursive = true;
 
         private ScenarioBuilder() { }
 
@@ -446,6 +454,12 @@ class DefaultGraphBuilderTest
             return this;
         }
 
+        public ScenarioBuilder setNonRecursive()
+        {
+            this.isRecursive = false;
+            return this;
+        }
+
         public Arguments expectResult( String... expectedReactorProjects )
         {
             ExpectedResult expectedResult = new SelectedProjectsResult( asList( expectedReactorProjects ) );
@@ -462,7 +476,7 @@ class DefaultGraphBuilderTest
         {
             return Arguments.arguments( description, activeRequiredProjects, activeOptionalProjects,
                     inactiveRequiredProjects, inactiveOptionalProjects, resumeFrom, makeBehavior, expectedResult,
-                    requestedPom );
+                    requestedPom, isRecursive );
         }
 
         private List<String> prependWithColonIfNeeded( String[] selectors )

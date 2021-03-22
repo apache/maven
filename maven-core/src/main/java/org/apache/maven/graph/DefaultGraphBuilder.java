@@ -233,7 +233,7 @@ public class DefaultGraphBuilder
             selectedProjects.add( selectedProject );
 
             List<MavenProject> children = selectedProject.getCollectedProjects();
-            if ( children != null )
+            if ( children != null && request.isRecursive() )
             {
                 selectedProjects.addAll( children );
             }
