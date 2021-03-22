@@ -60,9 +60,7 @@ public class DefaultProjectsSelector implements ProjectsSelector
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        // TODO: When MNG-6511 is merged, clean this up using a new method in ProjectActivation
-        boolean hasProjectSelection = !request.getSelectedProjects().isEmpty()
-                || !request.getExcludedProjects().isEmpty();
+        boolean hasProjectSelection = !request.getProjectActivation().isEmpty();
         boolean isRecursive = hasProjectSelection || request.isRecursive();
         List<ProjectBuildingResult> results = projectBuilder.build( files, isRecursive, projectBuildingRequest );
 

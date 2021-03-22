@@ -199,4 +199,9 @@ public class ProjectActivation
     {
         this.activations.add( new ProjectActivationSettings( selector, ActivationSettings.DEACTIVATION_OPTIONAL ) );
     }
+
+    public boolean isEmpty()
+    {
+        return this.activations.isEmpty();
+    }
 }
