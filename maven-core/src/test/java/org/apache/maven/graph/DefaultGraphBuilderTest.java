@@ -147,6 +147,10 @@ class DefaultGraphBuilderTest
                         .activeRequiredProjects( MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
                         .expectResult( MavenExecutionException.class, "empty reactor" ),
+                scenario( "Excluded aggregator, but selected child" )
+                        .activeRequiredProjects( MODULE_C_1 )
+                        .inactiveRequiredProjects( MODULE_C )
+                        .expectResult( MavenExecutionException.class, "empty reactor" ),
                 scenario( "Project selected with different selector resolves to same project" )
                         .activeRequiredProjects( GROUP_ID + ":" + MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
@@ -282,7 +286,7 @@ class DefaultGraphBuilderTest
         // Then
         if ( parameterExpectedResult instanceof SelectedProjectsResult )
         {
-            assertThat( result.hasErrors() ).isFalse();
+            assertThat( result.hasErrors() ).withFailMessage( "Expected result not to have errors" ).isFalse();
             List<String> expectedProjectNames = ((SelectedProjectsResult) parameterExpectedResult).projectNames;
             List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
             List<MavenProject> expectedReactorProjects = expectedProjectNames.stream()
@@ -292,7 +296,7 @@ class DefaultGraphBuilderTest
         }
         else
         {
-            assertThat( result.hasErrors() ).isTrue();
+            assertThat( result.hasErrors() ).withFailMessage( "Expected result to have errors" ).isTrue();
             Class<? extends Throwable> expectedException = ((ExceptionThrown) parameterExpectedResult).expected;
             String partOfMessage = ((ExceptionThrown) parameterExpectedResult).partOfMessage;
 
