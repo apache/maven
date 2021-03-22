@@ -124,7 +124,6 @@ class DefaultGraphBuilderTest
                         .activeRequiredProjects( MODULE_C )
                         .setNonRecursive()
                         .expectResult( MODULE_C ),
-                // TODO: When MNG-7102 is merged, add testcase for -pl !<proj> -N
                 scenario( "Selected optional project" )
                         .activeOptionalProjects( MODULE_B )
                         .expectResult( MODULE_B ),
@@ -148,6 +147,10 @@ class DefaultGraphBuilderTest
                         .inactiveOptionalProjects( "non-existing-module" )
                         .inactiveRequiredProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Excluded aggregator project with non-recursive" )
+                        .inactiveRequiredProjects( MODULE_C )
+                        .setNonRecursive()
+                        .expectResult( PARENT_MODULE, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected and excluded same project" )
                         .activeRequiredProjects( MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
