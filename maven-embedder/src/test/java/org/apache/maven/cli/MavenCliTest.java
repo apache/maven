@@ -268,6 +268,7 @@ public class MavenCliTest
 
         MessageUtils.setColorEnabled( true );
         request = new CliRequest( new String[] { "-l", "target/temp/mvn.log" }, null );
+        request.workingDirectory = "target/temp";
         cli.cli( request );
         cli.properties( request );
         cli.logging( request );
@@ -289,6 +290,7 @@ public class MavenCliTest
 
         MessageUtils.setColorEnabled( false );
         request = new CliRequest( new String[] { "-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log" }, null );
+        request.workingDirectory = "target/temp";
         cli.cli( request );
         cli.properties( request );
         cli.logging( request );
@@ -298,6 +300,7 @@ public class MavenCliTest
         {
             MessageUtils.setColorEnabled( false );
             request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+            request.workingDirectory = "target/temp";
             cli.cli( request );
             cli.properties( request );
             cli.logging( request );
