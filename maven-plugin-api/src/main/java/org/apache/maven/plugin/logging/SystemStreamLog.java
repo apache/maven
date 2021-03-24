@@ -26,7 +26,10 @@ import java.io.StringWriter;
  * Logger with "standard" output and error output stream.
  *
  * @author jdcasey
+ *
+ * @deprecated Use SLF4J directly
  */
+@Deprecated
 public class SystemStreamLog
     implements Log
 {
@@ -120,7 +123,8 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.err.println( "[error] " + content.toString() + "\n\n" + sWriter.toString() );
+        System.err.println( "[error] " + content.toString()
+                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
     }
 
     /**
@@ -191,6 +195,7 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.out.println( "[" + prefix + "] " + content.toString() + "\n\n" + sWriter.toString() );
+        System.out.println( "[" + prefix + "] " + content.toString()
+                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
     }
 }

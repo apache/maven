@@ -238,7 +238,7 @@ public class DefaultArtifactVersion
         }
         catch ( NumberFormatException e )
         {
-            // should never happen since checked isDigits(s) before 
+            // should never happen since checked isDigits(s) before
             return null;
         }
     }

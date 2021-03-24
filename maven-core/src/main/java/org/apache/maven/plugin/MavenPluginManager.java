@@ -95,7 +95,7 @@ public interface MavenPluginManager
 
     /**
      * Sets up class realm for the specified build extensions plugin.
-     * 
+     *
      * @since 3.3.0
      */
     ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,

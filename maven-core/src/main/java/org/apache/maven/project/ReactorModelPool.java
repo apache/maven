@@ -44,11 +44,11 @@ class ReactorModelPool
     private final Map<Path, Model> modelsByPath = new HashMap<>();
 
     /**
-     * Get the model by its GAV or (since 3.7.0) by its GA if there is only one.
-     *  
-     * @param groupId, never {@code null}
-     * @param artifactId, never {@code null}
-     * @param version, can be {@code null}
+     * Get the model by its GAV or (since 4.0.0) by its GA if there is only one.
+     *
+     * @param groupId never {@code null}
+     * @param artifactId never {@code null}
+     * @param version can be {@code null}
      * @return the matching model or {@code null}
      * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
      */
@@ -56,7 +56,7 @@ class ReactorModelPool
     {
         return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptySet() ).stream()
                         .filter( m -> version == null || version.equals( getVersion( m ) ) )
-                        .reduce( ( a, b ) -> 
+                        .reduce( ( a, b ) ->
                         {
                             throw new IllegalStateException( "Multiple modules with key "
                                 + a.getGroupId() + ':' + a.getArtifactId() );
@@ -65,10 +65,10 @@ class ReactorModelPool
 
     /**
      * Find model by path, useful when location the parent by relativePath
-     * 
+     *
      * @param path
      * @return the matching model or {@code null}
-     * @since 3.7.0
+     * @since 4.0.0
      */
     public Model get( Path path )
     {
@@ -83,7 +83,7 @@ class ReactorModelPool
         }
         return modelsByPath.get( pomFile );
     }
-    
+
     private String getVersion( Model model )
     {
         String version = model.getVersion();
@@ -97,7 +97,7 @@ class ReactorModelPool
     static class Builder
     {
         private ReactorModelPool pool = new ReactorModelPool();
-        
+
         Builder put( Path pomFile, Model model )
         {
             pool.modelsByPath.put( pomFile, model );
@@ -105,8 +105,8 @@ class ReactorModelPool
                                              k -> new HashSet<Model>() ).add( model );
             return this;
         }
-        
-        ReactorModelPool build() 
+
+        ReactorModelPool build()
         {
             return pool;
         }

@@ -25,7 +25,7 @@ package org.apache.maven.artifact.handler;
  * <li>information on how to use the artifact: whether to add it to the classpath, or to take into account its
  * dependencies.</li>
  * </ul>
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public interface ArtifactHandler
@@ -43,7 +43,7 @@ public interface ArtifactHandler
 
     /**
      * Get the classifier associated to the dependency type.
-     * 
+     *
      * @return the classifier
      */
     String getClassifier();

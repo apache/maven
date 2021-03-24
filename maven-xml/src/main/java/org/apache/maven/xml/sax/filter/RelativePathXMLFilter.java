@@ -21,32 +21,30 @@ package org.apache.maven.xml.sax.filter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Remove relativePath element, has no value for consumer pom
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class RelativePathXMLFilter
     extends AbstractEventXMLFilter
 {
     private boolean parsingParent;
-    
+
     private String state;
-    
+
     RelativePathXMLFilter()
     {
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> RelativePathXMLFilter( T parent )
+    RelativePathXMLFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }
-    
+
     @Override
     public void startElement( String uri, final String localName, String qName, Attributes atts )
         throws SAXException
@@ -60,10 +58,10 @@ class RelativePathXMLFilter
         {
             state = localName;
         }
-        
+
         super.startElement( uri, localName, qName, atts );
     }
-    
+
     @Override
     public void endElement( String uri, String localName, String qName )
         throws SAXException
@@ -74,14 +72,14 @@ class RelativePathXMLFilter
             {
                 case "parent":
                     executeEvents();
-                    
+
                     parsingParent = false;
                     break;
                 default:
                     break;
             }
         }
-        
+
         super.endElement( uri, localName, qName );
 
         // for this simple structure resetting to parent it sufficient

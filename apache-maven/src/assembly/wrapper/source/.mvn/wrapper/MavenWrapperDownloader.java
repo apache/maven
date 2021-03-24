@@ -62,7 +62,7 @@ public class MavenWrapperDownloader {
         // If the maven-wrapper.properties exists, read it and check if it contains a custom
         // wrapperUrl parameter.
         File mavenWrapperPropertyFile = new File(baseDirectory, MAVEN_WRAPPER_PROPERTIES_PATH);
-        
+
         String url = null;
 
         String repoUrl = System.getenv( "MVNW_REPOURL" );
@@ -70,20 +70,20 @@ public class MavenWrapperDownloader {
         {
             url = repoUrl + DEFAULT_DOWNLOAD_PATH;
         }
-        else if ( mavenWrapperPropertyFile.exists() ) 
+        else if ( mavenWrapperPropertyFile.exists() )
         {
             Properties mavenWrapperProperties = new Properties();
-            try ( InputStream mavenWrapperPropertyFileInputStream = new FileInputStream( mavenWrapperPropertyFile ) ) 
+            try ( InputStream mavenWrapperPropertyFileInputStream = new FileInputStream( mavenWrapperPropertyFile ) )
             {
                 mavenWrapperProperties.load( mavenWrapperPropertyFileInputStream );
                 url = mavenWrapperProperties.getProperty(PROPERTY_NAME_WRAPPER_URL, url);
-            } 
+            }
             catch ( IOException e )
             {
                 System.out.println("- ERROR loading '" + MAVEN_WRAPPER_PROPERTIES_PATH + "'");
             }
         }
-        
+
         if ( url == null )
         {
             url = "https://repo.maven.apache.org/maven2" + DEFAULT_DOWNLOAD_PATH;

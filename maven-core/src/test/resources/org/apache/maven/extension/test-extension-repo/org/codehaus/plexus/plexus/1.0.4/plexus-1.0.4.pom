@@ -20,7 +20,7 @@
           <port>6667</port>
           <channel>#plexus</channel>
         </configuration>
-      </notifier>      
+      </notifier>
     </notifiers>
   </ciManagement>
   <inceptionYear>2001</inceptionYear>
@@ -167,7 +167,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

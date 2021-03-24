@@ -22,31 +22,31 @@ package org.apache.maven.xml.sax.filter;
 import java.util.Objects;
 
 /**
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class DependencyKey
 {
     private final String groupId;
-    
+
     private final String artifactId;
-    
+
     private final int hashCode;
 
     public DependencyKey( String groupId, String artifactId )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
-        
+
         this.hashCode = Objects.hash( artifactId, groupId );
     }
- 
+
     public String getGroupId()
     {
         return groupId;
     }
-    
+
     public String getArtifactId()
     {
         return artifactId;
@@ -61,7 +61,7 @@ public class DependencyKey
     @Override
     public boolean equals( Object obj )
     {
-        if ( this == obj ) 
+        if ( this == obj )
         {
             return true;
         }
@@ -73,9 +73,9 @@ public class DependencyKey
         {
             return false;
         }
-        
+
         DependencyKey other = (DependencyKey) obj;
-        
+
         if ( !Objects.equals( artifactId, other.artifactId ) )
         {
             return false;
@@ -84,9 +84,9 @@ public class DependencyKey
         {
             return false;
         }
-        
+
         return true;
     }
-    
-    
+
+
 }

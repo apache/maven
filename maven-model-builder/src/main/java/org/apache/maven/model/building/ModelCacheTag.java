@@ -65,7 +65,7 @@ interface ModelCacheTag<T>
     T fromCache( T data );
 
     /**
-     * The tag used to denote raw model data.
+     * The tag used for the raw model without profile activation
      */
     ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>()
     {
@@ -129,12 +129,16 @@ interface ModelCacheTag<T>
 
     };
 
-    ModelCacheTag<Model> FILEMODEL = new ModelCacheTag<Model>() 
+    /**
+     * The tag used for the file model without profile activation
+     * @since 4.0.0
+     */
+    ModelCacheTag<Model> FILE = new ModelCacheTag<Model>()
     {
         @Override
         public String getName()
         {
-            return "file-model";
+            return "file";
         }
 
         @Override

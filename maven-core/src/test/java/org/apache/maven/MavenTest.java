@@ -17,43 +17,29 @@ package org.apache.maven;
 
 
 import org.apache.maven.exception.ExceptionHandler;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
 
 public class MavenTest
     extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private Maven maven;
 
-    @Requirement
+    @Inject
     private ExceptionHandler exceptionHandler;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        maven = lookup( Maven.class );
-        exceptionHandler = lookup( ExceptionHandler.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        maven = null;
-        exceptionHandler = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory()
     {
         return "src/test/projects/lifecycle-executor";
     }
 
+    @Test
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()
         throws Exception
     {
-        /*
+/*
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
         MavenExecutionResult result = maven.execute( request );
@@ -64,6 +50,6 @@ public class MavenTest
             es.getException().printStackTrace();
             fail( "Maven did not execute correctly." );
         }
-        */
+*/
     }
 }

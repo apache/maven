@@ -48,7 +48,7 @@ public class DefaultToolchainManager
 
     @Inject
     Map<String, ToolchainFactory> factories;
-    
+
     @Override
     public Toolchain getToolchainFromBuildContext( String type, MavenSession session )
     {
@@ -59,7 +59,7 @@ public class DefaultToolchainManager
         if ( model != null )
         {
             List<Toolchain> toolchains = selectToolchains( Collections.singletonList( model ), type, null );
-            
+
             if ( !toolchains.isEmpty() )
             {
                 return toolchains.get( 0 );
@@ -112,7 +112,7 @@ public class DefaultToolchainManager
         }
         return toolchains;
     }
-    
+
     Map<String, Object> retrieveContext( MavenSession session )
     {
         Map<String, Object> context = null;

@@ -54,16 +54,19 @@ public interface Mojo
      * and feedback to the user.
      *
      * @param log a new logger
+     *
+     * @deprecated Use SLF4J directly
      */
-    // TODO not sure about this here, and may want a getLog on here as well/instead
+    @Deprecated
     void setLog( Log log );
 
     /**
      * Furnish access to the standard Maven logging mechanism which is managed in this base class.
      *
      * @return a log4j-like logger object which allows plugins to create messages at levels of <code>"debug"</code>,
-     * <code>"info"</code>, <code>"warn"</code>, and <code>"error"</code>. This logger is the accepted means to display
-     * information to the user.
+     * <code>"info"</code>, <code>"warn"</code>, and <code>"error"</code>.
+     * @deprecated Use SLF4J directly
      */
+    @Deprecated
     Log getLog();
 }

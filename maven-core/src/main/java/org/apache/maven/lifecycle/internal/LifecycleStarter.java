@@ -68,7 +68,7 @@ public class LifecycleStarter
 
     @Inject
     private Map<String, Builder> builders;
-    
+
     @Inject
     private SessionScope sessionScope;
 

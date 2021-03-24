@@ -25,6 +25,11 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verifies scope inheritance of direct and transitive dependencies.
@@ -49,9 +54,10 @@ public class ProjectInheritanceTest
     // or we can show it graphically as:
     //
     // p1 ---> p0 --> super model
-	//
+    //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementOverridesTransitiveDependencyVersion()
         throws Exception
     {
@@ -68,9 +74,9 @@ public class ProjectInheritanceTest
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         System.out.println("Project " + project1.getId() + " " + project1);
         Map map = project1.getArtifactMap();
-        assertNotNull("No artifacts", map);
-        assertTrue("No Artifacts", map.size() > 0);
-        assertTrue("Set size should be 3, is " + map.size(), map.size() == 3);
+        assertNotNull( map, "No artifacts" );
+        assertTrue( map.size() > 0, "No Artifacts" );
+        assertTrue( map.size() == 3, "Set size should be 3, is " + map.size() );
 
         Artifact a = (Artifact) map.get("maven-test:t10-a");
         Artifact b = (Artifact) map.get("maven-test:t10-b");
@@ -82,13 +88,13 @@ public class ProjectInheritanceTest
 
         // inherited from depMgmt
         System.out.println(a.getScope());
-        assertTrue("Incorrect scope for " + a.getDependencyConflictId(), a.getScope().equals("test"));
+        assertTrue( a.getScope().equals("test"), "Incorrect scope for " + a.getDependencyConflictId() );
 
         // transitive dep, overridden b depMgmt
-        assertTrue("Incorrect scope for " + b.getDependencyConflictId(), b.getScope().equals("runtime"));
+        assertTrue( b.getScope().equals("runtime"), "Incorrect scope for " + b.getDependencyConflictId() );
 
         // direct dep, overrides depMgmt
-        assertTrue("Incorrect scope for " + c.getDependencyConflictId(), c.getScope().equals("runtime"));
+        assertTrue( c.getScope().equals("runtime"), "Incorrect scope for " + c.getDependencyConflictId() );
 
     }
 }

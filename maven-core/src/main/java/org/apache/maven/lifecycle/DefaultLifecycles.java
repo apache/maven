@@ -70,7 +70,7 @@ public class DefaultLifecycles
 
     /**
      * Get lifecycle based on phase
-     * 
+     *
      * @param phase
      * @return
      */
@@ -121,22 +121,22 @@ public class DefaultLifecycles
     public List<Lifecycle> getLifeCycles()
     {
         List<String> lifecycleIds = Arrays.asList( STANDARD_LIFECYCLES );
-        
-        Comparator<String> comparator = ( l, r ) -> 
+
+        Comparator<String> comparator = ( l, r ) ->
         {
             int lx = lifecycleIds.indexOf( l );
             int rx = lifecycleIds.indexOf( r );
 
-            if ( lx < 0 || rx < 0 ) 
+            if ( lx < 0 || rx < 0 )
             {
                 return rx - lx;
             }
-            else 
+            else
             {
                 return lx - rx;
             }
-        }; 
-        
+        };
+
         // ensure canonical order of standard lifecycles
         return lifecyclesMap.values().stream()
                                 .peek( l -> Objects.requireNonNull( l.getId(), "A lifecycle must have an id." ) )
@@ -150,5 +150,5 @@ public class DefaultLifecycles
                         .flatMap( l -> l.getPhases().stream() )
                         .collect( Collectors.joining( ", " ) );
     }
-    
+
 }

@@ -27,28 +27,22 @@ import java.util.List;
 public class BuildResumptionData
 {
     /**
-     * The project where the next build could resume from.
+     * The list of projects that remain to be built.
      */
-    private final String resumeFrom;
+    private final List<String> remainingProjects;
+
+    public BuildResumptionData ( final List<String> remainingProjects )
+    {
+        this.remainingProjects = remainingProjects;
+    }
 
     /**
-     * List of projects to skip if the build would be resumed from {@link #resumeFrom}.
+     * Returns the projects that still need to be built when resuming.
+     * @return A list containing the group and artifact id of the projects.
      */
-    private final List<String> projectsToSkip;
-
-    public BuildResumptionData ( final String resumeFrom, final List<String> projectsToSkip )
+    public List<String> getRemainingProjects()
     {
-        this.resumeFrom = resumeFrom;
-        this.projectsToSkip = projectsToSkip;
+        return this.remainingProjects;
     }
 
-    public String getResumeFrom()
-    {
-        return this.resumeFrom;
-    }
-
-    public List<String> getProjectsToSkip()
-    {
-        return this.projectsToSkip;
-    }
 }

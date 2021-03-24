@@ -19,10 +19,8 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +29,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ComparableVersionIT
 {
@@ -52,19 +52,19 @@ public class ComparableVersionIT
                 if ( mavenArtifactJar.matcher( filename ).matches() )
                 {
                     Process p = Runtime.getRuntime().exec( new String[] {
-                        Paths.get( System.getProperty( "java.home" ), "bin/java" ).toString(), 
+                        Paths.get( System.getProperty( "java.home" ), "bin/java" ).toString(),
                         "-jar",
-                        file.toAbsolutePath().toString(), 
-                        "5.32", 
+                        file.toAbsolutePath().toString(),
+                        "5.32",
                         "5.27" } );
 
                     try
                     {
-                        assertEquals( "Unexpected exit code", 0, p.waitFor() );
+                        assertEquals( 0, p.waitFor(), "Unexpected exit code" );
                     }
                     catch ( InterruptedException e )
                     {
-                        fail( e.getMessage() );
+                        throw new InterruptedIOException( e.toString() );
                     }
                     return FileVisitResult.TERMINATE;
                 }

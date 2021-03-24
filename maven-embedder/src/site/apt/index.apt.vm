@@ -27,6 +27,10 @@ ${project.name}
 
  ${project.description}
 
+* Useful entry points
+
+ * {{{./apidocs/org/apache/maven/cli/MavenCli.html}MavenCli.doMain(CliRequest)}} is the main method preparing runtime environment before running {{{../maven-core/}Maven.execute()}}
+
 * References
 
  * {{{./cli.html}CLI options}},
@@ -45,5 +49,4 @@ ${project.name}
  * since 3.5.0, output is colorized by default, with color disabled in batch mode: see
    {{{/shared/maven-shared-utils/apidocs/org/apache/maven/shared/utils/logging/package-summary.html}styled message API}}
    for more details on adding color to a plugin output or customizing colors.
- 
-   
+

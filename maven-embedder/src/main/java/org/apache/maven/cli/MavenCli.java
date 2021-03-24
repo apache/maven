@@ -48,13 +48,14 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -83,6 +84,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -112,10 +114,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Comparator.comparing;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -168,8 +171,6 @@ public class MavenCli
     private DefaultSecDispatcher dispatcher;
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
-
-    private BuildResumptionDataRepository buildResumptionDataRepository;
 
     public MavenCli()
     {
@@ -708,8 +709,6 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
-        buildResumptionDataRepository = container.lookup( BuildResumptionDataRepository.class );
-
         return container;
     }
 
@@ -793,7 +792,7 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            slf4jLogger.warn( "Failed to read extensions descriptor {}: {}", extensionsFile, e.getMessage() );
+            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
         }
         return Collections.emptyList();
     }
@@ -821,11 +820,11 @@ public class MavenCli
 
             extRealm.setParentRealm( coreRealm );
 
-            slf4jLogger.debug( "Populating class realm {}", extRealm.getId() );
+            slf4jLogger.debug( "Populating class realm '{}'", extRealm.getId() );
 
             for ( File file : extClassPath )
             {
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 extRealm.addURL( file.toURI().toURL() );
             }
@@ -874,7 +873,7 @@ public class MavenCli
             {
                 File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                slf4jLogger.debug( "  Included {}", file );
+                slf4jLogger.debug( "  included '{}'", file );
 
                 jars.add( file );
             }
@@ -977,6 +976,11 @@ public class MavenCli
     {
         MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
 
+        if ( cliRequest.request.getRepositoryCache() == null )
+        {
+            cliRequest.request.setRepositoryCache( new DefaultRepositoryCache() );
+        }
+
         eventSpyDispatcher.onEvent( request );
 
         MavenExecutionResult result = maven.execute( request );
@@ -991,7 +995,7 @@ public class MavenCli
 
             Map<String, String> references = new LinkedHashMap<>();
 
-            MavenProject project = null;
+            List<MavenProject> failedProjects = new ArrayList<>();
 
             for ( Throwable exception : result.getExceptions() )
             {
@@ -999,10 +1003,9 @@ public class MavenCli
 
                 logSummary( summary, references, "", cliRequest.showErrors );
 
-                if ( project == null && exception instanceof LifecycleExecutionException )
+                if ( exception instanceof LifecycleExecutionException )
                 {
-                    LifecycleExecutionException lifecycleExecutionException = (LifecycleExecutionException) exception;
-                    project = lifecycleExecutionException.getProject();
+                    failedProjects.add ( ( (LifecycleExecutionException) exception ).getProject() );
                 }
             }
 
@@ -1010,12 +1013,12 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the {} switch.",
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch.",
                         buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the {} switch to enable full debug logging.",
+                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable full debug logging.",
                         buffer().strong( "-X" ) );
             }
 
@@ -1031,15 +1034,23 @@ public class MavenCli
                 }
             }
 
-            List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
             if ( result.canResume() )
             {
-                logBuildResumeHint( "mvn <args> -r " );
+                logBuildResumeHint( "mvn <args> -r" );
             }
-            else if ( project != null && !project.equals( sortedProjects.get( 0 ) ) )
+            else if ( !failedProjects.isEmpty() )
             {
-                String resumeFromSelector = getResumeFromSelector( sortedProjects, project );
-                logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
+
+                // Sort the failedProjects list in the topologically sorted order.
+                failedProjects.sort( comparing( sortedProjects::indexOf ) );
+
+                MavenProject firstFailedProject = failedProjects.get( 0 );
+                if ( !firstFailedProject.equals( sortedProjects.get( 0 ) ) )
+                {
+                    String resumeFromSelector = getResumeFromSelector( sortedProjects, firstFailedProject );
+                    logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                }
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
@@ -1079,22 +1090,22 @@ public class MavenCli
      * This method is made package-private for testing purposes.
      *
      * @param mavenProjects Maven projects which are part of build execution.
-     * @param failedProject Project which has failed.
+     * @param firstFailedProject The first project which has failed.
      * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general
      * and {@code groupId:artifactId} when there is a name clash).
      */
-    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject failedProject )
+    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject firstFailedProject )
     {
         boolean hasOverlappingArtifactId = mavenProjects.stream()
-                .filter( project -> failedProject.getArtifactId().equals( project.getArtifactId() ) )
+                .filter( project -> firstFailedProject.getArtifactId().equals( project.getArtifactId() ) )
                 .count() > 1;
 
         if ( hasOverlappingArtifactId )
         {
-            return failedProject.getGroupId() + ":" + failedProject.getArtifactId();
+            return firstFailedProject.getGroupId() + ":" + firstFailedProject.getArtifactId();
         }
 
-        return ":" + failedProject.getArtifactId();
+        return ":" + firstFailedProject.getArtifactId();
     }
 
     private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
@@ -1224,7 +1235,7 @@ public class MavenCli
             // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
             //
             StringBuilder sb = new StringBuilder(
-                String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n",
+                String.format( "%nThere can only be one user supplied ConfigurationProcessor, there are %s:%n%n",
                                userSuppliedConfigurationProcessorCount ) );
             for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
             {
@@ -1232,10 +1243,9 @@ public class MavenCli
                 if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
                 {
                     ConfigurationProcessor configurationProcessor = entry.getValue();
-                    sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
+                    sb.append( String.format( "%s%n", configurationProcessor.getClass().getName() ) );
                 }
             }
-            sb.append( "\n" );
             throw new Exception( sb.toString() );
         }
     }
@@ -1296,9 +1306,9 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
-        slf4jLogger.debug( "Reading global toolchains from {}",
+        slf4jLogger.debug( "Reading global toolchains from '{}'",
                 getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
-        slf4jLogger.debug( "Reading user toolchains from {}",
+        slf4jLogger.debug( "Reading user toolchains from '{}'",
                 getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
 
         ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
@@ -1331,286 +1341,55 @@ public class MavenCli
         return defaultLocation;
     }
 
-    private MavenExecutionRequest populateRequest( CliRequest cliRequest )
+    protected MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         return populateRequest( cliRequest, cliRequest.request );
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
-        boolean showErrors = cliRequest.showErrors;
-
-        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
-        for ( String deprecatedOption : deprecatedOptions )
-        {
-            if ( commandLine.hasOption( deprecatedOption ) )
-            {
-                slf4jLogger.warn( "Command line option -{} is deprecated and will be removed in future Maven versions.",
-                        deprecatedOption );
-            }
-        }
-
-        // ----------------------------------------------------------------------
-        // Now that we have everything that we need we will fire up plexus and
-        // bring the maven component to life for use.
-        // ----------------------------------------------------------------------
-
-        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
-        {
-            request.setInteractiveMode( false );
-        }
-
-        boolean noSnapshotUpdates = false;
-        if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
-        {
-            noSnapshotUpdates = true;
-        }
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        List<String> goals = commandLine.getArgList();
-
-        boolean recursive = true;
-
-        // this is the default behavior.
-        String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-
-        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
-        {
-            recursive = false;
-        }
-
-        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
-        }
-        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
-        {
-            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
-        }
-
-        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
-        {
-            request.setOffline( true );
-        }
-
-        boolean updateSnapshots = false;
-
-        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
-        {
-            updateSnapshots = true;
-        }
-
-        String globalChecksumPolicy = null;
-
-        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        }
-        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
-        }
-
+        request.setShowErrors( cliRequest.showErrors ); // default: false
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
-        // ----------------------------------------------------------------------
-        // Profile Activation
-        // ----------------------------------------------------------------------
-
-        List<String> activeProfiles = new ArrayList<>();
-
-        List<String> inactiveProfiles = new ArrayList<>();
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
-            {
-                for ( String profileOptionValue : profileOptionValues )
-                {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
-                    {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            activeProfiles.add( profileAction );
-                        }
-                    }
-                }
-            }
-        }
-
-        TransferListener transferListener;
-
-        if ( quiet || cliRequest.commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
-        {
-            transferListener = new QuietMavenTransferListener();
-        }
-        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            //
-            // If we're logging to a file then we don't want the console transfer listener as it will spew
-            // download progress all over the place
-            //
-            transferListener = getConsoleTransferListener( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) );
-        }
-        else
-        {
-            transferListener = getBatchTransferListener();
-        }
-
-        ExecutionListener executionListener = new ExecutionEventLogger();
-        if ( eventSpyDispatcher != null )
-        {
-            executionListener = eventSpyDispatcher.chainListener( executionListener );
-        }
-
-        String alternatePomFile = null;
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
-        {
-            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
-        }
-
-        request.setBaseDirectory( baseDirectory ).setGoals( goals ).setSystemProperties(
-            cliRequest.systemProperties ).setUserProperties( cliRequest.userProperties ).setReactorFailureBehavior(
-            reactorFailureBehaviour ) // default: fail fast
-            .setRecursive( recursive ) // default: true
-            .setShowErrors( showErrors ) // default: false
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
-            .setExecutionListener( executionListener ).setTransferListener(
-            transferListener ) // default: batch mode which goes along with interactive
-            .setUpdateSnapshots( updateSnapshots ) // default: false
-            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
-
-        if ( alternatePomFile != null )
-        {
-            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
-            if ( pom.isDirectory() )
-            {
-                pom = new File( pom, "pom.xml" );
-            }
-
-            request.setPom( pom );
-        }
-        else if ( modelProcessor != null )
-        {
-            File pom = modelProcessor.locatePom( baseDirectory );
-
-            if ( pom.isFile() )
-            {
-                request.setPom( pom );
-            }
-        }
+        disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
+        enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
+        request.setGoals( commandLine.getArgList() );
+        request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
+        disableOnPresentOption( commandLine, CLIManager.NON_RECURSIVE, request::setRecursive );
+        enableOnPresentOption( commandLine, CLIManager.OFFLINE, request::setOffline );
+        enableOnPresentOption( commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots );
+        request.setGlobalChecksumPolicy( determineGlobalCheckPolicy( commandLine ) );
+        request.setBaseDirectory( baseDirectory );
+        request.setSystemProperties( cliRequest.systemProperties );
+        request.setUserProperties( cliRequest.userProperties );
+        request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
+        request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
+        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
+        request.setExecutionListener( determineExecutionListener() );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
         }
 
-        if ( commandLine.hasOption( CLIManager.RESUME ) )
-        {
-            request.setResume();
-        }
-
-        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
-        {
-            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
-        }
-
-        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
-        {
-            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
-
-            List<String> inclProjects = new ArrayList<>();
-            List<String> exclProjects = new ArrayList<>();
-
-            if ( projectOptionValues != null )
-            {
-                for ( String projectOptionValue : projectOptionValues )
-                {
-                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
-
-                    while ( projectTokens.hasMoreTokens() )
-                    {
-                        String projectAction = projectTokens.nextToken().trim();
-
-                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
-                        {
-                            exclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else if ( projectAction.startsWith( "+" ) )
-                        {
-                            inclProjects.add( projectAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            inclProjects.add( projectAction );
-                        }
-                    }
-                }
-            }
-
-            request.setSelectedProjects( inclProjects );
-            request.setExcludedProjects( exclProjects );
-        }
-
-        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
-        }
-        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
-        }
-        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption(
-            CLIManager.ALSO_MAKE_DEPENDENTS ) )
-        {
-            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
-        }
-
-        String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-
-        if ( localRepoProperty == null )
-        {
-            localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-        }
-
-        if ( localRepoProperty != null )
-        {
-            request.setLocalRepositoryPath( localRepoProperty );
-        }
-
+        request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        enableOnPresentOption( commandLine, CLIManager.RESUME, request::setResume );
+        request.setMakeBehavior( determineMakeBehavior( commandLine ) );
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
+
+        performProjectActivation( commandLine, request.getProjectActivation() );
+        performProfileActivation( commandLine, request.getProfileActivation() );
+
+        final String localRepositoryPath = determineLocalRepositoryPath( request );
+        if ( localRepositoryPath != null )
+        {
+            request.setLocalRepositoryPath( localRepositoryPath );
+        }
 
         //
         // Builder, concurrency and parallelism
@@ -1620,9 +1399,7 @@ public class MavenCli
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
         // extend the command line to accept its own configuration parameters.
         //
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
-            ? commandLine.getOptionValue( CLIManager.THREADS )
-            : null;
+        final String threadConfiguration = commandLine.getOptionValue( CLIManager.THREADS );
 
         if ( threadConfiguration != null )
         {
@@ -1644,12 +1421,262 @@ public class MavenCli
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        if ( commandLine.hasOption( CLIManager.BUILDER ) )
-        {
-            request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
-        }
+        request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER, request.getBuilderId() ) );
 
         return request;
+    }
+
+    private String determineLocalRepositoryPath( final MavenExecutionRequest request )
+    {
+        String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        if ( userDefinedLocalRepo != null )
+        {
+            return userDefinedLocalRepo;
+        }
+
+        return request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+    }
+
+    private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
+    {
+        String alternatePomFile = null;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+        {
+            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+        }
+
+        if ( alternatePomFile != null )
+        {
+            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+            if ( pom.isDirectory() )
+            {
+                pom = new File( pom, "pom.xml" );
+            }
+
+            return pom;
+        }
+        else if ( modelProcessor != null )
+        {
+            File pom = modelProcessor.locatePom( baseDirectory );
+
+            if ( pom.isFile() )
+            {
+                return pom;
+            }
+        }
+
+        return null;
+    }
+
+    // Visible for testing
+    static void performProjectActivation( final CommandLine commandLine, final ProjectActivation projectActivation )
+    {
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            final String[] optionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+
+            if ( optionValues == null || optionValues.length == 0 )
+            {
+                return;
+            }
+
+            for ( final String optionValue : optionValues )
+            {
+                for ( String token : optionValue.split( "," ) )
+                {
+                    String selector = token.trim();
+                    boolean active = true;
+                    if ( selector.charAt( 0 ) == '-' || selector.charAt( 0 ) == '!' )
+                    {
+                        active = false;
+                        selector = selector.substring( 1 );
+                    }
+                    else if ( token.charAt( 0 ) == '+' )
+                    {
+                        selector = selector.substring( 1 );
+                    }
+
+                    boolean optional = selector.charAt( 0 ) == '?';
+                    selector = selector.substring( optional ? 1 : 0 );
+
+                    projectActivation.addProjectActivation( selector, active, optional );
+                }
+            }
+        }
+    }
+
+    // Visible for testing
+    static void performProfileActivation( final CommandLine commandLine, final ProfileActivation profileActivation )
+    {
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            final String[] optionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+
+            if ( optionValues == null || optionValues.length == 0 )
+            {
+                return;
+            }
+
+            for ( final String optionValue : optionValues )
+            {
+                for ( String token : optionValue.split( "," ) )
+                {
+                    String profileId = token.trim();
+                    boolean active = true;
+                    if ( profileId.charAt( 0 ) == '-' || profileId.charAt( 0 ) == '!' )
+                    {
+                        active = false;
+                        profileId = profileId.substring( 1 );
+                    }
+                    else if ( token.charAt( 0 ) == '+' )
+                    {
+                        profileId = profileId.substring( 1 );
+                    }
+
+                    boolean optional = profileId.charAt( 0 ) == '?';
+                    profileId = profileId.substring( optional ? 1 : 0 );
+
+                    profileActivation.addProfileActivation( profileId, active, optional );
+                }
+            }
+        }
+    }
+
+    private ExecutionListener determineExecutionListener()
+    {
+        ExecutionListener executionListener = new ExecutionEventLogger();
+        if ( eventSpyDispatcher != null )
+        {
+            return eventSpyDispatcher.chainListener( executionListener );
+        }
+        else
+        {
+            return executionListener;
+        }
+    }
+
+    private String determineReactorFailureBehaviour( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_AT_END;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            return MavenExecutionRequest.REACTOR_FAIL_NEVER;
+        }
+        else
+        {
+            // this is the default behavior.
+            return MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+    }
+
+    private TransferListener determineTransferListener( final boolean quiet,
+                                                        final CommandLine commandLine,
+                                                        final MavenExecutionRequest request )
+    {
+        if ( quiet || commandLine.hasOption( CLIManager.NO_TRANSFER_PROGRESS ) )
+        {
+            return new QuietMavenTransferListener();
+        }
+        else if ( request.isInteractiveMode() && !commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            //
+            // If we're logging to a file then we don't want the console transfer listener as it will spew
+            // download progress all over the place
+            //
+            return getConsoleTransferListener( commandLine.hasOption( CLIManager.DEBUG ) );
+        }
+        else
+        {
+            // default: batch mode which goes along with interactive
+            return getBatchTransferListener();
+        }
+    }
+
+    private String determineMakeBehavior( final CommandLine cl )
+    {
+        if ( cl.hasOption( CLIManager.ALSO_MAKE ) && !cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
+        }
+        else if ( !cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
+        }
+        else if ( cl.hasOption( CLIManager.ALSO_MAKE ) && cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            return MavenExecutionRequest.REACTOR_MAKE_BOTH;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String determineGlobalCheckPolicy( final CommandLine commandLine )
+    {
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final String option,
+                                         final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( false );
+        }
+    }
+
+    private void disableOnPresentOption( final CommandLine commandLine,
+                                         final char option,
+                                         final Consumer<Boolean> setting )
+    {
+        disableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final String option,
+                                        final Consumer<Boolean> setting )
+    {
+        if ( commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
+        }
+    }
+
+    private void enableOnPresentOption( final CommandLine commandLine,
+                                        final char option,
+                                        final Consumer<Boolean> setting )
+    {
+        enableOnPresentOption( commandLine, String.valueOf( option ), setting );
+    }
+
+    private void enableOnAbsentOption( final CommandLine commandLine,
+                                       final char option,
+                                       final Consumer<Boolean> setting )
+    {
+        if ( !commandLine.hasOption( option ) )
+        {
+            setting.accept( true );
+        }
     }
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )

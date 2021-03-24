@@ -19,14 +19,14 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ToolchainsBuildingExceptionTest
 {

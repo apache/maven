@@ -43,6 +43,22 @@ Maven Model Builder
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
    <<<$\{basedir}>>> (since Maven 3), System properties and request properties
 
+   ** file model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
+   with its <<<DefaultModelValidator>>> implementation
+   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
+
+   []
+
+ * phase 2, with optional plugin processing
+
+   ** Build up a raw model by re-reading the file and enrich it based on information available in the reactor. Some features:
+
+      *** Resolve version of versionless parents based on realtivePath (including ci-friendly versions)
+
+      *** Resolve version of versionless dependencies that are part of the reactor
+
+   []
+
    ** raw model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation
    ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
@@ -65,10 +81,6 @@ Maven Model Builder
    with its <<<DefaultUrlNormalizer>>> implementation
    ({{{./xref/org/apache/maven/model/path/DefaultUrlNormalizer.html}source}})
 
-   []
-
- * phase 2, with optional plugin processing
-
    ** model path translation: <<<ModelPathTranslator>>> ({{{./apidocs/org/apache/maven/model/path/ModelPathTranslator.html}javadoc}}),
    with its <<<DefaultModelPathTranslator>>> implementation
    ({{{./xref/org/apache/maven/model/path/DefaultModelPathTranslator.html}source}})
@@ -81,7 +93,7 @@ Maven Model Builder
    with its <<<DefaultLifecycleBindingsInjector>>> implementation in maven-core
    ({{{./maven-core/xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
-   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+   ** dependency management import (for dependencies of type <<<pom>>> and scope <<<import>>> in the <<<\<dependencyManagement\>>>> section)
 
    ** dependency management injection: <<<DependencyManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/DependencyManagementInjector.html}javadoc}}),
    with its <<<DefaultDependencyManagementInjector>>> implementation
@@ -124,7 +136,7 @@ Maven Model Builder
 
   Notice that the 5 URLs from the model (<<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>,
   <<<project.scm.url>>> and <<<project.distributionManagement.site.url>>>) have a special inheritance handling:
-  
+
   ** if not configured in current model, the inherited value is the parent's one with current artifact id appended,
 
   ** since Maven 3.5.0, if <<<project.directory>>> POM property value is defined, it is used instead of artifact id:
@@ -194,6 +206,11 @@ Maven Model Builder
 *----+------+------+
 | <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
 *----+------+------+
+| <<<changelist>>> \
+<<<revision>>> \
+<<<sha1>>> | CI friendly placeholders for the project version (see {{{/maven-ci-friendly.html}Maven CI Friendly Versions}}) | <<<1.0.0-$\{changelist\}-SNAPSHOT>>> |
+*----+------+------+
+
 
 **  Notice
 

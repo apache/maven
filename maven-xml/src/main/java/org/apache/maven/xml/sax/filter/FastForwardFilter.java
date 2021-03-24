@@ -26,21 +26,19 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * This filter will skip all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters, even though the elements match 
- * 
+ * Should be used in case of a DOM that should not be effected by other filters, even though the elements match
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class FastForwardFilter extends AbstractSAXFilter
 {
     /**
      * DOM elements of pom
-     * 
+     *
      * <ul>
      *  <li>execution.configuration</li>
      *  <li>plugin.configuration</li>
@@ -51,17 +49,17 @@ class FastForwardFilter extends AbstractSAXFilter
      * <ul>
      */
     private final Deque<String> state = new ArrayDeque<>();
-    
+
     private int domDepth = 0;
-    
+
     private ContentHandler originalHandler;
-    
+
     FastForwardFilter()
     {
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> FastForwardFilter( T parent )
+    FastForwardFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }
@@ -103,7 +101,7 @@ class FastForwardFilter extends AbstractSAXFilter
             state.push( localName );
         }
     }
-    
+
     @Override
     public void endElement( String uri, String localName, String qName )
         throws SAXException
@@ -111,7 +109,7 @@ class FastForwardFilter extends AbstractSAXFilter
         if ( domDepth > 0 )
         {
             domDepth--;
-            
+
             if ( domDepth == 0 )
             {
                 setContentHandler( originalHandler );
@@ -123,6 +121,6 @@ class FastForwardFilter extends AbstractSAXFilter
         }
         super.endElement( uri, localName, qName );
     }
-    
-    
+
+
 }

@@ -19,54 +19,53 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import static org.junit.Assert.assertArrayEquals;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
-
-public class DefaultProjectArtifactsCacheTest extends TestCase
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+public class DefaultProjectArtifactsCacheTest
 {
-    
+
     private ProjectArtifactsCache cache;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
         cache = new DefaultProjectArtifactsCache();
     }
-    
+
+    @Test
     public void testProjectDependencyOrder() throws Exception
     {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key(){};
-        
+
         Set<Artifact> artifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
-        
+
         cache.put( project1, artifacts );
-        
+
         assertArrayEquals( artifacts.toArray( new Artifact[0] ),
                            cache.get( project1 ).getArtifacts().toArray( new Artifact[0] ) );
-        
+
         ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key(){};
-        
+
         Set<Artifact> reversedArtifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
         artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
-        
+
         cache.put( project2, reversedArtifacts );
-        
+
         assertArrayEquals( reversedArtifacts.toArray( new Artifact[0] ),
                            cache.get( project2 ).getArtifacts().toArray( new Artifact[0] ) );
     }

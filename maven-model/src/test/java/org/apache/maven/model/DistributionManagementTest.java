@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code DistributionManagement}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class DistributionManagementTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new DistributionManagement().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new DistributionManagement().equals( null ) );
@@ -42,12 +47,14 @@ public class DistributionManagementTest
         new DistributionManagement().equals( new DistributionManagement() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         DistributionManagement thing = new DistributionManagement();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new DistributionManagement().toString() );

@@ -688,23 +688,23 @@ public class MavenMetadataSource
                         }
 
                         String message =
-                            "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
-                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+                            "  this artifact has been relocated to " + artifact.getGroupId() + ":"
+                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".";
 
                         if ( relocation.getMessage() != null )
                         {
-                            message += "  " + relocation.getMessage() + "\n";
+                            message += "  " + relocation.getMessage();
                         }
 
                         if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
                         {
                             logger.warn( "While downloading " + pomArtifact.getGroupId() + ":"
-                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message );
                         }
                         else
                         {
                             logger.debug( "While downloading " + pomArtifact.getGroupId() + ":"
-                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message );
                         }
                     }
                     else

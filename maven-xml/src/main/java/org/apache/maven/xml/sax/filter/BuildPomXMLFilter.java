@@ -20,30 +20,29 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Filter to adjust pom on filesystem before being processed for effective pom.
  * There should only be 1 BuildPomXMLFilter, so the same is being used by both
  * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
  * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
- * 
- * 
+ *
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
-public class BuildPomXMLFilter extends AbstractSAXFilter 
+public class BuildPomXMLFilter extends AbstractSAXFilter
 {
     BuildPomXMLFilter()
     {
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> BuildPomXMLFilter( T parent )
+    BuildPomXMLFilter( AbstractSAXFilter parent )
     {
         super( parent );
     }
-    
+
     /**
      * Don't allow overwriting parent
      */

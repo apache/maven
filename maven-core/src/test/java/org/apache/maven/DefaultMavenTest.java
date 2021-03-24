@@ -1,17 +1,3 @@
-package org.apache.maven;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-
-import java.io.File;
-import java.nio.file.Files;
-
-import static java.util.Arrays.asList;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,20 +16,30 @@ import static java.util.Arrays.asList;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import java.io.File;
+import java.nio.file.Files;
+
+import javax.inject.Inject;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.junit.jupiter.api.Test;
+
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class DefaultMavenTest
     extends AbstractCoreMavenComponentTestCase
 {
 
-    public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
-            throws Exception
-    {
-        Maven maven = getContainer().lookup( Maven.class );
-        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "cyclic-reference" ) ).setGoals( asList("validate") );
-
-        MavenExecutionResult result = maven.execute( request );
-
-        assertEquals( ProjectCycleException.class, result.getExceptions().get( 0 ).getClass() );
-    }
+    @Inject
+    private Maven maven;
 
     @Override
     protected String getProjectsDirectory()
@@ -52,10 +48,22 @@ public class DefaultMavenTest
     }
 
 
+    @Test
+    public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
+            throws Exception
+    {
+        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "cyclic-reference" ) ).setGoals( asList("validate") );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        assertEquals( ProjectCycleException.class, result.getExceptions().get( 0 ).getClass() );
+    }
+
+    @Test
     public void testMavenProjectNoDuplicateArtifacts()
         throws Exception
     {
-        MavenProjectHelper mavenProjectHelper = lookup( MavenProjectHelper.class );
+        MavenProjectHelper mavenProjectHelper = getContainer().lookup( MavenProjectHelper.class );
         MavenProject mavenProject = new MavenProject();
         mavenProject.setArtifact( new DefaultArtifact( "g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null ) );
         File artifactFile = Files.createTempFile( "foo", "tmp").toFile();

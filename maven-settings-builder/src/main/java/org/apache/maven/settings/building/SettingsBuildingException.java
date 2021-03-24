@@ -80,8 +80,12 @@ public class SettingsBuildingException
             writer.print( problem.getSeverity() );
             writer.print( "] " );
             writer.print( problem.getMessage() );
-            writer.print( " @ " );
-            writer.println( problem.getLocation() );
+            String location = problem.getLocation();
+            if ( !location.isEmpty() )
+            {
+                writer.print( " @ " );
+                writer.println( location );
+            }
         }
 
         return buffer.toString();

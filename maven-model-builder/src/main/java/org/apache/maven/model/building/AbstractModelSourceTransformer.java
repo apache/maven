@@ -19,15 +19,16 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -35,36 +36,47 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.xml.Factories;
 import org.apache.maven.xml.sax.ext.CommentRenormalizer;
 import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Offers a transformation implementation based on PipelineStreams.
  * Subclasses are responsible for providing the right SAXFilter.
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public abstract class AbstractModelSourceTransformer
     implements ModelSourceTransformer
 {
     private static final AtomicInteger TRANSFORM_THREAD_COUNTER = new AtomicInteger();
-    
+
     private final TransformerFactory transformerFactory = Factories.newTransformerFactory();
-                    
-    protected abstract AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context )
+
+    protected abstract AbstractSAXFilter getSAXFilter( Path pomFile,
+                                                       TransformerContext context,
+                                                       Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException;
 
     protected OutputStream filterOutputStream( OutputStream outputStream, Path pomFile )
     {
         return outputStream;
     }
-    
+
+    public SAXTransformerFactory getTransformerFactory()
+    {
+        return ( SAXTransformerFactory ) transformerFactory;
+    }
+
     protected TransformerHandler getTransformerHandler( Path pomFile )
         throws IOException, org.apache.maven.model.building.TransformerException
     {
@@ -77,41 +89,68 @@ public abstract class AbstractModelSourceTransformer
     {
         final TransformerHandler transformerHandler = getTransformerHandler( pomFile );
 
+        final PipedOutputStream pout = new PipedOutputStream();
+        OutputStream out = filterOutputStream( pout, pomFile );
+
+        final javax.xml.transform.Result result;
+        final Consumer<LexicalHandler> lexConsumer;
+        if ( transformerHandler == null )
+        {
+            result = new StreamResult( out );
+            lexConsumer = null;
+        }
+        else
+        {
+            result = new SAXResult( transformerHandler );
+            lexConsumer = l -> ( (SAXResult) result ).setLexicalHandler( new CommentRenormalizer( l ) );
+            transformerHandler.setResult( new StreamResult( out ) );
+        }
+
         final AbstractSAXFilter filter;
         try
         {
-            filter = getSAXFilter( pomFile, context );
+            filter = getSAXFilter( pomFile, context, lexConsumer );
             filter.setLexicalHandler( transformerHandler );
+            // By default errors are written to stderr.
+            // Hence set custom errorHandler to reduce noice
+            filter.setErrorHandler( new ErrorHandler()
+            {
+                @Override
+                public void warning( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+
+                @Override
+                public void fatalError( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+
+                @Override
+                public void error( SAXParseException exception )
+                    throws SAXException
+                {
+                    throw exception;
+                }
+            } );
         }
         catch ( TransformerConfigurationException | SAXException | ParserConfigurationException e )
         {
             throw new org.apache.maven.model.building.TransformerException( e );
         }
-        
+
         final SAXSource transformSource =
-            new SAXSource( filter,
-                           new org.xml.sax.InputSource( new FileInputStream( pomFile.toFile() ) ) );
-
-        final PipedOutputStream pout = new PipedOutputStream();
-        final PipedInputStream pipedInputStream = new PipedInputStream( pout );
-        
-        OutputStream out = filterOutputStream( pout, pomFile );
-
-        final javax.xml.transform.Result result; 
-        if ( transformerHandler == null )
-        {
-            result = new StreamResult( out );
-        }
-        else
-        {
-            result = new SAXResult( transformerHandler );
-            ( (SAXResult) result ).setLexicalHandler( new CommentRenormalizer( transformerHandler ) );
-            transformerHandler.setResult( new StreamResult( out ) );
-        }
+            new SAXSource( filter, new org.xml.sax.InputSource( Files.newInputStream( pomFile ) ) );
 
         IOExceptionHandler eh = new IOExceptionHandler();
 
-        Thread transformThread = new Thread( () -> 
+        // Ensure pipedStreams are connected before the transformThread starts!!
+        final PipedInputStream pipedInputStream = new PipedInputStream( pout );
+
+        Thread transformThread = new Thread( () ->
         {
             try ( PipedOutputStream pos = pout )
             {

@@ -29,36 +29,36 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  */
 public class LifecycleMojo
 {
-    
+
     private String goal;
     private Xpp3Dom configuration;
     private List<Dependency> dependencies;
-    
+
     public String getGoal()
     {
         return goal;
     }
-    
+
     public Xpp3Dom getConfiguration()
     {
         return configuration;
     }
-    
+
     public List<Dependency> getDependencies()
     {
         return dependencies;
     }
-    
+
     public void setGoal( String goal )
     {
         this.goal = goal;
     }
-    
+
     public void setConfiguration( Xpp3Dom configuration )
     {
         this.configuration = configuration;
     }
-    
+
     public void setDependencies( List<Dependency> dependencies )
     {
         this.dependencies = dependencies;

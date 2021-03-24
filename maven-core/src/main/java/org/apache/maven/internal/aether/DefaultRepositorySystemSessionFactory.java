@@ -113,6 +113,7 @@ public class DefaultRepositorySystemSessionFactory
         Map<Object, Object> configProps = new LinkedHashMap<>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
+        configProps.put( "maven.startTime", request.getStartTime() );
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
 
@@ -187,8 +188,8 @@ public class DefaultRepositorySystemSessionFactory
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
         for ( Mirror mirror : request.getMirrors() )
         {
-            mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
-                                mirror.getMirrorOfLayouts() );
+            mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.isBlocked(),
+                                mirror.getMirrorOf(), mirror.getMirrorOfLayouts() );
         }
         session.setMirrorSelector( mirrorSelector );
 
@@ -281,14 +282,14 @@ public class DefaultRepositorySystemSessionFactory
 
         return props.getProperty( "version", "unknown-version" );
     }
-    
+
     private Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact,
                                                                     final SessionData sessionData )
     {
         TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
         Collection<FileTransformer> transformers = new ArrayList<>();
-        
-        // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle. 
+
+        // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle.
         if ( "pom".equals( artifact.getExtension() ) && context != null )
         {
             transformers.add( new FileTransformer()
@@ -306,7 +307,7 @@ public class DefaultRepositorySystemSessionFactory
                         throw new TransformException( e );
                     }
                 }
-                
+
                 @Override
                 public Artifact transformArtifact( Artifact artifact )
                 {

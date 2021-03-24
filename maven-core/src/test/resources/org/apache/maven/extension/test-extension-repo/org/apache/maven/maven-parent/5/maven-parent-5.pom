@@ -291,9 +291,9 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>        
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.0-beta-4</version>          
+          <version>2.0-beta-4</version>
           <configuration>
             <!-- This element will be overridden by children -->
             <tagBase>https://svn.apache.org/repos/asf/maven/pom/tags</tagBase>
@@ -379,7 +379,7 @@ under the License.
           </plugin>
         </plugins>
       </reporting>
-    </profile>    
+    </profile>
     <profile>
       <id>release</id>
       <build>
@@ -451,10 +451,10 @@ under the License.
                 </goals>
               </execution>
             </executions>
-          </plugin>          
+          </plugin>
         </plugins>
       </build>
-    </profile>                     
+    </profile>
   </profiles>
 
   <scm>

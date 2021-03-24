@@ -158,7 +158,7 @@ public class LifecycleExecutionPlanCalculatorStub
         return calculateExecutionPlan( session, project, tasks, true );
     }
 
-    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution )
+    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution, Set<MojoDescriptor> alreadyForkedExecutions )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
@@ -212,7 +212,7 @@ public class LifecycleExecutionPlanCalculatorStub
     {
         InputSource defaultBindings = new InputSource();
         defaultBindings.setModelId( DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID );
-        
+
         final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
         plugin.setLocation( "version", new InputLocation( 12, 34, defaultBindings ) );
         MojoExecution result = new MojoExecution( plugin, goal, executionId );

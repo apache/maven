@@ -40,7 +40,7 @@ public interface ToolchainPrivate
     boolean matchesRequirements( Map<String, String> requirements );
 
     /**
-     * 
+     *
      * @return the original model wrapped by this interface
      */
     ToolchainModel getModel();

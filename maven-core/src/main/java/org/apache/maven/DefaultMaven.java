@@ -19,22 +19,6 @@ package org.apache.maven;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -44,15 +28,19 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
+import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -65,6 +53,26 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Jason van Zyl
@@ -108,6 +116,9 @@ public class DefaultMaven
 
     @Inject
     private BuildResumptionDataRepository buildResumptionDataRepository;
+
+    @Inject
+    private SuperPomProvider superPomProvider;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -216,12 +227,7 @@ public class DefaultMaven
     {
         try
         {
-            // CHECKSTYLE_OFF: LineLength
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
-            {
-                listener.afterSessionStart( session );
-            }
-            // CHECKSTYLE_ON: LineLength
+            afterSessionStart( session );
         }
         catch ( MavenExecutionException e )
         {
@@ -268,23 +274,13 @@ public class DefaultMaven
 
         repoSession.setReadOnly();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterProjectsRead( session );
-            }
+            afterProjectsRead( session );
         }
         catch ( MavenExecutionException e )
         {
             return addExceptionToResult( result, e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
         //
@@ -316,9 +312,17 @@ public class DefaultMaven
 
             validatePrerequisitesForNonMavenPluginProjects( session.getProjects() );
 
+            validateRequiredProfiles( session, request.getProfileActivation() );
+            if ( session.getResult().hasExceptions() )
+            {
+                return result;
+            }
+
+            validateOptionalProfiles( session, request.getProfileActivation() );
+
             lifecycleStarter.execute( session );
 
-            validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
+            validateOptionalProfiles( session, request.getProfileActivation() );
 
             if ( session.getResult().hasExceptions() )
             {
@@ -347,6 +351,36 @@ public class DefaultMaven
         }
 
         return result;
+    }
+
+    private void afterSessionStart( MavenSession session )
+        throws MavenExecutionException
+    {
+        // CHECKSTYLE_OFF: LineLength
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        // CHECKSTYLE_ON: LineLength
+        {
+            listener.afterSessionStart( session );
+        }
+    }
+
+    private void afterProjectsRead( MavenSession session )
+        throws MavenExecutionException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                listener.afterProjectsRead( session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
     }
 
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
@@ -491,22 +525,93 @@ public class DefaultMaven
         }
     }
 
-    private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
+    /**
+     * Get all profiles that are detected in the projects, any parent of the projects, or the settings.
+     * @param session The Maven session
+     * @return A {@link Set} of profile identifiers, never {@code null}.
+     */
+    private Set<String> getAllProfiles( MavenSession session )
     {
-        Collection<String> notActivatedProfileIds = new LinkedHashSet<>( activeProfileIds );
-
-        for ( MavenProject project : projects )
+        final Model superPomModel = superPomProvider.getSuperModel( "4.0.0" );
+        final Set<MavenProject> projectsIncludingParents = new HashSet<>();
+        for ( MavenProject project : session.getProjects() )
         {
-            for ( List<String> profileIds : project.getInjectedProfileIds().values() )
+            boolean isAdded = projectsIncludingParents.add( project );
+            MavenProject parent = project.getParent();
+            while ( isAdded && parent != null )
             {
-                notActivatedProfileIds.removeAll( profileIds );
+                isAdded = projectsIncludingParents.add( parent );
+                parent = parent.getParent();
             }
         }
 
-        for ( String notActivatedProfileId : notActivatedProfileIds )
+        final Stream<String> projectProfiles = projectsIncludingParents.stream()
+                .map( MavenProject::getModel )
+                .map( Model::getProfiles )
+                .flatMap( Collection::stream )
+                .map( Profile::getId );
+        final Stream<String> settingsProfiles = session.getSettings().getProfiles().stream()
+                .map( org.apache.maven.settings.Profile::getId );
+        final Stream<String> superPomProfiles = superPomModel.getProfiles().stream()
+                .map( Profile::getId );
+
+        return Stream.of( projectProfiles, settingsProfiles, superPomProfiles )
+                .flatMap( Function.identity() )
+                .collect( toSet() );
+    }
+
+    /**
+     * Check whether the required profiles were found in any of the projects we're building or the settings.
+     * @param session the Maven session.
+     * @param profileActivation the requested optional and required profiles.
+     */
+    private void validateRequiredProfiles( MavenSession session, ProfileActivation profileActivation )
+    {
+        final Set<String> allAvailableProfiles = getAllProfiles( session );
+
+        final Set<String> requiredProfiles = new HashSet<>( );
+        requiredProfiles.addAll( profileActivation.getRequiredActiveProfileIds() );
+        requiredProfiles.addAll( profileActivation.getRequiredInactiveProfileIds() );
+
+        // Check whether the required profiles were found in any of the projects we're building.
+        final Set<String> notFoundRequiredProfiles = requiredProfiles.stream()
+                .filter( rap -> !allAvailableProfiles.contains( rap ) )
+                .collect( toSet() );
+
+        if ( !notFoundRequiredProfiles.isEmpty() )
         {
-            logger.warn( "The requested profile \"" + notActivatedProfileId
-                + "\" could not be activated because it does not exist." );
+            final String message = String.format(
+                    "The requested profiles [%s] could not be activated or deactivated because they do not exist.",
+                    String.join( ", ", notFoundRequiredProfiles )
+            );
+            addExceptionToResult( session.getResult(), new MissingProfilesException( message ) );
+        }
+    }
+
+    /**
+     * Check whether any of the requested optional profiles were not activated or deactivated.
+     * @param session the Maven session.
+     * @param profileActivation the requested optional and required profiles.
+     */
+    private void validateOptionalProfiles( MavenSession session, ProfileActivation profileActivation )
+    {
+        final Set<String> allAvailableProfiles = getAllProfiles( session );
+
+        final Set<String> optionalProfiles = new HashSet<>( );
+        optionalProfiles.addAll( profileActivation.getOptionalActiveProfileIds() );
+        optionalProfiles.addAll( profileActivation.getOptionalInactiveProfileIds() );
+
+        final Set<String> notFoundOptionalProfiles = optionalProfiles.stream()
+                .filter( rap -> !allAvailableProfiles.contains( rap ) )
+                .collect( toSet() );
+
+        if ( !notFoundOptionalProfiles.isEmpty() )
+        {
+            final String message = String.format(
+                    "The requested optional profiles [%s] could not be activated or deactivated because they "
+                            + "do not exist.", String.join( ", ", notFoundOptionalProfiles )
+            );
+            logger.info( message );
         }
     }
 

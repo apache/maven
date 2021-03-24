@@ -19,17 +19,20 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class SettingsUtilsTest
-    extends TestCase
 {
 
+    @Test
     public void testShouldAppendRecessivePluginGroupIds()
     {
         Settings dominant = new Settings();
@@ -50,6 +53,7 @@ public class SettingsUtilsTest
         assertEquals( "org.codehaus.plexus", pluginGroups.get( 2 ) );
     }
 
+    @Test
     public void testRoundTripProfiles()
     {
         Random entropy = new Random();

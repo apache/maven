@@ -44,63 +44,45 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.test.PlexusTest;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
+import javax.inject.Inject;
+
+import static org.apache.maven.test.PlexusExtension.getBasedir;
+
+@PlexusTest
 public abstract class AbstractCoreMavenComponentTestCase
-    extends PlexusTestCase
 {
-    @Requirement
+
+    @Inject
+    protected PlexusContainer container;
+
+    @Inject
     protected RepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
-
-    protected void setUp()
-        throws Exception
-    {
-        repositorySystem = lookup( RepositorySystem.class );
-        projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        repositorySystem = null;
-        projectBuilder = null;
-        super.tearDown();
-    }
 
     abstract protected String getProjectsDirectory();
 
-    protected File getProject( String name )
+    protected PlexusContainer getContainer() {
+        return container;
+    }
+
+    protected File getProject(String name )
         throws Exception
     {
         File source = new File( new File( getBasedir(), getProjectsDirectory() ), name );
         File target = new File( new File( getBasedir(), "target" ), name );
         FileUtils.copyDirectoryStructureIfModified( source, target );
         return new File( target, "pom.xml" );
-    }
-
-    /**
-     * We need to customize the standard Plexus container with the plugin discovery listener which
-     * is what looks for the META-INF/maven/plugin.xml resources that enter the system when a Maven
-     * plugin is loaded.
-     *
-     * We also need to customize the Plexus container with a standard plugin discovery listener
-     * which is the MavenPluginCollector. When a Maven plugin is discovered the MavenPluginCollector
-     * collects the plugin descriptors which are found.
-     */
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        containerConfiguration.setAutoWiring( true ).setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
@@ -115,6 +97,11 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setRemoteRepositories( getRemoteRepositories() )
             .setPluginArtifactRepositories( getPluginArtifactRepositories() )
             .setGoals( Arrays.asList( "package" ) );
+
+        if ( pom != null )
+        {
+            request.setMultiModuleProjectDirectory( pom.getParentFile() );
+        }
 
         return request;
     }
@@ -133,7 +120,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     {
         return createMavenSession( pom, executionProperties, false );
     }
-    
+
     protected MavenSession createMavenSession( File pom, Properties executionProperties, boolean includeModules )
         throws Exception
     {
@@ -150,7 +137,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         if ( pom != null )
         {
             MavenProject project = projectBuilder.build( pom, configuration ).getProject();
-            
+
             projects.add( project );
             if ( includeModules )
             {

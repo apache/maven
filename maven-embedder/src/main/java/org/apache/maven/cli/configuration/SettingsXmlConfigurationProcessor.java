@@ -71,7 +71,7 @@ public class SettingsXmlConfigurationProcessor
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
         new File( System.getProperty( "maven.conf" ), "settings.xml" );
 
-    private final Logger logger = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
 
     @Inject
     private SettingsBuilder settingsBuilder;
@@ -137,9 +137,9 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        logger.debug( "Reading global settings from {}",
+        LOGGER.debug( "Reading global settings from '{}'",
             getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from {}",
+        LOGGER.debug( "Reading user settings from '{}'",
             getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
@@ -151,16 +151,16 @@ public class SettingsXmlConfigurationProcessor
 
         populateFromSettings( request, settingsResult.getEffectiveSettings() );
 
-        if ( !settingsResult.getProblems().isEmpty() && logger.isWarnEnabled() )
+        if ( !settingsResult.getProblems().isEmpty() && LOGGER.isWarnEnabled() )
         {
-            logger.warn( "" );
-            logger.warn( "Some problems were encountered while building the effective settings" );
+            LOGGER.warn( "" );
+            LOGGER.warn( "Some problems were encountered while building the effective settings" );
 
             for ( SettingsProblem problem : settingsResult.getProblems() )
             {
-                logger.warn( "{} @ {}", problem.getMessage(), problem.getLocation() );
+                LOGGER.warn( "{} @ {}", problem.getMessage(), problem.getLocation() );
             }
-            logger.warn( "" );
+            LOGGER.warn( "" );
         }
     }
 

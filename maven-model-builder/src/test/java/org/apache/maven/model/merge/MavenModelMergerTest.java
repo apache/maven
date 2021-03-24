@@ -20,15 +20,15 @@ package org.apache.maven.model.merge;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.Collections;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Profile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MavenModelMergerTest
 {
@@ -73,7 +73,7 @@ public class MavenModelMergerTest
         Model model = new Model();
         modelMerger.mergeModel_Prerequisites( model, parent, false, null );
         assertNull( model.getPrerequisites() );
-        
+
         Prerequisites modelPrerequisites = new Prerequisites();
         modelPrerequisites.setMaven( "3.0" );
         model.setPrerequisites( modelPrerequisites );
@@ -90,7 +90,7 @@ public class MavenModelMergerTest
         Model model = new Model();
         modelMerger.mergeModel_Profiles( model, parent, false, null );
         assertEquals( 0, model.getProfiles().size() );
-        
+
         Profile modelProfile = new Profile();
         modelProfile.setId( "MODEL" );
         model.setProfiles( Collections.singletonList( modelProfile ) );

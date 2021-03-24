@@ -21,25 +21,43 @@ package org.apache.maven.xml.sax.filter;
 
 import java.util.function.Function;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Resolves all ci-friendly properties occurrences
- * 
+ * Resolves all ci-friendly properties occurrences between version-tags
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 class CiFriendlyXMLFilter
     extends AbstractSAXFilter
 {
+    private final boolean replace;
+
     private Function<String, String> replaceChain = Function.identity();
-    
+
+    private String characters;
+
+    private boolean parseVersion;
+
+    CiFriendlyXMLFilter( boolean replace )
+    {
+        this.replace = replace;
+    }
+
+    CiFriendlyXMLFilter( AbstractSAXFilter parent, boolean replace )
+    {
+        super( parent );
+        this.replace = replace;
+    }
+
     public CiFriendlyXMLFilter setChangelist( String changelist )
     {
         replaceChain = replaceChain.andThen( t -> t.replace( "${changelist}", changelist ) );
         return this;
     }
-    
+
     public CiFriendlyXMLFilter setRevision( String revision )
     {
         replaceChain = replaceChain.andThen( t -> t.replace( "${revision}", revision ) );
@@ -51,7 +69,7 @@ class CiFriendlyXMLFilter
         replaceChain = replaceChain.andThen( t -> t.replace( "${sha1}", sha1 ) );
         return this;
     }
-    
+
     /**
      * @return {@code true} is any of the ci properties is set, otherwise {@code false}
      */
@@ -59,25 +77,54 @@ class CiFriendlyXMLFilter
     {
         return !replaceChain.equals( Function.identity() );
     }
-    
+
     @Override
     public void characters( char[] ch, int start, int length )
         throws SAXException
     {
-        String text = new String( ch, start, length );
-
-        // assuming this has the best performance
-        if ( text.contains( "${" ) )
+        if ( parseVersion )
         {
-            String newText = replaceChain.apply( text );
-            
-            super.characters( newText.toCharArray(), 0, newText.length() );
+            this.characters = nullSafeAppend( characters, new String( ch, start, length ) );
         }
         else
         {
             super.characters( ch, start, length );
         }
     }
-    
-    
+
+    @Override
+    public void startElement( String uri, String localName, String qName, Attributes atts )
+        throws SAXException
+    {
+        if ( !parseVersion && "version".equals( localName ) )
+        {
+            parseVersion = true;
+        }
+
+        super.startElement( uri, localName, qName, atts );
+    }
+
+    @Override
+    public void endElement( String uri, String localName, String qName )
+        throws SAXException
+    {
+        if ( parseVersion )
+        {
+            // assuming this has the best performance
+            if ( replace && characters != null && characters.contains( "${" ) )
+            {
+                char[] ch = replaceChain.apply( characters ).toCharArray();
+                super.characters( ch, 0, ch.length );
+            }
+            else
+            {
+                char[] ch = characters.toCharArray();
+                super.characters( ch, 0, ch.length );
+            }
+            characters = null;
+            parseVersion = false;
+        }
+
+        super.endElement( uri, localName, qName );
+    }
 }

@@ -18,20 +18,20 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>com.example.group</groupId>
-		<artifactId>com-parent</artifactId>
-		<version>RELEASE</version>
-	</parent>
-	<groupId>com.example.group</groupId>
-	<artifactId>valid-version-wrong</artifactId>
-	<version>1.0</version>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<description>
-        This will test if the validation for the parent version
-        is working correct in case of usage of RELEASE
-	</description>
+  <parent>
+    <groupId>com.example.group</groupId>
+    <artifactId>com-parent</artifactId>
+    <version>RELEASE</version>
+  </parent>
+  <groupId>com.example.group</groupId>
+  <artifactId>valid-version-wrong</artifactId>
+  <version>1.0</version>
+
+  <description>
+    This will test if the validation for the parent version
+    is working correct in case of usage of RELEASE
+  </description>
 </project>

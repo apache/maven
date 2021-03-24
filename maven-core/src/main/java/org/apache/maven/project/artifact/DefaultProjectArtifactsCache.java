@@ -60,11 +60,11 @@ public class DefaultProjectArtifactsCache
     {
 
         private final String groupId;
-        
+
         private final String artifactId;
-        
+
         private final String version;
-        
+
         private final Set<String> dependencyArtifacts;
 
         private final WorkspaceRepository workspace;
@@ -72,11 +72,11 @@ public class DefaultProjectArtifactsCache
         private final LocalRepository localRepo;
 
         private final List<RemoteRepository> repositories;
-        
+
         private final Set<String> collect;
-        
+
         private final Set<String> resolve;
-        
+
         private boolean aggregating;
 
         private final int hashCode;
@@ -85,11 +85,11 @@ public class DefaultProjectArtifactsCache
             Collection<String> scopesToCollect, Collection<String> scopesToResolve, boolean aggregating,
             RepositorySystemSession session )
         {
-            
+
             groupId = project.getGroupId();
             artifactId = project.getArtifactId();
             version = project.getVersion();
-            
+
             Set<String> deps = new LinkedHashSet<>();
             if ( project.getDependencyArtifacts() != null )
             {
@@ -99,7 +99,7 @@ public class DefaultProjectArtifactsCache
               }
             }
             dependencyArtifacts = Collections.unmodifiableSet( deps );
-            
+
             workspace = RepositoryUtils.getWorkspace( session );
             this.localRepo = session.getLocalRepository();
             this.repositories = new ArrayList<>( repositories.size() );
@@ -115,10 +115,10 @@ public class DefaultProjectArtifactsCache
                 }
             }
             collect = scopesToCollect == null
-                ? Collections.<String>emptySet() 
+                ? Collections.<String>emptySet()
                 : Collections.unmodifiableSet( new HashSet<>( scopesToCollect ) );
-            resolve = scopesToResolve == null 
-                ? Collections.<String>emptySet() 
+            resolve = scopesToResolve == null
+                ? Collections.<String>emptySet()
                 : Collections.unmodifiableSet( new HashSet<>( scopesToResolve ) );
             this.aggregating = aggregating;
 
@@ -166,10 +166,10 @@ public class DefaultProjectArtifactsCache
             return Objects.equals( groupId, that.groupId ) && Objects.equals( artifactId, that.artifactId )
                 && Objects.equals( version, that.version )
                 && Objects.equals( dependencyArtifacts, that.dependencyArtifacts )
-                && Objects.equals( workspace, that.workspace ) 
+                && Objects.equals( workspace, that.workspace )
                 && Objects.equals( localRepo, that.localRepo )
                 && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
-                && Objects.equals( collect, that.collect ) 
+                && Objects.equals( collect, that.collect )
                 && Objects.equals( resolve, that.resolve )
                 && aggregating == that.aggregating;
         }
@@ -181,7 +181,7 @@ public class DefaultProjectArtifactsCache
     public Key createKey( MavenProject project, Collection<String> scopesToCollect,
         Collection<String> scopesToResolve, boolean aggregating, RepositorySystemSession session )
     {
-        return new CacheKey( project, project.getRemoteProjectRepositories(), scopesToCollect, scopesToResolve, 
+        return new CacheKey( project, project.getRemoteProjectRepositories(), scopesToCollect, scopesToResolve,
             aggregating, session );
     }
 

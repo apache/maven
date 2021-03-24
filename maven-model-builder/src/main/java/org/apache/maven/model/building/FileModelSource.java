@@ -41,11 +41,11 @@ public class FileModelSource extends FileSource implements ModelSource2
     {
         super( pomFile );
     }
-    
+
     /**
-     * 
+     *
      * @return the file of this source
-     * 
+     *
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
@@ -53,7 +53,7 @@ public class FileModelSource extends FileSource implements ModelSource2
     {
         return getFile();
     }
-    
+
     @Override
     public ModelSource2 getRelatedSource( String relPath )
     {
@@ -82,9 +82,9 @@ public class FileModelSource extends FileSource implements ModelSource2
     }
 
     @Override
-    public boolean equals( Object obj ) 
+    public boolean equals( Object obj )
     {
-        if ( this == obj ) 
+        if ( this == obj )
         {
             return true;
         }
@@ -94,7 +94,7 @@ public class FileModelSource extends FileSource implements ModelSource2
             return false;
         }
 
-        if ( !FileModelSource.class.equals( obj.getClass() )  ) 
+        if ( !FileModelSource.class.equals( obj.getClass() )  )
         {
             return false;
         }
@@ -103,9 +103,9 @@ public class FileModelSource extends FileSource implements ModelSource2
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
-        return getFile().hashCode(); 
+        return getFile().hashCode();
     }
 
 }

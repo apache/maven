@@ -45,7 +45,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- * 
+ *
  * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */

@@ -35,7 +35,7 @@ public class FileSource
 {
     private final File file;
 
-    private final int hashCode; 
+    private final int hashCode;
 
     /**
      * Creates a new source backed by the specified file.

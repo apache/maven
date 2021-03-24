@@ -64,9 +64,9 @@ public class DefaultMavenExecutionRequest
 
     private boolean interactiveMode = true;
 
-    private boolean cacheTransferError;
+    private boolean cacheTransferError = false;
 
-    private boolean cacheNotFound;
+    private boolean cacheNotFound = false;
 
     private List<Proxy> proxies;
 
@@ -75,6 +75,9 @@ public class DefaultMavenExecutionRequest
     private List<Mirror> mirrors;
 
     private List<Profile> profiles;
+
+    private final ProjectActivation projectActivation = new ProjectActivation();
+    private final ProfileActivation profileActivation = new ProfileActivation();
 
     private List<String> pluginGroups;
 
@@ -112,10 +115,6 @@ public class DefaultMavenExecutionRequest
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
-    private List<String> selectedProjects;
-
-    private List<String> excludedProjects;
-
     private boolean resume = false;
 
     private String resumeFrom;
@@ -129,10 +128,6 @@ public class DefaultMavenExecutionRequest
     private Date startTime;
 
     private boolean showErrors = false;
-
-    private List<String> activeProfiles;
-
-    private List<String> inactiveProfiles;
 
     private TransferListener transferListener;
 
@@ -159,7 +154,7 @@ public class DefaultMavenExecutionRequest
      *
      * @issue MNG-2681
      */
-    private boolean noSnapshotUpdates;
+    private boolean noSnapshotUpdates = false;
 
     private boolean useLegacyLocalRepositoryManager = false;
 
@@ -283,23 +278,13 @@ public class DefaultMavenExecutionRequest
     @Override
     public List<String> getSelectedProjects()
     {
-        if ( selectedProjects == null )
-        {
-            selectedProjects = new ArrayList<>();
-        }
-
-        return selectedProjects;
+        return this.projectActivation.getSelectedProjects();
     }
 
     @Override
     public List<String> getExcludedProjects()
     {
-        if ( excludedProjects == null )
-        {
-            excludedProjects = new ArrayList<>();
-        }
-
-        return excludedProjects;
+        return this.projectActivation.getExcludedProjects();
     }
 
     @Override
@@ -343,11 +328,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( activeProfiles != null )
         {
-            this.activeProfiles = new ArrayList<>( activeProfiles );
-        }
-        else
-        {
-            this.activeProfiles = null;
+            this.profileActivation.overwriteActiveProfiles( activeProfiles );
         }
 
         return this;
@@ -358,14 +339,22 @@ public class DefaultMavenExecutionRequest
     {
         if ( inactiveProfiles != null )
         {
-            this.inactiveProfiles = new ArrayList<>( inactiveProfiles );
-        }
-        else
-        {
-            this.inactiveProfiles = null;
+            this.profileActivation.overwriteInactiveProfiles( inactiveProfiles );
         }
 
         return this;
+    }
+
+    @Override
+    public ProjectActivation getProjectActivation()
+    {
+        return this.projectActivation;
+    }
+
+    @Override
+    public ProfileActivation getProfileActivation()
+    {
+        return this.profileActivation;
     }
 
     @Override
@@ -406,21 +395,13 @@ public class DefaultMavenExecutionRequest
     @Override
     public List<String> getActiveProfiles()
     {
-        if ( activeProfiles == null )
-        {
-            activeProfiles = new ArrayList<>();
-        }
-        return activeProfiles;
+        return this.profileActivation.getActiveProfiles();
     }
 
     @Override
     public List<String> getInactiveProfiles()
     {
-        if ( inactiveProfiles == null )
-        {
-            inactiveProfiles = new ArrayList<>();
-        }
-        return inactiveProfiles;
+        return this.profileActivation.getInactiveProfiles();
     }
 
     @Override
@@ -581,11 +562,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( selectedProjects != null )
         {
-            this.selectedProjects = new ArrayList<>( selectedProjects );
-        }
-        else
-        {
-            this.selectedProjects = null;
+            this.projectActivation.overwriteActiveProjects( selectedProjects );
         }
 
         return this;
@@ -596,20 +573,16 @@ public class DefaultMavenExecutionRequest
     {
         if ( excludedProjects != null )
         {
-            this.excludedProjects = new ArrayList<>( excludedProjects );
-        }
-        else
-        {
-            this.excludedProjects = null;
+            this.projectActivation.overwriteInactiveProjects( excludedProjects );
         }
 
         return this;
     }
 
     @Override
-    public MavenExecutionRequest setResume()
+    public MavenExecutionRequest setResume( boolean resume )
     {
-        resume = true;
+        this.resume = resume;
 
         return this;
     }

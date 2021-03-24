@@ -22,15 +22,17 @@ package org.apache.maven.artifact.resolver.filter;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Igor Fedorenko
  */
 public class FilterHashEqualsTest
-    extends TestCase
 {
 
+    @Test
     public void testIncludesExcludesArtifactFilter()
     {
         List<String> patterns = Arrays.asList( "c", "d", "e" );

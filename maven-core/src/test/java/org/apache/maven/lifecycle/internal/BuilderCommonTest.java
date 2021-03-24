@@ -15,9 +15,7 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import java.util.HashSet;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -25,10 +23,11 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.codehaus.plexus.logging.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-
-import java.util.HashSet;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Kristian Rosenvold
@@ -36,7 +35,7 @@ import java.util.HashSet;
 public class BuilderCommonTest
 {
     private Logger logger = mock( Logger.class );
-    
+
     @Test
     public void testResolveBuildPlan()
         throws Exception
@@ -53,7 +52,7 @@ public class BuilderCommonTest
                     new HashSet<>() );
         assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan().size(), plan.size() );
     }
-    
+
     @Test
     public void testDefaultBindingPluginsWarning()
         throws Exception
@@ -65,7 +64,7 @@ public class BuilderCommonTest
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
         getBuilderCommon().resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
-        
+
         verify( logger ).warn("Version not locked for default bindings plugins ["
             + "stub-plugin-initialize, "
             + "stub-plugin-process-resources, "
@@ -77,17 +76,20 @@ public class BuilderCommonTest
             + "stub-plugin-install], "
             + "you should define versions in pluginManagement section of your pom.xml or parent");
     }
-    
+
+    @Test
     public void testHandleBuildError()
         throws Exception
     {
     }
 
+    @Test
     public void testAttachToThread()
         throws Exception
     {
     }
 
+    @Test
     public void testGetKey()
         throws Exception
     {

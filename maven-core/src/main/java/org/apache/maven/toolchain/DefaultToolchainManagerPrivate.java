@@ -63,7 +63,7 @@ public class DefaultToolchainManagerPrivate
                     toRet.add( fact.createToolchain( toolchainModel ) );
                 }
             }
-            
+
             // add default toolchain
             ToolchainPrivate tool = fact.createDefaultToolchain();
             if ( tool != null )

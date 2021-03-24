@@ -27,8 +27,10 @@ import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests {@link PluginDescriptorBuilder}.
@@ -36,7 +38,6 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class PluginDescriptorBuilderTest
-    extends TestCase
 {
 
     private PluginDescriptor build( String resource )
@@ -47,6 +48,7 @@ public class PluginDescriptorBuilderTest
         return new PluginDescriptorBuilder().build( reader );
     }
 
+    @Test
     public void testBuildReader()
         throws Exception
     {

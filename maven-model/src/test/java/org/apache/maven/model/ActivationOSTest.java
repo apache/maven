@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code ActivationOS}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class ActivationOSTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new ActivationOS().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new ActivationOS().equals( null ) );
@@ -42,12 +47,14 @@ public class ActivationOSTest
         new ActivationOS().equals( new ActivationOS() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         ActivationOS thing = new ActivationOS();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new ActivationOS().toString() );

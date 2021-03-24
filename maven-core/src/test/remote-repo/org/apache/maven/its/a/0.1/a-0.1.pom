@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: Dummy Artifact</name>
   <description>
-    
+
   </description>
 
   <distributionManagement>

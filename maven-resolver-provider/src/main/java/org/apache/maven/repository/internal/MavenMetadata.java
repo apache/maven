@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -46,16 +47,19 @@ abstract class MavenMetadata
 
     static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
+    protected Metadata metadata;
+
     private final File file;
 
-    protected Metadata metadata;
+    protected final Date timestamp;
 
     private boolean merged;
 
-    protected MavenMetadata( Metadata metadata, File file )
+    protected MavenMetadata( Metadata metadata, File file, Date timestamp )
     {
         this.metadata = metadata;
         this.file = file;
+        this.timestamp = timestamp;
     }
 
     public String getType()

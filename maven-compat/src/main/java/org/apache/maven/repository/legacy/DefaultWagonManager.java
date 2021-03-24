@@ -440,7 +440,7 @@ public class DefaultWagonManager
                     }
                     catch ( ChecksumFailedException e )
                     {
-                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the 
+                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the
                         // checksum doesn't match. This could be a problem with the server (ibiblio HTTP-200 error
                         // page), so we'll try this up to two times. On the second try, we'll handle it as a bona-fide
                         // error, based on the repository's checksum checking policy.

@@ -43,7 +43,7 @@ public class MojoExecutionXPathContainer
         context = JXPathContext.newContext( mojoExecution );
     }
 
-	public Iterator<?> getIteratorForXPathExpression( String expression )
+    public Iterator<?> getIteratorForXPathExpression( String expression )
     {
         return context.iterate( expression );
     }

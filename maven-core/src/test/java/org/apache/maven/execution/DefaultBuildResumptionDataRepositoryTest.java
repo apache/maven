@@ -19,19 +19,20 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
-@RunWith( MockitoJUnitRunner.class )
 public class DefaultBuildResumptionDataRepositoryTest
 {
     private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();
@@ -41,11 +42,11 @@ public class DefaultBuildResumptionDataRepositoryTest
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Properties properties = new Properties();
-        properties.setProperty( "resumeFrom", ":module-a" );
+        properties.setProperty( "remainingProjects", ":module-a" );
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getResumeFrom(), is( ":module-a" ) );
+        assertThat( request.getSelectedProjects(), is( asList( ":module-a" ) ) );
     }
 
     @Test
@@ -54,7 +55,7 @@ public class DefaultBuildResumptionDataRepositoryTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setResumeFrom( ":module-b" );
         Properties properties = new Properties();
-        properties.setProperty( "resumeFrom", ":module-a" );
+        properties.setProperty( "remainingProjects", ":module-a" );
 
         repository.applyResumptionProperties( request, properties );
 
@@ -62,17 +63,43 @@ public class DefaultBuildResumptionDataRepositoryTest
     }
 
     @Test
-    public void excludedProjectsFromPropertyGetsAddedToExistingRequestParameters()
+    public void projectsFromPropertyGetsAddedToExistingRequestParameters()
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        List<String> excludedProjects = new ArrayList<>();
-        excludedProjects.add( ":module-a" );
-        request.setExcludedProjects( excludedProjects );
+        List<String> selectedProjects = new ArrayList<>();
+        selectedProjects.add( ":module-a" );
+        request.setSelectedProjects( selectedProjects );
         Properties properties = new Properties();
-        properties.setProperty( "excludedProjects", ":module-b, :module-c" );
+        properties.setProperty( "remainingProjects", ":module-b, :module-c" );
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getExcludedProjects(), contains( ":module-a", ":module-b", ":module-c" ) );
+        assertThat( request.getSelectedProjects(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
+    }
+
+    @Test
+    public void selectedProjectsAreNotAddedWhenPropertyValueIsEmpty()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        Properties properties = new Properties();
+        properties.setProperty( "remainingProjects", "" );
+
+        repository.applyResumptionProperties( request, properties );
+
+        assertThat( request.getSelectedProjects(), is( empty() ) );
+    }
+
+    @Test
+    public void applyResumptionData_shouldLoadData()
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        Build build = new Build();
+        build.setDirectory( "src/test/resources/org/apache/maven/execution/" );
+        MavenProject rootProject = new MavenProject();
+        rootProject.setBuild( build );
+
+        repository.applyResumptionData( request,  rootProject );
+
+        assertThat( request.getSelectedProjects(), containsInAnyOrder( "example:module-c" ) );
     }
 }

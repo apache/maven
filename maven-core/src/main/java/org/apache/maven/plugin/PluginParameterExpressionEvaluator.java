@@ -54,7 +54,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>settings</code></td>          <td></td>               <td>{@link MavenSession#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
  * <tr><td><code>basedir</code></td>           <td></td>
- *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or 
+ *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or
  *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
  * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
@@ -106,12 +106,12 @@ public class PluginParameterExpressionEvaluator
         this.project = session.getCurrentProject();
 
         //
-        // Maven4: We may want to evaluate how this is used but we add these separate as the 
+        // Maven4: We may want to evaluate how this is used but we add these separate as the
         // getExecutionProperties is deprecated in MavenSession.
         //
         this.properties.putAll( session.getUserProperties() );
         this.properties.putAll( session.getSystemProperties() );
-        
+
         String basedir = null;
 
         if ( project != null )

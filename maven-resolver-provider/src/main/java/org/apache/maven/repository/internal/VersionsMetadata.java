@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashSet;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -38,15 +39,15 @@ final class VersionsMetadata
 
     private final Artifact artifact;
 
-    VersionsMetadata( Artifact artifact )
+    VersionsMetadata( Artifact artifact, Date timestamp )
     {
-        super( createRepositoryMetadata( artifact ), null );
+        super( createRepositoryMetadata( artifact ), null, timestamp );
         this.artifact = artifact;
     }
 
-    VersionsMetadata( Artifact artifact, File file )
+    VersionsMetadata( Artifact artifact, File file, Date timestamp )
     {
-        super( createRepositoryMetadata( artifact ), file );
+        super( createRepositoryMetadata( artifact ), file, timestamp );
         this.artifact = artifact;
     }
 
@@ -76,7 +77,7 @@ final class VersionsMetadata
     protected void merge( Metadata recessive )
     {
         Versioning versioning = metadata.getVersioning();
-        versioning.updateTimestamp();
+        versioning.setLastUpdatedTimestamp( timestamp );
 
         if ( recessive.getVersioning() != null )
         {
@@ -107,7 +108,7 @@ final class VersionsMetadata
 
     public MavenMetadata setFile( File file )
     {
-        return new VersionsMetadata( artifact, file );
+        return new VersionsMetadata( artifact, file, timestamp );
     }
 
     public String getGroupId()

@@ -23,19 +23,20 @@ import java.util.Locale;
 
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileSizeFormatTest {
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test
     public void testNegativeSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
         long negativeSize = -100L;
-        format.format( negativeSize );
+        assertThrows( IllegalArgumentException.class, () -> format.format( negativeSize ) );
     }
 
     @Test
@@ -209,21 +210,21 @@ public class FileSizeFormatTest {
         assertEquals( "1.0 GB", format.format( _1000_megabytes, ScaleUnit.GIGABYTE ) );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test
     public void testNegativeProgressedSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
         long negativeProgressedSize = -100L;
-        format.formatProgress( negativeProgressedSize, 10L );
+        assertThrows( IllegalArgumentException.class, () -> format.formatProgress( negativeProgressedSize, 10L ) );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test
     public void testNegativeProgressedSizeBiggerThanSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
-        format.formatProgress( 100L, 10L );
+        assertThrows( IllegalArgumentException.class, () -> format.formatProgress( 100L, 10L ) );
     }
 
     @Test

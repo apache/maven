@@ -43,6 +43,13 @@ public interface ModelBuildingResult
     List<String> getModelIds();
 
     /**
+     *
+     * @return the file model
+     * @since 4.0.0
+     */
+    Model getFileModel();
+
+    /**
      * Gets the assembled model.
      *
      * @return The assembled model, never {@code null}.

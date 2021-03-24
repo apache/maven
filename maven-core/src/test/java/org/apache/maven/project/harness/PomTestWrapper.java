@@ -79,9 +79,9 @@ public class PomTestWrapper
         source.init( domainModel.getModelProperties(), null );
         return source.queryFor( uri ).size();
     }
-	*/
+    */
 
-	public Iterator<?> getIteratorForXPathExpression( String expression )
+    public Iterator<?> getIteratorForXPathExpression( String expression )
     {
         return context.iterate( expression );
     }

@@ -19,34 +19,25 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import javax.inject.Inject;
+
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.impl.VersionResolver;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.artifact.DefaultArtifact;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultVersionResolverTest
     extends AbstractRepositoryTestCase
 {
+    @Inject
     private DefaultVersionResolver versionResolver;
 
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        // be sure we're testing the right class, i.e. DefaultVersionResolver.class
-        versionResolver = (DefaultVersionResolver) lookup( VersionResolver.class, "default" );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        versionResolver = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts()
         throws Exception
     {
@@ -70,6 +61,7 @@ public class DefaultVersionResolverTest
         assertEquals( "07.20.3-20120809.112124-88", resultA.getVersion() );
     }
 
+    @Test
     public void testResolveSeparateInstalledClassifiedNonVersionedArtifacts()
         throws Exception
     {

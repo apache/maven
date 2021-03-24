@@ -25,6 +25,11 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verifies the version of a dependency listed in a parent's
@@ -51,6 +56,7 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementOverridesTransitiveDependencyVersion()
         throws Exception
     {
@@ -65,9 +71,9 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         Set set = project1.getArtifacts();
-        assertNotNull( "No artifacts", set );
-        assertTrue( "No Artifacts", set.size() > 0 );
-        assertTrue( "Set size should be 3, is " + set.size(), set.size() == 3 );
+        assertNotNull( set, "No artifacts" );
+        assertTrue( set.size() > 0, "No Artifacts" );
+        assertTrue( set.size() == 3, "Set size should be 3, is " + set.size() );
 
         for ( Object aSet : set )
         {
@@ -77,8 +83,8 @@ public class ProjectInheritanceTest
                     artifact.isOptional()
                         ? "true"
                         : "false" ) );
-            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
-                        artifact.getVersion().equals( "1.0" ) );
+            assertTrue( artifact.getVersion().equals( "1.0" ),
+                        "Incorrect version for " + artifact.getDependencyConflictId() );
         }
 
     }

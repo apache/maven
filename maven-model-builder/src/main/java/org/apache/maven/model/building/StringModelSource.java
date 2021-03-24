@@ -25,7 +25,7 @@ import org.apache.maven.building.StringSource;
  * Wraps an ordinary {@link CharSequence} as a model source.
  *
  * @author Benjamin Bentmann
- * 
+ *
  * @deprecated instead use {@link StringSource}
  */
 @Deprecated

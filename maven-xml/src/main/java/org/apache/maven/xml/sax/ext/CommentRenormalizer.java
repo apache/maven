@@ -25,15 +25,15 @@ import org.xml.sax.ext.LexicalHandler;
 /**
  * During parsing the line separators are transformed to \n
  * Unlike characters(), comments don't use the systems line separator for serialization.
- * Hence use this class in the LexicalHandler chain to do so 
- * 
+ * Hence use this class in the LexicalHandler chain to do so
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class CommentRenormalizer implements LexicalHandler
 {
     private final LexicalHandler lexicalHandler;
-    
+
     private final String lineSeparator;
 
     public CommentRenormalizer( LexicalHandler lexicalHandler )
@@ -59,7 +59,7 @@ public class CommentRenormalizer implements LexicalHandler
         else
         {
             char[] ca = new String( ch, start, length ).replaceAll( "\n", lineSeparator ).toCharArray();
-            
+
             lexicalHandler.comment( ca, 0, ca.length );
         }
     }

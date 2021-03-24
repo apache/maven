@@ -29,15 +29,13 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.codehaus.plexus.util.FileUtils;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
  * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
 public class CLIManagerDocumentationTest
-    extends TestCase
 {
     private final static String LS = System.lineSeparator();
 
@@ -98,6 +96,7 @@ public class CLIManagerDocumentationTest
         return sb.toString();
     }
 
+    @Test
     public void testOptionsAsHtml()
         throws IOException
     {

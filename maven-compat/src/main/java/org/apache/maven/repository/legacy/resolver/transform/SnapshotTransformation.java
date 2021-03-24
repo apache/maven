@@ -91,6 +91,7 @@ public class SnapshotTransformation
         {
             Snapshot snapshot = new Snapshot();
 
+            // TODO Should this be changed for MNG-6754 too?
             snapshot.setTimestamp( getDeploymentTimestamp() );
 
             // we update the build number anyway so that it doesn't get lost. It requires the timestamp to take effect

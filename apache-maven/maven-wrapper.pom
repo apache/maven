@@ -24,12 +24,12 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.7.0-SNAPSHOT</version>
+    <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>apache-maven-wrapper</artifactId>
   <packaging>pom</packaging>
-  
+
   <name>Apache Maven Wrapper Distribution</name>
   <description>The Apache Maven Wrapper distribution in zip and tar.gz formats.</description>
 
@@ -89,7 +89,7 @@ under the License.
       </plugin>
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -97,7 +97,7 @@ under the License.
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     <profile>
       <id>apache-release</id>

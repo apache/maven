@@ -361,7 +361,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener
     {
         if ( logger.isWarnEnabled() )
         {
-            logger.warn( "Goal {} requires online mode for execution but Maven is currently offline, skipping",
+            logger.warn( "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",
                     event.getMojoExecution().getGoal() );
         }
     }

@@ -19,26 +19,30 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class DefaultArtifactDescriptorReaderTest
     extends AbstractRepositoryTestCase
 {
 
+    @Test
     public void testMng5459()
         throws Exception
     {
         // prepare
-        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) lookup( ArtifactDescriptorReader.class );
+        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) getContainer().lookup( ArtifactDescriptorReader.class );
 
         RepositoryEventDispatcher eventDispatcher = mock( RepositoryEventDispatcher.class );
 
@@ -69,9 +73,6 @@ public class DefaultArtifactDescriptorReaderTest
             }
         }
 
-        if( !missingArtifactDescriptor )
-        {
-            fail( "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2" );
-        }
+        assertTrue( missingArtifactDescriptor, "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2" );
     }
 }

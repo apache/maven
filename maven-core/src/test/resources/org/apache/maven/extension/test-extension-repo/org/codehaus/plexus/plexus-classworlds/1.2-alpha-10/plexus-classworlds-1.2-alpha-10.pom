@@ -33,7 +33,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.1</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -88,7 +88,7 @@
   </profiles>
   <scm>
     <connection>scm:svn:http://svn.codehaus.org/plexus/plexus-classworlds/tags/plexus-classworlds-1.2-alpha-10</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-classworlds/tags/plexus-classworlds-1.2-alpha-10</developerConnection> 
+    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-classworlds/tags/plexus-classworlds-1.2-alpha-10</developerConnection>
     <url>http://fisheye.codehaus.org/browse/plexus/plexus-classworlds/tags/plexus-classworlds-1.2-alpha-10</url>
   </scm>
 </project>

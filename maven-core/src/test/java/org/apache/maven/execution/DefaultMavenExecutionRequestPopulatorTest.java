@@ -8,7 +8,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.eclipse.sisu.launch.InjectedTestCase;
+import org.apache.maven.test.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,13 +31,13 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+@PlexusTest
 public class DefaultMavenExecutionRequestPopulatorTest
-    extends InjectedTestCase
 {
     @Inject
     MavenExecutionRequestPopulator testee;
-        
+
+    @Test
     public void testPluginRepositoryInjection()
         throws Exception
     {

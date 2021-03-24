@@ -26,14 +26,14 @@ import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Factory for SAXEvents
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public final class SAXEventFactory
 {
     private final ContentHandler contentHandler;
-    
+
     private final LexicalHandler lexicalHandler;
 
     protected SAXEventFactory( ContentHandler contentHandler, LexicalHandler lexicalHandler )
@@ -98,7 +98,7 @@ public final class SAXEventFactory
     {
         return () -> contentHandler.startPrefixMapping( prefix, uri );
     }
-    
+
     public static SAXEventFactory newInstance( ContentHandler contentHandler, LexicalHandler lexicalHandler )
     {
         return new SAXEventFactory( contentHandler, lexicalHandler );
@@ -122,7 +122,7 @@ public final class SAXEventFactory
     public SAXEvent endEntity( String name )
     {
         return () -> lexicalHandler.endEntity( name );
-        
+
     }
 
     public SAXEvent startCDATA()

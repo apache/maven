@@ -22,39 +22,18 @@ package org.apache.maven.xml.sax.ext;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.Arrays;
-import java.util.Collection;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.xml.sax.ext.LexicalHandler;
 
-@RunWith( Parameterized.class )
 public class CommentRenormalizerTest
 {
-    private LexicalHandler lexicalHandler;
-    
-    private final String lineSeparator;
-    
-    @Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {     
-                 { "\n" }, 
-                 { "\r\n" },  
-                 { "\r" }
-           });
-    }
-    
-    public CommentRenormalizerTest( String lineSeparator )
-    {
-        this.lineSeparator = lineSeparator;
-        this.lexicalHandler = mock( LexicalHandler.class );
-    }
+    private LexicalHandler lexicalHandler = mock( LexicalHandler.class );
 
-    @Test
-    public void singleLine()
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r" })
+    public void singleLine(String lineSeparator)
         throws Exception
     {
         CommentRenormalizer commentRenormalizer = new CommentRenormalizer( lexicalHandler, lineSeparator );
@@ -65,9 +44,10 @@ public class CommentRenormalizerTest
 
         verify( lexicalHandler ).comment( ch, 0, ch.length );
     }
-    
-    @Test
-    public void multiLine()
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r" })
+    public void multiLine(String lineSeparator)
         throws Exception
     {
         CommentRenormalizer commentRenormalizer = new CommentRenormalizer( lexicalHandler, lineSeparator );

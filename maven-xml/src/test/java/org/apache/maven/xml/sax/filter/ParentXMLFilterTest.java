@@ -19,33 +19,34 @@ package org.apache.maven.xml.sax.filter;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.maven.xml.sax.filter.ParentXMLFilter;
-import org.apache.maven.xml.sax.filter.RelativeProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 
 public class ParentXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-    protected ParentXMLFilter getFilter()
+    protected ParentXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerException, SAXException, ParserConfigurationException
     {
-        ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.of( new RelativeProject( "GROUPID", 
+        ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.of( new RelativeProject( "GROUPID",
                                                                                            "ARTIFACTID",
                                                                                            "1.0.0" ) ) );
         filter.setProjectPath( Paths.get( "pom.xml").toAbsolutePath() );
-        
+        lexicalHandlerConsumer.accept( filter );
+
         return filter;
     }
-    
+
     @Test
     public void testMinimum() throws Exception
     {
@@ -88,6 +89,31 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
         assertEquals( expected, actual );
     }
 
+    /**
+     * An empty relative path means it must downloaded from a repository.
+     * That implies that the version cannot be solved (if missing, Maven should complain)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testEmptyRelativePathNoVersion() throws Exception
+    {
+        String input = "<parent>"
+            + "<groupId>GROUPID</groupId>"
+            + "<artifactId>ARTIFACTID</artifactId>"
+            + "<relativePath></relativePath>"
+            + "</parent>";
+        String expected = "<parent>"
+                        + "<groupId>GROUPID</groupId>"
+                        + "<artifactId>ARTIFACTID</artifactId>"
+                        + "<relativePath/>" // SAX optimization, however "" != null ...
+                        + "</parent>";
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
+    }
+
     @Test
     public void testNoVersion() throws Exception
     {
@@ -113,7 +139,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
     {
         ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.ofNullable( null ) );
         filter.setProjectPath( Paths.get( "pom.xml").toAbsolutePath() );
-        
+
         String input = "<parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
@@ -166,7 +192,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
 
         assertEquals( expected, actual );
     }
-    
+
     @Test
     public void comment() throws Exception
     {
@@ -188,7 +214,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests
 
         assertEquals( expected, actual );
     }
-    
+
     @Test
     public void testIndent() throws Exception
     {

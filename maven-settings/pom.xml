@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.7.0-SNAPSHOT</version>
+    <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-settings</artifactId>
@@ -46,7 +46,7 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <version>1.1.0</version>
+          <version>1.2.0</version>
           <models>
             <model>src/main/mdo/settings.mdo</model>
           </models>

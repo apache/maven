@@ -37,7 +37,7 @@ under the License.
       <outputDirectory>.mvn/wrapper</outputDirectory>
       <outputFileNameMapping>maven-wrapper.jar</outputFileNameMapping>
     </dependencySet>
-  </dependencySets>  
+  </dependencySets>
   <files>
     <file>
       <source>src/assembly/shared/mvnwDebug.cmd</source>

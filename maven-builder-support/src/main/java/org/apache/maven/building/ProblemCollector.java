@@ -41,17 +41,17 @@ public interface ProblemCollector
      * @param cause The cause of the problem, may be {@code null}.
      */
     void add( Problem.Severity severity, String message, int line, int column, Exception cause );
-    
+
     /**
      * The next messages will be bound to this source. When calling this method again, previous messages keep
      * their source, but the next messages will use the new source.
-     * 
+     *
      * @param source
      */
     void setSource( String source );
-    
+
     /**
-     * 
+     *
      * @return the collected Problems, never {@code null}
      */
     List<Problem> getProblems();

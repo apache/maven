@@ -28,7 +28,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * 
+ *
  * @author Robert Scholte
  * @since 3.2.4
  */
@@ -55,14 +55,14 @@ public class MavenToolchainMerger
         for ( ToolchainModel dominantModel : dominant )
         {
             Object key = getToolchainModelKey( dominantModel );
-            
+
             merged.put( key, dominantModel );
         }
 
         for ( ToolchainModel recessiveModel : recessive )
         {
             Object key = getToolchainModelKey( recessiveModel );
-            
+
             ToolchainModel dominantModel = merged.get( key );
             if ( dominantModel == null )
             {

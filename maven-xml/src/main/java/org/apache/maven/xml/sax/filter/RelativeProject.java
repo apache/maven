@@ -20,18 +20,18 @@ package org.apache.maven.xml.sax.filter;
  */
 
 /**
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class RelativeProject
 {
     private final String groupId;
-    
+
     private final String artifactId;
-    
+
     private final String version;
-    
+
     public RelativeProject( String groupId, String artifactId, String version )
     {
         this.groupId = groupId;
@@ -43,12 +43,12 @@ public class RelativeProject
     {
         return groupId;
     }
-    
+
     public String getArtifactId()
     {
         return artifactId;
     }
-    
+
     public String getVersion()
     {
         return version;

@@ -25,14 +25,15 @@ import java.io.FileInputStream;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultModelBuilderFactoryTest
-    extends TestCase
 {
 
     private File getPom( String name )
@@ -40,6 +41,7 @@ public class DefaultModelBuilderFactoryTest
         return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
+    @Test
     public void testCompleteWiring()
         throws Exception
     {

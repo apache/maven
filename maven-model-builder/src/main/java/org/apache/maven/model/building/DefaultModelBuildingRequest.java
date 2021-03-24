@@ -40,8 +40,6 @@ public class DefaultModelBuildingRequest
 {
     private Model fileModel;
 
-    private Model rawModel;
-
     private File pomFile;
 
     private ModelSource modelSource;
@@ -73,8 +71,8 @@ public class DefaultModelBuildingRequest
     private ModelCache modelCache;
 
     private WorkspaceModelResolver workspaceResolver;
-    
-    private TransformerContext context;
+
+    private TransformerContextBuilder contextBuilder;
 
     /**
      * Creates an empty request.
@@ -104,6 +102,8 @@ public class DefaultModelBuildingRequest
         setModelResolver( request.getModelResolver() );
         setModelBuildingListener( request.getModelBuildingListener() );
         setModelCache( request.getModelCache() );
+        setWorkspaceModelResolver( request.getWorkspaceModelResolver() );
+        setTransformerContextBuilder( request.getTransformerContextBuilder() );
     }
 
     @Override
@@ -390,24 +390,23 @@ public class DefaultModelBuildingRequest
     {
         return fileModel;
     }
-    
+
     @Override
     public ModelBuildingRequest setFileModel( Model fileModel )
     {
         this.fileModel = fileModel;
         return this;
     }
-    
+
     @Override
     public Model getRawModel()
     {
-        return rawModel;
+        return null;
     }
 
     @Override
     public ModelBuildingRequest setRawModel( Model rawModel )
     {
-        this.rawModel = rawModel;
         return this;
     }
 
@@ -423,17 +422,18 @@ public class DefaultModelBuildingRequest
         this.workspaceResolver = workspaceResolver;
         return this;
     }
-    
+
     @Override
-    public TransformerContext getTransformerContext()
+    public TransformerContextBuilder getTransformerContextBuilder()
     {
-        return context;
+        return contextBuilder;
     }
-    
+
     @Override
-    public ModelBuildingRequest setTransformerContext( TransformerContext context )
+    public ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder )
     {
-        this.context = context;
+        this.contextBuilder = contextBuilder;
         return this;
     }
+
 }

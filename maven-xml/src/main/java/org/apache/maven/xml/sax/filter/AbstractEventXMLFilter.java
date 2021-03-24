@@ -20,6 +20,8 @@ package org.apache.maven.xml.sax.filter;
  */
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import org.apache.maven.xml.sax.SAXEvent;
@@ -27,44 +29,42 @@ import org.apache.maven.xml.sax.SAXEventFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * Builds up a list of SAXEvents, which will be executed with {@link #executeEvents()}
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 abstract class AbstractEventXMLFilter extends AbstractSAXFilter
 {
     private Queue<SAXEvent> saxEvents = new ArrayDeque<>();
-    
+
     private SAXEventFactory eventFactory;
-    
+
     // characters BEFORE startElement must get state of startingElement
     // this way removing based on state keeps correct formatting
-    private SAXEvent characters;
-    
+    private List<SAXEvent> charactersSegments = new ArrayList<>();
+
     private boolean lockCharacters = false;
-    
+
     protected abstract boolean isParsing();
-    
+
     protected abstract String getState();
-    
+
     protected boolean acceptEvent( String state )
     {
         return true;
     }
-    
+
     AbstractEventXMLFilter()
     {
         super();
     }
 
-    <T extends XMLReader & LexicalHandler> AbstractEventXMLFilter( T parent )
+    AbstractEventXMLFilter( AbstractSAXFilter parent )
     {
-        setParent( parent );
+        super( parent );
     }
 
     private SAXEventFactory getEventFactory()
@@ -75,28 +75,30 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         }
         return eventFactory;
     }
-    
+
     private void processEvent( final SAXEvent event )
                     throws SAXException
     {
         if ( isParsing() )
         {
             final String eventState = getState();
-            final SAXEvent charactersEvent = characters;
-            
-            if ( !lockCharacters && charactersEvent != null )
+
+            if ( !lockCharacters )
             {
-                saxEvents.add( () -> 
+                charactersSegments.stream().forEach( e ->
                 {
-                    if ( acceptEvent( eventState ) )
+                    saxEvents.add( () ->
                     {
-                        charactersEvent.execute();
-                    }
+                        if ( acceptEvent( eventState ) )
+                        {
+                            e.execute();
+                        }
+                    } );
                 } );
-                characters = null;
+                charactersSegments.clear();
             }
 
-            saxEvents.add( () -> 
+            saxEvents.add( () ->
             {
                 if ( acceptEvent( eventState ) )
                 {
@@ -113,39 +115,36 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     /**
      * Should be used to include extra events before a closing element.
      * This is a lightweight solution to keep the correct indentation.
-     * 
-     * @return
      */
-    protected Includer include() 
+    protected Includer include()
     {
         this.lockCharacters = true;
-        
+
         return () -> lockCharacters = false;
     }
 
     protected final void executeEvents() throws SAXException
     {
         final String eventState = getState();
-        final SAXEvent charactersEvent = characters;
-        if ( charactersEvent != null )
+        charactersSegments.stream().forEach( e ->
         {
-            saxEvents.add( () -> 
+            saxEvents.add( () ->
             {
                 if ( acceptEvent( eventState ) )
                 {
-                    charactersEvent.execute();
+                    e.execute();
                 }
             } );
-            characters = null;
-        }
-        
+        } );
+        charactersSegments.clear();
+
         // not with streams due to checked SAXException
         while ( !saxEvents.isEmpty() )
         {
             saxEvents.poll().execute();
         }
     }
-    
+
     @Override
     public void setDocumentLocator( Locator locator )
     {
@@ -204,7 +203,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
         }
         else if ( isParsing() )
         {
-            this.characters = getEventFactory().characters( ch, start, length );
+            this.charactersSegments.add( getEventFactory().characters( ch, start, length ) );
         }
         else
         {
@@ -265,7 +264,7 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     public void endCDATA()
         throws SAXException
     {
-        processEvent( getEventFactory().endCDATA() );        
+        processEvent( getEventFactory().endCDATA() );
     }
 
     @Override
@@ -274,10 +273,10 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     {
         processEvent( getEventFactory().comment( ch, start, length ) );
     }
-    
+
     /**
      * AutoCloseable with a close method that doesn't throw an exception
-     * 
+     *
      * @author Robert Scholte
      *
      */

@@ -64,7 +64,7 @@ public class VersionRange
     }
 
     /**
-     * @deprecated VersionRange is immutable, cloning is not useful and even more an issue against the cache 
+     * @deprecated VersionRange is immutable, cloning is not useful and even more an issue against the cache
      * @return a clone
      */
     @Deprecated

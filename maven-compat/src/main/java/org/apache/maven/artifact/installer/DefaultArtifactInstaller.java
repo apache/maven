@@ -123,6 +123,7 @@ public class DefaultArtifactInstaller
         }
 
         Versioning versioning = new Versioning();
+        // TODO Should this be changed for MNG-6754 too?
         versioning.updateTimestamp();
         versioning.addVersion( artifact.getBaseVersion() );
         if ( artifact.isRelease() )

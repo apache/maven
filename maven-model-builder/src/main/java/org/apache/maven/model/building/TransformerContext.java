@@ -25,10 +25,10 @@ import org.apache.maven.model.Model;
 
 /**
  * Context used to transform a pom file.
- * 
- * 
+ *
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public interface TransformerContext
 {
@@ -36,29 +36,29 @@ public interface TransformerContext
      * Key to get the TransformerContext from the SessionData
      */
     Object KEY = TransformerContext.class;
-    
+
     /**
      * Get the value of the commandline argument {@code -Dkey=value}
      * @param key
      * @return
      */
     String getUserProperty( String key );
-    
+
     /**
      * Get the model based on the path, will be used to resolve the parent based on relativePath
-     * 
-     * @param p the path
+     *
+     * @param pomFile the path to the pomFile
      * @return the model, otherwise {@code null}
      */
-    Model getRawModel( Path p );
-    
+    Model getRawModel( Path pomFile );
+
     /**
      * Get the model from the reactor based on the groupId and artifactId, will be used for reactor dependencies
-     * 
+     *
      * @param groupId the groupId
      * @param artifactId the artifactId
      * @return the model, otherwise {@code null}
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
-    Model getRawModel( String groupId, String artifactId ) throws IllegalStateException;
+    Model getRawModel( String groupId, String artifactId );
 }

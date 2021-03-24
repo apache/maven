@@ -419,8 +419,8 @@ public class MavenRepositorySystem
         }
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
-    }    
-    
+    }
+
     public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
@@ -442,7 +442,7 @@ public class MavenRepositorySystem
                                                 repositoryId ) );
         }
     }
-    
+
     public static ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
@@ -568,20 +568,20 @@ public class MavenRepositorySystem
         return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
                                     optional );
     }
-    
+
     //
     // Code taken from LegacyRepositorySystem
     //
-        
+
     public ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
         throws Exception
     {
         return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
                                  true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                                 ArtifactRepositoryPolicy.DEFAULT_CHECKSUM_POLICY );
     }
-    
+
     public ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
                                                  String releaseUpdates, boolean snapshots, String snapshotUpdates,
                                                  String checksumPolicy ) throws Exception
@@ -594,7 +594,7 @@ public class MavenRepositorySystem
 
         return createArtifactRepository( repositoryId, url, "default", snapshotsPolicy, releasesPolicy );
     }
-        
+
     public Set<String> getRepoIds( List<ArtifactRepository> repositories )
     {
         Set<String> repoIds = new HashSet<>();
@@ -707,11 +707,13 @@ public class MavenRepositorySystem
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                                  ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-    }    
-    
+    }
+
     private static final String WILDCARD = "*";
 
     private static final String EXTERNAL_WILDCARD = "external:*";
+
+    private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
 
     public static Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
     {
@@ -740,11 +742,17 @@ public class MavenRepositorySystem
     }
 
     /**
-     * This method checks if the pattern matches the originalRepository. Valid patterns: * = everything external:* =
-     * everything not on the localhost and not file based. repo,repo1 = repo or repo1 *,!repo1 = everything except repo1
+     * This method checks if the pattern matches the originalRepository. Valid patterns:
+     * <ul>
+     * <li>{@code *} = everything,</li>
+     * <li>{@code external:*} = everything not on the localhost and not file based,</li>
+     * <li>{@code external:http:*} = any repository not on the localhost using HTTP,</li>
+     * <li>{@code repo,repo1} = {@code repo} or {@code repo1},</li>
+     * <li>{@code *,!repo1} = everything except {@code repo1}.</li>
+     * </ul>
      *
      * @param originalRepository to compare for a match.
-     * @param pattern used for match. Currently only '*' is supported.
+     * @param pattern used for match.
      * @return true if the repository is a match to this pattern.
      */
     static boolean matchPattern( ArtifactRepository originalRepository, String pattern )
@@ -785,6 +793,12 @@ public class MavenRepositorySystem
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
                 }
+                // check for external:http:*
+                else if ( EXTERNAL_HTTP_WILDCARD.equals( repo ) && isExternalHttpRepo( originalRepository ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
                 else if ( WILDCARD.equals( repo ) )
                 {
                     result = true;
@@ -806,8 +820,34 @@ public class MavenRepositorySystem
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" )
-                            || url.getProtocol().equals( "file" ) );
+            return !( isLocal( url.getHost() ) || url.getProtocol().equals( "file" ) );
+        }
+        catch ( MalformedURLException e )
+        {
+            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
+            return false;
+        }
+    }
+
+    private static boolean isLocal( String host )
+    {
+        return "localhost".equals( host ) || "127.0.0.1".equals( host );
+    }
+
+    /**
+     * Checks the URL to see if this repository refers to a non-localhost repository using HTTP.
+     *
+     * @param originalRepository
+     * @return true if external.
+     */
+    static boolean isExternalHttpRepo( ArtifactRepository originalRepository )
+    {
+        try
+        {
+            URL url = new URL( originalRepository.getUrl() );
+            return ( "http".equalsIgnoreCase( url.getProtocol() ) || "dav".equalsIgnoreCase( url.getProtocol() )
+                || "dav:http".equalsIgnoreCase( url.getProtocol() )
+                || "dav+http".equalsIgnoreCase( url.getProtocol() ) ) && !isLocal( url.getHost() );
         }
         catch ( MalformedURLException e )
         {
@@ -873,5 +913,5 @@ public class MavenRepositorySystem
         }
 
         return result;
-    }    
+    }
 }

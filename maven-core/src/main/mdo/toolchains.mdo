@@ -182,7 +182,7 @@
                 <![CDATA[
     /**
      * Method hashCode.
-     * 
+     *
      * @return int
      */
     public int hashCode()
@@ -194,10 +194,10 @@
 
         return result;
     } //-- int hashCode()
-    
+
     /**
      * Method equals.
-     * 
+     *
      * @param other
      * @return boolean
      */
@@ -220,7 +220,7 @@
         result = result && ( getProvides() == null ? that.getProvides() == null : getProvides().equals( that.getProvides() ) );
 
         return result;
-    } //-- boolean equals( Object )    
+    } //-- boolean equals( Object )
                 ]]>
               </code>
             </codeSegment>

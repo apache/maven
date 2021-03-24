@@ -33,7 +33,7 @@ under the License.
   </description>
 
   <build>
-  	<!-- NOTE: This parent uses plugin management -->
+    <!-- NOTE: This parent uses plugin management -->
     <pluginManagement>
       <plugins>
         <plugin>

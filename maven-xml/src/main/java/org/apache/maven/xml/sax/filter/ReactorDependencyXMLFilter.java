@@ -27,9 +27,9 @@ import org.xml.sax.SAXException;
 
 /**
  * Will apply the version if the dependency is part of the reactor
- * 
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 {
@@ -37,9 +37,9 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
 
     // states
     private String state;
-    
+
     // whiteSpace after <dependency>, to be used to position <version>
-    private String dependencyWhitespace = "";
+    private String dependencyWhitespace;
 
     private boolean hasVersion;
 
@@ -62,7 +62,7 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
         {
             parsingDependency = true;
         }
-        
+
         if ( parsingDependency )
         {
             state = localName;
@@ -79,16 +79,17 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
         if ( parsingDependency )
         {
             final String eventState = state;
+            String value = new String( ch, start, length );
             switch ( eventState )
             {
                 case "dependency":
-                    dependencyWhitespace = new String( ch, start, length );
+                    dependencyWhitespace = nullSafeAppend( dependencyWhitespace, value );
                     break;
                 case "groupId":
-                    groupId = new String( ch, start, length );
+                    groupId = nullSafeAppend( groupId, value );
                     break;
                 case "artifactId":
-                    artifactId = new String( ch, start, length );
+                    artifactId = nullSafeAppend( artifactId, value );
                     break;
                 default:
                     break;
@@ -115,10 +116,14 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
                         {
                             try ( Includer i = super.include() )
                             {
-                                super.characters( dependencyWhitespace.toCharArray(), 0,
-                                                  dependencyWhitespace.length() );
+                                if ( dependencyWhitespace != null )
+                                {
+                                    super.characters( dependencyWhitespace.toCharArray(), 0,
+                                                      dependencyWhitespace.length() );
+
+                                }
                                 String versionQName = SAXEventUtils.renameQName( qName, "version" );
-                                
+
                                 super.startElement( uri, "version", versionQName, null );
                                 super.characters( version.toCharArray(), 0, version.length() );
                                 super.endElement( uri, "version", versionQName );
@@ -126,22 +131,23 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
                         }
                     }
                     super.executeEvents();
-                    
+
                     parsingDependency = false;
-                    
+
                     // reset
                     hasVersion = false;
+                    dependencyWhitespace = null;
                     groupId = null;
                     artifactId = null;
-                    
+
                     break;
-                default: 
+                default:
                     break;
             }
         }
 
         super.endElement( uri, localName, qName );
-        
+
         state = "";
     }
 
@@ -161,5 +167,5 @@ public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
     {
         return state;
     }
-    
+
 }

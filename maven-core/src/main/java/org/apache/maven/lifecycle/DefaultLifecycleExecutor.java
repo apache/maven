@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -44,7 +43,6 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -106,26 +104,6 @@ public class DefaultLifecycleExecutor
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         return lifeCyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( packaging );
-    }
-
-    // USED BY MAVEN HELP PLUGIN
-
-    @Deprecated
-    public Map<String, Lifecycle> getPhaseToLifecycleMap()
-    {
-        return defaultLifeCycles.getPhaseToLifecycleMap();
-    }
-
-    // NOTE: Backward-compat with maven-help-plugin:2.1
-
-    @SuppressWarnings( { "UnusedDeclaration" } )
-    MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project, String invokedVia,
-                                      boolean canUsePrefix, boolean isOptionalMojo )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        PluginVersionResolutionException
-    {
-        return mojoDescriptorCreator.getMojoDescriptor( task, session, project );
     }
 
     // Used by m2eclipse

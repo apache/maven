@@ -936,7 +936,7 @@ public class MavenProject
         int index = attachedArtifacts.indexOf( artifact );
         if ( index >= 0 )
         {
-            LOGGER.warn( "artifact {} already attached, replace previous instance", artifact );
+            LOGGER.warn( "artifact '{}' already attached, replacing previous instance", artifact );
             attachedArtifacts.set( index, artifact );
         }
         else
@@ -1073,7 +1073,7 @@ public class MavenProject
         MavenProject that = (MavenProject) other;
 
         return Objects.equals( getArtifactId(), that.getArtifactId() )
-            && Objects.equals( getGroupId(), that.getGroupId() ) 
+            && Objects.equals( getGroupId(), that.getGroupId() )
             && Objects.equals( getVersion(), that.getVersion() );
     }
 
@@ -1154,15 +1154,10 @@ public class MavenProject
         sb.append( getArtifactId() );
         sb.append( ':' );
         sb.append( getVersion() );
-        sb.append( " @ " );
-
-        try
+        if ( getFile() != null )
         {
+            sb.append( " @ " );
             sb.append( getFile().getPath() );
-        }
-        catch ( NullPointerException e )
-        {
-            // don't log it.
         }
 
         return sb.toString();

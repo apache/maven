@@ -26,20 +26,20 @@ import org.xml.sax.ext.LexicalHandler;
  * XML Filter to transform pom.xml to consumer pom.
  * This often means stripping of build-specific information.
  * When extra information is required during filtering it is probably a member of the BuildPomXMLFilter
- * 
- * This filter is used at 1 locations:
- * - {@link org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory} when publishing pom files.
- * 
+ *
+ * This filter is used at one location:
+ * - org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory when publishing POM files.
+ *
  * @author Robert Scholte
- * @since 3.7.0
+ * @since 4.0.0
  */
 public class ConsumerPomXMLFilter extends AbstractSAXFilter
 {
-    <T extends XMLReader & LexicalHandler> ConsumerPomXMLFilter( T filter )
+    ConsumerPomXMLFilter( AbstractSAXFilter filter )
     {
         super( filter );
     }
-    
+
     /**
      * Don't allow overwriting parent
      */
@@ -50,5 +50,11 @@ public class ConsumerPomXMLFilter extends AbstractSAXFilter
         {
             super.setParent( parent );
         }
+    }
+
+    @Override
+    public LexicalHandler getLexicalHandler()
+    {
+        return ( (AbstractSAXFilter) getParent() ).getLexicalHandler();
     }
 }
