@@ -31,6 +31,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
 {
-    private static final String PATH = "src/test/resources/";
+    private static final Path PATH = Paths.get(  "src", "test", "resources" + "tmp" );
     private static final String FILE = "file.txt";
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
@@ -58,9 +61,14 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         activator.setProfileActivationFilePathInterpolator(
                 new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
 
-        context.setProjectDirectory( new File( PATH ) );
+        context.setProjectDirectory( new File( PATH.toString() ) );
 
-        File file = new File( PATH + FILE );
+        if (!Files.exists( PATH ))
+        {
+            Files.createDirectory( PATH );
+        }
+
+        File file = new File( PATH.resolve( FILE ).toString() );
         if ( !file.exists() )
         {
             if ( !file.createNewFile() )
@@ -140,7 +148,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     @AfterEach
     public void tearDown() throws Exception
     {
-        File file = new File( PATH + FILE );
+        File file = new File( PATH.resolve( FILE ).toString() );
         if ( file.exists() )
         {
             if ( !file.delete() )
@@ -148,6 +156,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
                 throw new IOException( "Can't delete " + file );
             }
         }
+        Files.deleteIfExists( PATH );
         super.tearDown();
     }
 }
