@@ -63,7 +63,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
         context.setProjectDirectory( new File( PATH.toString() ) );
 
-        if (!Files.exists( PATH ))
+        if (Files.notExists( PATH ))
         {
             Files.createDirectory( PATH );
         }
