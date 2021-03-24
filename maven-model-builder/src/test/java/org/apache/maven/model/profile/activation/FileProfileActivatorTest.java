@@ -25,6 +25,8 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -49,7 +51,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         super( FileProfileActivator.class );
     }
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception
     {
         super.setUp();
@@ -135,7 +137,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         return profile;
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception
     {
         File file = new File( PATH + FILE );
