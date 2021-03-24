@@ -276,7 +276,6 @@ public class DefaultModelBuilder
         return new DefaultTransformerContextBuilder();
     }
     
-    @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
