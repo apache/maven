@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-1-SNAPSHOT</version>
+    <version>3.8.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-api</artifactId>
