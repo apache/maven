@@ -25,9 +25,12 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link FileProfileActivator}.
@@ -47,7 +50,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Override
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
         activator.setProfileActivationFilePathInterpolator(
@@ -66,6 +69,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
 
+    @Test
     public void test_isActive_noFile()
     {
         assertActivation( false, newExistsProfile( null ), context );
@@ -77,6 +81,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         assertActivation( true, newMissingProfile( "${basedir}/someFile.txt" ), context );
     }
 
+    @Test
     public void test_isActiveExists_fileExists()
     {
         assertActivation( true, newExistsProfile( FILE ), context );
@@ -88,6 +93,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         assertActivation( false, newMissingProfile( "${basedir}/" + FILE ), context );
     }
 
+    @Test
     public void test_isActiveExists_leavesFileUnchanged()
     {
         Profile profile = newExistsProfile( FILE );
@@ -130,7 +136,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Override
-    protected void tearDown() throws Exception
+    public void tearDown() throws Exception
     {
         File file = new File( PATH + FILE );
         if ( file.exists() )

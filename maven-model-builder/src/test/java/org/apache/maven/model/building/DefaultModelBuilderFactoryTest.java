@@ -27,6 +27,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -61,6 +62,7 @@ public class DefaultModelBuilderFactoryTest
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }
 
+    @Test
     public void test_pom_changes() throws Exception
     {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();

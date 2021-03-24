@@ -419,10 +419,6 @@ public class DefaultModelBuilder
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
-            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
-                                                                                 profileActivationContext, problems );
-            currentData.setActiveProfiles( activePomProfiles );
-
             Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
                                                                                           profileActivationContext, 
                                                                                           problems );
