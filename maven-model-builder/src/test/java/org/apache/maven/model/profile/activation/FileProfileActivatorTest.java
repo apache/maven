@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
 {
-    private static final Path PATH = Paths.get(  "src", "test", "resources" + "tmp" );
+    private static final Path PATH = Paths.get( "src", "test", "resources" + "tmp" );
     private static final String FILE = "file.txt";
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
