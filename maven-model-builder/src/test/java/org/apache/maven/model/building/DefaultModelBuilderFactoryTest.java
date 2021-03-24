@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -37,9 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class DefaultModelBuilderFactoryTest
 {
 
+    private static final String BASE_DIR = Paths.get( "src", "test", "resources", "poms", "factory" ).toString();
+
     private File getPom( String name )
     {
-        return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
+        return new File( Paths.get( BASE_DIR, name + ".xml"  ).toString() ).getAbsoluteFile();
     }
 
     @Test
@@ -79,7 +82,7 @@ public class DefaultModelBuilderFactoryTest
 
         assertEquals( originalExists, resultedExists );
         assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists()
-                .contains( "src/test/resources/poms/factory/" ) );
+                .contains( BASE_DIR ) );
     }
 
     private static Model readPom( File file ) throws Exception
