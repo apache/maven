@@ -25,15 +25,14 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,8 +43,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
 {
-    private static final Path PATH = Paths.get( "src", "test", "resources" + "tmp" );
     private static final String FILE = "file.txt";
+
+    @TempDir
+    static Path tempDir;
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
@@ -61,14 +62,14 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         activator.setProfileActivationFilePathInterpolator(
                 new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
 
-        context.setProjectDirectory( new File( PATH.toString() ) );
+        context.setProjectDirectory( new File( tempDir.toString() ) );
 
-        if (Files.notExists( PATH ))
+        if (Files.notExists( tempDir ))
         {
-            Files.createDirectory( PATH );
+            Files.createDirectory( tempDir );
         }
 
-        File file = new File( PATH.resolve( FILE ).toString() );
+        File file = new File( tempDir.resolve( FILE ).toString() );
         if ( !file.exists() )
         {
             if ( !file.createNewFile() )
@@ -143,20 +144,5 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         profile.setActivation( activation );
 
         return profile;
-    }
-
-    @AfterEach
-    public void tearDown() throws Exception
-    {
-        File file = new File( PATH.resolve( FILE ).toString() );
-        if ( file.exists() )
-        {
-            if ( !file.delete() )
-            {
-                throw new IOException( "Can't delete " + file );
-            }
-        }
-        Files.deleteIfExists( PATH );
-        super.tearDown();
     }
 }
