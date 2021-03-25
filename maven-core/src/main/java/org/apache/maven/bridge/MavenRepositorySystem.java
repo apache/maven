@@ -190,6 +190,7 @@ public class MavenRepositorySystem
                     mirror.setId( repo.getId() );
                     mirror.setUrl( repo.getUrl() );
                     mirror.setLayout( repo.getContentType() );
+                    mirror.setBlocked( repo.isBlocked() );
                     return mirror;
                 }
             }
@@ -226,6 +227,8 @@ public class MavenRepositorySystem
             {
                 repository.setLayout( getLayout( mirror.getLayout() ) );
             }
+
+            repository.setBlocked( mirror.isBlocked() );
         }
     }
 
@@ -670,6 +673,8 @@ public class MavenRepositorySystem
             effectiveRepository.setProxy( aliasedRepo.getProxy() );
 
             effectiveRepository.setMirroredRepositories( mirroredRepos );
+
+            effectiveRepository.setBlocked( aliasedRepo.isBlocked() );
 
             effectiveRepositories.add( effectiveRepository );
         }

@@ -210,6 +210,7 @@ public class RepositoryUtils
             builder.setAuthentication( toAuthentication( repo.getAuthentication() ) );
             builder.setProxy( toProxy( repo.getProxy() ) );
             builder.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
+            builder.setBlocked( repo.isBlocked() );
             result = builder.build();
         }
         return result;
