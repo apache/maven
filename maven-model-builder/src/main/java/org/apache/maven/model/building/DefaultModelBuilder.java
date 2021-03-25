@@ -93,8 +93,9 @@ import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
+
+import static org.codehaus.plexus.util.StringUtils.isNotEmpty;
 
 /**
  * @author Benjamin Bentmann
@@ -522,12 +523,12 @@ public class DefaultModelBuilder
         String path;
         boolean missing;
 
-        if ( StringUtils.isNotEmpty( activationFile.getExists() ) )
+        if ( isNotEmpty( activationFile.getExists() ) )
         {
             path = activationFile.getExists();
             missing = false;
         }
-        else if ( StringUtils.isNotEmpty( activationFile.getMissing() ) )
+        else if ( isNotEmpty( activationFile.getMissing() ) )
         {
             path = activationFile.getMissing();
             missing = true;
