@@ -54,6 +54,8 @@ public class DefaultArtifactRepository
 
     private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
 
+    private boolean blocked;
+
     /**
      * Create a local repository or a test repository.
      *
@@ -262,6 +264,16 @@ public class DefaultArtifactRepository
         {
             this.mirroredRepositories = Collections.emptyList();
         }
+    }
+
+    public boolean isBlocked()
+    {
+        return blocked;
+    }
+
+    public void setBlocked( boolean blocked )
+    {
+        this.blocked = blocked;
     }
 
 }
