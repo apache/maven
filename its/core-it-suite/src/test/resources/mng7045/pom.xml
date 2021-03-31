@@ -7,7 +7,7 @@
 
   <name>Maven Integration Test :: MNG-7045</name>
   <description>
-    Do a Maven exec-java which executes some CDI 2.0 code which would fail if maven leaks CDI API 1.0.
+    Runs a Groovy script which refers some CDI 2.0 code. The script fails if Maven would leak CDI API 1.0.
   </description>
 
   <dependencies>
@@ -53,9 +53,15 @@ javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-ant</artifactId>
+            <version>4.0.0-alpha-2</version>
+            <scope>runtime</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>3.0.7</version>
+            <version>4.0.0-alpha-2</version>
             <scope>runtime</scope>
           </dependency>
         </dependencies>

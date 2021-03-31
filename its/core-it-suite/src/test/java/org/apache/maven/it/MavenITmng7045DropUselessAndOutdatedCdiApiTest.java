@@ -17,13 +17,13 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest
     }
 
     @Test
-    public void testit()
+    public void testShouldNotLeakCdiApi()
         throws IOException, VerificationException
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng7045" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath()) ;
 
-        verifier.executeGoal( "process-classes") ;
+        verifier.executeGoal( "process-classes" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
     }
