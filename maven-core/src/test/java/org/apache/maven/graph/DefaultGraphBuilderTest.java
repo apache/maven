@@ -122,7 +122,7 @@ class DefaultGraphBuilderTest
                         .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
                 scenario( "Selected aggregator project with non-recursive" )
                         .activeRequiredProjects( MODULE_C )
-                        .setNonRecursive()
+                        .nonRecursive()
                         .expectResult( MODULE_C ),
                 scenario( "Selected optional project" )
                         .activeOptionalProjects( MODULE_B )
@@ -149,7 +149,7 @@ class DefaultGraphBuilderTest
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Excluded aggregator project with non-recursive" )
                         .inactiveRequiredProjects( MODULE_C )
-                        .setNonRecursive()
+                        .nonRecursive()
                         .expectResult( PARENT_MODULE, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected and excluded same project" )
                         .activeRequiredProjects( MODULE_A )
@@ -272,7 +272,7 @@ class DefaultGraphBuilderTest
             String parameterMakeBehavior,
             ExpectedResult parameterExpectedResult,
             File parameterRequestedPom,
-            boolean isRecursive)
+            boolean parameterRecursive )
     {
         // Given
         ProjectActivation projectActivation = new ProjectActivation();
@@ -284,7 +284,7 @@ class DefaultGraphBuilderTest
         when( mavenExecutionRequest.getProjectActivation() ).thenReturn( projectActivation );
         when( mavenExecutionRequest.getMakeBehavior() ).thenReturn( parameterMakeBehavior );
         when( mavenExecutionRequest.getPom() ).thenReturn( parameterRequestedPom );
-        when( mavenExecutionRequest.isRecursive() ).thenReturn( isRecursive );
+        when( mavenExecutionRequest.isRecursive() ).thenReturn( parameterRecursive );
         if ( StringUtils.isNotEmpty( parameterResumeFrom ) )
         {
             when( mavenExecutionRequest.getResumeFrom() ).thenReturn( ":" + parameterResumeFrom );
@@ -404,7 +404,7 @@ class DefaultGraphBuilderTest
         private String resumeFrom = "";
         private String makeBehavior = "";
         private File requestedPom = new File( PARENT_MODULE, "pom.xml" );
-        private boolean isRecursive = true;
+        private boolean recursive = true;
 
         private ScenarioBuilder() { }
 
@@ -457,9 +457,9 @@ class DefaultGraphBuilderTest
             return this;
         }
 
-        public ScenarioBuilder setNonRecursive()
+        public ScenarioBuilder nonRecursive()
         {
-            this.isRecursive = false;
+            this.recursive = false;
             return this;
         }
 
@@ -479,7 +479,7 @@ class DefaultGraphBuilderTest
         {
             return Arguments.arguments( description, activeRequiredProjects, activeOptionalProjects,
                     inactiveRequiredProjects, inactiveOptionalProjects, resumeFrom, makeBehavior, expectedResult,
-                    requestedPom, isRecursive );
+                    requestedPom, recursive );
         }
 
         private List<String> prependWithColonIfNeeded( String[] selectors )
