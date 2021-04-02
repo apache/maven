@@ -1356,7 +1356,7 @@ public class MavenCli
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
         disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
-        enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
+        enableOnPresentOption( commandLine, CLIManager.SUPPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
         request.setGoals( commandLine.getArgList() );
         request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
         disableOnPresentOption( commandLine, CLIManager.NON_RECURSIVE, request::setRecursive );
