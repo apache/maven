@@ -73,10 +73,10 @@ public interface ArtifactRepository
     @Deprecated
     void setBlacklisted( boolean blackListed );
 
-    /** @since 3.8.1 **/
+    /** @since 3.6.4 **/
     boolean isBlocked();
 
-    /** @since 3.8.1 **/
+    /** @since 3.6.4 **/
     void setBlocked( boolean blocked );
 
     //
