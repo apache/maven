@@ -50,9 +50,16 @@ under the License.
 	  <version>1.3</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-ant</artifactId>
+      <version>4.0.0-alpha-2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>3.0.7</version>
+      <version>4.0.0-alpha-2</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.gmavenplus</groupId>
