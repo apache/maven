@@ -123,7 +123,7 @@ public class CLIManager
         options.addOption( Option.builder( Character.toString( ERRORS ) ).longOpt( "errors" ).desc( "Produce execution error messages" ).build() );
         options.addOption( Option.builder( Character.toString( NON_RECURSIVE ) ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects" ).build() );
         options.addOption( Option.builder( Character.toString( UPDATE_SNAPSHOTS ) ).longOpt( "update-snapshots" ).desc( "Forces a check for missing releases and updated snapshots on remote repositories" ).build() );
-        options.addOption( Option.builder( Character.toString( ACTIVATE_PROFILES ) ).longOpt( "activate-profiles" ).desc( "Comma-delimited list of profiles to activate" ).hasArg().build() );
+        options.addOption( Option.builder( Character.toString( ACTIVATE_PROFILES ) ).longOpt( "activate-profiles" ).desc( "Comma-delimited list of profiles to activate. Prefixing a profile with ! excludes it, and ? marks it as optional" ).hasArg().build() );
         options.addOption( Option.builder( Character.toString( BATCH_MODE ) ).longOpt( "batch-mode" ).desc( "Run in non-interactive (batch) mode (disables output color)" ).build() );
         options.addOption( Option.builder( SUPRESS_SNAPSHOT_UPDATES ).longOpt( "no-snapshot-updates" ).desc( "Suppress SNAPSHOT updates" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_FAILURE_POLICY ) ).longOpt( "strict-checksums" ).desc( "Fail the build if checksums don't match" ).build() );
