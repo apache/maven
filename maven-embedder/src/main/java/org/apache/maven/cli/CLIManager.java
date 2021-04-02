@@ -61,7 +61,7 @@ public class CLIManager
 
     public static final char ACTIVATE_PROFILES = 'P';
 
-    public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
+    public static final String SUPPRESS_SNAPSHOT_UPDATES = "nsu";
 
     public static final char CHECKSUM_FAILURE_POLICY = 'C';
 
@@ -121,11 +121,11 @@ public class CLIManager
         options.addOption( Option.builder( Character.toString( QUIET ) ).longOpt( "quiet" ).desc( "Quiet output - only show errors" ).build() );
         options.addOption( Option.builder( Character.toString( DEBUG ) ).longOpt( "debug" ).desc( "Produce execution debug output" ).build() );
         options.addOption( Option.builder( Character.toString( ERRORS ) ).longOpt( "errors" ).desc( "Produce execution error messages" ).build() );
-        options.addOption( Option.builder( Character.toString( NON_RECURSIVE ) ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects" ).build() );
+        options.addOption( Option.builder( Character.toString( NON_RECURSIVE ) ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators" ).build() );
         options.addOption( Option.builder( Character.toString( UPDATE_SNAPSHOTS ) ).longOpt( "update-snapshots" ).desc( "Forces a check for missing releases and updated snapshots on remote repositories" ).build() );
-        options.addOption( Option.builder( Character.toString( ACTIVATE_PROFILES ) ).longOpt( "activate-profiles" ).desc( "Comma-delimited list of profiles to activate" ).hasArg().build() );
+        options.addOption( Option.builder( Character.toString( ACTIVATE_PROFILES ) ).longOpt( "activate-profiles" ).desc( "Comma-delimited list of profiles to activate. Prefixing a profile with ! excludes it, and ? marks it as optional" ).hasArg().build() );
         options.addOption( Option.builder( Character.toString( BATCH_MODE ) ).longOpt( "batch-mode" ).desc( "Run in non-interactive (batch) mode (disables output color)" ).build() );
-        options.addOption( Option.builder( SUPRESS_SNAPSHOT_UPDATES ).longOpt( "no-snapshot-updates" ).desc( "Suppress SNAPSHOT updates" ).build() );
+        options.addOption( Option.builder( SUPPRESS_SNAPSHOT_UPDATES ).longOpt( "no-snapshot-updates" ).desc( "Suppress SNAPSHOT updates" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_FAILURE_POLICY ) ).longOpt( "strict-checksums" ).desc( "Fail the build if checksums don't match" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_WARNING_POLICY ) ).longOpt( "lax-checksums" ).desc( "Warn if checksums don't match" ).build() );
         options.addOption( Option.builder( Character.toString( ALTERNATE_USER_SETTINGS ) ).longOpt( "settings" ).desc( "Alternate path for the user settings file" ).hasArg().build() );
@@ -136,9 +136,9 @@ public class CLIManager
         options.addOption( Option.builder( FAIL_FAST ).longOpt( "fail-fast" ).desc( "Stop at first failure in reactorized builds" ).build() );
         options.addOption( Option.builder( FAIL_AT_END ).longOpt( "fail-at-end" ).desc( "Only fail the build afterwards; allow all non-impacted builds to continue" ).build() );
         options.addOption( Option.builder( FAIL_NEVER ).longOpt( "fail-never" ).desc( "NEVER fail the build, regardless of project result" ).build() );
-        options.addOption( Option.builder( RESUME ).longOpt( "resume" ).desc( "Resume reactor from the last failed project, using the resume.properties file in the build directory " ).build() );
+        options.addOption( Option.builder( RESUME ).longOpt( "resume" ).desc( "Resume reactor from the last failed project, using the resume.properties file in the build directory" ).build() );
         options.addOption( Option.builder( RESUME_FROM ).longOpt( "resume-from" ).hasArg().desc( "Resume reactor from specified project" ).build() );
-        options.addOption( Option.builder( PROJECT_LIST ).longOpt( "projects" ).desc( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path" ).hasArg().build() );
+        options.addOption( Option.builder( PROJECT_LIST ).longOpt( "projects" ).desc( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path. Prefixing a project with ! excludes it, and ? marks it as optional" ).hasArg().build() );
         options.addOption( Option.builder( ALSO_MAKE ).longOpt( "also-make" ).desc( "If project list is specified, also build projects required by the list" ).build() );
         options.addOption( Option.builder( ALSO_MAKE_DEPENDENTS ).longOpt( "also-make-dependents" ).desc( "If project list is specified, also build projects that depend on projects on the list" ).build() );
         options.addOption( Option.builder( LOG_FILE ).longOpt( "log-file" ).hasArg().desc( "Log file where all build output will go (disables output color)" ).build() );
