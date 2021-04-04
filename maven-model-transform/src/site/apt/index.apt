@@ -41,8 +41,8 @@ Maven Model XML Transformer
 
  Transformation is implemented as two filters:
 
- * <<build to raw>> in <<<BuildPomXMLFilter>>> ({{{./apidocs/org/apache/maven/xml/sax/filter/BuildPomXMLFilter.html}javadoc}}),
-   with its <<<BuildPomXMLFilterFactory>>> ({{{./xref/org/apache/maven/xml/sax/filter/BuildPomXMLFilterFactory.html}source}}) assembling transformation steps,
+ * <<build to raw>> in <<<BuildPomXMLFilter>>> ({{{./apidocs/org/apache/maven/model/transform/BuildPomXMLFilter.html}javadoc}}),
+   with its <<<BuildPomXMLFilterFactory>>> ({{{./xref/org/apache/maven/model/transform/BuildPomXMLFilterFactory.html}source}}) assembling transformation steps,
 
    * in a multi-module build, <<<parent>>>'s <<<version>>> is automatically added,
 
@@ -52,8 +52,8 @@ Maven Model XML Transformer
 
    []
 
- * <<raw to consumer>> in <<<ConsumerPomXMLFilter>>>  ({{{./apidocs/org/apache/maven/xml/sax/filter/ConsumerPomXMLFilter.html}javadoc}}),
-   with its <<<ConsumerPomXMLFilterFactory>>> ({{{./xref/org/apache/maven/xml/sax/filter/ConsumerPomXMLFilterFactory.html}source}}) assembling transformation steps.
+ * <<raw to consumer>> in <<<ConsumerPomXMLFilter>>>  ({{{./apidocs/org/apache/maven/model/transform/ConsumerPomXMLFilter.html}javadoc}}),
+   with its <<<ConsumerPomXMLFilterFactory>>> ({{{./xref/org/apache/maven/model/transform/ConsumerPomXMLFilterFactory.html}source}}) assembling transformation steps.
 
    * <<<modules>>> is stripped because it only has a meaning at build time on disk, but not once mapped to repository format,
 

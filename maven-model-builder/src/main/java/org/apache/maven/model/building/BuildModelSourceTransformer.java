@@ -31,9 +31,9 @@ import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterListener;
+import org.apache.maven.model.transform.BuildPomXMLFilterFactory;
+import org.apache.maven.model.transform.BuildPomXMLFilterListener;
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;

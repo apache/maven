@@ -37,7 +37,7 @@ import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;

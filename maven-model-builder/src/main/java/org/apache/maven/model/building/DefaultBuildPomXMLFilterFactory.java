@@ -27,8 +27,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.RelativeProject;
+import org.apache.maven.model.transform.BuildPomXMLFilterFactory;
+import org.apache.maven.model.transform.RelativeProject;
 import org.xml.sax.ext.LexicalHandler;
 
 /**

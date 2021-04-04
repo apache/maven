@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.model.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.xml.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,20 +19,24 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
-import org.apache.maven.model.transform.ConsumerPomXMLFilterFactory;
+import java.nio.file.Path;
 
 /**
- * The default implementation of the {@link ConsumerPomXMLFilterFactory}
- * It will provide several values for the consumer pom based on its context.
+ * Listener can be used to capture the result of the build pom
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+@FunctionalInterface
+public interface BuildPomXMLFilterListener
 {
-    public DefaultConsumerPomXMLFilterFactory( DefaultBuildPomXMLFilterFactory buildPomXMLFilterFactory )
-    {
-        super( buildPomXMLFilterFactory );
-    }
+    /**
+     * Captures the result of the XML transformation
+     *
+     * @param pomFile the original to being transformed
+     * @param b the byte array
+     * @param off the offset
+     * @param len the length
+     */
+    void write( Path pomFile, byte[] b, int off, int len );
 }

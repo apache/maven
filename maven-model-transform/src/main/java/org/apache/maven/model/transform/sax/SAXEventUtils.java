@@ -1,4 +1,4 @@
-package org.apache.maven.xml.internal;
+package org.apache.maven.model.transform.sax;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.xml.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,20 +19,31 @@ package org.apache.maven.xml.internal;
  * under the License.
  */
 
-import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
-import org.apache.maven.model.transform.ConsumerPomXMLFilterFactory;
+import java.util.regex.Pattern;
 
 /**
- * The default implementation of the {@link ConsumerPomXMLFilterFactory}
- * It will provide several values for the consumer pom based on its context.
+ * Utility class for SAXEvents
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public final class SAXEventUtils
 {
-    public DefaultConsumerPomXMLFilterFactory( DefaultBuildPomXMLFilterFactory buildPomXMLFilterFactory )
+    private static final Pattern PATTERN = Pattern.compile( "[^:]+$" );
+
+    private SAXEventUtils()
     {
-        super( buildPomXMLFilterFactory );
+    }
+
+    /**
+     * Returns the newLocalName prefixed with the namespace of the oldQName if present
+     *
+     * @param oldQName the QName, used for its namespace
+     * @param newLocalName the preferred localName
+     * @return the new QName
+     */
+    public static String renameQName( String oldQName, String newLocalName )
+    {
+        return PATTERN.matcher( oldQName ).replaceFirst( newLocalName );
     }
 }
