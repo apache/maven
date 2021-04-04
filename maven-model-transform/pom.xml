@@ -28,8 +28,8 @@ under the License.
     <artifactId>maven</artifactId>
     <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
-  <artifactId>maven-xml</artifactId>
-  <name>Maven XML</name>
+  <artifactId>maven-model-transform</artifactId>
+  <name>Maven Model XML Transform</name>
 
   <dependencies>
     <dependency>

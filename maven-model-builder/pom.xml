@@ -60,7 +60,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml</artifactId>
+      <artifactId>maven-model-transform</artifactId>
     </dependency>
     <!-- Testing -->
     <dependency>

@@ -88,6 +88,7 @@ under the License.
     <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
+    <module>maven-model-transform</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -101,7 +102,6 @@ under the License.
     <module>apache-maven</module> <!-- rename to apache-maven/maven.pom after RAT-268 -->
     <module>maven-wrapper</module>
     <module>apache-maven/maven-wrapper.pom</module>
-    <module>maven-xml</module>
   </modules>
 
   <scm>
