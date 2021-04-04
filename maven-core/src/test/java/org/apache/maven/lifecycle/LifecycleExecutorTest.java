@@ -42,8 +42,6 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
@@ -378,6 +377,36 @@ public class LifecycleExecutorTest
                 new HashSet<>() );
         assertNotNull(execution.getConfiguration());
         assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
+    }
+
+    @Test
+    void testSetupMojoExecutionWithInlineTags()
+            throws Exception
+    {
+        File pom = getProject( "mojo-inline-configuration" );
+
+        MavenSession session = createMavenSession( pom );
+
+        LifecycleTask task = new LifecycleTask( "generate-sources" );
+        MavenExecutionPlan executionPlan =
+                lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
+                        Collections.singletonList( task ), false );
+
+        MojoExecution execution = executionPlan.getMojoExecutions().get(0);
+        assertEquals( "maven-it-plugin", execution.getArtifactId(), execution.toString() );
+        assertNull(execution.getConfiguration());
+
+        lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution,
+                new HashSet<>() );
+        Xpp3Dom configuration = execution.getConfiguration();
+        assertNotNull( configuration );
+        assertEquals("1.0", configuration.getChild( "version" ).getAttribute( "default-value" ));
+        assertEquals(1, configuration.getChildren( "version" ).length);
+
+        List<Xpp3Dom> modules = Arrays.asList( configuration.getChildren( "models" ) );
+        assertEquals( 2, modules.size() );
+        assertTrue( modules.stream().anyMatch( dom -> dom.getValue().equals( "item1" ) ) );
+        assertTrue( modules.stream().anyMatch( dom -> dom.getValue().equals( "item2" ) ) );
     }
 
     @Test
