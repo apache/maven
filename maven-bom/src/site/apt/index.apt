@@ -25,5 +25,5 @@
 
 Maven Dependencies BOM
 
-  Bill Of Materials for Apache Maven dependencies, to easily use as dependencyManagement import.
+  Bill Of Materials for Apache Maven dependencies, to easily use as dependencyManagement import: see {{{./dependency-management.html}Dependency Management report}}.
  

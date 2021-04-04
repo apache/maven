@@ -37,7 +37,6 @@ under the License.
 
   <properties>
     <maven.site.path>ref/3-LATEST/${project.artifactId}</maven.site.path>
-    <project.build.outputTimestamp>2019-11-07T12:32:18Z</project.build.outputTimestamp>
   </properties>
 
   <scm>

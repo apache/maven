@@ -34,6 +34,7 @@ under the License.
     <breadcrumbs>
       <item name="Ref" href="../" />
       <item name="Maven ${project.version}" href="../" />
+      <item name="${project.name}" href="./" />
     </breadcrumbs>
 
     <menu name="Overview">
