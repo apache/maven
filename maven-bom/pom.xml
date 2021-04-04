@@ -42,7 +42,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}/${project.artifactId}</url>
     <tag>master</tag>
   </scm>
   <issueManagement>
