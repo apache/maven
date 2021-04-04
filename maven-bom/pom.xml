@@ -33,6 +33,34 @@ under the License.
 
   <name>Maven Dependencies BOM</name>
   <description>Bill Of Materials for Apache Maven dependencies</description>
+  <url>https://maven.apache.org/ref/${project.version}/${project.artifactId}</url>
+
+  <properties>
+    <maven.site.path>ref/3-LATEST/${project.artifactId}</maven.site.path>
+    <project.build.outputTimestamp>2019-11-07T12:32:18Z</project.build.outputTimestamp>
+  </properties>
+
+  <scm>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
+    <tag>master</tag>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.apache.org/jira/browse/MNG</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/</url>
+  </ciManagement>
+  <distributionManagement>
+    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
+    <site>
+      <id>apache.website</id>
+      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
+    </site>
+  </distributionManagement>
 
   <dependencyManagement>
     <!-- Not included:
@@ -109,4 +137,15 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <topSiteURL>${project.distributionManagement.site.url}/..</topSiteURL>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
