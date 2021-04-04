@@ -48,7 +48,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
     protected AbstractSAXFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
-        final BuildPomXMLFilterFactory buildPomXMLFilterFactory = new BuildPomXMLFilterFactory( lexicalHandlerConsumer, true )
+        final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory( lexicalHandlerConsumer, true )
         {
             @Override
             protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
@@ -82,8 +82,8 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 
         };
 
-        ConsumerPomXMLFilter filter =
-            new ConsumerPomXMLFilterFactory( buildPomXMLFilterFactory ).get( Paths.get( "pom.xml" ) );
+        RawToConsumerPomXMLFilter filter =
+            new RawToConsumerPomXMLFilterFactory( buildPomXMLFilterFactory ).get( Paths.get( "pom.xml" ) );
         filter.setFeature( "http://xml.org/sax/features/namespaces", true );
         return filter;
     }

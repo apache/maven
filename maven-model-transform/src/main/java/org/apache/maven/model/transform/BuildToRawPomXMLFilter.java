@@ -19,24 +19,40 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import java.nio.file.Path;
+import org.xml.sax.XMLReader;
+
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 
 /**
- * Listener can be used to capture the result of the build pom
+ * Filter to adjust pom on filesystem before being processed for effective pom.
+ * There should only be 1 BuildToRawPomXMLFilter, so the same is being used by both
+ * org.apache.maven.model.building.DefaultModelBuilder.transformData(InputStream) and
+ * org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory.newFileTransformerManager()
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-@FunctionalInterface
-public interface BuildPomXMLFilterListener
+public class BuildToRawPomXMLFilter extends AbstractSAXFilter
 {
+    BuildToRawPomXMLFilter()
+    {
+        super();
+    }
+
+    BuildToRawPomXMLFilter( AbstractSAXFilter parent )
+    {
+        super( parent );
+    }
+
     /**
-     * Captures the result of the XML transformation
-     *
-     * @param pomFile the original to being transformed
-     * @param b the byte array
-     * @param off the offset
-     * @param len the length
+     * Don't allow overwriting parent
      */
-    void write( Path pomFile, byte[] b, int off, int len );
+    @Override
+    public final void setParent( XMLReader parent )
+    {
+        if ( getParent() == null )
+        {
+            super.setParent( parent );
+        }
+    }
 }

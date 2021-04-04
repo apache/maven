@@ -18,6 +18,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 import java.util.function.Consumer;

@@ -31,8 +31,8 @@ import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.apache.maven.model.transform.BuildPomXMLFilterFactory;
-import org.apache.maven.model.transform.BuildPomXMLFilterListener;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterListener;
 import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 import org.eclipse.sisu.Nullable;
 import org.xml.sax.SAXException;
@@ -50,14 +50,14 @@ class BuildModelSourceTransformer extends AbstractModelSourceTransformer
 {
     @Inject
     @Nullable
-    private BuildPomXMLFilterListener xmlFilterListener;
+    private BuildToRawPomXMLFilterListener xmlFilterListener;
 
     protected AbstractSAXFilter getSAXFilter( Path pomFile,
                                               TransformerContext context,
                                               Consumer<LexicalHandler> lexicalHandlerConsumer )
         throws TransformerConfigurationException, SAXException, ParserConfigurationException
     {
-        BuildPomXMLFilterFactory buildPomXMLFilterFactory =
+        BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory =
             new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer, false );
 
         return buildPomXMLFilterFactory.get( pomFile );

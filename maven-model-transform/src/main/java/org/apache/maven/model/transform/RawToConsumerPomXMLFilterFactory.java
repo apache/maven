@@ -32,19 +32,19 @@ import org.xml.sax.SAXException;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class ConsumerPomXMLFilterFactory
+public class RawToConsumerPomXMLFilterFactory
 {
-    private BuildPomXMLFilterFactory buildPomXMLFilterFactory;
+    private BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory;
 
-    public ConsumerPomXMLFilterFactory( BuildPomXMLFilterFactory buildPomXMLFilterFactory )
+    public RawToConsumerPomXMLFilterFactory( BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory )
     {
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
 
-    public final ConsumerPomXMLFilter get( Path projectPath )
+    public final RawToConsumerPomXMLFilter get( Path projectPath )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
-        BuildPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
+        BuildToRawPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
 
 
         // Ensure that xs:any elements aren't touched by next filters
@@ -55,6 +55,6 @@ public class ConsumerPomXMLFilterFactory
         // Adjust relativePath
         filter = new RelativePathXMLFilter( filter );
 
-        return new ConsumerPomXMLFilter( filter );
+        return new RawToConsumerPomXMLFilter( filter );
     }
 }

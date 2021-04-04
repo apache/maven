@@ -1,7 +1,5 @@
 package org.apache.maven.model.transform;
 
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,6 +22,8 @@ import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
+
 /**
  * XML Filter to transform pom.xml to consumer pom.
  * This often means stripping of build-specific information.
@@ -35,9 +35,9 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class ConsumerPomXMLFilter extends AbstractSAXFilter
+public class RawToConsumerPomXMLFilter extends AbstractSAXFilter
 {
-    ConsumerPomXMLFilter( AbstractSAXFilter filter )
+    RawToConsumerPomXMLFilter( AbstractSAXFilter filter )
     {
         super( filter );
     }

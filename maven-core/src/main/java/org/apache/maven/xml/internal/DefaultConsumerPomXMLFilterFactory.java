@@ -20,16 +20,16 @@ package org.apache.maven.xml.internal;
  */
 
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
-import org.apache.maven.model.transform.ConsumerPomXMLFilterFactory;
+import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
 
 /**
- * The default implementation of the {@link ConsumerPomXMLFilterFactory}
+ * The default implementation of the {@link RawToConsumerPomXMLFilterFactory}
  * It will provide several values for the consumer pom based on its context.
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultConsumerPomXMLFilterFactory extends ConsumerPomXMLFilterFactory
+public class DefaultConsumerPomXMLFilterFactory extends RawToConsumerPomXMLFilterFactory
 {
     public DefaultConsumerPomXMLFilterFactory( DefaultBuildPomXMLFilterFactory buildPomXMLFilterFactory )
     {

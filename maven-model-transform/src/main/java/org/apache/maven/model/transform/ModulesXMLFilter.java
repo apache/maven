@@ -1,7 +1,5 @@
 package org.apache.maven.model.transform;
 
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,6 +21,8 @@ import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 
 /**
  * Remove all modules, this is just buildtime information

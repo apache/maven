@@ -35,23 +35,23 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.LexicalHandler;
 
 /**
- * Base implementation for providing the BuildPomXML.
+ * Base implementation for providing the BuildToRawPomXML.
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class BuildPomXMLFilterFactory
+public class BuildToRawPomXMLFilterFactory
 {
     private final boolean consume;
 
     private final Consumer<LexicalHandler> lexicalHandlerConsumer;
 
-    public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
+    public BuildToRawPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
     {
         this( lexicalHandlerConsumer, false );
     }
 
-    public BuildPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer, boolean consume )
+    public BuildToRawPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer, boolean consume )
     {
         this.lexicalHandlerConsumer = lexicalHandlerConsumer;
         this.consume = consume;
@@ -64,7 +64,7 @@ public class BuildPomXMLFilterFactory
      * @throws ParserConfigurationException
      * @throws TransformerConfigurationException
      */
-    public final BuildPomXMLFilter get( Path projectFile )
+    public final BuildToRawPomXMLFilter get( Path projectFile )
         throws SAXException, ParserConfigurationException, TransformerConfigurationException
     {
         AbstractSAXFilter parent = new AbstractSAXFilter();
@@ -104,7 +104,7 @@ public class BuildPomXMLFilterFactory
             parent = ciFriendlyFilter;
         }
 
-        return new BuildPomXMLFilter( parent );
+        return new BuildToRawPomXMLFilter( parent );
     }
 
     private XMLReader getXMLReader() throws SAXException, ParserConfigurationException
