@@ -73,7 +73,8 @@ public class DefaultMavenProjectBuilderTest
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
-     * @throws Exception
+     *
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildFromMiddlePom() throws Exception
@@ -207,7 +208,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildValidParentVersionRangeLocally() throws Exception
@@ -227,7 +228,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception
@@ -245,7 +246,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildParentVersionRangeLocallyWithChildVersionExpression() throws Exception
@@ -264,7 +265,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildParentVersionRangeExternally() throws Exception
@@ -284,7 +285,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception
@@ -303,7 +304,7 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testBuildParentVersionRangeExternallyWithChildVersionExpression() throws Exception
@@ -319,34 +320,34 @@ public class DefaultMavenProjectBuilderTest
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
     
-        /**
-         * Ensure that when re-reading a pom, it should not use the cached Model
-         * 
-         * @throws Exception
-         */
-        @Test
-        public void rereadPom_mng7063() throws Exception
+    /**
+     * Ensure that when re-reading a pom, it should not use the cached Model
+     * 
+     * @throws Exception in case of issue
+     */
+    @Test
+    public void rereadPom_mng7063() throws Exception
+    {
+        final Path pom = projectRoot.resolve( "pom.xml" );
+        final ProjectBuildingRequest buildingRequest = newBuildingRequest();
+
+        try ( InputStream pomResource =
+            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom1.xml" ) )
         {
-            final Path pom = projectRoot.resolve( "pom.xml" );
-            final ProjectBuildingRequest buildingRequest = newBuildingRequest();
-    
-            try ( InputStream pomResource =
-                DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom1.xml" ) )
-            {
-                Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
-            }
-            
-            MavenProject project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
-            assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
-            
-            try ( InputStream pomResource =
-                DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
-            {
-                Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
-            }
-    
-            project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
-            assertThat( project.getName(), is( "PROJECT NAME" ) );
+            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
         }
+        
+        MavenProject project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+        assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
+        
+        try ( InputStream pomResource =
+            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
+        {
+            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
+        }
+
+        project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+        assertThat( project.getName(), is( "PROJECT NAME" ) );
+    }
 
 }

@@ -83,7 +83,7 @@ public class PomConstructionTest
     /**
      * Will throw exception if url is empty. MNG-4050
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testEmptyUrl()
@@ -95,7 +95,7 @@ public class PomConstructionTest
     /**
      * Tests that modules is not overridden by profile
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     /* MNG-786*/
     @Test
@@ -114,7 +114,7 @@ public class PomConstructionTest
     /**
      * Will throw exception if doesn't find parent(s) in build
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
     @Test
     public void testParentInheritance()
@@ -171,7 +171,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "dependency-scope/sub" );
 
-    }
+    }*/
 
     /*MNG- 4010*/
     @Test
@@ -193,7 +193,7 @@ public class PomConstructionTest
 
     }
 
-    /** MNG-4005: postponed to 3.1
+    /* MNG-4005: postponed to 3.1
     public void testValidationErrorUponNonUniqueDependencyKey()
         throws Exception
     {
@@ -253,6 +253,7 @@ public class PomConstructionTest
         }
     }
     */
+
     @Test
     public void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode()
         throws Exception
@@ -316,7 +317,6 @@ public class PomConstructionTest
                                                  "resources-project-builder", "reporting-interpolation", "target",
                                                  "site" ) ), pom.getValue( "reporting/outputDirectory" ) );
     }
-
 
     @Test
     public void testPluginOrder()
@@ -690,7 +690,7 @@ public class PomConstructionTest
         assertEquals( "https://parent.url/site/ap/child", pom.getValue( "distributionManagement/site/url" ) );
         assertEquals( "https://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
-    //*/
+
     @Test
     public void testNonInheritedElementsInSubtreesOverriddenByChild()
         throws Exception
