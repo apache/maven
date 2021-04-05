@@ -25,7 +25,7 @@
 
 Lifecycles Reference
 
-  Maven defines 3 lifecycles in <<<META-INF/plexus/components.xml>>>:
+  Maven defines 4 lifecycles in <<<META-INF/plexus/components.xml>>>:
 
 %{toc|fromDepth=2}
 
@@ -47,3 +47,9 @@ Lifecycles Reference
   <<<site>>> lifecycle is defined directly with its plugin bindings.
 
 %{snippet|id=site|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+
+* <<<wrapper>>> Lifecycle
+
+  <<<wrapper>>> lifecycle is defined directly with its plugin bindings.
+
+%{snippet|id=wrapper|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
