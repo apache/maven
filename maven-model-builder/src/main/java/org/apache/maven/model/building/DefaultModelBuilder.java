@@ -95,8 +95,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
 
-import static org.codehaus.plexus.util.StringUtils.isNotEmpty;
-
 /**
  * @author Benjamin Bentmann
  */
@@ -557,6 +555,10 @@ public class DefaultModelBuilder
                     "Failed to interpolate file location " + path + ": " + e.getMessage() ).setLocation(
                     activationFile.getLocation( missing ? "missing" : "exists" ) ).setException( e ) );
         }
+    }
+
+    public static boolean isNotEmpty(String string) {
+        return string != null && !string.isEmpty();
     }
 
     @Override
