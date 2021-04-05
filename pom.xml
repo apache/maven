@@ -75,7 +75,7 @@ under the License.
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
-    <maven.site.path>ref/3-LATEST</maven.site.path>
+    <maven.site.path>ref/4-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2019-11-07T12:32:18Z</project.build.outputTimestamp>

@@ -36,7 +36,7 @@ under the License.
   <url>https://maven.apache.org/ref/${project.version}/${project.artifactId}</url>
 
   <properties>
-    <maven.site.path>ref/3-LATEST/${project.artifactId}</maven.site.path>
+    <maven.site.path>ref/4-LATEST/${project.artifactId}</maven.site.path>
   </properties>
 
   <scm>
