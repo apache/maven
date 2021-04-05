@@ -557,7 +557,8 @@ public class DefaultModelBuilder
         }
     }
 
-    private static boolean isNotEmpty(String string) {
+    private static boolean isNotEmpty( String string ) 
+    {
         return string != null && !string.isEmpty();
     }
 
