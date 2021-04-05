@@ -62,6 +62,7 @@ under the License.
           <area shape="rect" coords="447,743,550,782"  alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="675,742,822,783"  alt="maven-test-support" href="maven-test-support/" />
           <area shape="rect" coords="64,67,211,107"    alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
+          <area shape="rect" coords="64,132,211,172"   alt="maven-slf4j-wrapper" href="maven-slf4j-wrapper/" />
           <area shape="rect" coords="1,621,193,782"    alt="maven-resolver" href="https://maven.apache.org/resolver/" />
           <area shape="rect" coords="79,198,196,238"   alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
           <area shape="rect" coords="620,198,796,239"  alt="commons-cli" href="http://commons.apache.org/cli/" />
