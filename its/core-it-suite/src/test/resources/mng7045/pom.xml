@@ -55,13 +55,13 @@ javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-ant</artifactId>
-            <version>4.0.0-alpha-2</version>
+            <version>4.0.0-alpha-3</version>
             <scope>runtime</scope>
           </dependency>
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>4.0.0-alpha-2</version>
+            <version>4.0.0-alpha-3</version>
             <scope>runtime</scope>
           </dependency>
         </dependencies>
