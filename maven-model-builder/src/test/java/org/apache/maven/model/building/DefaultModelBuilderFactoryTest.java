@@ -66,7 +66,7 @@ public class DefaultModelBuilderFactoryTest
     }
 
     @Test
-    public void test_pom_changes() throws Exception
+    public void testPomChanges() throws Exception
     {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull( builder );
@@ -78,9 +78,9 @@ public class DefaultModelBuilderFactoryTest
         request.setProcessPlugins( true );
         request.setPomFile( pom );
         ModelBuildingResult result = builder.build( request );
-        String resultedExists = result.getRawModel().getProfiles().get( 1 ).getActivation().getFile().getExists();
+        String resultExists = result.getRawModel().getProfiles().get( 1 ).getActivation().getFile().getExists();
 
-        assertEquals( originalExists, resultedExists );
+        assertEquals( originalExists, resultExists );
         assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists()
                 .contains( BASE_DIR ) );
     }

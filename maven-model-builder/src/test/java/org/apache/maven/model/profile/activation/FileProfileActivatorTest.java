@@ -31,7 +31,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +45,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     private static final String FILE = "file.txt";
 
     @TempDir
-    static Path tempDir;
+    Path tempDir;
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
@@ -63,11 +62,6 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
                 new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
 
         context.setProjectDirectory( new File( tempDir.toString() ) );
-
-        if (Files.notExists( tempDir ))
-        {
-            Files.createDirectory( tempDir );
-        }
 
         File file = new File( tempDir.resolve( FILE ).toString() );
         if ( !file.exists() )
