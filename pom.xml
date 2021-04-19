@@ -46,7 +46,6 @@ under the License.
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <maven.version>3.0.5</maven.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
