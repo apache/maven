@@ -86,7 +86,7 @@ public class MavenIT0146InstallerSnapshotNaming
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
+        properties.setProperty( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
         properties.setProperty( "@port@", Integer.toString( port ) );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
@@ -125,7 +125,7 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier = newVerifier( testDir.getAbsolutePath() );
 
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
+        properties.setProperty( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
         properties.setProperty( "@port@", Integer.toString( port ) );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );

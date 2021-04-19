@@ -93,7 +93,7 @@ public class MavenITmng4991NonProxyHostsTest
             filterProps.setProperty( "@port@", Integer.toString( port ) );
             int proxyPort = ( (NetworkConnector) proxy.getConnectors()[0] ).getLocalPort();
             filterProps.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
-            filterProps.setProperty( "@localhost@", InetAddress.getLocalHost().getCanonicalHostName() );
+            filterProps.setProperty( "@localhost@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
