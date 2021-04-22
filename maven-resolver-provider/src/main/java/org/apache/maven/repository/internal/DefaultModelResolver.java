@@ -103,7 +103,7 @@ class DefaultModelResolver
         this.remoteRepositoryManager = original.remoteRepositoryManager;
         this.repositories = new ArrayList<>( original.repositories );
         this.externalRepositories = original.externalRepositories;
-        this.repositoryIds = new HashSet<>();
+        this.repositoryIds = new HashSet<>( original.repositoryIds );
     }
 
     @Override
