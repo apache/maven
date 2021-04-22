@@ -117,7 +117,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6754TimestampInMultimoduleProject.class );
         suite.addTestSuite( MavenITmng6981ProjectListShouldIncludeChildrenTest.class );
         suite.addTestSuite( MavenITmng6972AllowAccessToGraphPackageTest.class );
-        suite.addTestSuite( MavenITmng6772NestedImportScopeRepositoryOverride.class );
+        // This IT has been disabled until it is decided how the solution shall look like
+        // suite.addTestSuite( MavenITmng6772NestedImportScopeRepositoryOverride.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );
         suite.addTestSuite( MavenITmng6720FailFastTest.class );
         suite.addTestSuite( MavenITmng6656BuildConsumer.class );
