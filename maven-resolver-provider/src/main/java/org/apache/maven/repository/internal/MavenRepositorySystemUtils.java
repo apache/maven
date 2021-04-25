@@ -68,7 +68,9 @@ public final class MavenRepositorySystemUtils
      * acquire a complete repository system, clients need to add some repository connectors for remote transfers.
      *
      * @return The new service locator, never {@code null}.
+     * @deprecated This method is deprecated along with {@link DefaultServiceLocator} (since Maven Resolver 1.7.0).
      */
+    @Deprecated
     public static DefaultServiceLocator newServiceLocator()
     {
         DefaultServiceLocator locator = new DefaultServiceLocator();

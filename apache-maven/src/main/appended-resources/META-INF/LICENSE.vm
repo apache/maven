@@ -62,7 +62,7 @@ subject to the terms and conditions of the following licenses:
 #*    *###
 #*    *### copy license file to lib/$artifactId.license
 #*    *##set ( $licFile = $directory + '/' + $project.artifact.artifactId + '.license' )
-#*    *##if ( $spdx == "MIT" )
+#*    *##if ( $spdx == "MIT" || $spdx == "unrecognized" )
 #*      *### MIT license contains date and copyright that makes the file specific to each artifact
 #*      *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}-${project.artifact.artifactId}-${project.artifact.version}.txt", "licenses/${licFile}" ) )
 #*    *##else

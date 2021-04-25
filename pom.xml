@@ -67,7 +67,7 @@ under the License.
     <cipherVersion>1.8</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.6.2</resolverVersion>
+    <resolverVersion>1.7.0</resolverVersion>
     <slf4jVersion>1.7.30</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -566,10 +566,11 @@ under the License.
               <exclude>src/test/remote-repo/**</exclude>
               <exclude>**/*.odg</exclude>
               <!--
-                ! Excluded the license files itself cause they do not have have a license of themselfs.
+                ! Excluded the license files itself cause they do not have have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
