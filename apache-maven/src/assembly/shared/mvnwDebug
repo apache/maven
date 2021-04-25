@@ -27,7 +27,7 @@
 #   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
 # -----------------------------------------------------------------------------
 
-MAVEN_DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
+MAVEN_DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=0.0.0.0:8000"
 
 echo Preparing to execute Maven Wrapper in debug mode
 

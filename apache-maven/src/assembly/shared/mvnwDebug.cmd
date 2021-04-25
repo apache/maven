@@ -28,6 +28,6 @@
 @REM -----------------------------------------------------------------------------
 
 @setlocal
-@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=0.0.0.0:8000
 
 @call "%~dp0"mvnw.cmd %*
