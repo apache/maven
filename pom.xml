@@ -64,7 +64,7 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.6.3</resolverVersion>
+    <resolverVersion>1.7.2</resolverVersion>
     <slf4jVersion>1.7.32</slf4jVersion>
     <xmlunitVersion>2.2.1</xmlunitVersion>
     <powermockVersion>1.7.4</powermockVersion>
@@ -268,7 +268,7 @@ under the License.
       <dependency>
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
-        <version>1.2</version>
+        <version>1.3.2</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -545,7 +545,7 @@ under the License.
                 ! Excluded the license files itself cause they do not have have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.2.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
