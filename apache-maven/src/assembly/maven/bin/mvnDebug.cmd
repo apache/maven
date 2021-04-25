@@ -20,14 +20,18 @@
 @REM
 @REM Environment Variable Prerequisites
 @REM
-@REM   JAVA_HOME          Must point at your Java Development Kit installation.
-@REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
-@REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
-@REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
-@REM   MAVEN_SKIP_RC     (Optional) Flag to disable loading of mavenrc files.
+@REM   JAVA_HOME           Must point at your Java Development Kit installation.
+@REM   MAVEN_BATCH_ECHO    (Optional) Set to 'on' to enable the echoing of the batch commands.
+@REM   MAVEN_BATCH_PAUSE   (Optional) set to 'on' to wait for a key stroke before ending.
+@REM   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
+@REM   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
+@REM   MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is localhost:8000
 @REM -----------------------------------------------------------------------------
 
 @setlocal
-@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+
+IF "%MAVEN_DEBUG_ADDRESS%"=="" @set MAVEN_DEBUG_ADDRESS=localhost:8000
+
+@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
 
 @call "%~dp0"mvn.cmd %*
