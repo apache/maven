@@ -64,7 +64,7 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
-      <directory>target/dependency/META-INF/native</directory>
+      <directory>target/dependency/org/fusesource/jansi/internal/native</directory>
       <outputDirectory>lib/jansi-native</outputDirectory>
       <includes>
         <include>**</include>
