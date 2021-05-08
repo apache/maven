@@ -518,35 +518,23 @@ public class DefaultModelBuilder
     private void replaceWithInterpolatedValue( ActivationFile activationFile, ProfileActivationContext context,
                                                DefaultModelProblemCollector problems  )
     {
-        String path;
-        boolean missing;
-
-        if ( isNotEmpty( activationFile.getExists() ) )
-        {
-            path = activationFile.getExists();
-            missing = false;
-        }
-        else if ( isNotEmpty( activationFile.getMissing() ) )
-        {
-            path = activationFile.getMissing();
-            missing = true;
-        }
-        else
-        {
-            return;
-        }
-
+        String path = null;
+        Boolean missing = null;
         try
         {
-            String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
-
-            if ( missing )
+            if ( isNotEmpty( activationFile.getExists() ) )
             {
-                activationFile.setMissing( absolutePath );
-            }
-            else
-            {
+                path = activationFile.getExists();
+                missing = false;
+                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
                 activationFile.setExists( absolutePath );
+            }
+            else if ( isNotEmpty( activationFile.getMissing() ) )
+            {
+                path = activationFile.getMissing();
+                missing = true;
+                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
+                activationFile.setMissing( absolutePath );
             }
         }
         catch ( InterpolationException e )
