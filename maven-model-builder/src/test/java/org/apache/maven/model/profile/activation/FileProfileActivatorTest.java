@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
 {
-    private static final String FILE = "file.txt";
 
     @TempDir
     Path tempDir;
@@ -63,19 +62,15 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
         context.setProjectDirectory( new File( tempDir.toString() ) );
 
-        File file = new File( tempDir.resolve( FILE ).toString() );
-        if ( !file.exists() )
+        File file = new File( tempDir.resolve( "file.txt" ).toString() );
+        if ( !file.createNewFile() )
         {
-            if ( !file.createNewFile() )
-            {
-                throw new IOException( "Can't create " + file );
-            }
+            throw new IOException( "Can't create " + file );
         }
     }
 
-
     @Test
-    public void test_isActive_noFile()
+    public void testIsActiveNoFile()
     {
         assertActivation( false, newExistsProfile( null ), context );
         assertActivation( false, newExistsProfile( "someFile.txt" ), context );
@@ -87,50 +82,44 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void test_isActiveExists_fileExists()
+    public void testIsActiveExistsFileExists()
     {
-        assertActivation( true, newExistsProfile( FILE ), context );
+        assertActivation( true, newExistsProfile( "file.txt" ), context );
         assertActivation( true, newExistsProfile( "${basedir}" ), context );
-        assertActivation( true, newExistsProfile( "${basedir}/" + FILE ), context );
+        assertActivation( true, newExistsProfile( "${basedir}/" + "file.txt" ), context );
 
-        assertActivation( false, newMissingProfile( FILE ), context );
+        assertActivation( false, newMissingProfile( "file.txt" ), context );
         assertActivation( false, newMissingProfile( "${basedir}" ), context );
-        assertActivation( false, newMissingProfile( "${basedir}/" + FILE ), context );
+        assertActivation( false, newMissingProfile( "${basedir}/" + "file.txt" ), context );
     }
 
     @Test
-    public void test_isActiveExists_leavesFileUnchanged()
+    public void testIsActiveExistsLeavesFileUnchanged()
     {
-        Profile profile = newExistsProfile( FILE );
-        assertEquals( profile.getActivation().getFile().getExists(), FILE );
+        Profile profile = newExistsProfile( "file.txt" );
+        assertEquals( "file.txt", profile.getActivation().getFile().getExists() );
 
         assertActivation( true, profile, context );
 
-        assertEquals( profile.getActivation().getFile().getExists(), FILE );
+        assertEquals( "file.txt", profile.getActivation().getFile().getExists() );
     }
 
     private Profile newExistsProfile( String filePath )
     {
-        return newProfile( filePath, true );
+        ActivationFile activationFile = new ActivationFile();
+        activationFile.setExists( filePath );
+        return newProfile( activationFile );
     }
 
     private Profile newMissingProfile( String filePath )
     {
-        return newProfile( filePath, false );
+        ActivationFile activationFile = new ActivationFile();
+        activationFile.setMissing( filePath );
+        return newProfile( activationFile );
     }
 
-    private Profile newProfile( String filePath, boolean exists )
+    private Profile newProfile( ActivationFile activationFile )
     {
-        ActivationFile activationFile = new ActivationFile();
-        if ( exists )
-        {
-            activationFile.setExists( filePath );
-        }
-        else
-        {
-            activationFile.setMissing( filePath );
-        }
-
         Activation activation = new Activation();
         activation.setFile( activationFile );
 
