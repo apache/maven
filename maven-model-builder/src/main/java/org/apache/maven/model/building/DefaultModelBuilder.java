@@ -519,7 +519,7 @@ public class DefaultModelBuilder
                                                DefaultModelProblemCollector problems  )
     {
         String path = null;
-        Boolean missing = null;
+        boolean missing = false;
         try
         {
             if ( isNotEmpty( activationFile.getExists() ) )
