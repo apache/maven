@@ -59,6 +59,8 @@ public class MavenArtifactRepository
 
     private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
 
+    private boolean blocked;
+
     public MavenArtifactRepository()
     {
     }
@@ -161,6 +163,8 @@ public class MavenArtifactRepository
             sb.append( LS ).append( "releases: [enabled => " ).append( releases.isEnabled() );
             sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( ']' );
         }
+
+        sb.append( "   blocked: " ).append( isBlocked() ).append( '\n' );
 
         return sb.toString();
     }
@@ -414,6 +418,16 @@ public class MavenArtifactRepository
         {
             this.mirroredRepositories = Collections.emptyList();
         }
+    }
+
+    public boolean isBlocked()
+    {
+        return blocked;
+    }
+
+    public void setBlocked( boolean blocked )
+    {
+        this.blocked = blocked;
     }
 
 }

@@ -117,9 +117,13 @@ class DefaultGraphBuilderTest
                 scenario( "Selected project" )
                         .activeRequiredProjects( MODULE_B )
                         .expectResult( MODULE_B ),
-                scenario( "Selected project (including child modules)" )
+                scenario( "Selected aggregator project (including child modules)" )
                         .activeRequiredProjects( MODULE_C )
                         .expectResult( MODULE_C, MODULE_C_1, MODULE_C_2 ),
+                scenario( "Selected aggregator project with non-recursive" )
+                        .activeRequiredProjects( MODULE_C )
+                        .nonRecursive()
+                        .expectResult( MODULE_C ),
                 scenario( "Selected optional project" )
                         .activeOptionalProjects( MODULE_B )
                         .expectResult( MODULE_B ),
@@ -143,9 +147,17 @@ class DefaultGraphBuilderTest
                         .inactiveOptionalProjects( "non-existing-module" )
                         .inactiveRequiredProjects( MODULE_B )
                         .expectResult( PARENT_MODULE, MODULE_C, MODULE_C_1, MODULE_A, MODULE_C_2, INDEPENDENT_MODULE ),
+                scenario( "Excluded aggregator project with non-recursive" )
+                        .inactiveRequiredProjects( MODULE_C )
+                        .nonRecursive()
+                        .expectResult( PARENT_MODULE, MODULE_C_1, MODULE_A, MODULE_B, MODULE_C_2, INDEPENDENT_MODULE ),
                 scenario( "Selected and excluded same project" )
                         .activeRequiredProjects( MODULE_A )
                         .inactiveRequiredProjects( MODULE_A )
+                        .expectResult( MavenExecutionException.class, "empty reactor" ),
+                scenario( "Excluded aggregator, but selected child" )
+                        .activeRequiredProjects( MODULE_C_1 )
+                        .inactiveRequiredProjects( MODULE_C )
                         .expectResult( MavenExecutionException.class, "empty reactor" ),
                 scenario( "Project selected with different selector resolves to same project" )
                         .activeRequiredProjects( GROUP_ID + ":" + MODULE_A )
@@ -259,7 +271,8 @@ class DefaultGraphBuilderTest
             String parameterResumeFrom,
             String parameterMakeBehavior,
             ExpectedResult parameterExpectedResult,
-            File parameterRequestedPom)
+            File parameterRequestedPom,
+            boolean parameterRecursive )
     {
         // Given
         ProjectActivation projectActivation = new ProjectActivation();
@@ -271,6 +284,7 @@ class DefaultGraphBuilderTest
         when( mavenExecutionRequest.getProjectActivation() ).thenReturn( projectActivation );
         when( mavenExecutionRequest.getMakeBehavior() ).thenReturn( parameterMakeBehavior );
         when( mavenExecutionRequest.getPom() ).thenReturn( parameterRequestedPom );
+        when( mavenExecutionRequest.isRecursive() ).thenReturn( parameterRecursive );
         if ( StringUtils.isNotEmpty( parameterResumeFrom ) )
         {
             when( mavenExecutionRequest.getResumeFrom() ).thenReturn( ":" + parameterResumeFrom );
@@ -282,7 +296,7 @@ class DefaultGraphBuilderTest
         // Then
         if ( parameterExpectedResult instanceof SelectedProjectsResult )
         {
-            assertThat( result.hasErrors() ).isFalse();
+            assertThat( result.hasErrors() ).withFailMessage( "Expected result not to have errors" ).isFalse();
             List<String> expectedProjectNames = ((SelectedProjectsResult) parameterExpectedResult).projectNames;
             List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
             List<MavenProject> expectedReactorProjects = expectedProjectNames.stream()
@@ -292,7 +306,7 @@ class DefaultGraphBuilderTest
         }
         else
         {
-            assertThat( result.hasErrors() ).isTrue();
+            assertThat( result.hasErrors() ).withFailMessage( "Expected result to have errors" ).isTrue();
             Class<? extends Throwable> expectedException = ((ExceptionThrown) parameterExpectedResult).expected;
             String partOfMessage = ((ExceptionThrown) parameterExpectedResult).partOfMessage;
 
@@ -390,6 +404,7 @@ class DefaultGraphBuilderTest
         private String resumeFrom = "";
         private String makeBehavior = "";
         private File requestedPom = new File( PARENT_MODULE, "pom.xml" );
+        private boolean recursive = true;
 
         private ScenarioBuilder() { }
 
@@ -442,6 +457,12 @@ class DefaultGraphBuilderTest
             return this;
         }
 
+        public ScenarioBuilder nonRecursive()
+        {
+            this.recursive = false;
+            return this;
+        }
+
         public Arguments expectResult( String... expectedReactorProjects )
         {
             ExpectedResult expectedResult = new SelectedProjectsResult( asList( expectedReactorProjects ) );
@@ -458,7 +479,7 @@ class DefaultGraphBuilderTest
         {
             return Arguments.arguments( description, activeRequiredProjects, activeOptionalProjects,
                     inactiveRequiredProjects, inactiveOptionalProjects, resumeFrom, makeBehavior, expectedResult,
-                    requestedPom );
+                    requestedPom, recursive );
         }
 
         private List<String> prependWithColonIfNeeded( String[] selectors )

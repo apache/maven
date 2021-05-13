@@ -38,8 +38,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
 import org.apache.maven.xml.internal.DefaultConsumerPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 

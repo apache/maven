@@ -124,7 +124,7 @@ under the License.
         </phases>
         <default-phases>
           <wrapper>
-            org.apache.maven.plugins:maven-wrapper-plugin:3.0.1:wrapper
+            org.apache.maven.plugins:maven-wrapper-plugin:3.0.2:wrapper
           </wrapper>
         </default-phases>
         <!-- END SNIPPET: wrapper -->

@@ -27,8 +27,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.RelativeProject;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
+import org.apache.maven.model.transform.RelativeProject;
 import org.xml.sax.ext.LexicalHandler;
 
 /**
@@ -37,7 +37,7 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
+public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFactory
 {
     private final TransformerContext context;
 

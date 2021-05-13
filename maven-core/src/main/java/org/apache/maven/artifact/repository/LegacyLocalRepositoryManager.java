@@ -427,6 +427,15 @@ public class LegacyLocalRepositoryManager
         {
         }
 
+        public boolean isBlocked()
+        {
+            return false;
+        }
+
+        public void setBlocked( boolean blocked )
+        {
+        }
+
     }
 
 }

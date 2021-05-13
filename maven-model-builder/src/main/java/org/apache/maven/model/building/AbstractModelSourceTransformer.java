@@ -40,9 +40,9 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.maven.xml.Factories;
-import org.apache.maven.xml.sax.ext.CommentRenormalizer;
-import org.apache.maven.xml.sax.filter.AbstractSAXFilter;
+import org.apache.maven.model.transform.sax.AbstractSAXFilter;
+import org.apache.maven.model.transform.sax.CommentRenormalizer;
+import org.apache.maven.model.transform.sax.Factories;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;

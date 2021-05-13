@@ -141,7 +141,7 @@ public class DefaultGraphBuilder
         activeProjects = trimProjectsToRequest( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
-        activeProjects = trimExcludedProjects( activeProjects, session.getRequest() );
+        activeProjects = trimExcludedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
 
         if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
         {
@@ -233,7 +233,7 @@ public class DefaultGraphBuilder
             selectedProjects.add( selectedProject );
 
             List<MavenProject> children = selectedProject.getCollectedProjects();
-            if ( children != null )
+            if ( children != null && request.isRecursive() )
             {
                 selectedProjects.addAll( children );
             }
@@ -269,7 +269,8 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    private List<MavenProject> trimExcludedProjects( List<MavenProject> projects, MavenExecutionRequest request )
+    private List<MavenProject> trimExcludedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
+                                                     MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List<MavenProject> result = projects;
@@ -280,24 +281,12 @@ public class DefaultGraphBuilder
         if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
         {
             Set<MavenProject> excludedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
-            excludedProjects.addAll( getProjectsBySelectors( request, projects, requiredSelectors, true ) );
-            excludedProjects.addAll( getProjectsBySelectors( request, projects, optionalSelectors, false ) );
+            List<MavenProject> allProjects = graph.getAllProjects();
+            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, requiredSelectors, true ) );
+            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, optionalSelectors, false ) );
 
             result = new ArrayList<>( projects );
-
-            for ( MavenProject excludedProject : excludedProjects )
-            {
-                boolean isExcludedProjectRemoved = result.remove( excludedProject );
-
-                if ( isExcludedProjectRemoved )
-                {
-                    List<MavenProject> children = excludedProject.getCollectedProjects();
-                    if ( children != null )
-                    {
-                        result.removeAll( children );
-                    }
-                }
-            }
+            result.removeAll( excludedProjects );
 
             if ( result.isEmpty() )
             {

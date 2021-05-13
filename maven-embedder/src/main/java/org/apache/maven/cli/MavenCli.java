@@ -119,6 +119,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Comparator.comparing;
+import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -171,6 +172,8 @@ public class MavenCli
     private DefaultSecDispatcher dispatcher;
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
+
+    private CLIManager cliManager;
 
     public MavenCli()
     {
@@ -284,6 +287,7 @@ public class MavenCli
             cli( cliRequest );
             properties( cliRequest );
             logging( cliRequest );
+            informativeCommands( cliRequest );
             version( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
@@ -373,7 +377,7 @@ public class MavenCli
         //
         slf4jLogger = new Slf4jStdoutLogger();
 
-        CLIManager cliManager = new CLIManager();
+        cliManager = new CLIManager();
 
         List<String> args = new ArrayList<>();
         CommandLine mavenConfig = null;
@@ -423,7 +427,10 @@ public class MavenCli
             cliManager.displayHelp( System.out );
             throw e;
         }
+    }
 
+    private void informativeCommands( CliRequest cliRequest ) throws ExitException
+    {
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp( System.out );
@@ -504,6 +511,7 @@ public class MavenCli
 
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
+        styleColor = cliRequest.commandLine.getOptionValue( COLOR, styleColor );
         if ( "always".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( true );
@@ -1356,7 +1364,7 @@ public class MavenCli
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
         disableOnPresentOption( commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode );
-        enableOnPresentOption( commandLine, CLIManager.SUPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
+        enableOnPresentOption( commandLine, CLIManager.SUPPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates );
         request.setGoals( commandLine.getArgList() );
         request.setReactorFailureBehavior( determineReactorFailureBehaviour ( commandLine ) );
         disableOnPresentOption( commandLine, CLIManager.NON_RECURSIVE, request::setRecursive );

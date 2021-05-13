@@ -29,6 +29,7 @@ under the License.
 
   <artifactId>maven-wrapper</artifactId>
   <name>Maven Wrapper</name>
+  <description>Maven Wrapper ...</description>
 
   <build>
     <finalName>${project.artifactId}</finalName> <!-- to simplify installation for maven-integration-testing -->

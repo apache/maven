@@ -31,7 +31,6 @@ import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.plugin.MavenPluginValidator;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -166,6 +165,9 @@ public class DefaultMavenPluginManager
     @Inject
     private PluginArtifactsCache pluginArtifactsCache;
 
+    @Inject
+    private MavenPluginValidator pluginValidator;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -243,14 +245,13 @@ public class DefaultMavenPluginManager
             throw new PluginDescriptorParsingException( plugin, pluginFile.getAbsolutePath(), e );
         }
 
-        MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
+        List<String> errors = new ArrayList<>();
+        pluginValidator.validate( pluginArtifact, pluginDescriptor, errors );
 
-        validator.validate( pluginDescriptor );
-
-        if ( validator.hasErrors() )
+        if ( !errors.isEmpty() )
         {
             throw new InvalidPluginDescriptorException(
-                "Invalid plugin descriptor for " + plugin.getId() + " (" + pluginFile + ")", validator.getErrors() );
+                "Invalid plugin descriptor for " + plugin.getId() + " (" + pluginFile + ")", errors );
         }
 
         pluginDescriptor.setPluginArtifact( pluginArtifact );
