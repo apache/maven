@@ -39,6 +39,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -53,9 +54,15 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 {
     private final Logger logger;
 
-    private static final int LINE_LENGTH = 72;
+    private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
+    private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"
+    private static final int MIN_TERMINAL_WIDTH = 60;
+    private static final int MAX_TERMINAL_WIDTH = 130;
+    private static final int TERMINAL_WIDTH =
+            Math.min( MAX_TERMINAL_WIDTH, Math.max( MessageUtils.getTerminalWidth(), MIN_TERMINAL_WIDTH ) );
+    private static final int LINE_LENGTH = TERMINAL_WIDTH - MAX_LOG_PREFIX_SIZE;
     private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
-    private static final int MAX_PROJECT_NAME_LENGTH = 52;
+    private static final int MAX_PROJECT_NAME_LENGTH = LINE_LENGTH - PROJECT_STATUS_SUFFIX_SIZE;
 
     private int totalProjects;
     private volatile int currentVisitedProjectCount;

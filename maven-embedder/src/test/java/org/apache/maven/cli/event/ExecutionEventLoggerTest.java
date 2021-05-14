@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 
-public class ExecutionEventLoggerTest
+class ExecutionEventLoggerTest
 {
     private ExecutionEventLogger executionEventLogger;
 
@@ -49,7 +49,7 @@ public class ExecutionEventLoggerTest
     }
 
     @Test
-    public void testProjectStarted()
+    void testProjectStarted_shortLinesAreJustified()
     {
         // prepare
         Logger logger = mock( Logger.class );
@@ -71,13 +71,13 @@ public class ExecutionEventLoggerTest
         // verify
         InOrder inOrder = inOrder( logger );
         inOrder.verify( logger ).info( "" );
-        inOrder.verify( logger ).info( "------------------< org.apache.maven:maven-embedder >-------------------" );
+        inOrder.verify( logger ).info( "--------< org.apache.maven:maven-embedder >---------" );
         inOrder.verify( logger ).info( "Building Apache Maven Embedder 3.5.4-SNAPSHOT" );
-        inOrder.verify( logger ).info( "--------------------------------[ jar ]---------------------------------" );
+        inOrder.verify( logger ).info( "----------------------[ jar ]-----------------------" );
     }
 
     @Test
-    public void testProjectStartedOverflow()
+    void testProjectStarted_longLinesAreNotWrapped()
     {
         // prepare
         Logger logger = mock( Logger.class );
@@ -101,6 +101,6 @@ public class ExecutionEventLoggerTest
         inOrder.verify( logger ).info( "" );
         inOrder.verify( logger ).info( "--< org.apache.maven.plugins.overflow:maven-project-info-reports-plugin >--" );
         inOrder.verify( logger ).info( "Building Apache Maven Project Info Reports Plugin 3.0.0-SNAPSHOT" );
-        inOrder.verify( logger ).info( "----------------------------[ maven-plugin ]----------------------------" );
+        inOrder.verify( logger ).info( "------------------[ maven-plugin ]------------------" );
     }
 }
