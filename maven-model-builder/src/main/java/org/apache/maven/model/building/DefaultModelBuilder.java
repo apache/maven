@@ -24,6 +24,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -46,11 +47,13 @@ import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
+import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
 import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
@@ -59,8 +62,10 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
 
 import java.io.File;
@@ -141,6 +146,9 @@ public class DefaultModelBuilder
 
     @Inject
     private ReportingConverter reportingConverter;
+
+    @Inject
+    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -244,6 +252,13 @@ public class DefaultModelBuilder
         return this;
     }
 
+    public DefaultModelBuilder setProfileActivationFilePathInterpolator(
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
+    {
+        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        return this;
+    }
+
     @SuppressWarnings( "checkstyle:methodlength" )
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
@@ -317,7 +332,9 @@ public class DefaultModelBuilder
                                                                                  profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
+            Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
+                                                                                          profileActivationContext,
+                                                                                          problems );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
             // profile injection
@@ -438,6 +455,51 @@ public class DefaultModelBuilder
         }
 
         return result;
+    }
+
+    private Map<String, Activation> getInterpolatedActivations( Model rawModel,
+                                                                DefaultProfileActivationContext context,
+                                                                DefaultModelProblemCollector problems )
+    {
+        Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, true );
+        for ( Activation activation : interpolatedActivations.values() )
+        {
+            if ( activation.getFile() != null )
+            {
+                replaceWithInterpolatedValue( activation.getFile(), context, problems );
+            }
+        }
+        return interpolatedActivations;
+    }
+
+    private void replaceWithInterpolatedValue( ActivationFile activationFile, ProfileActivationContext context,
+                                               DefaultModelProblemCollector problems  )
+    {
+        try
+        {
+            if ( StringUtils.isNotEmpty( activationFile.getExists() ) )
+            {
+                String path = activationFile.getExists();
+                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
+                activationFile.setExists( absolutePath );
+            }
+            else if ( StringUtils.isNotEmpty( activationFile.getMissing() ) )
+            {
+                String path = activationFile.getMissing();
+                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
+                activationFile.setMissing( absolutePath );
+            }
+        }
+        catch ( InterpolationException e )
+        {
+            String path = StringUtils.isNotEmpty(
+                    activationFile.getExists() ) ? activationFile.getExists() : activationFile.getMissing();
+
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
+                    "Failed to interpolate file location " + path + ": " + e.getMessage() ).setLocation(
+                    activationFile.getLocation( StringUtils.isNotEmpty( activationFile.getExists() ) ? "exists" : "missing"  ) )
+                    .setException( e ) );
+        }
     }
 
     @Override
@@ -818,7 +880,7 @@ public class DefaultModelBuilder
                 problems.add( mpcr );
             }
 
-            
+
         }
         interpolatedModel.setPomFile( model.getPomFile() );
 
