@@ -33,4 +33,4 @@ Maven Settings Model
 
    * A {{{./settings.html}Descriptor Reference}}
 
-   * An {{{https://maven.apache.org/xsd/settings-1.1.0.xsd}XSD}}
+   * An {{{https://maven.apache.org/xsd/settings-1.2.0.xsd}XSD}}
