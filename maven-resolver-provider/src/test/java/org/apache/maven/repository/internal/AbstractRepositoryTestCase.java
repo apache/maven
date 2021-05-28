@@ -23,19 +23,18 @@ import java.net.MalformedURLException;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTest;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.apache.maven.test.PlexusExtension.getTestFile;
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
 @PlexusTest
 public abstract class AbstractRepositoryTestCase

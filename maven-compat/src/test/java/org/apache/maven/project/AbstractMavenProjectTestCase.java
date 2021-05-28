@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -33,7 +33,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.fail;

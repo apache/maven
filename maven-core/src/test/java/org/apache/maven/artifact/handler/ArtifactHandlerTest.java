@@ -24,13 +24,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusExtension;
-import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.maven.test.PlexusExtension.getTestFile;
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest

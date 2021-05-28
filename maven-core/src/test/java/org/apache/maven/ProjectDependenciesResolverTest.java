@@ -28,7 +28,7 @@ import org.apache.maven.project.MavenProject;
 import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.maven.test.PlexusExtension.getBasedir;
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;

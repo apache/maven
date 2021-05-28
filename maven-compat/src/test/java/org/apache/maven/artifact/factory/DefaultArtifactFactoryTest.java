@@ -21,7 +21,7 @@ package org.apache.maven.artifact.factory;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.Test;

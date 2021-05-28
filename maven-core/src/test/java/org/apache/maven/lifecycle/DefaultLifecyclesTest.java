@@ -23,8 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTest;
-import org.junit.jupiter.api.BeforeEach;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

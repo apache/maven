@@ -66,7 +66,6 @@ under the License.
          - apache-maven, as it delivers the binaries
          - maven-compat, only used by apache-maven distributions to support older releases
          - maven-slf4j-provider, only used by apache-maven distributions
-         - maven-test-support, only for internal test usage
          - maven-wrapper, only used by apache-maven-wrapper distributions -->
     <dependencies>
       <dependency>

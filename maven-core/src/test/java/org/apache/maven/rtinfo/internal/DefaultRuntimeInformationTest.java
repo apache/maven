@@ -20,10 +20,7 @@ package org.apache.maven.rtinfo.internal;
  */
 
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.apache.maven.test.PlexusTest;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.junit.jupiter.api.BeforeEach;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

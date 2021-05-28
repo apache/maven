@@ -19,7 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import static org.apache.maven.test.PlexusExtension.getTestFile;
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;

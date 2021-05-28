@@ -35,7 +35,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.maven.test.PlexusExtension.getBasedir;
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

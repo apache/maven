@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;

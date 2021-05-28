@@ -22,7 +22,7 @@ import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformat
 import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
-import org.apache.maven.test.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
