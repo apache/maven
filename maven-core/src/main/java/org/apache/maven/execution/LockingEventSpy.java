@@ -46,22 +46,9 @@ import org.slf4j.LoggerFactory;
 public class LockingEventSpy extends AbstractEventSpy
 {
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
-
     private static final Object LOCKS_KEY = new Object();
 
-    @SuppressWarnings( { "unchecked", "rawtypes" } )
-    private Lock getLock( ExecutionEvent event )
-    {
-        SessionData data = event.getSession().getRepositorySession().getData();
-        Map<MavenProject, Lock> locks = ( Map ) data.get( LOCKS_KEY );
-        if ( locks == null )
-        {
-            data.set( LOCKS_KEY, null, new ConcurrentHashMap<>() );
-            locks = ( Map ) data.get( LOCKS_KEY );
-        }
-        return locks.computeIfAbsent( event.getProject(), p -> new ReentrantLock() );
-    }
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Override
     public void onEvent( Object event ) throws Exception
@@ -77,7 +64,7 @@ public class LockingEventSpy extends AbstractEventSpy
                 if ( !lock.tryLock() )
                 {
                     logger.warn( "Suspending concurrent execution of project " + ee.getProject() );
-                    getLock( ee ).lockInterruptibly();
+                    lock.lockInterruptibly();
                     logger.warn( "Resuming execution of project " + ee.getProject() );
                 }
                 break;
@@ -91,6 +78,19 @@ public class LockingEventSpy extends AbstractEventSpy
                 break;
             }
         }
+    }
+
+    @SuppressWarnings( { "unchecked", "rawtypes" } )
+    private Lock getLock( ExecutionEvent event )
+    {
+        SessionData data = event.getSession().getRepositorySession().getData();
+        Map<MavenProject, Lock> locks = ( Map ) data.get( LOCKS_KEY );
+        if ( locks == null )
+        {
+            data.set( LOCKS_KEY, null, new ConcurrentHashMap<>() );
+            locks = ( Map ) data.get( LOCKS_KEY );
+        }
+        return locks.computeIfAbsent( event.getProject(), p -> new ReentrantLock() );
     }
 
 }
