@@ -96,7 +96,7 @@ public class ProjectDependenciesResolverTest
         MavenSession session = createMavenSession( pom, eps );
         MavenProject project = session.getCurrentProject();
 
-        project.setArtifacts( resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session ) );
+        project.setResolvedArtifacts( resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session ) );
 
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );

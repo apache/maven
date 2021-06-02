@@ -248,7 +248,6 @@ public class DefaultProjectBuilder
             }
         }
         project.setResolvedArtifacts( artifacts );
-        project.setArtifacts( artifacts );
 
         return resolutionResult;
     }

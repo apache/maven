@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -114,9 +115,10 @@ public class MavenProject
 
     private Set<Artifact> resolvedArtifacts;
 
-    private ArtifactFilter artifactFilter;
+    private final ThreadLocal<ArtifactFilter> artifactFilter
+            = ThreadLocal.withInitial( () -> a -> true );
 
-    private Set<Artifact> artifacts;
+    private final Map<ArtifactFilter, Set<Artifact>> artifacts = new ConcurrentHashMap<>();
 
     private Artifact parentArtifact;
 
@@ -154,8 +156,7 @@ public class MavenProject
 
     private Artifact artifact;
 
-    // calculated.
-    private Map<String, Artifact> artifactMap;
+    private final Map<ArtifactFilter, Map<String, Artifact>> artifactMap = new ConcurrentHashMap<>();
 
     private Model originalModel;
 
@@ -653,14 +654,6 @@ public class MavenProject
         getModel().addLicense( license );
     }
 
-    public void setArtifacts( Set<Artifact> artifacts )
-    {
-        this.artifacts = artifacts;
-
-        // flush the calculated artifactMap
-        artifactMap = null;
-    }
-
     /**
      * All dependencies that this project has, including transitive ones. Contents are lazily populated, so depending on
      * what phases have run dependencies in some scopes won't be included. eg. if only compile phase has run,
@@ -671,34 +664,32 @@ public class MavenProject
      */
     public Set<Artifact> getArtifacts()
     {
-        if ( artifacts == null )
+        if ( resolvedArtifacts == null )
         {
-            if ( artifactFilter == null || resolvedArtifacts == null )
+            return Collections.emptySet();
+        }
+        return artifacts.computeIfAbsent( Objects.requireNonNull( artifactFilter.get() ), f ->
+        {
+            Set<Artifact> artifacts = new LinkedHashSet<>();
+            for ( Artifact a : resolvedArtifacts )
             {
-                artifacts = new LinkedHashSet<>();
-            }
-            else
-            {
-                artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
-                for ( Artifact artifact : resolvedArtifacts )
+                if ( f.include( a ) )
                 {
-                    if ( artifactFilter.include( artifact ) )
-                    {
-                        artifacts.add( artifact );
-                    }
+                    artifacts.add( a );
                 }
             }
-        }
-        return artifacts;
+            return artifacts;
+        } );
     }
 
     public Map<String, Artifact> getArtifactMap()
     {
-        if ( artifactMap == null )
+        if ( resolvedArtifacts == null )
         {
-            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
+            return Collections.emptyMap();
         }
-        return artifactMap;
+        return artifactMap.computeIfAbsent( Objects.requireNonNull( artifactFilter.get() ),
+                f -> ArtifactUtils.artifactMapByVersionlessId( getArtifacts() ) );
     }
 
     public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
@@ -1189,11 +1180,6 @@ public class MavenProject
             setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
         }
 
-        if ( project.getArtifacts() != null )
-        {
-            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
-        }
-
         if ( project.getParentFile() != null )
         {
             parentFile = new File( project.getParentFile().getAbsolutePath() );
@@ -1387,9 +1373,9 @@ public class MavenProject
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
-        this.artifacts = null;
-        this.artifactMap = null;
+        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.emptySet();
+        this.artifacts.clear();
+        this.artifactMap.clear();
     }
 
     /**
@@ -1402,9 +1388,7 @@ public class MavenProject
      */
     public void setArtifactFilter( ArtifactFilter artifactFilter )
     {
-        this.artifactFilter = artifactFilter;
-        this.artifacts = null;
-        this.artifactMap = null;
+        this.artifactFilter.set( artifactFilter );
     }
 
     /**
