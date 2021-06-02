@@ -351,37 +351,58 @@ public class MavenProject
         return testCompileSourceRoots;
     }
 
+    @Deprecated
     public List<String> getCompileClasspathElements()
+        throws DependencyResolutionRequiredException
+    {
+        return getCompileClasspathElements( artifactFilter.get() );
+    }
+
+    public List<String> getCompileClasspathElements( ArtifactFilter artifactFilter )
         throws DependencyResolutionRequiredException
     {
         return Stream.concat(
                     ofNullable( getBuild().getOutputDirectory() ),
-                    getClasspathElements( MavenProject::compileScope )
+                    getClasspathElements( artifactFilter, MavenProject::compileScope )
                 ).collect( Collectors.toList() );
     }
 
+    @Deprecated
     public List<String> getTestClasspathElements()
+        throws DependencyResolutionRequiredException
+    {
+        return getTestClasspathElements( artifactFilter.get() );
+    }
+
+    public List<String> getTestClasspathElements( ArtifactFilter artifactFilter )
         throws DependencyResolutionRequiredException
     {
         return Stream.concat( Stream.concat(
                 ofNullable( getBuild().getTestOutputDirectory() ),
                 ofNullable( getBuild().getOutputDirectory() ) ),
-                getClasspathElements( a -> true )
+                getClasspathElements( artifactFilter, a -> true )
             ).collect( Collectors.toList() );
     }
 
+    @Deprecated
     public List<String> getRuntimeClasspathElements()
+        throws DependencyResolutionRequiredException
+    {
+        return getRuntimeClasspathElements( artifactFilter.get() );
+    }
+
+    public List<String> getRuntimeClasspathElements( ArtifactFilter artifactFilter )
         throws DependencyResolutionRequiredException
     {
         return Stream.concat(
                     ofNullable( getBuild().getOutputDirectory() ),
-                    getClasspathElements( MavenProject::runtimeScope )
+                    getClasspathElements( artifactFilter, MavenProject::runtimeScope )
                 ).collect( Collectors.toList() );
     }
 
-    private Stream<String> getClasspathElements( Predicate<Artifact> scopes )
+    private Stream<String> getClasspathElements( ArtifactFilter artifactFilter, Predicate<Artifact> scopes )
     {
-        return getArtifacts().stream()
+        return getArtifacts( artifactFilter ).stream()
                 .filter( MavenProject::isAddedToClasspath )
                 .filter( scopes )
                 .filter( a -> a.getFile() != null )
@@ -662,13 +683,19 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
+    @Deprecated
     public Set<Artifact> getArtifacts()
     {
-        if ( resolvedArtifacts == null )
+        return getArtifacts( artifactFilter.get() );
+    }
+
+    public Set<Artifact> getArtifacts( ArtifactFilter filter )
+    {
+        if ( filter == null || resolvedArtifacts == null )
         {
             return Collections.emptySet();
         }
-        return artifacts.computeIfAbsent( Objects.requireNonNull( artifactFilter.get() ), f ->
+        return artifacts.computeIfAbsent( filter, f ->
         {
             Set<Artifact> artifacts = new LinkedHashSet<>();
             for ( Artifact a : resolvedArtifacts )
@@ -682,14 +709,20 @@ public class MavenProject
         } );
     }
 
+    @Deprecated
     public Map<String, Artifact> getArtifactMap()
     {
-        if ( resolvedArtifacts == null )
+        return getArtifactMap( artifactFilter.get() );
+    }
+
+    public Map<String, Artifact> getArtifactMap( ArtifactFilter filter )
+    {
+        if ( filter == null || resolvedArtifacts == null )
         {
             return Collections.emptyMap();
         }
-        return artifactMap.computeIfAbsent( Objects.requireNonNull( artifactFilter.get() ),
-                f -> ArtifactUtils.artifactMapByVersionlessId( getArtifacts() ) );
+        return artifactMap.computeIfAbsent( filter,
+                f -> ArtifactUtils.artifactMapByVersionlessId( getArtifacts( f ) ) );
     }
 
     public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
@@ -1386,6 +1419,7 @@ public class MavenProject
      *
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
+    @Deprecated
     public void setArtifactFilter( ArtifactFilter artifactFilter )
     {
         this.artifactFilter.set( artifactFilter );
@@ -1582,7 +1616,7 @@ public class MavenProject
     {
         return Stream.concat(
                     ofNullable( getBuild().getOutputDirectory() ),
-                    getClasspathElements( MavenProject::systemScope )
+                    getClasspathElements( artifactFilter.get(), MavenProject::systemScope )
                 ).collect( Collectors.toList() );
     }
 

@@ -283,7 +283,7 @@ public class MojoExecutor
         }
     }
 
-    private ArtifactFilter getArtifactFilter( MojoDescriptor mojoDescriptor )
+    public static ArtifactFilter getArtifactFilter( MojoDescriptor mojoDescriptor )
     {
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();

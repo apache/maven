@@ -21,10 +21,13 @@ package org.apache.maven.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
@@ -389,6 +392,45 @@ public class PluginParameterExpressionEvaluatorTest
         Artifact result = artifacts.get( 0 );
 
         assertEquals( "testGroup", result.getGroupId() );
+    }
+
+    @Test
+    public void testProjectArtifacts()
+        throws Exception
+    {
+        MavenProject project = createDefaultProject();
+
+        Artifact artifact1 = createArtifact( "testGroup", "testArtifact1", "1.0" );
+        Artifact artifact2 = createArtifact( "testGroup", "testArtifact2", "1.0" );
+        artifact2.setScope( "test" );
+        project.setResolvedArtifacts( new HashSet<>(Arrays.asList( artifact1, artifact2 ) ) );
+
+        ArtifactRepository repo = factory.createDefaultLocalRepository();
+
+        MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
+        MavenSession session = createSession( container, repo, new Properties() );
+        session.setCurrentProject( project );
+
+        MojoDescriptor mojo = new MojoDescriptor();
+        PluginDescriptor pd = new PluginDescriptor();
+        mojo.setPluginDescriptor( pd );
+        mojo.setGoal( "goal" );
+        mojo.setDependencyResolutionRequired( "compile" );
+        MojoExecution mojoExecution = new MojoExecution( mojo );
+        ExpressionEvaluator ee = new PluginParameterExpressionEvaluator( session, mojoExecution );
+
+        Object value = ee.evaluate( "${project.artifacts}" );
+
+        assertTrue( value instanceof Set );
+
+        @SuppressWarnings( "unchecked" )
+        Set<Artifact> artifacts = (Set<Artifact>) value;
+
+        assertEquals( 1, artifacts.size() );
+
+        Artifact result = artifacts.iterator().next();
+
+        assertEquals( "testArtifact1", result.getArtifactId() );
     }
 
     private MavenProject createDefaultProject()

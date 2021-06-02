@@ -22,7 +22,9 @@ package org.apache.maven.plugin;
 import java.io.File;
 import java.util.Properties;
 
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -244,6 +246,10 @@ public class PluginParameterExpressionEvaluator
         {
             value = mojoExecution;
         }
+        else if ( "artifactFilter".equals( expression ) )
+        {
+            value = MojoExecutor.getArtifactFilter( mojoDescriptor );
+        }
         else if ( "project".equals( expression ) )
         {
             value = project;
@@ -263,6 +269,31 @@ public class PluginParameterExpressionEvaluator
                     String pathExpression = expression.substring( 0, pathSeparator );
                     value = ReflectionValueExtractor.evaluate( pathExpression, project );
                     value = value + expression.substring( pathSeparator );
+                }
+                else if ( "project.artifacts".equals( expression ) )
+                {
+                    ArtifactFilter filter = MojoExecutor.getArtifactFilter( mojoDescriptor );
+                    value = project.getArtifacts( filter );
+                }
+                else if ( "project.artifactMap".equals( expression ) )
+                {
+                    ArtifactFilter filter = MojoExecutor.getArtifactFilter( mojoDescriptor );
+                    value = project.getArtifactMap( filter );
+                }
+                else if ( "project.compileClasspathElements".equals( expression ) )
+                {
+                    ArtifactFilter filter = MojoExecutor.getArtifactFilter( mojoDescriptor );
+                    value = project.getCompileClasspathElements( filter );
+                }
+                else if ( "project.runtimeClasspathElements".equals( expression ) )
+                {
+                    ArtifactFilter filter = MojoExecutor.getArtifactFilter( mojoDescriptor );
+                    value = project.getRuntimeClasspathElements( filter );
+                }
+                else if ( "project.testClasspathElements".equals( expression ) )
+                {
+                    ArtifactFilter filter = MojoExecutor.getArtifactFilter( mojoDescriptor );
+                    value = project.getTestClasspathElements( filter );
                 }
                 else
                 {
