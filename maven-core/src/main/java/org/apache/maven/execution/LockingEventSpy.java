@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * EventSpy implementation that provides a per-project locking mechanism
- * to make sure a given project can not be build twice concurrently.
+ * to make sure a given project can not be built concurrently.
  * This case can happen when running parallel builds with forked lifecycles.
  */
 @Singleton
@@ -55,24 +55,24 @@ public class LockingEventSpy extends AbstractEventSpy
     {
         if ( event instanceof ExecutionEvent )
         {
-            ExecutionEvent ee = ( ExecutionEvent ) event;
-            switch ( ee.getType() )
+            ExecutionEvent executionEvent = ( ExecutionEvent ) event;
+            switch ( executionEvent.getType() )
             {
             case ProjectStarted:
             case ForkedProjectStarted:
-                Lock lock = getLock( ee );
+                Lock lock = getLock( executionEvent );
                 if ( !lock.tryLock() )
                 {
-                    logger.warn( "Suspending concurrent execution of project " + ee.getProject() );
+                    logger.warn( "Suspending concurrent execution of project '{}'", executionEvent.getProject() );
                     lock.lockInterruptibly();
-                    logger.warn( "Resuming execution of project " + ee.getProject() );
+                    logger.warn( "Resuming execution of project '{}'", executionEvent.getProject() );
                 }
                 break;
             case ProjectSucceeded:
             case ProjectFailed:
             case ForkedProjectSucceeded:
             case ForkedProjectFailed:
-                getLock( ee ).unlock();
+                getLock( executionEvent ).unlock();
                 break;
             default:
                 break;
@@ -85,8 +85,10 @@ public class LockingEventSpy extends AbstractEventSpy
     {
         SessionData data = event.getSession().getRepositorySession().getData();
         Map<MavenProject, Lock> locks = ( Map ) data.get( LOCKS_KEY );
+        // initialize the value if not already done (in case of a concurrent access) to the method
         if ( locks == null )
         {
+            // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
             data.set( LOCKS_KEY, null, new ConcurrentHashMap<>() );
             locks = ( Map ) data.get( LOCKS_KEY );
         }
