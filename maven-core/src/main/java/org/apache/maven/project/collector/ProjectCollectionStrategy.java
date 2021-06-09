@@ -36,6 +36,6 @@ public interface ProjectCollectionStrategy
      * @return
      * @throws ProjectBuildingException
      */
-    List<MavenProject> collectProjects( final MavenExecutionRequest request )
+    List<MavenProject> collectProjects( MavenExecutionRequest request )
             throws ProjectBuildingException;
 }

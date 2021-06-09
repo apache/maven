@@ -1,0 +1,1 @@
+The .mvn folder is needed to be able to use the ${maven.multiModuleProjectDirectory} property.
