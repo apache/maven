@@ -154,7 +154,7 @@ under the License.
         <configuration>
           <includeArtifactIds>jansi</includeArtifactIds>
           <includes>org/fusesource/jansi/internal/native/**</includes>
-          <excludes>org/fusesource/jansi/internal/native/osx/**</excludes>
+          <excludes>org/fusesource/jansi/internal/native/Mac/**</excludes>
         </configuration>
         <executions>
           <execution>
