@@ -64,14 +64,6 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
-      <directory>target/dependency/org/fusesource/jansi/internal/native</directory>
-      <outputDirectory>lib/jansi-native</outputDirectory>
-      <includes>
-        <include>**</include>
-      </includes>
-      <fileMode>0755</fileMode>
-    </fileSet>
-    <fileSet>
       <directory>src/assembly/maven/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
