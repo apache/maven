@@ -150,22 +150,6 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <configuration>
-          <includeArtifactIds>jansi</includeArtifactIds>
-          <includes>org/fusesource/jansi/internal/native/**</includes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>unpack-jansi-native</id>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
           <execution>
