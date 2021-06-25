@@ -92,13 +92,9 @@ import org.slf4j.LoggerFactory;
 public class MavenProject
     implements Cloneable
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger( MavenProject.class );
-
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
-
     public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
-
     public static final String EMPTY_PROJECT_VERSION = "0";
 
     private Model model;
@@ -110,10 +106,6 @@ public class MavenProject
     private File basedir;
 
     private Set<Artifact> resolvedArtifacts;
-
-    private ArtifactFilter artifactFilter;
-
-    private Set<Artifact> artifacts;
 
     private Artifact parentArtifact;
 
@@ -151,8 +143,13 @@ public class MavenProject
 
     private Artifact artifact;
 
-    // calculated.
-    private Map<String, Artifact> artifactMap;
+    private final ThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = new ThreadLocal()
+    {
+        protected ArtifactsHolder initialValue()
+        {
+            return new ArtifactsHolder();
+        }
+    };
 
     private Model originalModel;
 
@@ -185,11 +182,9 @@ public class MavenProject
     public MavenProject()
     {
         Model model = new Model();
-
         model.setGroupId( EMPTY_PROJECT_GROUP_ID );
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
-
         setModel( model );
     }
 
@@ -695,10 +690,11 @@ public class MavenProject
 
     public void setArtifacts( Set<Artifact> artifacts )
     {
-        this.artifacts = artifacts;
+        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
+        artifactsHolder.artifacts = artifacts;
 
         // flush the calculated artifactMap
-        artifactMap = null;
+        artifactsHolder.artifactMap = null;
     }
 
     /**
@@ -711,34 +707,36 @@ public class MavenProject
      */
     public Set<Artifact> getArtifacts()
     {
-        if ( artifacts == null )
+        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
+        if ( artifactsHolder.artifacts == null )
         {
-            if ( artifactFilter == null || resolvedArtifacts == null )
+            if ( artifactsHolder.artifactFilter == null || resolvedArtifacts == null )
             {
-                artifacts = new LinkedHashSet<>();
+                artifactsHolder.artifacts = new LinkedHashSet<>();
             }
             else
             {
-                artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
+                artifactsHolder.artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
                 for ( Artifact artifact : resolvedArtifacts )
                 {
-                    if ( artifactFilter.include( artifact ) )
+                    if ( artifactsHolder.artifactFilter.include( artifact ) )
                     {
-                        artifacts.add( artifact );
+                        artifactsHolder.artifacts.add( artifact );
                     }
                 }
             }
         }
-        return artifacts;
+        return artifactsHolder.artifacts;
     }
 
     public Map<String, Artifact> getArtifactMap()
     {
-        if ( artifactMap == null )
+        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
+        if ( artifactsHolder.artifactMap == null )
         {
-            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
+            artifactsHolder.artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
-        return artifactMap;
+        return artifactsHolder.artifactMap;
     }
 
     public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
@@ -1433,8 +1431,9 @@ public class MavenProject
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
         this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
-        this.artifacts = null;
-        this.artifactMap = null;
+        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
+        artifactsHolder.artifacts = null;
+        artifactsHolder.artifactMap = null;
     }
 
     /**
@@ -1447,9 +1446,10 @@ public class MavenProject
      */
     public void setArtifactFilter( ArtifactFilter artifactFilter )
     {
-        this.artifactFilter = artifactFilter;
-        this.artifacts = null;
-        this.artifactMap = null;
+        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
+        artifactsHolder.artifactFilter = artifactFilter;
+        artifactsHolder.artifacts = null;
+        artifactsHolder.artifactMap = null;
     }
 
     /**
@@ -1844,7 +1844,6 @@ public class MavenProject
         {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getReportArtifacts() );
         }
-
         return reportArtifactMap;
     }
 
@@ -1869,7 +1868,6 @@ public class MavenProject
         {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getExtensionArtifacts() );
         }
-
         return extensionArtifactMap;
     }
 
@@ -1990,5 +1988,12 @@ public class MavenProject
     public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
     {
         this.projectBuilderConfiguration = projectBuildingRequest;
+    }
+
+    private static class ArtifactsHolder
+    {
+        private ArtifactFilter artifactFilter;
+        private Set<Artifact> artifacts;
+        private Map<String, Artifact> artifactMap;
     }
 }
