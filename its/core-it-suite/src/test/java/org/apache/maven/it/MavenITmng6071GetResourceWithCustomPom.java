@@ -15,7 +15,7 @@ public class MavenITmng6071GetResourceWithCustomPom
 {
     public MavenITmng6071GetResourceWithCustomPom()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.8.2,)" );
     }
 
     /**
