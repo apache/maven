@@ -70,7 +70,7 @@ public class DefaultModelValidator
     implements ModelValidator
 {
 
-    private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile( "\\$\\{(.+?)\\}" );
+    private static final Pattern EXPRESSION_NAME = Pattern.compile( "\\$\\{(.+?)\\}" );
 
     private static final List<String> CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES =
         Arrays.asList( AbstractStringBasedModelInterpolator.REVISION_PROPERTY,
@@ -762,15 +762,28 @@ public class DefaultModelValidator
                                           String prefix2, ModelBuildingRequest request )
     {
         Map<String, Repository> index = new HashMap<>();
-
+        
         for ( Repository repository : repositories )
         {
             validateStringNotEmpty( prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(),
                                     null, repository );
 
-            validateStringNotEmpty( prefix, prefix2, "[" + repository.getId() + "].url", problems, Severity.ERROR,
-                                    Version.V20, repository.getUrl(), null, repository );
-
+            if ( validateStringNotEmpty( prefix, prefix2, "[" + repository.getId() + "].url", problems, Severity.ERROR,
+                                         Version.V20, repository.getUrl(), null, repository ) )
+            {
+                // only allow ${basedir} and ${project.basedir}
+                Matcher m = EXPRESSION_NAME.matcher( repository.getUrl() );
+                while ( m.find() )
+                {
+                    if ( !( "basedir".equals( m.group( 1 ) ) || "project.basedir".equals( m.group( 1 ) ) ) )
+                    {
+                        validateStringNoExpression( prefix + prefix2 + "[" + repository.getId() + "].url", problems,
+                                                    Severity.ERROR, Version.V40, repository.getUrl(), repository );
+                        break;
+                    }
+                }
+            }
+            
             String key = repository.getId();
 
             Repository existing = index.get( key );
@@ -992,7 +1005,7 @@ public class DefaultModelValidator
         // revision
         // sha1
         //
-        Matcher m = CI_FRIENDLY_EXPRESSION.matcher( string.trim() );
+        Matcher m = EXPRESSION_NAME.matcher( string.trim() );
         while ( m.find() )
         {
             if ( !CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES.contains( m.group( 1 ) ) )
