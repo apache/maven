@@ -274,7 +274,7 @@ public class DefaultModelBuilder
     {
         return new DefaultTransformerContextBuilder();
     }
-    
+
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
@@ -418,7 +418,7 @@ public class DefaultModelBuilder
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
             Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
-                                                                                          profileActivationContext, 
+                                                                                          profileActivationContext,
                                                                                           problems );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
@@ -545,7 +545,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private static boolean isNotEmpty( String string ) 
+    private static boolean isNotEmpty( String string )
     {
         return string != null && !string.isEmpty();
     }
@@ -1065,7 +1065,7 @@ public class DefaultModelBuilder
             {
                 parentData = readParentExternally( childModel, request, result, problems );
             }
-            
+
             Model parentModel = parentData.getModel();
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {

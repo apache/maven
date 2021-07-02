@@ -47,7 +47,7 @@ public final class Features
     public static class Feature
     {
         private final boolean active;
-        
+
         private final String name;
 
         Feature( String name, String defaultValue )
@@ -60,7 +60,7 @@ public final class Features
         {
            return active;
         }
-        
+
         public String propertyName()
         {
             return name;

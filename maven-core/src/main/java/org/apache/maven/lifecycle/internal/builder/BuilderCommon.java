@@ -112,7 +112,7 @@ public class BuilderCommon
         if ( Features.buildConsumer().isActive() )
         {
             Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
-                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() ) 
+                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() )
                                        && "org.apache.maven.plugins".equals( m.getGroupId() ) )
                             .findAny();
 

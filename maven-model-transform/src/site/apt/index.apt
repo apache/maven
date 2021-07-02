@@ -27,14 +27,14 @@ Maven Model XML Transformer
 
  Maven Model XML Transformer provides build/consumer <<<pom.xml>>> transformers.
 
- In order to keep formatting, comments and every detail when transforming a build <<<pom.xml>>> to a consumer <<<pom.xml>>>, transformation happens directly on the stream of SAX events. 
+ In order to keep formatting, comments and every detail when transforming a build <<<pom.xml>>> to a consumer <<<pom.xml>>>, transformation happens directly on the stream of SAX events.
 
  There are 3 states of a <<<pom.xml>>> content:
- 
+
  [[1]] the <<build>> <<<pom.xml>>>, as it is stored on disk during development and in source control, which can be simplified to ease source code maintenance,
- 
+
  [[2]] the <<raw>> content (usually not saved to a file), which is enriched from initial build content, to match Maven Model validation rules,
- 
+
  [[3]] the <<consumer>> <<<pom.xml>>>, as it is saved to local repository or remote repository, to be used as dependencies descriptor when consumed by a project.
 
  []
@@ -64,7 +64,7 @@ Maven Model XML Transformer
  []
 
  For Maven 4, every state of Maven Model remains with the same <<<maven-4.0.0.xsd>>> schema, but it the future Maven 5+:
- 
+
  * build model should evolve to add new features configuration in new <v5> model fields, or remove some old unused fields,
 
  * consumer model should at least continue to produce a <<<maven-4.0.0.xsd>>>-compliant <<<pom.xml>>> for compatibility with the vast and diverse dependency consumers ecosystem,

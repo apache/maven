@@ -10,7 +10,7 @@ else
     if [ "$MVNW_VERBOSE" = true ]; then
       echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
     fi
-    
+
     jarUrl="https://repo.maven.apache.org/maven2/org/apache/maven/maven-wrapper/${project.version}/maven-wrapper-${project.version}.jar"
 
     if [ -n "$MVNW_REPOURL" ]; then

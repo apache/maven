@@ -48,7 +48,7 @@ public class DefaultMavenProjectBuilderTest
 {
     @TempDir
     File localRepoDir;
-    
+
     // only use by reread()
     @TempDir
     Path projectRoot;
@@ -319,10 +319,10 @@ public class DefaultMavenProjectBuilderTest
                 "Expected 'ProjectBuildingException' not thrown." );
         assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
-    
+
     /**
      * Ensure that when re-reading a pom, it should not use the cached Model
-     * 
+     *
      * @throws Exception in case of issue
      */
     @Test
@@ -336,10 +336,10 @@ public class DefaultMavenProjectBuilderTest
         {
             Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
         }
-        
+
         MavenProject project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
         assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
-        
+
         try ( InputStream pomResource =
             DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
         {

@@ -30,7 +30,7 @@ def tests
 
 try {
 
-def osNode = jenkinsEnv.labelForOS(buildOs) 
+def osNode = jenkinsEnv.labelForOS(buildOs)
 node(jenkinsEnv.nodeSelection(osNode)) {
     dir('build') {
         stage('Checkout') {
@@ -163,8 +163,8 @@ parallel(runITsTasks)
 } finally {
     // notify completion
     stage("Notifications") {
-        jenkinsNotify()      
-    }    
+        jenkinsNotify()
+    }
 }
 
 def archiveDirs(stageId, archives) {

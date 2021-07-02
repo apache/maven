@@ -45,8 +45,8 @@ You can download the release source from our [download page][maven-download].
 Contributing
 ------------
 
-If you are interested in the development of Maven, please consult the 
-documentation first and afterward you are welcome to join the developers 
+If you are interested in the development of Maven, please consult the
+documentation first and afterward you are welcome to join the developers
 mailing list to ask questions or discuss new ideas/features/bugs etc.
 
 Take a look into the [contribution guidelines](CONTRIBUTING.md).
