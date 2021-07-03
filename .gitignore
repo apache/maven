@@ -13,3 +13,5 @@ out/
 /bootstrap
 /dependencies.xml
 .java-version
+.factorypath
+.checkstyle
