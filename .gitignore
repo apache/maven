@@ -14,3 +14,4 @@ out/
 /dependencies.xml
 .java-version
 .checkstyle
+.factorypath
