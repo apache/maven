@@ -506,18 +506,18 @@ public class MavenCli
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
         styleColor = cliRequest.commandLine.getOptionValue( COLOR, styleColor );
-        if ( "always".equals( styleColor ) )
+        if ( "always".equals( styleColor ) || "yes".equals( styleColor ) || "force".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( true );
         }
-        else if ( "never".equals( styleColor ) )
+        else if ( "never".equals( styleColor ) || "no".equals( styleColor ) || "none".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( false );
         }
-        else if ( !"auto".equals( styleColor ) )
+        else if ( !"auto".equals( styleColor ) && !"tty".equals( styleColor ) && !"if-tty".equals( styleColor ) )
         {
-            throw new IllegalArgumentException( "Invalid color configuration option [" + styleColor
-                + "]. Supported values are (auto|always|never)." );
+            throw new IllegalArgumentException( "Invalid color configuration value '" + styleColor
+                + "'. Supported are 'auto', 'always', 'never'." );
         }
         else if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
             || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )

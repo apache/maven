@@ -152,7 +152,7 @@ public class CLIManager
         options.addOption( Option.builder( "up" ).longOpt( "update-plugins" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
         options.addOption( Option.builder( "npu" ).longOpt( "no-plugin-updates" ).desc( "Ineffective, only kept for backward compatibility" ).build() );
 
-        options.addOption( Option.builder().longOpt( COLOR ).hasArg().desc( "Defines the color mode of the output. Available options are auto/always/never" ).build() );
+        options.addOption( Option.builder().longOpt( COLOR ).hasArg().optionalArg( true ).desc( "Defines the color mode of the output. Supported are 'auto', 'always', 'never'." ).build() );
     }
 
     public CommandLine parse( String[] args )
