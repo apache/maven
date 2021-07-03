@@ -643,6 +643,7 @@ under the License.
             <exclude>bootstrap/**</exclude>
             <exclude>README.bootstrap.txt</exclude>
             <exclude>README.md</exclude>
+            <exclude>**/.factorypath</exclude>
           </excludes>
         </configuration>
       </plugin>
