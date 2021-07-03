@@ -433,7 +433,14 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            System.out.println( CLIReportingUtils.showVersion() );
+            if ( cliRequest.commandLine.hasOption( CLIManager.QUIET ) )
+            {
+                System.out.println( CLIReportingUtils.showVersionMinimal() );
+            }
+            else
+            {
+                System.out.println( CLIReportingUtils.showVersion() );
+            }
             throw new ExitException( 0 );
         }
     }
