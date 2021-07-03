@@ -74,7 +74,17 @@ public class MavenITmng5771CoreExtensionsTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty("@port@", Integer.toString(server.port()));
+        properties.setProperty("@port@", Integer.toString( server.port() ) );
+        String mirrorOf;
+        if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
+        {
+            mirrorOf = "*";
+        }
+        else
+        {
+            mirrorOf = "external:*";
+        }
+        properties.setProperty("@mirrorOf@", mirrorOf );
         verifier.filterFile( "settings-template-mirror-auth.xml", "settings.xml", "UTF-8", properties );
 
         verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
