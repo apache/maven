@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
@@ -164,10 +165,11 @@ public class MavenITmng5937MavenWrapper
         unpack( testDir.toPath(), "bin" );
 
         Path p = baseDir.resolve( "properties/.mvn/wrapper/maven-wrapper.properties" );
-        try ( BufferedWriter out = Files.newBufferedWriter( p, StandardOpenOption.TRUNCATE_EXISTING ) )
+        try ( BufferedWriter out = Files.newBufferedWriter( p, StandardCharsets.ISO_8859_1,
+                                                            StandardOpenOption.TRUNCATE_EXISTING ) )
         {
             String localRepo = System.getProperty("maven.repo.local");
-            out.append( "distributionUrl = " + Paths.get( localRepo ).toUri().toURL().toString() )
+            out.append( "distributionUrl = " + Paths.get( localRepo ).toUri().toASCIIString() )
                .append( "org/apache/maven/apache-maven/")
                .append( getMavenVersion().toString() )
                .append( "/apache-maven-")
