@@ -517,7 +517,8 @@ public class MavenCli
         // see https://issues.apache.org/jira/browse/MNG-2570
 
         // LOG COLOR
-        String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
+        String styleColor = cliRequest.getSystemProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
+        styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, styleColor );
         styleColor = cliRequest.commandLine.getOptionValue( COLOR, styleColor );
         if ( "always".equals( styleColor ) || "yes".equals( styleColor ) || "force".equals( styleColor ) )
         {
