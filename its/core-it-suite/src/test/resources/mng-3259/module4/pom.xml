@@ -4,12 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-	    <groupId>org.codehaus.jira.mng.XXX</groupId>
-    	<artifactId>parent</artifactId>
-	    <version>1-SNAPSHOT</version>
-	</parent>	
-	
+  <parent>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>parent</artifactId>
+      <version>1-SNAPSHOT</version>
+  </parent>  
+  
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codehaus.jira.mng.XXX</groupId>
     <artifactId>mng-module4-XXX</artifactId>
@@ -18,42 +18,42 @@
     <name>Module-4 XXX</name>
     <description><![CDATA[Module 4 of issue XXX.]]></description>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-ejb-plugin</artifactId>
-				<configuration>
-					<generateClient>true</generateClient>
-					<clientExcludes>
-						<clientExclude>**/*Bean.class</clientExclude>
-					</clientExcludes>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <configuration>
+          <generateClient>true</generateClient>
+          <clientExcludes>
+            <clientExclude>**/*Bean.class</clientExclude>
+          </clientExcludes>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
-    <dependencies>
-        <dependency>
-   	        <groupId>org.codehaus.jira.mng.XXX</groupId>
-       	    <artifactId>mng-module3-XXX</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-j2ee</artifactId>
-		</dependency>
-		<!-- for test -->
-        <dependency>
-   	        <groupId>org.codehaus.jira.mng.XXX</groupId>
-       	    <artifactId>mng-module1-XXX</artifactId>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module3-XXX</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-j2ee</artifactId>
+    </dependency>
+    <!-- for test -->
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module1-XXX</artifactId>
+    </dependency>
+  </dependencies>
 
 </project>

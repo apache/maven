@@ -1,19 +1,19 @@
 <settings>
 
-	<profiles>
-		<profile>
-			<id>test-repo</id>
-			<repositories>
-				<repository>
-					<id>test-repo</id>
-					<url>file:../../test-repo</url>
-				</repository>
-			</repositories>
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>test-repo</id>
+      <repositories>
+        <repository>
+          <id>test-repo</id>
+          <url>file:../../test-repo</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
 
-	<activeProfiles>
-		<activeProfile>test-repo</activeProfile>
-	</activeProfiles>
-	
+  <activeProfiles>
+    <activeProfile>test-repo</activeProfile>
+  </activeProfiles>
+  
 </settings>

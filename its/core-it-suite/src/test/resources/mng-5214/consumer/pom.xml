@@ -59,11 +59,11 @@ under the License.
               <goal>resolve-one-dependency</goal>
             </goals>
             <configuration>
-	      <scope>compile</scope>
-	      <groupId>${project.groupId}</groupId>
-	      <artifactId>dependency</artifactId>
-	      <version>${project.version}</version>
-	      <type>wsdl</type>
+              <scope>compile</scope>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>dependency</artifactId>
+              <version>${project.version}</version>
+              <type>wsdl</type>
             </configuration>
           </execution>
         </executions>

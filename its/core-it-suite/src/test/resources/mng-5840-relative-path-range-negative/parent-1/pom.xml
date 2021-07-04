@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
 
   <properties>
-   	<enforcer.skip>true</enforcer.skip>
+    <enforcer.skip>true</enforcer.skip>
   </properties>
 
 </project>

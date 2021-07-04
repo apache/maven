@@ -1,256 +1,256 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<!-- Define group, artifact and project type -->
-	<groupId>bugs.maven.issue</groupId>
-	<artifactId>master</artifactId>
-	<packaging>pom</packaging>
+  <!-- Define group, artifact and project type -->
+  <groupId>bugs.maven.issue</groupId>
+  <artifactId>master</artifactId>
+  <packaging>pom</packaging>
 
-	<!-- Describe the project -->
-	<name>Master Project</name>
-	<version>1</version>
-	<description>Master project with global settings.</description>
+  <!-- Describe the project -->
+  <name>Master Project</name>
+  <version>1</version>
+  <description>Master project with global settings.</description>
 
-	<!-- Minimum versions to use this POM -->
-	<prerequisites>
-		<maven>2.2.1</maven>
-	</prerequisites>
+  <!-- Minimum versions to use this POM -->
+  <prerequisites>
+    <maven>2.2.1</maven>
+  </prerequisites>
 
-	<!-- Global build settings -->
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.assembly}</version>
-					<extensions>true</extensions>
-					<configuration>
-						<overWriteReleases>false</overWriteReleases>
-						<overWriteSnapshots>true</overWriteSnapshots>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-clean-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.clean}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.compiler}</version>
-					<extensions>true</extensions>
-					<configuration>
-						<source>${java.version.source}</source>
-						<target>${java.version.target}</target>
-						<encoding>${project.build.sourceEncoding}</encoding>
-						<optimize>false</optimize>
-						<debug>true</debug>
-						<showDeprecation>true</showDeprecation>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.dependency}</version>
-					<extensions>true</extensions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.deploy}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ear-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.ear}</version>
-					<configuration>
-						<defaultJavaBundleDir>/</defaultJavaBundleDir>
-						<displayName>${project.name}</displayName>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-							<manifest>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							</manifest>
-						</archive>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-ejb-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.ejb}</version>
-					<configuration>
-						<generateClient>true</generateClient>
-						<ejbVersion>${java.ejb.version}</ejbVersion>
-						<clientExcludes>
-							<clientExclude>META-INF/*.xml</clientExclude>
-							<clientExclude>**/ejb/*Bean.class</clientExclude>
-						</clientExcludes>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-							<manifest>
-								<addClasspath>true</addClasspath>
-								<useUniqueVersions>false</useUniqueVersions>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							</manifest>
-						</archive>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.install}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.jar}</version>
-					<configuration>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-							<manifest>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							</manifest>
-						</archive>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.resources}</version>
-					<configuration>
-						<!-- Workaround for bug reported with MRESOURCES-104 -->
-						<useDefaultDelimiters>false</useDefaultDelimiters>
-						<delimiters>
-							<delimiter>${*}</delimiter>
-						</delimiters>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.source}</version>
-					<executions>
-						<execution>
-							<id>attach-sources</id>
-							<phase>package</phase>
-							<goals>
-								<goal>jar-no-fork</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-							<manifest>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							</manifest>
-						</archive>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${version.org.apache.maven.plugins.surefire}</version>
-					<extensions>true</extensions>
-					<!-- We set a forkMode -->
-					<configuration>
-						<forkMode>once</forkMode>
-						<argLine>-Xms64m -Xmx128m</argLine>
-						<workingDirectory>${basedir}</workingDirectory>
-						<childDelegation>false</childDelegation>
-						<runOrder>random</runOrder>
-						<useFile>false</useFile>
-					</configuration>
-				</plugin>
+  <!-- Global build settings -->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.assembly}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <overWriteReleases>false</overWriteReleases>
+            <overWriteSnapshots>true</overWriteSnapshots>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.clean}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.compiler}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <source>${java.version.source}</source>
+            <target>${java.version.target}</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <optimize>false</optimize>
+            <debug>true</debug>
+            <showDeprecation>true</showDeprecation>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.dependency}</version>
+          <extensions>true</extensions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.deploy}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.ear}</version>
+          <configuration>
+            <defaultJavaBundleDir>/</defaultJavaBundleDir>
+            <displayName>${project.name}</displayName>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.ejb}</version>
+          <configuration>
+            <generateClient>true</generateClient>
+            <ejbVersion>${java.ejb.version}</ejbVersion>
+            <clientExcludes>
+              <clientExclude>META-INF/*.xml</clientExclude>
+              <clientExclude>**/ejb/*Bean.class</clientExclude>
+            </clientExcludes>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+              <manifest>
+                <addClasspath>true</addClasspath>
+                <useUniqueVersions>false</useUniqueVersions>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.install}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.jar}</version>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.resources}</version>
+          <configuration>
+            <!-- Workaround for bug reported with MRESOURCES-104 -->
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+            <delimiters>
+              <delimiter>${*}</delimiter>
+            </delimiters>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.source}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.surefire}</version>
+          <extensions>true</extensions>
+          <!-- We set a forkMode -->
+          <configuration>
+            <forkMode>once</forkMode>
+            <argLine>-Xms64m -Xmx128m</argLine>
+            <workingDirectory>${basedir}</workingDirectory>
+            <childDelegation>false</childDelegation>
+            <runOrder>random</runOrder>
+            <useFile>false</useFile>
+          </configuration>
+        </plugin>
 
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>${version.org.codehaus.mojo.build-helper-plugin}</version>
-					<extensions>true</extensions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${version.org.codehaus.mojo.build-helper-plugin}</version>
+          <extensions>true</extensions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>bugs.maven.issue</groupId>
-				<artifactId>application</artifactId>
-				<version>${version.application}</version>
-			</dependency>
-			<dependency>
-				<groupId>bugs.maven.issue</groupId>
-				<artifactId>delegate</artifactId>
-				<version>${version.delegate}</version>
-			</dependency>
-			<!-- not required for example
-			<dependency>
-				<groupId>bugs.maven.issue</groupId>
-				<artifactId>ejb</artifactId>
-				<version>${version.ejb}</version>
-				<type>ejb</type>
-				<scope>runtime</scope>
-			</dependency>
-			-->
-			<dependency>
-				<groupId>bugs.maven.issue</groupId>
-				<artifactId>ejb</artifactId>
-				<version>${version.ejb}</version>
-				<classifier>client</classifier>
-				<type>ejb-client</type>
-			</dependency>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>bugs.maven.issue</groupId>
+        <artifactId>application</artifactId>
+        <version>${version.application}</version>
+      </dependency>
+      <dependency>
+        <groupId>bugs.maven.issue</groupId>
+        <artifactId>delegate</artifactId>
+        <version>${version.delegate}</version>
+      </dependency>
+      <!-- not required for example
+      <dependency>
+        <groupId>bugs.maven.issue</groupId>
+        <artifactId>ejb</artifactId>
+        <version>${version.ejb}</version>
+        <type>ejb</type>
+        <scope>runtime</scope>
+      </dependency>
+      -->
+      <dependency>
+        <groupId>bugs.maven.issue</groupId>
+        <artifactId>ejb</artifactId>
+        <version>${version.ejb}</version>
+        <classifier>client</classifier>
+        <type>ejb-client</type>
+      </dependency>
 
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>${version.commons-lang}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${version.commons-lang}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-	<!-- Define properties for better consistency -->
-	<properties>
-		<!-- ==== -->
-		<!-- Java -->
-		<!-- === =-->
-		<java.version.source>1.6</java.version.source>
-		<java.version.target>1.6</java.version.target>
-		<java.ejb.version>2.1</java.ejb.version>
+  <!-- Define properties for better consistency -->
+  <properties>
+    <!-- ==== -->
+    <!-- Java -->
+    <!-- === =-->
+    <java.version.source>1.6</java.version.source>
+    <java.version.target>1.6</java.version.target>
+    <java.ejb.version>2.1</java.ejb.version>
 
-		<!-- ======= -->
-		<!-- Plugins -->
-		<!-- ======= -->
-		<version.org.apache.maven.plugins.assembly>2.2.1</version.org.apache.maven.plugins.assembly>
-		<version.org.apache.maven.plugins.clean>2.4.1</version.org.apache.maven.plugins.clean>
-		<version.org.apache.maven.plugins.compiler>2.3.2</version.org.apache.maven.plugins.compiler>
-		<version.org.apache.maven.plugins.dependency>2.3</version.org.apache.maven.plugins.dependency>
-		<version.org.apache.maven.plugins.deploy>2.7</version.org.apache.maven.plugins.deploy>
-		<version.org.apache.maven.plugins.ear>2.6</version.org.apache.maven.plugins.ear>
-		<version.org.apache.maven.plugins.ejb>2.3</version.org.apache.maven.plugins.ejb>
-		<version.org.apache.maven.plugins.install>2.3.1</version.org.apache.maven.plugins.install>
-		<version.org.apache.maven.plugins.jar>2.3.2</version.org.apache.maven.plugins.jar>
-		<version.org.apache.maven.plugins.resources>2.5</version.org.apache.maven.plugins.resources>
-		<version.org.apache.maven.plugins.source>2.1.2</version.org.apache.maven.plugins.source>
-		<version.org.apache.maven.plugins.surefire>2.9</version.org.apache.maven.plugins.surefire>
+    <!-- ======= -->
+    <!-- Plugins -->
+    <!-- ======= -->
+    <version.org.apache.maven.plugins.assembly>2.2.1</version.org.apache.maven.plugins.assembly>
+    <version.org.apache.maven.plugins.clean>2.4.1</version.org.apache.maven.plugins.clean>
+    <version.org.apache.maven.plugins.compiler>2.3.2</version.org.apache.maven.plugins.compiler>
+    <version.org.apache.maven.plugins.dependency>2.3</version.org.apache.maven.plugins.dependency>
+    <version.org.apache.maven.plugins.deploy>2.7</version.org.apache.maven.plugins.deploy>
+    <version.org.apache.maven.plugins.ear>2.6</version.org.apache.maven.plugins.ear>
+    <version.org.apache.maven.plugins.ejb>2.3</version.org.apache.maven.plugins.ejb>
+    <version.org.apache.maven.plugins.install>2.3.1</version.org.apache.maven.plugins.install>
+    <version.org.apache.maven.plugins.jar>2.3.2</version.org.apache.maven.plugins.jar>
+    <version.org.apache.maven.plugins.resources>2.5</version.org.apache.maven.plugins.resources>
+    <version.org.apache.maven.plugins.source>2.1.2</version.org.apache.maven.plugins.source>
+    <version.org.apache.maven.plugins.surefire>2.9</version.org.apache.maven.plugins.surefire>
 
-		<version.org.codehaus.mojo.build-helper-plugin>1.7</version.org.codehaus.mojo.build-helper-plugin>
+    <version.org.codehaus.mojo.build-helper-plugin>1.7</version.org.codehaus.mojo.build-helper-plugin>
 
-		<!-- ============ -->
-		<!-- Dependencies -->
-		<!-- ============ -->
-		<version.application>1-SNAPSHOT</version.application>
-		<version.delegate>1</version.delegate>
-		<version.ejb>1</version.ejb>
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+    <version.application>1-SNAPSHOT</version.application>
+    <version.delegate>1</version.delegate>
+    <version.ejb>1</version.ejb>
 
-		<version.commons-lang>2.4</version.commons-lang>
+    <version.commons-lang>2.4</version.commons-lang>
 
-		<project.build.sourceEncoding>iso-8859-1</project.build.sourceEncoding>
-	</properties>
+    <project.build.sourceEncoding>iso-8859-1</project.build.sourceEncoding>
+  </properties>
 </project>

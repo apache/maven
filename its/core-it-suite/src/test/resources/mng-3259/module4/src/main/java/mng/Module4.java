@@ -10,6 +10,6 @@ import javax.ejb.EJBObject;
  */
 public interface Module4 extends EJBObject
 {
-	public boolean doIt() throws RemoteException;
+    public boolean doIt() throws RemoteException;
 }
 

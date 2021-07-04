@@ -9,28 +9,28 @@ import javax.ejb.SessionContext;
  */
 public class Module4Bean implements SessionBean
 {
-	public void ejbCreate() throws CreateException
-	{
-	}
+    public void ejbCreate() throws CreateException
+    {
+    }
 
-	public void ejbRemove()
-	{
-	}
+    public void ejbRemove()
+    {
+    }
 
-	public void ejbActivate()
-	{
-	}
+    public void ejbActivate()
+    {
+    }
 
-	public void ejbPassivate()
-	{
-	}
+    public void ejbPassivate()
+    {
+    }
 
-	public void setSessionContext(SessionContext sessionContext)
-	{
-	}
+    public void setSessionContext(SessionContext sessionContext)
+    {
+    }
 
-	public boolean doIt()
-	{
-		return true;
-	}
+    public boolean doIt()
+    {
+        return true;
+    }
 }

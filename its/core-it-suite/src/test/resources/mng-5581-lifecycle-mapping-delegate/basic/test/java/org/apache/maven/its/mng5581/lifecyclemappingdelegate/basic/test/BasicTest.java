@@ -24,10 +24,11 @@ import org.apache.maven.its.mng5581.lifecyclemappingdelegate.basic.BasicClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ModuleBTest {
-
-	@Test
-	public void testBasic() {
-		Assert.assertNotNull(new BasicClass().toString());
-	}
+public class ModuleBTest
+{
+    @Test
+    public void testBasic()
+    {
+        Assert.assertNotNull(new BasicClass().toString());
+    }
 }

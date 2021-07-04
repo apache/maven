@@ -30,24 +30,24 @@ import org.apache.maven.project.MavenProject;
 public class MyMojo
     extends AbstractMojo
 {
-	
-	/**
-	 * Not used, just an offset to place reactorProjects in the middle.
-	 * @parameter default-value="${project.build.directory}"
-	 */
-	private String outputDirectory;
-	
+
+    /**
+     * Not used, just an offset to place reactorProjects in the middle.
+     * @parameter default-value="${project.build.directory}"
+     */
+    private String outputDirectory;
+
     /**
      * @parameter expression="${reactorProjects}"
      * @required
      */
     private List reactorProjects;
 
-	/**
-	 * Not used, just an offset to place reactorProjects in the middle.
-	 * @parameter default-value="${project.build.directory}"
-	 */
-	private String outputDirectory2;
+    /**
+     * Not used, just an offset to place reactorProjects in the middle.
+     * @parameter default-value="${project.build.directory}"
+     */
+    private String outputDirectory2;
 
     public void execute()
         throws MojoExecutionException

@@ -11,6 +11,6 @@ public class Diamond
 {
     public static void main( String[] args )
     {
-	    List<String> stuff = new ArrayList<>();
+        List<String> stuff = new ArrayList<>();
     }
 }

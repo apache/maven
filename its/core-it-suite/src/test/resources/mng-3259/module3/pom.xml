@@ -4,12 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-	    <groupId>org.codehaus.jira.mng.XXX</groupId>
-    	<artifactId>parent</artifactId>
-	    <version>1-SNAPSHOT</version>
-	</parent>	
-	
+  <parent>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>parent</artifactId>
+      <version>1-SNAPSHOT</version>
+  </parent>  
+  
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codehaus.jira.mng.XXX</groupId>
     <artifactId>mng-module3-XXX</artifactId>
@@ -18,32 +18,32 @@
     <name>Module-3 XXX</name>
     <description><![CDATA[Module 3 of issue XXX.]]></description>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-    <dependencies>
-        <dependency>
-   	        <groupId>org.codehaus.jira.mng.XXX</groupId>
-       	    <artifactId>mng-module2-XXX</artifactId>
-        </dependency>
-		<!-- for test -->
-        <dependency>
-   	        <groupId>org.codehaus.jira.mng.XXX</groupId>
-       	    <artifactId>mng-module1-XXX</artifactId>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module2-XXX</artifactId>
+    </dependency>
+    <!-- for test -->
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module1-XXX</artifactId>
+    </dependency>
+  </dependencies>
 
 </project>

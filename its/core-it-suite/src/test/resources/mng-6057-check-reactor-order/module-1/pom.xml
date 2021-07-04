@@ -22,11 +22,11 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>mng-6057-check-reactor-order</groupId>
-		<artifactId>base-project</artifactId>
-		<version>${revision}</version>
-	</parent>
+  <parent>
+    <groupId>mng-6057-check-reactor-order</groupId>
+    <artifactId>base-project</artifactId>
+    <version>${revision}</version>
+  </parent>
 
   <artifactId>module-1</artifactId>
   <packaging>pom</packaging>

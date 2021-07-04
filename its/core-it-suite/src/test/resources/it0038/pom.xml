@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: it0038</name>
   <description>
-  	Test building project from outside the project directory using '-f' option
+    Test building project from outside the project directory using '-f' option
   </description>
 
   <build>

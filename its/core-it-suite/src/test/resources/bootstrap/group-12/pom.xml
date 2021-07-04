@@ -66,17 +66,17 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
-	  <artifactId>maven-common-artifact-filters</artifactId>
+      <artifactId>maven-common-artifact-filters</artifactId>
       <version>3.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
-	  <artifactId>maven-artifact-transfer</artifactId>
+      <artifactId>maven-artifact-transfer</artifactId>
       <version>0.11.0</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
-	  <artifactId>asm</artifactId>
+      <artifactId>asm</artifactId>
       <version>7.2</version>
     </dependency>
   </dependencies>

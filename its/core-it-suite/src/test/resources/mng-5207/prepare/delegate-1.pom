@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>bugs.maven.issue</groupId>
-        <artifactId>master</artifactId>
-        <version>1</version>
-    </parent>
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>bugs.maven.issue</groupId>
+    <artifactId>master</artifactId>
+    <version>1</version>
+  </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-	<artifactId>delegate</artifactId>
-	<version>1</version>
-    <packaging>jar</packaging>
-    <name>Issue EJB Delegate</name>
-    <description><![CDATA[Demonstration of issue with EJB delegate.]]></description>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>delegate</artifactId>
+  <version>1</version>
+  <packaging>jar</packaging>
+  <name>Issue EJB Delegate</name>
+  <description><![CDATA[Demonstration of issue with EJB delegate.]]></description>
 
-    <dependencies>
-        <dependency>
-            <groupId>bugs.maven.issue</groupId>
-			<artifactId>ejb</artifactId>
-			<classifier>client</classifier>
-			<type>ejb-client</type>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>bugs.maven.issue</groupId>
+      <artifactId>ejb</artifactId>
+      <classifier>client</classifier>
+      <type>ejb-client</type>
+    </dependency>
+  </dependencies>
 
 </project>

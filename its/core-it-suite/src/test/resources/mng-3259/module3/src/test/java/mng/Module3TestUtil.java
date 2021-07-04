@@ -6,9 +6,9 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class Module3TestUtil
 {
-	public static String getCalendarAsXML(Calendar cal)
-	{
-		XStream xstream = new XStream(new DomDriver());
-		return xstream.toXML(cal);
-	}
+    public static String getCalendarAsXML(Calendar cal)
+    {
+        XStream xstream = new XStream(new DomDriver());
+        return xstream.toXML(cal);
+    }
 }

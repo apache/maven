@@ -24,8 +24,8 @@ under the License.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-  	<groupId>org.sonatype.mavenbook.multi</groupId>
-  	<artifactId>parent</artifactId>
+    <groupId>org.sonatype.mavenbook.multi</groupId>
+    <artifactId>parent</artifactId>
   </parent>
   <artifactId>simple-parent</artifactId>
   <packaging>pom</packaging>

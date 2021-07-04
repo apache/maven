@@ -18,9 +18,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.apache.maven.its.mng3693</groupId>
-    	<artifactId>dep</artifactId>
-    	<version>1</version>
+      <groupId>org.apache.maven.its.mng3693</groupId>
+      <artifactId>dep</artifactId>
+      <version>1</version>
     </dependency>
   </dependencies>
 </project>

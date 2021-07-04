@@ -21,19 +21,19 @@
         </executions>
       </plugin>
       <plugin>
-      	 <groupId>org.apache.maven.plugins</groupId>
-      	 <artifactId>maven-verifier-plugin</artifactId>
-      	 <configuration>
-      	   <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
-      	 </configuration>
-      	 <executions>
-      	   <execution>
-      	     <phase>verify</phase>
-      	     <goals>
-      	       <goal>verify</goal>
-      	     </goals>
-      	   </execution>
-      	 </executions>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-verifier-plugin</artifactId>
+         <configuration>
+           <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
+         </configuration>
+         <executions>
+           <execution>
+             <phase>verify</phase>
+             <goals>
+               <goal>verify</goal>
+             </goals>
+           </execution>
+         </executions>
       </plugin>
     </plugins>
   </build>

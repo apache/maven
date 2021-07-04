@@ -4,17 +4,20 @@ import java.util.Calendar;
 
 public class Module5Test extends XStreamTestCase
 {
-	private Calendar cal = Calendar.getInstance();
+    private Calendar cal = Calendar.getInstance();
 
-	protected Object getObject() {
-		return cal;
-	}
+    protected Object getObject()
+    {
+        return cal;
+    }
 
-	protected String getXML() {
-		return Module3TestUtil.getCalendarAsXML(cal);
-	}
+    protected String getXML()
+    {
+        return Module3TestUtil.getCalendarAsXML( cal );
+    }
 
-	public void testJMockAvailable() {
-		assertNotNull(mock(Module4.class));
-	}
+    public void testJMockAvailable()
+    {
+        assertNotNull( mock( Module4.class ) );
+    }
 }

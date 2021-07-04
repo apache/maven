@@ -6,6 +6,6 @@
   <version>1</version>
   <packaging>pom</packaging>
   <modules>
-  	<module>child</module>
+    <module>child</module>
   </modules>
 </project>

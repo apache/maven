@@ -36,7 +36,7 @@ under the License.
   </distributionManagement>
   <build>
     <plugins>
-	  <plugin>
+      <plugin>
         <groupId>org.apache.maven.its.mng6240</groupId>
         <artifactId>plugin-extension</artifactId>
         <version>1.0</version>

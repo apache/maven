@@ -86,10 +86,10 @@ public class MavenITmng3642DynamicResourcesTest
          */
         verifier.resetStreams();
 
-		File first = new File( testDir, "target/test-classes/one.txt" );
-		assertTrue( "First resource file was not present: " + first, first.exists() );
-		
-		File second = new File( testDir, "target/test-classes/two.txt" );
-		assertTrue( "Second resource file was not present: " + second, second.exists() );
+        File first = new File( testDir, "target/test-classes/one.txt" );
+        assertTrue( "First resource file was not present: " + first, first.exists() );
+
+        File second = new File( testDir, "target/test-classes/two.txt" );
+        assertTrue( "Second resource file was not present: " + second, second.exists() );
     }
 }
