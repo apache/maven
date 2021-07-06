@@ -33,10 +33,6 @@ under the License.
   <name>Maven Model</name>
   <description>Model for Maven POM (Project Object Model)</description>
 
-  <properties>
-    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

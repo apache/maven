@@ -76,8 +76,6 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
-    <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2021-04-05T08:12:18Z</project.build.outputTimestamp>
   </properties>
 
@@ -591,6 +589,8 @@ under the License.
               <!--
                 ! Excluded the license files itself cause they do not have have a license of themselves.
               -->
+              <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/MIT-jsoup-1.12.1.txt</exclude>
               <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
@@ -672,6 +672,27 @@ under the License.
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <violationSeverity>info</violationSeverity>
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.41.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-shared-resources</artifactId>
+            <version>3</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
