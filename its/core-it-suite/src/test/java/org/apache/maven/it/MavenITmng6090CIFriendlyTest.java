@@ -85,6 +85,7 @@ public class MavenITmng6090CIFriendlyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
+        verifier.setForkJvm(true);
 
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
@@ -96,6 +97,7 @@ public class MavenITmng6090CIFriendlyTest
         verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
+        verifier.setForkJvm(true);
 
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-pl module-3" );
