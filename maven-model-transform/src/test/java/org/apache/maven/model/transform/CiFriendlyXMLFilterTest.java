@@ -19,32 +19,18 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.junit.jupiter.api.BeforeEach;
 
-import org.xml.sax.SAXException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests
 {
-    private CiFriendlyXMLFilter filter;
-
-    @BeforeEach
-    public void setUp()
-    {
-        filter = new CiFriendlyXMLFilter( true );
-        filter.setChangelist( "CHANGELIST" );
-    }
-
     @Override
-    protected AbstractSAXFilter getFilter()
-        throws TransformerException, SAXException, ParserConfigurationException
-    {
+    protected CiFriendlyXMLFilter getFilter(XmlPullParser parser) {
+
+        CiFriendlyXMLFilter filter = new CiFriendlyXMLFilter( parser, true );
+        filter.setChangelist( "CHANGELIST" );
         return filter;
     }
 

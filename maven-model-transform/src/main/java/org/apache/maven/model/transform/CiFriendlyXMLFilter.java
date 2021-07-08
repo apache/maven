@@ -19,37 +19,29 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.util.List;
 import java.util.function.Function;
 
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.apache.maven.model.transform.pull.NodeBufferingParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Resolves all ci-friendly properties occurrences between version-tags
  *
  * @author Robert Scholte
+ * @author Guillaume Nodet
  * @since 4.0.0
  */
 class CiFriendlyXMLFilter
-    extends AbstractSAXFilter
+    extends NodeBufferingParser
 {
     private final boolean replace;
 
     private Function<String, String> replaceChain = Function.identity();
 
-    private String characters;
-
-    private boolean parseVersion;
-
-    CiFriendlyXMLFilter( boolean replace )
+    CiFriendlyXMLFilter( XmlPullParser xmlPullParser, boolean replace )
     {
-        this.replace = replace;
-    }
-
-    CiFriendlyXMLFilter( AbstractSAXFilter parent, boolean replace )
-    {
-        super( parent );
+        super( xmlPullParser, "version" );
         this.replace = replace;
     }
 
@@ -80,52 +72,16 @@ class CiFriendlyXMLFilter
     }
 
     @Override
-    public void characters( char[] ch, int start, int length )
-        throws SAXException
+    protected void process( List<Event> buffer )
     {
-        if ( parseVersion )
+        for ( Event event : buffer )
         {
-            this.characters = nullSafeAppend( characters, new String( ch, start, length ) );
-        }
-        else
-        {
-            super.characters( ch, start, length );
-        }
-    }
-
-    @Override
-    public void startElement( String uri, String localName, String qName, Attributes atts )
-        throws SAXException
-    {
-        if ( !parseVersion && "version".equals( localName ) )
-        {
-            parseVersion = true;
-        }
-
-        super.startElement( uri, localName, qName, atts );
-    }
-
-    @Override
-    public void endElement( String uri, String localName, String qName )
-        throws SAXException
-    {
-        if ( parseVersion )
-        {
-            // assuming this has the best performance
-            if ( replace && characters != null && characters.contains( "${" ) )
+            if ( event.event == TEXT && replace && event.text.contains( "${" ) )
             {
-                char[] ch = replaceChain.apply( characters ).toCharArray();
-                super.characters( ch, 0, ch.length );
+                event.text = replaceChain.apply( event.text );
             }
-            else
-            {
-                char[] ch = characters.toCharArray();
-                super.characters( ch, 0, ch.length );
-            }
-            characters = null;
-            parseVersion = false;
+            pushEvent( event );
         }
-
-        super.endElement( uri, localName, qName );
     }
+
 }

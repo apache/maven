@@ -22,14 +22,13 @@ package org.apache.maven.model.transform;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.maven.model.transform.sax.SAXEventUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.apache.maven.model.transform.pull.NodeBufferingParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * <p>
@@ -40,167 +39,117 @@ import org.xml.sax.SAXException;
  * </p>
  *
  * @author Robert Scholte
+ * @author Guillaume Nodet
  * @since 4.0.0
  */
 class ParentXMLFilter
-    extends AbstractEventXMLFilter
+    extends NodeBufferingParser
 {
-    private boolean parsingParent;
-
-    // states
-    private String state;
-
-    // whiteSpace after <parent>, to be used to position <version>
-    private String parentWhitespace = "";
-
-    private String groupId;
-
-    private String artifactId;
-
-    private String relativePath;
-
-    private boolean hasVersion;
-
-    private boolean hasRelativePath;
-
-    private Optional<RelativeProject> resolvedParent;
 
     private final Function<Path, Optional<RelativeProject>> relativePathMapper;
 
-    private Path projectPath;
+    private final Path projectPath;
 
     /**
      * @param relativePathMapper
      */
-    ParentXMLFilter( Function<Path, Optional<RelativeProject>> relativePathMapper )
+    ParentXMLFilter( XmlPullParser parser,
+                     Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath )
     {
+        super( parser, "parent" );
         this.relativePathMapper = relativePathMapper;
-    }
-
-    public void setProjectPath( Path projectPath )
-    {
         this.projectPath = projectPath;
     }
 
-    @Override
-    protected boolean isParsing()
+    protected void process( List<Event> buffer )
     {
-        return parsingParent;
-    }
-
-    @Override
-    protected String getState()
-    {
-        return state;
-    }
-
-    @Override
-    public void startElement( String uri, final String localName, String qName, Attributes atts )
-        throws SAXException
-    {
-        if ( !parsingParent && "parent".equals( localName ) )
+        String tagName = null;
+        String groupId = null;
+        String artifactId = null;
+        String version = null;
+        String relativePath = null;
+        String whitespaceAfterParentStart = "";
+        boolean hasVersion = false;
+        boolean hasRelativePath = false;
+        for ( int i = 0; i < buffer.size(); i++ )
         {
-            parsingParent = true;
-        }
-
-        if ( parsingParent )
-        {
-            state = localName;
-
-            hasVersion |= "version".equals( localName );
-
-            // can be set to empty on purpose to enforce repository download
-            hasRelativePath |= "relativePath".equals( localName );
-        }
-
-        super.startElement( uri, localName, qName, atts );
-    }
-
-    @Override
-    public void characters( char[] ch, int start, int length )
-        throws SAXException
-    {
-        if ( parsingParent )
-        {
-            final String eventState = state;
-
-            final String charSegment =  new String( ch, start, length );
-
-            switch ( eventState )
+            Event event = buffer.get( i );
+            if ( event.event == START_TAG )
             {
-                case "parent":
-                    parentWhitespace = nullSafeAppend( parentWhitespace, charSegment );
-                    break;
-                case "relativePath":
-                    relativePath = nullSafeAppend( relativePath, charSegment );
-                    break;
-                case "groupId":
-                    groupId = nullSafeAppend( groupId, charSegment );
-                    break;
-                case "artifactId":
-                    artifactId = nullSafeAppend( artifactId, charSegment );
-                    break;
-                default:
-                    break;
+                tagName = event.name;
+                hasVersion |= "version".equals( tagName );
+                hasRelativePath |= "relativePath".equals( tagName );
+            }
+            else if ( event.event == TEXT )
+            {
+                if ( event.text.matches( "\\s+" ) )
+                {
+                    if ( whitespaceAfterParentStart.isEmpty() )
+                    {
+                        whitespaceAfterParentStart = event.text;
+                    }
+                }
+                else if ( "groupId".equals( tagName ) )
+                {
+                    groupId = nullSafeAppend( groupId, event.text );
+                }
+                else if ( "artifactId".equals( tagName ) )
+                {
+                    artifactId = nullSafeAppend( artifactId, event.text );
+                }
+                else if ( "relativePath".equals( tagName ) )
+                {
+                    relativePath = nullSafeAppend( relativePath, event.text );
+                }
+                else if ( "version".equals( tagName ) )
+                {
+                    version = nullSafeAppend( version, event.text );
+                }
+            }
+            else if ( event.event == END_TAG && "parent".equals( event.name ) )
+            {
+                Optional<RelativeProject> resolvedParent;
+                if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
+                {
+                    Path relPath = Paths.get( Objects.toString( relativePath, "../pom.xml" ) );
+                    resolvedParent = resolveRelativePath( relPath, groupId, artifactId );
+                }
+                else
+                {
+                    resolvedParent = Optional.empty();
+                }
+                if ( !hasVersion && resolvedParent.isPresent() )
+                {
+                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
+                    Event e = new Event();
+                    e.event = TEXT;
+                    e.text = whitespaceAfterParentStart;
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = START_TAG;
+                    e.namespace = buffer.get( 0 ).namespace;
+                    e.prefix = buffer.get( 0 ).prefix;
+                    e.name = "version";
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = TEXT;
+                    e.text = resolvedParent.get().getVersion();
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = END_TAG;
+                    e.name = "version";
+                    e.namespace = buffer.get( 0 ).namespace;
+                    e.prefix = buffer.get( 0 ).prefix;
+                    buffer.add( pos++, e );
+                }
+                break;
             }
         }
+        buffer.forEach( this::pushEvent );
+   }
 
-        super.characters( ch, start, length );
-    }
 
-    @Override
-    public void endElement( String uri, final String localName, String qName )
-        throws SAXException
-    {
-        if ( parsingParent )
-        {
-            switch ( localName )
-            {
-                case "parent":
-                    if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
-                    {
-                        resolvedParent =
-                            resolveRelativePath( Paths.get( Objects.toString( relativePath, "../pom.xml" ) ) );
-                    }
-                    else
-                    {
-                        resolvedParent = Optional.empty();
-                    }
-
-                    if ( !hasVersion && resolvedParent.isPresent() )
-                    {
-                        try ( Includer i = super.include() )
-                        {
-                            super.characters( parentWhitespace.toCharArray(), 0,
-                                              parentWhitespace.length() );
-
-                            String versionQName = SAXEventUtils.renameQName( qName, "version" );
-
-                            super.startElement( uri, "version", versionQName, null );
-
-                            String resolvedParentVersion = resolvedParent.get().getVersion();
-
-                            super.characters( resolvedParentVersion.toCharArray(), 0,
-                                                          resolvedParentVersion.length() );
-
-                            super.endElement( uri, "version", versionQName );
-                        }
-                    }
-                    super.executeEvents();
-
-                    parsingParent = false;
-                    break;
-                default:
-                    // marker?
-                    break;
-            }
-        }
-
-        super.endElement( uri, localName, qName );
-        state = "";
-    }
-
-    protected Optional<RelativeProject> resolveRelativePath( Path relativePath )
+    protected Optional<RelativeProject> resolveRelativePath( Path relativePath, String groupId, String artifactId )
     {
         Path pomPath = projectPath.resolve( relativePath );
         if ( Files.isDirectory( pomPath ) )
@@ -222,4 +171,5 @@ class ParentXMLFilter
         }
         return Optional.empty();
     }
+
 }

@@ -19,27 +19,29 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
+import java.util.function.BiFunction;
 
-import java.util.function.Consumer;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
+
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class ReactorDependencyXMLFilterTest
     extends AbstractXMLFilterTests
 {
+    private BiFunction<String, String, String> reactorVersionMapper;
+
+    @BeforeEach
+    protected void reset() {
+        reactorVersionMapper = null;
+    }
+
     @Override
-    protected ReactorDependencyXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
-        throws TransformerException, SAXException, ParserConfigurationException
+    protected ReactorDependencyXMLFilter getFilter(XmlPullParser parser)
     {
-        ReactorDependencyXMLFilter filter = new ReactorDependencyXMLFilter( (g, a) -> "1.0.0" );
-        lexicalHandlerConsumer.accept( filter );
-        return filter;
+        return new ReactorDependencyXMLFilter( parser,
+                reactorVersionMapper != null ? reactorVersionMapper : (g, a) -> "1.0.0" );
     }
 
     @Test
@@ -62,7 +64,7 @@ public class ReactorDependencyXMLFilterTest
     public void testManagedDependency()
         throws Exception
     {
-        ReactorDependencyXMLFilter filter = new ReactorDependencyXMLFilter( (g, a) -> null );
+        reactorVersionMapper = (g, a) -> null;
 
         String input = "<dependency>"
             + "<groupId>GROUPID</groupId>"
@@ -70,7 +72,7 @@ public class ReactorDependencyXMLFilterTest
             + "</dependency>";
         String expected = input;
 
-        String actual = transform( input, filter );
+        String actual = transform( input );
 
         assertThat( actual ).isEqualTo( expected );
     }

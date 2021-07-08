@@ -19,24 +19,14 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
-import org.apache.maven.model.transform.BuildToRawPomXMLFilterListener;
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.eclipse.sisu.Nullable;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * ModelSourceTransformer for the build pom
@@ -46,44 +36,15 @@ import org.xml.sax.ext.LexicalHandler;
  */
 @Named
 @Singleton
-class BuildModelSourceTransformer extends AbstractModelSourceTransformer
+class BuildModelSourceTransformer implements ModelSourceTransformer
 {
-    @Inject
-    @Nullable
-    private BuildToRawPomXMLFilterListener xmlFilterListener;
-
-    protected AbstractSAXFilter getSAXFilter( Path pomFile,
-                                              TransformerContext context,
-                                              Consumer<LexicalHandler> lexicalHandlerConsumer )
-        throws TransformerConfigurationException, SAXException, ParserConfigurationException
+    @Override
+    public XmlPullParser transform( XmlPullParser parser, Path pomFile, TransformerContext context )
+            throws IOException, TransformerException
     {
         BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory =
-            new DefaultBuildPomXMLFilterFactory( context, lexicalHandlerConsumer, false );
+                new DefaultBuildPomXMLFilterFactory( context, false );
 
-        return buildPomXMLFilterFactory.get( pomFile );
-    }
-
-    @Override
-    protected OutputStream filterOutputStream( OutputStream outputStream, Path pomFile )
-    {
-        OutputStream out;
-        if ( xmlFilterListener != null )
-        {
-            out = new FilterOutputStream( outputStream )
-            {
-                @Override
-                public void write( byte[] b, int off, int len )
-                    throws IOException
-                {
-                    super.write( b, off, len );
-                    xmlFilterListener.write( pomFile, b, off, len );
-                }
-            };
-        }
-        else
-        {
-            out = outputStream;
-        }
-        return out;
+        return buildPomXMLFilterFactory.get( parser, pomFile );
     }
 }
