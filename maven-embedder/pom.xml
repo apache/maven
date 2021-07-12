@@ -104,6 +104,10 @@ under the License.
            <groupId>org.codehaus.mojo</groupId>
            <artifactId>animal-sniffer-annotations</artifactId>
          </exclusion>
+         <exclusion>
+           <groupId>org.checkerframework</groupId>
+           <artifactId>checker-qual</artifactId>
+         </exclusion>
        </exclusions>
      </dependency>
     <dependency>
