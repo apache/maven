@@ -195,8 +195,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -T 3} option can be overwritten via command line
      * argument.
@@ -221,8 +223,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
@@ -249,8 +253,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
@@ -277,8 +283,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line argument when there are
      * funky arguments present.
@@ -300,11 +308,14 @@ public class MavenCliTest
         cli.cli( request );
         cli.properties( request );
 
+        assertEquals( "3", request.commandLine.getOptionValue( CLIManager.THREADS ) );
+
         String revision = System.getProperty( "revision" );
         assertEquals( "8.2.0", revision );
 
         assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
         assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
+        assertEquals( "Apache Maven", request.getSystemProperties().getProperty( "label" ) );
 
         assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
     }
