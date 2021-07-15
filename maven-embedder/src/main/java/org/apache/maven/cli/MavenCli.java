@@ -104,6 +104,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -387,7 +388,7 @@ public class MavenCli
 
             if ( configFile.isFile() )
             {
-                for ( String arg : new String( Files.readAllBytes( configFile.toPath() ) ).split( "\\s+" ) )
+                for ( String arg : Files.readAllLines( configFile.toPath(), Charset.defaultCharset() ) )
                 {
                     if ( !arg.isEmpty() )
                     {
