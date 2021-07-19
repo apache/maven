@@ -41,10 +41,10 @@ fi
 
 # OS specific support. $var _must_ be set to either true or false.
 cygwin=false;
-mingw=false
+mingw=false;
 darwin=false;
 case "`uname`" in
-  CYGWIN*) cygwin=true ;;
+  CYGWIN*) cygwin=true;;
   MINGW*) mingw=true;;
   Darwin*) darwin=true
     # Use /usr/libexec/java_home if available, otherwise fall back to /Library/Java/Home
