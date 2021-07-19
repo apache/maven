@@ -2,8 +2,6 @@
 
 :init
 
-set MAVEN_CMD_LINE_ARGS=%*
-
 @REM Find the project basedir, i.e., the directory that contains the directory ".mvn".
 @REM Fallback to current working directory if not found.
 
