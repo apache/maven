@@ -5,7 +5,7 @@
   -classpath %LAUNCHER_JAR% ^
   %MAVENHOME_CONFIG% ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  %MAVEN_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+  %MAVEN_LAUNCHER% %*
 if ERRORLEVEL 1 goto error
 goto end
 
