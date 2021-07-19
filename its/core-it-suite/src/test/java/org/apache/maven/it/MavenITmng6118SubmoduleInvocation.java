@@ -49,9 +49,6 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         super( "[4.0.0-alpha-1,)" );
         testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_PATH );
-        // It seems MAVEN_BASEDIR isn't always properly set, so make sure to have the right value here
-        // as it is determined by the mvn script.
-        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
     }
 
     /**

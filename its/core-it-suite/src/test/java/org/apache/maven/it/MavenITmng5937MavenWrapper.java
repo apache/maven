@@ -113,8 +113,6 @@ public class MavenITmng5937MavenWrapper
 
         unpack( testDir.toPath(), "bin" );
 
-        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
-
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setDebug( true );
@@ -130,8 +128,6 @@ public class MavenITmng5937MavenWrapper
 
         unpack( testDir.toPath(), "script" );
 
-        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
-
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setDebug( true );
@@ -146,8 +142,6 @@ public class MavenITmng5937MavenWrapper
         final File testDir = baseDir.resolve( "source" ).toFile();
 
         unpack( testDir.toPath(), "source" );
-
-        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -178,7 +172,6 @@ public class MavenITmng5937MavenWrapper
         }
 
         envVars.remove( "MVNW_REPOURL" );
-        envVars.put( "MAVEN_BASEDIR", testDir.getAbsolutePath() );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
