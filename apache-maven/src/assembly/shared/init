@@ -114,7 +114,7 @@ concat_lines() {
   fi
 }
 
-MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir "$@"`}"
+MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"
 
 # For Cygwin, switch project base directory path to Windows format before
