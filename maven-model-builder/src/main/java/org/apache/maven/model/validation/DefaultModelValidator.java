@@ -70,7 +70,7 @@ public class DefaultModelValidator
     implements ModelValidator
 {
 
-    private static final Pattern EXPRESSION_NAME = Pattern.compile( "\\$\\{(.+?)\\}" );
+    private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile( "\\$\\{(.+?)\\}" );
 
     private static final List<String> CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES =
         Arrays.asList( AbstractStringBasedModelInterpolator.REVISION_PROPERTY,
@@ -772,7 +772,7 @@ public class DefaultModelValidator
                                          Version.V20, repository.getUrl(), null, repository ) )
             {
                 // only allow ${basedir} and ${project.basedir}
-                Matcher m = EXPRESSION_NAME.matcher( repository.getUrl() );
+                Matcher m = EXPRESSION_NAME_PATTERN.matcher( repository.getUrl() );
                 while ( m.find() )
                 {
                     if ( !( "basedir".equals( m.group( 1 ) ) || "project.basedir".equals( m.group( 1 ) ) ) )
@@ -1005,7 +1005,7 @@ public class DefaultModelValidator
         // revision
         // sha1
         //
-        Matcher m = EXPRESSION_NAME.matcher( string.trim() );
+        Matcher m = EXPRESSION_NAME_PATTERN.matcher( string.trim() );
         while ( m.find() )
         {
             if ( !CI_FRIENDLY_POSSIBLE_PROPERTY_NAMES.contains( m.group( 1 ) ) )
