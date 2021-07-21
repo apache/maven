@@ -11,7 +11,7 @@
     <repositories>
         <repository>
             <id>customRepo</id>
-            <url>${custom.repo.uri}</url>
+            <url>file:///${basedir}/../dependency-in-custom-repo/target/repo</url>
         </repository>
     </repositories>
 
