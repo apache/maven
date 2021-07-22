@@ -19,6 +19,8 @@ package org.apache.maven.feature;
  * under the License.
  */
 
+import java.util.Properties;
+
 /**
  * Centralized class for feature information
  *
@@ -31,11 +33,9 @@ public final class Features
     {
     }
 
-    private static final Feature BUILDCONSUMER = new Feature( "maven.experimental.buildconsumer", "true" );
-
-    public static Feature buildConsumer()
+    public static Feature buildConsumer( Properties userProperties )
     {
-        return BUILDCONSUMER;
+        return new Feature( userProperties, "maven.experimental.buildconsumer", "true" );
     }
 
     /**
@@ -50,10 +50,10 @@ public final class Features
 
         private final String name;
 
-        Feature( String name, String defaultValue )
+        Feature( Properties userProperties, String name, String defaultValue )
         {
             this.name = name;
-            this.active = "true".equals( System.getProperty( name, defaultValue ) );
+            this.active = "true".equals( userProperties.getProperty( name, defaultValue ) );
         }
 
         public boolean isActive()

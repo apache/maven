@@ -790,7 +790,8 @@ public class DefaultModelBuilder
         }
 
         Model rawModel;
-        if ( Features.buildConsumer().isActive() && modelSource instanceof FileModelSource )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive()
+            && modelSource instanceof FileModelSource )
         {
             rawModel = readFileModel( request, problems );
             File pomFile = ( (FileModelSource) modelSource ).getFile();

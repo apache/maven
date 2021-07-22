@@ -249,7 +249,7 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
-        if ( Features.buildConsumer().isActive() )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
         {
             session.setFileTransformerManager( a -> getTransformersForArtifact( a, session.getData() ) );
         }

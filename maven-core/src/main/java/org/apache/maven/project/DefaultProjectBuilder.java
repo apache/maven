@@ -400,7 +400,7 @@ public class DefaultProjectBuilder
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
 
-        if ( Features.buildConsumer().isActive() )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
         {
             request.getRepositorySession().getData().set( TransformerContext.KEY,
                                                           config.transformerContextBuilder.build() );

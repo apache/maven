@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,8 @@ public class BuilderCommon
         // With Maven 4's build/consumer the POM will always rewrite during distribution.
         // The maven-gpg-plugin uses the original POM, causing an invalid signature.
         // Fail as long as there's no solution available yet
-        if ( Features.buildConsumer().isActive() )
+        Properties userProperties = session.getUserProperties();
+        if ( Features.buildConsumer( userProperties ).isActive() )
         {
             Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
                             .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() )
@@ -120,7 +122,7 @@ public class BuilderCommon
             {
                 throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
                     + " Verify if there is a compatible signing solution,"
-                    + " add -D" + Features.buildConsumer().propertyName() + "=false"
+                    + " add -D" + Features.buildConsumer( userProperties ).propertyName() + "=false"
                     + " or use Maven 3." );
             }
         }
