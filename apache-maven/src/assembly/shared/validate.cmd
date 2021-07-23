@@ -61,3 +61,6 @@ if not exist "%JAVACMD%" (
   goto error
 )
 
+if "%JAVA_HOME%"=="" (
+  echo Warning: JAVA_HOME environment variable is not set. >&2
+)
