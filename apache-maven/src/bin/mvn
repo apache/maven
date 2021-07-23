@@ -100,9 +100,8 @@ else
 fi
 
 if [ ! -x "$JAVACMD" ] ; then
-  echo "The JAVA_HOME environment variable is not defined correctly" >&2
-  echo "This environment variable is needed to run this program" >&2
-  echo "NB: JAVA_HOME should point to a JDK not a JRE" >&2
+  echo "The JAVA_HOME environment variable is not defined correctly," >&2
+  echo "this environment variable is needed to run this program." >&2
   exit 1
 fi
 
