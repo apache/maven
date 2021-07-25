@@ -20,7 +20,7 @@
 @REM
 @REM Environment Variable Prerequisites
 @REM
-@REM   JAVA_HOME          Must point at your Java Development Kit installation.
+@REM   JAVA_HOME         (Optional) Points to a Java installation.
 @REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
 @REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
 @REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
@@ -46,20 +46,21 @@ if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
 set ERROR_CODE=0
 
 @REM ==== START VALIDATION ====
-if not "%JAVA_HOME%"=="" goto OkJHome
+if not "%JAVA_HOME%"=="" goto javaHomeSet
 for %%i in (java.exe) do set "JAVACMD=%%~$PATH:i"
-goto checkJCmd
+goto checkJavaCmd
 
-:OkJHome
+:javaHomeSet
 set "JAVACMD=%JAVA_HOME%\bin\java.exe"
 
-:checkJCmd
 if not exist "%JAVACMD%" (
-  echo The JAVA_HOME environment variable is not defined correctly, >&2
-  echo this environment variable is needed to run this program. >&2
+  echo The JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started. >&2
+  echo JAVA_HOME is set to "%JAVA_HOME%", but "%%JAVA_HOME%%\bin\java.exe" does not exist. >&2
   goto error
 )
 
-if "%JAVA_HOME%"=="" (
-  echo Warning: JAVA_HOME environment variable is not set. >&2
+:checkJavaCmd
+if not exist "%JAVACMD%" (
+  echo The java.exe command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started. >&2
+  goto error
 )
