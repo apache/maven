@@ -20,7 +20,7 @@
 @REM
 @REM Environment Variable Prerequisites
 @REM
-@REM   JAVA_HOME           Must point at your Java Development Kit installation.
+@REM   JAVA_HOME           (Optional) Points to a Java installation.
 @REM   MAVEN_BATCH_ECHO    (Optional) Set to 'on' to enable the echoing of the batch commands.
 @REM   MAVEN_BATCH_PAUSE   (Optional) set to 'on' to wait for a key stroke before ending.
 @REM   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
@@ -37,7 +37,7 @@ title %0
 
 @setlocal
 
-IF "%MAVEN_DEBUG_ADDRESS%"=="" @set MAVEN_DEBUG_ADDRESS=localhost:8000
+if "%MAVEN_DEBUG_ADDRESS%"=="" @set MAVEN_DEBUG_ADDRESS=localhost:8000
 
 @set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
 
