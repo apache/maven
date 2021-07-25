@@ -37,8 +37,22 @@ title %0
 
 @setlocal
 
-if "%MAVEN_DEBUG_ADDRESS%"=="" @set MAVEN_DEBUG_ADDRESS=localhost:8000
+for %%a in (%*) do (
+  if "%%a" == "-v" goto runMvnCmd
+  if "%%a" == "--version" goto runMvnCmd
+  if "%%a" == "-h" goto runMvnCmd
+  if "%%a" == "--help" goto runMvnCmd
+  if "%%a" == "-emp" goto runMvnCmd
+  if "%%a" == "--encrypt-master-password" goto runMvnCmd
+  if "%%a" == "-ep" goto runMvnCmd
+  if "%%a" == "--encrypt-password" goto runMvnCmd
+)
+goto setDebugFlags
 
-@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
+:setDebugFlags
+if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
 
-@call "%~dp0"mvn.cmd %*
+set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
+
+:runMvnCmd
+call "%~dp0"mvn.cmd %*
