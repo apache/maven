@@ -97,6 +97,7 @@ for %%a in (%*) do (
 goto endSetMavenDebugOpts
 
 :setMavenDebugOpts
+echo Preparing to execute Maven in Java debug mode
 if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
 set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
 
