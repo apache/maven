@@ -22,9 +22,10 @@
 #
 # Environment Variable Prerequisites
 #
-#   JAVA_HOME       (Optional) Points to a Java installation.
-#   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
-#   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
+#   JAVA_HOME           (Optional) Points to a Java installation.
+#   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
+#   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
+#   MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is localhost:8000
 # -----------------------------------------------------------------------------
 
 if [ -z "$MAVEN_SKIP_RC" ] ; then
