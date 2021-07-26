@@ -110,6 +110,8 @@ public class CLIManager
 
     public static final String COLOR = "color";
 
+    public static final String DEBUG_JAVA = "dj";
+
     protected Options options;
 
     @SuppressWarnings( "checkstyle:linelength" )
@@ -153,6 +155,7 @@ public class CLIManager
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
         options.addOption( Option.builder().longOpt( COLOR ).hasArg().optionalArg( true ).desc( "Defines the color mode of the output. Supported are 'auto', 'always', 'never'." ).build() );
+        options.addOption( Option.builder( DEBUG_JAVA ).longOpt( "debug-java" ).desc( "Start Maven in Java debug mode" ).build() );
     }
 
     public CommandLine parse( String[] args )
