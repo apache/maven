@@ -90,3 +90,14 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 :endReadAdditionalConfig
 
+for %%a in (%*) do (
+  if "%%a" == "-dj" goto setMavenDebugOpts
+  if "%%a" == "--debug-java" goto setMavenDebugOpts
+)
+goto endSetMavenDebugOpts
+
+:setMavenDebugOpts
+if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
+set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
+
+:endSetMavenDebugOpts
