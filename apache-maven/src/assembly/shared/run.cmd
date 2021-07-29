@@ -3,7 +3,8 @@
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
   -classpath %LAUNCHER_JAR% ^
-  %MAVENHOME_CONFIG% ^
+  "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
+  "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %MAVEN_LAUNCHER% %*
 if ERRORLEVEL 1 goto error

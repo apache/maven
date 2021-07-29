@@ -1,3 +1,5 @@
+CLASSWORLDS_CONF="${MAVEN_HOME}/bin/m2.conf"
+
 # For Cygwin, ensure paths are in Unix format before anything is touched
 if $cygwin ; then
   [ -n "$MAVEN_HOME" ] &&

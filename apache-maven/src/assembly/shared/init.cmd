@@ -2,6 +2,8 @@
 
 :init
 
+set "CLASSWORLDS_CONF=%MAVEN_HOME%\bin\m2.conf"
+
 @REM Find the project basedir, i.e., the directory that contains the directory ".mvn".
 @REM Fallback to current working directory if not found.
 
