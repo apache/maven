@@ -103,6 +103,22 @@ for arg in "$@"; do
   fi
 done
 
+IGNORE_DEBUG_MODE=0
+ENABLE_DEBUG_MODE=0
+for arg in "$@"; do
+  if [ "$arg" = "-B" -o "$arg" = "--batch-mode" ]; then
+    IGNORE_DEBUG_MODE=1
+  fi
+  if [ "$arg" = "-dj" -o "$arg" = "--debug-java" ]; then
+    ENABLE_DEBUG_MODE=1
+  fi
+done
+
+if [ $IGNORE_DEBUG_MODE -eq 0 -a $ENABLE_DEBUG_MODE -eq 1 ] ; then
+  echo "Preparing to execute Maven in Java debug mode"
+  MAVEN_DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${MAVEN_DEBUG_ADDRESS:-localhost:8000}"
+fi
+
 # For Cygwin, switch project base directory path to Windows format before
 # executing Maven otherwise this will cause Maven not to consider it.
 if $cygwin ; then

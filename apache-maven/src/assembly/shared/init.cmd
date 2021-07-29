@@ -91,8 +91,14 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 :endReadAdditionalConfig
 
 for %%a in (%*) do (
-  if "%%a" == "-dj" goto setMavenDebugOpts
-  if "%%a" == "--debug-java" goto setMavenDebugOpts
+  if "%%a" == "-B" set IGNORE_DEBUG_MODE=1
+  if "%%a" == "--batch-mode" set IGNORE_DEBUG_MODE=1
+  if "%%a" == "-dj" set ENABLE_DEBUG_MODE=1
+  if "%%a" == "--debug-java" set ENABLE_DEBUG_MODE=1
+)
+
+if "%IGNORE_DEBUG_MODE%" == "" (
+  if not "%ENABLE_DEBUG_MODE%" == "" goto setMavenDebugOpts
 )
 goto endSetMavenDebugOpts
 
