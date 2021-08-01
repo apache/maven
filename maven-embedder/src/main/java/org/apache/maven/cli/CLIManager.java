@@ -46,7 +46,7 @@ public class CLIManager
 
     public static final char QUIET = 'q';
 
-    public static final char DEBUG = 'X';
+    public static final char VERBOSE = 'X';
 
     public static final char ERRORS = 'e';
 
@@ -110,6 +110,11 @@ public class CLIManager
 
     public static final String COLOR = "color";
 
+    /** This option is deprecated and may be repurposed as Java debug in a future version.
+     * Use {@code -X/--verbose} instead. */
+    @Deprecated
+    public static final String DEBUG = "debug";
+
     protected Options options;
 
     @SuppressWarnings( "checkstyle:linelength" )
@@ -122,7 +127,7 @@ public class CLIManager
         options.addOption( Option.builder( Character.toString( OFFLINE ) ).longOpt( "offline" ).desc( "Work offline" ).build() );
         options.addOption( Option.builder( Character.toString( VERSION ) ).longOpt( "version" ).desc( "Display version information" ).build() );
         options.addOption( Option.builder( Character.toString( QUIET ) ).longOpt( "quiet" ).desc( "Quiet output - only show errors" ).build() );
-        options.addOption( Option.builder( Character.toString( DEBUG ) ).longOpt( "debug" ).desc( "Produce execution debug output" ).build() );
+        options.addOption( Option.builder( Character.toString( VERBOSE ) ).longOpt( "verbose" ).longOpt( "verbose" ).desc( "Produce execution verbose output" ).build() );
         options.addOption( Option.builder( Character.toString( ERRORS ) ).longOpt( "errors" ).desc( "Produce execution error messages" ).build() );
         options.addOption( Option.builder( Character.toString( NON_RECURSIVE ) ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators" ).build() );
         options.addOption( Option.builder( Character.toString( UPDATE_SNAPSHOTS ) ).longOpt( "update-snapshots" ).desc( "Forces a check for missing releases and updated snapshots on remote repositories" ).build() );
@@ -153,6 +158,9 @@ public class CLIManager
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
         options.addOption( Option.builder().longOpt( COLOR ).hasArg().optionalArg( true ).desc( "Defines the color mode of the output. Supported are 'auto', 'always', 'never'." ).build() );
+
+        // Deprecated
+        options.addOption( Option.builder().longOpt( DEBUG ).desc( "Produce execution verbose output (deprecated; only kept for backward compatibility)" ).build() );
     }
 
     public CommandLine parse( String[] args )

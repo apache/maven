@@ -157,7 +157,8 @@ public class BuilderCommon
                     {
                         logger.warn( unsafePlugin.getId() );
                     }
-                    logger.warn( "Enable debug to see more precisely which goals are not marked @threadSafe." );
+                    logger.warn( "Enable verbose output (-X) to see more precisely which goals are not marked"
+                            + " @threadSafe." );
                 }
                 logger.warn( "*****************************************************************" );
             }

@@ -128,7 +128,7 @@ class LoggingRepositoryListener
         }
         else
         {
-            logger.warn( buffer + ", enable debug logging for more details" );
+            logger.warn( buffer + ", enable verbose output (-X) for more details" );
         }
     }
 

@@ -497,14 +497,15 @@ public class MavenCli
     void logging( CliRequest cliRequest )
     {
         // LOG LEVEL
-        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
-        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
-        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
+        cliRequest.verbose = cliRequest.commandLine.hasOption( CLIManager.VERBOSE )
+                             || cliRequest.commandLine.hasOption( CLIManager.DEBUG );
+        cliRequest.quiet = !cliRequest.verbose && cliRequest.commandLine.hasOption( CLIManager.QUIET );
+        cliRequest.showErrors = cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
 
-        if ( cliRequest.debug )
+        if ( cliRequest.verbose )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
             slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );
@@ -582,11 +583,17 @@ public class MavenCli
                         MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName() );
             }
         }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) )
+        {
+            slf4jLogger.warn( "The option '--debug' is deprecated and may be repurposed as Java debug"
+                    + " in a future version. Use -X/--verbose instead." );
+        }
     }
 
     private void version( CliRequest cliRequest )
     {
-        if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
+        if ( cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             System.out.println( CLIReportingUtils.showVersion() );
         }
@@ -1029,12 +1036,12 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch.",
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch",
                         buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable full debug logging.",
+                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable verbose output",
                         buffer().strong( "-X" ) );
             }
 
@@ -1368,6 +1375,7 @@ public class MavenCli
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
+        boolean verbose = cliRequest.verbose;
         request.setShowErrors( cliRequest.showErrors ); // default: false
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
@@ -1384,7 +1392,7 @@ public class MavenCli
         request.setUserProperties( cliRequest.userProperties );
         request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
         request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
-        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
+        request.setTransferListener( determineTransferListener( quiet, verbose, commandLine, request ) );
         request.setExecutionListener( determineExecutionListener() );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
@@ -1593,6 +1601,7 @@ public class MavenCli
     }
 
     private TransferListener determineTransferListener( final boolean quiet,
+                                                        final boolean verbose,
                                                         final CommandLine commandLine,
                                                         final MavenExecutionRequest request )
     {
@@ -1606,7 +1615,7 @@ public class MavenCli
             // If we're logging to a file then we don't want the console transfer listener as it will spew
             // download progress all over the place
             //
-            return getConsoleTransferListener( commandLine.hasOption( CLIManager.DEBUG ) );
+            return getConsoleTransferListener( verbose );
         }
         else
         {

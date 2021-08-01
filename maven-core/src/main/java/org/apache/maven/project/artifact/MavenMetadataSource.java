@@ -623,7 +623,7 @@ public class MavenMetadataSource
                         message =
                             "Invalid POM for " + artifact.getId()
                                 + ", transitive dependencies (if any) will not be available"
-                                + ", enable debug logging for more details";
+                                + ", enable verbose output (-X) for more details";
                     }
 
                     if ( logger.isDebugEnabled() )
