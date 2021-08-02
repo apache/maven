@@ -1,21 +1,9 @@
-CLASSWORLDS_CONF="${MAVEN_HOME}/bin/m2.conf"
+CLASSWORLDS_CONF="$MAVEN_HOME/bin/m2.conf"
 
-# For Cygwin, ensure paths are in Unix format before anything is touched
-if $cygwin ; then
-  [ -n "$MAVEN_HOME" ] &&
-    MAVEN_HOME=`cygpath --unix "$MAVEN_HOME"`
+# For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
+if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] &&
-    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
-fi
-
-# For Mingw, ensure paths are in Unix format before anything is touched
-if $mingw ; then
-  [ -n "$MAVEN_HOME" ] &&
-    MAVEN_HOME=`(cd "$MAVEN_HOME"; pwd)`
-  [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`(cd "$JAVA_HOME"; pwd)`
 fi
 
 if [ -n "$JAVA_HOME" ] ; then
@@ -96,13 +84,3 @@ concat_lines() {
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"
-
-# For Cygwin, switch project base directory path to Windows format before
-# executing Maven otherwise this will cause Maven not to consider it.
-if $cygwin ; then
-  [ -n "$MAVEN_PROJECTBASEDIR" ] &&
-  MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
-fi
-
-export MAVEN_PROJECTBASEDIR
-

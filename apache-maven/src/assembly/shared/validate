@@ -51,4 +51,3 @@ case "`uname`" in
   MINGW*) mingw=true;;
 esac
 
-
