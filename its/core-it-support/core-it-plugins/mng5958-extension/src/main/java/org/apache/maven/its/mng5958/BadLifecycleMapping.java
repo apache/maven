@@ -34,10 +34,10 @@ public class BadLifecycleMapping extends AbstractLifecycleMapping
     protected Map<String, String> initPhases()
     {
         Map phases = new LinkedHashMap<>();
-        
+
         LifecyclePhase lp = new LifecyclePhase();
         lp.set( "org.apache.maven.its.plugins:mng-5805-pkg-type-mojo-configuration-plugin:2.1-SNAPSHOT:test" );
-        
+
         phases.put( "validate", lp );
         return phases;
     }

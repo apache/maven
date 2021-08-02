@@ -33,7 +33,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping
 {
 
     private Map<String, Lifecycle> lifecycleMap;
-    
+
     public Map<String, Lifecycle> getLifecycles()
     {
         if ( lifecycleMap != null )
@@ -65,7 +65,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping
     {
         return null;
     }
-    
+
     // raw map on purpose
     protected abstract Map initPhases();
 }
