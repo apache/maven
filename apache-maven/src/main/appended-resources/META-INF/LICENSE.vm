@@ -18,13 +18,14 @@
 ##
 
 
-Apache Maven includes a number of components and libraries with separate 
-copyright notices and license terms. Your use of those components are 
-subject to the terms and conditions of the following licenses: 
+Apache Maven includes a number of components and libraries with separate
+copyright notices and license terms. Your use of those components are
+subject to the terms and conditions of the following licenses:
 ##
 #set ( $apacheMavenGroupIds = [ "org.apache.maven", "org.apache.maven.wagon", "org.apache.maven.resolver",
                                 "org.apache.maven.shared" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
+#set ( $CDDLLicenseNames = [ "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0", "CDDL/GPLv2+CE", "CDDL 1.1", "GPL2 w/ CPE" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses)
 #*  *##set ( $groupId = $project.artifact.groupId )
@@ -32,8 +33,8 @@ subject to the terms and conditions of the following licenses:
 #*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) )
 #*    *### advertise about each non-Maven dependency
 #*    *###
-#*    *### infer SPDX license code
-#*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
+#*    *### infer SPDX license id
+#*    *##if ( $CDDLLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'CDDL-1.0' )
 #*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'MIT' )
@@ -41,9 +42,17 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
 #*      *##set ( $spdx = 'ASL-2.0' )
+#*    *##elseif ( $license.url.contains( "www.eclipse.org/org/documents/edl-v10.php" )  )
+#*      *##set ( $spdx = 'EDL-1.0' )
+#*    *##elseif ( $license.url.contains( "www.mozilla.org/en-US/MPL/1.1" )  )
+#*      *##set ( $spdx = 'MPL-1.1' )
+#*    *##elseif ( $license.url.contains( "www.gnu.org/licenses/gpl" )  )
+#*      *##set ( $spdx = 'GPL-3.0' )
+#*    *##elseif ( $license.url.contains( "www.gnu.org/licenses/lgpl" )  )
+#*      *##set ( $spdx = 'LGPL-3.0' )
 #*    *##else
 #*      *### unrecognized license will require analysis to know obligations
-#*      *##set ( $spdx = 'unrecognized' )
+#*      *##set ( $spdx = "unrecognized: $license.name $license.url" )
 #*    *##end
 #*    *###
 #*    *### fix project urls that are wrong in pom

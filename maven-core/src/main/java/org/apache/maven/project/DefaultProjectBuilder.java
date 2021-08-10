@@ -19,20 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -75,6 +61,20 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DefaultProjectBuilder
@@ -675,6 +675,7 @@ public class DefaultProjectBuilder
 
         project.setModel( model );
         project.setOriginalModel( result.getRawModel() );
+        project.setOriginalEffectiveModel( model.clone() );
         project.setFile( model.getPomFile() );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
@@ -791,7 +792,7 @@ public class DefaultProjectBuilder
                     HashMap<String, Artifact> delegate;
 
                     @Override
-                    public Set<Entry<String, Artifact>> entrySet()
+                    public Set<Map.Entry<String, Artifact>> entrySet()
                     {
                         return Collections.unmodifiableSet( compute().entrySet() );
                     }

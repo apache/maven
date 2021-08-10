@@ -19,13 +19,14 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * MojoExecution
@@ -41,7 +42,14 @@ public class MojoExecution
 
     private MojoDescriptor mojoDescriptor;
 
+    private MojoCheker mojoCheker;
+
     private Xpp3Dom configuration;
+
+    public boolean canRun( Mojo mojo, MavenSession session )
+    {
+        return mojoCheker == null || mojoCheker.check( this, mojo, session );
+    }
 
     /**
      * Describes the source of an execution.
@@ -63,8 +71,8 @@ public class MojoExecution
     private Source source = Source.LIFECYCLE;
 
     /**
-     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
-     * this mojo execution is going to run in.
+     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase this
+     * mojo execution is going to run in.
      */
     private String lifecyclePhase;
 
@@ -237,4 +245,8 @@ public class MojoExecution
         this.forkedExecutions.put( projectKey, forkedExecutions );
     }
 
+    public void setMojoExecutionManager( MojoCheker mojoCheker )
+    {
+        this.mojoCheker = mojoCheker;
+    }
 }
