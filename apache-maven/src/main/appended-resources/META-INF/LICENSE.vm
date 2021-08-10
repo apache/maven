@@ -25,6 +25,7 @@ subject to the terms and conditions of the following licenses:
 #set ( $apacheMavenGroupIds = [ "org.apache.maven", "org.apache.maven.wagon", "org.apache.maven.resolver",
                                 "org.apache.maven.shared" ] )
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
+#set ( $CDDLLicenseNames = [ "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0", "CDDL/GPLv2+CE", "CDDL 1.1", "GPL2 w/ CPE" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses )
 #*  *##set ( $groupId = $project.artifact.groupId )
@@ -41,7 +42,7 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'Apache-2.0' )
 #*    *##else
 #*      *### unrecognized license will require analysis to know obligations
-#*      *##set ( $spdx = 'unrecognized' )
+#*      *##set ( $spdx = "unrecognized: $license.name $license.url" )
 #*    *##end
 #*    *###
 #*    *### fix project urls that are wrong in pom

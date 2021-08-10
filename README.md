@@ -29,6 +29,11 @@ build, reporting and documentation from a central piece of information.
 
 If you think you have found a bug, please file an issue in the [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG).
 
+Incremental Build and Cache
+-------------
+This maven version supports Incremental Build feature which calculates out-of-date modules in the build dependencies graph and improves build times by avoiding re-building unnecessary modules.
+Read [cache guide](Documentation/CACHE.md) for more details
+
 Documentation
 -------------
 

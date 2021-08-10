@@ -47,8 +47,8 @@ under the License.
 
   <properties>
     <maven.version>3.0.5</maven.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
     <commonsLangVersion>3.8.1</commonsLangVersion>
@@ -591,6 +591,7 @@ under the License.
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <version>1.17</version><!-- latest for Java 7 -->
         <configuration>
+          <skip>false</skip>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
             <artifactId>java17</artifactId>

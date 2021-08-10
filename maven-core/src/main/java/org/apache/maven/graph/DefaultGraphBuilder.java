@@ -34,9 +34,11 @@ import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.caching.checksum.KeyUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.ModelProblem;
@@ -56,6 +58,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+import static org.apache.maven.artifact.versioning.VersionRange.createFromVersion;
+
 /**
  * Builds the {@link ProjectDependencyGraph inter-dependencies graph} between projects in the reactor.
  */
@@ -63,6 +67,8 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 public class DefaultGraphBuilder
     implements GraphBuilder
 {
+
+    public static final String PROJECT_VERSION_PROP_NAME = "org.maven.project.version";
 
     @Requirement
     private Logger logger;
@@ -81,6 +87,11 @@ public class DefaultGraphBuilder
             {
                 final List<MavenProject> projects = getProjectsForMavenReactor( session );
                 validateProjects( projects );
+
+                if ( System.getProperties().containsKey( PROJECT_VERSION_PROP_NAME ) )
+                {
+                    overrideReactorVersions( projects, session );
+                }
                 result = reactorDependencyGraph( session, projects );
             }
 
@@ -97,6 +108,68 @@ public class DefaultGraphBuilder
             ProjectCycleException error = new ProjectCycleException( message, e );
             return Result.error( Collections.singletonList(
                     new DefaultModelProblem( null, null, null, null, 0, 0, error ) ) );
+        }
+    }
+
+    private void overrideReactorVersions( List<MavenProject> projects, MavenSession session )
+    {
+        String injectedVersion = System.getProperty( PROJECT_VERSION_PROP_NAME );
+        logger.info( "Overriding reactor projects version to " + injectedVersion );
+
+        Map<String, String> reactorProjects = new HashMap<>( projects.size() );
+
+        for ( MavenProject project : projects )
+        {
+            String projectKey = KeyUtils.getVersionlessProjectKey( project );
+            logger.debug(
+                    "[" + projectKey + "] Overriding version from " + project.getVersion() + " to " + injectedVersion );
+            reactorProjects.put( projectKey, project.getVersion() );
+            project.setVersion( injectedVersion );
+            project.getArtifact().setVersionRange( createFromVersion( injectedVersion ) );
+            project.getArtifact().updateVersion( injectedVersion, session.getLocalRepository() );
+        }
+
+        for ( MavenProject project : projects )
+        {
+            String projectKey = KeyUtils.getVersionlessProjectKey( project );
+            MavenProject parent = project.getParent();
+            String parentKey = KeyUtils.getVersionlessProjectKey( parent );
+            String overriddenParentVersion = reactorProjects.get( parentKey );
+            if ( overriddenParentVersion != null && overriddenParentVersion.equals(
+                    project.getParentArtifact().getVersion() ) )
+            {
+                logger.debug(
+                        "[" + projectKey + "] Parent " + parentKey + " overriding artefact version from "
+                                + parent.getVersion() + " to " + injectedVersion );
+                project.getParentArtifact().setVersionRange( createFromVersion( injectedVersion ) );
+                project.getParentArtifact().updateVersion( injectedVersion, session.getLocalRepository() );
+            }
+
+            for ( Dependency dependency : project.getDependencies() )
+            {
+                String dependencyKey = KeyUtils.getVersionlessDependencyKey( dependency );
+                String overriddenReactorVersion = reactorProjects.get( dependencyKey );
+                if ( overriddenReactorVersion != null && overriddenReactorVersion.equals( dependency.getVersion() ) )
+                {
+                    logger.debug(
+                            "[" + projectKey + "] Dependency " + dependencyKey + " overriding version from "
+                                    + dependency.getVersion() + " to " + injectedVersion );
+                    dependency.setVersion( injectedVersion );
+                }
+            }
+
+            for ( Dependency dependency : project.getDependencyManagement().getDependencies() )
+            {
+                String dependencyKey = KeyUtils.getVersionlessDependencyKey( dependency );
+                String overriddenReactorVersion = reactorProjects.get( dependencyKey );
+                if ( overriddenReactorVersion != null && overriddenReactorVersion.equals( dependency.getVersion() ) )
+                {
+                    logger.debug(
+                            "[" + projectKey + "] Dependency management " + dependencyKey
+                                   + " overriding version from " + dependency.getVersion() + " to " + injectedVersion );
+                    dependency.setVersion( injectedVersion );
+                }
+            }
         }
     }
 

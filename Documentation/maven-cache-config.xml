@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!---
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<cache xmlns="org:apache:maven:cache:config:v1"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="org:apache:maven:cache:config:v1 cache-config.xsd">
+
+    <configuration>
+        <enabled>true</enabled>
+        <hashAlgorithm>SHA-256</hashAlgorithm>
+        <validateXml>true</validateXml>
+        <projectDiscoveryStrategy>
+            <specificVersion>PROJECT-LOCAL</specificVersion>
+        </projectDiscoveryStrategy>
+        <remote enabled="true">
+            <url>http://host:port</url>
+        </remote>
+        <local>
+            <maxBuildsCached>3</maxBuildsCached>
+        </local>
+    </configuration>
+
+    <input>
+        <global>
+            <glob>
+                {*.java,*.groovy,*.yaml,*.svcd,*.proto,*assembly.xml,assembly*.xml,*logback.xml,*.vm,*.ini,*.jks,*.properties,*.sh,*.bat}
+            </glob>
+            <include>src/</include>
+            <exclude>pom.xml</exclude>
+        </global>
+        <plugin artifactId="codegen">
+            <effectivePom>
+                <excludeProperty>111</excludeProperty>
+            </effectivePom>
+            <dirScan mode="auto">
+                <exclude tagName="outputDirectory"/>
+                <exclude tagName="directory"/>
+                <tagScanConfig tagName="someProperty" glob="*.java" recursive="false"/>
+            </dirScan>
+            <execution>
+                <execId>1</execId>
+                <execId>2</execId>
+                <dirScan mode="auto">
+                    <include tagName="protolocation" recursive="false" glob="*.proto"/>
+                </dirScan>
+            </execution>
+        </plugin>
+    </input>
+    <executionControl>
+        <runAlways>
+            <plugin artifactId="maven-failsafe-plugin"/>
+            <execution artifactId="maven-deploy-plugin">
+                <execId>my-execution-id</execId>
+            </execution>
+            <goals artifactId="maven-install-plugin">
+                <goal>install</goal>
+            </goals>
+            <goals artifactId="maven-deploy-plugin">
+                <goal>deploy</goal>
+            </goals>
+            <goals artifactId="bb-sdk-codegen">
+                <goal>deploy-local</goal>
+            </goals>
+        </runAlways>
+        <reconcile logAllProperties="true">
+            <plugin artifactId="maven-compiler-plugin" goal="compile">
+                <reconcile propertyName="source"/>
+                <reconcile propertyName="target"/>
+                <reconcile propertyName="debug"/>
+                <reconcile propertyName="debuglevel"/>
+                <!-- whitelist of logged properties-->
+                <log propertyName="includes"/>
+                <log propertyName="excludes"/>
+                <log propertyName="argLine"/>
+            </plugin>
+            <plugin artifactId="duplicate-finder-maven-plugin" goal="check">
+                <reconcile propertyName="skip" skipValue="true"/>
+                <reconcile propertyName="quiet" skipValue="true"/>
+            </plugin>
+            <plugin artifactId="maven-enforcer-plugin" goal="enforce">
+                <reconcile propertyName="skip" skipValue="true"/>
+                <!-- blacklisted from logging properties-->
+                <nolog propertyName="redundantProperty"/>
+                <nolog propertyName="redundantProperty2"/>
+            </plugin>
+        </reconcile>
+    </executionControl>
+</cache>
