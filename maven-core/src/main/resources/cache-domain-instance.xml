@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<build xmlns="org:apache:maven:cache:domain"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="org:apache:maven:cache:domain cache-domain.xsd">
+    <cacheImplementationVersion>v3</cacheImplementationVersion>
+    <buildTime>1980-03-23T10:20:15</buildTime>
+    <buildServer>my-server.com</buildServer>
+    <hashFunction>SHA-256</hashFunction>
+    <goals>
+        <goal>clean</goal>
+        <goal>verify</goal>
+    </goals>
+    <artifact>
+        <groupId>com.my.shared</groupId>
+        <artifactId>my-server</artifactId>
+        <type>jar</type>
+        <fileName>my-server.jar</fileName>
+        <fileHash>hashvalue</fileHash>
+        <fileSize>123456</fileSize>
+    </artifact>
+    <attachedArtifacts>
+        <artifact>
+            <groupId>com.my.shared</groupId>
+            <artifactId>my-server</artifactId>
+            <type>java-source</type>
+            <classifier>sources</classifier>
+            <fileName>my-server-sources.jar</fileName>
+        </artifact>
+    </attachedArtifacts>
+    <executions>
+        <execution>
+            <executionKey>default:check:verify:duplicate-finder-maven-plugin:org.basepom.maven:1.3.0</executionKey>
+            <mojoClassName>org.basepom.mojo.duplicatefinder.DuplicateFinderMojo</mojoClassName>
+            <configuration>
+                <property name="quiet">true</property>
+                <property name="skip">false</property>
+            </configuration>
+        </execution>
+    </executions>
+    <projectsInputInfo>
+        <checksum>0136171ac2c9d9b066805bd09904a25318cfb2037189b20c48e79b20b63b81ed</checksum>
+        <item type="file" hash="834a0056e4881c6c91ad266d24e87cb12e1901859fb169af24efc176b70fcee0">src/main/conf/my-context.xml</item>
+    </projectsInputInfo>
+</build>

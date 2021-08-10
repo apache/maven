@@ -3,6 +3,7 @@ target/
 .classpath
 .settings/
 .svn/
+.cache/
 bin/
 # Intellij
 *.ipr
