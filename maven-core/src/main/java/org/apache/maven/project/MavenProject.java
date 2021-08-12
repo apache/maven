@@ -143,7 +143,7 @@ public class MavenProject
 
     private Artifact artifact;
 
-    private final ThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = new ThreadLocal()
+    private final InheritableThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = new InheritableThreadLocal()
     {
         protected ArtifactsHolder initialValue()
         {
