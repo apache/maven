@@ -33,6 +33,24 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2021-08-04</created>
+        <revision>3.8.2</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.2/source/apache-maven-3.8.2-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.2/source/apache-maven-3.8.2-src.tar.gz</file-release>
+      </Version>
+      <Version>
+        <name>Latest stable release</name>
+        <created>2021-04-04</created>
+        <revision>3.8.1</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.1/source/apache-maven-3.8.1-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.1/source/apache-maven-3.8.1-src.tar.gz</file-release>
+      </Version>
+      <Version>
+        <name>Apache Maven 3.6.2</name>
         <created>2019-08-27</created>
         <revision>3.6.2</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.zip</file-release>
