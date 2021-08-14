@@ -41,7 +41,7 @@ under the License.
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.2/source/apache-maven-3.8.2-src.tar.gz</file-release>
       </Version>
       <Version>
-        <name>Latest stable release</name>
+        <name>Apache Maven 3.8.1</name>
         <created>2021-04-04</created>
         <revision>3.8.1</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.zip</file-release>
