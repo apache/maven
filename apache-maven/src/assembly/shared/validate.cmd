@@ -35,11 +35,12 @@ title %0
 @if "%MAVEN_BATCH_ECHO%"=="on" echo %MAVEN_BATCH_ECHO%
 
 @REM Execute a user defined script before this one
-if not "%MAVEN_SKIP_RC%"=="" goto skipRcPre
+if not "%MAVEN_SKIP_RC%"=="" goto skipRc
 @REM check for pre script, once with legacy .bat ending and once with .cmd ending
 if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
 if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
-:skipRcPre
+if exist "%USERPROFILE%\mavenrc.cmd" call "%USERPROFILE%\mavenrc.cmd" %*
+:skipRc
 
 @setlocal
 
