@@ -32,6 +32,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -332,4 +333,29 @@ public class ProjectBuilderTest
             assertNotNull( "Missing version for build plugin " + buildPlugin.getKey(), buildPlugin.getVersion() );
         }
     }
+
+    @Test
+    public void testBuildFromModelSourceResolvesBasedir()
+        throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/modelsourcebasedir/pom.xml" );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        ModelSource modelSource = new FileModelSource( pomFile );
+        ProjectBuildingResult result =
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
+
+        assertEquals( pomFile.getAbsoluteFile(), result.getProject().getModel().getPomFile().getAbsoluteFile() );
+        int errors = 0;
+        for ( ModelProblem p : result.getProblems() )
+        {
+            if ( p.getSeverity() == ModelProblem.Severity.ERROR )
+            {
+                errors++;
+            }
+        }
+        assertEquals( 0, errors );
+    }
+
 }
