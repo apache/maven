@@ -624,14 +624,7 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        if ( pomFile != null )
-        {
-            model.setPomFile( pomFile );
-        }
-        else if ( modelSource instanceof FileModelSource )
-        {
-            model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
-        }
+        model.setPomFile( pomFile );
 
         problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
