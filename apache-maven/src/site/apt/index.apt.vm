@@ -29,12 +29,14 @@ ${project.name}
 
 * References
 
- * <<<mvn>>> invocation can be customised through:
+ * <<<mvn>>> invocation can be customized through pre-invocation script calls, that can be disabled by setting <<<MAVEN_SKIP_RC>>> environment variable:
 
-   * <<</usr/local/etc/mavenrc>>> (since 3.8.2), <<</etc/mavenrc>>> and <<<$HOME/.mavenrc>>> scripts on Unix,
-
-   * <<<%USERPROFILE%\\mavenrc_pre.bat>>> and <<<%USERPROFILE%\\mavenrc_pre.cmd>>> scripts on Windows,
-
-   []
-
-  and these scripts calls can be disabled by setting <<<MAVEN_SKIP_RC>>> environment variable. 
+*----------+--------------------------------------------+-----------------------+
+||         || system level                              || user level 
+*----------+--------------------------------------------+-----------------------+
+|| POSIX   | <<</etc/mavenrc>>>\
+||         | <<</usr/local/etc/mavenrc>>> (since 3.8.2) | <<<$HOME/.mavenrc>>> 
+*----------+--------------------------------------------+-----------------------+
+|| Windows | <<<%PROGRAMDATA%\\mavenrc.cmd>>> (since 4) | <<<%USERPROFILE%\\mavenrc_pre.bat>>>\
+||         |                                            | <<<%USERPROFILE%\\mavenrc_pre.cmd>>> (since 3.3.1)
+*----------+--------------------------------------------+-----------------------+
