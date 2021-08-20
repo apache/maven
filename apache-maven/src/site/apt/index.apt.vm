@@ -38,5 +38,6 @@ ${project.name}
 ||         | <<</usr/local/etc/mavenrc>>> (since 3.8.2) | <<<$HOME/.mavenrc>>> 
 *----------+--------------------------------------------+-----------------------+
 || Windows | <<<%PROGRAMDATA%\\mavenrc.cmd>>> (since 4) | <<<%USERPROFILE%\\mavenrc_pre.bat>>>\
-||         |                                            | <<<%USERPROFILE%\\mavenrc_pre.cmd>>> (since 3.3.1)
+||         |                                            | <<<%USERPROFILE%\\mavenrc_pre.cmd>>> (since 3.3.1)\
+||         |                                            | <<<%USERPROFILE%\\mavenrc.cmd>>> (since 4)
 *----------+--------------------------------------------+-----------------------+
