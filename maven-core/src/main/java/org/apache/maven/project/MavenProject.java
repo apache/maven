@@ -143,13 +143,7 @@ public class MavenProject
 
     private Artifact artifact;
 
-    private final ThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = new ThreadLocal()
-    {
-        protected ArtifactsHolder initialValue()
-        {
-            return new ArtifactsHolder();
-        }
-    };
+    private ThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = newThreadLocalArtifactsHolder();
 
     private Model originalModel;
 
@@ -186,6 +180,17 @@ public class MavenProject
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
         setModel( model );
+    }
+
+    private static ThreadLocal<ArtifactsHolder> newThreadLocalArtifactsHolder()
+    {
+        return new ThreadLocal<ArtifactsHolder>()
+        {
+            protected ArtifactsHolder initialValue()
+            {
+                return new ArtifactsHolder();
+            }
+        };
     }
 
     public MavenProject( Model model )
@@ -1181,7 +1186,8 @@ public class MavenProject
         {
             throw new UnsupportedOperationException( e );
         }
-
+        // clone must have it's own TL, otherwise the artifacts are intermingled!
+        clone.threadLocalArtifactsHolder = newThreadLocalArtifactsHolder();
         clone.deepCopy( this );
 
         return clone;
@@ -1224,17 +1230,13 @@ public class MavenProject
         // copy fields
         file = project.file;
         basedir = project.basedir;
+        threadLocalArtifactsHolder.set( project.threadLocalArtifactsHolder.get().copy() );
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
         if ( project.getDependencyArtifacts() != null )
         {
             setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
-        }
-
-        if ( project.getArtifacts() != null )
-        {
-            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
         }
 
         if ( project.getParentFile() != null )
@@ -1479,13 +1481,7 @@ public class MavenProject
 
     // ----------------------------------------------------------------------------------------------------------------
     //
-    //
-    // D E P R E C A T E D
-    //
-    //
-    // ----------------------------------------------------------------------------------------------------------------
-    //
-    // Everything below will be removed for Maven 4.0.0
+    // D E P R E C A T E D - Everything below will be removed for Maven 4.0.0
     //
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -1506,7 +1502,6 @@ public class MavenProject
         if ( moduleFile != null )
         {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
-
             module = moduleDir.getName();
         }
 
@@ -1827,7 +1822,6 @@ public class MavenProject
     public void setReportArtifacts( Set<Artifact> reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
-
         reportArtifactMap = null;
     }
 
@@ -1851,7 +1845,6 @@ public class MavenProject
     public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
-
         extensionArtifactMap = null;
     }
 
@@ -1885,7 +1878,6 @@ public class MavenProject
     public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
     {
         Xpp3Dom dom = null;
-
         // ----------------------------------------------------------------------
         // I would like to be able to lookup the Mojo object using a key but
         // we have a limitation in modello that will be remedied shortly. So
@@ -1995,5 +1987,14 @@ public class MavenProject
         private ArtifactFilter artifactFilter;
         private Set<Artifact> artifacts;
         private Map<String, Artifact> artifactMap;
+
+        ArtifactsHolder copy()
+        {
+           ArtifactsHolder copy = new ArtifactsHolder();
+           copy.artifactFilter = artifactFilter;
+           copy.artifacts = artifacts != null ? new LinkedHashSet<>( artifacts ) : null;
+           copy.artifactMap = artifactMap != null ? new LinkedHashMap<>( artifactMap ) : null;
+           return copy;
+        }
     }
 }
