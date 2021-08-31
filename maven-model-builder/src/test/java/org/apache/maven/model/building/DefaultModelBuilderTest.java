@@ -1,6 +1,11 @@
 package org.apache.maven.model.building;
 
-  /*
+  import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.File;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -20,15 +25,13 @@ package org.apache.maven.model.building;
  */
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Nodet
@@ -144,4 +147,14 @@ public class DefaultModelBuilderTest
         }
     }
 
+    @Test
+    public void testBuildRawModel()
+            throws Exception
+    {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull( builder );
+
+        Result<? extends Model> res = builder.buildRawModel( new File( getClass().getResource("/poms/factory/simple.xml" ).getFile() ), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false);
+        assertNotNull( res.get() );
+    }
 }
