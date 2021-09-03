@@ -636,7 +636,8 @@ public class DefaultModelBuilder
     public Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking )
     {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( validationLevel )
-            .setLocationTracking( locationTracking );
+            .setLocationTracking( locationTracking )
+            .setModelSource( new FileModelSource( pomFile ) );
         final DefaultModelProblemCollector collector =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
