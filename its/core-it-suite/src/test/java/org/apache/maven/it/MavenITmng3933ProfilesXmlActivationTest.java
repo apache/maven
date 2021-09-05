@@ -90,9 +90,9 @@ public class MavenITmng3933ProfilesXmlActivationTest
             }
         }
 
-        assertEquals( null, props.getProperty( "project.properties.sysPropertyMissing" ) );
-        assertEquals( null, props.getProperty( "project.properties.envPropertyMissing" ) );
-        assertEquals( null, props.getProperty( "project.properties.filePropertyMissing" ) );
+        assertNull( props.getProperty( "project.properties.sysPropertyMissing" ) );
+        assertNull( props.getProperty( "project.properties.envPropertyMissing" ) );
+        assertNull( props.getProperty( "project.properties.filePropertyMissing" ) );
     }
 
 }

@@ -62,7 +62,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        assertEquals( null, verifier.loadProperties( "target/checksum.properties" ).getProperty( "b-0.1-SNAPSHOT.jar" ) );
+        assertNull( verifier.loadProperties( "target/checksum.properties" ).getProperty( "b-0.1-SNAPSHOT.jar" ) );
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );

@@ -19,11 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Properties;
+
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-469">MNG-469</a>.
@@ -100,7 +101,7 @@ public class MavenITmng0469ReportConfigTest
             verifier.executeGoal( "validate" );
             Properties props = verifier.loadProperties( "target/config.properties" );
             assertEquals( "maven-it-plugin-site", props.getProperty( "project.reporting.plugins.0.artifactId" ) );
-            assertFalse( "fail.properties".equals( props.getProperty( "project.reporting.plugins.0.configuration.children.infoFile.0.value" ) ) );
+            assertNotEquals( "fail.properties", props.getProperty( "project.reporting.plugins.0.configuration.children.infoFile.0.value" ) );
         }
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

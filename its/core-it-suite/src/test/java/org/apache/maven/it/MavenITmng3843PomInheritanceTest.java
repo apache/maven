@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3843">MNG-3843</a>.
  *
@@ -137,7 +139,7 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "child-1", props.getProperty( "project.artifactId" ) );
         assertEquals( "0.1", props.getProperty( "project.version" ) );
         assertEquals( "jar", props.getProperty( "project.packaging" ) );
-        assertFalse( "parent-name".equals( props.getProperty( "project.name" ) ) );
+        assertNotEquals( "parent-name", props.getProperty( "project.name" ) );
         assertEquals( "parent-description", props.getProperty( "project.description", "" ) );
         assertUrlCommon( "http://parent.url", props.getProperty( "project.url", "" ) );
         assertEquals( "2008", props.getProperty( "project.inceptionYear", "" ) );

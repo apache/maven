@@ -60,7 +60,7 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest
         Properties props = verifier.loadProperties( "sub/target/config.properties" );
         assertEquals( "1", props.getProperty( "stringParams" ) );
         assertEquals( "test", props.getProperty( "stringParams.0" ) );
-        assertEquals( null, props.getProperty( "stringParams.1" ) );
+        assertNull( props.getProperty( "stringParams.1" ) );
     }
 
 }

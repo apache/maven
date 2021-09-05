@@ -2,7 +2,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.maven.it.util.ResourceExtractor;
 import org.junit.Test;

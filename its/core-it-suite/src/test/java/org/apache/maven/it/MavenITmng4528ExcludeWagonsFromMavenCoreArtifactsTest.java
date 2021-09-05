@@ -25,6 +25,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4528">MNG-4528</a>.
  *
@@ -60,7 +62,7 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest
 
         Properties props = verifier.loadProperties( "target/wagon.properties" );
         String version = props.getProperty( "version", "" );
-        assertFalse( "Bad wagon version used: " + version, version.equals( "1.0-alpha-6" ) );
+        assertNotEquals( "Bad wagon version used: " + version, "1.0-alpha-6", version );
     }
 
 }

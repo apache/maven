@@ -25,6 +25,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4474">MNG-4474</a>.
  *
@@ -59,7 +61,7 @@ public class MavenITmng4474PerLookupWagonInstantiationTest
         assertNotNull( hash1 );
         String hash2 = props.getProperty( "coreit://two.hash" );
         assertNotNull( hash2 );
-        assertFalse( hash1.equals( hash2 ) );
+        assertNotEquals( hash1, hash2 );
     }
 
 }

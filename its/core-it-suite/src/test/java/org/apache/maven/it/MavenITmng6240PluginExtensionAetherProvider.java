@@ -74,7 +74,7 @@ public class MavenITmng6240PluginExtensionAetherProvider
                 count++;
             }
         }
-        assertTrue( count == 2 ); // 1 from download, 1 from upload
+        assertEquals( 2, count ); // 1 from download, 1 from upload
 
     }
 

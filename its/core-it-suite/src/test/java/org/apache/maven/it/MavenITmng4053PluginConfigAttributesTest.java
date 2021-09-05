@@ -88,8 +88,8 @@ public class MavenITmng4053PluginConfigAttributesTest
         assertEquals( "2", props.getProperty( "domParam.children.copy.0.attributes" ) );
 
         assertEquals( "target", props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.dir" ) );
-        assertEquals( null, props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.todir" ) );
-        assertEquals( null, props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.overwrite" ) );
+        assertNull( props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.todir" ) );
+        assertNull( props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes.overwrite" ) );
         assertEquals( "1", props.getProperty( "domParam.children.copy.0.children.fileset.0.attributes" ) );
     }
 

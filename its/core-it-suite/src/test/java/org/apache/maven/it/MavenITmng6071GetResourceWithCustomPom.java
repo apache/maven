@@ -4,7 +4,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6071">MNG-6071</a>:

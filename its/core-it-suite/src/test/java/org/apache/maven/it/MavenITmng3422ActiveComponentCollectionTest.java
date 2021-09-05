@@ -25,6 +25,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3422">MNG-3422</a>.
  *
@@ -56,8 +58,8 @@ public class MavenITmng3422ActiveComponentCollectionTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/layout.properties" );
-        assertFalse( "0".equals( props.getProperty( "layouts", "0" ) ) );
-        assertFalse( "".equals( props.getProperty( "layouts.default", "" ) ) );
+        assertNotEquals( "0", props.getProperty( "layouts", "0" ) );
+        assertNotEquals( "", props.getProperty( "layouts.default", "" ) );
     }
 
 }

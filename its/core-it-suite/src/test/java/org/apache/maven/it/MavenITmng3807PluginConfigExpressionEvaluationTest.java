@@ -72,7 +72,7 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest
     {
         assertNotNull( value );
         assertTrue( value.length() > 0 );
-        assertTrue( value, !value.contains( "${" ) );
+        assertFalse( value, value.contains( "${" ) );
     }
 
 }
