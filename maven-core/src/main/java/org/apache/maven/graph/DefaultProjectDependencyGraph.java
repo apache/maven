@@ -22,8 +22,11 @@ package org.apache.maven.graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -42,9 +45,13 @@ public class DefaultProjectDependencyGraph
     implements ProjectDependencyGraph
 {
 
-    private ProjectSorter sorter;
+    private final ProjectSorter sorter;
 
-    private List<MavenProject> allProjects;
+    private final List<MavenProject> allProjects;
+
+    private final Map<MavenProject, Integer> order;
+
+    private final Map<String, MavenProject> projects;
 
     /**
      * Creates a new project dependency graph based on the specified projects.
@@ -59,6 +66,16 @@ public class DefaultProjectDependencyGraph
         super();
         this.allProjects = Collections.unmodifiableList( new ArrayList<>( projects ) );
         this.sorter = new ProjectSorter( projects );
+        this.order = new HashMap<>();
+        this.projects = new HashMap<>();
+        List<MavenProject> sorted = this.sorter.getSortedProjects();
+        for ( int index = 0; index < sorted.size(); index++ )
+        {
+            MavenProject project = sorted.get( index );
+            String id = ProjectSorter.getId( project );
+            this.projects.put( id, project );
+            this.order.put( project, index );
+        }
     }
 
     /**
@@ -78,6 +95,16 @@ public class DefaultProjectDependencyGraph
         super();
         this.allProjects = Collections.unmodifiableList( new ArrayList<>( allProjects ) );
         this.sorter = new ProjectSorter( projects );
+        this.order = new HashMap<>();
+        this.projects = new HashMap<>();
+        List<MavenProject> sorted = this.sorter.getSortedProjects();
+        for ( int index = 0; index < sorted.size(); index++ )
+        {
+            MavenProject project = sorted.get( index );
+            String id = ProjectSorter.getId( project );
+            this.projects.put( id, project );
+            this.order.put( project, index );
+        }
     }
 
     /**
@@ -140,14 +167,12 @@ public class DefaultProjectDependencyGraph
     private List<MavenProject> getSortedProjects( Set<String> projectIds )
     {
         List<MavenProject> result = new ArrayList<>( projectIds.size() );
-
-        for ( MavenProject mavenProject : sorter.getSortedProjects() )
+        for ( String projectId : projectIds )
         {
-            if ( projectIds.contains( ProjectSorter.getId( mavenProject ) ) )
-            {
-                result.add( mavenProject );
-            }
+            result.add( projects.get( projectId ) );
         }
+
+        Collections.sort( result, new MavenProjectComparator() );
 
         return result;
     }
@@ -158,4 +183,12 @@ public class DefaultProjectDependencyGraph
         return sorter.getSortedProjects().toString();
     }
 
+    private class MavenProjectComparator implements Comparator<MavenProject>
+    {
+        @Override
+        public int compare( MavenProject o1, MavenProject o2 )
+        {
+            return order.get( o1 ) - order.get( o2 );
+        }
+    }
 }
