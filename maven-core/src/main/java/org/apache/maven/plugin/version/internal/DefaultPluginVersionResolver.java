@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -49,6 +52,7 @@ import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.SessionData;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -72,6 +76,8 @@ public class DefaultPluginVersionResolver
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
+    private static final Object CACHE_KEY = new Object();
+
     @Requirement
     private Logger logger;
 
@@ -91,12 +97,26 @@ public class DefaultPluginVersionResolver
 
         if ( result == null )
         {
-            result = resolveFromRepository( request );
+            ConcurrentMap<Key, PluginVersionResult> cache = getCache( request.getRepositorySession().getData() );
+            Key key = getKey( request );
+            result = cache.get( key );
 
-            if ( logger.isDebugEnabled() )
+            if ( result == null )
             {
-                logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                    + " to " + result.getVersion() + " from repository " + result.getRepository() );
+                result = resolveFromRepository( request );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                        + " to " + result.getVersion() + " from repository " + result.getRepository() );
+                }
+
+                cache.putIfAbsent( key, result );
+            }
+            else if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Reusing cached resolved plugin version for " + request.getGroupId() + ":"
+                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom() );
             }
         }
         else if ( logger.isDebugEnabled() )
@@ -382,6 +402,67 @@ public class DefaultPluginVersionResolver
             }
         }
         return null;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private ConcurrentMap<Key, PluginVersionResult> getCache( SessionData data )
+    {
+        ConcurrentMap<Key, PluginVersionResult> cache =
+                ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+        while ( cache == null )
+        {
+            cache = new ConcurrentHashMap<>( 256 );
+            if ( data.set( CACHE_KEY, null, cache ) )
+            {
+                break;
+            }
+            cache = ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+        }
+        return cache;
+    }
+
+    private static Key getKey( PluginVersionRequest request )
+    {
+        return new Key( request.getGroupId(), request.getArtifactId(), request.getRepositories() );
+    }
+
+    static class Key
+    {
+        final String groupId;
+        final String artifactId;
+        final List<RemoteRepository> repositories;
+        final int hash;
+
+        Key( String groupId, String artifactId, List<RemoteRepository> repositories )
+        {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.repositories = repositories;
+            this.hash = Objects.hash( groupId, artifactId, repositories );
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+            Key key = ( Key ) o;
+            return groupId.equals( key.groupId )
+                    && artifactId.equals( key.artifactId )
+                    && repositories.equals( key.repositories );
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return hash;
+        }
     }
 
     static class Versions
