@@ -61,8 +61,8 @@ under the License.
     <sisuInjectVersion>0.3.4</sisuInjectVersion>
     <wagonVersion>3.4.3</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
-    <securityDispatcherVersion>1.4</securityDispatcherVersion>
-    <cipherVersion>1.8</cipherVersion>
+    <securityDispatcherVersion>2.0</securityDispatcherVersion>
+    <cipherVersion>2.0</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.6.3</resolverVersion>
@@ -402,15 +402,9 @@ under the License.
         <version>${commonsLangVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.plexus</groupId>
-            <artifactId>plexus-cipher</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -641,15 +635,16 @@ under the License.
               <goal>enforce</goal>
             </goals>
             <phase>validate</phase>
-            <id>ensure-no-org.sonatype:plexus-cipher</id>
+            <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
             <configuration>
               <rules>
                 <bannedDependencies>
                   <excludes>
+                    <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
                   </excludes>
                   <message>
-                    ensure no more org.sonatype.plexus:plexus-cipher as groupId changed. you have to add some exclusions.
+                    ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.
                   </message>
                 </bannedDependencies>
               </rules>
