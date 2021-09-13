@@ -166,7 +166,7 @@ under the License.
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-impl</exportedArtifact>
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
-    <exportedArtifact>javax.annotation:jsr250-api</exportedArtifact>
+    <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 

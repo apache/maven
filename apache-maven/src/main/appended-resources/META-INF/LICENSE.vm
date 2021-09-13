@@ -33,9 +33,7 @@ subject to the terms and conditions of the following licenses:
 #*    *### advertise about each non-Maven dependency
 #*    *###
 #*    *### infer SPDX license id
-#*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
-#*      *##set ( $spdx = 'CDDL-1.0' )
-#*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
+#*    *##if ( $MITLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'MIT' )
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )
@@ -62,7 +60,7 @@ subject to the terms and conditions of the following licenses:
 #*    *###
 #*    *### copy license file to lib/$artifactId.license
 #*    *##set ( $licFile = $directory + '/' + $project.artifact.artifactId + '.license' )
-#*    *##if ( $spdx == "MIT" )
+#*    *##if ( $spdx == "MIT" || $spdx == "unrecognized" )
 #*      *### MIT license contains date and copyright that makes the file specific to each artifact
 #*      *##set ( $downloaded = $locator.getResourceAsFile( "licenses/${spdx}-${project.artifact.artifactId}-${project.artifact.version}.txt", "licenses/${licFile}" ) )
 #*    *##else

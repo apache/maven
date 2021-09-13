@@ -58,7 +58,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
-    <sisuInjectVersion>0.3.4</sisuInjectVersion>
+    <sisuVersion>0.3.5</sisuVersion>
     <wagonVersion>3.4.3</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
@@ -248,12 +248,12 @@ under the License.
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
-        <version>${sisuInjectVersion}</version>
+        <version>${sisuVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuInjectVersion}</version>
+        <version>${sisuVersion}</version>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
@@ -262,8 +262,8 @@ under the License.
       </dependency>
       <dependency>
         <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -480,7 +480,7 @@ under the License.
         <plugin>
           <groupId>org.eclipse.sisu</groupId>
           <artifactId>sisu-maven-plugin</artifactId>
-          <version>${sisuInjectVersion}</version>
+          <version>${sisuVersion}</version>
           <executions>
             <execution>
               <goals>
@@ -545,10 +545,10 @@ under the License.
               <exclude>src/test/remote-repo/**</exclude>
               <exclude>**/*.odg</exclude>
               <!--
-                ! Excluded the license files itself cause they do not have have a license of themselfs.
+                ! Excluded the license files itself cause they do not have have a license of themselves.
               -->
-              <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.2.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
