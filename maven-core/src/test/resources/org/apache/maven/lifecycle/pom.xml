@@ -55,7 +55,7 @@ under the License.
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>4.13</junitVersion>
     <plexusVersion>1.0-beta-3.0.7-SNAPSHOT</plexusVersion>
-    <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
+    <plexusInteractivityVersion>1.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>1.5.8</plexusUtilsVersion>
