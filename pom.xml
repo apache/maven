@@ -59,7 +59,7 @@ under the License.
     <guiceVersion>4.2.3</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <sisuInjectVersion>0.3.4</sisuInjectVersion>
+    <sisuInjectVersion>0.3.5</sisuInjectVersion>
     <wagonVersion>3.4.3</wagonVersion>
     <jsoupVersion>1.12.1</jsoupVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
@@ -278,8 +278,8 @@ under the License.
       </dependency>
       <dependency>
         <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

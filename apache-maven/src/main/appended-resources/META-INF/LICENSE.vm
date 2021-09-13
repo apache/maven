@@ -35,6 +35,8 @@ subject to the terms and conditions of the following licenses:
 #*    *### infer SPDX license id
 #*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
 #*      *##set ( $spdx = 'CDDL-1.0' )
+#*    *##elseif ( $license.name == "CDDL + GPLv2 with classpath exception" )
+#*      *##set ( $spdx = 'CDDL-1.1' )
 #*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'MIT' )
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
