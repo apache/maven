@@ -114,6 +114,7 @@ under the License.
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
     </dependency>
+    <!-- This is required for classpath scanning of annotated components -->
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
