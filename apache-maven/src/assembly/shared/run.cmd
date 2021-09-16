@@ -5,6 +5,7 @@
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
+  "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %MAVEN_LAUNCHER% %*
 if ERRORLEVEL 1 goto error

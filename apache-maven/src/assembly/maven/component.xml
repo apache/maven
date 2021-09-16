@@ -73,6 +73,13 @@ under the License.
       <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
+      <directory>target/dependency/org/fusesource/jansi/internal/native</directory>
+      <outputDirectory>lib/jansi-native</outputDirectory>
+      <includes>
+        <include>**</include>
+      </includes>
+    </fileSet>
+	<fileSet>
       <directory>src/assembly/maven/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
