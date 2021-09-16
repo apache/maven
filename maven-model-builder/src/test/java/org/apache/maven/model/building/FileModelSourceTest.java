@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
-import org.apache.commons.lang3.SystemUtils;
+import org.codehaus.plexus.util.Os;;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class FileModelSourceTest
     public void testWindowsPaths() 
             throws Exception 
     {
-        assumeTrue( SystemUtils.IS_OS_WINDOWS );
+        assumeTrue( Os.isFamily( "Windows" ) );
 
         File upperCaseFile = createTempFile( "TESTE" );
         String absolutePath = upperCaseFile.getAbsolutePath();
