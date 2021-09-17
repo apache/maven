@@ -181,18 +181,6 @@ public class DefaultProjectDependenciesResolver
 
         depRequest.setRoot( node );
 
-        if ( logger.isWarnEnabled() )
-        {
-            for ( DependencyNode child : node.getChildren() )
-            {
-                if ( !child.getRelocations().isEmpty() )
-                {
-                    logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
-                        + child.getDependency().getArtifact() );
-                }
-            }
-        }
-
         if ( logger.isDebugEnabled() )
         {
             node.accept( new GraphLogger( project ) );
