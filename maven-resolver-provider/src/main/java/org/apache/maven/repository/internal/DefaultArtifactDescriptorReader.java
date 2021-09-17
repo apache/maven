@@ -68,6 +68,8 @@ import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Benjamin Bentmann
@@ -77,6 +79,8 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultArtifactDescriptorReader.class );
+
     private RemoteRepositoryManager remoteRepositoryManager;
 
     private VersionResolver versionResolver;
@@ -319,10 +323,20 @@ public class DefaultArtifactDescriptorReader
             if ( relocation != null )
             {
                 result.addRelocation( a );
-                a =
+                Artifact relocatedArtifact =
                     new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
                                            relocation.getVersion() );
-                result.setArtifact( a );
+                if ( LOGGER.isWarnEnabled() )
+                {
+                    String message = "The artifact " + a + " has been relocated to " + relocatedArtifact;
+                    if ( relocation.getMessage() != null )
+                    {
+                        message += ": " + relocation.getMessage();
+                    }
+                    LOGGER.warn( message );
+                }
+                result.setArtifact( relocatedArtifact );
+                a = relocatedArtifact;
             }
             else
             {
