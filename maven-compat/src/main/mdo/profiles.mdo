@@ -308,7 +308,7 @@ under the License.
           <name>checksumPolicy</name>
           <version>1.0.0</version>
           <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
-            "fail", "warn" (default) or "ignore"</description>
+            "fail" (default), "warn" or "ignore"</description>
           <type>String</type>
         </field>
       </fields>

@@ -969,7 +969,7 @@
           <version>1.0.0+</version>
           <description>
             What to do when verification of an artifact checksum fails -
-            warn, fail, etc. Valid values are "fail", "warn" (default) or "ignore".
+            warn, fail, etc. Valid values are "fail" (default), "warn" or "ignore".
           </description>
           <type>String</type>
         </field>
