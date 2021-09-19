@@ -38,7 +38,9 @@ title %0
 if not "%MAVEN_SKIP_RC%"=="" goto skipRc
 if exist "%PROGRAMDATA%\mavenrc.cmd" call "%PROGRAMDATA%\mavenrc.cmd" %*
 @REM check for pre script, once with legacy .bat ending and once with .cmd ending
+if exist "%USERPROFILE%\mavenrc_pre.bat" echo Warning: The mavenrc_pre.bat script is deprecated and will be removed in a future version. >&2
 if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
+if exist "%USERPROFILE%\mavenrc_pre.cmd" echo Warning: The mavenrc_pre.cmd script is deprecated and will be removed in a future version. >&2
 if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
 if exist "%USERPROFILE%\mavenrc.cmd" call "%USERPROFILE%\mavenrc.cmd" %*
 :skipRc
