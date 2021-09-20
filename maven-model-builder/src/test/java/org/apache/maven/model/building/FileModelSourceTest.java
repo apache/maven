@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.lang3.SystemUtils;
+import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,7 +57,7 @@ public class FileModelSourceTest
     public void testWindowsPaths()
             throws Exception
     {
-        assumeTrue( SystemUtils.IS_OS_WINDOWS );
+        assumeTrue( Os.isFamily( "Windows" ) );
 
         File upperCaseFile = createTempFile( "TESTE" );
         String absolutePath = upperCaseFile.getAbsolutePath();
