@@ -46,8 +46,6 @@ import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
@@ -72,7 +70,7 @@ import java.util.Objects;
 @Named
 @Singleton
 public class DefaultVersionResolver
-    implements VersionResolver, Service
+    implements VersionResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
@@ -101,13 +99,6 @@ public class DefaultVersionResolver
         setMetadataResolver( metadataResolver );
         setSyncContextFactory( syncContextFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
-    }
-
-    public void initService( ServiceLocator locator )
-    {
-        setMetadataResolver( locator.getService( MetadataResolver.class ) );
-        setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
     }
 
     public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
