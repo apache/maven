@@ -42,8 +42,13 @@ public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
 
+    private final Logger logger;
+
     @Inject
-    private Logger logger;
+    public DefaultToolchainsBuilder( Logger logger )
+    {
+        this.logger = logger;
+    }
 
     public PersistedToolchains build( File userToolchainsFile )
         throws MisconfiguredToolchainException

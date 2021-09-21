@@ -51,21 +51,22 @@ public class DefaultBuildPluginManager
     implements BuildPluginManager
 {
 
-    @Inject
-    private MavenPluginManager mavenPluginManager;
+    private final MavenPluginManager mavenPluginManager;
+    private final LegacySupport legacySupport;
+    private final MojoExecutionScope scope;
+    private final MojoExecutionListener mojoExecutionListener;
 
     @Inject
-    private LegacySupport legacySupport;
-
-    @Inject
-    private MojoExecutionScope scope;
-
-    private MojoExecutionListener mojoExecutionListener;
-
-    @Inject
-    public void setMojoExecutionListeners( final List<MojoExecutionListener> listeners )
+    public DefaultBuildPluginManager(
+            MavenPluginManager mavenPluginManager,
+            LegacySupport legacySupport,
+            MojoExecutionScope scope,
+            List<MojoExecutionListener> mojoExecutionListeners )
     {
-        this.mojoExecutionListener = new CompoundMojoExecutionListener( listeners );
+        this.mavenPluginManager = mavenPluginManager;
+        this.legacySupport = legacySupport;
+        this.scope = scope;
+        this.mojoExecutionListener = new CompoundMojoExecutionListener( mojoExecutionListeners );
     }
 
     /**

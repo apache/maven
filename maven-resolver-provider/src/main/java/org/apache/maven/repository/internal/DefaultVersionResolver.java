@@ -81,43 +81,18 @@ public class DefaultVersionResolver
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
-    private MetadataResolver metadataResolver;
-
-    private SyncContextFactory syncContextFactory;
-
-    private RepositoryEventDispatcher repositoryEventDispatcher;
-
-    public DefaultVersionResolver()
-    {
-        // enable no-arg constructor
-    }
+    private final MetadataResolver metadataResolver;
+    private final SyncContextFactory syncContextFactory;
+    private final RepositoryEventDispatcher repositoryEventDispatcher;
 
     @Inject
-    DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
+    public DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
                             RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        setMetadataResolver( metadataResolver );
-        setSyncContextFactory( syncContextFactory );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
-    }
-
-    public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
-    {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
-    {
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
-    {
         this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
-        return this;
+                "repositoryEventDispatcher cannot be null" );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )

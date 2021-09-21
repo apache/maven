@@ -41,13 +41,12 @@ import java.io.File;
 public class ProfileActivationFilePathInterpolator
 {
 
-    @Inject
-    private PathTranslator pathTranslator;
+    private final PathTranslator pathTranslator;
 
-    public ProfileActivationFilePathInterpolator setPathTranslator( PathTranslator pathTranslator )
+    @Inject
+    public ProfileActivationFilePathInterpolator( PathTranslator pathTranslator )
     {
         this.pathTranslator = pathTranslator;
-        return this;
     }
 
     /**

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.eclipse.sisu.Priority;
 
 @Named
 @Singleton

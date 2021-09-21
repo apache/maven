@@ -132,48 +132,53 @@ public class DefaultMavenPluginManager
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 
-    @Inject
     private Logger logger;
-
-    @Inject
     private LoggerManager loggerManager;
-
-    @Inject
     private PlexusContainer container;
-
-    @Inject
     private ClassRealmManager classRealmManager;
-
-    @Inject
     private PluginDescriptorCache pluginDescriptorCache;
-
-    @Inject
     private PluginRealmCache pluginRealmCache;
-
-    @Inject
     private PluginDependenciesResolver pluginDependenciesResolver;
-
-    @Inject
     private RuntimeInformation runtimeInformation;
-
-    @Inject
     private ExtensionRealmCache extensionRealmCache;
-
-    @Inject
     private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
     private PluginArtifactsCache pluginArtifactsCache;
-
-    @Inject
     private MavenPluginValidator pluginValidator;
 
-    private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
+    private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
+    private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-    private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
+    @Inject
+    public DefaultMavenPluginManager(
+            Logger logger,
+            LoggerManager loggerManager,
+            PlexusContainer container,
+            ClassRealmManager classRealmManager,
+            PluginDescriptorCache pluginDescriptorCache,
+            PluginRealmCache pluginRealmCache,
+            PluginDependenciesResolver pluginDependenciesResolver,
+            RuntimeInformation runtimeInformation,
+            ExtensionRealmCache extensionRealmCache,
+            PluginVersionResolver pluginVersionResolver,
+            PluginArtifactsCache pluginArtifactsCache,
+            MavenPluginValidator pluginValidator )
+    {
+        this.logger = logger;
+        this.loggerManager = loggerManager;
+        this.container = container;
+        this.classRealmManager = classRealmManager;
+        this.pluginDescriptorCache = pluginDescriptorCache;
+        this.pluginRealmCache = pluginRealmCache;
+        this.pluginDependenciesResolver = pluginDependenciesResolver;
+        this.runtimeInformation = runtimeInformation;
+        this.extensionRealmCache = extensionRealmCache;
+        this.pluginVersionResolver = pluginVersionResolver;
+        this.pluginArtifactsCache = pluginArtifactsCache;
+        this.pluginValidator = pluginValidator;
+    }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
-                                                              RepositorySystemSession session )
+                                                             RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositories, session );

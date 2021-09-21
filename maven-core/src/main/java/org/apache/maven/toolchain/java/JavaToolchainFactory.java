@@ -51,8 +51,13 @@ public class JavaToolchainFactory
     implements ToolchainFactory
 {
 
-    @Inject
     private Logger logger;
+
+    @Inject
+    public JavaToolchainFactory( Logger logger )
+    {
+        this.logger = logger;
+    }
 
     public ToolchainPrivate createToolchain( ToolchainModel model )
         throws MisconfiguredToolchainException

@@ -39,25 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
 {
 
-    private Class<T> activatorClass;
-
     protected T activator;
 
-    public AbstractProfileActivatorTest( Class<T> activatorClass )
-    {
-        this.activatorClass = Objects.requireNonNull( activatorClass, "activatorClass cannot be null" );;
-    }
-
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        activator = activatorClass.getConstructor().newInstance();
-    }
+    abstract void setUp() throws Exception;
 
     @AfterEach
-    public void tearDown()
-        throws Exception
+    void tearDown() throws Exception
     {
         activator = null;
     }

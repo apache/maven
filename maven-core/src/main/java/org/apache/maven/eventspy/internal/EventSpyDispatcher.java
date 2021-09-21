@@ -40,21 +40,16 @@ import org.eclipse.aether.RepositoryListener;
 public class EventSpyDispatcher
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
 
-    private List<EventSpy> eventSpies;
+    private final List<EventSpy> eventSpies;
 
     @Inject
-    public void setEventSpies( List<EventSpy> eventSpies )
+    public EventSpyDispatcher( Logger logger, List<EventSpy> eventSpies )
     {
+        this.logger = logger;
         // make copy to get rid of needless overhead for dynamic lookups
         this.eventSpies = new ArrayList<>( eventSpies );
-    }
-
-    public List<EventSpy> getEventSpies()
-    {
-        return eventSpies;
     }
 
     public ExecutionListener chainListener( ExecutionListener listener )

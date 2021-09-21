@@ -52,10 +52,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultModelReader
     implements ModelReader
 {
-    @Inject
-    private ModelSourceTransformer transformer;
+    private final ModelSourceTransformer transformer;
 
-    public void setTransformer( ModelSourceTransformer transformer )
+    @Inject
+    public DefaultModelReader( ModelSourceTransformer transformer )
     {
         this.transformer = transformer;
     }

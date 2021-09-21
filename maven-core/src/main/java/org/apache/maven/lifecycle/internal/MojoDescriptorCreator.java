@@ -67,29 +67,21 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class MojoDescriptorCreator
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+    private final PluginVersionResolver pluginVersionResolver;
+    private final BuildPluginManager pluginManager;
+    private final PluginPrefixResolver pluginPrefixResolver;
+    private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
-    private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private PluginPrefixResolver pluginPrefixResolver;
-
-    @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    public MojoDescriptorCreator()
+    public MojoDescriptorCreator(
+            Logger logger,
+            PluginVersionResolver pluginVersionResolver,
+            BuildPluginManager pluginManager,
+            PluginPrefixResolver pluginPrefixResolver,
+            LifecyclePluginResolver lifecyclePluginResolver )
     {
-    }
-
-    public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
-                                  PluginPrefixResolver pluginPrefixResolver,
-                                  LifecyclePluginResolver lifecyclePluginResolver )
-    {
+        this.logger = logger;
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
         this.pluginPrefixResolver = pluginPrefixResolver;
