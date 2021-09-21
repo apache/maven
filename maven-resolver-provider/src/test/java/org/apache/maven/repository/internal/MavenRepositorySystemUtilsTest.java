@@ -19,13 +19,9 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.MetadataGeneratorFactory;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MavenRepositorySystemUtilsTest
@@ -36,21 +32,6 @@ public class MavenRepositorySystemUtilsTest
     {
         RepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         assertNotNull( session );
-    }
-
-    @Test
-    public void testGetRepositorySystem()
-    {
-        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        RepositorySystem repoSys = locator.getService( RepositorySystem.class );
-        assertNotNull( repoSys );
-    }
-
-    @Test
-    public void testGetMetadataGeneratorFactories()
-    {
-        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        assertEquals( 2, locator.getServices( MetadataGeneratorFactory.class ).size() );
     }
 
 }
