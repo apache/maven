@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
  */
 
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MavenRepositorySystemUtilsTest
 {
+
+    @Test
+    public void testNewSession()
+    {
+        RepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        assertNotNull( session );
+    }
 
     @Test
     public void testGetRepositorySystem()
