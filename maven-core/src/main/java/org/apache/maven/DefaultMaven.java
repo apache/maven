@@ -83,42 +83,58 @@ public class DefaultMaven
     implements Maven
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
 
-    @Inject
     protected ProjectBuilder projectBuilder;
 
-    @Inject
     private LifecycleStarter lifecycleStarter;
 
-    @Inject
     protected PlexusContainer container;
 
-    @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Inject
     private LegacySupport legacySupport;
 
-    @Inject
     private SessionScope sessionScope;
 
-    @Inject
     private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
-    @Inject
-    @Named( GraphBuilder.HINT )
-    private GraphBuilder graphBuilder;
+    private final GraphBuilder graphBuilder;
+
+    private final BuildResumptionAnalyzer buildResumptionAnalyzer;
+
+    private final BuildResumptionDataRepository buildResumptionDataRepository;
+
+    private final SuperPomProvider superPomProvider;
 
     @Inject
-    private BuildResumptionAnalyzer buildResumptionAnalyzer;
-
-    @Inject
-    private BuildResumptionDataRepository buildResumptionDataRepository;
-
-    @Inject
-    private SuperPomProvider superPomProvider;
+    public DefaultMaven(
+            Logger logger,
+            ProjectBuilder projectBuilder,
+            LifecycleStarter lifecycleStarter,
+            PlexusContainer container,
+            ExecutionEventCatapult eventCatapult,
+            LegacySupport legacySupport,
+            SessionScope sessionScope,
+            DefaultRepositorySystemSessionFactory repositorySessionFactory,
+            @Named( GraphBuilder.HINT ) GraphBuilder graphBuilder,
+            BuildResumptionAnalyzer buildResumptionAnalyzer,
+            BuildResumptionDataRepository buildResumptionDataRepository,
+            SuperPomProvider superPomProvider )
+    {
+        this.logger = logger;
+        this.projectBuilder = projectBuilder;
+        this.lifecycleStarter = lifecycleStarter;
+        this.container = container;
+        this.eventCatapult = eventCatapult;
+        this.legacySupport = legacySupport;
+        this.sessionScope = sessionScope;
+        this.repositorySessionFactory = repositorySessionFactory;
+        this.graphBuilder = graphBuilder;
+        this.buildResumptionAnalyzer = buildResumptionAnalyzer;
+        this.buildResumptionDataRepository = buildResumptionDataRepository;
+        this.superPomProvider = superPomProvider;
+    }
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )

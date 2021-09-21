@@ -52,19 +52,13 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 public class LifecycleDebugLogger
 {
+    private final Logger logger;
+
     @Inject
-    private Logger logger;
-
-
-    public LifecycleDebugLogger()
-    {
-    }
-
     public LifecycleDebugLogger( Logger logger )
     {
         this.logger = logger;
     }
-
 
     public void debug( String s )
     {

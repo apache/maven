@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -71,6 +72,8 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
@@ -88,6 +91,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class StringVisitorModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
+    @Inject
+    public StringVisitorModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
+    {
+        super( pathTranslator, urlNormalizer );
+    }
 
     interface InnerInterpolator
     {

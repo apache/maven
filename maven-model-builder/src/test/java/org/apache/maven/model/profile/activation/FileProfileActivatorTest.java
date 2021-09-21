@@ -48,17 +48,11 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
-    public FileProfileActivatorTest()
-    {
-        super( FileProfileActivator.class );
-    }
-
     @BeforeEach
-    public void setUp() throws Exception
+    @Override
+    void setUp() throws Exception
     {
-        super.setUp();
-        activator.setProfileActivationFilePathInterpolator(
-                new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
+        activator = new FileProfileActivator( new ProfileActivationFilePathInterpolator( new DefaultPathTranslator() ) );
 
         context.setProjectDirectory( new File( tempDir.toString() ) );
 

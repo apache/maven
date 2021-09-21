@@ -62,32 +62,37 @@ public class DefaultLifecycleExecutor
     implements LifecycleExecutor
 {
 
-    @Inject
-    private LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
+    private final LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
+    private final DefaultLifecycles defaultLifeCycles;
+    private final LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
+    private final LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
+    private final MojoExecutor mojoExecutor;
+    private final LifecycleStarter lifecycleStarter;
+    private final MojoDescriptorCreator mojoDescriptorCreator;
 
     @Inject
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
-
-    @Inject
-    private LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
-
-    @Inject
-    private MojoExecutor mojoExecutor;
-
-    @Inject
-    private LifecycleStarter lifecycleStarter;
-
+    public DefaultLifecycleExecutor(
+            LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer,
+            DefaultLifecycles defaultLifeCycles,
+            LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
+            LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator,
+            MojoExecutor mojoExecutor,
+            LifecycleStarter lifecycleStarter,
+            MojoDescriptorCreator mojoDescriptorCreator )
+    {
+        this.lifeCyclePluginAnalyzer = lifeCyclePluginAnalyzer;
+        this.defaultLifeCycles = defaultLifeCycles;
+        this.lifecycleTaskSegmentCalculator = lifecycleTaskSegmentCalculator;
+        this.lifecycleExecutionPlanCalculator = lifecycleExecutionPlanCalculator;
+        this.mojoExecutor = mojoExecutor;
+        this.lifecycleStarter = lifecycleStarter;
+        this.mojoDescriptorCreator = mojoDescriptorCreator;
+    }
 
     public void execute( MavenSession session )
     {
         lifecycleStarter.execute( session );
     }
-
-    @Inject
-    private MojoDescriptorCreator mojoDescriptorCreator;
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
     // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information

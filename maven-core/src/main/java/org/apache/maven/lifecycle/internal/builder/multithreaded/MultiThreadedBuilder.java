@@ -65,14 +65,14 @@ public class MultiThreadedBuilder
     implements Builder
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+    private final LifecycleModuleBuilder lifecycleModuleBuilder;
 
     @Inject
-    private LifecycleModuleBuilder lifecycleModuleBuilder;
-
-    public MultiThreadedBuilder()
+    public MultiThreadedBuilder( Logger logger, LifecycleModuleBuilder lifecycleModuleBuilder )
     {
+        this.logger = logger;
+        this.lifecycleModuleBuilder = lifecycleModuleBuilder;
     }
 
     @Override

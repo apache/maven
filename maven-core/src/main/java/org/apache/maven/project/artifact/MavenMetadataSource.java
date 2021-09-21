@@ -78,8 +78,6 @@ import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -94,27 +92,30 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
-    @Inject
-    private RepositoryMetadataManager repositoryMetadataManager;
 
-    @Inject
-    private ArtifactFactory repositorySystem;
-
-    //TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
-    //@Inject
-    private ProjectBuilder projectBuilder;
-
-    @Inject
-    private PlexusContainer container;
-
-    @Inject
     private Logger logger;
-
-    @Inject
+    private RepositoryMetadataManager repositoryMetadataManager;
+    private ArtifactFactory repositorySystem;
+    private ProjectBuilder projectBuilder;
     private MavenMetadataCache cache;
+    private LegacySupport legacySupport;
 
     @Inject
-    private LegacySupport legacySupport;
+    public MavenMetadataSource(
+            Logger logger,
+            RepositoryMetadataManager repositoryMetadataManager,
+            ArtifactFactory repositorySystem,
+            ProjectBuilder projectBuilder,
+            MavenMetadataCache cache,
+            LegacySupport legacySupport )
+    {
+        this.logger = logger;
+        this.repositoryMetadataManager = repositoryMetadataManager;
+        this.repositorySystem = repositorySystem;
+        this.projectBuilder = projectBuilder;
+        this.cache = cache;
+        this.legacySupport = legacySupport;
+    }
 
     private void injectSession( MetadataResolutionRequest request )
     {
@@ -535,24 +536,6 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    private ProjectBuilder getProjectBuilder()
-    {
-        if ( projectBuilder != null )
-        {
-            return projectBuilder;
-        }
-
-        try
-        {
-            projectBuilder = container.lookup( ProjectBuilder.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // Won't happen
-        }
-
-        return projectBuilder;
-    }
     @SuppressWarnings( "checkstyle:methodlength" )
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, MetadataResolutionRequest repositoryRequest )
         throws ArtifactMetadataRetrievalException
@@ -593,7 +576,7 @@ public class MavenMetadataSource
                     configuration.setSystemProperties( getSystemProperties() );
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
-                    project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
+                    project = projectBuilder.build( pomArtifact, configuration ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {

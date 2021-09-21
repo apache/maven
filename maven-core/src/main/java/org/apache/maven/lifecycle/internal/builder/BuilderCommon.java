@@ -71,28 +71,22 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 public class BuilderCommon
 {
-    @Inject
-    private LifecycleDebugLogger lifecycleDebugLogger;
+    private final Logger logger;
+    private final LifecycleDebugLogger lifecycleDebugLogger;
+    private final LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
+    private final ExecutionEventCatapult eventCatapult;
 
     @Inject
-    private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    @Inject
-    private Logger logger;
-
-    public BuilderCommon()
+    public BuilderCommon(
+            Logger logger,
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+            ExecutionEventCatapult eventCatapult )
     {
-    }
-
-    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator, Logger logger )
-    {
+        this.logger = logger;
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
-        this.logger = logger;
+        this.eventCatapult = eventCatapult;
     }
 
     public MavenExecutionPlan resolveBuildPlan( MavenSession session, MavenProject project, TaskSegment taskSegment,

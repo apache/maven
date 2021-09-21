@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
@@ -45,8 +46,10 @@ public class ProjectClasspathTest
         super.setUp();
 
         ArtifactResolver resolver = getContainer().lookup( ArtifactResolver.class, "classpath" );
-        DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)getContainer().lookup(ArtifactDescriptorReader.class);
-        pomReader.setArtifactResolver( resolver );
+        DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader) getContainer().lookup(ArtifactDescriptorReader.class);
+        Field field = DefaultArtifactDescriptorReader.class.getDeclaredField( "artifactResolver" );
+        field.setAccessible( true );
+        field.set( pomReader, resolver );
 
         projectBuilder = getContainer().lookup( ProjectBuilder.class, "classpath" );
     }

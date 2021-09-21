@@ -41,13 +41,12 @@ public class DefaultModelUrlNormalizer
     implements ModelUrlNormalizer
 {
 
-    @Inject
-    private UrlNormalizer urlNormalizer;
+    private final UrlNormalizer urlNormalizer;
 
-    public DefaultModelUrlNormalizer setUrlNormalizer( UrlNormalizer urlNormalizer )
+    @Inject
+    public DefaultModelUrlNormalizer( UrlNormalizer urlNormalizer )
     {
         this.urlNormalizer = urlNormalizer;
-        return this;
     }
 
     @Override
