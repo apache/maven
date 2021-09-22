@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.internal.sisu.VisibleBeansHelper;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -37,11 +42,11 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -52,24 +57,28 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component( role = LifeCyclePluginAnalyzer.class )
+@Singleton
+@Named
 public class DefaultLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
     public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
         + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
-    @Requirement( role = LifecycleMapping.class )
-    private Map<String, LifecycleMapping> lifecycleMappings;
+    private final VisibleBeansHelper visibleBeansHelper;
 
-    @Requirement
-    private DefaultLifecycles defaultLifeCycles;
+    private final DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
-    private Logger logger;
+    private final Logger logger;
 
-    public DefaultLifecyclePluginAnalyzer()
+    @Inject
+    public DefaultLifecyclePluginAnalyzer( final VisibleBeansHelper visibleBeansHelper,
+                                           final DefaultLifecycles defaultLifeCycles,
+                                           final Logger logger )
     {
+        this.visibleBeansHelper = requireNonNull( visibleBeansHelper );
+        this.defaultLifeCycles = requireNonNull( defaultLifeCycles );
+        this.logger = requireNonNull( logger );
     }
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
@@ -82,6 +91,7 @@ public class DefaultLifecyclePluginAnalyzer
     // from the plugin.xml inside a plugin.
     //
 
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         if ( logger.isDebugEnabled() )
@@ -90,7 +100,8 @@ public class DefaultLifecyclePluginAnalyzer
                 + Thread.currentThread().getContextClassLoader() );
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+        LifecycleMapping lifecycleMappingForPackaging =
+            visibleBeansHelper.lookupMap( LifecycleMapping.class ).get( packaging );
 
         if ( lifecycleMappingForPackaging == null )
         {
