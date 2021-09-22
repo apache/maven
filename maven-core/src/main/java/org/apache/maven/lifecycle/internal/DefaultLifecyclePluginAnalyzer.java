@@ -101,7 +101,7 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         LifecycleMapping lifecycleMappingForPackaging =
-            visibleBeansHelper.lookupMap( LifecycleMapping.class ).get( packaging );
+            visibleBeansHelper.lookup( LifecycleMapping.class, packaging );
 
         if ( lifecycleMappingForPackaging == null )
         {
