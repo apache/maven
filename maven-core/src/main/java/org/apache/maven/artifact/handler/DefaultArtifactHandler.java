@@ -80,6 +80,11 @@ public class DefaultArtifactHandler
         return classifier;
     }
 
+    public void setClassifier( String classifier )
+    {
+        this.classifier = classifier;
+    }
+
     public String getDirectory()
     {
         if ( directory == null )
@@ -96,6 +101,11 @@ public class DefaultArtifactHandler
             packaging = type;
         }
         return packaging;
+    }
+
+    public void setPackaging( String packaging )
+    {
+        this.packaging = packaging;
     }
 
     public boolean isIncludesDependencies()
