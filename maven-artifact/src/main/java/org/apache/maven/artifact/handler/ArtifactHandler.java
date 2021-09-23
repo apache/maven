@@ -30,6 +30,7 @@ package org.apache.maven.artifact.handler;
  */
 public interface ArtifactHandler
 {
+    @Deprecated
     String ROLE = ArtifactHandler.class.getName();
 
     /**
