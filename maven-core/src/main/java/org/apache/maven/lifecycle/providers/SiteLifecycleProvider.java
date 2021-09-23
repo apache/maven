@@ -19,13 +19,15 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
@@ -39,20 +41,19 @@ public final class SiteLifecycleProvider
   @Inject
   public SiteLifecycleProvider()
   {
+    HashMap<String, LifecyclePhase> phases = new HashMap<>();
+    phases.put( "site", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ) );
+    phases.put( "site-deploy", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" ) );
+
     this.lifecycle = new Lifecycle(
         "site",
-        ImmutableList.of(
-            "pre-site",
-            "site",
-            "post-site",
-            "site-deploy"
-        ),
-        ImmutableMap.of(
-            "site",
-            new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ),
-            "site-deploy",
-            new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" )
-        )
+        Collections.unmodifiableList( Arrays.asList(
+                "pre-site",
+                "site",
+                "post-site",
+                "site-deploy"
+        ) ),
+        Collections.unmodifiableMap( phases )
     );
   }
 

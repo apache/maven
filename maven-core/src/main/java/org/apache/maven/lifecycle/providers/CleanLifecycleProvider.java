@@ -19,13 +19,15 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
@@ -39,17 +41,17 @@ public final class CleanLifecycleProvider
   @Inject
   public CleanLifecycleProvider()
   {
+    HashMap<String, LifecyclePhase> phases = new HashMap<>();
+    phases.put( "clean", new LifecyclePhase( "org.apache.maven.plugins:maven-clean-plugin:3.1.0:clean" ) );
+
     this.lifecycle = new Lifecycle(
         "clean",
-        ImmutableList.of(
-            "pre-clean",
-            "clean",
-            "post-clean"
-        ),
-        ImmutableMap.of(
-            "clean",
-            new LifecyclePhase( "org.apache.maven.plugins:maven-clean-plugin:3.1.0:clean" )
-        )
+        Collections.unmodifiableList( Arrays.asList(
+                "pre-clean",
+                "clean",
+                "post-clean"
+        ) ),
+        Collections.unmodifiableMap( phases )
     );
   }
 

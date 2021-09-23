@@ -19,12 +19,14 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.maven.lifecycle.Lifecycle;
 
 @Named( "default" )
@@ -39,31 +41,31 @@ public final class DefaultLifecycleProvider
   {
     this.lifecycle = new Lifecycle(
         "default",
-        ImmutableList.of(
-            "validate",
-            "initialize",
-            "generate-sources",
-            "process-sources",
-            "generate-resources",
-            "process-resources",
-            "compile",
-            "process-classes",
-            "generate-test-sources",
-            "process-test-sources",
-            "generate-test-resources",
-            "process-test-resources",
-            "test-compile",
-            "process-test-classes",
-            "test",
-            "prepare-package",
-            "package",
-            "pre-integration-test",
-            "integration-test",
-            "post-integration-test",
-            "verify",
-            "install",
-            "deploy"
-        ),
+        Collections.unmodifiableList( Arrays.asList(
+                "validate",
+                "initialize",
+                "generate-sources",
+                "process-sources",
+                "generate-resources",
+                "process-resources",
+                "compile",
+                "process-classes",
+                "generate-test-sources",
+                "process-test-sources",
+                "generate-test-resources",
+                "process-test-resources",
+                "test-compile",
+                "process-test-classes",
+                "test",
+                "prepare-package",
+                "package",
+                "pre-integration-test",
+                "integration-test",
+                "post-integration-test",
+                "verify",
+                "install",
+                "deploy"
+        ) ),
         null
     );
   }
