@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.eclipse.sisu.plexus.ClassRealmManager;
@@ -62,8 +61,8 @@ public final class VisibleBeansHelper
     final Set<String> realmNames = ClassRealmManager.visibleRealmNames( ClassRealmManager.contextRealm() );
     for ( BeanEntry<Annotation, T> beanEntry : beanLocator.locate( key ) ) 
     {
-      final Object source = beanEntry.getSource();
-      if ( !( source instanceof ClassRealm ) || realmNames == null || realmNames.contains( source.toString() ) )
+      final String source = String.valueOf( beanEntry.getSource() );
+      if ( !source.startsWith( "ClassRealm" ) || realmNames == null || realmNames.contains( source ) )
       {
         return beanEntry.getProvider().get();
       }
@@ -81,8 +80,8 @@ public final class VisibleBeansHelper
     HashMap<String, T> result = new HashMap<>();
     beanLocator.locate( key ).forEach( b ->
     {
-      final Object source = b.getSource();
-      if ( !( source instanceof ClassRealm ) || realmNames == null || realmNames.contains( source.toString() ) )
+      final String source = String.valueOf( b.getSource() );
+      if ( !source.startsWith( "ClassRealm" ) || realmNames == null || realmNames.contains( source ) )
       {
         result.put( ( ( com.google.inject.name.Named ) b.getKey() ).value(), b.getProvider().get() );
       }
