@@ -37,13 +37,16 @@ public class JavadocArtifactHandlerProvider
     @Inject
     public JavadocArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "javadoc" );
-        handler.setClassifier( "javadoc" );
-        handler.setExtension( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "javadoc",
+            "jar",
+            "javadoc",
+            null,
+            null,
+            false,
+            "java",
+            true
+        );
     }
 
     @Override

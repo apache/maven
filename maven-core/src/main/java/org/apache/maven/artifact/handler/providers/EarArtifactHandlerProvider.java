@@ -37,12 +37,16 @@ public class EarArtifactHandlerProvider
     @Inject
     public EarArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "ear" );
-        handler.setIncludesDependencies( true );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( false );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "ear",
+            null,
+            null,
+            null,
+            null,
+            true,
+            "java",
+            false
+        );
     }
 
     @Override

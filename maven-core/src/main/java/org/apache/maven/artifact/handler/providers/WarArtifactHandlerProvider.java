@@ -37,12 +37,16 @@ public class WarArtifactHandlerProvider
     @Inject
     public WarArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "war" );
-        handler.setIncludesDependencies( true );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( false );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "war",
+            null,
+            null,
+            null,
+            null,
+            true,
+            "java",
+            false
+        );
     }
 
     @Override

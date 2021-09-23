@@ -65,6 +65,7 @@ public class ProjectArtifact
 
     }
 
+    // TODO: this is duplicate of PomArtifactHandlerProvider provided one
     static class PomArtifactHandler
         implements ArtifactHandler
     {

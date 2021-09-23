@@ -37,14 +37,16 @@ public class TestJarArtifactHandlerProvider
     @Inject
     public TestJarArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "test-jar" );
-        handler.setClassifier( "tests" );
-        handler.setExtension( "jar" );
-        handler.setPackaging( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "test-jar",
+            "jar",
+            "tests",
+            null,
+            "jar",
+            false,
+            "java",
+            true
+        );
     }
 
     @Override

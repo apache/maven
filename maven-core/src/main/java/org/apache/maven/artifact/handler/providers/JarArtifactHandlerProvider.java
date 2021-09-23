@@ -37,11 +37,16 @@ public class JarArtifactHandlerProvider
     @Inject
     public JarArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "jar",
+            null,
+            null,
+            null,
+            null,
+            false,
+            "java",
+            true
+        );
     }
 
     @Override

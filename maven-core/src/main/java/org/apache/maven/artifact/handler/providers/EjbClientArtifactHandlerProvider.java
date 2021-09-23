@@ -37,14 +37,16 @@ public class EjbClientArtifactHandlerProvider
     @Inject
     public EjbClientArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "ejb-client" );
-        handler.setExtension( "jar" );
-        handler.setPackaging( "ejb" );
-        handler.setClassifier( "client" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "ejb-client",
+            "jar",
+            "client",
+            null,
+            "ejb",
+            false,
+            "java",
+            true
+        );
     }
 
     @Override

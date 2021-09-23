@@ -37,12 +37,16 @@ public class EjbArtifactHandlerProvider
     @Inject
     public EjbArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "ejb" );
-        handler.setExtension( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "ejb",
+            "jar",
+            null,
+            null,
+            null,
+            false,
+            "java",
+            true
+        );
     }
 
     @Override

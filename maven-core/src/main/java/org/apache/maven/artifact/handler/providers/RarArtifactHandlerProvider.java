@@ -37,12 +37,16 @@ public class RarArtifactHandlerProvider
     @Inject
     public RarArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "rar" );
-        handler.setIncludesDependencies( true );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( false );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "rar",
+            null,
+            null,
+            null,
+            null,
+            true,
+            "java",
+            false
+        );
     }
 
     @Override

@@ -37,9 +37,16 @@ public class PomArtifactHandlerProvider
     @Inject
     public PomArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "pom" );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "pom",
+            null,
+            null,
+            null,
+            null,
+            false,
+            "none",
+            false
+        );
     }
 
     @Override

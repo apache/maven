@@ -37,13 +37,16 @@ public class JavaSourceArtifactHandlerProvider
     @Inject
     public JavaSourceArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "java-source" );
-        handler.setClassifier( "sources" );
-        handler.setExtension( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( false );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "java-source",
+            "jar",
+            "sources",
+            null,
+            null,
+            false,
+            "java",
+            false
+        );
     }
 
     @Override

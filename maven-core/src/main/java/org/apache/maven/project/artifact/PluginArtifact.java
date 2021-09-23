@@ -56,6 +56,7 @@ public class PluginArtifact
         return Collections.emptyList();
     }
 
+    // TODO: this is duplicate of MavenPluginArtifactHandlerProvider provided one
     static class PluginArtifactHandler
         implements ArtifactHandler
     {

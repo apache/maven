@@ -37,12 +37,16 @@ public class MavenPluginArtifactHandlerProvider
     @Inject
     public MavenPluginArtifactHandlerProvider()
     {
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( "maven-plugin" );
-        handler.setExtension( "jar" );
-        handler.setLanguage( "java" );
-        handler.setAddedToClasspath( true );
-
-        this.artifactHandler = handler;
+        this.artifactHandler = new DefaultArtifactHandler(
+            "maven-plugin",
+            "jar",
+            null,
+            null,
+            null,
+            false,
+            "java",
+            true
+        );
     }
 
     @Override
