@@ -21,14 +21,14 @@ package org.apache.maven.artifact.factory;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PlexusTest
+@MavenTest
 public class DefaultArtifactFactoryTest
 {
 

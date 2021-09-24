@@ -21,17 +21,17 @@ package org.apache.maven.artifact.deployer;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.apache.maven.container.test.MavenTestExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

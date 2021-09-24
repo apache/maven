@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@PlexusTest
+@MavenTest
 public class PomConstructionTest
 {
     private static String BASE_DIR = "src/test";

@@ -24,19 +24,19 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.PlexusContainer;
+import org.apache.maven.container.Container;
+import org.apache.maven.container.test.MavenTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PlexusTest
+@MavenTest
 public class ArtifactHandlerTest
 {
     @Inject
-    PlexusContainer container;
+    Container container;
 
     @Test
     public void testAptConsistency()

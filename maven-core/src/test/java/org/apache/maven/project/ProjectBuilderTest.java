@@ -86,7 +86,7 @@ public class ProjectBuilderTest
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         ModelSource modelSource = new FileModelSource( pomFile );
         ProjectBuildingResult result =
-            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
+            lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
 
         assertNotNull( result.getProject().getParentFile() );
     }
@@ -101,7 +101,7 @@ public class ProjectBuilderTest
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
 
         ProjectBuildingException e = assertThrows( ProjectBuildingException.class,
-                      () -> getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
+                      () -> lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
         assertThat( e.getMessage(),
                     containsString( "[ERROR] 'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing. "
                         + "@ line 9, column 17" ) );
@@ -118,11 +118,11 @@ public class ProjectBuilderTest
         configuration.setResolveDependencies( true );
 
         // single project build entry point
-        ProjectBuildingResult result = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        ProjectBuildingResult result = lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
         assertEquals( 1, result.getProject().getArtifacts().size() );
         // multi projects build entry point
         List<ProjectBuildingResult> results =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false,
+                lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false,
                                                                            configuration );
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
@@ -140,10 +140,10 @@ public class ProjectBuilderTest
         configuration.setResolveDependencies( false );
 
         // single project build entry point
-        ProjectBuildingResult result = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        ProjectBuildingResult result = lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
         assertEquals( 0, result.getProject().getArtifacts().size() );
         // multi projects build entry point
-        List<ProjectBuildingResult> results = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
+        List<ProjectBuildingResult> results = lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 0, mavenProject.getArtifacts().size() );
@@ -161,7 +161,7 @@ public class ProjectBuilderTest
             MavenSession mavenSession = createMavenSession( null );
             ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
             configuration.setRepositorySession( mavenSession.getRepositorySession() );
-            org.apache.maven.project.ProjectBuilder projectBuilder = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+            org.apache.maven.project.ProjectBuilder projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
             File child = new File( tempDir.toFile(), "child/pom.xml" );
             // build project once
             projectBuilder.build( child, configuration );
@@ -191,7 +191,7 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+                lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
         ProjectBuildingException ex1 =
@@ -225,7 +225,7 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+                lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
         Exception ex = assertThrows( Exception.class, () -> projectBuilder.build( pomFile, configuration ) );
@@ -254,7 +254,7 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+                lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // read poms separately
         boolean parentFileWasFoundOnChild = false;
@@ -344,7 +344,7 @@ public class ProjectBuilderTest
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         ModelSource modelSource = new FileModelSource( pomFile );
         ProjectBuildingResult result =
-            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
+            lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
 
         assertEquals( pomFile.getAbsoluteFile(), result.getProject().getModel().getPomFile().getAbsoluteFile() );
         int errors = 0;

@@ -40,7 +40,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -67,7 +66,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 @Named
 @Singleton
 public class DefaultPluginManager
-    implements PluginManager
 {
 
     @Inject

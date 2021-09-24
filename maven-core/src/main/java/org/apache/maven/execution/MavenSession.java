@@ -34,8 +34,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -288,12 +286,6 @@ public class MavenSession
 
     /*if_not[MAVEN4]*/
 
-    //
-    // Deprecated
-    //
-
-    private PlexusContainer container;
-
     private final Settings settings;
 
     @Deprecated
@@ -304,10 +296,9 @@ public class MavenSession
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
+    public MavenSession( RepositorySystemSession repositorySession,
                          MavenExecutionRequest request, MavenExecutionResult result )
     {
-        this.container = container;
         this.request = request;
         this.result = result;
         this.settings = new SettingsAdapter( request );
@@ -315,30 +306,29 @@ public class MavenSession
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
+    public MavenSession( MavenExecutionRequest request, MavenExecutionResult result,
                          MavenProject project )
     {
-        this( container, request, result, Arrays.asList( new MavenProject[]{project} ) );
+        this( request, result, Arrays.asList( new MavenProject[]{project} ) );
     }
 
     @Deprecated
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+    public MavenSession( Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
                          String executionRootDir, Properties executionProperties, Date startTime )
     {
-        this( container, settings, localRepository, eventDispatcher, unused, goals, executionRootDir,
+        this( settings, localRepository, eventDispatcher, unused, goals, executionRootDir,
               executionProperties, null, startTime );
     }
 
     @Deprecated
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+    public MavenSession( Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
                          String executionRootDir, Properties executionProperties, Properties userProperties,
                          Date startTime )
     {
-        this.container = container;
         this.settings = settings;
         this.executionProperties = executionProperties;
         this.request = new DefaultMavenExecutionRequest();
@@ -350,10 +340,9 @@ public class MavenSession
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
+    public MavenSession( MavenExecutionRequest request, MavenExecutionResult result,
                          List<MavenProject> projects )
     {
-        this.container = container;
         this.request = request;
         this.result = result;
         this.settings = new SettingsAdapter( request );
@@ -402,40 +391,6 @@ public class MavenSession
         }
 
         return executionProperties;
-    }
-
-    @Deprecated
-    public PlexusContainer getContainer()
-    {
-        return container;
-    }
-
-    @Deprecated
-    public Object lookup( String role )
-        throws ComponentLookupException
-    {
-        return container.lookup( role );
-    }
-
-    @Deprecated
-    public Object lookup( String role, String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( role, roleHint );
-    }
-
-    @Deprecated
-    public List<Object> lookupList( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupList( role );
-    }
-
-    @Deprecated
-    public Map<String, Object> lookupMap( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupMap( role );
     }
 
     /*end[MAVEN4]*/

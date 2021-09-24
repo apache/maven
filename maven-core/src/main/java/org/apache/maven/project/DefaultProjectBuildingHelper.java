@@ -37,6 +37,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.container.Container;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -49,7 +50,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -72,7 +72,7 @@ public class DefaultProjectBuildingHelper
     private Logger logger;
 
     @Inject
-    private PlexusContainer container;
+    private Container container;
 
     @Inject
     private ClassRealmManager classRealmManager;

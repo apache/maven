@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Jason van Zyl
  */
-@PlexusTest
+@MavenTest
 public abstract class AbstractMavenProjectTestCase
 {
     protected ProjectBuilder projectBuilder;

@@ -24,15 +24,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@PlexusTest
+@MavenTest
 public class DefaultMavenExecutionRequestPopulatorTest
 {
     @Inject

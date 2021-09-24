@@ -23,10 +23,10 @@ import java.net.MalformedURLException;
 
 import javax.inject.Inject;
 
+import org.apache.maven.container.Container;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -36,14 +36,14 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
-@PlexusTest
+@MavenTest
 public abstract class AbstractRepositoryTestCase
 {
     @Inject
     protected RepositorySystem system;
 
     @Inject
-    protected PlexusContainer container;
+    protected Container container;
 
     protected RepositorySystemSession session;
 
@@ -54,11 +54,12 @@ public abstract class AbstractRepositoryTestCase
         session = newMavenRepositorySystemSession( system );
     }
 
-    protected PlexusContainer getContainer() {
-        return container;
+    protected <T> T lookup( Class<T> role )
+    {
+        return container.lookup( role );
     }
 
-    public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system )
+    public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 

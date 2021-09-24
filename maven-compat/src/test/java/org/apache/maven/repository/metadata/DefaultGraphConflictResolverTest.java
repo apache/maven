@@ -18,7 +18,7 @@ package org.apache.maven.repository.metadata;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-@PlexusTest
+@MavenTest
 public class DefaultGraphConflictResolverTest
 {
     @Inject

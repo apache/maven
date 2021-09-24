@@ -19,10 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import java.net.MalformedURLException;
-
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 /**
  * Error constructing an artifact repository.
  *
@@ -32,18 +28,6 @@ public class InvalidRepositoryException
     extends Exception
 {
     private final String repositoryId;
-
-    public InvalidRepositoryException( String message, String repositoryId, MalformedURLException cause )
-    {
-        super( message, cause );
-        this.repositoryId = repositoryId;
-    }
-
-    protected InvalidRepositoryException( String message, String repositoryId, ComponentLookupException cause )
-    {
-        super( message, cause );
-        this.repositoryId = repositoryId;
-    }
 
     @Deprecated
     public InvalidRepositoryException( String message, Throwable t )
@@ -55,6 +39,12 @@ public class InvalidRepositoryException
     public InvalidRepositoryException( String message, String repositoryId )
     {
         super( message );
+        this.repositoryId = repositoryId;
+    }
+
+    public InvalidRepositoryException( String message, String repositoryId, Throwable t )
+    {
+        super( message, t );
         this.repositoryId = repositoryId;
     }
 

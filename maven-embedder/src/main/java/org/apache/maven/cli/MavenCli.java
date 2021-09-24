@@ -19,7 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -44,6 +43,8 @@ import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.container.Container;
+import org.apache.maven.container.DefaultContainer;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -56,6 +57,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -66,21 +68,16 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -281,7 +278,7 @@ public class MavenCli
     // TODO need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
-        PlexusContainer localContainer = null;
+        Container localContainer = null;
         try
         {
             initialize( cliRequest );
@@ -644,7 +641,7 @@ public class MavenCli
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
 
-    PlexusContainer container( CliRequest cliRequest )
+    Container container( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.classWorld == null )
@@ -666,10 +663,6 @@ public class MavenCli
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
-        ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld )
-            .setRealm( containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true )
-            .setJSR250Lifecycle( true ).setName( "maven" );
-
         Set<String> exportedArtifacts = new HashSet<>( coreEntry.getExportedArtifacts() );
         Set<String> exportedPackages = new HashSet<>( coreEntry.getExportedPackages() );
         for ( CoreExtensionEntry extension : extensions )
@@ -677,18 +670,11 @@ public class MavenCli
             exportedArtifacts.addAll( extension.getExportedArtifacts() );
             exportedPackages.addAll( extension.getExportedPackages() );
         }
-
         final CoreExports exports = new CoreExports( containerRealm, exportedArtifacts, exportedPackages );
 
-        DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
-        {
-            @Override
-            protected void configure()
-            {
-                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                bind( CoreExports.class ).toInstance( exports );
-            }
-        } );
+        Container container = new DefaultContainer( containerRealm );
+        container.addComponent( ILoggerFactory.class, slf4jLoggerFactory );
+        container.addComponent( CoreExports.class, exports );
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm( null );
@@ -698,13 +684,15 @@ public class MavenCli
 
         for ( CoreExtensionEntry extension : extensions )
         {
-            container.discoverComponents( extension.getClassRealm(), new SessionScopeModule( container ),
-                                          new MojoExecutionScopeModule( container ) );
+            container.discoverComponents(
+                    extension.getClassRealm(),
+                    new SessionScopeModule( container.lookup( SessionScope.class ) ),
+                    new MojoExecutionScopeModule( container.lookup( MojoExecutionScope.class ) ) );
         }
 
         customizeContainer( container );
 
-        container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+        plexusLoggerManager.setThresholds( cliRequest.request.getLoggingLevel() );
 
         eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
 
@@ -757,22 +745,8 @@ public class MavenCli
                 return Collections.emptyList();
             }
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration() //
-                .setClassWorld( cliRequest.classWorld ) //
-                .setRealm( containerRealm ) //
-                .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
-                .setAutoWiring( true ) //
-                .setJSR250Lifecycle( true ) //
-                .setName( "maven" );
-
-            DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
-            {
-                @Override
-                protected void configure()
-                {
-                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                }
-            } );
+            Container container = new DefaultContainer( containerRealm );
+            container.addComponent( ILoggerFactory.class, slf4jLoggerFactory );
 
             try
             {
@@ -780,7 +754,7 @@ public class MavenCli
 
                 container.setLoggerManager( plexusLoggerManager );
 
-                container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+                plexusLoggerManager.setThresholds( cliRequest.request.getLoggingLevel() );
 
                 Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
@@ -1809,12 +1783,11 @@ public class MavenCli
         return new Slf4jMavenTransferListener();
     }
 
-    protected void customizeContainer( PlexusContainer container )
+    protected void customizeContainer( Container container )
     {
     }
 
-    protected ModelProcessor createModelProcessor( PlexusContainer container )
-        throws ComponentLookupException
+    protected ModelProcessor createModelProcessor( Container container )
     {
         return container.lookup( ModelProcessor.class );
     }

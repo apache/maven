@@ -41,7 +41,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -51,6 +50,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.maven.Maven;
+import org.apache.maven.container.Container;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.ProfileActivation;
@@ -59,8 +59,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -383,12 +381,10 @@ public class MavenCliTest
         final EventSpyDispatcher eventSpyDispatcherMock = mock(EventSpyDispatcher.class);
         MavenCli customizedMavenCli = new MavenCli() {
             @Override
-            protected void customizeContainer(PlexusContainer container) {
+            protected void customizeContainer(Container container) {
                 super.customizeContainer(container);
-                container.addComponent(mock(Maven.class), "org.apache.maven.Maven");
-
-                ( (DefaultPlexusContainer) container ).addPlexusInjector( Collections.emptyList(),
-                        binder -> binder.bind( EventSpyDispatcher.class ).toInstance( eventSpyDispatcherMock ) );
+                container.addComponent( Maven.class, mock(Maven.class) );
+                container.addComponent( EventSpyDispatcher.class, eventSpyDispatcherMock );
             }
         };
 

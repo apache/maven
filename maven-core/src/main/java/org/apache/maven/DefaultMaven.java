@@ -32,6 +32,7 @@ import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.container.Container;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -46,8 +47,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
@@ -68,6 +67,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -93,7 +93,7 @@ public class DefaultMaven
     private LifecycleStarter lifecycleStarter;
 
     @Inject
-    protected PlexusContainer container;
+    protected Container container;
 
     @Inject
     private ExecutionEventCatapult eventCatapult;
@@ -208,7 +208,7 @@ public class DefaultMaven
         {
             DefaultRepositorySystemSession repoSession =
                 (DefaultRepositorySystemSession) newRepositorySession( request );
-            MavenSession session = new MavenSession( container, repoSession, request, result );
+            MavenSession session = new MavenSession( repoSession, request, result );
 
             sessionScope.seed( MavenSession.class, session );
 
@@ -252,14 +252,11 @@ public class DefaultMaven
             return addExceptionToResult( result, e );
         }
 
-        WorkspaceReader reactorWorkspace;
-        try
+        WorkspaceReader reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
+        if ( reactorWorkspace == null )
         {
-            reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
-        }
-        catch ( ComponentLookupException e )
-        {
-            return addExceptionToResult( result, e );
+            return addExceptionToResult( result, new NoSuchElementException( "Unable to find a component with"
+                    + " role=" + WorkspaceReader.class.getName() + " and hint=" + ReactorReader.HINT ) );
         }
 
         //
@@ -456,15 +453,7 @@ public class DefaultMaven
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            try
-            {
-                lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // this is just silly, lookupList should return an empty list!
-                logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
-            }
+            lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
 
             Collection<ClassLoader> scannedRealms = new HashSet<>();
 
@@ -476,15 +465,7 @@ public class DefaultMaven
                 {
                     Thread.currentThread().setContextClassLoader( projectRealm );
 
-                    try
-                    {
-                        lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
-                    }
-                    catch ( ComponentLookupException e )
-                    {
-                        // this is just silly, lookupList should return an empty list!
-                        logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
-                    }
+                    lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
                 }
             }
         }

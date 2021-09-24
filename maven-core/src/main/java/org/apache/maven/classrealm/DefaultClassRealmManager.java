@@ -38,10 +38,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExportsProvider;
+import org.apache.maven.container.Container;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -91,11 +90,11 @@ public class DefaultClassRealmManager
     private final Set<String> providedArtifacts;
 
     @Inject
-    public DefaultClassRealmManager( Logger logger, PlexusContainer container,
+    public DefaultClassRealmManager( Logger logger, Container container,
                                      List<ClassRealmManagerDelegate> delegates, CoreExportsProvider exports )
     {
         this.logger = logger;
-        this.world = ( (MutablePlexusContainer) container ).getClassWorld();
+        this.world = container.getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
 

@@ -42,7 +42,7 @@ public class DefaultArtifactDescriptorReaderTest
         throws Exception
     {
         // prepare
-        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) getContainer().lookup( ArtifactDescriptorReader.class );
+        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) lookup( ArtifactDescriptorReader.class );
 
         RepositoryEventDispatcher eventDispatcher = mock( RepositoryEventDispatcher.class );
 

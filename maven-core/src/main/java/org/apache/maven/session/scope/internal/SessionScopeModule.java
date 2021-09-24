@@ -24,8 +24,6 @@ import javax.inject.Named;
 
 import org.apache.maven.SessionScoped;
 import org.apache.maven.execution.MavenSession;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import com.google.inject.AbstractModule;
 
@@ -44,13 +42,7 @@ public class SessionScopeModule
         this( new SessionScope() );
     }
 
-    public SessionScopeModule( PlexusContainer container )
-        throws ComponentLookupException
-    {
-        this( container.lookup( SessionScope.class ) );
-    }
-
-    private SessionScopeModule( SessionScope scope )
+    public SessionScopeModule( SessionScope scope )
     {
         this.scope = scope;
     }

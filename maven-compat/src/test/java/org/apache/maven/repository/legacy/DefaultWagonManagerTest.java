@@ -33,8 +33,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
@@ -47,7 +47,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.apache.maven.container.test.MavenTestExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,7 +60,7 @@ import javax.inject.Inject;
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
-@PlexusTest
+@MavenTest
 public class DefaultWagonManagerTest
 {
     @Inject

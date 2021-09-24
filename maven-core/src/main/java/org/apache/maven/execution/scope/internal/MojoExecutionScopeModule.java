@@ -22,8 +22,6 @@ package org.apache.maven.execution.scope.internal;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import com.google.inject.AbstractModule;
 
@@ -35,13 +33,7 @@ public class MojoExecutionScopeModule
 {
     protected final MojoExecutionScope scope;
 
-    public MojoExecutionScopeModule( PlexusContainer container )
-        throws ComponentLookupException
-    {
-        this( container.lookup( MojoExecutionScope.class ) );
-    }
-
-    protected MojoExecutionScopeModule( MojoExecutionScope scope )
+    public MojoExecutionScopeModule( MojoExecutionScope scope )
     {
         this.scope = scope;
     }

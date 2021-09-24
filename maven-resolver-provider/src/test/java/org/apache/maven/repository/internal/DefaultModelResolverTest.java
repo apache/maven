@@ -26,7 +26,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
@@ -199,11 +198,11 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         assertEquals( "1.0", dependency.getVersion() );
     }
 
-    private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException
+    private ModelResolver newModelResolver() throws MalformedURLException
     {
         return new DefaultModelResolver( this.session, null, this.getClass().getName(),
-                                         getContainer().lookup( ArtifactResolver.class ), getContainer().lookup( VersionRangeResolver.class ),
-                                         getContainer().lookup( RemoteRepositoryManager.class ),
+                                         lookup( ArtifactResolver.class ), lookup( VersionRangeResolver.class ),
+                                         lookup( RemoteRepositoryManager.class ),
                                          Arrays.asList( newTestRepository() ) );
 
     }

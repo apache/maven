@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.apache.maven.container.test.MavenTestExtension.getBasedir;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

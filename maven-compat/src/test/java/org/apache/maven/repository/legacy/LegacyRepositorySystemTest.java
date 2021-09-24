@@ -20,9 +20,9 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,7 @@ import javax.inject.Inject;
  *
  * @author Benjamin Bentmann
  */
-@PlexusTest
+@MavenTest
 public class LegacyRepositorySystemTest
 {
     @Inject

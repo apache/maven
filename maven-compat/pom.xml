@@ -100,8 +100,10 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-testing</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-container</artifactId>
+      <classifier>tests</classifier>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>

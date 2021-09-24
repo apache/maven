@@ -32,11 +32,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -67,14 +67,14 @@ import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.apache.maven.container.test.MavenTestExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
-@PlexusTest
+@MavenTest
 public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
 {
     @Inject
@@ -101,7 +101,7 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
         throws Exception
     {
         RepositorySystemSession repoSession = initRepoSession();
-        MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
+        MavenSession session = new MavenSession( repoSession, new DefaultMavenExecutionRequest(),
                                                  new DefaultMavenExecutionResult() );
 
         legacySupport.setSession( session );

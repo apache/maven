@@ -209,8 +209,8 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         final DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
 
-        return new ProjectModelResolver( repoSession, null, getContainer().lookup( RepositorySystem.class ),
-                                         getContainer().lookup( RemoteRepositoryManager.class ),
+        return new ProjectModelResolver( repoSession, null, container.lookup( RepositorySystem.class ),
+                                        container.lookup( RemoteRepositoryManager.class ),
                                          this.getRemoteRepositories(),
                                          ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT, null );
 

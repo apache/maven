@@ -23,12 +23,12 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.container.Container;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ import javax.inject.Inject;
 /**
  * @author Jason van Zyl
  */
-@PlexusTest
+@MavenTest
 public abstract class AbstractMavenProjectTestCase
 {
     protected ProjectBuilder projectBuilder;
@@ -47,24 +47,17 @@ public abstract class AbstractMavenProjectTestCase
     protected RepositorySystem repositorySystem;
 
     @Inject
-    protected PlexusContainer container;
-
-    public PlexusContainer getContainer() {
-        return container;
-    }
+    protected Container container;
 
     @BeforeEach
     public void setUp()
         throws Exception
     {
-        if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
-        {
-            projectBuilder = getContainer().lookup( ProjectBuilder.class, "test" );
-        }
-        else
+        projectBuilder = container.lookup( ProjectBuilder.class, "test" );
+        if ( projectBuilder == null )
         {
             // default over to the main project builder...
-            projectBuilder = getContainer().lookup( ProjectBuilder.class );
+            projectBuilder = container.lookup( ProjectBuilder.class );
         }
     }
 

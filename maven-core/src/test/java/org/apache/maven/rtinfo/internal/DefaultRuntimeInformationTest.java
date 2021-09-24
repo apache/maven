@@ -19,8 +19,8 @@ package org.apache.maven.rtinfo.internal;
  * under the License.
  */
 
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
-@PlexusTest
+@MavenTest
 public class DefaultRuntimeInformationTest
 {
     @Inject

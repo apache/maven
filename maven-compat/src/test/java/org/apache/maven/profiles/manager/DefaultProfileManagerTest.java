@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@PlexusTest
+@MavenTest
 public class DefaultProfileManagerTest
 {
 

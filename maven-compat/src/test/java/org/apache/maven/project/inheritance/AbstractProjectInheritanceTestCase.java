@@ -23,7 +23,7 @@ import java.io.File;
 
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.apache.maven.container.test.MavenTestExtension.getTestFile;
 
 /**
  * @author Jason van Zyl

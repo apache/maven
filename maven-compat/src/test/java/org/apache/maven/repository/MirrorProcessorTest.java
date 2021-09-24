@@ -22,7 +22,7 @@ package org.apache.maven.repository;
 import java.util.Arrays;
 import java.util.List;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
-@PlexusTest
+@MavenTest
 public class MirrorProcessorTest
 {
     @Inject

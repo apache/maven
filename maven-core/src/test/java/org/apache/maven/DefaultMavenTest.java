@@ -63,7 +63,7 @@ public class DefaultMavenTest
     public void testMavenProjectNoDuplicateArtifacts()
         throws Exception
     {
-        MavenProjectHelper mavenProjectHelper = getContainer().lookup( MavenProjectHelper.class );
+        MavenProjectHelper mavenProjectHelper = lookup( MavenProjectHelper.class );
         MavenProject mavenProject = new MavenProject();
         mavenProject.setArtifact( new DefaultArtifact( "g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null ) );
         File artifactFile = Files.createTempFile( "foo", "tmp").toFile();

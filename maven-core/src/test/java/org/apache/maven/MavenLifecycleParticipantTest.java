@@ -27,8 +27,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,15 +109,9 @@ public class MavenLifecycleParticipantTest
     public void testDependencyInjection()
         throws Exception
     {
-        PlexusContainer container = getContainer();
+        container.addComponent( AbstractMavenLifecycleParticipant.class, InjectDependencyLifecycleListener.class );
 
-        ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
-            new ComponentDescriptor<>( InjectDependencyLifecycleListener.class,
-                                                                        container.getContainerRealm() );
-        cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
-        container.addComponentDescriptor( cd );
-
-        Maven maven = container.lookup( Maven.class );
+        Maven maven = lookup( Maven.class );
         File pom = getProject( "lifecycle-listener-dependency-injection" );
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
         request.setGoals( Arrays.asList( "validate" ) );
@@ -146,16 +138,12 @@ public class MavenLifecycleParticipantTest
         assertEquals( Arrays.asList( "parent", "module-b", "module-a" ), reactorOrder );
     }
 
-    private <T> List<String> getReactorOrder( String testProject, Class<T> participant )
+    private <T extends AbstractMavenLifecycleParticipant> List<String> getReactorOrder( String testProject, Class<T> participant )
         throws Exception
     {
-        PlexusContainer container = getContainer();
+        container.addComponent( AbstractMavenLifecycleParticipant.class, participant );
 
-        ComponentDescriptor<T> cd = new ComponentDescriptor<>( participant, container.getContainerRealm() );
-        cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
-        container.addComponentDescriptor( cd );
-
-        Maven maven = container.lookup( Maven.class );
+        Maven maven = lookup( Maven.class );
         File pom = getProject( testProject );
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
         request.setGoals( Arrays.asList( "validate" ) );

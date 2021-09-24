@@ -42,8 +42,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.junit.jupiter.api.Test;
@@ -322,8 +320,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
-    @SuppressWarnings( "deprecation" )
-    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo, Properties properties )
+    private static MavenSession createSession( ArtifactRepository repo, Properties properties )
         throws CycleDetectedException, DuplicateProjectException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
@@ -332,7 +329,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList()  );
+        return new MavenSession( request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList()  );
     }
 
     @Test
@@ -401,8 +398,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         ArtifactRepository repo = factory.createDefaultLocalRepository();
 
-        MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
-        MavenSession session = createSession( container, repo, executionProperties );
+        MavenSession session = createSession( repo, executionProperties );
         session.setCurrentProject( project );
 
         MojoDescriptor mojo = new MojoDescriptor();

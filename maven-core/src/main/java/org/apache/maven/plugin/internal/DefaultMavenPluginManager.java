@@ -22,7 +22,9 @@ package org.apache.maven.plugin.internal;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.container.Container;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -57,19 +59,15 @@ import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -139,7 +137,7 @@ public class DefaultMavenPluginManager
     private LoggerManager loggerManager;
 
     @Inject
-    private PlexusContainer container;
+    private Container container;
 
     @Inject
     private ClassRealmManager classRealmManager;
@@ -425,26 +423,19 @@ public class DefaultMavenPluginManager
                                            PluginDescriptor pluginDescriptor )
         throws PluginContainerException
     {
-        try
+        if ( pluginDescriptor != null )
         {
-            if ( pluginDescriptor != null )
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
             {
-                for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
-                {
-                    componentDescriptor.setRealm( pluginRealm );
-                    container.addComponentDescriptor( componentDescriptor );
-                }
+                componentDescriptor.setRealm( pluginRealm );
+                container.addComponent( componentDescriptor );
             }
+        }
 
-            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm, new SessionScopeModule( container ),
-                                                                       new MojoExecutionScopeModule( container ) );
-        }
-        catch ( ComponentLookupException | CycleDetectedInComponentGraphException e )
-        {
-            throw new PluginContainerException( plugin, pluginRealm,
-                                                "Error in component graph of plugin " + plugin.getId() + ": "
-                                                    + e.getMessage(), e );
-        }
+        container.discoverComponents(
+                pluginRealm,
+                new SessionScopeModule( container.lookup( SessionScope.class ) ),
+                new MojoExecutionScopeModule( container.lookup( MojoExecutionScope.class ) ) );
     }
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts( final List<Artifact> pluginArtifacts )
@@ -515,7 +506,7 @@ public class DefaultMavenPluginManager
             {
                 mojo = container.lookup( mojoInterface, mojoDescriptor.getRoleHint() );
             }
-            catch ( ComponentLookupException e )
+            catch ( Throwable e )
             {
                 Throwable cause = e.getCause();
                 while ( cause != null && !( cause instanceof LinkageError )
@@ -660,12 +651,6 @@ public class DefaultMavenPluginManager
 
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), message, e );
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to retrieve component configurator " + configuratorId
-                                                        + " for configuration of mojo " + mojoDescriptor.getId(), e );
-        }
         catch ( NoClassDefFoundError e )
         {
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
@@ -691,14 +676,7 @@ public class DefaultMavenPluginManager
         {
             if ( configurator != null )
             {
-                try
-                {
-                    container.release( configurator );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    logger.debug( "Failed to release mojo configurator - ignoring." );
-                }
+                container.release( configurator );
             }
         }
     }
@@ -761,21 +739,7 @@ public class DefaultMavenPluginManager
     {
         if ( mojo != null )
         {
-            try
-            {
-                container.release( mojo );
-            }
-            catch ( ComponentLifecycleException e )
-            {
-                String goalExecId = mojoExecution.getGoal();
-
-                if ( mojoExecution.getExecutionId() != null )
-                {
-                    goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
-                }
-
-                logger.debug( "Error releasing mojo for " + goalExecId, e );
-            }
+            container.release( mojo );
         }
     }
 

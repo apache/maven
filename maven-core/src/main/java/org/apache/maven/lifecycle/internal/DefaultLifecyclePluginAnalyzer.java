@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.container.Container;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -37,8 +42,6 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -52,24 +55,27 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component( role = LifeCyclePluginAnalyzer.class )
+@Singleton
+@Named
 public class DefaultLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
     public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
         + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
-    @Requirement( role = LifecycleMapping.class )
-    private Map<String, LifecycleMapping> lifecycleMappings;
+    private final Logger logger;
+    private final DefaultLifecycles defaultLifeCycles;
+    private final Container container;
 
-    @Requirement
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Requirement
-    private Logger logger;
-
-    public DefaultLifecyclePluginAnalyzer()
+    @Inject
+    public DefaultLifecyclePluginAnalyzer(
+            Logger logger,
+            DefaultLifecycles defaultLifeCycles,
+            Container container )
     {
+        this.logger = logger;
+        this.defaultLifeCycles =  defaultLifeCycles;
+        this.container = container;
     }
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
@@ -90,8 +96,7 @@ public class DefaultLifecyclePluginAnalyzer
                 + Thread.currentThread().getContextClassLoader() );
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
-
+        LifecycleMapping lifecycleMappingForPackaging = container.lookup( LifecycleMapping.class, packaging );
         if ( lifecycleMappingForPackaging == null )
         {
             return null;

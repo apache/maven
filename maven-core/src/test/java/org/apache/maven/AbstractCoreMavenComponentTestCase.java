@@ -28,10 +28,12 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.container.test.MavenTest;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.container.Container;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -44,8 +46,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -55,12 +55,12 @@ import javax.inject.Inject;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 
-@PlexusTest
+@MavenTest
 public abstract class AbstractCoreMavenComponentTestCase
 {
 
     @Inject
-    protected PlexusContainer container;
+    protected Container container;
 
     @Inject
     protected RepositorySystem repositorySystem;
@@ -70,8 +70,9 @@ public abstract class AbstractCoreMavenComponentTestCase
 
     abstract protected String getProjectsDirectory();
 
-    protected PlexusContainer getContainer() {
-        return container;
+    protected <T> T lookup( Class<T> role )
+    {
+        return container.lookup( role );
     }
 
     protected File getProject(String name )
@@ -161,7 +162,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         initRepoSession( configuration );
 
         MavenSession session =
-            new MavenSession( getContainer(), configuration.getRepositorySession(), request,
+            new MavenSession( configuration.getRepositorySession(), request,
                               new DefaultMavenExecutionResult() );
         session.setProjects( projects );
         session.setAllProjects( session.getProjects() );

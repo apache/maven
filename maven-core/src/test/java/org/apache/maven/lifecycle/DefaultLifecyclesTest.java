@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.codehaus.plexus.testing.PlexusTest;
+import org.apache.maven.container.test.MavenTest;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * @author Kristian Rosenvold
  */
-@PlexusTest
+@MavenTest
 public class DefaultLifecyclesTest
 {
     @Inject

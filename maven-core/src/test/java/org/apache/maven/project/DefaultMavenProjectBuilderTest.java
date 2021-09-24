@@ -58,7 +58,7 @@ public class DefaultMavenProjectBuilderTest
     public void setUp()
         throws Exception
     {
-        projectBuilder = getContainer().lookup( ProjectBuilder.class );
+        projectBuilder = container.lookup( ProjectBuilder.class );
     }
 
     protected MavenProject getProject( Artifact pom, boolean allowStub )

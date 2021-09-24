@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.PlexusContainer;
+import org.apache.maven.container.Container;
 import org.eclipse.sisu.Nullable;
 
 /**
@@ -37,7 +37,7 @@ public class CoreExportsProvider
     private final CoreExports exports;
 
     @Inject
-    public CoreExportsProvider( PlexusContainer container, @Nullable CoreExports exports )
+    public CoreExportsProvider( Container container, @Nullable CoreExports exports )
     {
         if ( exports == null )
         {
