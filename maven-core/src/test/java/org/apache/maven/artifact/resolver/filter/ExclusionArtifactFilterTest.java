@@ -83,7 +83,7 @@ public class ExclusionArtifactFilterTest
     {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId( "*" );
-        exclusion.setArtifactId( "maven-compat" );
+        exclusion.setArtifactId( "maven-settings" );
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter( Collections.singletonList( exclusion ) );
 
         assertThat( filter.include( artifact ), is( true ) );

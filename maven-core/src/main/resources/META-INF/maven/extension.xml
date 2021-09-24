@@ -147,7 +147,6 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-aether-provider</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-resolver-provider</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-artifact-manager</exportedArtifact>
-    <exportedArtifact>org.apache.maven:maven-compat</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-core</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-error-diagnostics</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-lifecycle</exportedArtifact>
