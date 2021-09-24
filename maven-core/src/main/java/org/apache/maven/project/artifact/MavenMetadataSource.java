@@ -57,6 +57,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.container.Container;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -78,8 +79,6 @@ import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -105,7 +104,7 @@ public class MavenMetadataSource
     private ProjectBuilder projectBuilder;
 
     @Inject
-    private PlexusContainer container;
+    private Container container;
 
     @Inject
     private Logger logger;
@@ -537,18 +536,9 @@ public class MavenMetadataSource
 
     private ProjectBuilder getProjectBuilder()
     {
-        if ( projectBuilder != null )
-        {
-            return projectBuilder;
-        }
-
-        try
+        if ( projectBuilder == null )
         {
             projectBuilder = container.lookup( ProjectBuilder.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // Won't happen
         }
 
         return projectBuilder;
