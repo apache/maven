@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping;
 import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.lifecycle.mapping.LifecycleMappingImpl;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 @Named( "maven-plugin" )
@@ -87,7 +87,7 @@ public final class MavenPluginLifecycleMappingProvider
     lifecycle.setId( "default" );
     lifecycle.setLifecyclePhases( Collections.unmodifiableMap( lifecyclePhases ) );
 
-    this.lifecycleMapping = new LifecycleMappingImpl(
+    this.lifecycleMapping = new DefaultLifecycleMapping(
         Collections.singletonList(
             lifecycle
         )
