@@ -26,7 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.PasswordDecryptor;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -39,10 +39,11 @@ public final class MavenSecDispatcherProvider
     private final SecDispatcher secDispatcher;
 
     @Inject
-    public MavenSecDispatcherProvider( final Map<String, PasswordDecryptor> decryptors )
+    public MavenSecDispatcherProvider( final PlexusCipher plexusCipher,
+                                       final Map<String, PasswordDecryptor> decryptors )
     {
         this.secDispatcher = new DefaultSecDispatcher(
-            new DefaultPlexusCipher(),
+            plexusCipher,
             decryptors,
             "~/.m2/settings-security.xml"
         );
