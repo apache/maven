@@ -208,10 +208,6 @@ under the License.
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
       </plugin>
