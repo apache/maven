@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -221,7 +222,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
     {
         final File repoDir = new File( getBasedir(), "src/test/remote-repo" ).getAbsoluteFile();
         final RemoteRepository remoteRepository =
-            new RemoteRepository.Builder( org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+            new RemoteRepository.Builder( MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID,
                                           "default", repoDir.toURI().toASCIIString() ).build();
 
         return Collections.singletonList( remoteRepository );

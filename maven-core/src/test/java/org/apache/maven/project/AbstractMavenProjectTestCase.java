@@ -23,9 +23,9 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
@@ -44,7 +44,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ProjectBuilder projectBuilder;
 
     @Inject
-    protected RepositorySystem repositorySystem;
+    protected MavenRepositorySystem repositorySystem;
 
     @Inject
     protected PlexusContainer container;
@@ -103,7 +103,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
+        return repositorySystem.createLocalRepository( null, getLocalRepositoryPath() );
     }
 
     // ----------------------------------------------------------------------
@@ -152,7 +152,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         final ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( this.getLocalRepository() );
-        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository( null ) ) );
         initRepoSession( configuration );
 
         return projectBuilder.build( pom, configuration ).getProject();

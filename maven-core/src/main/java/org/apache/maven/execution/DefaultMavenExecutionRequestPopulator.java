@@ -33,7 +33,6 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.repository.RepositorySystem;
 //
 // All of this needs to go away and be couched in terms of the execution request
 //
@@ -123,7 +122,7 @@ public class DefaultMavenExecutionRequestPopulator
     {
         Set<String> definedRepositories = repositorySystem.getRepoIds( request.getRemoteRepositories() );
 
-        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        if ( !definedRepositories.contains( MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
         {
             try
             {
@@ -141,7 +140,7 @@ public class DefaultMavenExecutionRequestPopulator
     {
         Set<String> definedRepositories = repositorySystem.getRepoIds( request.getPluginArtifactRepositories() );
 
-        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        if ( !definedRepositories.contains( MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
         {
             try
             {
@@ -192,7 +191,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( StringUtils.isEmpty( localRepositoryPath ) )
         {
-            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
+            localRepositoryPath = MavenRepositorySystem.defaultUserLocalRepository.getAbsolutePath();
         }
 
         try

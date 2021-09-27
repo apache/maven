@@ -37,6 +37,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -48,7 +49,6 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
@@ -81,7 +81,7 @@ public class DefaultProjectBuildingHelper
     private ProjectRealmCache projectRealmCache;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     @Inject
     private MavenPluginManager pluginManager;

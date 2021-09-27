@@ -28,13 +28,13 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -67,7 +67,7 @@ public class PomConstructionTest
     private DefaultProjectBuilder projectBuilder;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     private File testDirectory;
 
@@ -1354,8 +1354,8 @@ public class PomConstructionTest
         assertEquals( "project-remote-repo", pom.getValue( "repositories[1]/id" ) );
         assertEquals( "https://project.url/remote", pom.getValue( "repositories[1]/url" ) );
         assertEquals( "repo", pom.getValue( "repositories[1]/name" ) );
-        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_ID, pom.getValue( "repositories[2]/id" ) );
-        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_URL, pom.getValue( "repositories[2]/url" ) );
+        assertEquals( MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID, pom.getValue( "repositories[2]/id" ) );
+        assertEquals( MavenRepositorySystem.DEFAULT_REMOTE_REPO_URL, pom.getValue( "repositories[2]/url" ) );
 
         assertEquals( "test", pom.getValue( "build/defaultGoal" ) );
         assertEquals( "coreit", pom.getValue( "build/finalName" ) );

@@ -20,6 +20,10 @@ package org.apache.maven.plugin;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,19 +33,19 @@ import java.util.Properties;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -65,7 +69,7 @@ public class PluginParameterExpressionEvaluatorTest
     private static final String FS = File.separator;
 
     @Inject
-    private RepositorySystem factory;
+    private MavenRepositorySystem factory;
 
     @Test
     public void testPluginDescriptorExpressionReference()
@@ -90,7 +94,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MojoExecution exec = newMojoExecution();
 
-        Artifact depArtifact = createArtifact( "group", "artifact", "1" );
+        Artifact depArtifact = new DefaultArtifact( "group", "artifact", "1", "compile", "jar", "", null );
 
         List<Artifact> deps = new ArrayList<>();
         deps.add( depArtifact );
@@ -116,7 +120,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MojoExecution exec = newMojoExecution();
 
-        Artifact depArtifact = createArtifact( "group", "artifact", "1" );
+        Artifact depArtifact = new DefaultArtifact( "group", "artifact", "1", "compile", "jar", "", null );
 
         List<Artifact> deps = new ArrayList<>();
         deps.add( depArtifact );
@@ -371,7 +375,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         PluginDescriptor pd = new PluginDescriptor();
 
-        Artifact artifact = createArtifact( "testGroup", "testArtifact", "1.0" );
+        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", "compile", "jar", "", null );
 
         pd.setArtifacts( Collections.singletonList( artifact ) );
 
@@ -399,7 +403,7 @@ public class PluginParameterExpressionEvaluatorTest
     private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
         throws Exception
     {
-        ArtifactRepository repo = factory.createDefaultLocalRepository();
+        ArtifactRepository repo = factory.createLocalRepository( null, getLocalRepositoryPath() );
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession session = createSession( container, repo, executionProperties );
@@ -414,17 +418,27 @@ public class PluginParameterExpressionEvaluatorTest
         return new PluginParameterExpressionEvaluator( session, mojoExecution );
     }
 
-    protected Artifact createArtifact( String groupId, String artifactId, String version )
-        throws Exception
+    protected static File getFileForClasspathResource( String resource )
+            throws FileNotFoundException
     {
-        Dependency dependency = new Dependency();
-        dependency.setGroupId( groupId );
-        dependency.setArtifactId( artifactId );
-        dependency.setVersion( version );
-        dependency.setType( "jar" );
-        dependency.setScope( "compile" );
+        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
-        return factory.createDependencyArtifact( dependency );
+        URL resourceUrl = cloader.getResource( resource );
+
+        if ( resourceUrl == null )
+        {
+            throw new FileNotFoundException( "Unable to find: " + resource );
+        }
+
+        return new File( URI.create( resourceUrl.toString().replaceAll( " ", "%20" ) ) );
+    }
+
+    private File getLocalRepositoryPath()
+            throws FileNotFoundException, URISyntaxException
+    {
+        File markerFile = getFileForClasspathResource( "local-repo/marker.txt" );
+
+        return markerFile.getAbsoluteFile().getParentFile();
     }
 
     private MojoExecution newMojoExecution()

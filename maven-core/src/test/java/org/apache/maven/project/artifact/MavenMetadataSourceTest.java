@@ -21,7 +21,7 @@ package org.apache.maven.project.artifact;
 
 import javax.inject.Inject;
 
-import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
 import org.junit.jupiter.api.Disabled;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 public class MavenMetadataSourceTest
 {
     @Inject
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     @Inject
     PlexusContainer container;

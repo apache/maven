@@ -55,7 +55,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.repository.Proxy;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
@@ -71,6 +70,21 @@ import org.eclipse.aether.repository.RemoteRepository;
 @Singleton
 public class MavenRepositorySystem
 {
+    public static final String DEFAULT_LOCAL_REPO_ID = "local";
+
+    @SuppressWarnings( "checkstyle:constantname" )
+    public static final String userHome = System.getProperty( "user.home" );
+
+    @SuppressWarnings( "checkstyle:constantname" )
+    public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
+
+    @SuppressWarnings( "checkstyle:constantname" )
+    public static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+
+    public static final String DEFAULT_REMOTE_REPO_ID = "central";
+
+    public static final String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
+
     private final ArtifactHandlerManager artifactHandlerManager;
 
     private final Map<String, ArtifactRepositoryLayout> layouts;
@@ -579,7 +593,7 @@ public class MavenRepositorySystem
     public ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
         throws Exception
     {
-        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+        return createRepository( DEFAULT_REMOTE_REPO_URL, DEFAULT_REMOTE_REPO_ID,
                                  true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
                                  ArtifactRepositoryPolicy.DEFAULT_CHECKSUM_POLICY );
@@ -708,7 +722,7 @@ public class MavenRepositorySystem
         throws Exception
     {
         return createRepository( "file://" + localRepository.toURI().getRawPath(),
-                                 RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
+                                 DEFAULT_LOCAL_REPO_ID, true,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
                                  ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                                  ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );

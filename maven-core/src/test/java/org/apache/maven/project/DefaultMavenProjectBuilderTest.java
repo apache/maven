@@ -37,7 +37,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.artifact.ProjectArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -147,7 +150,8 @@ public class DefaultMavenProjectBuilderTest
     public void testBuildStubModelForMissingRemotePom()
         throws Exception
     {
-        Artifact pom = repositorySystem.createProjectArtifact( "org.apache.maven.its", "missing", "0.1" );
+        Artifact pom = new DefaultArtifact("org.apache.maven.its", "missing", "0.1",
+                "compile", "pom", "", new PomArtifactHandler());
         MavenProject project = getProject( pom, true );
 
         assertNotNull( project.getArtifactId() );
@@ -168,7 +172,7 @@ public class DefaultMavenProjectBuilderTest
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
+        return repositorySystem.createLocalRepository( null, getLocalRepositoryPath() );
     }
 
     @Test
@@ -350,4 +354,42 @@ public class DefaultMavenProjectBuilderTest
         assertThat( project.getName(), is( "PROJECT NAME" ) );
     }
 
+    static class PomArtifactHandler
+            implements ArtifactHandler
+    {
+        public String getClassifier()
+        {
+            return null;
+        }
+
+        public String getDirectory()
+        {
+            return null;
+        }
+
+        public String getExtension()
+        {
+            return "pom";
+        }
+
+        public String getLanguage()
+        {
+            return "none";
+        }
+
+        public String getPackaging()
+        {
+            return "pom";
+        }
+
+        public boolean isAddedToClasspath()
+        {
+            return false;
+        }
+
+        public boolean isIncludesDependencies()
+        {
+            return false;
+        }
+    }
 }
