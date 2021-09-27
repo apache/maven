@@ -66,15 +66,15 @@ public class DefaultProjectDependencyGraph
         super();
         this.allProjects = Collections.unmodifiableList( new ArrayList<>( projects ) );
         this.sorter = new ProjectSorter( projects );
-        this.order = new HashMap<>();
-        this.projects = new HashMap<>();
         List<MavenProject> sorted = this.sorter.getSortedProjects();
-        for ( int index = 0; index < sorted.size(); index++ )
+        this.order = new HashMap<>( sorted.size() );
+        this.projects = new HashMap<>( sorted.size() );
+        int index = 0;
+        for ( MavenProject project : sorted )
         {
-            MavenProject project = sorted.get( index );
             String id = ProjectSorter.getId( project );
             this.projects.put( id, project );
-            this.order.put( project, index );
+            this.order.put( project, index++ );
         }
     }
 
@@ -95,15 +95,15 @@ public class DefaultProjectDependencyGraph
         super();
         this.allProjects = Collections.unmodifiableList( new ArrayList<>( allProjects ) );
         this.sorter = new ProjectSorter( projects );
-        this.order = new HashMap<>();
-        this.projects = new HashMap<>();
         List<MavenProject> sorted = this.sorter.getSortedProjects();
-        for ( int index = 0; index < sorted.size(); index++ )
+        this.order = new HashMap<>( sorted.size() );
+        this.projects = new HashMap<>( sorted.size() );
+        int index = 0;
+        for ( MavenProject project : sorted )
         {
-            MavenProject project = sorted.get( index );
             String id = ProjectSorter.getId( project );
             this.projects.put( id, project );
-            this.order.put( project, index );
+            this.order.put( project, index++ );
         }
     }
 
