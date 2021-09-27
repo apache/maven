@@ -37,6 +37,8 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -44,6 +46,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -62,17 +66,20 @@ public class DefaultLifecyclePluginAnalyzer
     public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
         + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
-    @Inject
-    private Map<String, LifecycleMapping> lifecycleMappings;
+    private final PlexusContainer plexusContainer;
+
+    private final DefaultLifecycles defaultLifeCycles;
+
+    private final Logger logger;
 
     @Inject
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private Logger logger;
-
-    public DefaultLifecyclePluginAnalyzer()
+    public DefaultLifecyclePluginAnalyzer( final PlexusContainer plexusContainer,
+                                           final DefaultLifecycles defaultLifeCycles,
+                                           final Logger logger )
     {
+        this.plexusContainer = requireNonNull( plexusContainer );
+        this.defaultLifeCycles = requireNonNull( defaultLifeCycles );
+        this.logger = requireNonNull( logger );
     }
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
@@ -85,6 +92,7 @@ public class DefaultLifecyclePluginAnalyzer
     // from the plugin.xml inside a plugin.
     //
 
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         if ( logger.isDebugEnabled() )
@@ -93,7 +101,15 @@ public class DefaultLifecyclePluginAnalyzer
                 + Thread.currentThread().getContextClassLoader() );
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+        LifecycleMapping lifecycleMappingForPackaging = null;
+        try
+        {
+            lifecycleMappingForPackaging = plexusContainer.lookup( LifecycleMapping.class, packaging );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // ignore
+        }
 
         if ( lifecycleMappingForPackaging == null )
         {
