@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.maven.lifecycle.DefaultLifecycles;
@@ -101,15 +102,7 @@ public class DefaultLifecyclePluginAnalyzer
                 + Thread.currentThread().getContextClassLoader() );
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = null;
-        try
-        {
-            lifecycleMappingForPackaging = plexusContainer.lookup( LifecycleMapping.class, packaging );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // ignore
-        }
+        LifecycleMapping lifecycleMappingForPackaging = lookupLifecycleMapping( packaging );
 
         if ( lifecycleMappingForPackaging == null )
         {
@@ -149,6 +142,26 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         return plugins.keySet();
+    }
+
+    /**
+     * Performs a lookup using Plexus API to make sure we can look up only "visible" (see Maven classloading) components
+     * from current module and for example not extensions coming from other modules.
+     */
+    private LifecycleMapping lookupLifecycleMapping( final String packaging )
+    {
+        try
+        {
+            return plexusContainer.lookup( LifecycleMapping.class, packaging );
+        }
+        catch ( ComponentLookupException e )
+        {
+            if ( e.getCause() instanceof NoSuchElementException )
+            {
+                return null;
+            }
+            throw new RuntimeException( e );
+        }
     }
 
     private List<Lifecycle> getOrderedLifecycles()
