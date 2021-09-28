@@ -90,21 +90,25 @@ final class PluginsMetadata
         return new PluginsMetadata( pluginInfo, file, timestamp );
     }
 
+    @Override
     public String getGroupId()
     {
         return pluginInfo.getPluginGroupId();
     }
 
+    @Override
     public String getArtifactId()
     {
         return "";
     }
 
+    @Override
     public String getVersion()
     {
         return "";
     }
 
+    @Override
     public Nature getNature()
     {
         return Nature.RELEASE_OR_SNAPSHOT;

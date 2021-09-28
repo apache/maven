@@ -63,10 +63,12 @@ public class MavenSessionPluginsMetadataInfoProvider
         MavenSession mavenSession = mavenSessionRef.get();
         if ( mavenSession != null )
         {
+            // TODO: match or maybe search (not just current) for passed in artifact
+            // ie. "deploy at end"?
             MavenProject currentProject = mavenSession.getCurrentProject();
             if ( "maven-plugin".equals( currentProject.getPackaging() ) )
             {
-                String pluginPrefix = "blah";
+                String pluginPrefix = "blah"; // TODO: get it somehow
 
                 return new PluginInfo()
                 {
