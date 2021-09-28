@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
@@ -152,7 +153,12 @@ public abstract class AbstractMavenProjectTestCase
     {
         final ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( this.getLocalRepository() );
-        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository( null ) ) );
+        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createRepository(
+                "file://" + new File( System.getProperty( "basedir", "." ), "src/test/remote-repo" ).getAbsoluteFile().toURI().getPath(),
+                MavenRepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                false, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                ArtifactRepositoryPolicy.DEFAULT_CHECKSUM_POLICY ) ) );
         initRepoSession( configuration );
 
         return projectBuilder.build( pom, configuration ).getProject();
