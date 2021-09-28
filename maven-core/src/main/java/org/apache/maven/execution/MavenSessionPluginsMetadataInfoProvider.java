@@ -25,9 +25,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.PluginsMetadataInfoProvider;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactProperties;
 
 /**
  * Default implementation of {@link PluginsMetadataInfoProvider}.
@@ -66,9 +68,10 @@ public class MavenSessionPluginsMetadataInfoProvider
             // TODO: match or maybe search (not just current) for passed in artifact
             // ie. "deploy at end"?
             MavenProject currentProject = mavenSession.getCurrentProject();
-            if ( "maven-plugin".equals( currentProject.getPackaging() ) )
+            if ( "maven-plugin".equals( artifact.getProperty( ArtifactProperties.TYPE, "" ) ) )
             {
-                String pluginPrefix = "blah"; // TODO: get it somehow
+                String pluginPrefix = PluginDescriptor.getGoalPrefixFromArtifactId( artifact.getArtifactId() );
+                // TODO: check for goalPrefix if set
 
                 return new PluginInfo()
                 {
