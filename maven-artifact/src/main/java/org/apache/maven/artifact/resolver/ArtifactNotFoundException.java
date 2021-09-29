@@ -45,7 +45,7 @@ public class ArtifactNotFoundException
               artifact.getClassifier(), null, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
-    protected ArtifactNotFoundException( String message, Artifact artifact,
+    public ArtifactNotFoundException( String message, Artifact artifact,
                                          List<ArtifactRepository> remoteRepositories, Throwable cause )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),

@@ -187,6 +187,12 @@ public class MavenRepositorySystem
         return createPluginArtifactX( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version,
+                                                  String type, String classifier )
+    {
+        return createArtifactX( groupId, artifactId, version, type, null, classifier, null );
+    }
+
     public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )
     {
         if ( repositories != null && mirrors != null )
@@ -441,7 +447,7 @@ public class MavenRepositorySystem
     public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
-        throws Exception
+        throws InvalidRepositoryException
     {
         ArtifactRepositoryLayout layout = layouts.get( layoutId );
 
@@ -451,12 +457,13 @@ public class MavenRepositorySystem
     }
 
     private void checkLayout( String repositoryId, String layoutId, ArtifactRepositoryLayout layout )
-        throws Exception
+        throws InvalidRepositoryException
     {
         if ( layout == null )
         {
-            throw new Exception( String.format( "Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId,
-                                                repositoryId ) );
+            throw new InvalidRepositoryException(
+                    String.format( "Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId, repositoryId ),
+                    repositoryId );
         }
     }
 
@@ -591,7 +598,7 @@ public class MavenRepositorySystem
     //
 
     public ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
-        throws Exception
+        throws InvalidRepositoryException
     {
         return createRepository( DEFAULT_REMOTE_REPO_URL, DEFAULT_REMOTE_REPO_ID,
                                  true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
@@ -601,7 +608,7 @@ public class MavenRepositorySystem
 
     public ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
                                                  String releaseUpdates, boolean snapshots, String snapshotUpdates,
-                                                 String checksumPolicy ) throws Exception
+                                                 String checksumPolicy ) throws InvalidRepositoryException
     {
         ArtifactRepositoryPolicy snapshotsPolicy =
             new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
@@ -719,7 +726,7 @@ public class MavenRepositorySystem
     }
 
     public ArtifactRepository createLocalRepository( MavenExecutionRequest request, File localRepository )
-        throws Exception
+        throws InvalidRepositoryException
     {
         return createRepository( "file://" + localRepository.toURI().getRawPath(),
                                  DEFAULT_LOCAL_REPO_ID, true,

@@ -181,6 +181,10 @@ under the License.
       <artifactId>plexus-testing</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-provider-api</artifactId>
+      </dependency>
   </dependencies>
 
   <build>
