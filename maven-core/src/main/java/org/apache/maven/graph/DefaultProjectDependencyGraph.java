@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.DuplicateProjectException;
@@ -166,15 +167,10 @@ public class DefaultProjectDependencyGraph
 
     private List<MavenProject> getSortedProjects( Set<String> projectIds )
     {
-        List<MavenProject> result = new ArrayList<>( projectIds.size() );
-        for ( String projectId : projectIds )
-        {
-            result.add( projects.get( projectId ) );
-        }
-
-        Collections.sort( result, new MavenProjectComparator() );
-
-        return result;
+        return projectIds.stream()
+                .map( id -> projects.get( id ) )
+                .sorted( Comparator.comparingInt( order::get ) )
+                .collect( Collectors.toList() );
     }
 
     @Override
@@ -183,12 +179,4 @@ public class DefaultProjectDependencyGraph
         return sorter.getSortedProjects().toString();
     }
 
-    private class MavenProjectComparator implements Comparator<MavenProject>
-    {
-        @Override
-        public int compare( MavenProject o1, MavenProject o2 )
-        {
-            return order.get( o1 ) - order.get( o2 );
-        }
-    }
 }
