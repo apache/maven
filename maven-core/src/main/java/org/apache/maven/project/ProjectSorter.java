@@ -19,13 +19,12 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Dependency;
@@ -48,8 +47,6 @@ public class ProjectSorter
     private List<MavenProject> sortedProjects;
 
     private Map<String, MavenProject> projectMap;
-
-    private MavenProject topLevelProject;
 
     /**
      * Sort a list of projects.
@@ -126,43 +123,29 @@ public class ProjectSorter
                          parent.getVersion(), true, false );
             }
 
-            List<Plugin> buildPlugins = project.getBuildPlugins();
-            if ( buildPlugins != null )
+            for ( Plugin plugin : project.getBuildPlugins() )
             {
-                for ( Plugin plugin : buildPlugins )
-                {
-                    addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
-                             plugin.getArtifactId(), plugin.getVersion(), false, true );
+                addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
+                         plugin.getArtifactId(), plugin.getVersion(), false, true );
 
-                    for ( Dependency dependency : plugin.getDependencies() )
-                    {
-                        addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
-                                 dependency.getArtifactId(), dependency.getVersion(), false, true );
-                    }
+                for ( Dependency dependency : plugin.getDependencies() )
+                {
+                    addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
+                             dependency.getArtifactId(), dependency.getVersion(), false, true );
                 }
             }
 
-            List<Extension> buildExtensions = project.getBuildExtensions();
-            if ( buildExtensions != null )
+            for ( Extension extension : project.getBuildExtensions() )
             {
-                for ( Extension extension : buildExtensions )
-                {
-                    addEdge( projectMap, vertexMap, project, projectVertex, extension.getGroupId(),
-                             extension.getArtifactId(), extension.getVersion(), false, true );
-                }
+                addEdge( projectMap, vertexMap, project, projectVertex, extension.getGroupId(),
+                         extension.getArtifactId(), extension.getVersion(), false, true );
             }
         }
-
-        List<MavenProject> sortedProjects = new ArrayList<>( projects.size() );
 
         List<String> sortedProjectLabels = TopologicalSorter.sort( dag );
 
-        for ( String id : sortedProjectLabels )
-        {
-            sortedProjects.add( projectMap.get( id ) );
-        }
-
-        this.sortedProjects = Collections.unmodifiableList( sortedProjects );
+        this.sortedProjects = sortedProjectLabels.stream().map( id -> projectMap.get( id ) )
+                .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
     }
     @SuppressWarnings( "checkstyle:parameternumber" )
     private void addEdge( Map<String, MavenProject> projectMap, Map<String, Map<String, Vertex>> vertexMap,
@@ -235,19 +218,8 @@ public class ProjectSorter
     // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
     public MavenProject getTopLevelProject()
     {
-        if ( topLevelProject == null )
-        {
-            for ( Iterator<MavenProject> i = sortedProjects.iterator(); i.hasNext() && ( topLevelProject == null ); )
-            {
-                MavenProject project = i.next();
-                if ( project.isExecutionRoot() )
-                {
-                    topLevelProject = project;
-                }
-            }
-        }
-
-        return topLevelProject;
+        return sortedProjects.stream().filter( MavenProject::isExecutionRoot ).findFirst()
+                .orElse( null );
     }
 
     public List<MavenProject> getSortedProjects()
