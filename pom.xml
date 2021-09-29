@@ -51,7 +51,7 @@ under the License.
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
-    <junitVersion>5.7.0</junitVersion>
+    <junitVersion>5.8.1</junitVersion>
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
@@ -448,10 +448,11 @@ under the License.
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-params</artifactId>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <type>pom</type>
         <version>${junitVersion}</version>
-        <scope>test</scope>
+        <scope>import</scope>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -462,7 +463,6 @@ under the License.
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
