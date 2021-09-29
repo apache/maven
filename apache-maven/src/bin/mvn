@@ -94,7 +94,7 @@ if $mingw ; then
 fi
 
 if [ -z "$JAVA_HOME" ] ; then
-  JAVACMD=`which java`
+  JAVACMD="`\\unset -f command; \\command -v java`"
 else
   JAVACMD="$JAVA_HOME/bin/java"
 fi
