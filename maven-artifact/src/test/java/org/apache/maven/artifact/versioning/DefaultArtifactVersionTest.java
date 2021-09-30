@@ -205,16 +205,6 @@ public class DefaultArtifactVersionTest
         assertFalse( newArtifactVersion( "1" ).equals( "non-an-artifact-version-instance" ) );
     }
 
-    @Test
-    @Disabled("That one does not work")
-    public void testNonNumericVersionRepresentationReturnsANumberFormatException()
-    {
-        assertThrows(
-                NumberFormatException.class,
-                () -> new DefaultArtifactVersion( "..." ),
-                "We expect a NumberFormatException to be thrown." );
-    }
-
     private void assertVersionOlder( String left, String right )
     {
         assertTrue(
