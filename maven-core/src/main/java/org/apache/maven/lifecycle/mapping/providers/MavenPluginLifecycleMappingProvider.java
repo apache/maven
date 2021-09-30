@@ -69,7 +69,8 @@ public final class MavenPluginLifecycleMappingProvider
     );
     lifecyclePhases.put(
         "package",
-        new LifecyclePhase( "org.apache.maven.plugins:maven-jar-plugin:3.2.0:jar" )
+        new LifecyclePhase( "org.apache.maven.plugins:maven-jar-plugin:3.2.0:jar,"
+            + "org.apache.maven.plugins:maven-plugin-plugin:3.6.0:addPluginArtifactMetadata" )
     );
     lifecyclePhases.put(
         "install",

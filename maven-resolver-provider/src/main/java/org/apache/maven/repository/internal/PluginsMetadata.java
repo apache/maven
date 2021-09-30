@@ -85,6 +85,7 @@ final class PluginsMetadata
         return artifact.getGroupId();
     }
 
+    @Override
     public MavenMetadata setFile( File file )
     {
         return new PluginsMetadata( pluginInfo, file, timestamp );
