@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -170,32 +172,21 @@ public class RepositoryUtils
 
         Artifact result = toArtifact( artifact );
 
-        List<Exclusion> excl = null;
-        if ( exclusions != null )
-        {
-            excl = new ArrayList<>( exclusions.size() );
-            for ( org.apache.maven.model.Exclusion exclusion : exclusions )
-            {
-                excl.add( toExclusion( exclusion ) );
-            }
-        }
-
+        List<Exclusion> excl = Optional.ofNullable( exclusions )
+                .orElse( Collections.emptyList() )
+                .stream()
+                .map( RepositoryUtils::toExclusion )
+                .collect( Collectors.toList() );
         return new Dependency( result, artifact.getScope(), artifact.isOptional(), excl );
     }
 
     public static List<RemoteRepository> toRepos( List<ArtifactRepository> repos )
     {
-        if ( repos == null )
-        {
-            return null;
-        }
-
-        List<RemoteRepository> results = new ArrayList<>( repos.size() );
-        for ( ArtifactRepository repo : repos )
-        {
-            results.add( toRepo( repo ) );
-        }
-        return results;
+        return Optional.ofNullable( repos )
+                .orElse( Collections.emptyList() )
+                .stream()
+                .map( RepositoryUtils::toRepo )
+                .collect( Collectors.toList() );
     }
 
     public static RemoteRepository toRepo( ArtifactRepository repo )
@@ -318,11 +309,8 @@ public class RepositoryUtils
             new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), null,
                                  dependency.getVersion(), props, stereotype );
 
-        List<Exclusion> exclusions = new ArrayList<>( dependency.getExclusions().size() );
-        for ( org.apache.maven.model.Exclusion exclusion : dependency.getExclusions() )
-        {
-            exclusions.add( toExclusion( exclusion ) );
-        }
+        List<Exclusion> exclusions =
+                dependency.getExclusions().stream().map( RepositoryUtils::toExclusion ).collect( Collectors.toList() );
 
         return new Dependency( artifact,
                                             dependency.getScope(),
@@ -363,12 +351,7 @@ public class RepositoryUtils
 
     public static Collection<Artifact> toArtifacts( Collection<org.apache.maven.artifact.Artifact> artifactsToConvert )
     {
-        List<Artifact> artifacts = new ArrayList<>();
-        for ( org.apache.maven.artifact.Artifact a : artifactsToConvert )
-        {
-            artifacts.add( toArtifact( a ) );
-        }
-        return artifacts;
+        return artifactsToConvert.stream().map( RepositoryUtils::toArtifact ).collect( Collectors.toList() );
     }
 
     public static WorkspaceRepository getWorkspace( RepositorySystemSession session )

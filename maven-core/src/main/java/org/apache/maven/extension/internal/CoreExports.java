@@ -20,13 +20,15 @@ package org.apache.maven.extension.internal;
  */
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by
@@ -47,13 +49,9 @@ public class CoreExports
 
     public CoreExports( ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages )
     {
-        Map<String, ClassLoader> packages = new LinkedHashMap<>();
-        for ( String pkg : exportedPackages )
-        {
-            packages.put( pkg, realm );
-        }
         this.artifacts = Collections.unmodifiableSet( new HashSet<>( exportedArtifacts ) );
-        this.packages = Collections.unmodifiableMap( new HashMap<>( packages ) );
+        this.packages = exportedPackages.stream().collect(
+                collectingAndThen( toMap( identity(), v -> realm ), Collections::unmodifiableMap ) );
     }
 
     /**
