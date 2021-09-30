@@ -19,9 +19,13 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * DefaultLifecycleMapping
@@ -38,7 +42,28 @@ public class DefaultLifecycleMapping
     private Map<String, LifecyclePhase> phases;
 
     /**
-     * Populates the lifecycle map from the injected list of lifecycle mappings (if not already done).
+     * Default ctor for plexus compatibility: lifecycles are most commonly defined in Plexus XML, that does field
+     * injection. Still, for Plexus to be able to instantiate this class, default ctor is needed.
+     *
+     * @deprecated Should not be used in Java code.
+     */
+    @Deprecated
+    public DefaultLifecycleMapping()
+    {
+    }
+
+    /**
+     * Ctor to be used in Java code/providers.
+     */
+    public DefaultLifecycleMapping( final List<Lifecycle> lifecycles )
+    {
+        this.lifecycleMap = Collections.unmodifiableMap(
+                lifecycles.stream().collect( toMap( Lifecycle::getId, identity() ) )
+        );
+    }
+
+    /**
+     * Plexus: Populates the lifecycle map from the injected list of lifecycle mappings (if not already done).
      */
     private void initLifecycleMap()
     {
@@ -79,6 +104,7 @@ public class DefaultLifecycleMapping
         }
     }
 
+    @Override
     public Map<String, Lifecycle> getLifecycles()
     {
         initLifecycleMap();
@@ -86,6 +112,8 @@ public class DefaultLifecycleMapping
         return lifecycleMap;
     }
 
+    @Deprecated
+    @Override
     public List<String> getOptionalMojos( String lifecycle )
     {
         return null;
@@ -110,7 +138,7 @@ public class DefaultLifecycleMapping
             return null;
         }
     }
-    
+
     @Deprecated
     public Map<String, String> getPhases( String lifecycle )
     {

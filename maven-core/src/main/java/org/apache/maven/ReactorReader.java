@@ -20,17 +20,17 @@ package org.apache.maven;
  */
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
@@ -40,6 +40,13 @@ import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either as packaged
@@ -57,32 +64,27 @@ class ReactorReader
     private static final Collection<String> COMPILE_PHASE_TYPES =
         Arrays.asList( "jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client" );
 
-    private Map<String, MavenProject> projectsByGAV;
+    private final MavenSession session;
+    private final Map<String, MavenProject> projectsByGAV;
+    private final Map<String, List<MavenProject>> projectsByGA;
+    private final WorkspaceRepository repository;
 
-    private Map<String, List<MavenProject>> projectsByGA;
+    private Function<MavenProject, String> projectIntoKey =
+            s -> ArtifactUtils.key( s.getGroupId(), s.getArtifactId(), s.getVersion() );
 
-    private WorkspaceRepository repository;
+    private Function<MavenProject, String> projectIntoVersionlessKey =
+            s -> ArtifactUtils.versionlessKey( s.getGroupId(), s.getArtifactId() );
 
     @Inject
     ReactorReader( MavenSession session )
     {
-        projectsByGAV = session.getProjectMap();
+        this.session = session;
+        this.projectsByGAV =
+                session.getAllProjects().stream()
+                        .collect( toMap( projectIntoKey, identity() ) );
 
-        projectsByGA = new HashMap<>( projectsByGAV.size() * 2 );
-        for ( MavenProject project : projectsByGAV.values() )
-        {
-            String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
-
-            List<MavenProject> projects = projectsByGA.get( key );
-
-            if ( projects == null )
-            {
-                projects = new ArrayList<>( 1 );
-                projectsByGA.put( key, projects );
-            }
-
-            projects.add( project );
-        }
+        this.projectsByGA = projectsByGAV.values().stream()
+                .collect( groupingBy( projectIntoVersionlessKey ) );
 
         repository = new WorkspaceRepository( "reactor", new HashSet<>( projectsByGAV.keySet() ) );
     }
@@ -119,23 +121,11 @@ class ReactorReader
     {
         String key = ArtifactUtils.versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
 
-        List<MavenProject> projects = projectsByGA.get( key );
-        if ( projects == null || projects.isEmpty() )
-        {
-            return Collections.emptyList();
-        }
-
-        List<String> versions = new ArrayList<>();
-
-        for ( MavenProject project : projects )
-        {
-            if ( find( project, artifact ) != null )
-            {
-                versions.add( project.getVersion() );
-            }
-        }
-
-        return Collections.unmodifiableList( versions );
+        return Optional.ofNullable( projectsByGA.get( key ) )
+                .orElse( Collections.emptyList() ).stream()
+                .filter( s -> Objects.nonNull( find( s, artifact ) ) )
+                .map( MavenProject::getVersion )
+                .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
     }
 
     @Override
@@ -190,6 +180,17 @@ class ReactorReader
         return null;
     }
 
+    private File determinePreviouslyPackagedArtifactFile( MavenProject project, Artifact artifact )
+    {
+        if ( artifact == null )
+        {
+            return null;
+        }
+
+        String fileName = String.format( "%s.%s", project.getBuild().getFinalName(), artifact.getExtension() );
+        return new File( project.getBuild().getDirectory(), fileName );
+    }
+
     private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
     {
         return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
@@ -218,28 +219,27 @@ class ReactorReader
             return mainArtifact;
         }
 
-        for ( Artifact attachedArtifact : RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ) )
-        {
-            if ( attachedArtifactComparison( requestedArtifact, attachedArtifact ) )
-            {
-                return attachedArtifact;
-            }
-        }
-
-        return null;
+        return RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ).stream()
+                .filter( isRequestedArtifact( requestedArtifact ) )
+                .findFirst()
+                .orElse( null );
     }
 
-    private boolean attachedArtifactComparison( Artifact requested, Artifact attached )
+    /**
+     * We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file, so we want
+     * to remove that from the comparison.
+     *
+     * @param requestArtifact checked against the given artifact.
+     * @return true if equals, false otherwise.
+     */
+    private Predicate<Artifact> isRequestedArtifact( Artifact requestArtifact )
     {
-        //
-        // We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file so
-        // we want to remove that from the comparison.
-        //
-        return requested.getArtifactId().equals( attached.getArtifactId() )
-            && requested.getGroupId().equals( attached.getGroupId() )
-            && requested.getVersion().equals( attached.getVersion() )
-            && requested.getExtension().equals( attached.getExtension() )
-            && requested.getClassifier().equals( attached.getClassifier() );
+        return s -> s.getArtifactId().equals( requestArtifact.getArtifactId() )
+                && s.getGroupId().equals( requestArtifact.getGroupId() )
+                && s.getVersion().equals( requestArtifact.getVersion() )
+                && s.getExtension().equals( requestArtifact.getExtension() )
+                && s.getClassifier().equals( requestArtifact.getClassifier() );
+
     }
 
     /**
