@@ -50,13 +50,13 @@ public class BootstrapMainStarter
 
     private Path findLauncherJar( Path mavenHome ) throws RuntimeException, IOException
     {
-        try(Stream<Path> list = Files.list( mavenHome.resolve( "boot" ) )) 
+        try ( Stream<Path> list = Files.list( mavenHome.resolve( "boot" ) ) ) 
         {
             return list.filter( p -> p.getFileName().toString().matches( "plexus-classworlds-.*\\.jar" )  )
                         .findFirst()
                         .orElseThrow( () -> new RuntimeException(
                                   String.format( "Couldn't locate the Maven launcher JAR in Maven distribution '%s'.",
                                    mavenHome ) ) );
-	}
+        }
     }
 }
