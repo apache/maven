@@ -23,11 +23,14 @@ import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -38,6 +41,9 @@ public class ArtifactInstallerTest
     @Inject
     private ArtifactInstaller artifactInstaller;
 
+    @Inject
+    private SessionScope sessionScope;
+
     protected String component()
     {
         return "installer";
@@ -47,6 +53,9 @@ public class ArtifactInstallerTest
     public void testArtifactInstallation()
         throws Exception
     {
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, mock(MavenSession.class));
+
         String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
         Artifact artifact = createArtifact( "artifact", "1.0" );

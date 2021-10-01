@@ -24,12 +24,15 @@ import java.io.File;
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import javax.inject.Inject;
 
@@ -42,6 +45,9 @@ public class ArtifactDeployerTest
     @Inject
     private ArtifactDeployer artifactDeployer;
 
+    @Inject
+    private SessionScope sessionScope;
+
     protected String component()
     {
         return "deployer";
@@ -51,6 +57,9 @@ public class ArtifactDeployerTest
     public void testArtifactInstallation()
         throws Exception
     {
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, mock(MavenSession.class));
+
         String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
         Artifact artifact = createArtifact( "artifact", "1.0" );

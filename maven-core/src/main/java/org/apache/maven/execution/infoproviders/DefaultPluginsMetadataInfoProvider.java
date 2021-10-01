@@ -20,12 +20,12 @@ package org.apache.maven.execution.infoproviders;
  */
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -35,38 +35,28 @@ import org.apache.maven.repository.internal.PluginsMetadataInfoProvider;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
 import org.eclipse.aether.artifact.Artifact;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Default implementation of {@link PluginsMetadataInfoProvider}.
  */
 @Named
 @Singleton
 public class DefaultPluginsMetadataInfoProvider
-    extends AbstractMavenLifecycleParticipant
     implements PluginsMetadataInfoProvider
 {
-    private final AtomicReference<MavenSession> mavenSessionRef;
+    private final Provider<MavenSession> mavenSessionProvider;
 
-    public DefaultPluginsMetadataInfoProvider()
+    @Inject
+    public DefaultPluginsMetadataInfoProvider( final Provider<MavenSession> mavenSessionProvider )
     {
-        this.mavenSessionRef = new AtomicReference<>( null );
-    }
-
-    @Override
-    public void afterSessionStart( final MavenSession session )
-    {
-        this.mavenSessionRef.set( session );
-    }
-
-    @Override
-    public void afterSessionEnd( final MavenSession session )
-    {
-        this.mavenSessionRef.set( null );
+        this.mavenSessionProvider = requireNonNull( mavenSessionProvider );
     }
 
     @Override
     public PluginInfo getPluginInfo( final Artifact artifact )
     {
-        MavenSession mavenSession = mavenSessionRef.get();
+        MavenSession mavenSession = mavenSessionProvider.get();
         if ( mavenSession != null )
         {
             MavenProject mavenProject = searchForProject( mavenSession, artifact );
