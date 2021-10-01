@@ -25,7 +25,6 @@ import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
@@ -568,7 +567,7 @@ public class DefaultMavenPluginManager
             if ( mojo instanceof Mojo )
             {
                 Logger mojoLogger = LoggerFactory.getLogger( mojoDescriptor.getImplementation() );
-                ( (Mojo) mojo ).setLog( new DefaultLog( mojoLogger ) );
+                ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();
