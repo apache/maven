@@ -46,7 +46,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -64,6 +63,8 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves a version for a plugin.
@@ -76,13 +77,11 @@ import org.eclipse.aether.version.VersionScheme;
 public class DefaultPluginVersionResolver
     implements PluginVersionResolver
 {
-
     private static final String REPOSITORY_CONTEXT = "plugin";
 
     private static final Object CACHE_KEY = new Object();
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private RepositorySystem repositorySystem;

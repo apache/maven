@@ -22,8 +22,8 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
  */
 public class BuilderCommonTest
 {
-    private Logger logger = mock( Logger.class );
+    private Logger logger = mock(Logger.class);
 
     @Test
     public void testResolveBuildPlan()
@@ -46,7 +46,7 @@ public class BuilderCommonTest
         final MavenSession session1 = original.clone();
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
-        final BuilderCommon builderCommon = getBuilderCommon();
+        final BuilderCommon builderCommon = getBuilderCommon( logger );
         final MavenExecutionPlan plan =
             builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
                     new HashSet<>() );
@@ -63,7 +63,7 @@ public class BuilderCommonTest
         final MavenSession session1 = original.clone();
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
-        getBuilderCommon().resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
+        getBuilderCommon( logger ).resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
 
         verify( logger ).warn("Version not locked for default bindings plugins ["
             + "stub-plugin-initialize, "
@@ -95,11 +95,10 @@ public class BuilderCommonTest
     {
     }
 
-    public BuilderCommon getBuilderCommon()
+    public BuilderCommon getBuilderCommon( Logger logger )
     {
-        final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger( logger );
-        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(),
-                                  logger );
+        final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();
+        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(), logger );
     }
 
 }

@@ -22,6 +22,7 @@ package org.apache.maven.toolchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.io.InputStream;
@@ -31,16 +32,14 @@ import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 
 public class DefaultToolchainTest
 {
-    @Mock
-    private Logger logger;
+    private final Logger logger = mock( Logger.class);
 
     private MavenToolchainsXpp3Reader reader = new MavenToolchainsXpp3Reader();
 

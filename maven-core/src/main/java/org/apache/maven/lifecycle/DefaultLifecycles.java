@@ -19,8 +19,6 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import org.codehaus.plexus.logging.Logger;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -32,6 +30,9 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.0
@@ -46,26 +47,24 @@ public class DefaultLifecycles
 {
     public static final String[] STANDARD_LIFECYCLES = { "default", "clean", "site", "wrapper" };
 
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
     private final Map<String, Lifecycle> lifecyclesMap;
 
-    private final Logger logger;
-
     public DefaultLifecycles()
     {
         this.lifecyclesMap = null;
-        this.logger = null;
     }
 
     @Inject
-    public DefaultLifecycles( Map<String, Lifecycle> lifecyclesMap, Logger logger )
+    public DefaultLifecycles( Map<String, Lifecycle> lifecyclesMap )
     {
         // Must keep the lifecyclesMap as is.
         // During initialization it only contains the default lifecycles.
         // However, extensions might add custom lifecycles later on.
         this.lifecyclesMap = lifecyclesMap;
-        this.logger = logger;
     }
 
     /**

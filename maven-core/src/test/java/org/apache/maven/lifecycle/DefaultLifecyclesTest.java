@@ -91,8 +91,7 @@ public class DefaultLifecyclesTest
         myLifecycles.addAll( defaultLifeCycles.getLifeCycles() );
 
         DefaultLifecycles dl = new DefaultLifecycles( myLifecycles.stream()
-                                                            .collect( Collectors.toMap( l -> l.getId(), l -> l ) ),
-                                                      null );
+                                                            .collect( Collectors.toMap( l -> l.getId(), l -> l ) ) );
 
         assertThat( dl.getLifeCycles().get( 0 ).getId(), is( "default" ) );
         assertThat( dl.getLifeCycles().get( 1 ).getId(), is( "clean" ) );

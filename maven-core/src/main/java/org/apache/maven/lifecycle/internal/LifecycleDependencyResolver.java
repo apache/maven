@@ -46,12 +46,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.ProjectArtifactsCache;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -66,12 +67,10 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 @Named
 public class LifecycleDependencyResolver
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private ProjectDependenciesResolver dependenciesResolver;
-
-    @Inject
-    private Logger logger;
 
     @Inject
     private ProjectArtifactFactory artifactFactory;
@@ -86,10 +85,9 @@ public class LifecycleDependencyResolver
     {
     }
 
-    public LifecycleDependencyResolver( ProjectDependenciesResolver projectDependenciesResolver, Logger logger )
+    public LifecycleDependencyResolver( ProjectDependenciesResolver projectDependenciesResolver )
     {
         this.dependenciesResolver = projectDependenciesResolver;
-        this.logger = logger;
     }
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )

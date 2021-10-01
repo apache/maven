@@ -51,9 +51,10 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
@@ -67,9 +68,7 @@ import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 public class DefaultProjectBuildingHelper
     implements ProjectBuildingHelper
 {
-
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private PlexusContainer container;

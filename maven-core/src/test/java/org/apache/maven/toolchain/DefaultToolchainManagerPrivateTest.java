@@ -35,35 +35,23 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 
 public class DefaultToolchainManagerPrivateTest
 {
-    // Mocks to inject into toolchainManager
-    @Mock
-    private Logger logger;
+    private final org.slf4j.Logger logger = mock(Logger.class);
 
-    @InjectMocks
-    private DefaultToolchainManagerPrivate toolchainManager;
+    private final ToolchainFactory toolchainFactory_basicType = mock(ToolchainFactory.class);
 
-    @Mock
-    private ToolchainFactory toolchainFactory_basicType;
+    private final ToolchainFactory toolchainFactory_rareType = mock(ToolchainFactory.class);
 
-    @Mock
-    private ToolchainFactory toolchainFactory_rareType;
+    private final DefaultToolchainManagerPrivate toolchainManager = new DefaultToolchainManagerPrivate( logger );
 
     @BeforeEach
     public void setUp()
     {
-        toolchainManager = new DefaultToolchainManagerPrivate();
-
-        MockitoAnnotations.initMocks( this );
-
         toolchainManager.factories = new HashMap<>();
         toolchainManager.factories.put( "basic", toolchainFactory_basicType );
         toolchainManager.factories.put( "rare", toolchainFactory_rareType );

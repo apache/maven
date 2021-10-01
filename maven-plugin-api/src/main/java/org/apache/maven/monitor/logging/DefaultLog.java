@@ -20,7 +20,7 @@ package org.apache.maven.monitor.logging;
  */
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * @author jdcasey

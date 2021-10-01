@@ -57,7 +57,8 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
@@ -71,6 +72,8 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 public class BuilderCommon
 {
+    private final Logger logger;
+
     @Inject
     private LifecycleDebugLogger lifecycleDebugLogger;
 
@@ -80,15 +83,14 @@ public class BuilderCommon
     @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Inject
-    private Logger logger;
-
     public BuilderCommon()
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
     }
 
     public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator, Logger logger )
+                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                          Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;

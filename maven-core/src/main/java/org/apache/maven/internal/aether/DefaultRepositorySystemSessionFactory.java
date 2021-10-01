@@ -36,7 +36,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -57,6 +56,8 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,8 +78,7 @@ import java.util.Properties;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private ArtifactHandlerManager artifactHandlerManager;
