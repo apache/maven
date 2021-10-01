@@ -17,7 +17,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <inherited>false</inherited>
