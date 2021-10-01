@@ -60,7 +60,7 @@ public class DefaultToolchainManager
     /**
      * Ctor for UT.
      */
-    public DefaultToolchainManager( Logger logger )
+    DefaultToolchainManager( Logger logger )
     {
         this.logger = requireNonNull( logger );
     }

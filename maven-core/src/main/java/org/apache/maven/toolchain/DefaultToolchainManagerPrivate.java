@@ -52,7 +52,7 @@ public class DefaultToolchainManagerPrivate
     /**
      * Ctor for UT.
      */
-    public DefaultToolchainManagerPrivate( Logger logger )
+    DefaultToolchainManagerPrivate( Logger logger )
     {
         super( logger );
     }
