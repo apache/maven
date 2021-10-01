@@ -41,11 +41,11 @@ import org.slf4j.Logger;
 
 public class DefaultToolchainManagerPrivateTest
 {
-    private final org.slf4j.Logger logger = mock(Logger.class);
+    private final org.slf4j.Logger logger = mock( Logger.class );
 
-    private final ToolchainFactory toolchainFactory_basicType = mock(ToolchainFactory.class);
+    private final ToolchainFactory toolchainFactory_basicType = mock( ToolchainFactory.class );
 
-    private final ToolchainFactory toolchainFactory_rareType = mock(ToolchainFactory.class);
+    private final ToolchainFactory toolchainFactory_rareType = mock( ToolchainFactory.class );
 
     private final DefaultToolchainManagerPrivate toolchainManager = new DefaultToolchainManagerPrivate( logger );
 

@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 
 public class DefaultToolchainTest
 {
-    private final Logger logger = mock( Logger.class);
+    private final Logger logger = mock( Logger.class );
 
     private MavenToolchainsXpp3Reader reader = new MavenToolchainsXpp3Reader();
 
