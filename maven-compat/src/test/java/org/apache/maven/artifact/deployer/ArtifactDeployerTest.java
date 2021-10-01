@@ -58,20 +58,27 @@ public class ArtifactDeployerTest
         throws Exception
     {
         sessionScope.enter();
-        sessionScope.seed(MavenSession.class, mock(MavenSession.class));
+        try
+        {
+            sessionScope.seed(MavenSession.class, mock(MavenSession.class));
 
-        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
+            String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
-        Artifact artifact = createArtifact( "artifact", "1.0" );
+            Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        File file = new File( artifactBasedir, "artifact-1.0.jar" );
-        assertEquals( "dummy", FileUtils.fileRead( file, "UTF-8" ).trim() );
+            File file = new File( artifactBasedir, "artifact-1.0.jar" );
+            assertEquals( "dummy", FileUtils.fileRead( file, "UTF-8" ).trim() );
 
-        artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
+            artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
 
-        ArtifactRepository remoteRepository = remoteRepository();
-        File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
-        assertTrue( deployedFile.exists() );
-        assertEquals( "dummy", FileUtils.fileRead( deployedFile, "UTF-8" ).trim() );
+            ArtifactRepository remoteRepository = remoteRepository();
+            File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
+            assertTrue( deployedFile.exists() );
+            assertEquals( "dummy", FileUtils.fileRead( deployedFile, "UTF-8" ).trim() );
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
     }
 }

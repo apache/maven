@@ -54,16 +54,23 @@ public class ArtifactInstallerTest
         throws Exception
     {
         sessionScope.enter();
-        sessionScope.seed(MavenSession.class, mock(MavenSession.class));
+        try
+        {
+            sessionScope.seed(MavenSession.class, mock(MavenSession.class));
 
-        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
+            String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
-        Artifact artifact = createArtifact( "artifact", "1.0" );
+            Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        File source = new File( artifactBasedir, "artifact-1.0.jar" );
+            File source = new File( artifactBasedir, "artifact-1.0.jar" );
 
-        artifactInstaller.install( source, artifact, localRepository() );
+            artifactInstaller.install( source, artifact, localRepository() );
 
-        assertLocalArtifactPresent( artifact );
+            assertLocalArtifactPresent( artifact );
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
     }
 }
