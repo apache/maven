@@ -84,7 +84,7 @@ public class PluginParameterExpressionEvaluator
 
     private Properties properties;
 
-    @Deprecated //TODO used by the Enforcer plugin
+    @Deprecated //TODO used by the Enforcer plugin (cstamas: not anymore, since 3.0.0)
     public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution,
                                                PathTranslator pathTranslator, MavenProject project,
                                                Properties properties )
