@@ -19,6 +19,8 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.lang.reflect.Field;
+
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -48,7 +50,9 @@ public class DefaultArtifactDescriptorReaderTest
 
         ArgumentCaptor<RepositoryEvent> event = ArgumentCaptor.forClass( RepositoryEvent.class );
 
-        reader.setRepositoryEventDispatcher( eventDispatcher );
+        Field field = DefaultArtifactDescriptorReader.class.getDeclaredField( "repositoryEventDispatcher" );
+        field.setAccessible( true );
+        field.set( reader, eventDispatcher );
 
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
 

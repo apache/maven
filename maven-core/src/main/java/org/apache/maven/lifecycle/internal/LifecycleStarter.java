@@ -48,29 +48,42 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 public class LifecycleStarter
 {
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
+    private final ExecutionEventCatapult eventCatapult;
+
+    private final DefaultLifecycles defaultLifeCycles;
+
+    private final Logger logger;
+
+    private final BuildListCalculator buildListCalculator;
+
+    private final LifecycleDebugLogger lifecycleDebugLogger;
+
+    private final LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
+
+    private final Map<String, Builder> builders;
+
+    private final SessionScope sessionScope;
 
     @Inject
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private BuildListCalculator buildListCalculator;
-
-    @Inject
-    private LifecycleDebugLogger lifecycleDebugLogger;
-
-    @Inject
-    private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
-
-    @Inject
-    private Map<String, Builder> builders;
-
-    @Inject
-    private SessionScope sessionScope;
+    public LifecycleStarter(
+            ExecutionEventCatapult eventCatapult,
+            DefaultLifecycles defaultLifeCycles,
+            Logger logger,
+            BuildListCalculator buildListCalculator,
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
+            Map<String, Builder> builders,
+            SessionScope sessionScope )
+    {
+        this.eventCatapult = eventCatapult;
+        this.defaultLifeCycles = defaultLifeCycles;
+        this.logger = logger;
+        this.buildListCalculator = buildListCalculator;
+        this.lifecycleDebugLogger = lifecycleDebugLogger;
+        this.lifecycleTaskSegmentCalculator = lifecycleTaskSegmentCalculator;
+        this.builders = builders;
+        this.sessionScope = sessionScope;
+    }
 
     public void execute( MavenSession session )
     {

@@ -68,23 +68,29 @@ public class DefaultProjectBuildingHelper
     implements ProjectBuildingHelper
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+    private final PlexusContainer container;
+    private final ClassRealmManager classRealmManager;
+    private final ProjectRealmCache projectRealmCache;
+    private final RepositorySystem repositorySystem;
+    private final MavenPluginManager pluginManager;
 
     @Inject
-    private PlexusContainer container;
-
-    @Inject
-    private ClassRealmManager classRealmManager;
-
-    @Inject
-    private ProjectRealmCache projectRealmCache;
-
-    @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MavenPluginManager pluginManager;
+    public DefaultProjectBuildingHelper(
+            Logger logger,
+            PlexusContainer container,
+            ClassRealmManager classRealmManager,
+            ProjectRealmCache projectRealmCache,
+            RepositorySystem repositorySystem,
+            MavenPluginManager pluginManager )
+    {
+        this.logger = logger;
+        this.container = container;
+        this.classRealmManager = classRealmManager;
+        this.projectRealmCache = projectRealmCache;
+        this.repositorySystem = repositorySystem;
+        this.pluginManager = pluginManager;
+    }
 
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                 List<ArtifactRepository> externalRepositories,

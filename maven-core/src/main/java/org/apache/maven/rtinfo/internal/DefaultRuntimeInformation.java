@@ -46,10 +46,15 @@ public class DefaultRuntimeInformation
     implements RuntimeInformation
 {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
 
     private String mavenVersion;
+
+    @Inject
+    public DefaultRuntimeInformation( Logger logger )
+    {
+        this.logger = logger;
+    }
 
     public String getMavenVersion()
     {

@@ -67,13 +67,10 @@ class ReactorReader
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ReactorReader.class );
 
-    private MavenSession session;
-
-    private Map<String, MavenProject> projectsByGAV;
-
-    private Map<String, List<MavenProject>> projectsByGA;
-
-    private WorkspaceRepository repository;
+    private final MavenSession session;
+    private final Map<String, MavenProject> projectsByGAV;
+    private final Map<String, List<MavenProject>> projectsByGA;
+    private final WorkspaceRepository repository;
 
     @Inject
     ReactorReader( MavenSession session )

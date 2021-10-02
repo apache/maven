@@ -43,11 +43,15 @@ import org.codehaus.plexus.logging.Logger;
 public class DefaultToolchainManager
     implements ToolchainManager
 {
-    @Inject
-    Logger logger;
+    final Logger logger;
+    final Map<String, ToolchainFactory> factories;
 
     @Inject
-    Map<String, ToolchainFactory> factories;
+    public DefaultToolchainManager( Logger logger, Map<String, ToolchainFactory> factories )
+    {
+        this.logger = logger;
+        this.factories = factories;
+    }
 
     @Override
     public Toolchain getToolchainFromBuildContext( String type, MavenSession session )

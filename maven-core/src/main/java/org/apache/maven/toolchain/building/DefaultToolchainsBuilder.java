@@ -53,13 +53,18 @@ import java.util.Map;
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
-    private MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
-
-    @Inject
+    private final MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
     private ToolchainsWriter toolchainsWriter;
+    private ToolchainsReader toolchainsReader;
 
     @Inject
-    private ToolchainsReader toolchainsReader;
+    public DefaultToolchainsBuilder(
+            ToolchainsWriter toolchainsWriter,
+            ToolchainsReader toolchainsReader )
+    {
+        this.toolchainsWriter = toolchainsWriter;
+        this.toolchainsReader = toolchainsReader;
+    }
 
     @Override
     public ToolchainsBuildingResult build( ToolchainsBuildingRequest request )

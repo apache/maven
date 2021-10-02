@@ -67,29 +67,29 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 public class LifecycleDependencyResolver
 {
 
-    @Inject
-    private ProjectDependenciesResolver dependenciesResolver;
+    private final ProjectDependenciesResolver dependenciesResolver;
+
+    private final Logger logger;
+
+    private final ProjectArtifactFactory artifactFactory;
+
+    private final EventSpyDispatcher eventSpyDispatcher;
+
+    private final ProjectArtifactsCache projectArtifactsCache;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private ProjectArtifactFactory artifactFactory;
-
-    @Inject
-    private EventSpyDispatcher eventSpyDispatcher;
-
-    @Inject
-    private ProjectArtifactsCache projectArtifactsCache;
-
-    public LifecycleDependencyResolver()
+    public LifecycleDependencyResolver(
+            ProjectDependenciesResolver dependenciesResolver,
+            Logger logger,
+            ProjectArtifactFactory artifactFactory,
+            EventSpyDispatcher eventSpyDispatcher,
+            ProjectArtifactsCache projectArtifactsCache )
     {
-    }
-
-    public LifecycleDependencyResolver( ProjectDependenciesResolver projectDependenciesResolver, Logger logger )
-    {
-        this.dependenciesResolver = projectDependenciesResolver;
+        this.dependenciesResolver = dependenciesResolver;
         this.logger = logger;
+        this.artifactFactory = artifactFactory;
+        this.eventSpyDispatcher = eventSpyDispatcher;
+        this.projectArtifactsCache = projectArtifactsCache;
     }
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
