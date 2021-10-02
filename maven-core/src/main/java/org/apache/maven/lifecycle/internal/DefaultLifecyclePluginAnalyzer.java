@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.maven.lifecycle.DefaultLifecycles;
@@ -37,11 +38,17 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -52,24 +59,28 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component( role = LifeCyclePluginAnalyzer.class )
+@Singleton
+@Named
 public class DefaultLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
     public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
         + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
-    @Requirement( role = LifecycleMapping.class )
-    private Map<String, LifecycleMapping> lifecycleMappings;
+    private final PlexusContainer plexusContainer;
 
-    @Requirement
-    private DefaultLifecycles defaultLifeCycles;
+    private final DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
-    private Logger logger;
+    private final Logger logger;
 
-    public DefaultLifecyclePluginAnalyzer()
+    @Inject
+    public DefaultLifecyclePluginAnalyzer( final PlexusContainer plexusContainer,
+                                           final DefaultLifecycles defaultLifeCycles,
+                                           final Logger logger )
     {
+        this.plexusContainer = requireNonNull( plexusContainer );
+        this.defaultLifeCycles = requireNonNull( defaultLifeCycles );
+        this.logger = requireNonNull( logger );
     }
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
@@ -82,6 +93,7 @@ public class DefaultLifecyclePluginAnalyzer
     // from the plugin.xml inside a plugin.
     //
 
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         if ( logger.isDebugEnabled() )
@@ -90,7 +102,7 @@ public class DefaultLifecyclePluginAnalyzer
                 + Thread.currentThread().getContextClassLoader() );
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+        LifecycleMapping lifecycleMappingForPackaging = lookupLifecycleMapping( packaging );
 
         if ( lifecycleMappingForPackaging == null )
         {
@@ -130,6 +142,26 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         return plugins.keySet();
+    }
+
+    /**
+     * Performs a lookup using Plexus API to make sure we can look up only "visible" (see Maven classloading) components
+     * from current module and for example not extensions coming from other modules.
+     */
+    private LifecycleMapping lookupLifecycleMapping( final String packaging )
+    {
+        try
+        {
+            return plexusContainer.lookup( LifecycleMapping.class, packaging );
+        }
+        catch ( ComponentLookupException e )
+        {
+            if ( e.getCause() instanceof NoSuchElementException )
+            {
+                return null;
+            }
+            throw new RuntimeException( e );
+        }
     }
 
     private List<Lifecycle> getOrderedLifecycles()
