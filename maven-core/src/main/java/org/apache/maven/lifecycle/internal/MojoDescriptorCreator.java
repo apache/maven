@@ -47,8 +47,9 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -66,8 +67,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Singleton
 public class MojoDescriptorCreator
 {
-
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final PluginVersionResolver pluginVersionResolver;
     private final BuildPluginManager pluginManager;
     private final PluginPrefixResolver pluginPrefixResolver;
@@ -75,13 +75,11 @@ public class MojoDescriptorCreator
 
     @Inject
     public MojoDescriptorCreator(
-            Logger logger,
             PluginVersionResolver pluginVersionResolver,
             BuildPluginManager pluginManager,
             PluginPrefixResolver pluginPrefixResolver,
             LifecyclePluginResolver lifecyclePluginResolver )
     {
-        this.logger = logger;
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
         this.pluginPrefixResolver = pluginPrefixResolver;

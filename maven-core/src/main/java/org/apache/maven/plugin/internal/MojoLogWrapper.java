@@ -1,4 +1,4 @@
-package org.apache.maven.monitor.logging;
+package org.apache.maven.plugin.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,23 +20,21 @@ package org.apache.maven.monitor.logging;
  */
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author jdcasey
- *
- * @deprecated Use SLF4J directly
  */
-@Deprecated
-public class DefaultLog
+public class MojoLogWrapper
     implements Log
 {
-
     private final Logger logger;
 
-    public DefaultLog( Logger logger )
+    public MojoLogWrapper( Logger logger )
     {
-        this.logger = logger;
+        this.logger = requireNonNull( logger );
     }
 
     public void debug( CharSequence content )
@@ -56,79 +54,93 @@ public class DefaultLog
         }
     }
 
+    @Override
     public void debug( CharSequence content, Throwable error )
     {
         logger.debug( toString( content ), error );
     }
 
+    @Override
     public void debug( Throwable error )
     {
         logger.debug( "", error );
     }
 
+    @Override
     public void info( CharSequence content )
     {
         logger.info( toString( content ) );
     }
 
+    @Override
     public void info( CharSequence content, Throwable error )
     {
         logger.info( toString( content ), error );
     }
 
+    @Override
     public void info( Throwable error )
     {
         logger.info( "", error );
     }
 
+    @Override
     public void warn( CharSequence content )
     {
         logger.warn( toString( content ) );
     }
 
+    @Override
     public void warn( CharSequence content, Throwable error )
     {
         logger.warn( toString( content ), error );
     }
 
+    @Override
     public void warn( Throwable error )
     {
         logger.warn( "", error );
     }
 
+    @Override
     public void error( CharSequence content )
     {
         logger.error( toString( content ) );
     }
 
+    @Override
     public void error( CharSequence content, Throwable error )
     {
         logger.error( toString( content ), error );
     }
 
+    @Override
     public void error( Throwable error )
     {
         logger.error( "", error );
     }
 
+    @Override
     public boolean isDebugEnabled()
     {
         return logger.isDebugEnabled();
     }
 
+    @Override
     public boolean isInfoEnabled()
     {
         return logger.isInfoEnabled();
     }
 
+    @Override
     public boolean isWarnEnabled()
     {
         return logger.isWarnEnabled();
     }
 
+    @Override
     public boolean isErrorEnabled()
     {
         return logger.isErrorEnabled();
     }
-
 }

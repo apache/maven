@@ -43,7 +43,8 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project).
@@ -64,14 +65,13 @@ import org.codehaus.plexus.logging.Logger;
 public class MultiThreadedBuilder
     implements Builder
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private final Logger logger;
     private final LifecycleModuleBuilder lifecycleModuleBuilder;
 
     @Inject
-    public MultiThreadedBuilder( Logger logger, LifecycleModuleBuilder lifecycleModuleBuilder )
+    public MultiThreadedBuilder( LifecycleModuleBuilder lifecycleModuleBuilder )
     {
-        this.logger = logger;
         this.lifecycleModuleBuilder = lifecycleModuleBuilder;
     }
 

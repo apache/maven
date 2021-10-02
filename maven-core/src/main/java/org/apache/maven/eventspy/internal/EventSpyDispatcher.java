@@ -28,8 +28,9 @@ import javax.inject.Singleton;
 
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches callbacks to all registered eventspies.
@@ -39,15 +40,13 @@ import org.eclipse.aether.RepositoryListener;
 @Singleton
 public class EventSpyDispatcher
 {
-
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final List<EventSpy> eventSpies;
 
     @Inject
-    public EventSpyDispatcher( Logger logger, List<EventSpy> eventSpies )
+    public EventSpyDispatcher( List<EventSpy> eventSpies )
     {
-        this.logger = logger;
         // make copy to get rid of needless overhead for dynamic lookups
         this.eventSpies = new ArrayList<>( eventSpies );
     }

@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -33,9 +32,10 @@ import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JDK toolchain factory.
@@ -50,14 +50,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class JavaToolchainFactory
     implements ToolchainFactory
 {
-
-    private Logger logger;
-
-    @Inject
-    public JavaToolchainFactory( Logger logger )
-    {
-        this.logger = logger;
-    }
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public ToolchainPrivate createToolchain( ToolchainModel model )
         throws MisconfiguredToolchainException

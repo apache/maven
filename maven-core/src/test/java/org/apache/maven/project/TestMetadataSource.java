@@ -33,7 +33,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.codehaus.plexus.logging.Logger;
 
 @SuppressWarnings( "deprecation" )
 @Named( "classpath" )
@@ -42,8 +41,8 @@ public class TestMetadataSource
     extends MavenMetadataSource
 {
 
-    public TestMetadataSource( Logger logger, RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem, ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport) {
-        super( logger, repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport );
+    public TestMetadataSource( RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem, ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport) {
+        super( repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport );
     }
 
     @Override

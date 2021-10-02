@@ -21,13 +21,13 @@ package org.apache.maven.toolchain;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Reader;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -41,14 +41,7 @@ import javax.inject.Singleton;
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
-
-    private final Logger logger;
-
-    @Inject
-    public DefaultToolchainsBuilder( Logger logger )
-    {
-        this.logger = logger;
-    }
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public PersistedToolchains build( File userToolchainsFile )
         throws MisconfiguredToolchainException

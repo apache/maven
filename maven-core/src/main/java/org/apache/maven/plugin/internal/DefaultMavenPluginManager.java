@@ -25,7 +25,6 @@ import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
@@ -73,8 +72,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -84,6 +81,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,8 +131,8 @@ public class DefaultMavenPluginManager
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 
-    private Logger logger;
-    private LoggerManager loggerManager;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private PlexusContainer container;
     private ClassRealmManager classRealmManager;
     private PluginDescriptorCache pluginDescriptorCache;
@@ -150,8 +149,6 @@ public class DefaultMavenPluginManager
 
     @Inject
     public DefaultMavenPluginManager(
-            Logger logger,
-            LoggerManager loggerManager,
             PlexusContainer container,
             ClassRealmManager classRealmManager,
             PluginDescriptorCache pluginDescriptorCache,
@@ -163,8 +160,6 @@ public class DefaultMavenPluginManager
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator )
     {
-        this.logger = logger;
-        this.loggerManager = loggerManager;
         this.container = container;
         this.classRealmManager = classRealmManager;
         this.pluginDescriptorCache = pluginDescriptorCache;
@@ -576,8 +571,8 @@ public class DefaultMavenPluginManager
 
             if ( mojo instanceof Mojo )
             {
-                Logger mojoLogger = loggerManager.getLoggerForComponent( mojoDescriptor.getImplementation() );
-                ( (Mojo) mojo ).setLog( new DefaultLog( mojoLogger ) );
+                Logger mojoLogger = LoggerFactory.getLogger( mojoDescriptor.getImplementation() );
+                ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

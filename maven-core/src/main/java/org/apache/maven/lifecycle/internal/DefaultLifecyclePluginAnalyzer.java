@@ -40,9 +40,10 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -67,20 +68,18 @@ public class DefaultLifecyclePluginAnalyzer
     public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
         + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion() + ":default-lifecycle-bindings";
 
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final PlexusContainer plexusContainer;
 
     private final DefaultLifecycles defaultLifeCycles;
 
-    private final Logger logger;
-
     @Inject
     public DefaultLifecyclePluginAnalyzer( final PlexusContainer plexusContainer,
-                                           final DefaultLifecycles defaultLifeCycles,
-                                           final Logger logger )
+                                           final DefaultLifecycles defaultLifeCycles )
     {
         this.plexusContainer = requireNonNull( plexusContainer );
         this.defaultLifeCycles = requireNonNull( defaultLifeCycles );
-        this.logger = requireNonNull( logger );
     }
 
     // These methods deal with construction intact Plugin object that look like they come from a standard

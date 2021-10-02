@@ -29,9 +29,11 @@ import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
+ * TODO: refactor this, component extending component is bad practice.
+ *
  * @author mkleint
  * @author Robert Scholte
  */
@@ -41,11 +43,18 @@ public class DefaultToolchainManagerPrivate
     extends DefaultToolchainManager
     implements ToolchainManagerPrivate
 {
-
     @Inject
-    public DefaultToolchainManagerPrivate( Logger logger, Map<String, ToolchainFactory> factories )
+    public DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories )
     {
-        super( logger, factories );
+        super( factories );
+    }
+
+    /**
+     * Ctor needed for UT.
+     */
+    DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories, Logger logger )
+    {
+        super( factories, logger );
     }
 
     @Override

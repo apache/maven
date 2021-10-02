@@ -22,7 +22,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelProcessor;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 
@@ -37,12 +36,12 @@ public class TestProjectBuilder
 {
     @Inject
     public TestProjectBuilder(
-            Logger logger, ModelBuilder modelBuilder, ModelProcessor modelProcessor,
+            ModelBuilder modelBuilder, ModelProcessor modelProcessor,
             ProjectBuildingHelper projectBuildingHelper, MavenRepositorySystem repositorySystem,
             RepositorySystem repoSystem, RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver )
     {
-        super( logger, modelBuilder, modelProcessor, projectBuildingHelper, repositorySystem, repoSystem,
+        super( modelBuilder, modelProcessor, projectBuildingHelper, repositorySystem, repoSystem,
                 repositoryManager, dependencyResolver );
     }
 

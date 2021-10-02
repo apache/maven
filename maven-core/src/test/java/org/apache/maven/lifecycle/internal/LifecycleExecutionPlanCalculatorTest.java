@@ -72,7 +72,7 @@ public class LifecycleExecutionPlanCalculatorTest
 
     public static MojoDescriptorCreator createMojoDescriptorCreator()
     {
-        return new MojoDescriptorCreator( null, new PluginVersionResolverStub(), new BuildPluginManagerStub(),
+        return new MojoDescriptorCreator( new PluginVersionResolverStub(), new BuildPluginManagerStub(),
                                           new PluginPrefixResolverStub(),
                                           new LifecyclePluginResolver( new PluginVersionResolverStub() ) );
     }

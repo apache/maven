@@ -33,7 +33,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -61,6 +60,8 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility class that
@@ -75,16 +76,15 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 public class DefaultPluginDependenciesResolver
     implements PluginDependenciesResolver
 {
-
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final RepositorySystem repoSystem;
 
     @Inject
-    public DefaultPluginDependenciesResolver( Logger logger, RepositorySystem repoSystem )
+    public DefaultPluginDependenciesResolver( RepositorySystem repoSystem )
     {
-        this.logger = logger;
         this.repoSystem = repoSystem;
     }
 

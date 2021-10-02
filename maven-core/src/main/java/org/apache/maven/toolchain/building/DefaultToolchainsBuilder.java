@@ -54,8 +54,8 @@ public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {
     private final MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
-    private ToolchainsWriter toolchainsWriter;
-    private ToolchainsReader toolchainsReader;
+    private final ToolchainsWriter toolchainsWriter;
+    private final ToolchainsReader toolchainsReader;
 
     @Inject
     public DefaultToolchainsBuilder(

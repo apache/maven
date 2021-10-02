@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.internal;
+package org.apache.maven.lifecycle.internal.builder;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -19,11 +19,13 @@ import java.util.HashSet;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
+import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
+import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -46,7 +48,7 @@ public class BuilderCommonTest
         final MavenSession session1 = original.clone();
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
-        final BuilderCommon builderCommon = getBuilderCommon();
+        final BuilderCommon builderCommon = getBuilderCommon( logger );
         final MavenExecutionPlan plan =
             builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
                     new HashSet<>() );
@@ -63,7 +65,7 @@ public class BuilderCommonTest
         final MavenSession session1 = original.clone();
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
-        getBuilderCommon().resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
+        getBuilderCommon( logger ).resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
 
         verify( logger ).warn("Version not locked for default bindings plugins ["
             + "stub-plugin-initialize, "
@@ -95,10 +97,11 @@ public class BuilderCommonTest
     {
     }
 
-    public BuilderCommon getBuilderCommon()
+    public BuilderCommon getBuilderCommon( Logger logger )
     {
-        final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger( logger );
-        return new BuilderCommon( logger, debugLogger, new LifecycleExecutionPlanCalculatorStub(), null );
+        final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();
+        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(), mock(
+                ExecutionEventCatapult.class ),  logger );
     }
 
 }

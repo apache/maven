@@ -33,7 +33,10 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author mkleint
@@ -43,14 +46,24 @@ import org.codehaus.plexus.logging.Logger;
 public class DefaultToolchainManager
     implements ToolchainManager
 {
-    final Logger logger;
+    protected final Logger logger; // TODO this class is extended, needs refactoring
+
     final Map<String, ToolchainFactory> factories;
 
     @Inject
-    public DefaultToolchainManager( Logger logger, Map<String, ToolchainFactory> factories )
+    public DefaultToolchainManager( Map<String, ToolchainFactory> factories )
     {
-        this.logger = logger;
         this.factories = factories;
+        this.logger = LoggerFactory.getLogger( DefaultToolchainManager.class );
+    }
+
+    /**
+     * Ctor needed for UT.
+     */
+    DefaultToolchainManager( Map<String, ToolchainFactory> factories, Logger logger )
+    {
+        this.factories = factories;
+        this.logger = requireNonNull( logger );
     }
 
     @Override

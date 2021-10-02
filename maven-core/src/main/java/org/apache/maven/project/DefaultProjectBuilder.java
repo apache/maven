@@ -72,7 +72,6 @@ import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.DefaultModelCache;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
@@ -84,6 +83,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultProjectBuilder
@@ -93,8 +94,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
-
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ModelBuilder modelBuilder;
     private final ModelProcessor modelProcessor;
     private final ProjectBuildingHelper projectBuildingHelper;
@@ -105,7 +105,6 @@ public class DefaultProjectBuilder
 
     @Inject
     public DefaultProjectBuilder(
-            Logger logger,
             ModelBuilder modelBuilder,
             ModelProcessor modelProcessor,
             ProjectBuildingHelper projectBuildingHelper,
@@ -114,7 +113,6 @@ public class DefaultProjectBuilder
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver )
     {
-        this.logger = logger;
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
         this.projectBuildingHelper = projectBuildingHelper;

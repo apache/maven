@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,8 +33,9 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -52,13 +52,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 public class LifecycleDebugLogger
 {
-    private final Logger logger;
-
-    @Inject
-    public LifecycleDebugLogger( Logger logger )
-    {
-        this.logger = logger;
-    }
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     public void debug( String s )
     {

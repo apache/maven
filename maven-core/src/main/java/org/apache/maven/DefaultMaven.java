@@ -48,11 +48,12 @@ import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -82,8 +83,7 @@ import static java.util.stream.Collectors.toSet;
 public class DefaultMaven
     implements Maven
 {
-
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     protected ProjectBuilder projectBuilder;
 
@@ -109,7 +109,6 @@ public class DefaultMaven
 
     @Inject
     public DefaultMaven(
-            Logger logger,
             ProjectBuilder projectBuilder,
             LifecycleStarter lifecycleStarter,
             PlexusContainer container,
@@ -122,7 +121,6 @@ public class DefaultMaven
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider )
     {
-        this.logger = logger;
         this.projectBuilder = projectBuilder;
         this.lifecycleStarter = lifecycleStarter;
         this.container = container;

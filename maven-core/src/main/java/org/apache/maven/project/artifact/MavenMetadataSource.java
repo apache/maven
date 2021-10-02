@@ -78,11 +78,12 @@ import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason van Zyl
@@ -92,24 +93,21 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
-
-    private Logger logger;
-    private RepositoryMetadataManager repositoryMetadataManager;
-    private ArtifactFactory repositorySystem;
-    private ProjectBuilder projectBuilder;
-    private MavenMetadataCache cache;
-    private LegacySupport legacySupport;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final RepositoryMetadataManager repositoryMetadataManager;
+    private final ArtifactFactory repositorySystem;
+    private final ProjectBuilder projectBuilder;
+    private final MavenMetadataCache cache;
+    private final LegacySupport legacySupport;
 
     @Inject
     public MavenMetadataSource(
-            Logger logger,
             RepositoryMetadataManager repositoryMetadataManager,
             ArtifactFactory repositorySystem,
             ProjectBuilder projectBuilder,
             MavenMetadataCache cache,
             LegacySupport legacySupport )
     {
-        this.logger = logger;
         this.repositoryMetadataManager = repositoryMetadataManager;
         this.repositorySystem = repositorySystem;
         this.projectBuilder = projectBuilder;

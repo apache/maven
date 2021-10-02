@@ -35,12 +35,12 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 
 public class DefaultToolchainManagerPrivateTest
 {
@@ -66,7 +66,7 @@ public class DefaultToolchainManagerPrivateTest
         Map<String, ToolchainFactory> factories = new HashMap<>();
         factories.put( "basic", toolchainFactory_basicType );
         factories.put( "rare", toolchainFactory_rareType );
-        toolchainManager = new DefaultToolchainManagerPrivate( logger, factories );
+        toolchainManager = new DefaultToolchainManagerPrivate( factories, logger );
     }
 
     @Test
