@@ -82,15 +82,20 @@ public class DefaultPluginVersionResolver
     private static final Object CACHE_KEY = new Object();
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final RepositorySystem repositorySystem;
+    private final MetadataReader metadataReader;
+    private final MavenPluginManager pluginManager;
 
     @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MetadataReader metadataReader;
-
-    @Inject
-    private MavenPluginManager pluginManager;
+    public DefaultPluginVersionResolver(
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader,
+            MavenPluginManager pluginManager )
+    {
+        this.repositorySystem = repositorySystem;
+        this.metadataReader = metadataReader;
+        this.pluginManager = pluginManager;
+    }
 
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException

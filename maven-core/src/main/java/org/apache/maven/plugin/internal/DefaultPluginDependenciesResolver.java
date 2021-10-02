@@ -80,8 +80,13 @@ public class DefaultPluginDependenciesResolver
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
+    private final RepositorySystem repoSystem;
+
     @Inject
-    private RepositorySystem repoSystem;
+    public DefaultPluginDependenciesResolver( RepositorySystem repoSystem )
+    {
+        this.repoSystem = repoSystem;
+    }
 
     private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
     {

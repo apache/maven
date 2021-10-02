@@ -44,17 +44,17 @@ public class DefaultToolchainManagerPrivate
     implements ToolchainManagerPrivate
 {
     @Inject
-    public DefaultToolchainManagerPrivate()
+    public DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories )
     {
-        super();
+        super( factories );
     }
 
     /**
-     * Ctor for UT.
+     * Ctor needed for UT.
      */
-    DefaultToolchainManagerPrivate( Logger logger )
+    DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories, Logger logger )
     {
-        super( logger );
+        super( factories, logger );
     }
 
     @Override

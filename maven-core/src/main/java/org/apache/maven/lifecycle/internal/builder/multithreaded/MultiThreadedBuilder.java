@@ -67,11 +67,12 @@ public class MultiThreadedBuilder
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private LifecycleModuleBuilder lifecycleModuleBuilder;
+    private final LifecycleModuleBuilder lifecycleModuleBuilder;
 
-    public MultiThreadedBuilder()
+    @Inject
+    public MultiThreadedBuilder( LifecycleModuleBuilder lifecycleModuleBuilder )
     {
+        this.lifecycleModuleBuilder = lifecycleModuleBuilder;
     }
 
     @Override

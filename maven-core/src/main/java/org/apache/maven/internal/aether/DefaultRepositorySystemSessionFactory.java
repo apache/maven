@@ -80,30 +80,38 @@ public class DefaultRepositorySystemSessionFactory
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final ArtifactHandlerManager artifactHandlerManager;
+
+    private final RepositorySystem repoSystem;
+
+    private final LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
+
+    private final WorkspaceReader workspaceRepository;
+
+    private final SettingsDecrypter settingsDecrypter;
+
+    private final EventSpyDispatcher eventSpyDispatcher;
+
+    private final MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
-    private RepositorySystem repoSystem;
-
-    @Inject
-    @Nullable
-    @Named( "simple" )
-    private LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
-
-    @Inject
-    @Nullable
-    @Named( "ide" )
-    private WorkspaceReader workspaceRepository;
-
-    @Inject
-    private SettingsDecrypter settingsDecrypter;
-
-    @Inject
-    private EventSpyDispatcher eventSpyDispatcher;
-
-    @Inject
-    MavenRepositorySystem mavenRepositorySystem;
+    public DefaultRepositorySystemSessionFactory(
+            ArtifactHandlerManager artifactHandlerManager,
+            RepositorySystem repoSystem,
+            @Nullable @Named( "simple" ) LocalRepositoryManagerFactory simpleLocalRepoMgrFactory,
+            @Nullable @Named( "ide" ) WorkspaceReader workspaceRepository,
+            SettingsDecrypter settingsDecrypter,
+            EventSpyDispatcher eventSpyDispatcher,
+            MavenRepositorySystem mavenRepositorySystem )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.repoSystem = repoSystem;
+        this.simpleLocalRepoMgrFactory = simpleLocalRepoMgrFactory;
+        this.workspaceRepository = workspaceRepository;
+        this.settingsDecrypter = settingsDecrypter;
+        this.eventSpyDispatcher = eventSpyDispatcher;
+        this.mavenRepositorySystem = mavenRepositorySystem;
+    }
 
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {

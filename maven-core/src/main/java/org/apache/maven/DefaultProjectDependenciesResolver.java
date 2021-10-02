@@ -56,11 +56,18 @@ public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
 
-    @Inject
-    private RepositorySystem repositorySystem;
+    private final RepositorySystem repositorySystem;
+
+    private final ResolutionErrorHandler resolutionErrorHandler;
 
     @Inject
-    private ResolutionErrorHandler resolutionErrorHandler;
+    public DefaultProjectDependenciesResolver(
+            RepositorySystem repositorySystem,
+            ResolutionErrorHandler resolutionErrorHandler )
+    {
+        this.repositorySystem = repositorySystem;
+        this.resolutionErrorHandler = resolutionErrorHandler;
+    }
 
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException

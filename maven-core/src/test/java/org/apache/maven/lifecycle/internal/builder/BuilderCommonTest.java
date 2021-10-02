@@ -19,6 +19,7 @@ import java.util.HashSet;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
@@ -99,7 +100,8 @@ public class BuilderCommonTest
     public BuilderCommon getBuilderCommon( Logger logger )
     {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();
-        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(), logger );
+        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(), mock(
+                ExecutionEventCatapult.class ),  logger );
     }
 
 }

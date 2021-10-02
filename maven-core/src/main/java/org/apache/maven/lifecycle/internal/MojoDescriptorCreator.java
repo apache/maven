@@ -68,26 +68,17 @@ import org.slf4j.LoggerFactory;
 public class MojoDescriptorCreator
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final PluginVersionResolver pluginVersionResolver;
+    private final BuildPluginManager pluginManager;
+    private final PluginPrefixResolver pluginPrefixResolver;
+    private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
-    private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private PluginPrefixResolver pluginPrefixResolver;
-
-    @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    public MojoDescriptorCreator()
-    {
-    }
-
-    public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
-                                  PluginPrefixResolver pluginPrefixResolver,
-                                  LifecyclePluginResolver lifecyclePluginResolver )
+    public MojoDescriptorCreator(
+            PluginVersionResolver pluginVersionResolver,
+            BuildPluginManager pluginManager,
+            PluginPrefixResolver pluginPrefixResolver,
+            LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;

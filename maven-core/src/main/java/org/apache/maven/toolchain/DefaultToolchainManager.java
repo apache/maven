@@ -48,20 +48,21 @@ public class DefaultToolchainManager
 {
     protected final Logger logger;
 
-    @Inject
-    Map<String, ToolchainFactory> factories;
+    final Map<String, ToolchainFactory> factories;
 
     @Inject
-    public DefaultToolchainManager()
+    public DefaultToolchainManager( Map<String, ToolchainFactory> factories )
     {
-        this( LoggerFactory.getLogger( DefaultToolchainManager.class ) );
+        this.factories = factories;
+        this.logger = LoggerFactory.getLogger( DefaultToolchainManager.class );
     }
 
     /**
-     * Ctor for UT.
+     * Ctor needed for UT.
      */
-    DefaultToolchainManager( Logger logger )
+    DefaultToolchainManager( Map<String, ToolchainFactory> factories, Logger logger )
     {
+        this.factories = factories;
         this.logger = requireNonNull( logger );
     }
 

@@ -54,10 +54,6 @@ public class LifecycleDebugLogger
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    public LifecycleDebugLogger()
-    {
-    }
-
     public void debug( String s )
     {
         logger.debug( s );

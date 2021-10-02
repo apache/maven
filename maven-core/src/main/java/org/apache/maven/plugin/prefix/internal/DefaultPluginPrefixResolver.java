@@ -69,15 +69,20 @@ public class DefaultPluginPrefixResolver
     private static final String REPOSITORY_CONTEXT = "plugin";
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final BuildPluginManager pluginManager;
+    private final RepositorySystem repositorySystem;
+    private final MetadataReader metadataReader;
 
     @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MetadataReader metadataReader;
+    public DefaultPluginPrefixResolver(
+            BuildPluginManager pluginManager,
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader )
+    {
+        this.pluginManager = pluginManager;
+        this.repositorySystem = repositorySystem;
+        this.metadataReader = metadataReader;
+    }
 
     public PluginPrefixResult resolve( PluginPrefixRequest request )
         throws NoPluginFoundForPrefixException

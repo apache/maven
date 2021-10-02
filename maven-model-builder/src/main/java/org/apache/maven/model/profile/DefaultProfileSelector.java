@@ -47,8 +47,13 @@ public class DefaultProfileSelector
     implements ProfileSelector
 {
 
+    private final List<ProfileActivator> activators;
+
     @Inject
-    private List<ProfileActivator> activators = new ArrayList<>();
+    public DefaultProfileSelector( List<ProfileActivator> activators )
+    {
+        this.activators = activators;
+    }
 
     public DefaultProfileSelector addProfileActivator( ProfileActivator profileActivator )
     {

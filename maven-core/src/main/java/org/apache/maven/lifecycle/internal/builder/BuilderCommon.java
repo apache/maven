@@ -73,30 +73,34 @@ import org.slf4j.LoggerFactory;
 public class BuilderCommon
 {
     private final Logger logger;
+    private final LifecycleDebugLogger lifecycleDebugLogger;
+    private final LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
+    private final ExecutionEventCatapult eventCatapult;
 
     @Inject
-    private LifecycleDebugLogger lifecycleDebugLogger;
-
-    @Inject
-    private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    public BuilderCommon()
+    public BuilderCommon(
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+            ExecutionEventCatapult eventCatapult )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
+        this.lifecycleDebugLogger = lifecycleDebugLogger;
+        this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
+        this.eventCatapult = eventCatapult;
     }
 
     /**
      * Ctor needed for UT.
      */
-    BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                   LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-                   Logger logger )
+    BuilderCommon(
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+            ExecutionEventCatapult eventCatapult,
+            Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
+        this.eventCatapult = eventCatapult;
         this.logger = logger;
     }
 

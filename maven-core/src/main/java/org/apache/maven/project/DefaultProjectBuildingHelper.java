@@ -69,21 +69,26 @@ public class DefaultProjectBuildingHelper
     implements ProjectBuildingHelper
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final PlexusContainer container; // TODO not used? Then remove
+    private final ClassRealmManager classRealmManager;
+    private final ProjectRealmCache projectRealmCache;
+    private final RepositorySystem repositorySystem;
+    private final MavenPluginManager pluginManager;
 
     @Inject
-    private PlexusContainer container;
-
-    @Inject
-    private ClassRealmManager classRealmManager;
-
-    @Inject
-    private ProjectRealmCache projectRealmCache;
-
-    @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MavenPluginManager pluginManager;
+    public DefaultProjectBuildingHelper(
+            PlexusContainer container,
+            ClassRealmManager classRealmManager,
+            ProjectRealmCache projectRealmCache,
+            RepositorySystem repositorySystem,
+            MavenPluginManager pluginManager )
+    {
+        this.container = container;
+        this.classRealmManager = classRealmManager;
+        this.projectRealmCache = projectRealmCache;
+        this.repositorySystem = repositorySystem;
+        this.pluginManager = pluginManager;
+    }
 
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                 List<ArtifactRepository> externalRepositories,

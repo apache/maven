@@ -42,18 +42,13 @@ public class EventSpyDispatcher
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private List<EventSpy> eventSpies;
+    private final List<EventSpy> eventSpies;
 
     @Inject
-    public void setEventSpies( List<EventSpy> eventSpies )
+    public EventSpyDispatcher( List<EventSpy> eventSpies )
     {
         // make copy to get rid of needless overhead for dynamic lookups
         this.eventSpies = new ArrayList<>( eventSpies );
-    }
-
-    public List<EventSpy> getEventSpies()
-    {
-        return eventSpies;
     }
 
     public ExecutionListener chainListener( ExecutionListener listener )

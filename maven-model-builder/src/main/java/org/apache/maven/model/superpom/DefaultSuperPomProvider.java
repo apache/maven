@@ -43,18 +43,17 @@ public class DefaultSuperPomProvider
     implements SuperPomProvider
 {
 
+    private final ModelProcessor modelProcessor;
+
     /**
      * The cached super POM, lazily created.
      */
     private Model superModel;
 
     @Inject
-    private ModelProcessor modelProcessor;
-
-    public DefaultSuperPomProvider setModelProcessor( ModelProcessor modelProcessor )
+    public DefaultSuperPomProvider( ModelProcessor modelProcessor )
     {
         this.modelProcessor = modelProcessor;
-        return this;
     }
 
     @Override

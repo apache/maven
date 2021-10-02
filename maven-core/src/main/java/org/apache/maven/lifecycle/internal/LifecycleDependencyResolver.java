@@ -69,25 +69,25 @@ public class LifecycleDependencyResolver
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private ProjectDependenciesResolver dependenciesResolver;
+    private final ProjectDependenciesResolver dependenciesResolver;
+
+    private final ProjectArtifactFactory artifactFactory;
+
+    private final EventSpyDispatcher eventSpyDispatcher;
+
+    private final ProjectArtifactsCache projectArtifactsCache;
 
     @Inject
-    private ProjectArtifactFactory artifactFactory;
-
-    @Inject
-    private EventSpyDispatcher eventSpyDispatcher;
-
-    @Inject
-    private ProjectArtifactsCache projectArtifactsCache;
-
-    public LifecycleDependencyResolver()
+    public LifecycleDependencyResolver(
+            ProjectDependenciesResolver dependenciesResolver,
+            ProjectArtifactFactory artifactFactory,
+            EventSpyDispatcher eventSpyDispatcher,
+            ProjectArtifactsCache projectArtifactsCache )
     {
-    }
-
-    public LifecycleDependencyResolver( ProjectDependenciesResolver projectDependenciesResolver )
-    {
-        this.dependenciesResolver = projectDependenciesResolver;
+        this.dependenciesResolver = dependenciesResolver;
+        this.artifactFactory = artifactFactory;
+        this.eventSpyDispatcher = eventSpyDispatcher;
+        this.projectArtifactsCache = projectArtifactsCache;
     }
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )

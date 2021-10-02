@@ -63,12 +63,17 @@ public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final RepositorySystem repoSystem;
+    private final List<RepositorySessionDecorator> decorators;
 
     @Inject
-    private RepositorySystem repoSystem;
-
-    @Inject
-    private List<RepositorySessionDecorator> decorators;
+    public DefaultProjectDependenciesResolver(
+            RepositorySystem repoSystem,
+            List<RepositorySessionDecorator> decorators )
+    {
+        this.repoSystem = repoSystem;
+        this.decorators = decorators;
+    }
 
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )
         throws DependencyResolutionException
