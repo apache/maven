@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.internal;
+package org.apache.maven.lifecycle.internal.builder;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -19,7 +19,8 @@ import java.util.HashSet;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
+import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.verify;
  */
 public class BuilderCommonTest
 {
-    private Logger logger = mock(Logger.class);
+    private Logger logger = mock( Logger.class );
 
     @Test
     public void testResolveBuildPlan()

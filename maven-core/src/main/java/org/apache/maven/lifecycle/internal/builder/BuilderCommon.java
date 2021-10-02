@@ -88,9 +88,12 @@ public class BuilderCommon
         this.logger = LoggerFactory.getLogger( getClass() );
     }
 
-    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-                          Logger logger )
+    /**
+     * Ctor needed for UT.
+     */
+    BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
+                   LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                   Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
