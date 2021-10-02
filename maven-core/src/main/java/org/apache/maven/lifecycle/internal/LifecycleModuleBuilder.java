@@ -53,24 +53,25 @@ import org.apache.maven.session.scope.internal.SessionScope;
 public class LifecycleModuleBuilder
 {
 
-    @Inject
-    private MojoExecutor mojoExecutor;
+    private final MojoExecutor mojoExecutor;
+    private final BuilderCommon builderCommon;
+    private final ExecutionEventCatapult eventCatapult;
+    private final ProjectExecutionListener projectExecutionListener;
+    private final SessionScope sessionScope;
 
     @Inject
-    private BuilderCommon builderCommon;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    private ProjectExecutionListener projectExecutionListener;
-
-    @Inject
-    private SessionScope sessionScope;
-
-    @Inject
-    public void setProjectExecutionListeners( final List<ProjectExecutionListener> listeners )
+    public LifecycleModuleBuilder(
+            MojoExecutor mojoExecutor,
+            BuilderCommon builderCommon,
+            ExecutionEventCatapult eventCatapult,
+            List<ProjectExecutionListener> listeners,
+            SessionScope sessionScope )
     {
+        this.mojoExecutor = mojoExecutor;
+        this.builderCommon = builderCommon;
+        this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener( listeners );
+        this.sessionScope = sessionScope;
     }
 
     public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,

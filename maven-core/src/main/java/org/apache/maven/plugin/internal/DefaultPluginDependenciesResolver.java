@@ -78,11 +78,15 @@ public class DefaultPluginDependenciesResolver
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+    private final RepositorySystem repoSystem;
 
     @Inject
-    private RepositorySystem repoSystem;
+    public DefaultPluginDependenciesResolver( Logger logger, RepositorySystem repoSystem )
+    {
+        this.logger = logger;
+        this.repoSystem = repoSystem;
+    }
 
     private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
     {

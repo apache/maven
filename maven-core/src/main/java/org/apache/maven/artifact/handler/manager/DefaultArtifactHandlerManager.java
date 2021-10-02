@@ -39,10 +39,15 @@ public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
 
-    @Inject
-    private Map<String, ArtifactHandler> artifactHandlers;
+    private final Map<String, ArtifactHandler> artifactHandlers;
 
-    private Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
+    private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
+
+    @Inject
+    public DefaultArtifactHandlerManager( Map<String, ArtifactHandler> artifactHandlers )
+    {
+        this.artifactHandlers = artifactHandlers;
+    }
 
     public ArtifactHandler getArtifactHandler( String type )
     {

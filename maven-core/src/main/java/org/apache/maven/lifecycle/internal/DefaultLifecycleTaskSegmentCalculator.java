@@ -58,14 +58,17 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultLifecycleTaskSegmentCalculator
     implements LifecycleTaskSegmentCalculator
 {
-    @Inject
-    private MojoDescriptorCreator mojoDescriptorCreator;
+    private final MojoDescriptorCreator mojoDescriptorCreator;
+
+    private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    public DefaultLifecycleTaskSegmentCalculator()
+    public DefaultLifecycleTaskSegmentCalculator(
+            MojoDescriptorCreator mojoDescriptorCreator,
+            LifecyclePluginResolver lifecyclePluginResolver )
     {
+        this.mojoDescriptorCreator = mojoDescriptorCreator;
+        this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
     public List<TaskSegment> calculateTaskSegments( MavenSession session )

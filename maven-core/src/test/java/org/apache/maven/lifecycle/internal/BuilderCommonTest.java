@@ -98,8 +98,7 @@ public class BuilderCommonTest
     public BuilderCommon getBuilderCommon()
     {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger( logger );
-        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(),
-                                  logger );
+        return new BuilderCommon( logger, debugLogger, new LifecycleExecutionPlanCalculatorStub(), null );
     }
 
 }

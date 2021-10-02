@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,12 +36,14 @@ public class PropertyProfileActivatorTest
     extends AbstractProfileActivatorTest<PropertyProfileActivator>
 {
 
-    public PropertyProfileActivatorTest()
+    @BeforeEach
+    @Override
+    void setUp() throws Exception
     {
-        super( PropertyProfileActivator.class );
+        activator = new PropertyProfileActivator();
     }
 
-    private Profile newProfile( String key, String value )
+    private Profile newProfile(String key, String value )
     {
         ActivationProperty ap = new ActivationProperty();
         ap.setName( key );

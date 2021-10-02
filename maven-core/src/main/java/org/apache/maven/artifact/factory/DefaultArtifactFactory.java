@@ -39,8 +39,13 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {
+    private final ArtifactHandlerManager artifactHandlerManager;
+
     @Inject
-    private ArtifactHandlerManager artifactHandlerManager;
+    public DefaultArtifactFactory( ArtifactHandlerManager artifactHandlerManager )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+    }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
