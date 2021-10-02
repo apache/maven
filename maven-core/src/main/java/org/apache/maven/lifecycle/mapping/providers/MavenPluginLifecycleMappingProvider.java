@@ -74,13 +74,11 @@ public final class MavenPluginLifecycleMappingProvider
     );
     lifecyclePhases.put(
         "install",
-        // TODO: MNG-6556: Do not upgrade to 3.0.0-M1 is does not install the plugin prefix metadata
-        new LifecyclePhase( "org.apache.maven.plugins:maven-install-plugin:2.5.2:install" )
+        new LifecyclePhase( "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install" )
     );
     lifecyclePhases.put(
         "deploy",
-        // TODO: MNG-6556: Do not upgrade to 3.0.0-M1 is does not install the plugin prefix metadata
-        new LifecyclePhase( "org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy" )
+        new LifecyclePhase( "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy" )
     );
 
     Lifecycle lifecycle = new Lifecycle();
