@@ -46,7 +46,7 @@ import static java.util.Objects.requireNonNull;
 public class DefaultToolchainManager
     implements ToolchainManager
 {
-    protected final Logger logger;
+    protected final Logger logger; // TODO this class is extended, needs refactoring
 
     final Map<String, ToolchainFactory> factories;
 
