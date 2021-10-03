@@ -22,7 +22,6 @@ package org.apache.maven.rtinfo.internal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -34,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -47,60 +47,69 @@ public class DefaultRuntimeInformation
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private String mavenVersion;
+    private final VersionScheme versionScheme;
 
+    private final String mavenVersion;
+
+    @Inject
+    public DefaultRuntimeInformation( final VersionScheme versionScheme )
+    {
+        this.versionScheme = versionScheme;
+        this.mavenVersion = loadMavenVersion();
+    }
+
+    @Override
     public String getMavenVersion()
     {
-        if ( mavenVersion == null )
-        {
-            Properties props = new Properties();
-
-            String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
-
-            try ( InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ) )
-            {
-                if ( is != null )
-                {
-                    props.load( is );
-                }
-                else
-                {
-                    logger.warn(
-                        "Could not locate " + resource + " on classpath, Maven runtime information not available" );
-                }
-            }
-            catch ( IOException e )
-            {
-                String msg = "Could not parse " + resource + ", Maven runtime information not available";
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( msg, e );
-                }
-                else
-                {
-                    logger.warn( msg );
-                }
-            }
-
-            String version = props.getProperty( "version", "" ).trim();
-
-            if ( !version.startsWith( "${" ) )
-            {
-                mavenVersion = version;
-            }
-            else
-            {
-                mavenVersion = "";
-            }
-        }
-
         return mavenVersion;
     }
 
+    private String loadMavenVersion()
+    {
+        Properties props = new Properties();
+
+        String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
+
+        try ( InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ) )
+        {
+            if ( is != null )
+            {
+                props.load( is );
+            }
+            else
+            {
+                logger.warn(
+                    "Could not locate " + resource + " on classpath, Maven runtime information not available" );
+            }
+        }
+        catch ( IOException e )
+        {
+            String msg = "Could not parse " + resource + ", Maven runtime information not available";
+            if ( logger.isDebugEnabled() )
+            {
+                logger.warn( msg, e );
+            }
+            else
+            {
+                logger.warn( msg );
+            }
+        }
+
+        String version = props.getProperty( "version", "" ).trim();
+
+        if ( !version.startsWith( "${" ) )
+        {
+            return version;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    @Override
     public boolean isMavenVersion( String versionRange )
     {
-        VersionScheme versionScheme = new GenericVersionScheme();
-
         Validate.notBlank( versionRange, "versionRange can neither be null, empty nor blank" );
 
         VersionConstraint constraint;
