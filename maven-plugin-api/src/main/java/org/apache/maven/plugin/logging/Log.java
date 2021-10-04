@@ -29,9 +29,8 @@ package org.apache.maven.plugin.logging;
  *
  * @author jdcasey
  *
- * @deprecated Use SLF4J directly
+ * TODO: Make this interface more SLF4J Logger-lookalike.
  */
-@Deprecated
 public interface Log
 {
     /**

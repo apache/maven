@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.logging.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,23 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.Map;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.LogFactory;
 
 /**
- * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than
- * project's source root and project's attachment.<br>
- * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
+ * This internal interface bridges {@link LogFactory} with Maven internals.
  *
- * @author jdcasey
+ * @since TBD
  */
-public interface ContextEnabled
+public interface ILogFactory
 {
     /**
-     * Set a new shared context <code>Map</code> to a mojo before executing it.
-     *
-     * @param pluginContext a new <code>Map</code>
+     * Returns the {@link Log} instance for given class.
      */
-    void setPluginContext( Map<String, Object> pluginContext );
+    Log getLog( Class<?> clazz );
 
     /**
-     * @return a <code>Map</code> stored in the plugin container's context.
+     * Returns the {@link Log} instance for given name.
      */
-    Map<String, Object> getPluginContext();
+    Log getLog( String name );
 }

@@ -25,14 +25,16 @@ import org.slf4j.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author jdcasey
+ * Mojo {@link Log} wrapper using Maven Core logging.
+ *
+ * @since TBD
  */
-public class MojoLogWrapper
+public class MojoLog
     implements Log
 {
     private final Logger logger;
 
-    public MojoLogWrapper( Logger logger )
+    public MojoLog( Logger logger )
     {
         this.logger = requireNonNull( logger );
     }

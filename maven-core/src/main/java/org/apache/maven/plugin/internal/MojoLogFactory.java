@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,38 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.Map;
+import javax.inject.Named;
+
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.LogFactory;
+import org.apache.maven.plugin.logging.internal.ILogFactory;
+import org.eclipse.sisu.EagerSingleton;
+import org.slf4j.LoggerFactory;
 
 /**
- * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than
- * project's source root and project's attachment.<br>
- * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
+ * Bridge implementation for Mojo {@link Log}.
  *
- * @author jdcasey
+ * @since TBD
  */
-public interface ContextEnabled
+@EagerSingleton
+@Named
+public class MojoLogFactory
+    implements ILogFactory
 {
-    /**
-     * Set a new shared context <code>Map</code> to a mojo before executing it.
-     *
-     * @param pluginContext a new <code>Map</code>
-     */
-    void setPluginContext( Map<String, Object> pluginContext );
+    public MojoLogFactory()
+    {
+        LogFactory.initLogFactory( this ); // init Mojo Logging
+    }
 
-    /**
-     * @return a <code>Map</code> stored in the plugin container's context.
-     */
-    Map<String, Object> getPluginContext();
+    @Override
+    public Log getLog( final Class<?> clazz )
+    {
+        return new MojoLog( LoggerFactory.getLogger( clazz ) );
+    }
+
+    @Override
+    public Log getLog( final String name )
+    {
+        return new MojoLog( LoggerFactory.getLogger( name ) );
+    }
 }

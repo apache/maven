@@ -30,7 +30,6 @@ import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginArtifactsCache;
@@ -567,12 +566,6 @@ public class DefaultMavenPluginManager
 
                     ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
                 }
-            }
-
-            if ( mojo instanceof Mojo )
-            {
-                Logger mojoLogger = LoggerFactory.getLogger( mojoDescriptor.getImplementation() );
-                ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

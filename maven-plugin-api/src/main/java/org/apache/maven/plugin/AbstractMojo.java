@@ -22,7 +22,7 @@ package org.apache.maven.plugin;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.plugin.logging.LogFactory;
 
 /**
  * Abstract class to provide most of the infrastructure required to implement a <code>Mojo</code> except for
@@ -144,55 +144,39 @@ public abstract class AbstractMojo
     implements Mojo, ContextEnabled
 {
     /** Instance logger */
-    private Log log;
+    private final Log log = LogFactory.getLog( getClass() );
 
     /** Plugin container context */
-    private Map pluginContext;
+    private Map<String, Object> pluginContext;
 
     /**
-     * @deprecated Use SLF4J directly
+     * Returns the {@link Log} instance this mojo uses (is public for backward compatibility), never returns
+     * {@code null}.
      */
-    @Deprecated
-    @Override
-    public void setLog( Log log )
-    {
-        this.log = log;
-    }
-
-    /**
-     * <p>
-     * Returns the logger that has been injected into this mojo. If no logger has been setup yet, a
-     * <code>SystemStreamLog</code> logger will be created and returned.
-     * </p>
-     * <strong>Note:</strong>
-     * The logger returned by this method must not be cached in an instance field during the construction of the mojo.
-     * This would cause the mojo to use a wrongly configured default logger when being run by Maven. The proper logger
-     * gets injected by the Plexus container <em>after</em> the mojo has been constructed. Therefore, simply call this
-     * method directly whenever you need the logger, it is fast enough and needs no caching.
-     *
-     * @see org.apache.maven.plugin.Mojo#getLog()
-     * @deprecated Use SLF4J directly
-     */
-    @Deprecated
-    @Override
     public Log getLog()
     {
-        if ( log == null )
-        {
-            log = new SystemStreamLog();
-        }
-
         return log;
     }
 
+    /**
+     * Method in place only for backward binary compatibility, otherwise has no effect.
+     *
+     * @deprecated This method should not be used, as {@link #log} field is initialized at construction time.
+     */
+    @Deprecated
+    public void setLog( Log log )
+    {
+        // nothing
+    }
+
     @Override
-    public Map getPluginContext()
+    public Map<String, Object> getPluginContext()
     {
         return pluginContext;
     }
 
     @Override
-    public void setPluginContext( Map pluginContext )
+    public void setPluginContext( Map<String, Object> pluginContext )
     {
         this.pluginContext = pluginContext;
     }

@@ -19,8 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.plugin.logging.Log;
-
 /**
  * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
  * infrastructure.<br>
@@ -48,25 +46,4 @@ public interface Mojo
      */
     void execute()
         throws MojoExecutionException, MojoFailureException;
-
-    /**
-     * Inject a standard <code>Maven</code> logging mechanism to allow this <code>Mojo</code> to communicate events
-     * and feedback to the user.
-     *
-     * @param log a new logger
-     *
-     * @deprecated Use SLF4J directly
-     */
-    @Deprecated
-    void setLog( Log log );
-
-    /**
-     * Furnish access to the standard Maven logging mechanism which is managed in this base class.
-     *
-     * @return a log4j-like logger object which allows plugins to create messages at levels of <code>"debug"</code>,
-     * <code>"info"</code>, <code>"warn"</code>, and <code>"error"</code>.
-     * @deprecated Use SLF4J directly
-     */
-    @Deprecated
-    Log getLog();
 }
