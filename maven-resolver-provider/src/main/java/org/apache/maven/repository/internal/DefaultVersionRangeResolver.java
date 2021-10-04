@@ -40,7 +40,6 @@ import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -73,22 +72,24 @@ public class DefaultVersionRangeResolver
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
+    private final VersionScheme versionScheme;
 
     @Inject
-    public DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                                        RepositoryEventDispatcher repositoryEventDispatcher )
+    public DefaultVersionRangeResolver( MetadataResolver metadataResolver,
+                                        SyncContextFactory syncContextFactory,
+                                        RepositoryEventDispatcher repositoryEventDispatcher,
+                                        VersionScheme versionScheme )
     {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
         this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
                 "repositoryEventDispatcher cannot be null" );
+        this.versionScheme = Objects.requireNonNull( versionScheme, "versionScheme cannot be null" );
     }
     public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         throws VersionRangeResolutionException
     {
         VersionRangeResult result = new VersionRangeResult( request );
-
-        VersionScheme versionScheme = new GenericVersionScheme();
 
         VersionConstraint versionConstraint;
         try
