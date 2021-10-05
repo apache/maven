@@ -34,6 +34,7 @@ import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.impl.guice.AetherModule;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  * MavenResolverModule
@@ -46,6 +47,7 @@ public final class MavenResolverModule
     protected void configure()
     {
         install( new AetherModule() );
+        bind( VersionScheme.class ).toProvider( new DefaultVersionSchemeProvider() );
         bind( ArtifactDescriptorReader.class ).to( DefaultArtifactDescriptorReader.class ).in( Singleton.class );
         bind( VersionResolver.class ).to( DefaultVersionResolver.class ).in( Singleton.class );
         bind( VersionRangeResolver.class ).to( DefaultVersionRangeResolver.class ).in( Singleton.class );

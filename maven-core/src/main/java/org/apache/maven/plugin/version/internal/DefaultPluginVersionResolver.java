@@ -59,7 +59,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
@@ -85,18 +84,22 @@ public class DefaultPluginVersionResolver
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
+    private final VersionScheme versionScheme;
 
     @Inject
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
-            MavenPluginManager pluginManager )
+            MavenPluginManager pluginManager,
+            VersionScheme versionScheme )
     {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
+        this.versionScheme = versionScheme;
     }
 
+    @Override
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
@@ -199,8 +202,6 @@ public class DefaultPluginVersionResolver
 
         if ( version == null )
         {
-            VersionScheme versionScheme = new GenericVersionScheme();
-
             TreeSet<Version> releases = new TreeSet<>( Collections.reverseOrder() );
             TreeSet<Version> snapshots = new TreeSet<>( Collections.reverseOrder() );
 
