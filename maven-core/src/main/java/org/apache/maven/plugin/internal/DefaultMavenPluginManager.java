@@ -48,7 +48,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.LogFactory;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
@@ -576,8 +575,7 @@ public class DefaultMavenPluginManager
 
             if ( mojo instanceof Mojo )
             {
-                Log mojoLog = logFactory.getLog( mojoDescriptor.getImplementation() );
-                ( ( Mojo ) mojo ).setLog( mojoLog );
+                ( ( Mojo ) mojo ).setLog( logFactory.getLog( mojoDescriptor.getImplementation() ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

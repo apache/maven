@@ -27,7 +27,7 @@ import javax.inject.Provider;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Mojo {@link Log} wrapper using Maven Core logging.
+ * Mojo {@link Log} implementation that lazily creates {@link Logger} instances.
  *
  * @since TBD
  */

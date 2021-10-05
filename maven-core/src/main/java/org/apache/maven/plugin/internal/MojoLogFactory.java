@@ -27,7 +27,7 @@ import org.apache.maven.plugin.logging.LogFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Bridge implementation for Mojo {@link LogFactory}.
+ * Implementation of Mojo {@link LogFactory} backed by Maven internal logging (slf4j).
  *
  * @since TBD
  */
