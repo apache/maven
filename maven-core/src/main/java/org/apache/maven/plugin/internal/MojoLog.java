@@ -53,11 +53,6 @@ public class MojoLog
         return logger;
     }
 
-    public void debug( CharSequence content )
-    {
-        getLogger().debug( toString( content ) );
-    }
-
     private String toString( CharSequence content )
     {
         if ( content == null )
@@ -71,9 +66,27 @@ public class MojoLog
     }
 
     @Override
+    public void debug( CharSequence content )
+    {
+        getLogger().debug( toString( content ) );
+    }
+
+    @Override
+    public void debug( CharSequence format, Object... arguments )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( toString( format ), arguments );
+        }
+    }
+
+    @Override
     public void debug( CharSequence content, Throwable error )
     {
-        getLogger().debug( toString( content ), error );
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( toString( content ), error );
+        }
     }
 
     @Override
