@@ -149,15 +149,26 @@ public abstract class AbstractMojo
     private Map<String, Object> pluginContext;
 
     @Override
-    public Log getLog()
-    {
-        return log;
-    }
-
-    @Override
     public void setLog( Log log )
     {
         this.log = log;
+    }
+
+    /**
+     * <p>
+     * Returns the logger that has been injected into this mojo. Injection happens AFTER instance is constructed.
+     * </p>
+     * <strong>Note:</strong>
+     * The logger returned by this method must not be cached in an instance field during the construction of the mojo,
+     * as it is not yet injected. The proper logger gets injected by Maven <em>after</em> the mojo has been constructed.
+     * Therefore, simply call this method directly whenever you need the logger, it is fast enough and needs no caching.
+     *
+     * @see org.apache.maven.plugin.Mojo#getLog()
+     */
+    @Override
+    public Log getLog()
+    {
+        return log;
     }
 
     @Override
