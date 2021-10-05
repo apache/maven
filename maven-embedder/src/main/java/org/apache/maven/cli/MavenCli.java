@@ -397,10 +397,10 @@ public class MavenCli
                 }
 
                 mavenConfig = cliManager.parse( args.toArray( new String[0] ) );
-                List<?> unrecongized = mavenConfig.getArgList();
-                if ( !unrecongized.isEmpty() )
+                List<?> unrecognized = mavenConfig.getArgList();
+                if ( !unrecognized.isEmpty() )
                 {
-                    throw new ParseException( "Unrecognized maven.config entries: " + unrecongized );
+                    throw new ParseException( "Unrecognized maven.config entries: " + unrecognized );
                 }
             }
         }
