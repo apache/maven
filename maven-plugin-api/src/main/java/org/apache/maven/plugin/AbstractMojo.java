@@ -22,7 +22,6 @@ package org.apache.maven.plugin;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.LogFactory;
 
 /**
  * Abstract class to provide most of the infrastructure required to implement a <code>Mojo</code> except for
@@ -144,29 +143,21 @@ public abstract class AbstractMojo
     implements Mojo, ContextEnabled
 {
     /** Instance logger */
-    private final Log log = LogFactory.getLog( getClass() );
+    private Log log;
 
     /** Plugin container context */
     private Map<String, Object> pluginContext;
 
-    /**
-     * Returns the {@link Log} instance this mojo uses (is public for backward compatibility), never returns
-     * {@code null}.
-     */
+    @Override
     public Log getLog()
     {
         return log;
     }
 
-    /**
-     * Method in place only for backward binary compatibility, otherwise has no effect.
-     *
-     * @deprecated This method should not be used, as {@link #log} field is initialized at construction time.
-     */
-    @Deprecated
+    @Override
     public void setLog( Log log )
     {
-        // nothing
+        this.log = log;
     }
 
     @Override

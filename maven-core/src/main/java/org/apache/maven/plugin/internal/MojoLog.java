@@ -22,6 +22,8 @@ package org.apache.maven.plugin.internal;
 import org.apache.maven.plugin.logging.Log;
 import org.slf4j.Logger;
 
+import javax.inject.Provider;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -32,16 +34,28 @@ import static java.util.Objects.requireNonNull;
 public class MojoLog
     implements Log
 {
-    private final Logger logger;
+    private final Provider<Logger> loggerProvider;
 
-    public MojoLog( Logger logger )
+    private volatile Logger logger;
+
+    public MojoLog( Provider<Logger> loggerProvider )
     {
-        this.logger = requireNonNull( logger );
+        this.loggerProvider = requireNonNull( loggerProvider );
+        this.logger = null;
+    }
+
+    private Logger getLogger()
+    {
+        if ( logger == null )
+        {
+            logger = requireNonNull( loggerProvider.get() );
+        }
+        return logger;
     }
 
     public void debug( CharSequence content )
     {
-        logger.debug( toString( content ) );
+        getLogger().debug( toString( content ) );
     }
 
     private String toString( CharSequence content )
@@ -59,90 +73,90 @@ public class MojoLog
     @Override
     public void debug( CharSequence content, Throwable error )
     {
-        logger.debug( toString( content ), error );
+        getLogger().debug( toString( content ), error );
     }
 
     @Override
     public void debug( Throwable error )
     {
-        logger.debug( "", error );
+        getLogger().debug( "", error );
     }
 
     @Override
     public void info( CharSequence content )
     {
-        logger.info( toString( content ) );
+        getLogger().info( toString( content ) );
     }
 
     @Override
     public void info( CharSequence content, Throwable error )
     {
-        logger.info( toString( content ), error );
+        getLogger().info( toString( content ), error );
     }
 
     @Override
     public void info( Throwable error )
     {
-        logger.info( "", error );
+        getLogger().info( "", error );
     }
 
     @Override
     public void warn( CharSequence content )
     {
-        logger.warn( toString( content ) );
+        getLogger().warn( toString( content ) );
     }
 
     @Override
     public void warn( CharSequence content, Throwable error )
     {
-        logger.warn( toString( content ), error );
+        getLogger().warn( toString( content ), error );
     }
 
     @Override
     public void warn( Throwable error )
     {
-        logger.warn( "", error );
+        getLogger().warn( "", error );
     }
 
     @Override
     public void error( CharSequence content )
     {
-        logger.error( toString( content ) );
+        getLogger().error( toString( content ) );
     }
 
     @Override
     public void error( CharSequence content, Throwable error )
     {
-        logger.error( toString( content ), error );
+        getLogger().error( toString( content ), error );
     }
 
     @Override
     public void error( Throwable error )
     {
-        logger.error( "", error );
+        getLogger().error( "", error );
     }
 
     @Override
     public boolean isDebugEnabled()
     {
-        return logger.isDebugEnabled();
+        return getLogger().isDebugEnabled();
     }
 
     @Override
     public boolean isInfoEnabled()
     {
-        return logger.isInfoEnabled();
+        return getLogger().isInfoEnabled();
     }
 
     @Override
     public boolean isWarnEnabled()
     {
-        return logger.isWarnEnabled();
+        return getLogger().isWarnEnabled();
     }
 
     @Override
     public boolean isErrorEnabled()
     {
-        return logger.isErrorEnabled();
+        return getLogger().isErrorEnabled();
     }
 }

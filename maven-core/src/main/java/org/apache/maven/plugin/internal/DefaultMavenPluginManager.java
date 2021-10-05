@@ -30,6 +30,7 @@ import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginArtifactsCache;
@@ -47,6 +48,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.LogFactory;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -142,6 +145,7 @@ public class DefaultMavenPluginManager
     private PluginVersionResolver pluginVersionResolver;
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
+    private LogFactory logFactory;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -157,7 +161,8 @@ public class DefaultMavenPluginManager
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
-            MavenPluginValidator pluginValidator )
+            MavenPluginValidator pluginValidator,
+            LogFactory logFactory )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -169,6 +174,7 @@ public class DefaultMavenPluginManager
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
+        this.logFactory = logFactory;
     }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
@@ -566,6 +572,12 @@ public class DefaultMavenPluginManager
 
                     ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
                 }
+            }
+
+            if ( mojo instanceof Mojo )
+            {
+                Log mojoLog = logFactory.getLog( mojoDescriptor.getImplementation() );
+                ( ( Mojo ) mojo ).setLog( mojoLog );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

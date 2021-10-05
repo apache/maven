@@ -19,44 +19,28 @@ package org.apache.maven.plugin.logging;
  * under the License.
  */
 
-import org.apache.maven.plugin.logging.internal.ILogFactory;
-
 /**
- * This interface supplies {@link Log} instances to Mojos. Plugin code may freely use this log factory to obtain
- * loggers that will be abridged to Maven internal logging system.
+ * This component supplies {@link Log} instances. You can require this component to be injected into your own components
+ * and use it for provisioning logger instances. Simplest is to inject it via constructor injection (recommended way)
+ * and just get a {@link Log} instance:
+ * <pre>
+ *   Log log = logFactory.getLog( getClass() );
+ * </pre>
+ *
+ * {@link Log} instance for mojo implementations are provided by this component as well, but to not push constructor
+ * signature down to implementations, it is injected using setter method.
  *
  * @since TBD
  */
-public final class LogFactory
+public interface LogFactory
 {
-    private static ILogFactory bridge;
-
-    private LogFactory()
-    {
-        // no instances of this can be created
-    }
-
-    /**
-     * Initialized Mojo LogFactory with a bridge.
-     */
-    public static void initLogFactory( ILogFactory bridge )
-    {
-        LogFactory.bridge = bridge;
-    }
-
     /**
      * Returns the {@link Log} instance for given class.
      */
-    public static Log getLog( Class<?> clazz )
-    {
-        return bridge.getLog( clazz );
-    }
+    Log getLog( Class<?> clazz );
 
     /**
      * Returns the {@link Log} instance for given name.
      */
-    public static Log getLog( String name )
-    {
-        return bridge.getLog( name );
-    }
+    Log getLog( String name );
 }

@@ -20,37 +20,31 @@ package org.apache.maven.plugin.internal;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.LogFactory;
-import org.apache.maven.plugin.logging.internal.ILogFactory;
-import org.eclipse.sisu.EagerSingleton;
 import org.slf4j.LoggerFactory;
 
 /**
- * Bridge implementation for Mojo {@link Log}.
+ * Bridge implementation for Mojo {@link LogFactory}.
  *
  * @since TBD
  */
-@EagerSingleton
+@Singleton
 @Named
 public class MojoLogFactory
-    implements ILogFactory
+    implements LogFactory
 {
-    public MojoLogFactory()
-    {
-        LogFactory.initLogFactory( this ); // init Mojo Logging
-    }
-
     @Override
     public Log getLog( final Class<?> clazz )
     {
-        return new MojoLog( LoggerFactory.getLogger( clazz ) );
+        return new MojoLog( () -> LoggerFactory.getLogger( clazz ) );
     }
 
     @Override
     public Log getLog( final String name )
     {
-        return new MojoLog( LoggerFactory.getLogger( name ) );
+        return new MojoLog( () -> LoggerFactory.getLogger( name ) );
     }
 }
