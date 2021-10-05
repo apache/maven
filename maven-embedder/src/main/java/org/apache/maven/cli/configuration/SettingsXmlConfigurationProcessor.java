@@ -90,7 +90,7 @@ public class SettingsXmlConfigurationProcessor
         throws Exception
     {
         CommandLine commandLine = cliRequest.getCommandLine();
-        String workingDirectory = cliRequest.getWorkingDirectory();
+        String multiModuleDirectory = cliRequest.getMultiModuleProjectDirectory().toString();
         MavenExecutionRequest request = cliRequest.getRequest();
 
         File userSettingsFile;
@@ -98,7 +98,7 @@ public class SettingsXmlConfigurationProcessor
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = resolveFile( userSettingsFile, workingDirectory );
+            userSettingsFile = resolveFile( userSettingsFile, multiModuleDirectory );
 
             if ( !userSettingsFile.isFile() )
             {
@@ -116,7 +116,7 @@ public class SettingsXmlConfigurationProcessor
         if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
         {
             globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = resolveFile( globalSettingsFile, workingDirectory );
+            globalSettingsFile = resolveFile( globalSettingsFile, multiModuleDirectory );
 
             if ( !globalSettingsFile.isFile() )
             {
