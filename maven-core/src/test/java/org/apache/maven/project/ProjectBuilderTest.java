@@ -43,6 +43,8 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 
+import junit.framework.TestResult;
+
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
 {
@@ -119,6 +121,18 @@ public class ProjectBuilderTest
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 1, mavenProject.getArtifacts().size() );
+        
+        final MavenProject project = mavenProject;
+        final int[] getArtifactsResultInAnotherThead = { 0 };
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getArtifactsResultInAnotherThead[0] = project.getArtifacts().size();
+            }
+        });
+        t.start();
+        t.join();
+        assertEquals( project.getArtifacts().size(), getArtifactsResultInAnotherThead[0] );
     }
 
     public void testDontResolveDependencies()
