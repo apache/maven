@@ -167,7 +167,6 @@ public class DefaultDownloader
 
     private String calculateUserAgent()
     {
-        String appVersion = applicationVersion;
 
         String javaVendor = System.getProperty( "java.vendor" );
         String javaVersion = System.getProperty( "java.version" );
@@ -175,8 +174,8 @@ public class DefaultDownloader
         String osName = System.getProperty( "os.name" );
         String osVersion = System.getProperty( "os.version" );
         String osArch = System.getProperty( "os.arch" );
-        return String.format( "%s/%s (%s;%s;%s) (%s;%s;%s)", applicationName, appVersion, osName, osVersion, osArch,
-                              javaVendor, javaVersion, javaVendorVersion );
+        return String.format( "%s/%s (%s;%s;%s) (%s;%s;%s)", applicationName, applicationVersion, osName, osVersion,
+                osArch, javaVendor, javaVersion, javaVendorVersion );
     }
 
     private static class SystemPropertiesProxyAuthenticator

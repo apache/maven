@@ -355,9 +355,7 @@ public class MavenMetadataSource
                                               dependency.getType(), dependency.getClassifier(), effectiveScope,
                                               dependency.isOptional() );
 
-        ArtifactFilter dependencyFilter = inheritedFilter;
-
-        if ( dependencyFilter != null && !dependencyFilter.include( dependencyArtifact ) )
+        if ( inheritedFilter != null && !inheritedFilter.include( dependencyArtifact ) )
         {
             return null;
         }
@@ -367,7 +365,7 @@ public class MavenMetadataSource
             dependencyArtifact.setFile( new File( dependency.getSystemPath() ) );
         }
 
-        dependencyArtifact.setDependencyFilter( createDependencyFilter( dependency, dependencyFilter ) );
+        dependencyArtifact.setDependencyFilter( createDependencyFilter( dependency, inheritedFilter ) );
 
         return dependencyArtifact;
     }

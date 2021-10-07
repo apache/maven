@@ -271,9 +271,7 @@ public class DefaultMavenPluginManager
         {
             Reader reader = ReaderFactory.newXmlReader( is );
 
-            PluginDescriptor pluginDescriptor = builder.build( reader, descriptorLocation );
-
-            return pluginDescriptor;
+            return builder.build( reader, descriptorLocation );
         }
         catch ( IOException | PlexusConfigurationException e )
         {

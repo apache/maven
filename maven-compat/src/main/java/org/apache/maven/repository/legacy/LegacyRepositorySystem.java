@@ -834,11 +834,8 @@ public class LegacyRepositorySystem
             repositoryLayout = layouts.get( "default" );
         }
 
-        ArtifactRepository artifactRepository =
-            artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots,
-                                                                releases );
-
-        return artifactRepository;
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots,
+                                                            releases );
     }
 
     private static String getMessage( Throwable error, String def )

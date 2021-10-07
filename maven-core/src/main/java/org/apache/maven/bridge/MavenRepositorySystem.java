@@ -323,9 +323,8 @@ public class MavenRepositorySystem
 
     private ArtifactRepositoryLayout getLayout( String id )
     {
-        ArtifactRepositoryLayout layout = layouts.get( id );
 
-        return layout;
+        return layouts.get( id );
     }
 
 
