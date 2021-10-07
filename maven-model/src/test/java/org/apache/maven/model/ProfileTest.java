@@ -21,7 +21,9 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +44,7 @@ public class ProfileTest
     @Test
     public void testEqualsNullSafe()
     {
-        assertFalse( new Profile().equals( null ) );
+        assertNotEquals( null, new Profile() );
 
         new Profile().equals( new Profile() );
     }
@@ -51,7 +53,7 @@ public class ProfileTest
     public void testEqualsIdentity()
     {
         Profile thing = new Profile();
-        assertTrue( thing.equals( thing ) );
+        assertEquals( thing, thing );
     }
 
     @Test

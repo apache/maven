@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,7 +71,7 @@ public class ProjectInheritanceTest
         Set set = project1.getArtifacts();
         assertNotNull( set, "No artifacts" );
         assertTrue( set.size() > 0, "No Artifacts" );
-        assertTrue( set.size() == 3, "Set size should be 3, is " + set.size() );
+        assertEquals( 3, set.size(), "Set size should be 3, is " + set.size() );
 
         for ( Object aSet : set )
         {
@@ -81,8 +82,7 @@ public class ProjectInheritanceTest
                     artifact.isOptional()
                         ? "true"
                         : "false" ) );
-            assertTrue( artifact.getVersion().equals( "1.0" ),
-                        "Incorrect version for " + artifact.getDependencyConflictId() );
+            assertEquals( "1.0", artifact.getVersion(), "Incorrect version for " + artifact.getDependencyConflictId() );
         }
     }
 }

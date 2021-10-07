@@ -21,7 +21,9 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +44,7 @@ public class ActivationPropertyTest
     @Test
     public void testEqualsNullSafe()
     {
-        assertFalse( new ActivationProperty().equals( null ) );
+        assertNotEquals( null, new ActivationProperty() );
 
         new ActivationProperty().equals( new ActivationProperty() );
     }
@@ -51,7 +53,7 @@ public class ActivationPropertyTest
     public void testEqualsIdentity()
     {
         ActivationProperty thing = new ActivationProperty();
-        assertTrue( thing.equals( thing ) );
+        assertEquals( thing, thing );
     }
 
     @Test

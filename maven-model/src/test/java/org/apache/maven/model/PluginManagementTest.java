@@ -21,7 +21,9 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +44,7 @@ public class PluginManagementTest
     @Test
     public void testEqualsNullSafe()
     {
-        assertFalse( new PluginManagement().equals( null ) );
+        assertNotEquals( null, new PluginManagement() );
 
         new PluginManagement().equals( new PluginManagement() );
     }
@@ -51,7 +53,7 @@ public class PluginManagementTest
     public void testEqualsIdentity()
     {
         PluginManagement thing = new PluginManagement();
-        assertTrue( thing.equals( thing ) );
+        assertEquals( thing, thing );
     }
 
     @Test

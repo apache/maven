@@ -82,7 +82,7 @@ public class ProjectInheritanceTest
 
         assertNotNull( map, "No artifacts" );
         assertTrue( map.size() > 0, "No Artifacts" );
-        assertTrue( map.size() == 2, "Set size should be 2, is " + map.size() );
+        assertEquals( 2, map.size(), "Set size should be 2, is " + map.size() );
 
         assertTrue( map.containsKey( "maven-test:t09-a" ), "maven-test:t09-a is not in the project" );
         assertTrue( map.containsKey( "maven-test:t09-b" ), "maven-test:t09-b is not in the project" );
@@ -117,7 +117,7 @@ public class ProjectInheritanceTest
         Map map = project2.getArtifactMap();
         assertNotNull( map, "No artifacts" );
         assertTrue( map.size() > 0, "No Artifacts" );
-        assertTrue( map.size() == 4, "Set size should be 4, is " + map.size() );
+        assertEquals( 4, map.size(), "Set size should be 4, is " + map.size() );
 
         assertTrue( map.containsKey( "maven-test:t09-a" ), "maven-test:t09-a is not in the project" );
         assertTrue( map.containsKey( "maven-test:t09-b" ), "maven-test:t09-b is not in the project" );

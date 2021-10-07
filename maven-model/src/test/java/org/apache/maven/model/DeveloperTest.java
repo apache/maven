@@ -21,7 +21,9 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +44,7 @@ public class DeveloperTest
     @Test
     public void testEqualsNullSafe()
     {
-        assertFalse( new Developer().equals( null ) );
+        assertNotEquals( null, new Developer() );
 
         new Developer().equals( new Developer() );
     }
@@ -51,7 +53,7 @@ public class DeveloperTest
     public void testEqualsIdentity()
     {
         Developer thing = new Developer();
-        assertTrue( thing.equals( thing ) );
+        assertEquals( thing, thing );
     }
 
     @Test

@@ -25,7 +25,9 @@ import java.io.IOException;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -47,10 +49,10 @@ public class FileModelSourceTest
         File tempFile = createTempFile( "pomTest" );
         FileModelSource instance = new FileModelSource( tempFile );
 
-        assertFalse( instance.equals( null ) );
-        assertFalse( instance.equals( new Object() ) );
-        assertTrue( instance.equals( instance ) );
-        assertTrue( instance.equals( new FileModelSource( tempFile ) ) );
+        assertNotEquals( null, instance );
+        assertNotEquals( instance, new Object() );
+        assertEquals( instance, instance );
+        assertEquals( instance, new FileModelSource( tempFile ) );
     }
 
     @Test
@@ -66,7 +68,7 @@ public class FileModelSourceTest
         FileModelSource upperCaseFileSouce = new FileModelSource( upperCaseFile );
         FileModelSource lowerCaseFileSouce = new FileModelSource( lowerCaseFile );
 
-        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );
+        assertEquals( upperCaseFileSouce, lowerCaseFileSouce );
     }
 
     private File createTempFile( String name ) throws IOException

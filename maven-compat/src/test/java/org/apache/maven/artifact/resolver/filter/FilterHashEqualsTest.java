@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -41,12 +42,12 @@ public class FilterHashEqualsTest
 
         IncludesArtifactFilter f2 = new IncludesArtifactFilter( patterns );
 
-        assertTrue( f1.equals(f2) );
-        assertTrue( f2.equals(f1) );
-        assertTrue( f1.hashCode() == f2.hashCode() );
+        assertEquals( f1, f2 );
+        assertEquals( f2, f1 );
+        assertEquals( f1.hashCode(), f2.hashCode() );
 
         IncludesArtifactFilter f3 = new IncludesArtifactFilter( Arrays.asList( "d", "c", "e" ) );
-        assertTrue( f1.equals( f3 ) );
-        assertTrue( f1.hashCode() == f3.hashCode() );
+        assertEquals( f1, f3 );
+        assertEquals( f1.hashCode(), f3.hashCode() );
     }
 }

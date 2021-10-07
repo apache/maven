@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultArtifactTest
@@ -136,8 +137,8 @@ public class DefaultArtifactTest
 
         Artifact artifact = new DefaultArtifact( groupId, artifactId, VersionRange.createFromVersion( "5.0" ), scope,
                                                   type, classifier, artifactHandler );
-        assertTrue( artifact.compareTo( artifact1 ) == 0 );
-        assertTrue( artifact1.compareTo( artifact ) == 0 );
+        assertEquals( 0, artifact.compareTo( artifact1 ) );
+        assertEquals( 0, artifact1.compareTo( artifact ) );
     }
 
     @Test
@@ -146,8 +147,8 @@ public class DefaultArtifactTest
     {
         VersionRange vr = VersionRange.createFromVersionSpec( "[1.0,2.0)" );
         artifact = new DefaultArtifact( groupId, artifactId, vr, scope, type, null, artifactHandler );
-        assertEquals( null, artifact.getVersion() );
-        assertEquals( null, artifact.getBaseVersion() );
+        assertNull( artifact.getVersion() );
+        assertNull( artifact.getBaseVersion() );
     }
 
 }

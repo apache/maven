@@ -30,7 +30,10 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link PluginDescriptorBuilder}.
@@ -59,8 +62,8 @@ public class PluginDescriptorBuilderTest
         assertEquals( "2.3-SNAPSHOT", pd.getVersion() );
         assertEquals( "jar", pd.getGoalPrefix() );
         assertEquals( "plugin-description", pd.getDescription() );
-        assertEquals( false, pd.isIsolatedRealm() );
-        assertEquals( true, pd.isInheritedByDefault() );
+        assertFalse( pd.isIsolatedRealm() );
+        assertTrue( pd.isInheritedByDefault() );
         assertEquals( 2, pd.getMojos().size() );
         assertEquals( 1, pd.getDependencies().size() );
 
@@ -70,12 +73,12 @@ public class PluginDescriptorBuilderTest
         assertEquals( "mojo-description", md.getDescription() );
         assertEquals( "runtime", md.getDependencyResolutionRequired() );
         assertEquals( "test", md.getDependencyCollectionRequired() );
-        assertEquals( false, md.isAggregator() );
-        assertEquals( false, md.isDirectInvocationOnly() );
-        assertEquals( true, md.isInheritedByDefault() );
-        assertEquals( false, md.isOnlineRequired() );
-        assertEquals( true, md.isProjectRequired() );
-        assertEquals( false, md.isThreadSafe() );
+        assertFalse( md.isAggregator() );
+        assertFalse( md.isDirectInvocationOnly() );
+        assertTrue( md.isInheritedByDefault() );
+        assertFalse( md.isOnlineRequired() );
+        assertTrue( md.isProjectRequired() );
+        assertFalse( md.isThreadSafe() );
         assertEquals( "package", md.getPhase() );
         assertEquals( "org.apache.maven.plugin.jar.JarMojo", md.getImplementation() );
         assertEquals( "antrun", md.getComponentConfigurator() );
@@ -104,8 +107,8 @@ public class PluginDescriptorBuilderTest
         assertEquals( "jarName", mp.getAlias() );
         assertEquals( "java.lang.String", mp.getType() );
         assertEquals( "java.lang.String", mp.getImplementation() );
-        assertEquals( true, mp.isEditable() );
-        assertEquals( false, mp.isRequired() );
+        assertTrue( mp.isEditable() );
+        assertFalse( mp.isRequired() );
         assertEquals( "parameter-description", mp.getDescription() );
         assertEquals( "deprecated-parameter", mp.getDeprecated() );
         assertEquals( "${jar.finalName}", mp.getExpression() );
@@ -128,9 +131,9 @@ public class PluginDescriptorBuilderTest
         md = pd.getMojos().get( 1 );
 
         assertEquals( "war", md.getGoal() );
-        assertEquals( null, md.getDependencyResolutionRequired() );
-        assertEquals( null, md.getDependencyCollectionRequired() );
-        assertEquals( true, md.isThreadSafe() );
+        assertNull( md.getDependencyResolutionRequired() );
+        assertNull( md.getDependencyCollectionRequired() );
+        assertTrue( md.isThreadSafe() );
     }
 
 }

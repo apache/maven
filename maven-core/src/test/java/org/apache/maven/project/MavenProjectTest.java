@@ -129,17 +129,17 @@ public class MavenProjectTest
         assertNotNull( dep, "No dependencyManagement" );
         List<?> list = dep.getDependencies();
         assertNotNull( list, "No dependencies" );
-        assertTrue( !list.isEmpty(), "Empty dependency list" );
+        assertFalse( list.isEmpty(), "Empty dependency list" );
 
         Map<?, ?> map = projectToClone.getManagedVersionMap();
         assertNotNull( map, "No ManagedVersionMap" );
-        assertTrue( !map.isEmpty(), "ManagedVersionMap is empty" );
+        assertFalse( map.isEmpty(), "ManagedVersionMap is empty" );
 
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( clonedMap, "ManagedVersionMap not copied" );
-        assertTrue( !clonedMap.isEmpty(), "ManagedVersionMap is empty" );
+        assertFalse( clonedMap.isEmpty(), "ManagedVersionMap is empty" );
         assertTrue( clonedMap.containsKey( "maven-test:maven-test-b:jar" ), "ManagedVersionMap does not contain test key" );
     }
 

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -189,7 +190,7 @@ public class DefaultArtifactVersionTest
     {
         ArtifactVersion v1 = newArtifactVersion( "1" );
         ArtifactVersion v2 = newArtifactVersion( "1.0" );
-        assertEquals( true, v1.equals( v2 ) );
+        assertTrue( v1.equals( v2 ) );
         assertEquals( v1.hashCode(), v2.hashCode() );
     }
 
@@ -217,11 +218,9 @@ public class DefaultArtifactVersionTest
 
     private void assertVersionEqual( String left, String right )
     {
-        assertTrue(
-                newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) == 0,
+        assertEquals( 0, newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ),
                 left + " should be equal to " + right );
-        assertTrue(
-                newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0,
+        assertEquals( 0, newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ),
                 right + " should be equal to " + left );
     }
 }
