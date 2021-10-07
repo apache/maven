@@ -33,7 +33,11 @@ import org.apache.maven.plugin.logging.Log;
  */
 public interface Mojo
 {
-    /** The component <code>role</code> hint for Plexus container */
+    /** The component <code>role</code> hint for Plexus container
+     *
+     * @deprecated do not use legacy Plexus API to look up by string.
+     */
+    @Deprecated
     String ROLE = Mojo.class.getName();
 
     /**

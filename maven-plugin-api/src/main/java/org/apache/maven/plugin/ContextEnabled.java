@@ -23,10 +23,13 @@ import java.util.Map;
 
 /**
  * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than
- * project's source root and project's attachment.<br>
- * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
- *
- * @author jdcasey
+ * project's source root and project's attachment. The plugin manager populates it into the Mojo implementing this
+ * interface, before executing it. Mojos also may access other contexts using Maven Session API.<br/>
+ * Word of warning: Mojos live in their own classloader that is usually destroyed after Mojo is executed, and even
+ * same Mojo within two different projects will different classloader. That said, (mis) using the context to store
+ * anything that was loaded up by Mojo classloader is wrong to do and will lead to errors.<br/>
+ * Regarding concurrency: best practice is to "write once" (for example invoked Mojo writes to its own context),
+ * while other Mojos MAY get (via Maven Session API) and inspect (read) other Mojos contexts.
  */
 public interface ContextEnabled
 {
@@ -38,6 +41,8 @@ public interface ContextEnabled
     void setPluginContext( Map<String, Object> pluginContext );
 
     /**
+     * Gets the shared context of the mojo.
+     *
      * @return a <code>Map</code> stored in the plugin container's context.
      */
     Map<String, Object> getPluginContext();

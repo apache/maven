@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Abstract class to provide most of the infrastructure required to implement a <code>Mojo</code> except for
  * the execute method.<br>
@@ -151,7 +153,7 @@ public abstract class AbstractMojo
     @Override
     public void setLog( Log log )
     {
-        this.log = log;
+        this.log = requireNonNull( log );
     }
 
     /**
@@ -172,14 +174,14 @@ public abstract class AbstractMojo
     }
 
     @Override
-    public Map<String, Object> getPluginContext()
+    public void setPluginContext( Map<String, Object> pluginContext )
     {
-        return pluginContext;
+        this.pluginContext = requireNonNull( pluginContext );
     }
 
     @Override
-    public void setPluginContext( Map<String, Object> pluginContext )
+    public Map<String, Object> getPluginContext()
     {
-        this.pluginContext = pluginContext;
+        return pluginContext;
     }
 }
