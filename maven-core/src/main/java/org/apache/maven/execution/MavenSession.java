@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -75,7 +76,8 @@ public class MavenSession
 
     private boolean parallel;
 
-    private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
+    @SuppressWarnings( "checkstyle:linelength" )
+    private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
 
 
@@ -192,11 +194,12 @@ public class MavenSession
 
     // Backward compat
 
-    public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
+    public ConcurrentMap<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
 
-        Map<String, Map<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey.get( projectKey );
+        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey =
+            pluginContextsByProjectAndPluginKey.get( projectKey );
 
         if ( pluginContextsByKey == null )
         {
@@ -207,7 +210,7 @@ public class MavenSession
 
         String pluginKey = plugin.getPluginLookupKey();
 
-        Map<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
+        ConcurrentMap<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
 
         if ( pluginContext == null )
         {
