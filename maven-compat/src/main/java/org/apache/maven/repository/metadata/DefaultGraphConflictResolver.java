@@ -132,12 +132,11 @@ public class DefaultGraphConflictResolver
                     res.addEdge( sourceV, newV, edge );
                 }
             }
-            MetadataGraph linkedRes = findLinkedSubgraph( res );
             // System.err.println("Original graph("+graph.getVertices().size()+"):\n"+graph.toString());
             // System.err.println("Cleaned("+requestedScope+") graph("+res.getVertices().size()+"):\n"+res.toString());
             // System.err.println("Linked("+requestedScope+")
             // subgraph("+linkedRes.getVertices().size()+"):\n"+linkedRes.toString());
-            return linkedRes;
+            return findLinkedSubgraph( res );
         }
         catch ( MetadataResolutionException e )
         {

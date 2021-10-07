@@ -100,10 +100,8 @@ public class DependencyContext
     public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,
                                                               Collection<String> scopesToResolve )
     {
-        boolean required =
-            scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
-                || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
-        return required;
+        return scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
+            || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
     }
 
     public void synchronizeWithProjectState()

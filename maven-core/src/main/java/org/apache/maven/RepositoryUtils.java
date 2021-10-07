@@ -324,14 +324,12 @@ public class RepositoryUtils
             exclusions.add( toExclusion( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact,
+        return new Dependency( artifact,
                                             dependency.getScope(),
                                             dependency.getOptional() != null
                                                 ? dependency.isOptional()
                                                 : null,
                                             exclusions );
-
-        return result;
     }
 
     private static Exclusion toExclusion( org.apache.maven.model.Exclusion exclusion )
