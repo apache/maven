@@ -35,7 +35,8 @@ public interface Mojo
 {
     /** The component <code>role</code> hint for Plexus container
      *
-     * @deprecated do not use legacy Plexus API to look up by string.
+     * @deprecated do not use legacy Plexus API to look up by string, use JSR330 instead (or if must, use legacy
+     * Plexus lookup by class instead).
      */
     @Deprecated
     String ROLE = Mojo.class.getName();
