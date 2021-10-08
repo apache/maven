@@ -27,7 +27,9 @@ import javax.inject.Provider;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Mojo {@link Log} implementation that lazily creates {@link Logger} instances.
+ * Mojo {@link Log} implementation that lazily creates {@link Logger} instances. To achieve "lazyness" it uses
+ * {@link Provider} for logger, but guarantees that {@link Provider#get()} is invoked only once, and once got
+ * Logger instance is reused.
  *
  * @since TBD
  */
@@ -36,21 +38,14 @@ public class MojoLog
 {
     private final Provider<Logger> loggerProvider;
 
-    private volatile Logger logger;
-
     public MojoLog( Provider<Logger> loggerProvider )
     {
-        this.loggerProvider = requireNonNull( loggerProvider );
-        this.logger = null;
+        this.loggerProvider = memoize( loggerProvider );
     }
 
     private Logger getLogger()
     {
-        if ( logger == null )
-        {
-            logger = requireNonNull( loggerProvider.get() );
-        }
-        return logger;
+        return loggerProvider.get();
     }
 
     private String toString( CharSequence content )
@@ -171,5 +166,38 @@ public class MojoLog
     public boolean isErrorEnabled()
     {
         return getLogger().isErrorEnabled();
+    }
+
+    /**
+     * A helper bit to make users of this class easier: it wraps {@link Provider} into "memoizing" provider: the
+     * wrapped (delegate) provider will be invoked only once, and the returned value will be stored for subsequent
+     * invocations of {@link Provider#get()} on wrapper.
+     */
+    private static <T> Provider<T> memoize( Provider<T> provider )
+    {
+        requireNonNull( provider );
+        return new Provider<T>()
+        {
+            Provider<T> delegate = this::memoize;
+
+            volatile boolean memoized = false;
+
+            @Override
+            public T get()
+            {
+                return delegate.get();
+            }
+
+            private synchronized T memoize()
+            {
+                if ( !memoized )
+                {
+                    T value = provider.get();
+                    delegate = () -> value;
+                    memoized = true;
+                }
+                return delegate.get();
+            }
+        };
     }
 }
