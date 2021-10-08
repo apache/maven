@@ -38,7 +38,7 @@ public class PluginVersionResolutionException
 
     public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, Throwable cause )
     {
-        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
+        super( "Error resolving version for plugin '" + groupId + ":" + artifactId + "': " + baseMessage, cause );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -47,7 +47,7 @@ public class PluginVersionResolutionException
 
     public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage )
     {
-        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\': " + baseMessage );
+        super( "Error resolving version for plugin '" + groupId + ":" + artifactId + "': " + baseMessage );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -57,7 +57,7 @@ public class PluginVersionResolutionException
     public PluginVersionResolutionException( String groupId, String artifactId, LocalRepository localRepository,
                                              List<RemoteRepository> remoteRepositories, String baseMessage )
     {
-        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\' from the repositories "
+        super( "Error resolving version for plugin '" + groupId + ":" + artifactId + "' from the repositories "
             + format( localRepository, remoteRepositories ) + ": " + baseMessage );
 
         this.groupId = groupId;
