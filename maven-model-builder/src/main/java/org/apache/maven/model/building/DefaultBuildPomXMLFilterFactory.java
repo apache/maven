@@ -58,14 +58,15 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
-        return p -> Optional.ofNullable( context.getRawModel( p ) ).map( m -> toRelativeProject( m ) );
+        return p -> Optional.ofNullable( context.getRawModel( p ) )
+                .map( DefaultBuildPomXMLFilterFactory::toRelativeProject );
     }
 
     @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
         return ( g, a ) -> Optional.ofNullable( context.getRawModel( g, a ) )
-                            .map( m -> toVersion( m ) )
+                            .map( DefaultBuildPomXMLFilterFactory::toVersion )
                             .orElse( null );
     }
 
