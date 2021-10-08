@@ -76,6 +76,11 @@ public class MavenSession
 
     private boolean parallel;
 
+    /**
+     * Plugin context keyed by project ({@link MavenProject#getId()}) and by plugin lookup key
+     * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
+     * {@link Object} values.
+     */
     @SuppressWarnings( "checkstyle:linelength" )
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
