@@ -194,7 +194,15 @@ public class MavenSession
 
     // Backward compat
 
-    public ConcurrentMap<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
+    /**
+     * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
+     * {@link MavenProject}, never returns {@code null} as if context not present, creates it.
+     *
+     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
+     * implements {@link ConcurrentMap} as well.
+     *
+     */
+    public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
 

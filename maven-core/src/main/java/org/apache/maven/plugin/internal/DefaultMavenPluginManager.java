@@ -100,7 +100,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentMap;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -562,7 +561,7 @@ public class DefaultMavenPluginManager
             {
                 MavenProject project = session.getCurrentProject();
 
-                ConcurrentMap<String, Object> pluginContext = session.getPluginContext( pluginDescriptor, project );
+                Map<String, Object> pluginContext = session.getPluginContext( pluginDescriptor, project );
 
                 if ( pluginContext != null )
                 {
