@@ -80,7 +80,7 @@ class FileToRawModelMerger extends ModelMerger
                                                            boolean sourceDominant, Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
                                                                          context ) );
     }
 
@@ -124,7 +124,7 @@ class FileToRawModelMerger extends ModelMerger
                                         Map<Object, Object> context )
     {
         Iterator<Profile> sourceIterator = source.getProfiles().iterator();
-        target.getProfiles().stream().forEach( t -> mergeProfile( t, sourceIterator.next(), sourceDominant,
+        target.getProfiles().forEach( t -> mergeProfile( t, sourceIterator.next(), sourceDominant,
                                                                   context ) );
     }
 
@@ -133,7 +133,7 @@ class FileToRawModelMerger extends ModelMerger
                                                 Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
                                                                          context ) );
     }
 
@@ -156,7 +156,7 @@ class FileToRawModelMerger extends ModelMerger
                                              Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().stream().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
+        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
                                                                          context ) );
     }
 

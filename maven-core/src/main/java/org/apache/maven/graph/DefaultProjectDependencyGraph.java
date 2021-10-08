@@ -154,7 +154,7 @@ public class DefaultProjectDependencyGraph
     private List<MavenProject> getSortedProjects( Set<String> projectIds )
     {
         return projectIds.stream()
-                .map( id -> projects.get( id ) )
+                .map( projects::get )
                 .sorted( Comparator.comparingInt( order::get ) )
                 .collect( Collectors.toList() );
     }

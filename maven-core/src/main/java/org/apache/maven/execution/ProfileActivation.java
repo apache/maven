@@ -133,7 +133,7 @@ public class ProfileActivation
     {
         return this.activations.entrySet().stream()
                 .filter( e -> predicate.test( e.getValue() ) )
-                .map( e -> e.getKey() )
+                .map( Map.Entry::getKey )
                 .collect( toSet() );
     }
 
