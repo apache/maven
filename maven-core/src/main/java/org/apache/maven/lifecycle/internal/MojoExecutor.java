@@ -48,6 +48,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * <p>
@@ -76,8 +79,14 @@ public class MojoExecutor
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
+    private final Lock aggregatorReadLock;
+    private final Lock aggregatorWriteLock;
+
     public MojoExecutor()
     {
+        ReadWriteLock aggregatorLock = new ReentrantReadWriteLock( true );
+        aggregatorReadLock = aggregatorLock.readLock();
+        aggregatorWriteLock = aggregatorLock.writeLock();
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
@@ -197,37 +206,57 @@ public class MojoExecutor
             }
         }
 
-        List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
-
-        ensureDependenciesAreResolved( mojoDescriptor, session, dependencyContext );
-
-        eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
+        // Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use
+        // by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
+        // all other executions until finished.
+        Lock accquiredAggregatorLock = null;
+        if ( session.getRequest().getDegreeOfConcurrency() > 1 )
+        {
+            accquiredAggregatorLock = mojoDescriptor.isAggregator() ? aggregatorWriteLock : aggregatorReadLock;
+            accquiredAggregatorLock.lock();
+        }
 
         try
         {
+            List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
+
+            ensureDependenciesAreResolved( mojoDescriptor, session, dependencyContext );
+
+            eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
+
             try
             {
-                pluginManager.executeMojo( session, mojoExecution );
+                try
+                {
+                    pluginManager.executeMojo( session, mojoExecution );
+                }
+                catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
+                    | MojoExecutionException e )
+                {
+                    throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+                }
+
+                eventCatapult.fire( ExecutionEvent.Type.MojoSucceeded, session, mojoExecution );
             }
-            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
-                | MojoExecutionException e )
+            catch ( LifecycleExecutionException e )
             {
-                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+                eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution, e );
+
+                throw e;
             }
-
-            eventCatapult.fire( ExecutionEvent.Type.MojoSucceeded, session, mojoExecution );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution, e );
-
-            throw e;
+            finally
+            {
+                for ( MavenProject forkedProject : forkedProjects )
+                {
+                    forkedProject.setExecutionProject( null );
+                }
+            }
         }
         finally
         {
-            for ( MavenProject forkedProject : forkedProjects )
+            if ( accquiredAggregatorLock != null )
             {
-                forkedProject.setExecutionProject( null );
+                accquiredAggregatorLock.unlock();
             }
         }
     }
