@@ -23,6 +23,7 @@ import org.apache.maven.building.Problem.Severity;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class DefaultProblemTest
@@ -82,7 +83,7 @@ public class DefaultProblemTest
     public void testGetException()
     {
         DefaultProblem problem = new DefaultProblem( null, null, null, -1, -1, null );
-        assertEquals( null, problem.getException() );
+        assertNull( problem.getException() );
 
         Exception e = new Exception();
         problem = new DefaultProblem( null, null, null, -1, -1, e );
