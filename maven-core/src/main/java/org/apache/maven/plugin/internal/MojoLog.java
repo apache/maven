@@ -65,7 +65,7 @@ public class MojoLog
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(toString(content));
+            getLogger().debug( toString( content ) );
         }
     }
 
