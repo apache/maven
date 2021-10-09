@@ -19,7 +19,6 @@ package org.apache.maven.model.profile.activation;
  * under the License.
  */
 
-import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.model.Profile;

@@ -19,10 +19,7 @@ package org.apache.maven.repository.legacy;
  * under the License.
  */
 
-import org.apache.maven.wagon.Wagon;
-
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Wagon with per-lookup instantiation strategy.
