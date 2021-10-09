@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -76,13 +75,7 @@ public class MavenSession
 
     private boolean parallel;
 
-    /**
-     * Plugin context keyed by project ({@link MavenProject#getId()}) and by plugin lookup key
-     * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
-     * {@link Object} values.
-     */
-    @SuppressWarnings( "checkstyle:linelength" )
-    private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
+    private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
 
 
@@ -199,20 +192,11 @@ public class MavenSession
 
     // Backward compat
 
-    /**
-     * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
-     * {@link MavenProject}, never returns {@code null} as if context not present, creates it.
-     *
-     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
-     * implements {@link ConcurrentMap} as well.
-     *
-     */
     public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
 
-        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey =
-            pluginContextsByProjectAndPluginKey.get( projectKey );
+        Map<String, Map<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey.get( projectKey );
 
         if ( pluginContextsByKey == null )
         {
@@ -223,7 +207,7 @@ public class MavenSession
 
         String pluginKey = plugin.getPluginLookupKey();
 
-        ConcurrentMap<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
+        Map<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
 
         if ( pluginContext == null )
         {
