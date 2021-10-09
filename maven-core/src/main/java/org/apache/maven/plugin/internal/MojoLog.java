@@ -63,7 +63,10 @@ public class MojoLog
     @Override
     public void debug( CharSequence content )
     {
-        getLogger().debug( toString( content ) );
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(toString(content));
+        }
     }
 
     @Override
