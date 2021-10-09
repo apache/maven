@@ -187,7 +187,7 @@ public class DefaultArtifactVersionTest
     {
         ArtifactVersion v1 = newArtifactVersion( "1" );
         ArtifactVersion v2 = newArtifactVersion( "1.0" );
-        assertEquals( true, v1.equals( v2 ) );
+        assertTrue( v1.equals( v2 ) );
         assertEquals( v1.hashCode(), v2.hashCode() );
     }
 
