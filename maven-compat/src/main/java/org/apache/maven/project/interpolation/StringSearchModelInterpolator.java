@@ -368,12 +368,7 @@ public class StringSearchModelInterpolator
 //                return false;
 //            }
 
-            if ( "parent".equals( field.getName() ) )
-            {
-                return false;
-            }
-
-            return true;
+            return !"parent".equals( field.getName() );
         }
 
         private void evaluateArray( Object target )

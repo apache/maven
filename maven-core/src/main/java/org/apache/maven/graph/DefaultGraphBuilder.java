@@ -408,10 +408,7 @@ public class DefaultGraphBuilder
 
             id = project.getGroupId() + id;
 
-            if ( id.equals( selector ) )
-            {
-                return true;
-            }
+            return id.equals( selector );
         }
 
         // relative path, e.g. "sub", "../sub" or "."

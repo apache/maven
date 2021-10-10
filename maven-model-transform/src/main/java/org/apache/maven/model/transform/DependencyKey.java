@@ -80,12 +80,7 @@ public class DependencyKey
         {
             return false;
         }
-        if ( !Objects.equals( groupId, other.groupId ) )
-        {
-            return false;
-        }
-
-        return true;
+        return Objects.equals( groupId, other.groupId );
     }
 
 
