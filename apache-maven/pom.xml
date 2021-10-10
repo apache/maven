@@ -200,7 +200,7 @@ under the License.
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assembly/maven/bin.xml</descriptor>
+                <descriptor>src/assembly/bin.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
@@ -268,7 +268,7 @@ under the License.
                   <attach>false</attach>
                   <outputDirectory>${distributionTargetDir}</outputDirectory>
                   <descriptors>
-                    <descriptor>src/assembly/maven/dir.xml</descriptor>
+                    <descriptor>src/assembly/dir.xml</descriptor>
                   </descriptors>
                 </configuration>
               </execution>
@@ -292,7 +292,7 @@ under the License.
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>src/assembly/maven/src.xml</descriptor>
+                    <descriptor>src/assembly/src.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
