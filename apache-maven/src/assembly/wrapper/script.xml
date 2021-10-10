@@ -29,12 +29,12 @@ under the License.
   <includeBaseDirectory>false</includeBaseDirectory>
   <files>
     <file>
-      <source>src/assembly/shared/mvnwDebug.cmd</source>
+      <source>src/assembly/wrapper/shared/mvnwDebug.cmd</source>
       <outputDirectory>.</outputDirectory>
       <lineEnding>dos</lineEnding>
     </file>
     <file>
-      <source>src/assembly/shared/mvnwDebug</source>
+      <source>src/assembly/wrapper/shared/mvnwDebug</source>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -43,7 +43,7 @@ under the License.
       <sources>
         <source>src/assembly/shared/validate.cmd</source>
         <source>src/assembly/shared/init.cmd</source>
-        <source>src/assembly/shared/mvnwlauncher.cmd</source>
+        <source>src/assembly/wrapper/shared/mvnwlauncher.cmd</source>
         <source>src/assembly/wrapper/script/download.cmd</source>
         <source>src/assembly/shared/run.cmd</source>
       </sources>
@@ -56,7 +56,7 @@ under the License.
       <sources>
         <source>src/assembly/shared/validate</source>
         <source>src/assembly/shared/init</source>
-        <source>src/assembly/shared/mvnwlauncher</source>
+        <source>src/assembly/wrapper/shared/mvnwlauncher</source>
         <source>src/assembly/wrapper/script/download</source>
         <source>src/assembly/shared/run</source>
       </sources>
