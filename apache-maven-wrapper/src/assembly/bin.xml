@@ -39,22 +39,22 @@ under the License.
   </dependencySets>
   <files>
     <file>
-      <source>src/assembly/wrapper/shared/mvnwDebug.cmd</source>
+      <source>src/assembly/shared/mvnwDebug.cmd</source>
       <outputDirectory>.</outputDirectory>
       <lineEnding>dos</lineEnding>
     </file>
     <file>
-      <source>src/assembly/wrapper/shared/mvnwDebug</source>
+      <source>src/assembly/shared/mvnwDebug</source>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <sources>
-        <source>src/assembly/shared/validate.cmd</source>
-        <source>src/assembly/shared/init.cmd</source>
-        <source>src/assembly/wrapper/shared/mvnwlauncher.cmd</source>
-        <source>src/assembly/shared/run.cmd</source>
+        <source>../apache-maven/src/assembly/shared/validate.cmd</source>
+        <source>../apache-maven/src/assembly/shared/init.cmd</source>
+        <source>src/assembly/shared/mvnwlauncher.cmd</source>
+        <source>../apache-maven/src/assembly/shared/run.cmd</source>
       </sources>
       <destName>mvnw.cmd</destName>
       <outputDirectory>.</outputDirectory>
@@ -63,10 +63,10 @@ under the License.
     </file>
     <file>
       <sources>
-        <source>src/assembly/shared/validate</source>
-        <source>src/assembly/shared/init</source>
-        <source>src/assembly/wrapper/shared/mvnwlauncher</source>
-        <source>src/assembly/shared/run</source>
+        <source>../apache-maven/src/assembly/shared/validate</source>
+        <source>../apache-maven/src/assembly/shared/init</source>
+        <source>src/assembly/shared/mvnwlauncher</source>
+        <source>../apache-maven/src/assembly/shared/run</source>
       </sources>
       <destName>mvnw</destName>
       <outputDirectory>.</outputDirectory>
@@ -77,7 +77,7 @@ under the License.
   </files>
   <fileSets>
     <fileSet>
-      <directory>src/assembly/wrapper/shared/mvn</directory>
+      <directory>src/assembly/shared/mvn</directory>
       <outputDirectory>.mvn</outputDirectory>
       <filtered>true</filtered>
     </fileSet>

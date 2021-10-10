@@ -42,7 +42,7 @@ under the License.
       <p>
         <img src="images/maven-deps.png" width="1046" height="784" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
-          <area shape="rect" coords="433,1,658,41"     alt="apache-maven-wrapper" href="apache-maven/" />
+          <area shape="rect" coords="433,1,658,41"     alt="apache-maven-wrapper" href="apache-maven-wrapper/" />
           <area shape="rect" coords="711,0,959,40"     alt="maven-wrapper-plugin" href="/plugins/maven-wrapper-plugin/" />
           <area shape="rect" coords="488,67,604,107"   alt="maven-wrapper" href="maven-wrapper/" />
           <area shape="rect" coords="378,132,467,172"  alt="maven-bom" href="maven-bom/" />
