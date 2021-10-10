@@ -7,7 +7,7 @@
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  %MAVEN_LAUNCHER% %*
+  %LAUNCHER_CLASS% %*
 if ERRORLEVEL 1 goto error
 goto end
 
