@@ -77,7 +77,7 @@ under the License.
       </includes>
       <filtered>true</filtered>
     </fileSet>
-        <fileSet>
+    <fileSet>
       <directory>src/assembly/wrapper/source</directory>
       <outputDirectory>.</outputDirectory>
       <includes>
