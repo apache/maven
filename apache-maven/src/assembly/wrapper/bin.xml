@@ -78,11 +78,8 @@ under the License.
   </files>
   <fileSets>
     <fileSet>
-      <directory>src/assembly/wrapper/shared</directory>
-      <outputDirectory>.</outputDirectory>
-      <includes>
-        <include>.mvn/**</include>
-      </includes>
+      <directory>src/assembly/wrapper/shared/mvn</directory>
+      <outputDirectory>.mvn</outputDirectory>
       <filtered>true</filtered>
     </fileSet>
   </fileSets>
