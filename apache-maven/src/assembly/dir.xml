@@ -25,6 +25,6 @@ under the License.
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
   <componentDescriptors>
-    <componentDescriptor>src/assembly/maven/component.xml</componentDescriptor>
+    <componentDescriptor>src/assembly/component.xml</componentDescriptor>
   </componentDescriptors>
 </assembly>
