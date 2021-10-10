@@ -265,11 +265,10 @@ public class DefaultExceptionHandler
         {
             return false;
         }
-        else if ( exception.getClass().getName().startsWith( "java" ) )
+        else
         {
-            return false;
+            return !exception.getClass().getName().startsWith( "java" );
         }
-        return true;
     }
 
     private String getMessage( String message, Throwable exception )
