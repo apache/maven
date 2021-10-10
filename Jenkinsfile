@@ -63,7 +63,10 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
             }
             dir ('apache-maven/target') {
-                stash includes: 'apache-maven-bin.zip,apache-maven-wrapper-*.zip', name: 'maven-dist'
+                stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
+            }
+            dir ('apache-maven-wrapper/target') {
+                stash includes: 'apache-maven-wrapper-*.zip', name: 'maven-wrapper-dist'
             }
             dir ('maven-wrapper/target') {
                 stash includes: 'maven-wrapper.jar', name: 'wrapper-dist'
@@ -102,6 +105,7 @@ for (String os in runITsOses) {
                         }
                         dir('dists') {
                           unstash 'maven-dist'
+                          unstash 'maven-wrapper-dist'
                           unstash 'wrapper-dist'
                         }
                         try {

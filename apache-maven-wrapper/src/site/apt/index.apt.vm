@@ -1,0 +1,58 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~ http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+ -----
+ ${project.name}
+ -----
+ Hervé Boutemy
+ -----
+ 2021-10-10
+ -----
+
+${project.name}
+
+ ${project.description}
+
+ Distributions types share the same base structure:
+
+----
+mvnw
+mvnw.cmd
+mvnwDebug
+mvnwDebug.cmd
+.mvn/wrapper/maven-wrapper.properties
+----
+
+ but every distribution has specific <<<mvnw>>>/<<<mvnw.cmd>>> scripts to manage different strategies to get {{{../maven-wrapper/}<<<maven-wrapper.jar>>>}}:
+ 
+ - <<<script>>> (default): <<<mvnw>>>/<<<mvnw.cmd>>> scripts will download {{{../maven-wrapper/}<<<maven-wrapper.jar>>>}} with <<<wget>>> or <<<curl>>> on Unix or PowerShell on Windows
+ 
+ - <<<bin>>>: no need to download <<<maven-wrapper.jar>>> binary, it is directly provided and used from project source tree:
+
+----
+.mvn/wrapper/maven-wrapper.jar
+----
+
+ - <<<source>>>: <<<mvnw>>>/<<<mvnw.cmd>>> scripts will compile <<<MavenWrapperDownloader.java>>> source then run the class to download {{{../maven-wrapper/}<<<maven-wrapper.jar>>>}}:
+
+----
+.mvn/wrapper/MavenWrapperDownloader.java
+----
+
+ []
+
+ Distribution can be installed in a project either by unpacking zip archive by hand, or by using {{{/plugins/maven-wrapper-plugin/}<<<wrapper:wrapper>>>}}.

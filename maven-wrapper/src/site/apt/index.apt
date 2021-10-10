@@ -25,4 +25,6 @@
 
 Maven Wrapper
 
- Maven Wrapper...
+ Maven Wrapper dowloads Maven distribution if not already in cache, then launches Maven.
+
+ It is called by {{{../apache-maven-wrapper/}<<<mvnw>>>/<<<mvnw.cmd>>> scripts}} that need to be installed in the project and called instead of <<<mvn>>>/<<<mvn.cmd>>>.
