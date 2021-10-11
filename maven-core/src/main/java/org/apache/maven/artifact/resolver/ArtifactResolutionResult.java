@@ -133,7 +133,7 @@ public class ArtifactResolutionResult
     public List<Artifact> getMissingArtifacts()
     {
         return missingArtifacts == null
-                   ? Collections.<Artifact>emptyList()
+                   ? Collections.emptyList()
                    : Collections.unmodifiableList( missingArtifacts );
 
     }
@@ -171,7 +171,7 @@ public class ArtifactResolutionResult
     public List<Exception> getExceptions()
     {
         return exceptions == null
-                   ? Collections.<Exception>emptyList()
+                   ? Collections.emptyList()
                    : Collections.unmodifiableList( exceptions );
 
     }
@@ -211,7 +211,7 @@ public class ArtifactResolutionResult
     public List<Exception> getVersionRangeViolations()
     {
         return versionRangeViolations == null
-                   ? Collections.<Exception>emptyList()
+                   ? Collections.emptyList()
                    : Collections.unmodifiableList( versionRangeViolations );
 
     }
@@ -246,7 +246,7 @@ public class ArtifactResolutionResult
     public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
         return metadataResolutionExceptions == null
-                   ? Collections.<ArtifactResolutionException>emptyList()
+                   ? Collections.emptyList()
                    : Collections.unmodifiableList( metadataResolutionExceptions );
 
     }

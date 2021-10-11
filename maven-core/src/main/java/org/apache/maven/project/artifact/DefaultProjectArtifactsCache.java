@@ -115,10 +115,10 @@ public class DefaultProjectArtifactsCache
                 }
             }
             collect = scopesToCollect == null
-                ? Collections.<String>emptySet()
+                ? Collections.emptySet()
                 : Collections.unmodifiableSet( new HashSet<>( scopesToCollect ) );
             resolve = scopesToResolve == null
-                ? Collections.<String>emptySet()
+                ? Collections.emptySet()
                 : Collections.unmodifiableSet( new HashSet<>( scopesToResolve ) );
             this.aggregating = aggregating;
 

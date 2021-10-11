@@ -453,7 +453,7 @@ public class DefaultMavenPluginManager
     private List<Artifact> toMavenArtifacts( DependencyNode root, PreorderNodeListGenerator nlg )
     {
         List<Artifact> artifacts = new ArrayList<>( nlg.getNodes().size() );
-        RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
+        RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.emptyList(), null );
         artifacts.removeIf( artifact -> artifact.getFile() == null );
         return Collections.unmodifiableList( artifacts );
     }

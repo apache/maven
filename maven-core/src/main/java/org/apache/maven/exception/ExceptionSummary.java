@@ -55,7 +55,7 @@ public class ExceptionSummary
         this.reference = ( reference != null ) ? reference : "";
         this.children = ( children != null )
                             ? Collections.unmodifiableList( children )
-                            : Collections.<ExceptionSummary>emptyList();
+                            : Collections.emptyList();
 
     }
 

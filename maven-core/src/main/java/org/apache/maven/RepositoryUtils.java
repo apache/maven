@@ -121,7 +121,7 @@ public class RepositoryUtils
             nodeTrail.addAll( trail );
             nodeTrail.add( artifact.getId() );
 
-            if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
+            if ( filter == null || filter.accept( node, Collections.emptyList() ) )
             {
                 artifact.setDependencyTrail( nodeTrail );
                 artifacts.add( artifact );

@@ -94,7 +94,7 @@ public class DefaultPluginRealmCache
             }
             this.parentRealm = parentRealm;
             this.foreignImports =
-                ( foreignImports != null ) ? foreignImports : Collections.<String, ClassLoader>emptyMap();
+                ( foreignImports != null ) ? foreignImports : Collections.emptyMap();
             this.filter = dependencyFilter;
 
             int hash = 17;

@@ -52,8 +52,8 @@ public class MojoExecutionScopeModule
         bindScope( MojoExecutionScoped.class, scope );
         bind( MojoExecutionScope.class ).toInstance( scope );
 
-        bind( MavenProject.class ).toProvider( MojoExecutionScope.<MavenProject>seededKeyProvider() ).in( scope );
-        bind( MojoExecution.class ).toProvider( MojoExecutionScope.<MojoExecution>seededKeyProvider() ).in( scope );
+        bind( MavenProject.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
+        bind( MojoExecution.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
     }
 
 }
