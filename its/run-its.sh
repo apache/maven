@@ -31,7 +31,7 @@ else
  esac
  mvn clean verify -P versionlessMavenDist -f "$MAVENCODEBASE" || exit $?
  if [ -f "$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar" ] ; then
-  mvn clean install -Prun-its,embedded -Dmaven.repo.local="`pwd`/repo" -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar" || exit $?
+  mvn clean install -Prun-its,embedded -Dmaven.repo.local="`pwd`/repo" -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven-wrapper/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar" || exit $?
  else
   mvn clean install -Prun-its,embedded,!maven-wrapper -Dmaven.repo.local="`pwd`/repo" -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" || exit $?
  fi
