@@ -371,7 +371,7 @@ public class DefaultMaven
         throws MavenExecutionException
     {
         // CHECKSTYLE_OFF: LineLength
-        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.emptyList() ) )
         // CHECKSTYLE_ON: LineLength
         {
             listener.afterSessionStart( session );

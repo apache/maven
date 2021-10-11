@@ -318,7 +318,7 @@ public class PluginDescriptor
     {
         return ( introducedDependencyArtifacts != null )
             ? introducedDependencyArtifacts
-            : Collections.<Artifact>emptySet();
+            : Collections.emptySet();
     }
 
     public void setName( String name )

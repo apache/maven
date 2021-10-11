@@ -56,7 +56,7 @@ public class DefaultProjectRealmCache
         {
             this.extensionRealms = ( extensionRealms != null )
                                        ? Collections.unmodifiableList( extensionRealms )
-                                       : Collections.<ClassRealm>emptyList();
+                                       : Collections.emptyList();
 
             this.hashCode = this.extensionRealms.hashCode();
         }

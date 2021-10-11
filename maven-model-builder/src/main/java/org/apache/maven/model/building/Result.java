@@ -51,7 +51,7 @@ public class Result<T>
      */
     public static <T> Result<T> success( T model )
     {
-        return success( model, Collections.<ModelProblem>emptyList() );
+        return success( model, Collections.emptyList() );
     }
 
     /**
@@ -99,7 +99,7 @@ public class Result<T>
 
     public static <T> Result<T> error( T model )
     {
-        return error( model, Collections.<ModelProblem>emptyList() );
+        return error( model, Collections.emptyList() );
     }
 
     public static <T> Result<T> error( Result<?> result )

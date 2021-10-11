@@ -251,7 +251,7 @@ public class MojoExecutor
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 
             lifeCycleDependencyResolver.resolveProjectDependencies( project, scopesToCollect, scopesToResolve, session,
-                                                                    aggregating, Collections.<Artifact>emptySet() );
+                                                                    aggregating, Collections.emptySet() );
 
             dependencyContext.synchronizeWithProjectState();
         }
@@ -269,7 +269,7 @@ public class MojoExecutor
                     {
                         lifeCycleDependencyResolver.resolveProjectDependencies( aggregatedProject, scopesToCollect,
                                                                                 scopesToResolve, session, aggregating,
-                                                                                Collections.<Artifact>emptySet() );
+                                                                                Collections.emptySet() );
                     }
                 }
             }
