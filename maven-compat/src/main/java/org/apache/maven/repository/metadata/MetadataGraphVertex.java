@@ -175,7 +175,7 @@ public class MetadataGraphVertex
     @Override
     public boolean equals( Object vo )
     {
-        if ( vo == null || !( vo instanceof MetadataGraphVertex ) )
+        if ( !( vo instanceof MetadataGraphVertex ) )
         {
             return false;
         }
