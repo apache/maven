@@ -160,7 +160,7 @@ public class VersionRange
 
             process = process.substring( index + 1 ).trim();
 
-            if ( process.length() > 0 && process.startsWith( "," ) )
+            if ( process.startsWith( "," ) )
             {
                 process = process.substring( 1 ).trim();
             }

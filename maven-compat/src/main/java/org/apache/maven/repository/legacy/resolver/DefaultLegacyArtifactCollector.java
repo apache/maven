@@ -214,7 +214,7 @@ public class DefaultLegacyArtifactCollector
                                                      Map<String, Artifact> managedVersions )
     {
         ManagedVersionMap versionMap;
-        if ( ( managedVersions != null ) && ( managedVersions instanceof ManagedVersionMap ) )
+        if ( managedVersions instanceof ManagedVersionMap )
         {
             versionMap = (ManagedVersionMap) managedVersions;
         }
