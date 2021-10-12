@@ -30,12 +30,14 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Date;
 import java.util.Properties;
 
@@ -350,15 +352,16 @@ public class DefaultUpdateCheckManager
 
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
-            FileInputStream in = null;
+            InputStream in = null;
             FileLock lock = null;
-
+            FileChannel channel;
             try
             {
                 Properties props = new Properties();
 
-                in = new FileInputStream( touchfile );
-                lock = in.getChannel().lock( 0, Long.MAX_VALUE, true );
+                in = Files.newInputStream( touchfile.toPath() );
+                channel = FileChannel.open( touchfile.toPath(), StandardOpenOption.READ );
+                lock = channel.lock( 0, Long.MAX_VALUE, true );
 
                 getLogger().debug( "Reading resolution-state from: " + touchfile );
                 props.load( in );

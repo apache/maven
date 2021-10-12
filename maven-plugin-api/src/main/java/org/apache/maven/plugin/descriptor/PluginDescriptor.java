@@ -31,12 +31,12 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -416,7 +416,7 @@ public class PluginDescriptor
         }
         else
         {
-            return new FileInputStream( new File( pluginFile, descriptor ) );
+            return Files.newInputStream( new File( pluginFile, descriptor ).toPath() );
         }
     }
 

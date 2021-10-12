@@ -20,10 +20,10 @@ package org.apache.maven.model.io;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
@@ -71,7 +71,7 @@ public class DefaultModelReader
         final InputStream is;
         if ( context == null )
         {
-            is = new FileInputStream( input );
+            is = Files.newInputStream( input.toPath() );
         }
         else
         {

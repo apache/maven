@@ -49,8 +49,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -209,7 +209,7 @@ public class DefaultVersionRangeResolver
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        try ( InputStream in = new FileInputStream( metadata.getFile() ) )
+                        try ( InputStream in = Files.newInputStream( metadata.getFile().toPath() ) )
                         {
                             versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
                         }
