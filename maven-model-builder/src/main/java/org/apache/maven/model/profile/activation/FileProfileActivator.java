@@ -126,7 +126,7 @@ public class FileProfileActivator
 
         boolean fileExists = f.exists();
 
-        return missing ? !fileExists : fileExists;
+        return missing != fileExists;
     }
 
     @Override
