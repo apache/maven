@@ -98,9 +98,7 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 import java.io.BufferedInputStream;
 import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -549,11 +547,11 @@ public class MavenCli
             // redirect stdout and stderr to file
             try
             {
-                PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
+                PrintStream ps = new PrintStream( Files.newOutputStream( logFile.toPath() ) );
                 System.setOut( ps );
                 System.setErr( ps );
             }
-            catch ( FileNotFoundException e )
+            catch ( IOException e )
             {
                 //
                 // Ignore
@@ -825,7 +823,7 @@ public class MavenCli
     {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
 
-        try ( InputStream is = new BufferedInputStream( new FileInputStream( extensionsFile ) ) )
+        try ( InputStream is = new BufferedInputStream( Files.newInputStream( extensionsFile.toPath() ) ) )
         {
 
             return parser.read( is ).getExtensions();
