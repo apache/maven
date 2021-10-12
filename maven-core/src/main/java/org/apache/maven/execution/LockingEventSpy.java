@@ -63,9 +63,9 @@ public class LockingEventSpy extends AbstractEventSpy
                 Lock lock = getLock( executionEvent );
                 if ( !lock.tryLock() )
                 {
-                    logger.warn( "Suspending concurrent execution of project '{}'", executionEvent.getProject() );
+                    logger.debug( "Suspending concurrent execution of project '{}'", executionEvent.getProject() );
                     lock.lockInterruptibly();
-                    logger.warn( "Resuming execution of project '{}'", executionEvent.getProject() );
+                    logger.debug( "Resuming execution of project '{}'", executionEvent.getProject() );
                 }
                 break;
             case ProjectSucceeded:
