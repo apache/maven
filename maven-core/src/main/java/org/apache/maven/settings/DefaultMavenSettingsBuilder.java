@@ -99,7 +99,7 @@ public class DefaultMavenSettingsBuilder
         }
         catch ( SettingsBuildingException e )
         {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+            throw new IOException( e.getMessage(), e );
         }
     }
 
