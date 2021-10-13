@@ -108,7 +108,7 @@ public class ExtensionDescriptorBuilder
         }
         catch ( XmlPullParserException e )
         {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+            throw new IOException( e.getMessage(), e );
         }
 
         if ( !"extension".equals( dom.getName() ) )
