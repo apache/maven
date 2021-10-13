@@ -19,13 +19,13 @@ package org.apache.maven.toolchain.io;
  * under the License.
  */
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
+
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Handles deserialization of toolchains from some kind of textual format like XML.

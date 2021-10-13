@@ -19,10 +19,10 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.building.Problem;
 import org.apache.maven.toolchain.model.PersistedToolchains;
-
-import java.util.List;
 
 /**
  * Collects the output of the toolchains builder.

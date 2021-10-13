@@ -19,11 +19,11 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
-import org.apache.maven.building.Problem;
-import org.apache.maven.toolchain.model.PersistedToolchains;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.building.Problem;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Holds the result of the merged toolchains and holds the problems during this build, if any.
