@@ -360,7 +360,7 @@ public class DefaultUpdateCheckManager
                 Properties props = new Properties();
 
                 in = Files.newInputStream( touchfile.toPath() );
-                channel = FileChannel.open( touchfile.toPath(), StandardOpenOption.READ );
+                channel = FileChannel.open( touchfile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE );
                 lock = channel.lock( 0, Long.MAX_VALUE, true );
 
                 getLogger().debug( "Reading resolution-state from: " + touchfile );
