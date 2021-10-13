@@ -19,12 +19,12 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
+import org.apache.maven.building.Problem;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.maven.building.Problem;
 
 /**
  * @author Robert Scholte

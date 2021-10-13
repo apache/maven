@@ -19,32 +19,48 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.building.Problem;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Collects the output of the toolchains builder.
+ * Holds the result of the merged toolchains and holds the problems during this build, if any.
  *
  * @author Robert Scholte
  * @since 3.3.0
  */
-public interface ToolchainsBuildingResult
+public class DefaultToolchainsBuildingResult
+    implements ToolchainsBuildingResult
 {
 
-    /**
-     * Gets the assembled toolchains.
-     *
-     * @return The assembled toolchains, never {@code null}.
-     */
-    PersistedToolchains getEffectiveToolchains();
+    private PersistedToolchains effectiveToolchains;
+
+    private List<Problem> problems;
 
     /**
-     * Return a list of problems, if any.
+     * Default constructor
      *
-     * @return a list of problems, never {@code null}.
+     * @param effectiveToolchains the merged toolchains, may not be {@code null}
+     * @param problems the problems while building the effectiveToolchains, if any.
      */
-    List<Problem> getProblems();
+    public DefaultToolchainsBuildingResult( PersistedToolchains effectiveToolchains, List<Problem> problems )
+    {
+        this.effectiveToolchains = effectiveToolchains;
+        this.problems = ( problems != null ) ? problems : new ArrayList<>();
+    }
+
+    @Override
+    public PersistedToolchains getEffectiveToolchains()
+    {
+        return effectiveToolchains;
+    }
+
+    @Override
+    public List<Problem> getProblems()
+    {
+        return problems;
+    }
 
 }

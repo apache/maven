@@ -99,6 +99,7 @@ under the License.
     <module>maven-wrapper</module>
     <module>apache-maven/maven-wrapper.pom</module>
     <module>maven-toolchain-model</module>
+    <module>maven-toolchain-builder</module>
   </modules>
 
   <scm>
