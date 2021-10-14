@@ -39,9 +39,9 @@ public class MultipleArtifactsNotFoundException
 
     /** @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} */
     @Deprecated
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List<Artifact> missingArtifacts,
-                                               List<ArtifactRepository> remoteRepositories )
+    public MultipleArtifactsNotFoundException( final Artifact originatingArtifact,
+                                               final List<Artifact> missingArtifacts,
+                                               final List<ArtifactRepository> remoteRepositories )
     {
         this( originatingArtifact, new ArrayList<>(), missingArtifacts, remoteRepositories );
     }
@@ -54,10 +54,10 @@ public class MultipleArtifactsNotFoundException
      * @param missingArtifacts    artifacts that could not be resolved
      * @param remoteRepositories  remote repositories where the missing artifacts were not found
      */
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List<Artifact> resolvedArtifacts,
-                                               List<Artifact> missingArtifacts,
-                                               List<ArtifactRepository> remoteRepositories )
+    public MultipleArtifactsNotFoundException( final Artifact originatingArtifact,
+                                               final List<Artifact> resolvedArtifacts,
+                                               final List<Artifact> missingArtifacts,
+                                               final List<ArtifactRepository> remoteRepositories )
     {
         super( constructMessage( missingArtifacts ), originatingArtifact, remoteRepositories );
         this.resolvedArtifacts = resolvedArtifacts;
@@ -84,18 +84,18 @@ public class MultipleArtifactsNotFoundException
         return missingArtifacts;
     }
 
-    private static String constructMessage( List<Artifact> artifacts )
+    private static String constructMessage( final List<Artifact> artifacts )
     {
-        StringBuilder buffer = new StringBuilder( 256 );
+        final StringBuilder buffer = new StringBuilder( 256 );
 
         buffer.append( "Missing:" ).append( LS );
         buffer.append( "----------" ).append( LS );
 
         int counter = 0;
 
-        for ( Artifact artifact : artifacts )
+        for ( final Artifact artifact : artifacts )
         {
-            String message = ( ++counter ) + ") " + artifact.getId();
+            final String message = ( ++counter ) + ") " + artifact.getId();
 
             buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(),
                     artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
@@ -104,7 +104,7 @@ public class MultipleArtifactsNotFoundException
 
         buffer.append( "----------" ).append( LS );
 
-        int size = artifacts.size();
+        final int size = artifacts.size();
 
         buffer.append( size ).append( " required artifact" );
 

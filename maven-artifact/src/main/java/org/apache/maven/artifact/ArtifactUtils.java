@@ -35,7 +35,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public final class ArtifactUtils
 {
 
-    public static boolean isSnapshot( String version )
+    public static boolean isSnapshot( final String version )
     {
         if ( version != null )
         {
@@ -52,17 +52,17 @@ public final class ArtifactUtils
         return false;
     }
 
-    public static String toSnapshotVersion( String version )
+    public static String toSnapshotVersion( final String version )
     {
         notBlank( version, "version can neither be null, empty nor blank" );
 
-        int lastHyphen = version.lastIndexOf( '-' );
+        final int lastHyphen = version.lastIndexOf( '-' );
         if ( lastHyphen > 0 )
         {
-            int prevHyphen = version.lastIndexOf( '-', lastHyphen - 1 );
+            final int prevHyphen = version.lastIndexOf( '-', lastHyphen - 1 );
             if ( prevHyphen > 0 )
             {
-                Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
+                final Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
                 if ( m.matches() )
                 {
                     return m.group( 1 ) + "-" + Artifact.SNAPSHOT_VERSION;
@@ -72,12 +72,12 @@ public final class ArtifactUtils
         return version;
     }
 
-    public static String versionlessKey( Artifact artifact )
+    public static String versionlessKey( final Artifact artifact )
     {
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
     }
 
-    public static String versionlessKey( String groupId, String artifactId )
+    public static String versionlessKey( final String groupId, final String artifactId )
     {
         notBlank( groupId, "groupId can neither be null, empty nor blank" );
         notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
@@ -85,12 +85,12 @@ public final class ArtifactUtils
         return groupId + ":" + artifactId;
     }
 
-    public static String key( Artifact artifact )
+    public static String key( final Artifact artifact )
     {
         return key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
     }
 
-    public static String key( String groupId, String artifactId, String version )
+    public static String key( final String groupId, final String artifactId, final String version )
     {
         notBlank( groupId, "groupId can neither be null, empty nor blank" );
         notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
@@ -99,22 +99,22 @@ public final class ArtifactUtils
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    private static void notBlank( String str, String message )
+    private static void notBlank( final String str, final String message )
     {
-        int c = str != null && str.length() > 0 ? str.charAt( 0 ) : 0;
+        final int c = str != null && str.length() > 0 ? str.charAt( 0 ) : 0;
         if ( ( c < '0' || c > '9' ) && ( c < 'a' || c > 'z' ) )
         {
             Validate.notBlank( str, message );
         }
     }
 
-    public static Map<String, Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
+    public static Map<String, Artifact> artifactMapByVersionlessId( final Collection<Artifact> artifacts )
     {
-        Map<String, Artifact> artifactMap = new LinkedHashMap<>();
+        final Map<String, Artifact> artifactMap = new LinkedHashMap<>();
 
         if ( artifacts != null )
         {
-            for ( Artifact artifact : artifacts )
+            for ( final Artifact artifact : artifacts )
             {
                 artifactMap.put( versionlessKey( artifact ), artifact );
             }
@@ -123,12 +123,12 @@ public final class ArtifactUtils
         return artifactMap;
     }
 
-    public static Artifact copyArtifactSafe( Artifact artifact )
+    public static Artifact copyArtifactSafe( final Artifact artifact )
     {
         return ( artifact != null ) ? copyArtifact( artifact ) : null;
     }
 
-    public static Artifact copyArtifact( Artifact artifact )
+    public static Artifact copyArtifact( final Artifact artifact )
     {
         VersionRange range = artifact.getVersionRange();
 
@@ -152,7 +152,7 @@ public final class ArtifactUtils
             range = VersionRange.createFromVersion( artifact.getVersion() );
         }
 
-        DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range,
+        final DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range,
             artifact.getScope(), artifact.getType(), artifact.getClassifier(),
             artifact.getArtifactHandler(), artifact.isOptional() );
         clone.setRelease( artifact.isRelease() );
@@ -174,20 +174,20 @@ public final class ArtifactUtils
     }
 
     /** Returns <code>to</code> collection */
-    public static <T extends Collection<Artifact>> T copyArtifacts( Collection<Artifact> from, T to )
+    public static <T extends Collection<Artifact>> T copyArtifacts( final Collection<Artifact> from, final T to )
     {
-        for ( Artifact artifact : from )
+        for ( final Artifact artifact : from )
         {
             to.add( ArtifactUtils.copyArtifact( artifact ) );
         }
         return to;
     }
 
-    public static <K, T extends Map<K, Artifact>> T copyArtifacts( Map<K, ? extends Artifact> from, T to )
+    public static <K, T extends Map<K, Artifact>> T copyArtifacts( final Map<K, ? extends Artifact> from, final T to )
     {
         if ( from != null )
         {
-            for ( Map.Entry<K, ? extends Artifact> entry : from.entrySet() )
+            for ( final Map.Entry<K, ? extends Artifact> entry : from.entrySet() )
             {
                 to.put( entry.getKey(), ArtifactUtils.copyArtifact( entry.getValue() ) );
             }
@@ -196,7 +196,7 @@ public final class ArtifactUtils
         return to;
     }
 
-    private static <T> List<T> copyList( List<T> original )
+    private static <T> List<T> copyList( final List<T> original )
     {
         List<T> copy = null;
 

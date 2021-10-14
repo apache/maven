@@ -103,7 +103,7 @@ public class ComparableVersion
             this.value = 0;
         }
 
-        IntItem( String str )
+        IntItem( final String str )
         {
             this.value = Integer.parseInt( str );
         }
@@ -121,7 +121,7 @@ public class ComparableVersion
         }
 
         @Override
-        public int compareTo( Item item )
+        public int compareTo( final Item item )
         {
             if ( item == null )
             {
@@ -131,7 +131,7 @@ public class ComparableVersion
             switch ( item.getType() )
             {
                 case INT_ITEM:
-                    int itemValue = ( (IntItem) item ).value;
+                    final int itemValue = ( (IntItem) item ).value;
                     return Integer.compare( value, itemValue );
                 case LONG_ITEM:
                 case BIGINTEGER_ITEM:
@@ -149,7 +149,7 @@ public class ComparableVersion
         }
 
         @Override
-        public boolean equals( Object o )
+        public boolean equals( final Object o )
         {
             if ( this == o )
             {
@@ -160,7 +160,7 @@ public class ComparableVersion
                 return false;
             }
 
-            IntItem intItem = (IntItem) o;
+            final IntItem intItem = (IntItem) o;
 
             return value == intItem.value;
 
@@ -187,7 +187,7 @@ public class ComparableVersion
     {
         private final long value;
 
-        LongItem( String str )
+        LongItem( final String str )
         {
             this.value = Long.parseLong( str );
         }
@@ -205,7 +205,7 @@ public class ComparableVersion
         }
 
         @Override
-        public int compareTo( Item item )
+        public int compareTo( final Item item )
         {
             if ( item == null )
             {
@@ -217,7 +217,7 @@ public class ComparableVersion
                 case INT_ITEM:
                     return 1;
                 case LONG_ITEM:
-                    long itemValue = ( (LongItem) item ).value;
+                    final long itemValue = ( (LongItem) item ).value;
                     return Long.compare( value, itemValue );
                 case BIGINTEGER_ITEM:
                     return -1;
@@ -234,7 +234,7 @@ public class ComparableVersion
         }
 
         @Override
-        public boolean equals( Object o )
+        public boolean equals( final Object o )
         {
             if ( this == o )
             {
@@ -245,7 +245,7 @@ public class ComparableVersion
                 return false;
             }
 
-            LongItem longItem = (LongItem) o;
+            final LongItem longItem = (LongItem) o;
 
             return value == longItem.value;
 
@@ -272,7 +272,7 @@ public class ComparableVersion
     {
         private final BigInteger value;
 
-        BigIntegerItem( String str )
+        BigIntegerItem( final String str )
         {
             this.value = new BigInteger( str );
         }
@@ -290,7 +290,7 @@ public class ComparableVersion
         }
 
         @Override
-        public int compareTo( Item item )
+        public int compareTo( final Item item )
         {
             if ( item == null )
             {
@@ -318,7 +318,7 @@ public class ComparableVersion
         }
 
         @Override
-        public boolean equals( Object o )
+        public boolean equals( final Object o )
         {
             if ( this == o )
             {
@@ -329,7 +329,7 @@ public class ComparableVersion
                 return false;
             }
 
-            BigIntegerItem that = (BigIntegerItem) o;
+            final BigIntegerItem that = (BigIntegerItem) o;
 
             return value.equals( that.value );
 
@@ -373,7 +373,7 @@ public class ComparableVersion
 
         private final String value;
 
-        StringItem( String value, boolean followedByDigit )
+        StringItem( String value, final boolean followedByDigit )
         {
             if ( followedByDigit && value.length() == 1 )
             {
@@ -420,15 +420,15 @@ public class ComparableVersion
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
          */
-        public static String comparableQualifier( String qualifier )
+        public static String comparableQualifier( final String qualifier )
         {
-            int i = QUALIFIERS.indexOf( qualifier );
+            final int i = QUALIFIERS.indexOf( qualifier );
 
             return i == -1 ? ( QUALIFIERS.size() + "-" + qualifier ) : String.valueOf( i );
         }
 
         @Override
-        public int compareTo( Item item )
+        public int compareTo( final Item item )
         {
             if ( item == null )
             {
@@ -454,7 +454,7 @@ public class ComparableVersion
         }
 
         @Override
-        public boolean equals( Object o )
+        public boolean equals( final Object o )
         {
             if ( this == o )
             {
@@ -465,7 +465,7 @@ public class ComparableVersion
                 return false;
             }
 
-            StringItem that = (StringItem) o;
+            final StringItem that = (StringItem) o;
 
             return value.equals( that.value );
 
@@ -507,7 +507,7 @@ public class ComparableVersion
         {
             for ( int i = size() - 1; i >= 0; i-- )
             {
-                Item lastItem = get( i );
+                final Item lastItem = get( i );
 
                 if ( lastItem.isNull() )
                 {
@@ -522,7 +522,7 @@ public class ComparableVersion
         }
 
         @Override
-        public int compareTo( Item item )
+        public int compareTo( final Item item )
         {
             if ( item == null )
             {
@@ -531,9 +531,9 @@ public class ComparableVersion
                     return 0; // 1-0 = 1- (normalize) = 1
                 }
                 // Compare the entire list of items with null - not just the first one, MNG-6964
-                for ( Item i : this )
+                for ( final Item i : this )
                 {
-                    int result = i.compareTo( null );
+                    final int result = i.compareTo( null );
                     if ( result != 0 )
                     {
                         return result;
@@ -552,16 +552,16 @@ public class ComparableVersion
                     return 1; // 1-1 > 1-sp
 
                 case LIST_ITEM:
-                    Iterator<Item> left = iterator();
-                    Iterator<Item> right = ( (ListItem) item ).iterator();
+                    final Iterator<Item> left = iterator();
+                    final Iterator<Item> right = ( (ListItem) item ).iterator();
 
                     while ( left.hasNext() || right.hasNext() )
                     {
-                        Item l = left.hasNext() ? left.next() : null;
-                        Item r = right.hasNext() ? right.next() : null;
+                        final Item l = left.hasNext() ? left.next() : null;
+                        final Item r = right.hasNext() ? right.next() : null;
 
                         // if this is shorter, then invert the compare and mul with -1
-                        int result = l == null ? ( r == null ? 0 : -1 * r.compareTo( l ) ) : l.compareTo( r );
+                        final int result = l == null ? ( r == null ? 0 : -1 * r.compareTo( l ) ) : l.compareTo( r );
 
                         if ( result != 0 )
                         {
@@ -579,8 +579,8 @@ public class ComparableVersion
         @Override
         public String toString()
         {
-            StringBuilder buffer = new StringBuilder();
-            for ( Item item : this )
+            final StringBuilder buffer = new StringBuilder();
+            for ( final Item item : this )
             {
                 if ( buffer.length() > 0 )
                 {
@@ -596,9 +596,9 @@ public class ComparableVersion
          */
         private String toListString()
         {
-            StringBuilder buffer = new StringBuilder();
+            final StringBuilder buffer = new StringBuilder();
             buffer.append( "[" );
-            for ( Item item : this )
+            for ( final Item item : this )
             {
                 if ( buffer.length() > 1 )
                 {
@@ -618,7 +618,7 @@ public class ComparableVersion
         }
     }
 
-    public ComparableVersion( String version )
+    public ComparableVersion( final String version )
     {
         parseVersion( version );
     }
@@ -634,7 +634,7 @@ public class ComparableVersion
 
         ListItem list = items;
 
-        Deque<Item> stack = new ArrayDeque<>();
+        final Deque<Item> stack = new ArrayDeque<>();
         stack.push( list );
 
         boolean isDigit = false;
@@ -643,7 +643,7 @@ public class ComparableVersion
 
         for ( int i = 0; i < version.length(); i++ )
         {
-            char c = version.charAt( i );
+            final char c = version.charAt( i );
 
             if ( c == '.' )
             {
@@ -712,7 +712,7 @@ public class ComparableVersion
         }
     }
 
-    private static Item parseItem( boolean isDigit, String buf )
+    private static Item parseItem( final boolean isDigit, String buf )
     {
         if ( isDigit )
         {
@@ -732,7 +732,7 @@ public class ComparableVersion
         return new StringItem( buf, false );
     }
 
-    private static String stripLeadingZeroes( String buf )
+    private static String stripLeadingZeroes( final String buf )
     {
         if ( buf == null || buf.isEmpty() )
         {
@@ -740,7 +740,7 @@ public class ComparableVersion
         }
         for ( int i = 0; i < buf.length(); ++i )
         {
-            char c = buf.charAt( i );
+            final char c = buf.charAt( i );
             if ( c != '0' )
             {
                 return buf.substring( i );
@@ -750,7 +750,7 @@ public class ComparableVersion
     }
 
     @Override
-    public int compareTo( ComparableVersion o )
+    public int compareTo( final ComparableVersion o )
     {
         return items.compareTo( o.items );
     }
@@ -771,7 +771,7 @@ public class ComparableVersion
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals( final Object o )
     {
         return ( o instanceof ComparableVersion ) && items.equals( ( (ComparableVersion) o ).items );
     }
@@ -800,7 +800,7 @@ public class ComparableVersion
      * two adjacent will be compared
      */
     // CHECKSTYLE_ON: LineLength
-    public static void main( String... args )
+    public static void main( final String... args )
     {
         System.out.println( "Display parameters as parsed by Maven (in canonical form and as a list of tokens) and"
                                 + " comparison result:" );
@@ -811,13 +811,13 @@ public class ComparableVersion
 
         ComparableVersion prev = null;
         int i = 1;
-        for ( String version : args )
+        for ( final String version : args )
         {
-            ComparableVersion c = new ComparableVersion( version );
+            final ComparableVersion c = new ComparableVersion( version );
 
             if ( prev != null )
             {
-                int compare = prev.compareTo( c );
+                final int compare = prev.compareTo( c );
                 System.out.println( "   " + prev.toString() + ' '
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }

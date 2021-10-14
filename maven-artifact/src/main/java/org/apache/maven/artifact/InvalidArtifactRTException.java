@@ -33,11 +33,11 @@ public class InvalidArtifactRTException
     private final String type;
     private final String baseMessage;
 
-    public InvalidArtifactRTException( String groupId,
-                                       String artifactId,
-                                       String version,
-                                       String type,
-                                       String message )
+    public InvalidArtifactRTException( final String groupId,
+                                       final String artifactId,
+                                       final String version,
+                                       final String type,
+                                       final String message )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -46,12 +46,12 @@ public class InvalidArtifactRTException
         this.baseMessage = message;
     }
 
-    public InvalidArtifactRTException( String groupId,
-                                       String artifactId,
-                                       String version,
-                                       String type,
-                                       String message,
-                                       Throwable cause )
+    public InvalidArtifactRTException( final String groupId,
+                                       final String artifactId,
+                                       final String version,
+                                       final String type,
+                                       final String message,
+                                       final Throwable cause )
     {
         super( cause );
 

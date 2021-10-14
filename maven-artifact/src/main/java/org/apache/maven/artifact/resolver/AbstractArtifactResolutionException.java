@@ -55,28 +55,28 @@ public class AbstractArtifactResolutionException
     static final String LS = System.lineSeparator();
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected AbstractArtifactResolutionException( String message,
-                                                   String groupId,
-                                                   String artifactId,
-                                                   String version,
-                                                   String type,
-                                                   String classifier,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   List<String> path )
+    protected AbstractArtifactResolutionException( final String message,
+                                                   final String groupId,
+                                                   final String artifactId,
+                                                   final String version,
+                                                   final String type,
+                                                   final String classifier,
+                                                   final List<ArtifactRepository> remoteRepositories,
+                                                   final List<String> path )
     {
         this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected AbstractArtifactResolutionException( String message,
-                                                   String groupId,
-                                                   String artifactId,
-                                                   String version,
-                                                   String type,
-                                                   String classifier,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   List<String> path,
-                                                   Throwable t )
+    protected AbstractArtifactResolutionException( final String message,
+                                                   final String groupId,
+                                                   final String artifactId,
+                                                   final String version,
+                                                   final String type,
+                                                   final String classifier,
+                                                   final List<ArtifactRepository> remoteRepositories,
+                                                   final List<String> path,
+                                                   final Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
 
@@ -90,23 +90,23 @@ public class AbstractArtifactResolutionException
         this.path = constructArtifactPath( path, "" );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact )
+    protected AbstractArtifactResolutionException( final String message,
+                                                   final Artifact artifact )
     {
         this( message, artifact, null );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact,
-                                                   List<ArtifactRepository> remoteRepositories )
+    protected AbstractArtifactResolutionException( final String message,
+                                                   final Artifact artifact,
+                                                   final List<ArtifactRepository> remoteRepositories )
     {
         this( message, artifact, remoteRepositories, null );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   Throwable t )
+    protected AbstractArtifactResolutionException( final String message,
+                                                   final Artifact artifact,
+                                                   final List<ArtifactRepository> remoteRepositories,
+                                                   final Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
             artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail(), t );
@@ -160,10 +160,10 @@ public class AbstractArtifactResolutionException
         return originalMessage;
     }
 
-    protected static String constructArtifactPath( List<String> path,
-                                                   String indentation )
+    protected static String constructArtifactPath( final List<String> path,
+                                                   final String indentation )
     {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         if ( path != null )
         {
@@ -172,7 +172,7 @@ public class AbstractArtifactResolutionException
             sb.append( "Path to dependency: " );
             sb.append( LS );
             int num = 1;
-            for ( Iterator<String> i = path.iterator(); i.hasNext(); num++ )
+            for ( final Iterator<String> i = path.iterator(); i.hasNext(); num++ )
             {
                 sb.append( indentation );
                 sb.append( '\t' );
@@ -186,15 +186,15 @@ public class AbstractArtifactResolutionException
         return sb.toString();
     }
 
-    private static String constructMessageBase( String message,
-                                                String groupId,
-                                                String artifactId,
-                                                String version,
-                                                String type,
-                                                List<ArtifactRepository> remoteRepositories,
-                                                List<String> path )
+    private static String constructMessageBase( final String message,
+                                                final String groupId,
+                                                final String artifactId,
+                                                final String version,
+                                                final String type,
+                                                final List<ArtifactRepository> remoteRepositories,
+                                                final List<String> path )
     {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append( message );
 
@@ -215,21 +215,21 @@ public class AbstractArtifactResolutionException
                     sb.append( "(none)" );
                 }
 
-                for ( Iterator<ArtifactRepository> i = remoteRepositories.iterator(); i.hasNext(); )
+                for ( final Iterator<ArtifactRepository> i = remoteRepositories.iterator(); i.hasNext(); )
                 {
-                    ArtifactRepository remoteRepository = i.next();
+                    final ArtifactRepository remoteRepository = i.next();
 
                     sb.append( remoteRepository.getId() );
                     sb.append( " (" );
                     sb.append( remoteRepository.getUrl() );
 
-                    ArtifactRepositoryPolicy releases = remoteRepository.getReleases();
+                    final ArtifactRepositoryPolicy releases = remoteRepository.getReleases();
                     if ( releases != null )
                     {
                         sb.append( ", releases=" ).append( releases.isEnabled() );
                     }
 
-                    ArtifactRepositoryPolicy snapshots = remoteRepository.getSnapshots();
+                    final ArtifactRepositoryPolicy snapshots = remoteRepository.getSnapshots();
                     if ( snapshots != null )
                     {
                         sb.append( ", snapshots=" ).append( snapshots.isEnabled() );
@@ -251,17 +251,17 @@ public class AbstractArtifactResolutionException
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected static String constructMissingArtifactMessage( String message,
-                                                             String indentation,
-                                                             String groupId,
-                                                             String artifactId,
-                                                             String version,
-                                                             String type,
-                                                             String classifier,
-                                                             String downloadUrl,
-                                                             List<String> path )
+    protected static String constructMissingArtifactMessage( final String message,
+                                                             final String indentation,
+                                                             final String groupId,
+                                                             final String artifactId,
+                                                             final String version,
+                                                             final String type,
+                                                             final String classifier,
+                                                             final String downloadUrl,
+                                                             final List<String> path )
     {
-        StringBuilder sb = new StringBuilder( message );
+        final StringBuilder sb = new StringBuilder( message );
 
         if ( !"pom".equals( type ) )
         {

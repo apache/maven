@@ -43,7 +43,7 @@ public class DefaultArtifactVersion
 
     private ComparableVersion comparable;
 
-    public DefaultArtifactVersion( String version )
+    public DefaultArtifactVersion( final String version )
     {
         parseVersion( version );
     }
@@ -55,7 +55,7 @@ public class DefaultArtifactVersion
     }
 
     @Override
-    public boolean equals( Object other )
+    public boolean equals( final Object other )
     {
         if ( this == other )
         {
@@ -70,7 +70,7 @@ public class DefaultArtifactVersion
         return compareTo( (ArtifactVersion) other ) == 0;
     }
 
-    public int compareTo( ArtifactVersion otherVersion )
+    public int compareTo( final ArtifactVersion otherVersion )
     {
         if ( otherVersion instanceof DefaultArtifactVersion )
         {
@@ -107,13 +107,13 @@ public class DefaultArtifactVersion
         return qualifier;
     }
 
-    public final void parseVersion( String version )
+    public final void parseVersion( final String version )
     {
         comparable = new ComparableVersion( version );
 
-        int index = version.indexOf( '-' );
+        final int index = version.indexOf( '-' );
 
-        String part1;
+        final String part1;
         String part2 = null;
 
         if ( index < 0 )
@@ -156,7 +156,7 @@ public class DefaultArtifactVersion
         {
             boolean fallback = false;
 
-            StringTokenizer tok = new StringTokenizer( part1, "." );
+            final StringTokenizer tok = new StringTokenizer( part1, "." );
             if ( tok.hasMoreTokens() )
             {
                 majorVersion = getNextIntegerToken( tok );
@@ -209,9 +209,9 @@ public class DefaultArtifactVersion
         }
     }
 
-    private static Integer getNextIntegerToken( StringTokenizer tok )
+    private static Integer getNextIntegerToken( final StringTokenizer tok )
     {
-        String s = tok.nextToken();
+        final String s = tok.nextToken();
         if ( ( s.length() > 1 ) && s.startsWith( "0" ) )
         {
             return null;
@@ -219,7 +219,7 @@ public class DefaultArtifactVersion
         return tryParseInt( s );
     }
 
-    private static Integer tryParseInt( String s )
+    private static Integer tryParseInt( final String s )
     {
         // for performance, check digits instead of relying later on catching NumberFormatException
         if ( !isDigits( s ) )
@@ -229,14 +229,14 @@ public class DefaultArtifactVersion
 
         try
         {
-            long longValue = Long.parseLong( s );
+            final long longValue = Long.parseLong( s );
             if ( longValue > Integer.MAX_VALUE )
             {
                 return null;
             }
             return (int) longValue;
         }
-        catch ( NumberFormatException e )
+        catch ( final NumberFormatException e )
         {
             // should never happen since checked isDigits(s) before
             return null;

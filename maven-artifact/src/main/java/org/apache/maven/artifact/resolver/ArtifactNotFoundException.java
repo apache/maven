@@ -33,20 +33,20 @@ public class ArtifactNotFoundException
 {
     private String downloadUrl;
 
-    protected ArtifactNotFoundException( String message, Artifact artifact,
-                                         List<ArtifactRepository> remoteRepositories )
+    protected ArtifactNotFoundException( final String message, final Artifact artifact,
+                                         final List<ArtifactRepository> remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactNotFoundException( String message, Artifact artifact )
+    public ArtifactNotFoundException( final String message, final Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
               artifact.getClassifier(), null, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
-    protected ArtifactNotFoundException( String message, Artifact artifact,
-                                         List<ArtifactRepository> remoteRepositories, Throwable cause )
+    protected ArtifactNotFoundException( final String message, final Artifact artifact,
+                                         final List<ArtifactRepository> remoteRepositories, final Throwable cause )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
               artifact.getClassifier(), remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(),
@@ -54,9 +54,10 @@ public class ArtifactNotFoundException
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                      String classifier, List<ArtifactRepository> remoteRepositories,
-                                      String downloadUrl, List<String> path, Throwable cause )
+    public ArtifactNotFoundException( final String message, final String groupId, final String artifactId,
+                                      final String version, final String type,
+                                      final String classifier, final List<ArtifactRepository> remoteRepositories,
+                                      final String downloadUrl, final List<String> path, final Throwable cause )
     {
         super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,
                                                 downloadUrl, path ), groupId, artifactId, version, type, classifier,
@@ -66,9 +67,10 @@ public class ArtifactNotFoundException
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                       String classifier, List<ArtifactRepository> remoteRepositories,
-                                       String downloadUrl, List<String> path )
+    private ArtifactNotFoundException( final String message, final String groupId, final String artifactId,
+                                       final String version, final String type,
+                                       final String classifier, final List<ArtifactRepository> remoteRepositories,
+                                       final String downloadUrl, final List<String> path )
     {
         super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,
                                                 downloadUrl, path ), groupId, artifactId, version, type, classifier,

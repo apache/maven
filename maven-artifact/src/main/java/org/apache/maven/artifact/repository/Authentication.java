@@ -29,7 +29,7 @@ public class Authentication
 
     private String passphrase;
 
-    public Authentication( String userName, String password )
+    public Authentication( final String userName, final String password )
     {
         this.username = userName;
         this.password = password;
@@ -60,7 +60,7 @@ public class Authentication
      *
      * @param password password of the user
      */
-    public void setPassword( String password )
+    public void setPassword( final String password )
     {
         this.password = password;
     }

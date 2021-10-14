@@ -85,7 +85,7 @@ public class Proxy
      *
      * @param host proxy server host name
      */
-    public void setHost( String host )
+    public void setHost( final String host )
     {
         this.host = host;
     }
@@ -105,7 +105,7 @@ public class Proxy
      *
      * @param password password to use to login to a proxy server
      */
-    public void setPassword( String password )
+    public void setPassword( final String password )
     {
         this.password = password;
     }
@@ -125,7 +125,7 @@ public class Proxy
      *
      * @param port proxy server port
      */
-    public void setPort( int port )
+    public void setPort( final int port )
     {
         this.port = port;
     }
@@ -145,7 +145,7 @@ public class Proxy
      *
      * @param userName username for the proxy server
      */
-    public void setUserName( String userName )
+    public void setUserName( final String userName )
     {
         this.userName = userName;
     }
@@ -163,7 +163,7 @@ public class Proxy
     /**
      * @param protocol the protocol of the proxy server like <i>SOCKSv4</i>
      */
-    public void setProtocol( String protocol )
+    public void setProtocol( final String protocol )
     {
         this.protocol = protocol;
     }
@@ -173,7 +173,7 @@ public class Proxy
         return nonProxyHosts;
     }
 
-    public void setNonProxyHosts( String nonProxyHosts )
+    public void setNonProxyHosts( final String nonProxyHosts )
     {
         this.nonProxyHosts = nonProxyHosts;
     }
@@ -183,12 +183,12 @@ public class Proxy
         return ntlmHost;
     }
 
-    public void setNtlmHost( String ntlmHost )
+    public void setNtlmHost( final String ntlmHost )
     {
         this.ntlmHost = ntlmHost;
     }
 
-    public void setNtlmDomain( String ntlmDomain )
+    public void setNtlmDomain( final String ntlmDomain )
     {
         this.ntlmDomain = ntlmDomain;
     }

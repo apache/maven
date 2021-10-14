@@ -80,22 +80,25 @@ public class DefaultArtifact
 
     private boolean optional;
 
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                            String classifier, ArtifactHandler artifactHandler )
+    public DefaultArtifact( final String groupId, final String artifactId, final String version, final String scope,
+                            final String type,
+                            final String classifier, final ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, VersionRange.createFromVersion( version ), scope, type, classifier, artifactHandler,
               false );
     }
 
-    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
-                            String classifier, ArtifactHandler artifactHandler )
+    public DefaultArtifact( final String groupId, final String artifactId, final VersionRange versionRange,
+                            final String scope, final String type,
+                            final String classifier, final ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
-                            String classifier, ArtifactHandler artifactHandler, boolean optional )
+    public DefaultArtifact( final String groupId, final String artifactId, final VersionRange versionRange,
+                            final String scope, final String type,
+                            String classifier, final ArtifactHandler artifactHandler, final boolean optional )
     {
         this.groupId = groupId;
 
@@ -150,7 +153,7 @@ public class DefaultArtifact
         }
     }
 
-    private boolean empty( String value )
+    private boolean empty( final String value )
     {
         return ( value == null ) || ( value.trim().length() < 1 );
     }
@@ -185,7 +188,7 @@ public class DefaultArtifact
         return version;
     }
 
-    public void setVersion( String version )
+    public void setVersion( final String version )
     {
         this.version = version;
         setBaseVersionInternal( version );
@@ -197,7 +200,7 @@ public class DefaultArtifact
         return type;
     }
 
-    public void setFile( File file )
+    public void setFile( final File file )
     {
         this.file = file;
     }
@@ -212,7 +215,7 @@ public class DefaultArtifact
         return repository;
     }
 
-    public void setRepository( ArtifactRepository repository )
+    public void setRepository( final ArtifactRepository repository )
     {
         this.repository = repository;
     }
@@ -228,14 +231,14 @@ public class DefaultArtifact
 
     public String getDependencyConflictId()
     {
-        StringBuilder sb = new StringBuilder( 128 );
+        final StringBuilder sb = new StringBuilder( 128 );
         sb.append( getGroupId() );
         sb.append( ':' );
         appendArtifactTypeClassifierString( sb );
         return sb.toString();
     }
 
-    private void appendArtifactTypeClassifierString( StringBuilder sb )
+    private void appendArtifactTypeClassifierString( final StringBuilder sb )
     {
         sb.append( getArtifactId() );
         sb.append( ':' );
@@ -247,14 +250,14 @@ public class DefaultArtifact
         }
     }
 
-    public void addMetadata( ArtifactMetadata metadata )
+    public void addMetadata( final ArtifactMetadata metadata )
     {
         if ( metadataMap == null )
         {
             metadataMap = new HashMap<>();
         }
 
-        ArtifactMetadata m = metadataMap.get( metadata.getKey() );
+        final ArtifactMetadata m = metadataMap.get( metadata.getKey() );
         if ( m != null )
         {
             m.merge( metadata );
@@ -281,7 +284,7 @@ public class DefaultArtifact
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         if ( getGroupId() != null )
         {
             sb.append( getGroupId() );
@@ -319,7 +322,7 @@ public class DefaultArtifact
         return result;
     }
 
-    public boolean equals( Object o )
+    public boolean equals( final Object o )
     {
         if ( o == this )
         {
@@ -331,7 +334,7 @@ public class DefaultArtifact
             return false;
         }
 
-        Artifact a = (Artifact) o;
+        final Artifact a = (Artifact) o;
 
         if ( !a.getGroupId().equals( groupId ) )
         {
@@ -377,17 +380,17 @@ public class DefaultArtifact
         return baseVersion;
     }
 
-    public void setBaseVersion( String baseVersion )
+    public void setBaseVersion( final String baseVersion )
     {
         setBaseVersionInternal( baseVersion );
     }
 
-    protected void setBaseVersionInternal( String baseVersion )
+    protected void setBaseVersionInternal( final String baseVersion )
     {
         this.baseVersion = ArtifactUtils.toSnapshotVersion( baseVersion );
     }
 
-    public int compareTo( Artifact a )
+    public int compareTo( final Artifact a )
     {
         int result = groupId.compareTo( a.getGroupId() );
         if ( result == 0 )
@@ -428,7 +431,7 @@ public class DefaultArtifact
         return result;
     }
 
-    public void updateVersion( String version, ArtifactRepository localRepository )
+    public void updateVersion( final String version, final ArtifactRepository localRepository )
     {
         setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
@@ -439,7 +442,7 @@ public class DefaultArtifact
         return downloadUrl;
     }
 
-    public void setDownloadUrl( String downloadUrl )
+    public void setDownloadUrl( final String downloadUrl )
     {
         this.downloadUrl = downloadUrl;
     }
@@ -449,7 +452,7 @@ public class DefaultArtifact
         return dependencyFilter;
     }
 
-    public void setDependencyFilter( ArtifactFilter artifactFilter )
+    public void setDependencyFilter( final ArtifactFilter artifactFilter )
     {
         dependencyFilter = artifactFilter;
     }
@@ -464,12 +467,12 @@ public class DefaultArtifact
         return dependencyTrail;
     }
 
-    public void setDependencyTrail( List<String> dependencyTrail )
+    public void setDependencyTrail( final List<String> dependencyTrail )
     {
         this.dependencyTrail = dependencyTrail;
     }
 
-    public void setScope( String scope )
+    public void setScope( final String scope )
     {
         this.scope = scope;
     }
@@ -479,7 +482,7 @@ public class DefaultArtifact
         return versionRange;
     }
 
-    public void setVersionRange( VersionRange versionRange )
+    public void setVersionRange( final VersionRange versionRange )
     {
         this.versionRange = versionRange;
         selectVersionFromNewRangeIfAvailable();
@@ -498,18 +501,18 @@ public class DefaultArtifact
         }
     }
 
-    public void selectVersion( String version )
+    public void selectVersion( final String version )
     {
         this.version = version;
         setBaseVersionInternal( version );
     }
 
-    public void setGroupId( String groupId )
+    public void setGroupId( final String groupId )
     {
         this.groupId = groupId;
     }
 
-    public void setArtifactId( String artifactId )
+    public void setArtifactId( final String artifactId )
     {
         this.artifactId = artifactId;
     }
@@ -520,7 +523,7 @@ public class DefaultArtifact
             && ( getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION ) );
     }
 
-    public void setResolved( boolean resolved )
+    public void setResolved( final boolean resolved )
     {
         this.resolved = resolved;
     }
@@ -530,18 +533,18 @@ public class DefaultArtifact
         return resolved;
     }
 
-    public void setResolvedVersion( String version )
+    public void setResolvedVersion( final String version )
     {
         this.version = version;
         // retain baseVersion
     }
 
-    public void setArtifactHandler( ArtifactHandler artifactHandler )
+    public void setArtifactHandler( final ArtifactHandler artifactHandler )
     {
         this.artifactHandler = artifactHandler;
     }
 
-    public void setRelease( boolean release )
+    public void setRelease( final boolean release )
     {
         this.release = release;
     }
@@ -556,7 +559,7 @@ public class DefaultArtifact
         return availableVersions;
     }
 
-    public void setAvailableVersions( List<ArtifactVersion> availableVersions )
+    public void setAvailableVersions( final List<ArtifactVersion> availableVersions )
     {
         this.availableVersions = availableVersions;
     }
@@ -578,7 +581,7 @@ public class DefaultArtifact
         return versionRange.isSelectedVersionKnown( this );
     }
 
-    public void setOptional( boolean optional )
+    public void setOptional( final boolean optional )
     {
         this.optional = optional;
     }

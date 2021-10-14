@@ -31,8 +31,8 @@ public class CyclicDependencyException
 {
     private Artifact artifact;
 
-    public CyclicDependencyException( String message,
-                                      Artifact artifact )
+    public CyclicDependencyException( final String message,
+                                      final Artifact artifact )
     {
         super( message, artifact );
         this.artifact = artifact;

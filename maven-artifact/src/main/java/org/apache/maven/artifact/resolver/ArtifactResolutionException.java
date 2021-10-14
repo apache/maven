@@ -31,36 +31,40 @@ public class ArtifactResolutionException
     extends AbstractArtifactResolutionException
 {
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        String classifier, List<ArtifactRepository> remoteRepositories,
-                                        List<String> path, Throwable t )
+    public ArtifactResolutionException( final String message, final String groupId, final String artifactId,
+                                        final String version, final String type,
+                                        final String classifier, final List<ArtifactRepository> remoteRepositories,
+                                        final List<String> path, final Throwable t )
     {
         super( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, t );
     }
 
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        String classifier, Throwable t )
+    public ArtifactResolutionException( final String message, final String groupId, final String artifactId,
+                                        final String version, final String type,
+                                        final String classifier, final Throwable t )
     {
         super( message, groupId, artifactId, version, type, classifier, null, null, t );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact )
+    public ArtifactResolutionException( final String message, final Artifact artifact )
     {
         super( message, artifact );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories )
+    public ArtifactResolutionException( final String message, final Artifact artifact,
+                                        final List<ArtifactRepository> remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, Throwable cause )
+    public ArtifactResolutionException( final String message, final Artifact artifact, final Throwable cause )
     {
         super( message, artifact, null, cause );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                        Throwable cause )
+    public ArtifactResolutionException( final String message, final Artifact artifact,
+                                        final List<ArtifactRepository> remoteRepositories,
+                                        final Throwable cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }

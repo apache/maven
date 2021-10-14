@@ -56,12 +56,12 @@ public class ArtifactRepositoryPolicy
         this( true, null, null );
     }
 
-    public ArtifactRepositoryPolicy( ArtifactRepositoryPolicy policy )
+    public ArtifactRepositoryPolicy( final ArtifactRepositoryPolicy policy )
     {
         this( policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy() );
     }
 
-    public ArtifactRepositoryPolicy( boolean enabled, String updatePolicy, String checksumPolicy )
+    public ArtifactRepositoryPolicy( final boolean enabled, String updatePolicy, String checksumPolicy )
     {
         this.enabled = enabled;
 
@@ -78,12 +78,12 @@ public class ArtifactRepositoryPolicy
         this.checksumPolicy = checksumPolicy;
     }
 
-    public void setEnabled( boolean enabled )
+    public void setEnabled( final boolean enabled )
     {
         this.enabled = enabled;
     }
 
-    public void setUpdatePolicy( String updatePolicy )
+    public void setUpdatePolicy( final String updatePolicy )
     {
         if ( updatePolicy != null )
         {
@@ -91,7 +91,7 @@ public class ArtifactRepositoryPolicy
         }
     }
 
-    public void setChecksumPolicy( String checksumPolicy )
+    public void setChecksumPolicy( final String checksumPolicy )
     {
         if ( checksumPolicy != null )
         {
@@ -114,7 +114,7 @@ public class ArtifactRepositoryPolicy
         return checksumPolicy;
     }
 
-    public boolean checkOutOfDate( Date lastModified )
+    public boolean checkOutOfDate( final Date lastModified )
     {
         boolean checkForUpdates = false;
 
@@ -125,7 +125,7 @@ public class ArtifactRepositoryPolicy
         else if ( UPDATE_POLICY_DAILY.equals( updatePolicy ) )
         {
             // Get local midnight boundary
-            Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
 
             cal.set( Calendar.HOUR_OF_DAY, 0 );
             cal.set( Calendar.MINUTE, 0 );
@@ -139,9 +139,9 @@ public class ArtifactRepositoryPolicy
         }
         else if ( updatePolicy.startsWith( UPDATE_POLICY_INTERVAL ) )
         {
-            String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
-            int minutes = Integer.parseInt( s );
-            Calendar cal = Calendar.getInstance();
+            final String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
+            final int minutes = Integer.parseInt( s );
+            final Calendar cal = Calendar.getInstance();
             cal.add( Calendar.MINUTE, -minutes );
             if ( cal.getTime().after( lastModified ) )
             {
@@ -155,7 +155,7 @@ public class ArtifactRepositoryPolicy
     @Override
     public String toString()
     {
-        StringBuilder buffer = new StringBuilder( 64 );
+        final StringBuilder buffer = new StringBuilder( 64 );
         buffer.append( "{enabled=" );
         buffer.append( enabled );
         buffer.append( ", checksums=" );
@@ -166,7 +166,7 @@ public class ArtifactRepositoryPolicy
         return buffer.toString();
     }
 
-    public void merge( ArtifactRepositoryPolicy policy )
+    public void merge( final ArtifactRepositoryPolicy policy )
     {
         if ( policy != null && policy.isEnabled() )
         {
@@ -184,7 +184,7 @@ public class ArtifactRepositoryPolicy
         }
     }
 
-    private int ordinalOfCksumPolicy( String policy )
+    private int ordinalOfCksumPolicy( final String policy )
     {
         if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( policy ) )
         {
@@ -201,7 +201,7 @@ public class ArtifactRepositoryPolicy
     }
 
     @SuppressWarnings( "checkstyle:magicnumber" )
-    private int ordinalOfUpdatePolicy( String policy )
+    private int ordinalOfUpdatePolicy( final String policy )
     {
         if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( policy ) )
         {
@@ -213,7 +213,7 @@ public class ArtifactRepositoryPolicy
         }
         else if ( policy != null && policy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
         {
-            String s = policy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
+            final String s = policy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
             return Integer.parseInt( s );
         }
         else

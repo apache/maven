@@ -36,8 +36,9 @@ public class Restriction
 
     public static final Restriction EVERYTHING = new Restriction( null, false, null, false );
 
-    public Restriction( ArtifactVersion lowerBound, boolean lowerBoundInclusive, ArtifactVersion upperBound,
-                        boolean upperBoundInclusive )
+    public Restriction( final ArtifactVersion lowerBound, final boolean lowerBoundInclusive,
+                        final ArtifactVersion upperBound,
+                        final boolean upperBoundInclusive )
     {
         this.lowerBound = lowerBound;
         this.lowerBoundInclusive = lowerBoundInclusive;
@@ -65,11 +66,11 @@ public class Restriction
         return upperBoundInclusive;
     }
 
-    public boolean containsVersion( ArtifactVersion version )
+    public boolean containsVersion( final ArtifactVersion version )
     {
         if ( lowerBound != null )
         {
-            int comparison = lowerBound.compareTo( version );
+            final int comparison = lowerBound.compareTo( version );
 
             if ( ( comparison == 0 ) && !lowerBoundInclusive )
             {
@@ -82,7 +83,7 @@ public class Restriction
         }
         if ( upperBound != null )
         {
-            int comparison = upperBound.compareTo( version );
+            final int comparison = upperBound.compareTo( version );
 
             if ( ( comparison == 0 ) && !upperBoundInclusive )
             {
@@ -125,7 +126,7 @@ public class Restriction
     }
 
     @Override
-    public boolean equals( Object other )
+    public boolean equals( final Object other )
     {
         if ( this == other )
         {
@@ -137,7 +138,7 @@ public class Restriction
             return false;
         }
 
-        Restriction restriction = (Restriction) other;
+        final Restriction restriction = (Restriction) other;
         if ( lowerBound != null )
         {
             if ( !lowerBound.equals( restriction.lowerBound ) )
@@ -173,7 +174,7 @@ public class Restriction
 
     public String toString()
     {
-        StringBuilder buf = new StringBuilder();
+        final StringBuilder buf = new StringBuilder();
 
         buf.append( isLowerBoundInclusive() ? '[' : '(' );
         if ( getLowerBound() != null )

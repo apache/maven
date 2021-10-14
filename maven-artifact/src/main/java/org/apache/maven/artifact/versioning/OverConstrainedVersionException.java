@@ -33,15 +33,15 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 public class OverConstrainedVersionException
     extends ArtifactResolutionException
 {
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact )
+    public OverConstrainedVersionException( final String msg,
+                                            final Artifact artifact )
     {
         super( msg, artifact );
     }
 
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact,
-                                            List<ArtifactRepository> remoteRepositories )
+    public OverConstrainedVersionException( final String msg,
+                                            final Artifact artifact,
+                                            final List<ArtifactRepository> remoteRepositories )
     {
         super( msg, artifact, remoteRepositories );
     }

@@ -27,13 +27,13 @@ package org.apache.maven.artifact.repository.metadata;
 public class RepositoryMetadataStoreException
     extends Exception
 {
-    public RepositoryMetadataStoreException( String message )
+    public RepositoryMetadataStoreException( final String message )
     {
         super( message );
     }
 
-    public RepositoryMetadataStoreException( String message,
-                                             Exception e )
+    public RepositoryMetadataStoreException( final String message,
+                                             final Exception e )
     {
         super( message, e );
     }
