@@ -40,7 +40,7 @@ public class FarthestConflictResolver
     *      org.apache.maven.artifact.resolver.ResolutionNode)
     */
 
-    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
+    public ResolutionNode resolveConflict( final ResolutionNode node1, final ResolutionNode node2 )
     {
         return node1.getDepth() >= node2.getDepth() ? node1 : node2;
     }

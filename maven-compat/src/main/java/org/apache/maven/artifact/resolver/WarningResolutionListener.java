@@ -33,58 +33,58 @@ public class WarningResolutionListener
 {
     private Logger logger;
 
-    public WarningResolutionListener( Logger logger )
+    public WarningResolutionListener( final Logger logger )
     {
         this.logger = logger;
     }
 
-    public void testArtifact( Artifact node )
+    public void testArtifact( final Artifact node )
     {
     }
 
-    public void startProcessChildren( Artifact artifact )
+    public void startProcessChildren( final Artifact artifact )
     {
     }
 
-    public void endProcessChildren( Artifact artifact )
+    public void endProcessChildren( final Artifact artifact )
     {
     }
 
-    public void includeArtifact( Artifact artifact )
+    public void includeArtifact( final Artifact artifact )
     {
     }
 
-    public void omitForNearer( Artifact omitted,
-                               Artifact kept )
+    public void omitForNearer( final Artifact omitted,
+                               final Artifact kept )
     {
     }
 
-    public void omitForCycle( Artifact omitted )
+    public void omitForCycle( final Artifact omitted )
     {
     }
 
-    public void updateScopeCurrentPom( Artifact artifact,
-                                       String scope )
+    public void updateScopeCurrentPom( final Artifact artifact,
+                                       final String scope )
     {
     }
 
-    public void updateScope( Artifact artifact,
-                             String scope )
+    public void updateScope( final Artifact artifact,
+                             final String scope )
     {
     }
 
-    public void manageArtifact( Artifact artifact,
-                                Artifact replacement )
+    public void manageArtifact( final Artifact artifact,
+                                final Artifact replacement )
     {
     }
 
-    public void selectVersionFromRange( Artifact artifact )
+    public void selectVersionFromRange( final Artifact artifact )
     {
     }
 
-    public void restrictRange( Artifact artifact,
-                               Artifact replacement,
-                               VersionRange newRange )
+    public void restrictRange( final Artifact artifact,
+                               final Artifact replacement,
+                               final VersionRange newRange )
     {
     }
 }

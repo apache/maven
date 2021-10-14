@@ -72,7 +72,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
     static
     {
-        List<String> translatedPrefixes = new ArrayList<>();
+        final List<String> translatedPrefixes = new ArrayList<>();
 
         // MNG-1927, MNG-2124, MNG-3355:
         // If the build section is present and the project directory is non-null, we should make
@@ -98,7 +98,7 @@ public abstract class AbstractStringBasedModelInterpolator
     private RecursionInterceptor recursionInterceptor;
 
     // for testing.
-    protected AbstractStringBasedModelInterpolator( PathTranslator pathTranslator )
+    protected AbstractStringBasedModelInterpolator( final PathTranslator pathTranslator )
     {
         this.pathTranslator = pathTranslator;
     }
@@ -107,7 +107,7 @@ public abstract class AbstractStringBasedModelInterpolator
     {
     }
 
-    public Model interpolate( Model model, Map<String, ?> context )
+    public Model interpolate( final Model model, final Map<String, ?> context )
         throws ModelInterpolationException
     {
         return interpolate( model, context, true );
@@ -126,10 +126,10 @@ public abstract class AbstractStringBasedModelInterpolator
      *
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
-    public Model interpolate( Model model, Map<String, ?> context, boolean strict )
+    public Model interpolate( final Model model, final Map<String, ?> context, final boolean strict )
         throws ModelInterpolationException
     {
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.putAll( context );
 
         return interpolate( model,
@@ -139,19 +139,19 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     public Model interpolate( Model model,
-                              File projectDir,
-                              ProjectBuilderConfiguration config,
-                              boolean debugEnabled )
+                              final File projectDir,
+                              final ProjectBuilderConfiguration config,
+                              final boolean debugEnabled )
         throws ModelInterpolationException
     {
-        StringWriter sWriter = new StringWriter( 1024 );
+        final StringWriter sWriter = new StringWriter( 1024 );
 
-        MavenXpp3Writer writer = new MavenXpp3Writer();
+        final MavenXpp3Writer writer = new MavenXpp3Writer();
         try
         {
             writer.write( sWriter, model );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new ModelInterpolationException( "Cannot serialize project model for interpolation.", e );
         }
@@ -159,14 +159,14 @@ public abstract class AbstractStringBasedModelInterpolator
         String serializedModel = sWriter.toString();
         serializedModel = interpolate( serializedModel, model, projectDir, config, debugEnabled );
 
-        StringReader sReader = new StringReader( serializedModel );
+        final StringReader sReader = new StringReader( serializedModel );
 
-        MavenXpp3Reader modelReader = new MavenXpp3Reader();
+        final MavenXpp3Reader modelReader = new MavenXpp3Reader();
         try
         {
             model = modelReader.read( sReader );
         }
-        catch ( IOException | XmlPullParserException e )
+        catch ( final IOException | XmlPullParserException e )
         {
             throw new ModelInterpolationException(
                 "Cannot read project model from interpolating filter of serialized version.", e );
@@ -187,17 +187,17 @@ public abstract class AbstractStringBasedModelInterpolator
      *   <li>If the value is null, get it from the model properties.</li>
      * </ul>
      */
-    public String interpolate( String src,
-                               Model model,
+    public String interpolate( final String src,
+                               final Model model,
                                final File projectDir,
-                               ProjectBuilderConfiguration config,
-                               boolean debug )
+                               final ProjectBuilderConfiguration config,
+                               final boolean debug )
         throws ModelInterpolationException
     {
         try
         {
-            List<ValueSource> valueSources = createValueSources( model, projectDir, config );
-            List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
+            final List<ValueSource> valueSources = createValueSources( model, projectDir, config );
+            final List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
             return interpolateInternal( src, valueSources, postProcessors, debug );
         }
@@ -212,19 +212,19 @@ public abstract class AbstractStringBasedModelInterpolator
     {
         String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
 
-        Properties modelProperties = model.getProperties();
+        final Properties modelProperties = model.getProperties();
         if ( modelProperties != null )
         {
             timestampFormat = modelProperties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY, timestampFormat );
         }
 
-        ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
-        ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
+        final ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        final ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
 
-        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+        final ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
         {
 
-            public Object getValue( String expression )
+            public Object getValue( final String expression )
             {
                 if ( projectDir != null && "basedir".equals( expression ) )
                 {
@@ -234,10 +234,10 @@ public abstract class AbstractStringBasedModelInterpolator
             }
 
         }, PROJECT_PREFIXES, true );
-        ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+        final ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
         {
 
-            public Object getValue( String expression )
+            public Object getValue( final String expression )
             {
                 if ( projectDir != null && "baseUri".equals( expression ) )
                 {
@@ -248,7 +248,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
         }, PROJECT_PREFIXES, false );
 
-        List<ValueSource> valueSources = new ArrayList<>( 9 );
+        final List<ValueSource> valueSources = new ArrayList<>( 9 );
 
         // NOTE: Order counts here!
         valueSources.add( basedirValueSource );
@@ -261,7 +261,7 @@ public abstract class AbstractStringBasedModelInterpolator
         valueSources.add( new AbstractValueSource( false )
         {
 
-            public Object getValue( String expression )
+            public Object getValue( final String expression )
             {
                 return config.getExecutionProperties().getProperty( "env." + expression );
             }
@@ -285,8 +285,8 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     @SuppressWarnings( "unchecked" )
-    protected String interpolateInternal( String src, List<ValueSource> valueSources,
-                                          List<InterpolationPostProcessor> postProcessors, boolean debug )
+    protected String interpolateInternal( final String src, final List<ValueSource> valueSources,
+                                          final List<InterpolationPostProcessor> postProcessors, final boolean debug )
         throws ModelInterpolationException
     {
         if ( !src.contains( "${" ) )
@@ -294,18 +294,18 @@ public abstract class AbstractStringBasedModelInterpolator
             return src;
         }
 
-        Logger logger = getLogger();
+        final Logger logger = getLogger();
 
         String result = src;
         synchronized ( this )
         {
 
-            for ( ValueSource vs : valueSources )
+            for ( final ValueSource vs : valueSources )
             {
                 interpolator.addValueSource( vs );
             }
 
-            for ( InterpolationPostProcessor postProcessor : postProcessors )
+            for ( final InterpolationPostProcessor postProcessor : postProcessors )
             {
                 interpolator.addPostProcessor( postProcessor );
             }
@@ -316,20 +316,20 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     result = interpolator.interpolate( result, recursionInterceptor );
                 }
-                catch ( InterpolationException e )
+                catch ( final InterpolationException e )
                 {
                     throw new ModelInterpolationException( e.getMessage(), e );
                 }
 
                 if ( debug )
                 {
-                    List<Object> feedback = interpolator.getFeedback();
+                    final List<Object> feedback = interpolator.getFeedback();
                     if ( feedback != null && !feedback.isEmpty() )
                     {
                         logger.debug( "Maven encountered the following problems during initial POM interpolation:" );
 
                         Object last = null;
-                        for ( Object next : feedback )
+                        for ( final Object next : feedback )
                         {
                             if ( next instanceof Throwable )
                             {
@@ -364,12 +364,12 @@ public abstract class AbstractStringBasedModelInterpolator
             }
             finally
             {
-                for ( ValueSource vs : valueSources )
+                for ( final ValueSource vs : valueSources )
                 {
                     interpolator.removeValuesSource( vs );
                 }
 
-                for ( InterpolationPostProcessor postProcessor : postProcessors )
+                for ( final InterpolationPostProcessor postProcessor : postProcessors )
                 {
                     interpolator.removePostProcessor( postProcessor );
                 }
@@ -384,7 +384,7 @@ public abstract class AbstractStringBasedModelInterpolator
         return recursionInterceptor;
     }
 
-    protected void setRecursionInterceptor( RecursionInterceptor recursionInterceptor )
+    protected void setRecursionInterceptor( final RecursionInterceptor recursionInterceptor )
     {
         this.recursionInterceptor = recursionInterceptor;
     }

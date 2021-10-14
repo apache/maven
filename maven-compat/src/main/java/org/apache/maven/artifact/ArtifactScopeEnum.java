@@ -36,7 +36,7 @@ public enum ArtifactScopeEnum
     private int id;
 
     // Constructor
-    ArtifactScopeEnum( int id )
+    ArtifactScopeEnum( final int id )
     {
         this.id = id;
     }
@@ -50,7 +50,7 @@ public enum ArtifactScopeEnum
     /**
      * Helper method to simplify null processing
      */
-    public static ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
+    public static ArtifactScopeEnum checkScope( final ArtifactScopeEnum scope )
     {
         return scope == null ? DEFAULT_SCOPE : scope;
     }
@@ -102,7 +102,7 @@ public enum ArtifactScopeEnum
      * @param scope
      * @return true is supplied scope is an inclusive sub-scope of current one.
      */
-    public boolean encloses( ArtifactScopeEnum scope )
+    public boolean encloses( final ArtifactScopeEnum scope )
     {
         final ArtifactScopeEnum s = checkScope( scope );
 
@@ -112,11 +112,11 @@ public enum ArtifactScopeEnum
             return scope.id == system.id;
         }
 
-        for ( ArtifactScopeEnum[][] set : COMPLIANCY_SETS )
+        for ( final ArtifactScopeEnum[][] set : COMPLIANCY_SETS )
         {
             if ( id == set[0][0].id )
             {
-                for ( ArtifactScopeEnum ase : set[1] )
+                for ( final ArtifactScopeEnum ase : set[1] )
                 {
                     if ( s.id == ase.id )
                     {

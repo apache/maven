@@ -33,9 +33,9 @@ public class WagonConfigurationException
     private final String originalMessage;
     private final String repositoryId;
 
-    public WagonConfigurationException( String repositoryId,
-                                        String message,
-                                        Throwable cause )
+    public WagonConfigurationException( final String repositoryId,
+                                        final String message,
+                                        final Throwable cause )
     {
         super( "While configuring wagon for '" + repositoryId + "': " + message, cause );
 
@@ -43,8 +43,8 @@ public class WagonConfigurationException
         this.originalMessage = message;
     }
 
-    public WagonConfigurationException( String repositoryId,
-                                        String message )
+    public WagonConfigurationException( final String repositoryId,
+                                        final String message )
     {
         super( "While configuring wagon for '" + repositoryId + "': " + message );
 

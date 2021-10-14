@@ -44,7 +44,7 @@ public class MetadataTreeNode
         return nChildren;
     }
 
-    public void setNChildren( int children )
+    public void setNChildren( final int children )
     {
         nChildren = children;
     }
@@ -54,7 +54,7 @@ public class MetadataTreeNode
     {
     }
     //------------------------------------------------------------------------
-    public MetadataTreeNode( ArtifactMetadata md, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
+    public MetadataTreeNode( final ArtifactMetadata md, final MetadataTreeNode parent, final boolean resolved, final ArtifactScopeEnum scope )
     {
         if ( md != null )
         {
@@ -66,13 +66,13 @@ public class MetadataTreeNode
         this.parent = parent;
     }
     //------------------------------------------------------------------------
-    public MetadataTreeNode( Artifact af, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
+    public MetadataTreeNode( final Artifact af, final MetadataTreeNode parent, final boolean resolved, final ArtifactScopeEnum scope )
     {
         this( new ArtifactMetadata( af ), parent, resolved, scope );
     }
 
     // ------------------------------------------------------------------------
-    public void addChild( int index, MetadataTreeNode kid )
+    public void addChild( final int index, final MetadataTreeNode kid )
     {
         if ( kid == null )
         {
@@ -118,7 +118,7 @@ public class MetadataTreeNode
         return md;
     }
 
-    public void setMd( ArtifactMetadata md )
+    public void setMd( final ArtifactMetadata md )
     {
         this.md = md;
     }
@@ -128,7 +128,7 @@ public class MetadataTreeNode
         return parent;
     }
 
-    public void setParent( MetadataTreeNode parent )
+    public void setParent( final MetadataTreeNode parent )
     {
         this.parent = parent;
     }
@@ -138,7 +138,7 @@ public class MetadataTreeNode
         return children;
     }
 
-    public void setChildren( MetadataTreeNode[] children )
+    public void setChildren( final MetadataTreeNode[] children )
     {
         this.children = children;
     }

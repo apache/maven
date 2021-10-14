@@ -41,7 +41,7 @@ public class DefaultClasspathTransformation
     GraphConflictResolver conflictResolver;
 
     //----------------------------------------------------------------------------------------------------
-    public ClasspathContainer transform( MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve )
+    public ClasspathContainer transform( final MetadataGraph dirtyGraph, final ArtifactScopeEnum scope, final boolean resolve )
         throws MetadataGraphTransformationException
     {
         try
@@ -51,31 +51,31 @@ public class DefaultClasspathTransformation
                 return null;
             }
 
-            MetadataGraph cleanGraph = conflictResolver.resolveConflicts( dirtyGraph, scope );
+            final MetadataGraph cleanGraph = conflictResolver.resolveConflicts( dirtyGraph, scope );
 
             if ( cleanGraph == null || cleanGraph.isEmpty() )
             {
                 return null;
             }
 
-            ClasspathContainer cpc = new ClasspathContainer( scope );
+            final ClasspathContainer cpc = new ClasspathContainer( scope );
             if ( cleanGraph.isEmptyEdges() )
             {
                 // single entry in the classpath, populated from itself
-                ArtifactMetadata amd = cleanGraph.getEntry().getMd();
+                final ArtifactMetadata amd = cleanGraph.getEntry().getMd();
                 cpc.add( amd );
             }
             else
             {
-                ClasspathGraphVisitor v = new ClasspathGraphVisitor( cleanGraph, cpc );
-                MetadataGraphVertex entry = cleanGraph.getEntry();
+                final ClasspathGraphVisitor v = new ClasspathGraphVisitor( cleanGraph, cpc );
+                final MetadataGraphVertex entry = cleanGraph.getEntry();
                 // entry point
                 v.visit( entry );
             }
 
             return cpc;
         }
-        catch ( GraphConflictResolutionException e )
+        catch ( final GraphConflictResolutionException e )
         {
             throw new MetadataGraphTransformationException( e );
         }
@@ -95,7 +95,7 @@ public class DefaultClasspathTransformation
         List<MetadataGraphVertex> visited;
 
         // -----------------------------------------------------------------------
-        protected ClasspathGraphVisitor( MetadataGraph cleanGraph, ClasspathContainer cpc )
+        protected ClasspathGraphVisitor( final MetadataGraph cleanGraph, final ClasspathContainer cpc )
         {
             this.cpc = cpc;
             this.graph = cleanGraph;
@@ -104,9 +104,9 @@ public class DefaultClasspathTransformation
         }
 
         // -----------------------------------------------------------------------
-        protected void visit( MetadataGraphVertex node ) // , String version, String artifactUri )
+        protected void visit( final MetadataGraphVertex node ) // , String version, String artifactUri )
         {
-            ArtifactMetadata md = node.getMd();
+            final ArtifactMetadata md = node.getMd();
             if ( visited.contains( node ) )
             {
                 return;
@@ -134,11 +134,11 @@ public class DefaultClasspathTransformation
 //                        }
 //                    );
 
-            List<MetadataGraphEdge> exits = graph.getExcidentEdges( node );
+            final List<MetadataGraphEdge> exits = graph.getExcidentEdges( node );
 
             if ( exits != null && exits.size() > 0 )
             {
-                MetadataGraphEdge[] sortedExits = exits.toArray( new MetadataGraphEdge[0] );
+                final MetadataGraphEdge[] sortedExits = exits.toArray( new MetadataGraphEdge[0] );
                 Arrays.sort( sortedExits, ( e1, e2 ) ->
                 {
                     if ( e1.getDepth() == e2.getDepth() )
@@ -152,9 +152,9 @@ public class DefaultClasspathTransformation
                     return e2.getDepth() - e1.getDepth();
                 } );
 
-                for ( MetadataGraphEdge e : sortedExits )
+                for ( final MetadataGraphEdge e : sortedExits )
                 {
-                    MetadataGraphVertex targetNode = e.getTarget();
+                    final MetadataGraphVertex targetNode = e.getTarget();
                     targetNode.getMd().setArtifactScope( e.getScope() );
                     targetNode.getMd().setWhy( e.getSource().getMd().toString() );
                     visit( targetNode );

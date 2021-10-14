@@ -65,11 +65,11 @@ public class MetadataGraph
     /**
      * init graph
      */
-    public MetadataGraph( int nVertices )
+    public MetadataGraph( final int nVertices )
     {
         init( nVertices, 2 * nVertices );
     }
-    public MetadataGraph( int nVertices, int nEdges )
+    public MetadataGraph( final int nVertices, final int nEdges )
     {
         init( nVertices, nEdges );
     }
@@ -77,7 +77,7 @@ public class MetadataGraph
     /**
      * construct a single vertex
      */
-    public MetadataGraph( MetadataGraphVertex entry )
+    public MetadataGraph( final MetadataGraphVertex entry )
         throws MetadataResolutionException
     {
         checkVertex( entry );
@@ -93,7 +93,7 @@ public class MetadataGraph
     /**
      * construct graph from a "dirty" tree
      */
-    public MetadataGraph( MetadataTreeNode tree )
+    public MetadataGraph( final MetadataTreeNode tree )
         throws MetadataResolutionException
     {
         this( tree, false, false );
@@ -108,7 +108,7 @@ public class MetadataGraph
      * (different versions and/or scopes -&gt; different nodes)
      *
      */
-    public MetadataGraph( MetadataTreeNode tree, boolean versionedVertices, boolean scopedVertices )
+    public MetadataGraph( final MetadataTreeNode tree, final boolean versionedVertices, final boolean scopedVertices )
         throws MetadataResolutionException
     {
         if ( tree == null )
@@ -122,14 +122,14 @@ public class MetadataGraph
         this.versionedVertices = scopedVertices || versionedVertices;
         this.scopedVertices = scopedVertices;
 
-        int count = countNodes( tree );
+        final int count = countNodes( tree );
 
         init( count, count + ( count / 2 ) );
 
         processTreeNodes( null, tree, 0, 0 );
     }
     //------------------------------------------------------------------------
-    private void processTreeNodes( MetadataGraphVertex parentVertex, MetadataTreeNode node, int depth, int pomOrder )
+    private void processTreeNodes( final MetadataGraphVertex parentVertex, final MetadataTreeNode node, final int depth, final int pomOrder )
         throws MetadataResolutionException
     {
         if ( node == null )
@@ -137,7 +137,7 @@ public class MetadataGraph
             return;
         }
 
-        MetadataGraphVertex vertex = new MetadataGraphVertex( node.md, versionedVertices, scopedVertices );
+        final MetadataGraphVertex vertex = new MetadataGraphVertex( node.md, versionedVertices, scopedVertices );
         if ( !vertices.contains( vertex ) )
         {
             vertices.add( vertex );
@@ -145,8 +145,8 @@ public class MetadataGraph
 
         if ( parentVertex != null ) // then create the edge
         {
-            ArtifactMetadata md = node.getMd();
-            MetadataGraphEdge e =
+            final ArtifactMetadata md = node.getMd();
+            final MetadataGraphEdge e =
                 new MetadataGraphEdge( md.version, md.resolved, md.artifactScope, md.artifactUri, depth, pomOrder );
             addEdge( parentVertex, vertex, e );
         }
@@ -155,7 +155,7 @@ public class MetadataGraph
             entry = vertex;
         }
 
-        MetadataTreeNode[] kids = node.getChildren();
+        final MetadataTreeNode[] kids = node.getChildren();
         if ( kids == null || kids.length < 1 )
         {
             return;
@@ -163,23 +163,23 @@ public class MetadataGraph
 
         for ( int i = 0; i < kids.length; i++ )
         {
-            MetadataTreeNode n = kids[i];
+            final MetadataTreeNode n = kids[i];
             processTreeNodes( vertex, n, depth + 1, i );
         }
     }
     //------------------------------------------------------------------------
-    public MetadataGraphVertex findVertex( ArtifactMetadata md )
+    public MetadataGraphVertex findVertex( final ArtifactMetadata md )
     {
         if ( md == null || vertices == null || vertices.size() < 1 )
         {
             return null;
         }
 
-        MetadataGraphVertex v = new MetadataGraphVertex( md );
+        final MetadataGraphVertex v = new MetadataGraphVertex( md );
         v.setCompareVersion( versionedVertices );
         v.setCompareScope( scopedVertices );
 
-        for ( MetadataGraphVertex gv : vertices )
+        for ( final MetadataGraphVertex gv : vertices )
         {
             if ( gv.equals( v ) )
             {
@@ -190,7 +190,7 @@ public class MetadataGraph
         return null;
     }
     //------------------------------------------------------------------------
-    public MetadataGraphVertex addVertex( ArtifactMetadata md )
+    public MetadataGraphVertex addVertex( final ArtifactMetadata md )
     {
         if ( md == null )
         {
@@ -217,7 +217,7 @@ public class MetadataGraph
     /**
      * init graph
      */
-    private void init( int nVertices, int nEdges )
+    private void init( final int nVertices, final int nEdges )
     {
         int nV = nVertices;
         if ( nVertices < 1 )
@@ -241,7 +241,7 @@ public class MetadataGraph
         checkVertices( DEFAULT_VERTICES );
     }
 
-    private void checkVertices( int nVertices )
+    private void checkVertices( final int nVertices )
     {
         if ( vertices == null )
         {
@@ -259,7 +259,7 @@ public class MetadataGraph
 
         checkEdges( count );
     }
-    private void checkEdges( int nEdges )
+    private void checkEdges( final int nEdges )
     {
         if ( incidentEdges == null )
         {
@@ -271,7 +271,7 @@ public class MetadataGraph
         }
     }
     //------------------------------------------------------------------------
-    private static void checkVertex( MetadataGraphVertex v )
+    private static void checkVertex( final MetadataGraphVertex v )
         throws MetadataResolutionException
     {
         if ( v == null )
@@ -284,7 +284,7 @@ public class MetadataGraph
         }
     }
     //------------------------------------------------------------------------
-    private static void checkEdge( MetadataGraphEdge e )
+    private static void checkEdge( final MetadataGraphEdge e )
         throws MetadataResolutionException
     {
         if ( e == null )
@@ -293,17 +293,17 @@ public class MetadataGraph
         }
     }
     //------------------------------------------------------------------------
-    public List<MetadataGraphEdge> getEdgesBetween( MetadataGraphVertex vFrom, MetadataGraphVertex vTo )
+    public List<MetadataGraphEdge> getEdgesBetween( final MetadataGraphVertex vFrom, final MetadataGraphVertex vTo )
     {
-        List<MetadataGraphEdge> edges = getIncidentEdges( vTo );
+        final List<MetadataGraphEdge> edges = getIncidentEdges( vTo );
         if ( edges == null || edges.isEmpty() )
         {
             return null;
         }
 
-        List<MetadataGraphEdge> res = new ArrayList<>( edges.size() );
+        final List<MetadataGraphEdge> res = new ArrayList<>( edges.size() );
 
-        for ( MetadataGraphEdge e : edges )
+        for ( final MetadataGraphEdge e : edges )
         {
             if ( e.getSource().equals( vFrom ) )
             {
@@ -314,7 +314,7 @@ public class MetadataGraph
         return res;
     }
     //------------------------------------------------------------------------
-    public MetadataGraph addEdge( MetadataGraphVertex vFrom, MetadataGraphVertex vTo, MetadataGraphEdge e )
+    public MetadataGraph addEdge( final MetadataGraphVertex vFrom, final MetadataGraphVertex vTo, final MetadataGraphEdge e )
         throws MetadataResolutionException
     {
         checkVertex( vFrom );
@@ -331,14 +331,14 @@ public class MetadataGraph
         vFrom.setCompareVersion( versionedVertices );
         vFrom.setCompareScope( scopedVertices );
 
-        List<MetadataGraphEdge> exList = excidentEdges.computeIfAbsent( vFrom, k -> new ArrayList<>() );
+        final List<MetadataGraphEdge> exList = excidentEdges.computeIfAbsent( vFrom, k -> new ArrayList<>() );
 
         if ( !exList.contains( e ) )
         {
             exList.add( e );
         }
 
-        List<MetadataGraphEdge> inList = incidentEdges.computeIfAbsent( vTo, k -> new ArrayList<>() );
+        final List<MetadataGraphEdge> inList = incidentEdges.computeIfAbsent( vTo, k -> new ArrayList<>() );
 
         if ( !inList.contains( e ) )
         {
@@ -348,7 +348,7 @@ public class MetadataGraph
         return this;
     }
     //------------------------------------------------------------------------
-    public MetadataGraph removeVertex( MetadataGraphVertex v )
+    public MetadataGraph removeVertex( final MetadataGraphVertex v )
     {
         if ( vertices != null && v != null )
         {
@@ -369,7 +369,7 @@ public class MetadataGraph
 
     }
     //------------------------------------------------------------------------
-    private static int countNodes( MetadataTreeNode tree )
+    private static int countNodes( final MetadataTreeNode tree )
     {
         if ( tree == null )
         {
@@ -377,12 +377,12 @@ public class MetadataGraph
         }
 
         int count = 1;
-        MetadataTreeNode[] kids = tree.getChildren();
+        final MetadataTreeNode[] kids = tree.getChildren();
         if ( kids == null || kids.length < 1 )
         {
             return count;
         }
-        for ( MetadataTreeNode n : kids )
+        for ( final MetadataTreeNode n : kids )
         {
             count += countNodes( n );
         }
@@ -396,7 +396,7 @@ public class MetadataGraph
         return entry;
     }
 
-    public void setEntry( MetadataGraphVertex entry )
+    public void setEntry( final MetadataGraphVertex entry )
     {
         this.entry = entry;
     }
@@ -406,13 +406,13 @@ public class MetadataGraph
         return vertices;
     }
 
-    public List<MetadataGraphEdge> getIncidentEdges( MetadataGraphVertex vertex )
+    public List<MetadataGraphEdge> getIncidentEdges( final MetadataGraphVertex vertex )
     {
         checkEdges();
         return incidentEdges.get( vertex );
     }
 
-    public List<MetadataGraphEdge> getExcidentEdges( MetadataGraphVertex vertex )
+    public List<MetadataGraphEdge> getExcidentEdges( final MetadataGraphVertex vertex )
     {
         checkEdges();
         return excidentEdges.get( vertex );
@@ -423,7 +423,7 @@ public class MetadataGraph
         return versionedVertices;
     }
 
-    public void setVersionedVertices( boolean versionedVertices )
+    public void setVersionedVertices( final boolean versionedVertices )
     {
         this.versionedVertices = versionedVertices;
     }
@@ -433,7 +433,7 @@ public class MetadataGraph
         return scopedVertices;
     }
 
-    public void setScopedVertices( boolean scopedVertices )
+    public void setScopedVertices( final boolean scopedVertices )
     {
         this.scopedVertices = scopedVertices;
 
@@ -449,7 +449,7 @@ public class MetadataGraph
         return scope;
     }
 
-    public void setScope( ArtifactScopeEnum scope )
+    public void setScope( final ArtifactScopeEnum scope )
     {
         this.scope = scope;
     }
@@ -469,18 +469,18 @@ public class MetadataGraph
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( 512 );
+        final StringBuilder sb = new StringBuilder( 512 );
         if ( isEmpty() )
         {
             return "empty";
         }
-        for ( MetadataGraphVertex v : vertices )
+        for ( final MetadataGraphVertex v : vertices )
         {
             sb.append( "Vertex:  " ).append( v.getMd().toString() ).append( '\n' );
-            List<MetadataGraphEdge> ins = getIncidentEdges( v );
+            final List<MetadataGraphEdge> ins = getIncidentEdges( v );
             if ( ins != null )
             {
-                for ( MetadataGraphEdge e : ins )
+                for ( final MetadataGraphEdge e : ins )
                 {
                     sb.append( "       from :  " ).append( e.toString() ).append( '\n' );
                 }
@@ -490,10 +490,10 @@ public class MetadataGraph
                 sb.append( "      no entries\n" );
             }
 
-            List<MetadataGraphEdge> outs = getExcidentEdges( v );
+            final List<MetadataGraphEdge> outs = getExcidentEdges( v );
             if ( outs != null )
             {
-                for ( MetadataGraphEdge e : outs )
+                for ( final MetadataGraphEdge e : outs )
                 {
                     sb.append( "        to :  " ).append( e.toString() ).append( '\n' );
                 }

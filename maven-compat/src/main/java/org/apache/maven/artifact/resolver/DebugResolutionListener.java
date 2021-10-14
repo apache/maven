@@ -41,34 +41,34 @@ public class DebugResolutionListener
 
     private static Set<Artifact> ignoredArtifacts = new HashSet<>();
 
-    public DebugResolutionListener( Logger logger )
+    public DebugResolutionListener( final Logger logger )
     {
         this.logger = logger;
     }
 
-    public void testArtifact( Artifact node )
+    public void testArtifact( final Artifact node )
     {
     }
 
-    public void startProcessChildren( Artifact artifact )
+    public void startProcessChildren( final Artifact artifact )
     {
         indent += "  ";
     }
 
-    public void endProcessChildren( Artifact artifact )
+    public void endProcessChildren( final Artifact artifact )
     {
         indent = indent.substring( 2 );
     }
 
-    public void includeArtifact( Artifact artifact )
+    public void includeArtifact( final Artifact artifact )
     {
         logger.debug( indent + artifact + " (selected for " + artifact.getScope() + ")" );
     }
 
-    public void omitForNearer( Artifact omitted, Artifact kept )
+    public void omitForNearer( final Artifact omitted, final Artifact kept )
     {
-        String omittedVersion = omitted.getVersion();
-        String keptVersion = kept.getVersion();
+        final String omittedVersion = omitted.getVersion();
+        final String keptVersion = kept.getVersion();
 
         if ( !Objects.equals( omittedVersion, keptVersion ) )
         {
@@ -76,12 +76,12 @@ public class DebugResolutionListener
         }
     }
 
-    public void omitForCycle( Artifact omitted )
+    public void omitForCycle( final Artifact omitted )
     {
         logger.debug( indent + omitted + " (removed - causes a cycle in the graph)" );
     }
 
-    public void updateScopeCurrentPom( Artifact artifact, String ignoredScope )
+    public void updateScopeCurrentPom( final Artifact artifact, final String ignoredScope )
     {
         logger.debug( indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope "
             + artifact.getScope() + " wins)" );
@@ -96,18 +96,18 @@ public class DebugResolutionListener
         }
     }
 
-    public void updateScope( Artifact artifact, String scope )
+    public void updateScope( final Artifact artifact, final String scope )
     {
         logger.debug( indent + artifact + " (setting artifactScope to: " + scope + ")" );
     }
 
-    public void selectVersionFromRange( Artifact artifact )
+    public void selectVersionFromRange( final Artifact artifact )
     {
         logger.debug( indent + artifact + " (setting version to: " + artifact.getVersion() + " from range: "
             + artifact.getVersionRange() + ")" );
     }
 
-    public void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange )
+    public void restrictRange( final Artifact artifact, final Artifact replacement, final VersionRange newRange )
     {
         logger.debug( indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: "
             + replacement.getVersionRange() + " to: " + newRange + " )" );
@@ -119,7 +119,7 @@ public class DebugResolutionListener
      * (and more information) is needed to be able to determine when and if the version and/or artifactScope changes.
      * See the two added methods, manageArtifactVersion and manageArtifactScope.
      */
-    public void manageArtifact( Artifact artifact, Artifact replacement )
+    public void manageArtifact( final Artifact artifact, final Artifact replacement )
     {
         String msg = indent + artifact;
         msg += " (";
@@ -135,32 +135,32 @@ public class DebugResolutionListener
         logger.debug( msg );
     }
 
-    public void manageArtifactVersion( Artifact artifact, Artifact replacement )
+    public void manageArtifactVersion( final Artifact artifact, final Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getVersion().equals( artifact.getVersion() ) )
         {
-            String msg = indent + artifact + " (applying version: " + replacement.getVersion() + ")";
+            final String msg = indent + artifact + " (applying version: " + replacement.getVersion() + ")";
             logger.debug( msg );
         }
     }
 
-    public void manageArtifactScope( Artifact artifact, Artifact replacement )
+    public void manageArtifactScope( final Artifact artifact, final Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getScope().equals( artifact.getScope() ) )
         {
-            String msg = indent + artifact + " (applying artifactScope: " + replacement.getScope() + ")";
+            final String msg = indent + artifact + " (applying artifactScope: " + replacement.getScope() + ")";
             logger.debug( msg );
         }
     }
 
-    public void manageArtifactSystemPath( Artifact artifact, Artifact replacement )
+    public void manageArtifactSystemPath( final Artifact artifact, final Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getScope().equals( artifact.getScope() ) )
         {
-            String msg = indent + artifact + " (applying system path: " + replacement.getFile() + ")";
+            final String msg = indent + artifact + " (applying system path: " + replacement.getFile() + ")";
             logger.debug( msg );
         }
     }

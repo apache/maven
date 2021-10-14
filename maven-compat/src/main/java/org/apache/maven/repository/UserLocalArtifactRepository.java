@@ -33,16 +33,16 @@ public class UserLocalArtifactRepository
 {
     private ArtifactRepository localRepository;
 
-    public UserLocalArtifactRepository( ArtifactRepository localRepository )
+    public UserLocalArtifactRepository( final ArtifactRepository localRepository )
     {
         this.localRepository = localRepository;
         setLayout( localRepository.getLayout() );
     }
 
     @Override
-    public Artifact find( Artifact artifact )
+    public Artifact find( final Artifact artifact )
     {
-        File artifactFile = new File( localRepository.getBasedir(), pathOf( artifact ) );
+        final File artifactFile = new File( localRepository.getBasedir(), pathOf( artifact ) );
 
         // We need to set the file here or the resolver will fail with an NPE, not fully equipped to deal
         // with multiple local repository implementations yet.
@@ -58,13 +58,13 @@ public class UserLocalArtifactRepository
     }
 
     @Override
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( final ArtifactMetadata metadata, final ArtifactRepository repository )
     {
         return localRepository.pathOfLocalRepositoryMetadata( metadata, repository );
     }
 
     @Override
-    public String pathOf( Artifact artifact )
+    public String pathOf( final Artifact artifact )
     {
         return localRepository.pathOf( artifact );
     }

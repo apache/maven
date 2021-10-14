@@ -31,19 +31,19 @@ public class MetadataResolutionException
         // TODO Auto-generated constructor stub
     }
 
-    public MetadataResolutionException( String message )
+    public MetadataResolutionException( final String message )
     {
         super( message );
         // TODO Auto-generated constructor stub
     }
 
-    public MetadataResolutionException( Throwable cause )
+    public MetadataResolutionException( final Throwable cause )
     {
         super( cause );
         // TODO Auto-generated constructor stub
     }
 
-    public MetadataResolutionException( String message, Throwable cause )
+    public MetadataResolutionException( final String message, final Throwable cause )
     {
         super( message, cause );
         // TODO Auto-generated constructor stub

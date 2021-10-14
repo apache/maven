@@ -37,23 +37,23 @@ public class SystemPropertyProfileActivator
 {
     private Properties properties;
 
-    public void contextualize( Context context )
+    public void contextualize( final Context context )
         throws ContextException
     {
         properties = (Properties) context.get( "SystemProperties" );
     }
 
-    protected boolean canDetectActivation( Profile profile )
+    protected boolean canDetectActivation( final Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getProperty() != null;
     }
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( final Profile profile )
         throws ProfileActivationException
     {
-        Activation activation = profile.getActivation();
+        final Activation activation = profile.getActivation();
 
-        ActivationProperty property = activation.getProperty();
+        final ActivationProperty property = activation.getProperty();
 
         if ( property != null )
         {
@@ -72,7 +72,7 @@ public class SystemPropertyProfileActivator
                 name = name.substring( 1 );
             }
 
-            String sysValue = properties.getProperty( name );
+            final String sysValue = properties.getProperty( name );
 
             String propValue = property.getValue();
             if ( StringUtils.isNotEmpty( propValue ) )
@@ -85,7 +85,7 @@ public class SystemPropertyProfileActivator
                 }
 
                 // we have a value, so it has to match the system value...
-                boolean result = propValue.equals( sysValue );
+                final boolean result = propValue.equals( sysValue );
 
                 if ( reverseValue )
                 {
@@ -98,7 +98,7 @@ public class SystemPropertyProfileActivator
             }
             else
             {
-                boolean result = StringUtils.isNotEmpty( sysValue );
+                final boolean result = StringUtils.isNotEmpty( sysValue );
 
                 if ( reverseName )
                 {

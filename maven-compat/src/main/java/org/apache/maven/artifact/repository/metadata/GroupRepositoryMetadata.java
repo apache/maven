@@ -34,7 +34,7 @@ public class GroupRepositoryMetadata
 {
     private final String groupId;
 
-    public GroupRepositoryMetadata( String groupId )
+    public GroupRepositoryMetadata( final String groupId )
     {
         super( new Metadata() );
         this.groupId = groupId;
@@ -65,21 +65,21 @@ public class GroupRepositoryMetadata
         return null;
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId )
+    public void addPluginMapping( final String goalPrefix,
+                                  final String artifactId )
     {
         addPluginMapping( goalPrefix, artifactId, artifactId );
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId,
-                                  String name )
+    public void addPluginMapping( final String goalPrefix,
+                                  final String artifactId,
+                                  final String name )
     {
-        List<Plugin> plugins = getMetadata().getPlugins();
+        final List<Plugin> plugins = getMetadata().getPlugins();
         boolean found = false;
-        for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext() && !found; )
+        for ( final Iterator<Plugin> i = plugins.iterator(); i.hasNext() && !found; )
         {
-            Plugin plugin = i.next();
+            final Plugin plugin = i.next();
             if ( plugin.getPrefix().equals( goalPrefix ) )
             {
                 found = true;
@@ -87,7 +87,7 @@ public class GroupRepositoryMetadata
         }
         if ( !found )
         {
-            Plugin plugin = new Plugin();
+            final Plugin plugin = new Plugin();
             plugin.setPrefix( goalPrefix );
             plugin.setArtifactId( artifactId );
             plugin.setName( name );
@@ -112,7 +112,7 @@ public class GroupRepositoryMetadata
         return null;
     }
 
-    public void setRepository( ArtifactRepository remoteRepository )
+    public void setRepository( final ArtifactRepository remoteRepository )
     {
         // intentionally blank
     }

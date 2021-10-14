@@ -48,8 +48,8 @@ public class MetadataGraphEdge
     MetadataGraphVertex  target;
 
     //----------------------------------------------------------------------------
-    public MetadataGraphEdge( String version, boolean resolved, ArtifactScopeEnum scope, String artifactUri, int depth,
-                              int pomOrder )
+    public MetadataGraphEdge( final String version, final boolean resolved, final ArtifactScopeEnum scope, final String artifactUri, final int depth,
+                              final int pomOrder )
     {
         super();
         this.version = version;
@@ -63,7 +63,7 @@ public class MetadataGraphEdge
     /**
      * helper for equals
      */
-    private static boolean objectsEqual( Object o1, Object o2 )
+    private static boolean objectsEqual( final Object o1, final Object o2 )
     {
         if ( o1 == null && o2 == null )
         {
@@ -82,11 +82,11 @@ public class MetadataGraphEdge
      */
     @Override
     @SuppressWarnings( "checkstyle:equalshashcode" )
-    public boolean equals( Object o )
+    public boolean equals( final Object o )
     {
         if ( o instanceof MetadataGraphEdge )
         {
-            MetadataGraphEdge e = (MetadataGraphEdge) o;
+            final MetadataGraphEdge e = (MetadataGraphEdge) o;
 
             return objectsEqual( version, e.version )
                 && ArtifactScopeEnum.checkScope( scope ).getScope().
@@ -102,7 +102,7 @@ public class MetadataGraphEdge
         return version;
     }
 
-    public void setVersion( String version )
+    public void setVersion( final String version )
     {
         this.version = version;
     }
@@ -112,7 +112,7 @@ public class MetadataGraphEdge
         return scope;
     }
 
-    public void setScope( ArtifactScopeEnum scope )
+    public void setScope( final ArtifactScopeEnum scope )
     {
         this.scope = scope;
     }
@@ -122,7 +122,7 @@ public class MetadataGraphEdge
         return depth;
     }
 
-    public void setDepth( int depth )
+    public void setDepth( final int depth )
     {
         this.depth = depth;
     }
@@ -132,7 +132,7 @@ public class MetadataGraphEdge
         return resolved;
     }
 
-    public void setResolved( boolean resolved )
+    public void setResolved( final boolean resolved )
     {
         this.resolved = resolved;
     }
@@ -142,7 +142,7 @@ public class MetadataGraphEdge
         return pomOrder;
     }
 
-    public void setPomOrder( int pomOrder )
+    public void setPomOrder( final int pomOrder )
     {
         this.pomOrder = pomOrder;
     }
@@ -152,7 +152,7 @@ public class MetadataGraphEdge
         return artifactUri;
     }
 
-    public void setArtifactUri( String artifactUri )
+    public void setArtifactUri( final String artifactUri )
     {
         this.artifactUri = artifactUri;
     }
@@ -162,7 +162,7 @@ public class MetadataGraphEdge
         return source;
     }
 
-    public void setSource( MetadataGraphVertex source )
+    public void setSource( final MetadataGraphVertex source )
     {
         this.source = source;
     }
@@ -172,7 +172,7 @@ public class MetadataGraphEdge
         return target;
     }
 
-    public void setTarget( MetadataGraphVertex target )
+    public void setTarget( final MetadataGraphVertex target )
     {
         this.target = target;
     }

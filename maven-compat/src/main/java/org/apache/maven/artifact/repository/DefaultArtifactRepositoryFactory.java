@@ -47,62 +47,62 @@ public class DefaultArtifactRepositoryFactory
     @Requirement
     private RepositorySystem repositorySystem;
 
-    public ArtifactRepositoryLayout getLayout( String layoutId )
+    public ArtifactRepositoryLayout getLayout( final String layoutId )
         throws UnknownRepositoryLayoutException
     {
         return factory.getLayout( layoutId );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
-                                                                  boolean uniqueVersion )
+    public ArtifactRepository createDeploymentArtifactRepository( final String id, final String url, final String layoutId,
+                                                                  final boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
         return injectSession( factory.createDeploymentArtifactRepository( id, url, layoutId, uniqueVersion ), false );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
-                                                                  ArtifactRepositoryLayout repositoryLayout,
-                                                                  boolean uniqueVersion )
+    public ArtifactRepository createDeploymentArtifactRepository( final String id, final String url,
+                                                                  final ArtifactRepositoryLayout repositoryLayout,
+                                                                  final boolean uniqueVersion )
     {
         return injectSession( factory.createDeploymentArtifactRepository( id, url, repositoryLayout, uniqueVersion ),
                               false );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
+    public ArtifactRepository createArtifactRepository( final String id, final String url, final String layoutId,
+                                                        final ArtifactRepositoryPolicy snapshots,
+                                                        final ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
         return injectSession( factory.createArtifactRepository( id, url, layoutId, snapshots, releases ), true );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
+    public ArtifactRepository createArtifactRepository( final String id, final String url,
+                                                        final ArtifactRepositoryLayout repositoryLayout,
+                                                        final ArtifactRepositoryPolicy snapshots,
+                                                        final ArtifactRepositoryPolicy releases )
     {
         return injectSession( factory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases ),
                               true );
 
     }
 
-    public void setGlobalUpdatePolicy( String updatePolicy )
+    public void setGlobalUpdatePolicy( final String updatePolicy )
     {
         factory.setGlobalUpdatePolicy( updatePolicy );
     }
 
-    public void setGlobalChecksumPolicy( String checksumPolicy )
+    public void setGlobalChecksumPolicy( final String checksumPolicy )
     {
         factory.setGlobalChecksumPolicy( checksumPolicy );
     }
 
-    private ArtifactRepository injectSession( ArtifactRepository repository, boolean mirrors )
+    private ArtifactRepository injectSession( final ArtifactRepository repository, final boolean mirrors )
     {
-        RepositorySystemSession session = legacySupport.getRepositorySession();
+        final RepositorySystemSession session = legacySupport.getRepositorySession();
 
         if ( session != null && repository != null && !isLocalRepository( repository ) )
         {
-            List<ArtifactRepository> repositories = Arrays.asList( repository );
+            final List<ArtifactRepository> repositories = Arrays.asList( repository );
 
             if ( mirrors )
             {
@@ -117,7 +117,7 @@ public class DefaultArtifactRepositoryFactory
         return repository;
     }
 
-    private boolean isLocalRepository( ArtifactRepository repository )
+    private boolean isLocalRepository( final ArtifactRepository repository )
     {
         // unfortunately, the API doesn't allow to tell a remote repo and the local repo apart...
         return "local".equals( repository.getId() );

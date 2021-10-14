@@ -25,18 +25,18 @@ package org.apache.maven.artifact.deployer;
 public class ArtifactDeploymentException
     extends Exception
 {
-    public ArtifactDeploymentException( String message )
+    public ArtifactDeploymentException( final String message )
     {
         super( message );
     }
 
-    public ArtifactDeploymentException( Throwable cause )
+    public ArtifactDeploymentException( final Throwable cause )
     {
         super( cause );
     }
 
-    public ArtifactDeploymentException( String message,
-                                        Throwable cause )
+    public ArtifactDeploymentException( final String message,
+                                        final Throwable cause )
     {
         super( message, cause );
     }

@@ -45,18 +45,18 @@ public class DefaultMavenProfilesBuilder
 {
     private static final String PROFILES_XML_FILE = "profiles.xml";
 
-    public ProfilesRoot buildProfiles( File basedir )
+    public ProfilesRoot buildProfiles( final File basedir )
         throws IOException, XmlPullParserException
     {
-        File profilesXml = new File( basedir, PROFILES_XML_FILE );
+        final File profilesXml = new File( basedir, PROFILES_XML_FILE );
 
         ProfilesRoot profilesRoot = null;
 
         if ( profilesXml.exists() )
         {
-            ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
-            try ( Reader profileReader = ReaderFactory.newXmlReader( profilesXml );
-                  StringWriter sWriter = new StringWriter() )
+            final ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
+            try ( final Reader profileReader = ReaderFactory.newXmlReader( profilesXml );
+                  final StringWriter sWriter = new StringWriter() )
             {
                 IOUtil.copy( profileReader, sWriter );
 
@@ -64,12 +64,12 @@ public class DefaultMavenProfilesBuilder
 
                 try
                 {
-                    RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+                    final RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
                     interpolator.addValueSource( new EnvarBasedValueSource() );
 
                     rawInput = interpolator.interpolate( rawInput, "settings" );
                 }
-                catch ( Exception e )
+                catch ( final Exception e )
                 {
                     getLogger().warn(
                         "Failed to initialize environment variable resolver. Skipping environment " + "substitution in "
@@ -77,7 +77,7 @@ public class DefaultMavenProfilesBuilder
                     getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
                 }
 
-                StringReader sReader = new StringReader( rawInput );
+                final StringReader sReader = new StringReader( rawInput );
 
                 profilesRoot = reader.read( sReader );
             }

@@ -38,14 +38,14 @@ public class BuildTimestampValueSource
 
     private String formattedDate;
 
-    public BuildTimestampValueSource( Date startTime, String format )
+    public BuildTimestampValueSource( final Date startTime, final String format )
     {
         super( false );
         this.startTime = startTime;
         this.format = format;
     }
 
-    public Object getValue( String expression )
+    public Object getValue( final String expression )
     {
         if ( "build.timestamp".equals( expression ) || "maven.build.timestamp".equals( expression ) )
         {

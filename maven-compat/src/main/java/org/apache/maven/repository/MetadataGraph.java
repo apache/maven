@@ -36,7 +36,7 @@ public class MetadataGraph
     /** entry point for tree-like structures */
     MetadataGraphNode entry;
 
-    public MetadataGraph( MetadataGraphNode entry )
+    public MetadataGraph( final MetadataGraphNode entry )
     {
         this();
 
@@ -48,7 +48,7 @@ public class MetadataGraph
         nodes = new ArrayList<>( 64 );
     }
 
-    public void addNode( MetadataGraphNode node )
+    public void addNode( final MetadataGraphNode node )
     {
         nodes.add( node );
     }
@@ -58,9 +58,9 @@ public class MetadataGraph
      *
      * @param md
      */
-    public MetadataGraphNode findNode( MavenArtifactMetadata md )
+    public MetadataGraphNode findNode( final MavenArtifactMetadata md )
     {
-        for ( MetadataGraphNode mgn : nodes )
+        for ( final MetadataGraphNode mgn : nodes )
         {
             if ( mgn.metadata.equals( md ) )
             {
@@ -68,7 +68,7 @@ public class MetadataGraph
             }
         }
 
-        MetadataGraphNode node = new MetadataGraphNode( md );
+        final MetadataGraphNode node = new MetadataGraphNode( md );
         addNode( node );
         return node;
     }

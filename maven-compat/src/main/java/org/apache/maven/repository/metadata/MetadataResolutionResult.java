@@ -45,7 +45,7 @@ public class MetadataResolutionResult
     {
     }
     //----------------------------------------------------------------------------
-    public MetadataResolutionResult( MetadataTreeNode root )
+    public MetadataResolutionResult( final MetadataTreeNode root )
     {
         this.treeRoot = root;
     }
@@ -55,12 +55,12 @@ public class MetadataResolutionResult
         return treeRoot;
     }
     //----------------------------------------------------------------------------
-    public void setTree( MetadataTreeNode root )
+    public void setTree( final MetadataTreeNode root )
     {
         this.treeRoot = root;
     }
 
-    public void initTreeProcessing( PlexusContainer plexus )
+    public void initTreeProcessing( final PlexusContainer plexus )
         throws ComponentLookupException
     {
         classpathTransformation = plexus.lookup( ClasspathTransformation.class );
@@ -73,7 +73,7 @@ public class MetadataResolutionResult
         return treeRoot == null ? null : new MetadataGraph( treeRoot );
     }
     //----------------------------------------------------------------------------
-    public MetadataGraph getGraph( ArtifactScopeEnum scope )
+    public MetadataGraph getGraph( final ArtifactScopeEnum scope )
         throws MetadataResolutionException, GraphConflictResolutionException
     {
         if ( treeRoot == null )
@@ -89,7 +89,7 @@ public class MetadataResolutionResult
         return conflictResolver.resolveConflicts( getGraph(), scope );
     }
     //----------------------------------------------------------------------------
-    public MetadataGraph getGraph( MetadataResolutionRequestTypeEnum requestType )
+    public MetadataGraph getGraph( final MetadataResolutionRequestTypeEnum requestType )
         throws MetadataResolutionException, GraphConflictResolutionException
     {
         if ( requestType == null )
@@ -134,7 +134,7 @@ public class MetadataResolutionResult
         return null;
     }
     //----------------------------------------------------------------------------
-    public ClasspathContainer getClasspath( ArtifactScopeEnum scope )
+    public ClasspathContainer getClasspath( final ArtifactScopeEnum scope )
         throws MetadataGraphTransformationException, MetadataResolutionException
     {
         if ( classpathTransformation == null )
@@ -142,7 +142,7 @@ public class MetadataResolutionResult
             return null;
         }
 
-        MetadataGraph dirtyGraph = getGraph();
+        final MetadataGraph dirtyGraph = getGraph();
         if ( dirtyGraph == null )
         {
             return null;
@@ -152,10 +152,10 @@ public class MetadataResolutionResult
     }
 
     //----------------------------------------------------------------------------
-    public MetadataTreeNode getClasspathTree( ArtifactScopeEnum scope )
+    public MetadataTreeNode getClasspathTree( final ArtifactScopeEnum scope )
         throws MetadataGraphTransformationException, MetadataResolutionException
     {
-        ClasspathContainer cpc = getClasspath( scope );
+        final ClasspathContainer cpc = getClasspath( scope );
         if ( cpc == null )
         {
             return null;

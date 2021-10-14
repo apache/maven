@@ -47,12 +47,12 @@ public final class MetadataBridge
 
     private boolean merged;
 
-    public MetadataBridge( ArtifactMetadata metadata )
+    public MetadataBridge( final ArtifactMetadata metadata )
     {
         this.metadata = metadata;
     }
 
-    public void merge( File current, File result )
+    public void merge( final File current, final File result )
         throws RepositoryException
     {
         try
@@ -61,11 +61,11 @@ public final class MetadataBridge
             {
                 FileUtils.copyFile( current, result );
             }
-            ArtifactRepository localRepo = new MetadataRepository( result );
+            final ArtifactRepository localRepo = new MetadataRepository( result );
             metadata.storeInLocalRepository( localRepo, localRepo );
             merged = true;
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             throw new RepositoryException( e.getMessage(), e );
         }
@@ -96,7 +96,7 @@ public final class MetadataBridge
         return metadata.getRemoteFilename();
     }
 
-    private String emptify( String string )
+    private String emptify( final String string )
     {
         return ( string != null ) ? string : "";
     }
@@ -106,7 +106,7 @@ public final class MetadataBridge
         return null;
     }
 
-    public MetadataBridge setFile( File file )
+    public MetadataBridge setFile( final File file )
     {
         return this;
     }
@@ -137,7 +137,7 @@ public final class MetadataBridge
     }
 
     @Override
-    public Metadata setProperties( Map<String, String> properties )
+    public Metadata setProperties( final Map<String, String> properties )
     {
         return this;
     }
@@ -149,7 +149,7 @@ public final class MetadataBridge
 
         private File metadataFile;
 
-        MetadataRepository( File metadataFile )
+        MetadataRepository( final File metadataFile )
         {
             super( "local", "", null );
             this.metadataFile = metadataFile;
@@ -162,7 +162,7 @@ public final class MetadataBridge
         }
 
         @Override
-        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        public String pathOfLocalRepositoryMetadata( final ArtifactMetadata metadata, final ArtifactRepository repository )
         {
             return metadataFile.getName();
         }

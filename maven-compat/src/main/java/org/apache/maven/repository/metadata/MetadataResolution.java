@@ -36,12 +36,12 @@ public class MetadataResolution
     /** repositories, added by this POM  */
     private Collection<ArtifactRepository> metadataRepositories;
     //-------------------------------------------------------------------
-    public MetadataResolution( ArtifactMetadata artifactMetadata )
+    public MetadataResolution( final ArtifactMetadata artifactMetadata )
     {
         this.artifactMetadata = artifactMetadata;
     }
     //-------------------------------------------------------------------
-    public MetadataResolution( ArtifactMetadata artifactMetadata, Collection<ArtifactRepository> metadataRepositories )
+    public MetadataResolution( final ArtifactMetadata artifactMetadata, final Collection<ArtifactRepository> metadataRepositories )
     {
         this( artifactMetadata );
         this.metadataRepositories = metadataRepositories;
@@ -52,7 +52,7 @@ public class MetadataResolution
         return metadataRepositories;
     }
 
-    public void setMetadataRepositories( Collection<ArtifactRepository> metadataRepositories )
+    public void setMetadataRepositories( final Collection<ArtifactRepository> metadataRepositories )
     {
         this.metadataRepositories = metadataRepositories;
     }
@@ -62,7 +62,7 @@ public class MetadataResolution
         return artifactMetadata;
     }
 
-    public void setArtifactMetadata( ArtifactMetadata artifactMetadata )
+    public void setArtifactMetadata( final ArtifactMetadata artifactMetadata )
     {
         this.artifactMetadata = artifactMetadata;
     }

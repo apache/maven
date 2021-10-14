@@ -35,10 +35,10 @@ public class JdkPrefixProfileActivator
 {
     private static final String JDK_VERSION = System.getProperty( "java.version" );
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( final Profile profile )
         throws ProfileActivationException
     {
-        Activation activation = profile.getActivation();
+        final Activation activation = profile.getActivation();
 
         String jdk = activation.getJdk();
 
@@ -49,7 +49,7 @@ public class JdkPrefixProfileActivator
             {
                 return matchJdkVersionRange( jdk );
             }
-            catch ( InvalidVersionSpecificationException e )
+            catch ( final InvalidVersionSpecificationException e )
             {
                 throw new ProfileActivationException( "Invalid JDK version in profile '" + profile.getId() + "': "
                     + e.getMessage() );
@@ -74,15 +74,15 @@ public class JdkPrefixProfileActivator
         }
     }
 
-    private boolean matchJdkVersionRange( String jdk )
+    private boolean matchJdkVersionRange( final String jdk )
         throws InvalidVersionSpecificationException
     {
-        VersionRange jdkVersionRange = VersionRange.createFromVersionSpec( convertJdkToMavenVersion( jdk ) );
-        DefaultArtifactVersion jdkVersion = new DefaultArtifactVersion( convertJdkToMavenVersion( getJdkVersion() ) );
+        final VersionRange jdkVersionRange = VersionRange.createFromVersionSpec( convertJdkToMavenVersion( jdk ) );
+        final DefaultArtifactVersion jdkVersion = new DefaultArtifactVersion( convertJdkToMavenVersion( getJdkVersion() ) );
         return jdkVersionRange.containsVersion( jdkVersion );
     }
 
-    private String convertJdkToMavenVersion( String jdk )
+    private String convertJdkToMavenVersion( final String jdk )
     {
         return jdk.replaceAll( "_", "-" );
     }
@@ -92,7 +92,7 @@ public class JdkPrefixProfileActivator
         return JDK_VERSION;
     }
 
-    protected boolean canDetectActivation( Profile profile )
+    protected boolean canDetectActivation( final Profile profile )
     {
         return profile.getActivation() != null && StringUtils.isNotEmpty( profile.getActivation().getJdk() );
     }

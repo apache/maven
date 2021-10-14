@@ -39,8 +39,8 @@ public class PathTranslatingPostProcessor
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List<String> expressionPrefixes, List<String> unprefixedPathKeys,
-                                         File projectDir, PathTranslator pathTranslator )
+    public PathTranslatingPostProcessor( final List<String> expressionPrefixes, final List<String> unprefixedPathKeys,
+                                         final File projectDir, final PathTranslator pathTranslator )
     {
         this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;
@@ -49,7 +49,7 @@ public class PathTranslatingPostProcessor
     }
 
     public Object execute( String expression,
-                                      Object value )
+                           final Object value )
     {
         expression = ValueSourceUtils.trimPrefix( expression, expressionPrefixes, true );
 

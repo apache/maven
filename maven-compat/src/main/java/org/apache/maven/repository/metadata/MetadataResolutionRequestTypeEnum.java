@@ -36,7 +36,7 @@ public enum MetadataResolutionRequestTypeEnum
     private int id;
 
     // Constructor
-    MetadataResolutionRequestTypeEnum( int id )
+    MetadataResolutionRequestTypeEnum( final int id )
     {
         this.id = id;
     }

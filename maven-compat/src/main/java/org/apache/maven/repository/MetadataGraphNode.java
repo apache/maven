@@ -45,26 +45,26 @@ public class MetadataGraphNode
         exNodes = new ArrayList<>( 8 );
     }
 
-    public MetadataGraphNode( MavenArtifactMetadata metadata )
+    public MetadataGraphNode( final MavenArtifactMetadata metadata )
     {
         this();
         this.metadata = metadata;
     }
 
-    public MetadataGraphNode addIncident( MetadataGraphNode node )
+    public MetadataGraphNode addIncident( final MetadataGraphNode node )
     {
         inNodes.add( node );
         return this;
     }
 
-    public MetadataGraphNode addExident( MetadataGraphNode node )
+    public MetadataGraphNode addExident( final MetadataGraphNode node )
     {
         exNodes.add( node );
         return this;
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( obj == null )
         {
@@ -73,7 +73,7 @@ public class MetadataGraphNode
 
         if ( MetadataGraphNode.class.isAssignableFrom( obj.getClass() ) )
         {
-            MetadataGraphNode node2 = (MetadataGraphNode) obj;
+            final MetadataGraphNode node2 = (MetadataGraphNode) obj;
 
             if ( node2.metadata == null )
             {

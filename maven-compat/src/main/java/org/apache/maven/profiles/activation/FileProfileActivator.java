@@ -43,28 +43,28 @@ public class FileProfileActivator
 {
     private Logger logger;
 
-    protected boolean canDetectActivation( Profile profile )
+    protected boolean canDetectActivation( final Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getFile() != null;
     }
 
-    public boolean isActive( Profile profile )
+    public boolean isActive( final Profile profile )
     {
-        Activation activation = profile.getActivation();
+        final Activation activation = profile.getActivation();
 
-        ActivationFile actFile = activation.getFile();
+        final ActivationFile actFile = activation.getFile();
 
         if ( actFile != null )
         {
             // check if the file exists, if it does then the profile will be active
             String fileString = actFile.getExists();
 
-            RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+            final RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
             try
             {
                 interpolator.addValueSource( new EnvarBasedValueSource() );
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 // ignored
             }
@@ -87,7 +87,7 @@ public class FileProfileActivator
                     return !FileUtils.fileExists( fileString );
                 }
             }
-            catch ( InterpolationException e )
+            catch ( final InterpolationException e )
             {
                 if ( logger.isDebugEnabled() )
                 {
@@ -105,7 +105,7 @@ public class FileProfileActivator
         return false;
     }
 
-    public void enableLogging( Logger logger )
+    public void enableLogging( final Logger logger )
     {
         this.logger = logger;
     }

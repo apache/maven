@@ -55,7 +55,7 @@ public class DefaultUpdateCheckManager
 
     }
 
-    public DefaultUpdateCheckManager( Logger logger )
+    public DefaultUpdateCheckManager( final Logger logger )
     {
         enableLogging( logger );
     }
@@ -64,11 +64,11 @@ public class DefaultUpdateCheckManager
 
     private static final String TOUCHFILE_NAME = "resolver-status.properties";
 
-    public boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository )
+    public boolean isUpdateRequired( final Artifact artifact, final ArtifactRepository repository )
     {
-        File file = artifact.getFile();
+        final File file = artifact.getFile();
 
-        ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+        final ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
         if ( !policy.isEnabled() )
         {
@@ -95,7 +95,7 @@ public class DefaultUpdateCheckManager
             return true;
         }
 
-        Date lastCheckDate;
+        final Date lastCheckDate;
 
         if ( file.exists() )
         {
@@ -103,14 +103,14 @@ public class DefaultUpdateCheckManager
         }
         else
         {
-            File touchfile = getTouchfile( artifact );
+            final File touchfile = getTouchfile( artifact );
             lastCheckDate = readLastUpdated( touchfile, getRepositoryKey( repository ) );
         }
 
         return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
     }
 
-    public boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file )
+    public boolean isUpdateRequired( final RepositoryMetadata metadata, final ArtifactRepository repository, final File file )
     {
         // Here, we need to determine which policy to use. Release updateInterval will be used when
         // the metadata refers to a release artifact or meta-version, and snapshot updateInterval will be used when
@@ -118,7 +118,7 @@ public class DefaultUpdateCheckManager
         // NOTE: Release metadata includes version information about artifacts that have been released, to allow
         // meta-versions like RELEASE and LATEST to resolve, and also to allow retrieval of the range of valid, released
         // artifacts available.
-        ArtifactRepositoryPolicy policy = metadata.getPolicy( repository );
+        final ArtifactRepositoryPolicy policy = metadata.getPolicy( repository );
 
         if ( !policy.isEnabled() )
         {
@@ -145,31 +145,31 @@ public class DefaultUpdateCheckManager
             return true;
         }
 
-        Date lastCheckDate = readLastUpdated( metadata, repository, file );
+        final Date lastCheckDate = readLastUpdated( metadata, repository, file );
 
         return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
     }
 
-    private Date readLastUpdated( RepositoryMetadata metadata, ArtifactRepository repository, File file )
+    private Date readLastUpdated( final RepositoryMetadata metadata, final ArtifactRepository repository, final File file )
     {
-        File touchfile = getTouchfile( metadata, file );
+        final File touchfile = getTouchfile( metadata, file );
 
-        String key = getMetadataKey( repository, file );
+        final String key = getMetadataKey( repository, file );
 
         return readLastUpdated( touchfile, key );
     }
 
-    public String getError( Artifact artifact, ArtifactRepository repository )
+    public String getError( final Artifact artifact, final ArtifactRepository repository )
     {
-        File touchFile = getTouchfile( artifact );
+        final File touchFile = getTouchfile( artifact );
         return getError( touchFile, getRepositoryKey( repository ) );
     }
 
-    public void touch( Artifact artifact, ArtifactRepository repository, String error )
+    public void touch( final Artifact artifact, final ArtifactRepository repository, final String error )
     {
-        File file = artifact.getFile();
+        final File file = artifact.getFile();
 
-        File touchfile = getTouchfile( artifact );
+        final File touchfile = getTouchfile( artifact );
 
         if ( file.exists() )
         {
@@ -181,40 +181,40 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    public void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file )
+    public void touch( final RepositoryMetadata metadata, final ArtifactRepository repository, final File file )
     {
-        File touchfile = getTouchfile( metadata, file );
+        final File touchfile = getTouchfile( metadata, file );
 
-        String key = getMetadataKey( repository, file );
+        final String key = getMetadataKey( repository, file );
 
         writeLastUpdated( touchfile, key, null );
     }
 
-    String getMetadataKey( ArtifactRepository repository, File file )
+    String getMetadataKey( final ArtifactRepository repository, final File file )
     {
         return repository.getId() + '.' + file.getName() + LAST_UPDATE_TAG;
     }
 
-    String getRepositoryKey( ArtifactRepository repository )
+    String getRepositoryKey( final ArtifactRepository repository )
     {
-        StringBuilder buffer = new StringBuilder( 256 );
+        final StringBuilder buffer = new StringBuilder( 256 );
 
-        Proxy proxy = repository.getProxy();
+        final Proxy proxy = repository.getProxy();
         if ( proxy != null )
         {
             if ( proxy.getUserName() != null )
             {
-                int hash = ( proxy.getUserName() + proxy.getPassword() ).hashCode();
+                final int hash = ( proxy.getUserName() + proxy.getPassword() ).hashCode();
                 buffer.append( hash ).append( '@' );
             }
             buffer.append( proxy.getHost() ).append( ':' ).append( proxy.getPort() ).append( '>' );
         }
 
         // consider the username&password because a repo manager might block artifacts depending on authorization
-        Authentication auth = repository.getAuthentication();
+        final Authentication auth = repository.getAuthentication();
         if ( auth != null )
         {
-            int hash = ( auth.getUsername() + auth.getPassword() ).hashCode();
+            final int hash = ( auth.getUsername() + auth.getPassword() ).hashCode();
             buffer.append( hash ).append( '@' );
         }
 
@@ -224,7 +224,7 @@ public class DefaultUpdateCheckManager
         return buffer.toString();
     }
 
-    private void writeLastUpdated( File touchfile, String key, String error )
+    private void writeLastUpdated( final File touchfile, final String key, final String error )
     {
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
@@ -239,7 +239,7 @@ public class DefaultUpdateCheckManager
             FileLock lock = null;
             try
             {
-                Properties props = new Properties();
+                final Properties props = new Properties();
 
                 channel = new RandomAccessFile( touchfile, "rw" ).getChannel();
                 lock = channel.lock();
@@ -271,7 +271,7 @@ public class DefaultUpdateCheckManager
                 channel.close();
                 channel = null;
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 getLogger().debug(
                     "Failed to record lastUpdated information for resolution.\nFile: " + touchfile.toString()
@@ -285,7 +285,7 @@ public class DefaultUpdateCheckManager
                     {
                         lock.release();
                     }
-                    catch ( IOException e )
+                    catch ( final IOException e )
                     {
                         getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " + touchfile,
                                            e );
@@ -298,7 +298,7 @@ public class DefaultUpdateCheckManager
                     {
                         channel.close();
                     }
-                    catch ( IOException e )
+                    catch ( final IOException e )
                     {
                         getLogger().debug( "Error closing FileChannel for resolution tracking file: " + touchfile, e );
                     }
@@ -307,21 +307,21 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    Date readLastUpdated( File touchfile, String key )
+    Date readLastUpdated( final File touchfile, final String key )
     {
         getLogger().debug( "Searching for " + key + " in resolution tracking file." );
 
-        Properties props = read( touchfile );
+        final Properties props = read( touchfile );
         if ( props != null )
         {
-            String rawVal = props.getProperty( key );
+            final String rawVal = props.getProperty( key );
             if ( rawVal != null )
             {
                 try
                 {
                     return new Date( Long.parseLong( rawVal ) );
                 }
-                catch ( NumberFormatException e )
+                catch ( final NumberFormatException e )
                 {
                     getLogger().debug( "Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e );
                 }
@@ -330,9 +330,9 @@ public class DefaultUpdateCheckManager
         return null;
     }
 
-    private String getError( File touchFile, String key )
+    private String getError( final File touchFile, final String key )
     {
-        Properties props = read( touchFile );
+        final Properties props = read( touchFile );
         if ( props != null )
         {
             return props.getProperty( key + ERROR_KEY_SUFFIX );
@@ -340,7 +340,7 @@ public class DefaultUpdateCheckManager
         return null;
     }
 
-    private Properties read( File touchfile )
+    private Properties read( final File touchfile )
     {
         if ( !touchfile.canRead() )
         {
@@ -355,7 +355,7 @@ public class DefaultUpdateCheckManager
 
             try
             {
-                Properties props = new Properties();
+                final Properties props = new Properties();
 
                 in = new FileInputStream( touchfile );
                 lock = in.getChannel().lock( 0, Long.MAX_VALUE, true );
@@ -371,7 +371,7 @@ public class DefaultUpdateCheckManager
 
                 return props;
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 getLogger().debug( "Failed to read resolution tracking file " + touchfile, e );
 
@@ -385,7 +385,7 @@ public class DefaultUpdateCheckManager
                     {
                         lock.release();
                     }
-                    catch ( IOException e )
+                    catch ( final IOException e )
                     {
                         getLogger().debug( "Error releasing shared lock for resolution tracking file: " + touchfile,
                                            e );
@@ -398,7 +398,7 @@ public class DefaultUpdateCheckManager
                     {
                         in.close();
                     }
-                    catch ( IOException e )
+                    catch ( final IOException e )
                     {
                         getLogger().debug( "Error closing FileChannel for resolution tracking file: " + touchfile, e );
                     }
@@ -407,9 +407,9 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    File getTouchfile( Artifact artifact )
+    File getTouchfile( final Artifact artifact )
     {
-        StringBuilder sb = new StringBuilder( 128 );
+        final StringBuilder sb = new StringBuilder( 128 );
         sb.append( artifact.getArtifactId() );
         sb.append( '-' ).append( artifact.getBaseVersion() );
         if ( artifact.getClassifier() != null )
@@ -420,7 +420,7 @@ public class DefaultUpdateCheckManager
         return new File( artifact.getFile().getParentFile(), sb.toString() );
     }
 
-    File getTouchfile( RepositoryMetadata metadata, File file )
+    File getTouchfile( final RepositoryMetadata metadata, final File file )
     {
         return new File( file.getParent(), TOUCHFILE_NAME );
     }

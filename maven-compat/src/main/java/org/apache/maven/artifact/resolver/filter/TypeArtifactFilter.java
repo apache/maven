@@ -27,12 +27,12 @@ public class TypeArtifactFilter
 {
     private String type = "jar";
 
-    public TypeArtifactFilter( String type )
+    public TypeArtifactFilter( final String type )
     {
         this.type = type;
     }
 
-    public boolean include( Artifact artifact )
+    public boolean include( final Artifact artifact )
     {
         return type.equals( artifact.getType() );
     }
@@ -46,7 +46,7 @@ public class TypeArtifactFilter
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -58,7 +58,7 @@ public class TypeArtifactFilter
             return false;
         }
 
-        TypeArtifactFilter other = (TypeArtifactFilter) obj;
+        final TypeArtifactFilter other = (TypeArtifactFilter) obj;
 
         return type.equals( other.type );
     }

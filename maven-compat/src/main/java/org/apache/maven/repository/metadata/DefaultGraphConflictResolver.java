@@ -44,7 +44,7 @@ public class DefaultGraphConflictResolver
 
     // -------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------
-    public MetadataGraph resolveConflicts( MetadataGraph graph, ArtifactScopeEnum scope )
+    public MetadataGraph resolveConflicts( final MetadataGraph graph, final ArtifactScopeEnum scope )
         throws GraphConflictResolutionException
     {
         if ( policy == null )
@@ -85,16 +85,16 @@ public class DefaultGraphConflictResolver
 
             final ArtifactScopeEnum requestedScope = ArtifactScopeEnum.checkScope( scope );
 
-            MetadataGraph res = new MetadataGraph( vertices.size() );
+            final MetadataGraph res = new MetadataGraph( vertices.size() );
             res.setVersionedVertices( false );
             res.setScopedVertices( false );
 
-            MetadataGraphVertex resEntry = res.addVertex( entry.getMd() );
+            final MetadataGraphVertex resEntry = res.addVertex( entry.getMd() );
             res.setEntry( resEntry );
 
             res.setScope( requestedScope );
 
-            for ( MetadataGraphVertex v : vertices )
+            for ( final MetadataGraphVertex v : vertices )
             {
                 final List<MetadataGraphEdge> ins = graph.getIncidentEdges( v );
                 final MetadataGraphEdge edge = cleanEdges( v, ins, requestedScope );
@@ -119,15 +119,15 @@ public class DefaultGraphConflictResolver
                 {
                     // System.out.println("+++>"+v.getMd().toDomainString()+" still has "+edge.toString() );
                     // fill in domain md with actual version data
-                    ArtifactMetadata md = v.getMd();
-                    ArtifactMetadata newMd =
+                    final ArtifactMetadata md = v.getMd();
+                    final ArtifactMetadata newMd =
                         new ArtifactMetadata( md.getGroupId(), md.getArtifactId(), edge.getVersion(), md.getType(),
                                               md.getScopeAsEnum(), md.getClassifier(), edge.getArtifactUri(),
                                               edge.getSource() == null ? "" : edge.getSource().getMd().toString(),
                                               edge.isResolved(), edge.getTarget() == null ? null
                                                               : edge.getTarget().getMd().getError() );
-                    MetadataGraphVertex newV = res.addVertex( newMd );
-                    MetadataGraphVertex sourceV = res.addVertex( edge.getSource().getMd() );
+                    final MetadataGraphVertex newV = res.addVertex( newMd );
+                    final MetadataGraphVertex sourceV = res.addVertex( edge.getSource().getMd() );
 
                     res.addEdge( sourceV, newV, edge );
                 }
@@ -138,27 +138,27 @@ public class DefaultGraphConflictResolver
             // subgraph("+linkedRes.getVertices().size()+"):\n"+linkedRes.toString());
             return findLinkedSubgraph( res );
         }
-        catch ( MetadataResolutionException e )
+        catch ( final MetadataResolutionException e )
         {
             throw new GraphConflictResolutionException( e );
         }
     }
 
     // -------------------------------------------------------------------------------------
-    private MetadataGraph findLinkedSubgraph( MetadataGraph g )
+    private MetadataGraph findLinkedSubgraph( final MetadataGraph g )
     {
         if ( g.getVertices().size() == 1 )
         {
             return g;
         }
 
-        List<MetadataGraphVertex> visited = new ArrayList<>( g.getVertices().size() );
+        final List<MetadataGraphVertex> visited = new ArrayList<>( g.getVertices().size() );
         visit( g.getEntry(), visited, g );
 
-        List<MetadataGraphVertex> dropList = new ArrayList<>( g.getVertices().size() );
+        final List<MetadataGraphVertex> dropList = new ArrayList<>( g.getVertices().size() );
 
         // collect drop list
-        for ( MetadataGraphVertex v : g.getVertices() )
+        for ( final MetadataGraphVertex v : g.getVertices() )
         {
             if ( !visited.contains( v ) )
             {
@@ -172,8 +172,8 @@ public class DefaultGraphConflictResolver
         }
 
         // now - drop vertices
-        TreeSet<MetadataGraphVertex> vertices = g.getVertices();
-        for ( MetadataGraphVertex v : dropList )
+        final TreeSet<MetadataGraphVertex> vertices = g.getVertices();
+        for ( final MetadataGraphVertex v : dropList )
         {
             vertices.remove( v );
         }
@@ -182,7 +182,7 @@ public class DefaultGraphConflictResolver
     }
 
     // -------------------------------------------------------------------------------------
-    private void visit( MetadataGraphVertex from, List<MetadataGraphVertex> visited, MetadataGraph graph )
+    private void visit( final MetadataGraphVertex from, final List<MetadataGraphVertex> visited, final MetadataGraph graph )
     {
         if ( visited.contains( from ) )
         {
@@ -191,11 +191,11 @@ public class DefaultGraphConflictResolver
 
         visited.add( from );
 
-        List<MetadataGraphEdge> exitList = graph.getExcidentEdges( from );
+        final List<MetadataGraphEdge> exitList = graph.getExcidentEdges( from );
         // String s = "|---> "+from.getMd().toString()+" - "+(exitList == null ? -1 : exitList.size()) + " exit links";
         if ( exitList != null && exitList.size() > 0 )
         {
-            for ( MetadataGraphEdge e : graph.getExcidentEdges( from ) )
+            for ( final MetadataGraphEdge e : graph.getExcidentEdges( from ) )
             {
                 visit( e.getTarget(), visited, graph );
             }
@@ -203,8 +203,8 @@ public class DefaultGraphConflictResolver
     }
 
     // -------------------------------------------------------------------------------------
-    private MetadataGraphEdge cleanEdges( MetadataGraphVertex v, List<MetadataGraphEdge> edges,
-                                          ArtifactScopeEnum scope )
+    private MetadataGraphEdge cleanEdges( final MetadataGraphVertex v, final List<MetadataGraphEdge> edges,
+                                          final ArtifactScopeEnum scope )
     {
         if ( edges == null || edges.isEmpty() )
         {
@@ -213,7 +213,7 @@ public class DefaultGraphConflictResolver
 
         if ( edges.size() == 1 )
         {
-            MetadataGraphEdge e = edges.get( 0 );
+            final MetadataGraphEdge e = edges.get( 0 );
             if ( scope.encloses( e.getScope() ) )
             {
                 return e;
@@ -224,7 +224,7 @@ public class DefaultGraphConflictResolver
 
         MetadataGraphEdge res = null;
 
-        for ( MetadataGraphEdge e : edges )
+        for ( final MetadataGraphEdge e : edges )
         {
             if ( !scope.encloses( e.getScope() ) )
             {

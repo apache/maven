@@ -53,7 +53,7 @@ public class SnapshotTransformation
 
     private String deploymentTimestamp;
 
-    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+    public void transformForResolve( final Artifact artifact, final RepositoryRequest request )
         throws ArtifactResolutionException
     {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
@@ -61,35 +61,35 @@ public class SnapshotTransformation
         {
             try
             {
-                String version = resolveVersion( artifact, request );
+                final String version = resolveVersion( artifact, request );
                 artifact.updateVersion( version, request.getLocalRepository() );
             }
-            catch ( RepositoryMetadataResolutionException e )
+            catch ( final RepositoryMetadataResolutionException e )
             {
                 throw new ArtifactResolutionException( e.getMessage(), artifact, e );
             }
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( final Artifact artifact, final ArtifactRepository localRepository )
     {
         if ( artifact.isSnapshot() )
         {
-            Snapshot snapshot = new Snapshot();
+            final Snapshot snapshot = new Snapshot();
             snapshot.setLocalCopy( true );
-            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
+            final RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
             artifact.addMetadata( metadata );
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
-                                        ArtifactRepository localRepository )
+    public void transformForDeployment( final Artifact artifact, final ArtifactRepository remoteRepository,
+                                        final ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
         if ( artifact.isSnapshot() )
         {
-            Snapshot snapshot = new Snapshot();
+            final Snapshot snapshot = new Snapshot();
 
             // TODO Should this be changed for MNG-6754 too?
             snapshot.setTimestamp( getDeploymentTimestamp() );
@@ -97,17 +97,17 @@ public class SnapshotTransformation
             // we update the build number anyway so that it doesn't get lost. It requires the timestamp to take effect
             try
             {
-                int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
+                final int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
 
                 snapshot.setBuildNumber( buildNumber + 1 );
             }
-            catch ( RepositoryMetadataResolutionException e )
+            catch ( final RepositoryMetadataResolutionException e )
             {
                 throw new ArtifactDeploymentException( "Error retrieving previous build number for artifact '"
                     + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
             }
 
-            RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
+            final RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
             artifact.setResolvedVersion(
                 constructVersion( metadata.getMetadata().getVersioning(), artifact.getBaseVersion() ) );
@@ -125,15 +125,15 @@ public class SnapshotTransformation
         return deploymentTimestamp;
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( final Versioning versioning, final String baseVersion )
     {
         String version = null;
-        Snapshot snapshot = versioning.getSnapshot();
+        final Snapshot snapshot = versioning.getSnapshot();
         if ( snapshot != null )
         {
             if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
-                String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
+                final String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
                 version = StringUtils.replace( baseVersion, Artifact.SNAPSHOT_VERSION, newVersion );
             }
             else
@@ -144,17 +144,17 @@ public class SnapshotTransformation
         return version;
     }
 
-    private int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
-                                                  ArtifactRepository remoteRepository )
+    private int resolveLatestSnapshotBuildNumber( final Artifact artifact, final ArtifactRepository localRepository,
+                                                  final ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {
-        RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+        final RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
         repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
 
         int buildNumber = 0;
-        Metadata repoMetadata = metadata.getMetadata();
+        final Metadata repoMetadata = metadata.getMetadata();
         if ( ( repoMetadata != null )
             && ( repoMetadata.getVersioning() != null && repoMetadata.getVersioning().getSnapshot() != null ) )
         {
@@ -165,7 +165,7 @@ public class SnapshotTransformation
 
     public static DateFormat getUtcDateFormatter()
     {
-        DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
+        final DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
         utcDateFormatter.setCalendar( new GregorianCalendar() );
         utcDateFormatter.setTimeZone( DEFAULT_SNAPSHOT_TIME_ZONE );
         return utcDateFormatter;

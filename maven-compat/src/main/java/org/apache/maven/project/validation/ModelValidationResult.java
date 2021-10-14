@@ -45,7 +45,7 @@ public class ModelValidationResult
         return messages.size();
     }
 
-    public String getMessage( int i )
+    public String getMessage( final int i )
     {
         return messages.get( i );
     }
@@ -55,7 +55,7 @@ public class ModelValidationResult
         return Collections.unmodifiableList( messages );
     }
 
-    public void addMessage( String message )
+    public void addMessage( final String message )
     {
         messages.add( message );
     }
@@ -65,14 +65,14 @@ public class ModelValidationResult
         return render( "" );
     }
 
-    public String render( String indentation )
+    public String render( final String indentation )
     {
         if ( messages.size() == 0 )
         {
             return indentation + "There were no validation errors.";
         }
 
-        StringBuilder message = new StringBuilder();
+        final StringBuilder message = new StringBuilder();
 
 //        if ( messages.size() == 1 )
 //        {

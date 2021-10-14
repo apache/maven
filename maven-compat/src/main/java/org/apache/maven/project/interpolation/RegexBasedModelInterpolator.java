@@ -42,12 +42,12 @@ public class RegexBasedModelInterpolator
     {
     }
 
-    public RegexBasedModelInterpolator( PathTranslator pathTranslator )
+    public RegexBasedModelInterpolator( final PathTranslator pathTranslator )
     {
         super( pathTranslator );
     }
 
-    public RegexBasedModelInterpolator( Properties envars )
+    public RegexBasedModelInterpolator( final Properties envars )
     {
     }
 

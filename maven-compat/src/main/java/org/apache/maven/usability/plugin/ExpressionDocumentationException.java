@@ -27,12 +27,12 @@ public class ExpressionDocumentationException
 {
     static final long serialVersionUID = 1;
 
-    public ExpressionDocumentationException( String message, Throwable cause )
+    public ExpressionDocumentationException( final String message, final Throwable cause )
     {
         super( message, cause );
     }
 
-    public ExpressionDocumentationException( String message )
+    public ExpressionDocumentationException( final String message )
     {
         super( message );
     }

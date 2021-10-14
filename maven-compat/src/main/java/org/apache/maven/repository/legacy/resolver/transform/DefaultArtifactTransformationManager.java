@@ -41,39 +41,39 @@ public class DefaultArtifactTransformationManager
     @Requirement( role = ArtifactTransformation.class, hints = { "release", "latest", "snapshot" } )
     private List<ArtifactTransformation> artifactTransformations;
 
-    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+    public void transformForResolve( final Artifact artifact, final RepositoryRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        for ( ArtifactTransformation transform : artifactTransformations )
+        for ( final ArtifactTransformation transform : artifactTransformations )
         {
             transform.transformForResolve( artifact, request );
         }
     }
 
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
+    public void transformForResolve( final Artifact artifact, final List<ArtifactRepository> remoteRepositories,
+                                     final ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        for ( ArtifactTransformation transform : artifactTransformations )
+        for ( final ArtifactTransformation transform : artifactTransformations )
         {
             transform.transformForResolve( artifact, remoteRepositories, localRepository );
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( final Artifact artifact, final ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        for ( ArtifactTransformation transform : artifactTransformations )
+        for ( final ArtifactTransformation transform : artifactTransformations )
         {
             transform.transformForInstall( artifact, localRepository );
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
-                                        ArtifactRepository localRepository )
+    public void transformForDeployment( final Artifact artifact, final ArtifactRepository remoteRepository,
+                                        final ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        for ( ArtifactTransformation transform : artifactTransformations )
+        for ( final ArtifactTransformation transform : artifactTransformations )
         {
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }

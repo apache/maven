@@ -43,16 +43,16 @@ public class OldestConflictResolver
     *      org.apache.maven.artifact.resolver.ResolutionNode)
     */
 
-    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
+    public ResolutionNode resolveConflict( final ResolutionNode node1, final ResolutionNode node2 )
     {
         try
         {
-            ArtifactVersion version1 = node1.getArtifact().getSelectedVersion();
-            ArtifactVersion version2 = node2.getArtifact().getSelectedVersion();
+            final ArtifactVersion version1 = node1.getArtifact().getSelectedVersion();
+            final ArtifactVersion version2 = node2.getArtifact().getSelectedVersion();
 
             return version1.compareTo( version2 ) <= 0 ? node1 : node2;
         }
-        catch ( OverConstrainedVersionException exception )
+        catch ( final OverConstrainedVersionException exception )
         {
             // TODO log message or throw exception?
 

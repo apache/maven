@@ -39,8 +39,8 @@ public class VersionNotFoundException
     private File pomFile;
     private InvalidVersionSpecificationException cause;
 
-    public VersionNotFoundException( String projectId, Dependency dependency, File pomFile,
-                                     InvalidVersionSpecificationException cause )
+    public VersionNotFoundException( final String projectId, final Dependency dependency, final File pomFile,
+                                     final InvalidVersionSpecificationException cause )
     {
         super( projectId + ", " + formatLocationInPom( dependency ) + " " + dependency.getVersion() + ", pom file "
             + pomFile, cause );
@@ -54,7 +54,7 @@ public class VersionNotFoundException
         this.dependency = dependency;
     }
 
-    private static String formatLocationInPom( Dependency dependency )
+    private static String formatLocationInPom( final Dependency dependency )
     {
         return "Dependency: " + ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
     }

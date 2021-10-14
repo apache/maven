@@ -47,7 +47,7 @@ public class DefaultProjectBuilderConfiguration
     {
     }
 
-    public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
+    public ProjectBuilderConfiguration setGlobalProfileManager( final ProfileManager globalProfileManager )
     {
         this.globalProfileManager = globalProfileManager;
         return this;
@@ -58,7 +58,7 @@ public class DefaultProjectBuilderConfiguration
         return globalProfileManager;
     }
 
-    public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
+    public ProjectBuilderConfiguration setLocalRepository( final ArtifactRepository localRepository )
     {
         this.localRepository = localRepository;
         return this;
@@ -69,7 +69,7 @@ public class DefaultProjectBuilderConfiguration
         return localRepository;
     }
 
-    public ProjectBuilderConfiguration setUserProperties( Properties userProperties )
+    public ProjectBuilderConfiguration setUserProperties( final Properties userProperties )
     {
         this.userProperties = userProperties;
         return this;
@@ -90,7 +90,7 @@ public class DefaultProjectBuilderConfiguration
         return executionProperties;
     }
 
-    public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
+    public ProjectBuilderConfiguration setExecutionProperties( final Properties executionProperties )
     {
         this.executionProperties = executionProperties;
         return this;
@@ -101,7 +101,7 @@ public class DefaultProjectBuilderConfiguration
         return buildStartTime;
     }
 
-    public ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime )
+    public ProjectBuilderConfiguration setBuildStartTime( final Date buildStartTime )
     {
         this.buildStartTime = buildStartTime;
         return this;

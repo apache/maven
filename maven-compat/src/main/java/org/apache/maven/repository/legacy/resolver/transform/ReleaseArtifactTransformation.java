@@ -40,14 +40,14 @@ public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {
 
-    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+    public void transformForResolve( final Artifact artifact, final RepositoryRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
             try
             {
-                String version = resolveVersion( artifact, request );
+                final String version = resolveVersion( artifact, request );
 
                 if ( Artifact.RELEASE_VERSION.equals( version ) )
                 {
@@ -57,31 +57,31 @@ public class ReleaseArtifactTransformation
                 artifact.setBaseVersion( version );
                 artifact.updateVersion( version, request.getLocalRepository() );
             }
-            catch ( RepositoryMetadataResolutionException e )
+            catch ( final RepositoryMetadataResolutionException e )
             {
                 throw new ArtifactResolutionException( e.getMessage(), artifact, e );
             }
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( final Artifact artifact, final ArtifactRepository localRepository )
     {
-        ArtifactMetadata metadata = createMetadata( artifact );
+        final ArtifactMetadata metadata = createMetadata( artifact );
 
         artifact.addMetadata( metadata );
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
-                                        ArtifactRepository localRepository )
+    public void transformForDeployment( final Artifact artifact, final ArtifactRepository remoteRepository,
+                                        final ArtifactRepository localRepository )
     {
-        ArtifactMetadata metadata = createMetadata( artifact );
+        final ArtifactMetadata metadata = createMetadata( artifact );
 
         artifact.addMetadata( metadata );
     }
 
-    private ArtifactMetadata createMetadata( Artifact artifact )
+    private ArtifactMetadata createMetadata( final Artifact artifact )
     {
-        Versioning versioning = new Versioning();
+        final Versioning versioning = new Versioning();
         // TODO Should this be changed for MNG-6754 too?
         versioning.updateTimestamp();
         versioning.addVersion( artifact.getVersion() );
@@ -94,7 +94,7 @@ public class ReleaseArtifactTransformation
         return new ArtifactRepositoryMetadata( artifact, versioning );
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( final Versioning versioning, final String baseVersion )
     {
         return versioning.getRelease();
     }

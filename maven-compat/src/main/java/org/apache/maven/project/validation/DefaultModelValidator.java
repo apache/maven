@@ -40,14 +40,14 @@ public class DefaultModelValidator
     @Requirement
     private org.apache.maven.model.validation.ModelValidator modelValidator;
 
-    public ModelValidationResult validate( Model model )
+    public ModelValidationResult validate( final Model model )
     {
-        ModelValidationResult result = new ModelValidationResult();
+        final ModelValidationResult result = new ModelValidationResult();
 
-        ModelBuildingRequest request =
+        final ModelBuildingRequest request =
             new DefaultModelBuildingRequest().setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
 
-        SimpleModelProblemCollector problems = new SimpleModelProblemCollector( result );
+        final SimpleModelProblemCollector problems = new SimpleModelProblemCollector( result );
 
         modelValidator.validateEffectiveModel( model, request, problems );
 
@@ -60,12 +60,12 @@ public class DefaultModelValidator
 
         ModelValidationResult result;
 
-        SimpleModelProblemCollector( ModelValidationResult result )
+        SimpleModelProblemCollector( final ModelValidationResult result )
         {
             this.result = result;
         }
 
-        public void add( ModelProblemCollectorRequest req )
+        public void add( final ModelProblemCollectorRequest req )
         {
             if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
             {

@@ -29,13 +29,13 @@ import org.apache.maven.wagon.TransferFailedException;
 public class ChecksumFailedException
     extends TransferFailedException
 {
-    public ChecksumFailedException( String s )
+    public ChecksumFailedException( final String s )
     {
         super( s );
     }
 
-    public ChecksumFailedException( String message,
-                                    Throwable cause )
+    public ChecksumFailedException( final String message,
+                                    final Throwable cause )
     {
         super( message, cause );
     }

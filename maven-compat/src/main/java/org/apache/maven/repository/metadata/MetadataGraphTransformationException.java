@@ -32,17 +32,17 @@ public class MetadataGraphTransformationException
     {
     }
 
-    public MetadataGraphTransformationException( String message )
+    public MetadataGraphTransformationException( final String message )
     {
         super( message );
     }
 
-    public MetadataGraphTransformationException( Throwable cause )
+    public MetadataGraphTransformationException( final Throwable cause )
     {
         super( cause );
     }
 
-    public MetadataGraphTransformationException( String message, Throwable cause )
+    public MetadataGraphTransformationException( final String message, final Throwable cause )
     {
         super( message, cause );
     }

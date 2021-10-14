@@ -45,24 +45,24 @@ public class DefaultArtifactRepositoryFactory
     @Requirement( role = ArtifactRepositoryLayout.class )
     private Map<String, ArtifactRepositoryLayout> repositoryLayouts;
 
-    public ArtifactRepositoryLayout getLayout( String layoutId )
+    public ArtifactRepositoryLayout getLayout( final String layoutId )
         throws UnknownRepositoryLayoutException
     {
         return repositoryLayouts.get( layoutId );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
-                                                                  boolean uniqueVersion )
+    public ArtifactRepository createDeploymentArtifactRepository( final String id, final String url, final String layoutId,
+                                                                  final boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
+        final ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
 
         checkLayout( id, layoutId, layout );
 
         return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
     }
 
-    private void checkLayout( String repositoryId, String layoutId, ArtifactRepositoryLayout layout )
+    private void checkLayout( final String repositoryId, final String layoutId, final ArtifactRepositoryLayout layout )
         throws UnknownRepositoryLayoutException
     {
         if ( layout == null )
@@ -71,27 +71,27 @@ public class DefaultArtifactRepositoryFactory
         }
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
-                                                                  ArtifactRepositoryLayout repositoryLayout,
-                                                                  boolean uniqueVersion )
+    public ArtifactRepository createDeploymentArtifactRepository( final String id, final String url,
+                                                                  final ArtifactRepositoryLayout repositoryLayout,
+                                                                  final boolean uniqueVersion )
     {
         return createArtifactRepository( id, url, repositoryLayout, null, null );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
+    public ArtifactRepository createArtifactRepository( final String id, final String url, final String layoutId,
+                                                        final ArtifactRepositoryPolicy snapshots,
+                                                        final ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
+        final ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
 
         checkLayout( id, layoutId, layout );
 
         return createArtifactRepository( id, url, layout, snapshots, releases );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout,
+    public ArtifactRepository createArtifactRepository( final String id, final String url,
+                                                        final ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
@@ -117,7 +117,7 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        ArtifactRepository repository;
+        final ArtifactRepository repository;
         if ( repositoryLayout instanceof ArtifactRepositoryLayout2 )
         {
             repository =
@@ -132,12 +132,12 @@ public class DefaultArtifactRepositoryFactory
         return repository;
     }
 
-    public void setGlobalUpdatePolicy( String updatePolicy )
+    public void setGlobalUpdatePolicy( final String updatePolicy )
     {
         globalUpdatePolicy = updatePolicy;
     }
 
-    public void setGlobalChecksumPolicy( String checksumPolicy )
+    public void setGlobalChecksumPolicy( final String checksumPolicy )
     {
         globalChecksumPolicy = checksumPolicy;
     }

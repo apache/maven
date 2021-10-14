@@ -57,12 +57,12 @@ public class StringSearchModelInterpolator
     {
     }
 
-    public StringSearchModelInterpolator( PathTranslator pathTranslator )
+    public StringSearchModelInterpolator( final PathTranslator pathTranslator )
     {
         super( pathTranslator );
     }
 
-    public Model interpolate( Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugEnabled )
+    public Model interpolate( final Model model, final File projectDir, final ProjectBuilderConfiguration config, final boolean debugEnabled )
         throws ModelInterpolationException
     {
         interpolateObject( model, model, projectDir, config, debugEnabled );
@@ -70,20 +70,20 @@ public class StringSearchModelInterpolator
         return model;
     }
 
-    protected void interpolateObject( Object obj, Model model, File projectDir, ProjectBuilderConfiguration config,
-                                      boolean debugEnabled )
+    protected void interpolateObject( final Object obj, final Model model, final File projectDir, final ProjectBuilderConfiguration config,
+                                      final boolean debugEnabled )
         throws ModelInterpolationException
     {
         try
         {
-            List<ValueSource> valueSources = createValueSources( model, projectDir, config );
-            List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
+            final List<ValueSource> valueSources = createValueSources( model, projectDir, config );
+            final List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
-            InterpolateObjectAction action =
+            final InterpolateObjectAction action =
                 new InterpolateObjectAction( obj, valueSources, postProcessors, debugEnabled,
                                              this, getLogger() );
 
-            ModelInterpolationException error = AccessController.doPrivileged( action );
+            final ModelInterpolationException error = AccessController.doPrivileged( action );
 
             if ( error != null )
             {
@@ -98,7 +98,7 @@ public class StringSearchModelInterpolator
 
     protected Interpolator createInterpolator()
     {
-        StringSearchInterpolator interpolator = new StringSearchInterpolator();
+        final StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.setCacheAnswers( true );
 
         return interpolator;
@@ -114,9 +114,9 @@ public class StringSearchModelInterpolator
         private final List<ValueSource> valueSources;
         private final List<InterpolationPostProcessor> postProcessors;
 
-        InterpolateObjectAction( Object target, List<ValueSource> valueSources,
-                                        List<InterpolationPostProcessor> postProcessors, boolean debugEnabled,
-                                        StringSearchModelInterpolator modelInterpolator, Logger logger )
+        InterpolateObjectAction( final Object target, final List<ValueSource> valueSources,
+                                 final List<InterpolationPostProcessor> postProcessors, final boolean debugEnabled,
+                                 final StringSearchModelInterpolator modelInterpolator, final Logger logger )
         {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
@@ -133,13 +133,13 @@ public class StringSearchModelInterpolator
         {
             while ( !interpolationTargets.isEmpty() )
             {
-                Object obj = interpolationTargets.removeFirst();
+                final Object obj = interpolationTargets.removeFirst();
 
                 try
                 {
                     traverseObjectWithParents( obj.getClass(), obj );
                 }
-                catch ( ModelInterpolationException e )
+                catch ( final ModelInterpolationException e )
                 {
                     return e;
                 }
@@ -149,7 +149,7 @@ public class StringSearchModelInterpolator
         }
 
         @SuppressWarnings( { "unchecked", "checkstyle:methodlength" } )
-        private void traverseObjectWithParents( Class<?> cls, Object target )
+        private void traverseObjectWithParents( final Class<?> cls, final Object target )
             throws ModelInterpolationException
         {
             if ( cls == null )
@@ -164,14 +164,14 @@ public class StringSearchModelInterpolator
             }
             else if ( isQualifiedForInterpolation( cls ) )
             {
-                Field[] fields = FIELDS_BY_CLASS.computeIfAbsent( cls, k -> cls.getDeclaredFields() );
+                final Field[] fields = FIELDS_BY_CLASS.computeIfAbsent( cls, k -> cls.getDeclaredFields() );
 
-                for ( Field field : fields )
+                for ( final Field field : fields )
                 {
-                    Class<?> type = field.getType();
+                    final Class<?> type = field.getType();
                     if ( isQualifiedForInterpolation( field, type ) )
                     {
-                        boolean isAccessible = field.isAccessible();
+                        final boolean isAccessible = field.isAccessible();
                         field.setAccessible( true );
                         try
                         {
@@ -179,10 +179,10 @@ public class StringSearchModelInterpolator
                             {
                                 if ( String.class == type )
                                 {
-                                    String value = (String) field.get( target );
+                                    final String value = (String) field.get( target );
                                     if ( value != null )
                                     {
-                                        String interpolated =
+                                        final String interpolated =
                                             modelInterpolator.interpolateInternal( value, valueSources, postProcessors,
                                                                                    debugEnabled );
 
@@ -194,15 +194,15 @@ public class StringSearchModelInterpolator
                                 }
                                 else if ( Collection.class.isAssignableFrom( type ) )
                                 {
-                                    Collection<Object> c = (Collection<Object>) field.get( target );
+                                    final Collection<Object> c = (Collection<Object>) field.get( target );
                                     if ( c != null && !c.isEmpty() )
                                     {
-                                        List<Object> originalValues = new ArrayList<>( c );
+                                        final List<Object> originalValues = new ArrayList<>( c );
                                         try
                                         {
                                             c.clear();
                                         }
-                                        catch ( UnsupportedOperationException e )
+                                        catch ( final UnsupportedOperationException e )
                                         {
                                             if ( debugEnabled && logger != null )
                                             {
@@ -213,13 +213,13 @@ public class StringSearchModelInterpolator
                                             continue;
                                         }
 
-                                        for ( Object value : originalValues )
+                                        for ( final Object value : originalValues )
                                         {
                                             if ( value != null )
                                             {
                                                 if ( String.class == value.getClass() )
                                                 {
-                                                    String interpolated =
+                                                    final String interpolated =
                                                         modelInterpolator.interpolateInternal( (String) value,
                                                                                                valueSources,
                                                                                                postProcessors,
@@ -257,18 +257,18 @@ public class StringSearchModelInterpolator
                                 }
                                 else if ( Map.class.isAssignableFrom( type ) )
                                 {
-                                    Map<Object, Object> m = (Map<Object, Object>) field.get( target );
+                                    final Map<Object, Object> m = (Map<Object, Object>) field.get( target );
                                     if ( m != null && !m.isEmpty() )
                                     {
-                                        for ( Map.Entry<Object, Object> entry : m.entrySet() )
+                                        for ( final Map.Entry<Object, Object> entry : m.entrySet() )
                                         {
-                                            Object value = entry.getValue();
+                                            final Object value = entry.getValue();
 
                                             if ( value != null )
                                             {
                                                 if ( String.class == value.getClass() )
                                                 {
-                                                    String interpolated =
+                                                    final String interpolated =
                                                         modelInterpolator.interpolateInternal( (String) value,
                                                                                                valueSources,
                                                                                                postProcessors,
@@ -280,7 +280,7 @@ public class StringSearchModelInterpolator
                                                         {
                                                             entry.setValue( interpolated );
                                                         }
-                                                        catch ( UnsupportedOperationException e )
+                                                        catch ( final UnsupportedOperationException e )
                                                         {
                                                             if ( debugEnabled && logger != null )
                                                             {
@@ -310,7 +310,7 @@ public class StringSearchModelInterpolator
                                 }
                                 else
                                 {
-                                    Object value = field.get( target );
+                                    final Object value = field.get( target );
                                     if ( value != null )
                                     {
                                         if ( field.getType().isArray() )
@@ -324,7 +324,7 @@ public class StringSearchModelInterpolator
                                     }
                                 }
                             }
-                            catch ( IllegalArgumentException | IllegalAccessException e )
+                            catch ( final IllegalArgumentException | IllegalAccessException e )
                             {
                                 throw new ModelInterpolationException(
                                     "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );
@@ -341,12 +341,12 @@ public class StringSearchModelInterpolator
             }
         }
 
-        private boolean isQualifiedForInterpolation( Class<?> cls )
+        private boolean isQualifiedForInterpolation( final Class<?> cls )
         {
             return !cls.getPackage().getName().startsWith( "java" );
         }
 
-        private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
+        private boolean isQualifiedForInterpolation( final Field field, final Class<?> fieldType )
         {
             if ( !PRIMITIVE_BY_CLASS.containsKey( fieldType ) )
             {
@@ -366,18 +366,18 @@ public class StringSearchModelInterpolator
             return !"parent".equals( field.getName() );
         }
 
-        private void evaluateArray( Object target )
+        private void evaluateArray( final Object target )
             throws ModelInterpolationException
         {
-            int len = Array.getLength( target );
+            final int len = Array.getLength( target );
             for ( int i = 0; i < len; i++ )
             {
-                Object value = Array.get( target, i );
+                final Object value = Array.get( target, i );
                 if ( value != null )
                 {
                     if ( String.class == value.getClass() )
                     {
-                        String interpolated =
+                        final String interpolated =
                             modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors,
                                                                    debugEnabled );
 

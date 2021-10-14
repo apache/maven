@@ -35,13 +35,13 @@ public class MetadataGraphVertex
     private boolean compareVersion = false;
     private boolean compareScope   = false;
 
-    public MetadataGraphVertex( ArtifactMetadata md )
+    public MetadataGraphVertex( final ArtifactMetadata md )
     {
         super();
         this.md = md;
     }
 
-    public MetadataGraphVertex( ArtifactMetadata md, boolean compareVersion, boolean compareScope )
+    public MetadataGraphVertex( final ArtifactMetadata md, final boolean compareVersion, final boolean compareScope )
     {
         this( md );
         this.compareVersion = compareVersion;
@@ -53,7 +53,7 @@ public class MetadataGraphVertex
         return md;
     }
 
-    public void setMd( ArtifactMetadata md )
+    public void setMd( final ArtifactMetadata md )
     {
         this.md = md;
     }
@@ -64,7 +64,7 @@ public class MetadataGraphVertex
         return compareVersion;
     }
 
-    public void setCompareVersion( boolean compareVersion )
+    public void setCompareVersion( final boolean compareVersion )
     {
         this.compareVersion = compareVersion;
     }
@@ -74,7 +74,7 @@ public class MetadataGraphVertex
         return compareScope;
     }
 
-    public void setCompareScope( boolean compareScope )
+    public void setCompareScope( final boolean compareScope )
     {
         this.compareScope = compareScope;
     }
@@ -87,7 +87,7 @@ public class MetadataGraphVertex
     }
 
     // ---------------------------------------------------------------------
-    private static int compareStrings( String s1, String s2 )
+    private static int compareStrings( final String s1, final String s2 )
     {
         if ( s1 == null && s2 == null )
         {
@@ -108,14 +108,14 @@ public class MetadataGraphVertex
     }
 
     // ---------------------------------------------------------------------
-    public int compareTo( MetadataGraphVertex vertex )
+    public int compareTo( final MetadataGraphVertex vertex )
     {
         if ( vertex == null || vertex.getMd() == null )
         {
             return 1;
         }
 
-        ArtifactMetadata vmd = vertex.getMd();
+        final ArtifactMetadata vmd = vertex.getMd();
 
         if ( vmd == null )
         {
@@ -129,22 +129,22 @@ public class MetadataGraphVertex
             }
         }
 
-        int g = compareStrings( md.groupId, vmd.groupId );
+        final int g = compareStrings( md.groupId, vmd.groupId );
 
         if ( g == 0 )
         {
-            int a = compareStrings( md.artifactId, vmd.artifactId );
+            final int a = compareStrings( md.artifactId, vmd.artifactId );
             if ( a == 0 )
             {
                 if ( compareVersion )
                 {
-                    int v = compareStrings( md.version, vmd.version );
+                    final int v = compareStrings( md.version, vmd.version );
                     if ( v == 0 )
                     {
                         if ( compareScope )
                         {
-                            String s1 = ArtifactScopeEnum.checkScope( md.artifactScope ).getScope();
-                            String s2 = ArtifactScopeEnum.checkScope( vmd.artifactScope ).getScope();
+                            final String s1 = ArtifactScopeEnum.checkScope( md.artifactScope ).getScope();
+                            final String s2 = ArtifactScopeEnum.checkScope( vmd.artifactScope ).getScope();
                             return s1.compareTo( s2 );
                         }
                         else
@@ -173,7 +173,7 @@ public class MetadataGraphVertex
 
     // ---------------------------------------------------------------------
     @Override
-    public boolean equals( Object vo )
+    public boolean equals( final Object vo )
     {
         if ( !( vo instanceof MetadataGraphVertex ) )
         {
@@ -191,7 +191,7 @@ public class MetadataGraphVertex
         {
             return super.hashCode();
         }
-        StringBuilder hashString = new StringBuilder( 128 );
+        final StringBuilder hashString = new StringBuilder( 128 );
         hashString.append( md.groupId ).append( '|' );
         hashString.append( md.artifactId ).append( '|' );
 

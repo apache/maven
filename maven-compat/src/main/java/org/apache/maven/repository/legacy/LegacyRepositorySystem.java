@@ -114,35 +114,35 @@ public class LegacyRepositorySystem
     @Requirement
     private SettingsDecrypter settingsDecrypter;
 
-    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
+    public Artifact createArtifact( final String groupId, final String artifactId, final String version, final String scope, final String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
     }
 
-    public Artifact createArtifact( String groupId, String artifactId, String version, String packaging )
+    public Artifact createArtifact( final String groupId, final String artifactId, final String version, final String packaging )
     {
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging );
     }
 
-    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
-                                                  String classifier )
+    public Artifact createArtifactWithClassifier( final String groupId, final String artifactId, final String version, final String type,
+                                                  final String classifier )
     {
         return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
 
-    public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )
+    public Artifact createProjectArtifact( final String groupId, final String artifactId, final String metaVersionId )
     {
         return artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
     }
 
-    public Artifact createDependencyArtifact( Dependency d )
+    public Artifact createDependencyArtifact( final Dependency d )
     {
-        VersionRange versionRange;
+        final VersionRange versionRange;
         try
         {
             versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
         }
-        catch ( InvalidVersionSpecificationException e )
+        catch ( final InvalidVersionSpecificationException e )
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format( "Invalid version specification '%s' creating dependency artifact '%s'.",
@@ -150,7 +150,7 @@ public class LegacyRepositorySystem
             return null;
         }
 
-        Artifact artifact =
+        final Artifact artifact =
             artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
                                                       d.getClassifier(), d.getScope(), d.isOptional() );
 
@@ -161,9 +161,9 @@ public class LegacyRepositorySystem
 
         if ( !d.getExclusions().isEmpty() )
         {
-            List<String> exclusions = new ArrayList<>();
+            final List<String> exclusions = new ArrayList<>();
 
-            for ( Exclusion exclusion : d.getExclusions() )
+            for ( final Exclusion exclusion : d.getExclusions() )
             {
                 exclusions.add( exclusion.getGroupId() + ':' + exclusion.getArtifactId() );
             }
@@ -174,14 +174,14 @@ public class LegacyRepositorySystem
         return artifact;
     }
 
-    public Artifact createExtensionArtifact( String groupId, String artifactId, String version )
+    public Artifact createExtensionArtifact( final String groupId, final String artifactId, final String version )
     {
-        VersionRange versionRange;
+        final VersionRange versionRange;
         try
         {
             versionRange = VersionRange.createFromVersionSpec( version );
         }
-        catch ( InvalidVersionSpecificationException e )
+        catch ( final InvalidVersionSpecificationException e )
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format(
@@ -194,12 +194,12 @@ public class LegacyRepositorySystem
         return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
     }
 
-    public Artifact createParentArtifact( String groupId, String artifactId, String version )
+    public Artifact createParentArtifact( final String groupId, final String artifactId, final String version )
     {
         return artifactFactory.createParentArtifact( groupId, artifactId, version );
     }
 
-    public Artifact createPluginArtifact( Plugin plugin )
+    public Artifact createPluginArtifact( final Plugin plugin )
     {
         String version = plugin.getVersion();
         if ( StringUtils.isEmpty( version ) )
@@ -207,12 +207,12 @@ public class LegacyRepositorySystem
             version = "RELEASE";
         }
 
-        VersionRange versionRange;
+        final VersionRange versionRange;
         try
         {
             versionRange = VersionRange.createFromVersionSpec( version );
         }
-        catch ( InvalidVersionSpecificationException e )
+        catch ( final InvalidVersionSpecificationException e )
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format(
@@ -225,7 +225,7 @@ public class LegacyRepositorySystem
         return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
-    public ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
+    public ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( final RepositoryPolicy policy )
     {
         boolean enabled = true;
 
@@ -256,7 +256,7 @@ public class LegacyRepositorySystem
         return createLocalRepository( RepositorySystem.defaultUserLocalRepository );
     }
 
-    public ArtifactRepository createLocalRepository( File localRepository )
+    public ArtifactRepository createLocalRepository( final File localRepository )
         throws InvalidRepositoryException
     {
         return createRepository( "file://" + localRepository.toURI().getRawPath(),
@@ -275,7 +275,7 @@ public class LegacyRepositorySystem
                                  ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
-    public ArtifactRepository createLocalRepository( String url, String repositoryId )
+    public ArtifactRepository createLocalRepository( final String url, final String repositoryId )
         throws IOException
     {
         return createRepository( canonicalFileUrl( url ), repositoryId, true,
@@ -303,7 +303,7 @@ public class LegacyRepositorySystem
         // when you are using a custom settings.xml that contains a relative path entry
         // for the local repository setting.
 
-        File localRepository = new File( url.substring( "file://".length() ) );
+        final File localRepository = new File( url.substring( "file://".length() ) );
 
         if ( !localRepository.isAbsolute() )
         {
@@ -313,7 +313,7 @@ public class LegacyRepositorySystem
         return url;
     }
 
-    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    public ArtifactResolutionResult resolve( final ArtifactResolutionRequest request )
     {
         /*
          * Probably is not worth it, but here I make sure I restore request
@@ -321,15 +321,15 @@ public class LegacyRepositorySystem
          */
         try
         {
-            LocalArtifactRepository ideWorkspace =
+            final LocalArtifactRepository ideWorkspace =
                 plexus.lookup( LocalArtifactRepository.class, LocalArtifactRepository.IDE_WORKSPACE );
 
             if ( request.getLocalRepository() instanceof DelegatingLocalArtifactRepository )
             {
-                DelegatingLocalArtifactRepository delegatingLocalRepository =
+                final DelegatingLocalArtifactRepository delegatingLocalRepository =
                     (DelegatingLocalArtifactRepository) request.getLocalRepository();
 
-                LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorkspace();
+                final LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorkspace();
 
                 delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
 
@@ -344,8 +344,8 @@ public class LegacyRepositorySystem
             }
             else
             {
-                ArtifactRepository localRepository = request.getLocalRepository();
-                DelegatingLocalArtifactRepository delegatingLocalRepository =
+                final ArtifactRepository localRepository = request.getLocalRepository();
+                final DelegatingLocalArtifactRepository delegatingLocalRepository =
                     new DelegatingLocalArtifactRepository( localRepository );
                 delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
                 request.setLocalRepository( delegatingLocalRepository );
@@ -359,7 +359,7 @@ public class LegacyRepositorySystem
                 }
             }
         }
-        catch ( ComponentLookupException e )
+        catch ( final ComponentLookupException e )
         {
             // no ide workspace artifact resolution
         }
@@ -383,54 +383,54 @@ public class LegacyRepositorySystem
 //        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
 //    }
 
-    public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )
+    public List<ArtifactRepository> getEffectiveRepositories( final List<ArtifactRepository> repositories )
     {
         if ( repositories == null )
         {
             return null;
         }
 
-        Map<String, List<ArtifactRepository>> reposByKey = new LinkedHashMap<>();
+        final Map<String, List<ArtifactRepository>> reposByKey = new LinkedHashMap<>();
 
-        for ( ArtifactRepository repository : repositories )
+        for ( final ArtifactRepository repository : repositories )
         {
-            String key = repository.getId();
+            final String key = repository.getId();
 
-            List<ArtifactRepository> aliasedRepos = reposByKey.computeIfAbsent( key, k -> new ArrayList<>() );
+            final List<ArtifactRepository> aliasedRepos = reposByKey.computeIfAbsent( key, k -> new ArrayList<>() );
 
             aliasedRepos.add( repository );
         }
 
-        List<ArtifactRepository> effectiveRepositories = new ArrayList<>();
+        final List<ArtifactRepository> effectiveRepositories = new ArrayList<>();
 
-        for ( List<ArtifactRepository> aliasedRepos : reposByKey.values() )
+        for ( final List<ArtifactRepository> aliasedRepos : reposByKey.values() )
         {
-            List<ArtifactRepository> mirroredRepos = new ArrayList<>();
+            final List<ArtifactRepository> mirroredRepos = new ArrayList<>();
 
-            List<ArtifactRepositoryPolicy> releasePolicies =
+            final List<ArtifactRepositoryPolicy> releasePolicies =
                 new ArrayList<>( aliasedRepos.size() );
 
-            for ( ArtifactRepository aliasedRepo : aliasedRepos )
+            for ( final ArtifactRepository aliasedRepo : aliasedRepos )
             {
                 releasePolicies.add( aliasedRepo.getReleases() );
                 mirroredRepos.addAll( aliasedRepo.getMirroredRepositories() );
             }
 
-            ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
+            final ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
 
-            List<ArtifactRepositoryPolicy> snapshotPolicies =
+            final List<ArtifactRepositoryPolicy> snapshotPolicies =
                 new ArrayList<>( aliasedRepos.size() );
 
-            for ( ArtifactRepository aliasedRepo : aliasedRepos )
+            for ( final ArtifactRepository aliasedRepo : aliasedRepos )
             {
                 snapshotPolicies.add( aliasedRepo.getSnapshots() );
             }
 
-            ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy( snapshotPolicies );
+            final ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy( snapshotPolicies );
 
-            ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
+            final ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
 
-            ArtifactRepository effectiveRepository =
+            final ArtifactRepository effectiveRepository =
                 createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(),
                                           snapshotPolicy, releasePolicy );
 
@@ -448,11 +448,11 @@ public class LegacyRepositorySystem
         return effectiveRepositories;
     }
 
-    private ArtifactRepositoryPolicy getEffectivePolicy( Collection<ArtifactRepositoryPolicy> policies )
+    private ArtifactRepositoryPolicy getEffectivePolicy( final Collection<ArtifactRepositoryPolicy> policies )
     {
         ArtifactRepositoryPolicy effectivePolicy = null;
 
-        for ( ArtifactRepositoryPolicy policy : policies )
+        for ( final ArtifactRepositoryPolicy policy : policies )
         {
             if ( effectivePolicy == null )
             {
@@ -467,34 +467,34 @@ public class LegacyRepositorySystem
         return effectivePolicy;
     }
 
-    public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    public Mirror getMirror( final ArtifactRepository repository, final List<Mirror> mirrors )
     {
         return mirrorSelector.getMirror( repository, mirrors );
     }
 
-    public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )
+    public void injectMirror( final List<ArtifactRepository> repositories, final List<Mirror> mirrors )
     {
         if ( repositories != null && mirrors != null )
         {
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
-                Mirror mirror = getMirror( repository, mirrors );
+                final Mirror mirror = getMirror( repository, mirrors );
                 injectMirror( repository, mirror );
             }
         }
     }
 
-    private Mirror getMirror( RepositorySystemSession session, ArtifactRepository repository )
+    private Mirror getMirror( final RepositorySystemSession session, final ArtifactRepository repository )
     {
         if ( session != null )
         {
-            org.eclipse.aether.repository.MirrorSelector selector = session.getMirrorSelector();
+            final org.eclipse.aether.repository.MirrorSelector selector = session.getMirrorSelector();
             if ( selector != null )
             {
-                RemoteRepository repo = selector.getMirror( RepositoryUtils.toRepo( repository ) );
+                final RemoteRepository repo = selector.getMirror( RepositoryUtils.toRepo( repository ) );
                 if ( repo != null )
                 {
-                    Mirror mirror = new Mirror();
+                    final Mirror mirror = new Mirror();
                     mirror.setId( repo.getId() );
                     mirror.setUrl( repo.getUrl() );
                     mirror.setLayout( repo.getContentType() );
@@ -506,23 +506,23 @@ public class LegacyRepositorySystem
         return null;
     }
 
-    public void injectMirror( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    public void injectMirror( final RepositorySystemSession session, final List<ArtifactRepository> repositories )
     {
         if ( repositories != null && session != null )
         {
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
-                Mirror mirror = getMirror( session, repository );
+                final Mirror mirror = getMirror( session, repository );
                 injectMirror( repository, mirror );
             }
         }
     }
 
-    private void injectMirror( ArtifactRepository repository, Mirror mirror )
+    private void injectMirror( final ArtifactRepository repository, final Mirror mirror )
     {
         if ( mirror != null )
         {
-            ArtifactRepository original =
+            final ArtifactRepository original =
                 createArtifactRepository( repository.getId(), repository.getUrl(), repository.getLayout(),
                                           repository.getSnapshots(), repository.getReleases() );
 
@@ -540,15 +540,15 @@ public class LegacyRepositorySystem
         }
     }
 
-    public void injectAuthentication( List<ArtifactRepository> repositories, List<Server> servers )
+    public void injectAuthentication( final List<ArtifactRepository> repositories, final List<Server> servers )
     {
         if ( repositories != null )
         {
-            Map<String, Server> serversById = new HashMap<>();
+            final Map<String, Server> serversById = new HashMap<>();
 
             if ( servers != null )
             {
-                for ( Server server : servers )
+                for ( final Server server : servers )
                 {
                     if ( !serversById.containsKey( server.getId() ) )
                     {
@@ -557,25 +557,25 @@ public class LegacyRepositorySystem
                 }
             }
 
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
                 Server server = serversById.get( repository.getId() );
 
                 if ( server != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server );
-                    SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
+                    final SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server );
+                    final SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
                     server = result.getServer();
 
                     if ( logger.isDebugEnabled() )
                     {
-                        for ( SettingsProblem problem : result.getProblems() )
+                        for ( final SettingsProblem problem : result.getProblems() )
                         {
                             logger.debug( problem.getMessage(), problem.getException() );
                         }
                     }
 
-                    Authentication authentication = new Authentication( server.getUsername(), server.getPassword() );
+                    final Authentication authentication = new Authentication( server.getUsername(), server.getPassword() );
                     authentication.setPrivateKey( server.getPrivateKey() );
                     authentication.setPassphrase( server.getPassphrase() );
 
@@ -589,20 +589,20 @@ public class LegacyRepositorySystem
         }
     }
 
-    private Authentication getAuthentication( RepositorySystemSession session, ArtifactRepository repository )
+    private Authentication getAuthentication( final RepositorySystemSession session, final ArtifactRepository repository )
     {
         if ( session != null )
         {
-            AuthenticationSelector selector = session.getAuthenticationSelector();
+            final AuthenticationSelector selector = session.getAuthenticationSelector();
             if ( selector != null )
             {
                 RemoteRepository repo = RepositoryUtils.toRepo( repository );
-                org.eclipse.aether.repository.Authentication auth = selector.getAuthentication( repo );
+                final org.eclipse.aether.repository.Authentication auth = selector.getAuthentication( repo );
                 if ( auth != null )
                 {
                     repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
-                    AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
-                    Authentication result =
+                    final AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
+                    final Authentication result =
                         new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
                                             authCtx.get( AuthenticationContext.PASSWORD ) );
                     result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
@@ -615,32 +615,32 @@ public class LegacyRepositorySystem
         return null;
     }
 
-    public void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    public void injectAuthentication( final RepositorySystemSession session, final List<ArtifactRepository> repositories )
     {
         if ( repositories != null && session != null )
         {
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
                 repository.setAuthentication( getAuthentication( session, repository ) );
             }
         }
     }
 
-    private org.apache.maven.settings.Proxy getProxy( ArtifactRepository repository,
-                                                      List<org.apache.maven.settings.Proxy> proxies )
+    private org.apache.maven.settings.Proxy getProxy( final ArtifactRepository repository,
+                                                      final List<org.apache.maven.settings.Proxy> proxies )
     {
         if ( proxies != null && repository.getProtocol() != null )
         {
-            for ( org.apache.maven.settings.Proxy proxy : proxies )
+            for ( final org.apache.maven.settings.Proxy proxy : proxies )
             {
                 if ( proxy.isActive() && repository.getProtocol().equalsIgnoreCase( proxy.getProtocol() ) )
                 {
                     if ( StringUtils.isNotEmpty( proxy.getNonProxyHosts() ) )
                     {
-                        ProxyInfo pi = new ProxyInfo();
+                        final ProxyInfo pi = new ProxyInfo();
                         pi.setNonProxyHosts( proxy.getNonProxyHosts() );
 
-                        org.apache.maven.wagon.repository.Repository repo =
+                        final org.apache.maven.wagon.repository.Repository repo =
                             new org.apache.maven.wagon.repository.Repository( repository.getId(), repository.getUrl() );
 
                         if ( !ProxyUtils.validateNonProxyHosts( pi, repo.getHost() ) )
@@ -659,29 +659,29 @@ public class LegacyRepositorySystem
         return null;
     }
 
-    public void injectProxy( List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies )
+    public void injectProxy( final List<ArtifactRepository> repositories, final List<org.apache.maven.settings.Proxy> proxies )
     {
         if ( repositories != null )
         {
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
                 org.apache.maven.settings.Proxy proxy = getProxy( repository, proxies );
 
                 if ( proxy != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy );
-                    SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
+                    final SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy );
+                    final SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
                     proxy = result.getProxy();
 
                     if ( logger.isDebugEnabled() )
                     {
-                        for ( SettingsProblem problem : result.getProblems() )
+                        for ( final SettingsProblem problem : result.getProblems() )
                         {
                             logger.debug( problem.getMessage(), problem.getException() );
                         }
                     }
 
-                    Proxy p = new Proxy();
+                    final Proxy p = new Proxy();
                     p.setHost( proxy.getHost() );
                     p.setProtocol( proxy.getProtocol() );
                     p.setPort( proxy.getPort() );
@@ -699,25 +699,25 @@ public class LegacyRepositorySystem
         }
     }
 
-    private Proxy getProxy( RepositorySystemSession session, ArtifactRepository repository )
+    private Proxy getProxy( final RepositorySystemSession session, final ArtifactRepository repository )
     {
         if ( session != null )
         {
-            ProxySelector selector = session.getProxySelector();
+            final ProxySelector selector = session.getProxySelector();
             if ( selector != null )
             {
                 RemoteRepository repo = RepositoryUtils.toRepo( repository );
-                org.eclipse.aether.repository.Proxy proxy = selector.getProxy( repo );
+                final org.eclipse.aether.repository.Proxy proxy = selector.getProxy( repo );
                 if ( proxy != null )
                 {
-                    Proxy p = new Proxy();
+                    final Proxy p = new Proxy();
                     p.setHost( proxy.getHost() );
                     p.setProtocol( proxy.getType() );
                     p.setPort( proxy.getPort() );
                     if ( proxy.getAuthentication() != null )
                     {
                         repo = new RemoteRepository.Builder( repo ).setProxy( proxy ).build();
-                        AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
+                        final AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
                         p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
                         p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
                         p.setNtlmDomain( authCtx.get( AuthenticationContext.NTLM_DOMAIN ) );
@@ -731,19 +731,19 @@ public class LegacyRepositorySystem
         return null;
     }
 
-    public void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    public void injectProxy( final RepositorySystemSession session, final List<ArtifactRepository> repositories )
     {
         if ( repositories != null && session != null )
         {
-            for ( ArtifactRepository repository : repositories )
+            for ( final ArtifactRepository repository : repositories )
             {
                 repository.setProxy( getProxy( session, repository ) );
             }
         }
     }
 
-    public void retrieve( ArtifactRepository repository, File destination, String remotePath,
-                          ArtifactTransferListener transferListener )
+    public void retrieve( final ArtifactRepository repository, final File destination, final String remotePath,
+                          final ArtifactTransferListener transferListener )
         throws ArtifactTransferFailedException, ArtifactDoesNotExistException
     {
         try
@@ -752,18 +752,18 @@ public class LegacyRepositorySystem
                                         TransferListenerAdapter.newAdapter( transferListener ),
                                         ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
         }
-        catch ( org.apache.maven.wagon.TransferFailedException e )
+        catch ( final org.apache.maven.wagon.TransferFailedException e )
         {
             throw new ArtifactTransferFailedException( getMessage( e, "Error transferring artifact." ), e );
         }
-        catch ( org.apache.maven.wagon.ResourceDoesNotExistException e )
+        catch ( final org.apache.maven.wagon.ResourceDoesNotExistException e )
         {
             throw new ArtifactDoesNotExistException( getMessage( e, "Requested artifact does not exist." ), e );
         }
     }
 
-    public void publish( ArtifactRepository repository, File source, String remotePath,
-                         ArtifactTransferListener transferListener )
+    public void publish( final ArtifactRepository repository, final File source, final String remotePath,
+                         final ArtifactTransferListener transferListener )
         throws ArtifactTransferFailedException
     {
         try
@@ -771,7 +771,7 @@ public class LegacyRepositorySystem
             wagonManager.putRemoteFile( repository, source, remotePath,
                                         TransferListenerAdapter.newAdapter( transferListener ) );
         }
-        catch ( org.apache.maven.wagon.TransferFailedException e )
+        catch ( final org.apache.maven.wagon.TransferFailedException e )
         {
             throw new ArtifactTransferFailedException( getMessage( e, "Error transferring artifact." ), e );
         }
@@ -780,28 +780,28 @@ public class LegacyRepositorySystem
     //
     // Artifact Repository Creation
     //
-    public ArtifactRepository buildArtifactRepository( Repository repo )
+    public ArtifactRepository buildArtifactRepository( final Repository repo )
         throws InvalidRepositoryException
     {
         if ( repo != null )
         {
-            String id = repo.getId();
+            final String id = repo.getId();
 
             if ( StringUtils.isEmpty( id ) )
             {
                 throw new InvalidRepositoryException( "Repository identifier missing", "" );
             }
 
-            String url = repo.getUrl();
+            final String url = repo.getUrl();
 
             if ( StringUtils.isEmpty( url ) )
             {
                 throw new InvalidRepositoryException( "URL missing for repository " + id, id );
             }
 
-            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
+            final ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
 
-            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
+            final ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
             return createArtifactRepository( id, url, getLayout( repo.getLayout() ), snapshots, releases );
         }
@@ -811,23 +811,23 @@ public class LegacyRepositorySystem
         }
     }
 
-    private ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
-                                                 String releaseUpdates, boolean snapshots, String snapshotUpdates,
-                                                 String checksumPolicy )
+    private ArtifactRepository createRepository( final String url, final String repositoryId, final boolean releases,
+                                                 final String releaseUpdates, final boolean snapshots, final String snapshotUpdates,
+                                                 final String checksumPolicy )
     {
-        ArtifactRepositoryPolicy snapshotsPolicy =
+        final ArtifactRepositoryPolicy snapshotsPolicy =
             new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
 
-        ArtifactRepositoryPolicy releasesPolicy =
+        final ArtifactRepositoryPolicy releasesPolicy =
             new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
 
         return createArtifactRepository( repositoryId, url, null, snapshotsPolicy, releasesPolicy );
     }
 
-    public ArtifactRepository createArtifactRepository( String repositoryId, String url,
+    public ArtifactRepository createArtifactRepository( final String repositoryId, final String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
+                                                        final ArtifactRepositoryPolicy snapshots,
+                                                        final ArtifactRepositoryPolicy releases )
     {
         if ( repositoryLayout == null )
         {
@@ -837,13 +837,13 @@ public class LegacyRepositorySystem
                                                             releases );
     }
 
-    private static String getMessage( Throwable error, String def )
+    private static String getMessage( final Throwable error, final String def )
     {
         if ( error == null )
         {
             return def;
         }
-        String msg = error.getMessage();
+        final String msg = error.getMessage();
         if ( StringUtils.isNotEmpty( msg ) )
         {
             return msg;
@@ -851,7 +851,7 @@ public class LegacyRepositorySystem
         return getMessage( error.getCause(), def );
     }
 
-    private ArtifactRepositoryLayout getLayout( String id )
+    private ArtifactRepositoryLayout getLayout( final String id )
     {
         ArtifactRepositoryLayout layout = layouts.get( id );
 
@@ -877,7 +877,7 @@ public class LegacyRepositorySystem
 
         private final ArtifactRepositoryLayout fallback;
 
-        UnknownRepositoryLayout( String id, ArtifactRepositoryLayout fallback )
+        UnknownRepositoryLayout( final String id, final ArtifactRepositoryLayout fallback )
         {
             this.id = id;
             this.fallback = fallback;
@@ -888,17 +888,17 @@ public class LegacyRepositorySystem
             return id;
         }
 
-        public String pathOf( Artifact artifact )
+        public String pathOf( final Artifact artifact )
         {
             return fallback.pathOf( artifact );
         }
 
-        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        public String pathOfLocalRepositoryMetadata( final ArtifactMetadata metadata, final ArtifactRepository repository )
         {
             return fallback.pathOfLocalRepositoryMetadata( metadata, repository );
         }
 
-        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+        public String pathOfRemoteRepositoryMetadata( final ArtifactMetadata metadata )
         {
             return fallback.pathOfRemoteRepositoryMetadata( metadata );
         }

@@ -38,9 +38,9 @@ public class UnresolvedArtifacts
 
     private List<ArtifactRepository> remoteRepositories;
 
-    public UnresolvedArtifacts( Artifact originatingArtifact,
-                                List<Artifact> artifacts,
-                                List<ArtifactRepository> remoteRepositories )
+    public UnresolvedArtifacts( final Artifact originatingArtifact,
+                                final List<Artifact> artifacts,
+                                final List<ArtifactRepository> remoteRepositories )
     {
         this.originatingArtifact = originatingArtifact;
 

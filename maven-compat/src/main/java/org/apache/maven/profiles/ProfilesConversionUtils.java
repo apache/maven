@@ -37,29 +37,29 @@ public class ProfilesConversionUtils
     {
     }
 
-    public static Profile convertFromProfileXmlProfile( org.apache.maven.profiles.Profile profileXmlProfile )
+    public static Profile convertFromProfileXmlProfile( final org.apache.maven.profiles.Profile profileXmlProfile )
     {
-        Profile profile = new Profile();
+        final Profile profile = new Profile();
 
         profile.setId( profileXmlProfile.getId() );
 
         profile.setSource( "profiles.xml" );
 
-        org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
+        final org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
 
         if ( profileActivation != null )
         {
-            Activation activation = new Activation();
+            final Activation activation = new Activation();
 
             activation.setActiveByDefault( profileActivation.isActiveByDefault() );
 
             activation.setJdk( profileActivation.getJdk() );
 
-            org.apache.maven.profiles.ActivationProperty profileProp = profileActivation.getProperty();
+            final org.apache.maven.profiles.ActivationProperty profileProp = profileActivation.getProperty();
 
             if ( profileProp != null )
             {
-                ActivationProperty prop = new ActivationProperty();
+                final ActivationProperty prop = new ActivationProperty();
 
                 prop.setName( profileProp.getName() );
                 prop.setValue( profileProp.getValue() );
@@ -68,11 +68,11 @@ public class ProfilesConversionUtils
             }
 
 
-            ActivationOS profileOs = profileActivation.getOs();
+            final ActivationOS profileOs = profileActivation.getOs();
 
             if ( profileOs != null )
             {
-                org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
+                final org.apache.maven.model.ActivationOS os = new org.apache.maven.model.ActivationOS();
 
                 os.setArch( profileOs.getArch() );
                 os.setFamily( profileOs.getFamily() );
@@ -82,11 +82,11 @@ public class ProfilesConversionUtils
                 activation.setOs( os );
             }
 
-            org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
+            final org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
 
             if ( profileFile != null )
             {
-                ActivationFile file = new ActivationFile();
+                final ActivationFile file = new ActivationFile();
 
                 file.setExists( profileFile.getExists() );
                 file.setMissing( profileFile.getMissing() );
@@ -99,19 +99,19 @@ public class ProfilesConversionUtils
 
         profile.setProperties( profileXmlProfile.getProperties() );
 
-        List repos = profileXmlProfile.getRepositories();
+        final List repos = profileXmlProfile.getRepositories();
         if ( repos != null )
         {
-            for ( Object repo : repos )
+            for ( final Object repo : repos )
             {
                 profile.addRepository( convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) repo ) );
             }
         }
 
-        List pluginRepos = profileXmlProfile.getPluginRepositories();
+        final List pluginRepos = profileXmlProfile.getPluginRepositories();
         if ( pluginRepos != null )
         {
-            for ( Object pluginRepo : pluginRepos )
+            for ( final Object pluginRepo : pluginRepos )
             {
                 profile.addPluginRepository(
                     convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) pluginRepo ) );
@@ -121,9 +121,9 @@ public class ProfilesConversionUtils
         return profile;
     }
 
-    private static Repository convertFromProfileXmlRepository( org.apache.maven.profiles.Repository profileXmlRepo )
+    private static Repository convertFromProfileXmlRepository( final org.apache.maven.profiles.Repository profileXmlRepo )
     {
-        Repository repo = new Repository();
+        final Repository repo = new Repository();
 
         repo.setId( profileXmlRepo.getId() );
         repo.setLayout( profileXmlRepo.getLayout() );
@@ -142,9 +142,9 @@ public class ProfilesConversionUtils
         return repo;
     }
 
-    private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy profileXmlRepo )
+    private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( final RepositoryPolicy profileXmlRepo )
     {
-        org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
+        final org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
         policy.setEnabled( profileXmlRepo.isEnabled() );
         policy.setUpdatePolicy( profileXmlRepo.getUpdatePolicy() );
         policy.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );

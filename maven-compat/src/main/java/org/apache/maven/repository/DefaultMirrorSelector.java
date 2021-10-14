@@ -43,13 +43,13 @@ public class DefaultMirrorSelector
 
     private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
 
-    public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    public Mirror getMirror( final ArtifactRepository repository, final List<Mirror> mirrors )
     {
-        String repoId = repository.getId();
+        final String repoId = repository.getId();
 
         if ( repoId != null && mirrors != null )
         {
-            for ( Mirror mirror : mirrors )
+            for ( final Mirror mirror : mirrors )
             {
                 if ( repoId.equals( mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
                 {
@@ -57,7 +57,7 @@ public class DefaultMirrorSelector
                 }
             }
 
-            for ( Mirror mirror : mirrors )
+            for ( final Mirror mirror : mirrors )
             {
                 if ( matchPattern( repository, mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
                 {
@@ -83,10 +83,10 @@ public class DefaultMirrorSelector
      * @param pattern used for match.
      * @return true if the repository is a match to this pattern.
      */
-    static boolean matchPattern( ArtifactRepository originalRepository, String pattern )
+    static boolean matchPattern( final ArtifactRepository originalRepository, final String pattern )
     {
         boolean result = false;
-        String originalId = originalRepository.getId();
+        final String originalId = originalRepository.getId();
 
         // simple checks first to short circuit processing below.
         if ( WILDCARD.equals( pattern ) || pattern.equals( originalId ) )
@@ -96,7 +96,7 @@ public class DefaultMirrorSelector
         else
         {
             // process the list
-            String[] repos = pattern.split( "," );
+            final String[] repos = pattern.split( "," );
             for ( String repo : repos )
             {
                 repo = repo.trim();
@@ -144,21 +144,21 @@ public class DefaultMirrorSelector
      * @param originalRepository
      * @return true if external.
      */
-    static boolean isExternalRepo( ArtifactRepository originalRepository )
+    static boolean isExternalRepo( final ArtifactRepository originalRepository )
     {
         try
         {
-            URL url = new URL( originalRepository.getUrl() );
+            final URL url = new URL( originalRepository.getUrl() );
             return !( isLocal( url.getHost() ) || url.getProtocol().equals( "file" ) );
         }
-        catch ( MalformedURLException e )
+        catch ( final MalformedURLException e )
         {
             // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
             return false;
         }
     }
 
-    private static boolean isLocal( String host )
+    private static boolean isLocal( final String host )
     {
         return "localhost".equals( host ) || "127.0.0.1".equals( host );
     }
@@ -169,23 +169,23 @@ public class DefaultMirrorSelector
      * @param originalRepository
      * @return true if external.
      */
-    static boolean isExternalHttpRepo( ArtifactRepository originalRepository )
+    static boolean isExternalHttpRepo( final ArtifactRepository originalRepository )
     {
         try
         {
-            URL url = new URL( originalRepository.getUrl() );
+            final URL url = new URL( originalRepository.getUrl() );
             return ( "http".equalsIgnoreCase( url.getProtocol() ) || "dav".equalsIgnoreCase( url.getProtocol() )
                 || "dav:http".equalsIgnoreCase( url.getProtocol() )
                 || "dav+http".equalsIgnoreCase( url.getProtocol() ) ) && !isLocal( url.getHost() );
         }
-        catch ( MalformedURLException e )
+        catch ( final MalformedURLException e )
         {
             // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
             return false;
         }
     }
 
-   static boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
+   static boolean matchesLayout( final ArtifactRepository repository, final Mirror mirror )
     {
         return matchesLayout( RepositoryUtils.getLayout( repository ), mirror.getMirrorOfLayouts() );
     }
@@ -198,7 +198,7 @@ public class DefaultMirrorSelector
      * @return {@code true} if the layouts associated with the mirror match the layout of the original repository,
      *         {@code false} otherwise.
      */
-    static boolean matchesLayout( String repoLayout, String mirrorLayout )
+    static boolean matchesLayout( final String repoLayout, final String mirrorLayout )
     {
         boolean result = false;
 
@@ -214,8 +214,8 @@ public class DefaultMirrorSelector
         else
         {
             // process the list
-            String[] layouts = mirrorLayout.split( "," );
-            for ( String layout : layouts )
+            final String[] layouts = mirrorLayout.split( "," );
+            for ( final String layout : layouts )
             {
                 // see if this is a negative match
                 if ( layout.length() > 1 && layout.startsWith( "!" ) )

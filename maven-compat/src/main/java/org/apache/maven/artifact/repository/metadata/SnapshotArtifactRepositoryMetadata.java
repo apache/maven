@@ -33,14 +33,14 @@ public class SnapshotArtifactRepositoryMetadata
 {
     private Artifact artifact;
 
-    public SnapshotArtifactRepositoryMetadata( Artifact artifact )
+    public SnapshotArtifactRepositoryMetadata( final Artifact artifact )
     {
         super( createMetadata( artifact, null ) );
         this.artifact = artifact;
     }
 
-    public SnapshotArtifactRepositoryMetadata( Artifact artifact,
-                                               Snapshot snapshot )
+    public SnapshotArtifactRepositoryMetadata( final Artifact artifact,
+                                               final Snapshot snapshot )
     {
         super( createMetadata( artifact, createVersioning( snapshot ) ) );
         this.artifact = artifact;
@@ -91,7 +91,7 @@ public class SnapshotArtifactRepositoryMetadata
         return artifact.getRepository();
     }
 
-    public void setRepository( ArtifactRepository remoteRepository )
+    public void setRepository( final ArtifactRepository remoteRepository )
     {
         artifact.setRepository( remoteRepository );
     }

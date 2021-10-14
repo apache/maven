@@ -66,7 +66,7 @@ public final class ArtifactStatus
 
     private static Map<String, ArtifactStatus> map;
 
-    private ArtifactStatus( String key, int rank )
+    private ArtifactStatus( final String key, final int rank )
     {
         this.rank = rank;
         this.key = key;
@@ -78,7 +78,7 @@ public final class ArtifactStatus
         map.put( key, this );
     }
 
-    public static ArtifactStatus valueOf( String status )
+    public static ArtifactStatus valueOf( final String status )
     {
         ArtifactStatus retVal = null;
 
@@ -90,7 +90,7 @@ public final class ArtifactStatus
         return retVal != null ? retVal : NONE;
     }
 
-    public boolean equals( Object o )
+    public boolean equals( final Object o )
     {
         if ( this == o )
         {
@@ -117,7 +117,7 @@ public final class ArtifactStatus
         return key;
     }
 
-    public int compareTo( ArtifactStatus s )
+    public int compareTo( final ArtifactStatus s )
     {
         return rank - s.rank;
     }

@@ -41,14 +41,14 @@ public class OrArtifactFilter
         this.filters = new LinkedHashSet<>();
     }
 
-    public OrArtifactFilter( Collection<ArtifactFilter> filters )
+    public OrArtifactFilter( final Collection<ArtifactFilter> filters )
     {
         this.filters = new LinkedHashSet<>( filters );
     }
 
-    public boolean include( Artifact artifact )
+    public boolean include( final Artifact artifact )
     {
-        for ( ArtifactFilter filter : filters )
+        for ( final ArtifactFilter filter : filters )
         {
             if ( filter.include( artifact ) )
             {
@@ -59,7 +59,7 @@ public class OrArtifactFilter
         return false;
     }
 
-    public void add( ArtifactFilter artifactFilter )
+    public void add( final ArtifactFilter artifactFilter )
     {
         filters.add( artifactFilter );
     }
@@ -73,7 +73,7 @@ public class OrArtifactFilter
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -85,7 +85,7 @@ public class OrArtifactFilter
             return false;
         }
 
-        OrArtifactFilter other = (OrArtifactFilter) obj;
+        final OrArtifactFilter other = (OrArtifactFilter) obj;
 
         return filters.equals( other.filters );
     }

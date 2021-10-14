@@ -30,22 +30,22 @@ public class MetadataRetrievalException
 
     private ArtifactMetadata artifact;
 
-    public MetadataRetrievalException( String message )
+    public MetadataRetrievalException( final String message )
     {
         this( message, null, null );
     }
 
-    public MetadataRetrievalException( Throwable cause )
+    public MetadataRetrievalException( final Throwable cause )
     {
         this( null, cause, null );
     }
 
-    public MetadataRetrievalException( String message, Throwable cause )
+    public MetadataRetrievalException( final String message, final Throwable cause )
     {
         this( message, cause, null );
     }
 
-    public MetadataRetrievalException( String message, Throwable cause, ArtifactMetadata artifact )
+    public MetadataRetrievalException( final String message, final Throwable cause, final ArtifactMetadata artifact )
     {
         super( message, cause );
 

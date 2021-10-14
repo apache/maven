@@ -40,7 +40,7 @@ public class ConflictResolverNotFoundException
      *
      * @param message the message
      */
-    public ConflictResolverNotFoundException( String message )
+    public ConflictResolverNotFoundException( final String message )
     {
         super( message );
     }

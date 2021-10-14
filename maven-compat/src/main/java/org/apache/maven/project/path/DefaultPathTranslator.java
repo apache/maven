@@ -39,14 +39,14 @@ public class DefaultPathTranslator
 {
     private static final String[] BASEDIR_EXPRESSIONS = {"${basedir}", "${pom.basedir}", "${project.basedir}"};
 
-    public void alignToBaseDirectory( Model model, File basedir )
+    public void alignToBaseDirectory( final Model model, final File basedir )
     {
         if ( basedir == null )
         {
             return;
         }
 
-        Build build = model.getBuild();
+        final Build build = model.getBuild();
 
         if ( build != null )
         {
@@ -56,20 +56,20 @@ public class DefaultPathTranslator
 
             build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            for ( Resource resource : build.getResources() )
+            for ( final Resource resource : build.getResources() )
             {
                 resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            for ( Resource resource : build.getTestResources() )
+            for ( final Resource resource : build.getTestResources() )
             {
                 resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
             if ( build.getFilters() != null )
             {
-                List<String> filters = new ArrayList<>();
-                for ( String filter : build.getFilters() )
+                final List<String> filters = new ArrayList<>();
+                for ( final String filter : build.getFilters() )
                 {
                     filters.add( alignToBaseDirectory( filter, basedir ) );
                 }
@@ -81,7 +81,7 @@ public class DefaultPathTranslator
             build.setTestOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) );
         }
 
-        Reporting reporting = model.getReporting();
+        final Reporting reporting = model.getReporting();
 
         if ( reporting != null )
         {
@@ -89,7 +89,7 @@ public class DefaultPathTranslator
         }
     }
 
-    public String alignToBaseDirectory( String path, File basedir )
+    public String alignToBaseDirectory( final String path, final File basedir )
     {
         if ( basedir == null )
         {
@@ -103,7 +103,7 @@ public class DefaultPathTranslator
 
         String s = stripBasedirToken( path );
 
-        File file = new File( s );
+        final File file = new File( s );
         if ( file.isAbsolute() )
         {
             // path was already absolute, just normalize file separator and we're done
@@ -128,7 +128,7 @@ public class DefaultPathTranslator
         if ( s != null )
         {
             String basedirExpr = null;
-            for ( String expression : BASEDIR_EXPRESSIONS )
+            for ( final String expression : BASEDIR_EXPRESSIONS )
             {
                 if ( s.startsWith( expression ) )
                 {
@@ -173,14 +173,14 @@ public class DefaultPathTranslator
         return path;
     }
 
-    public void unalignFromBaseDirectory( Model model, File basedir )
+    public void unalignFromBaseDirectory( final Model model, final File basedir )
     {
         if ( basedir == null )
         {
             return;
         }
 
-        Build build = model.getBuild();
+        final Build build = model.getBuild();
 
         if ( build != null )
         {
@@ -190,20 +190,20 @@ public class DefaultPathTranslator
 
             build.setTestSourceDirectory( unalignFromBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            for ( Resource resource : build.getResources() )
+            for ( final Resource resource : build.getResources() )
             {
                 resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            for ( Resource resource : build.getTestResources() )
+            for ( final Resource resource : build.getTestResources() )
             {
                 resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
             if ( build.getFilters() != null )
             {
-                List<String> filters = new ArrayList<>();
-                for ( String filter : build.getFilters() )
+                final List<String> filters = new ArrayList<>();
+                for ( final String filter : build.getFilters() )
                 {
                     filters.add( unalignFromBaseDirectory( filter, basedir ) );
                 }
@@ -215,7 +215,7 @@ public class DefaultPathTranslator
             build.setTestOutputDirectory( unalignFromBaseDirectory( build.getTestOutputDirectory(), basedir ) );
         }
 
-        Reporting reporting = model.getReporting();
+        final Reporting reporting = model.getReporting();
 
         if ( reporting != null )
         {
@@ -223,7 +223,7 @@ public class DefaultPathTranslator
         }
     }
 
-    public String unalignFromBaseDirectory( String path, File basedir )
+    public String unalignFromBaseDirectory( String path, final File basedir )
     {
         if ( basedir == null )
         {
@@ -237,7 +237,7 @@ public class DefaultPathTranslator
 
         path = path.trim();
 
-        String base = basedir.getAbsolutePath();
+        final String base = basedir.getAbsolutePath();
         if ( path.startsWith( base ) )
         {
             path = chopLeadingFileSeparator( path.substring( base.length() ) );

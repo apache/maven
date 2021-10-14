@@ -64,8 +64,8 @@ public class MetadataResolutionRequest
     {
     }
 
-    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories )
+    public MetadataResolutionRequest( final MavenArtifactMetadata md, final ArtifactRepository localRepository,
+                                      final List<ArtifactRepository> remoteRepositories )
     {
         this.mad = md;
         this.localRepository = localRepository;
@@ -77,14 +77,14 @@ public class MetadataResolutionRequest
         return mad;
     }
 
-    public MetadataResolutionRequest setArtifactMetadata( MavenArtifactMetadata md )
+    public MetadataResolutionRequest setArtifactMetadata( final MavenArtifactMetadata md )
     {
         this.mad = md;
 
         return this;
     }
 
-    public MetadataResolutionRequest setArtifactDependencies( Set<Artifact> artifactDependencies )
+    public MetadataResolutionRequest setArtifactDependencies( final Set<Artifact> artifactDependencies )
     {
         this.artifactDependencies = artifactDependencies;
 
@@ -101,7 +101,7 @@ public class MetadataResolutionRequest
         return localRepository;
     }
 
-    public MetadataResolutionRequest setLocalRepository( ArtifactRepository localRepository )
+    public MetadataResolutionRequest setLocalRepository( final ArtifactRepository localRepository )
     {
         this.localRepository = localRepository;
 
@@ -126,14 +126,14 @@ public class MetadataResolutionRequest
      * @deprecated instead use {@link #setRemoteRepositories(List)}
      */
     @Deprecated
-    public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
+    public MetadataResolutionRequest setRemoteRepostories( final List<ArtifactRepository> remoteRepostories )
     {
         this.remoteRepositories = remoteRepostories;
 
         return this;
     }
 
-    public MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    public MetadataResolutionRequest setRemoteRepositories( final List<ArtifactRepository> remoteRepositories )
     {
         return setRemoteRepostories( remoteRepositories );
     }
@@ -143,7 +143,7 @@ public class MetadataResolutionRequest
         return managedVersionMap;
     }
 
-    public MetadataResolutionRequest setManagedVersionMap( Map managedVersionMap )
+    public MetadataResolutionRequest setManagedVersionMap( final Map managedVersionMap )
     {
         this.managedVersionMap = managedVersionMap;
 
@@ -152,7 +152,7 @@ public class MetadataResolutionRequest
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder()
+        final StringBuilder sb = new StringBuilder()
                 .append( "REQUEST: " ).append(  "\n" )
                 .append( "artifact: " ).append( mad ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )
@@ -168,7 +168,7 @@ public class MetadataResolutionRequest
         return asList;
     }
 
-    public MetadataResolutionRequest setAsList( boolean asList )
+    public MetadataResolutionRequest setAsList( final boolean asList )
     {
         this.asList = asList;
         return this;
@@ -179,7 +179,7 @@ public class MetadataResolutionRequest
         return asDirtyTree;
     }
 
-    public MetadataResolutionRequest setAsDirtyTree( boolean asDirtyTree )
+    public MetadataResolutionRequest setAsDirtyTree( final boolean asDirtyTree )
     {
         this.asDirtyTree = asDirtyTree;
         return this;
@@ -190,7 +190,7 @@ public class MetadataResolutionRequest
         return asResolvedTree;
     }
 
-    public MetadataResolutionRequest setAsResolvedTree( boolean asResolvedTree )
+    public MetadataResolutionRequest setAsResolvedTree( final boolean asResolvedTree )
     {
         this.asResolvedTree = asResolvedTree;
         return this;
@@ -201,13 +201,13 @@ public class MetadataResolutionRequest
         return asGraph;
     }
 
-    public MetadataResolutionRequest setAsGraph( boolean asGraph )
+    public MetadataResolutionRequest setAsGraph( final boolean asGraph )
     {
         this.asGraph = asGraph;
         return this;
     }
 
-    public MetadataResolutionRequest setScope( String scope )
+    public MetadataResolutionRequest setScope( final String scope )
     {
         this.scope = scope;
         return this;

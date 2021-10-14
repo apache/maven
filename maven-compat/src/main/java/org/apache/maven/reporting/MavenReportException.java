@@ -27,12 +27,12 @@ package org.apache.maven.reporting;
  */
 public class MavenReportException extends Exception
 {
-    public MavenReportException( String msg )
+    public MavenReportException( final String msg )
     {
         super( msg );
     }
 
-    public MavenReportException( String msg, Exception e )
+    public MavenReportException( final String msg, final Exception e )
     {
         super( msg, e );
     }

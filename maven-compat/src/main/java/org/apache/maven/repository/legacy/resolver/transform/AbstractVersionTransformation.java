@@ -54,30 +54,30 @@ public abstract class AbstractVersionTransformation
     @Requirement
     protected WagonManager wagonManager;
 
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
+    public void transformForResolve( final Artifact artifact, final List<ArtifactRepository> remoteRepositories,
+                                     final ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        RepositoryRequest request = new DefaultRepositoryRequest();
+        final RepositoryRequest request = new DefaultRepositoryRequest();
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         transformForResolve( artifact, request );
     }
 
-    protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
+    protected String resolveVersion( final Artifact artifact, final ArtifactRepository localRepository,
+                                     final List<ArtifactRepository> remoteRepositories )
         throws RepositoryMetadataResolutionException
     {
-        RepositoryRequest request = new DefaultRepositoryRequest();
+        final RepositoryRequest request = new DefaultRepositoryRequest();
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         return resolveVersion( artifact, request );
     }
 
-    protected String resolveVersion( Artifact artifact, RepositoryRequest request )
+    protected String resolveVersion( final Artifact artifact, final RepositoryRequest request )
         throws RepositoryMetadataResolutionException
     {
-        RepositoryMetadata metadata;
+        final RepositoryMetadata metadata;
         // Don't use snapshot metadata for LATEST (which isSnapshot returns true for)
         if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
         {
@@ -92,7 +92,7 @@ public abstract class AbstractVersionTransformation
 
         artifact.addMetadata( metadata );
 
-        Metadata repoMetadata = metadata.getMetadata();
+        final Metadata repoMetadata = metadata.getMetadata();
         String version = null;
         if ( repoMetadata != null && repoMetadata.getVersioning() != null )
         {

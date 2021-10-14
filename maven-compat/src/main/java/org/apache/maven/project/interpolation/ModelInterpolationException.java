@@ -31,17 +31,17 @@ public class ModelInterpolationException
 
     private String originalMessage;
 
-    public ModelInterpolationException( String message )
+    public ModelInterpolationException( final String message )
     {
         super( message );
     }
 
-    public ModelInterpolationException( String message, Throwable cause )
+    public ModelInterpolationException( final String message, final Throwable cause )
     {
         super( message, cause );
     }
 
-    public ModelInterpolationException( String expression, String message, Throwable cause )
+    public ModelInterpolationException( final String expression, final String message, final Throwable cause )
     {
         super( "The POM expression: " + expression + " could not be evaluated. Reason: " + message, cause );
 
@@ -49,7 +49,7 @@ public class ModelInterpolationException
         this.originalMessage = message;
     }
 
-    public ModelInterpolationException( String expression, String message )
+    public ModelInterpolationException( final String expression, final String message )
     {
         super( "The POM expression: " + expression + " could not be evaluated. Reason: " + message );
 

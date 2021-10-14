@@ -43,7 +43,7 @@ public class MavenArtifactMetadata
         return groupId;
     }
 
-    public void setGroupId( String groupId )
+    public void setGroupId( final String groupId )
     {
         this.groupId = groupId;
     }
@@ -53,7 +53,7 @@ public class MavenArtifactMetadata
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
+    public void setArtifactId( final String artifactId )
     {
         this.artifactId = artifactId;
     }
@@ -63,7 +63,7 @@ public class MavenArtifactMetadata
         return version;
     }
 
-    public void setVersion( String version )
+    public void setVersion( final String version )
     {
         this.version = version;
     }
@@ -73,7 +73,7 @@ public class MavenArtifactMetadata
         return classifier;
     }
 
-    public void setClassifier( String classifier )
+    public void setClassifier( final String classifier )
     {
         this.classifier = classifier;
     }
@@ -83,7 +83,7 @@ public class MavenArtifactMetadata
         return type;
     }
 
-    public void setType( String type )
+    public void setType( final String type )
     {
         this.type = type;
     }
@@ -93,7 +93,7 @@ public class MavenArtifactMetadata
         return datum;
     }
 
-    public void setDatum( Object datum )
+    public void setDatum( final Object datum )
     {
         this.datum = datum;
     }
@@ -103,7 +103,7 @@ public class MavenArtifactMetadata
         return scope;
     }
 
-    public void setScope( String scope )
+    public void setScope( final String scope )
     {
         this.scope = scope;
     }

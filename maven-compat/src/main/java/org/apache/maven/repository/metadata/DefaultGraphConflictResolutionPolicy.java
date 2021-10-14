@@ -44,15 +44,15 @@ public class DefaultGraphConflictResolutionPolicy
     @Configuration( name = "newer-first", value = "true" )
     private boolean newerFirst = true;
 
-    public MetadataGraphEdge apply( MetadataGraphEdge e1, MetadataGraphEdge e2 )
+    public MetadataGraphEdge apply( final MetadataGraphEdge e1, final MetadataGraphEdge e2 )
     {
-        int depth1 = e1.getDepth();
-        int depth2 = e2.getDepth();
+        final int depth1 = e1.getDepth();
+        final int depth2 = e2.getDepth();
 
         if ( depth1 == depth2 )
         {
-            ArtifactVersion v1 = new DefaultArtifactVersion( e1.getVersion() );
-            ArtifactVersion v2 = new DefaultArtifactVersion( e2.getVersion() );
+            final ArtifactVersion v1 = new DefaultArtifactVersion( e1.getVersion() );
+            final ArtifactVersion v2 = new DefaultArtifactVersion( e2.getVersion() );
 
             if ( newerFirst )
             {

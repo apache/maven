@@ -65,7 +65,7 @@ public class DefaultProfileManager
      * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work
      *             correctly in embedded environments.
      */
-    public DefaultProfileManager( PlexusContainer container )
+    public DefaultProfileManager( final PlexusContainer container )
     {
         this( container, null );
     }
@@ -75,14 +75,14 @@ public class DefaultProfileManager
      * are passed to maven, possibly containing profile activator properties
      *
      */
-    public DefaultProfileManager( PlexusContainer container, Properties props )
+    public DefaultProfileManager( final PlexusContainer container, final Properties props )
     {
         try
         {
             this.profileSelector = container.lookup( ProfileSelector.class );
             this.logger = ( (MutablePlexusContainer) container ).getLogger();
         }
-        catch ( ComponentLookupException e )
+        catch ( final ComponentLookupException e )
         {
             throw new IllegalStateException( e );
         }
@@ -102,11 +102,11 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
     */
-    public void addProfile( Profile profile )
+    public void addProfile( final Profile profile )
     {
-        String profileId = profile.getId();
+        final String profileId = profile.getId();
 
-        Profile existing = profilesById.get( profileId );
+        final Profile existing = profilesById.get( profileId );
         if ( existing != null )
         {
             logger.warn( "Overriding profile: '" + profileId + "' (source: " + existing.getSource()
@@ -115,7 +115,7 @@ public class DefaultProfileManager
 
         profilesById.put( profile.getId(), profile );
 
-        Activation activation = profile.getActivation();
+        final Activation activation = profile.getActivation();
 
         if ( activation != null && activation.isActiveByDefault() )
         {
@@ -126,7 +126,7 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
     */
-    public void explicitlyActivate( String profileId )
+    public void explicitlyActivate( final String profileId )
     {
         if ( !activatedIds.contains( profileId ) )
         {
@@ -139,9 +139,9 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
     */
-    public void explicitlyActivate( List<String> profileIds )
+    public void explicitlyActivate( final List<String> profileIds )
     {
-        for ( String profileId1 : profileIds )
+        for ( final String profileId1 : profileIds )
         {
             explicitlyActivate( profileId1 );
         }
@@ -150,7 +150,7 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
     */
-    public void explicitlyDeactivate( String profileId )
+    public void explicitlyDeactivate( final String profileId )
     {
         if ( !deactivatedIds.contains( profileId ) )
         {
@@ -163,9 +163,9 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
     */
-    public void explicitlyDeactivate( List<String> profileIds )
+    public void explicitlyDeactivate( final List<String> profileIds )
     {
-        for ( String profileId1 : profileIds )
+        for ( final String profileId1 : profileIds )
         {
             explicitlyDeactivate( profileId1 );
         }
@@ -177,7 +177,7 @@ public class DefaultProfileManager
     public List getActiveProfiles()
         throws ProfileActivationException
     {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
         context.setActiveProfileIds( activatedIds );
         context.setInactiveProfileIds( deactivatedIds );
         context.setSystemProperties( System.getProperties() );
@@ -185,7 +185,7 @@ public class DefaultProfileManager
 
         final List<ProfileActivationException> errors = new ArrayList<>();
 
-        List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req ->
+        final List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req ->
         {
             if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
             {
@@ -204,15 +204,15 @@ public class DefaultProfileManager
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
      */
-    public void addProfiles( List<Profile> profiles )
+    public void addProfiles( final List<Profile> profiles )
     {
-        for ( Profile profile1 : profiles )
+        for ( final Profile profile1 : profiles )
         {
             addProfile( profile1 );
         }
     }
 
-    public void activateAsDefault( String profileId )
+    public void activateAsDefault( final String profileId )
     {
         if ( !defaultIds.contains( profileId ) )
         {

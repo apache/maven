@@ -26,12 +26,12 @@ package org.apache.maven.artifact.manager;
 public class WagonConfigurationException
     extends org.apache.maven.repository.legacy.WagonConfigurationException
 {
-    public WagonConfigurationException( String repositoryId, String message, Throwable cause )
+    public WagonConfigurationException( final String repositoryId, final String message, final Throwable cause )
     {
         super( repositoryId, message, cause );
     }
 
-    public WagonConfigurationException( String repositoryId, String message )
+    public WagonConfigurationException( final String repositoryId, final String message )
     {
         super( repositoryId, message );
     }

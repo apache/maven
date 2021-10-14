@@ -60,22 +60,22 @@ public class DefaultArtifactInstaller
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
-    public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
+    public void install( final String basedir, final String finalName, final Artifact artifact, final ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        String extension = artifact.getArtifactHandler().getExtension();
-        File source = new File( basedir, finalName + "." + extension );
+        final String extension = artifact.getArtifactHandler().getExtension();
+        final File source = new File( basedir, finalName + "." + extension );
 
         install( source, artifact, localRepository );
     }
 
-    public void install( File source, Artifact artifact, ArtifactRepository localRepository )
+    public void install( final File source, final Artifact artifact, final ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        RepositorySystemSession session =
+        final RepositorySystemSession session =
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
-        InstallRequest request = new InstallRequest();
+        final InstallRequest request = new InstallRequest();
 
         request.setTrace( RequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
@@ -83,7 +83,7 @@ public class DefaultArtifactInstaller
         mainArtifact = mainArtifact.setFile( source );
         request.addArtifact( mainArtifact );
 
-        for ( ArtifactMetadata metadata : artifact.getMetadataList() )
+        for ( final ArtifactMetadata metadata : artifact.getMetadataList() )
         {
             if ( metadata instanceof ProjectArtifactMetadata )
             {
@@ -106,7 +106,7 @@ public class DefaultArtifactInstaller
         {
             repoSystem.install( session, request );
         }
-        catch ( InstallationException e )
+        catch ( final InstallationException e )
         {
             throw new ArtifactInstallationException( e.getMessage(), e );
         }
@@ -117,12 +117,12 @@ public class DefaultArtifactInstaller
 
         if ( artifact.isSnapshot() )
         {
-            Snapshot snapshot = new Snapshot();
+            final Snapshot snapshot = new Snapshot();
             snapshot.setLocalCopy( true );
             artifact.addMetadata( new SnapshotArtifactRepositoryMetadata( artifact, snapshot ) );
         }
 
-        Versioning versioning = new Versioning();
+        final Versioning versioning = new Versioning();
         // TODO Should this be changed for MNG-6754 too?
         versioning.updateTimestamp();
         versioning.addVersion( artifact.getBaseVersion() );

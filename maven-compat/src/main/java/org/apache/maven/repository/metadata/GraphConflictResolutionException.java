@@ -33,17 +33,17 @@ public class GraphConflictResolutionException
     {
     }
 
-    public GraphConflictResolutionException( String message )
+    public GraphConflictResolutionException( final String message )
     {
         super( message );
     }
 
-    public GraphConflictResolutionException( Throwable cause )
+    public GraphConflictResolutionException( final Throwable cause )
     {
         super( cause );
     }
 
-    public GraphConflictResolutionException( String message, Throwable cause )
+    public GraphConflictResolutionException( final String message, final Throwable cause )
     {
         super( message, cause );
     }

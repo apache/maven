@@ -81,7 +81,7 @@ public class MetadataResolutionResult
         return this;
     }
 
-    public void addArtifact( Artifact artifact )
+    public void addArtifact( final Artifact artifact )
     {
         if ( artifacts == null )
         {
@@ -96,7 +96,7 @@ public class MetadataResolutionResult
         return artifacts;
     }
 
-    public void addRequestedArtifact( Artifact artifact )
+    public void addRequestedArtifact( final Artifact artifact )
     {
         if ( requestedArtifacts == null )
         {
@@ -124,7 +124,7 @@ public class MetadataResolutionResult
 
     }
 
-    public MetadataResolutionResult addMissingArtifact( Artifact artifact )
+    public MetadataResolutionResult addMissingArtifact( final Artifact artifact )
     {
         missingArtifacts = initList( missingArtifacts );
 
@@ -171,7 +171,7 @@ public class MetadataResolutionResult
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
      *       {@link org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector}
      */
-    public MetadataResolutionResult addVersionRangeViolation( Exception e )
+    public MetadataResolutionResult addVersionRangeViolation( final Exception e )
     {
         versionRangeViolations = initList( versionRangeViolations );
 
@@ -184,7 +184,7 @@ public class MetadataResolutionResult
         return this;
     }
 
-    public OverConstrainedVersionException getVersionRangeViolation( int i )
+    public OverConstrainedVersionException getVersionRangeViolation( final int i )
     {
         return (OverConstrainedVersionException) versionRangeViolations.get( i );
     }
@@ -206,7 +206,7 @@ public class MetadataResolutionResult
         return metadataResolutionExceptions != null;
     }
 
-    public MetadataResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
+    public MetadataResolutionResult addMetadataResolutionException( final ArtifactResolutionException e )
     {
         metadataResolutionExceptions = initList( metadataResolutionExceptions );
 
@@ -219,7 +219,7 @@ public class MetadataResolutionResult
         return this;
     }
 
-    public ArtifactResolutionException getMetadataResolutionException( int i )
+    public ArtifactResolutionException getMetadataResolutionException( final int i )
     {
         return metadataResolutionExceptions.get( i );
     }
@@ -241,7 +241,7 @@ public class MetadataResolutionResult
         return errorArtifactExceptions != null;
     }
 
-    public MetadataResolutionResult addError( Exception e )
+    public MetadataResolutionResult addError( final Exception e )
     {
         exceptions = initList( exceptions );
 
@@ -269,7 +269,7 @@ public class MetadataResolutionResult
         return circularDependencyExceptions != null;
     }
 
-    public MetadataResolutionResult addCircularDependencyException( CyclicDependencyException e )
+    public MetadataResolutionResult addCircularDependencyException( final CyclicDependencyException e )
     {
         circularDependencyExceptions = initList( circularDependencyExceptions );
 
@@ -282,7 +282,7 @@ public class MetadataResolutionResult
         return this;
     }
 
-    public CyclicDependencyException getCircularDependencyException( int i )
+    public CyclicDependencyException getCircularDependencyException( final int i )
     {
         return circularDependencyExceptions.get( i );
     }
@@ -337,11 +337,11 @@ public class MetadataResolutionResult
         {
             return "";
         }
-        StringBuilder sb = new StringBuilder( 256 );
+        final StringBuilder sb = new StringBuilder( 256 );
         int i = 1;
         sb.append( "---------\n" );
         sb.append( artifacts.size() ).append( '\n' );
-        for ( Artifact a : artifacts )
+        for ( final Artifact a : artifacts )
         {
             sb.append( i ).append( ' ' ).append( a ).append( '\n' );
             i++;
@@ -355,7 +355,7 @@ public class MetadataResolutionResult
         return resolvedTree;
     }
 
-    public void setResolvedTree( MetadataGraph resolvedTree )
+    public void setResolvedTree( final MetadataGraph resolvedTree )
     {
         this.resolvedTree = resolvedTree;
     }

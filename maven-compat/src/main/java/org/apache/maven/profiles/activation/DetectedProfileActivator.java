@@ -28,7 +28,7 @@ import org.apache.maven.model.Profile;
 public abstract class DetectedProfileActivator
     implements ProfileActivator
 {
-    public boolean canDetermineActivation( Profile profile )
+    public boolean canDetermineActivation( final Profile profile )
     {
         return canDetectActivation( profile );
     }

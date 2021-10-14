@@ -29,12 +29,12 @@ public class ProfileActivationException
 
     private static final long serialVersionUID = -90820222109103638L;
 
-    public ProfileActivationException( String message, Throwable cause )
+    public ProfileActivationException( final String message, final Throwable cause )
     {
         super( message, cause );
     }
 
-    public ProfileActivationException( String message )
+    public ProfileActivationException( final String message )
     {
         super( message );
     }

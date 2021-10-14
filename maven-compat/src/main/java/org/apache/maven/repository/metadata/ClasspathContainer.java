@@ -39,13 +39,13 @@ implements Iterable<ArtifactMetadata>
     private ArtifactScopeEnum scope;
 
     // -------------------------------------------------------------------------------------------
-    public ClasspathContainer( ArtifactScopeEnum scope )
+    public ClasspathContainer( final ArtifactScopeEnum scope )
     {
         this.scope = ArtifactScopeEnum.checkScope( scope );
     }
 
     // -------------------------------------------------------------------------------------------
-    public ClasspathContainer( List<ArtifactMetadata> classpath, ArtifactScopeEnum scope )
+    public ClasspathContainer( final List<ArtifactMetadata> classpath, final ArtifactScopeEnum scope )
     {
         this( scope );
         this.classpath = classpath;
@@ -58,7 +58,7 @@ implements Iterable<ArtifactMetadata>
     }
 
     // -------------------------------------------------------------------------------------------
-    public ClasspathContainer add( ArtifactMetadata md )
+    public ClasspathContainer add( final ArtifactMetadata md )
     {
         if ( classpath == null )
         {
@@ -88,9 +88,9 @@ implements Iterable<ArtifactMetadata>
         MetadataTreeNode tree = null;
         MetadataTreeNode parent = null;
 
-        for ( ArtifactMetadata md : classpath )
+        for ( final ArtifactMetadata md : classpath )
         {
-            MetadataTreeNode node = new MetadataTreeNode( md, parent, md.isResolved(), md.getArtifactScope() );
+            final MetadataTreeNode node = new MetadataTreeNode( md, parent, md.isResolved(), md.getArtifactScope() );
             if ( tree == null )
             {
                 tree = node;
@@ -108,7 +108,7 @@ implements Iterable<ArtifactMetadata>
         return tree;
     }
 
-    public void setClasspath( List<ArtifactMetadata> classpath )
+    public void setClasspath( final List<ArtifactMetadata> classpath )
     {
         this.classpath = classpath;
     }
@@ -118,7 +118,7 @@ implements Iterable<ArtifactMetadata>
         return scope;
     }
 
-    public void setScope( ArtifactScopeEnum scope )
+    public void setScope( final ArtifactScopeEnum scope )
     {
         this.scope = scope;
     }
@@ -127,11 +127,11 @@ implements Iterable<ArtifactMetadata>
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( 256 );
+        final StringBuilder sb = new StringBuilder( 256 );
         sb.append( "[scope=" ).append( scope.getScope() );
         if ( classpath != null )
         {
-            for ( ArtifactMetadata md : classpath )
+            for ( final ArtifactMetadata md : classpath )
             {
                 sb.append( ": " ).append( md.toString() ).append( '{' ).append( md.getArtifactUri() ).append( '}' );
             }

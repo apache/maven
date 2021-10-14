@@ -69,23 +69,23 @@ public class DefaultArtifactDeployer
      *             correctly.
      */
     @Deprecated
-    public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
-                        ArtifactRepository localRepository )
+    public void deploy( final String basedir, final String finalName, final Artifact artifact, final ArtifactRepository deploymentRepository,
+                        final ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        String extension = artifact.getArtifactHandler().getExtension();
-        File source = new File( basedir, finalName + "." + extension );
+        final String extension = artifact.getArtifactHandler().getExtension();
+        final File source = new File( basedir, finalName + "." + extension );
         deploy( source, artifact, deploymentRepository, localRepository );
     }
 
-    public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository,
-                        ArtifactRepository localRepository )
+    public void deploy( final File source, final Artifact artifact, final ArtifactRepository deploymentRepository,
+                        final ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        RepositorySystemSession session =
+        final RepositorySystemSession session =
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
-        DeployRequest request = new DeployRequest();
+        final DeployRequest request = new DeployRequest();
 
         request.setTrace( RequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
@@ -93,7 +93,7 @@ public class DefaultArtifactDeployer
         mainArtifact = mainArtifact.setFile( source );
         request.addArtifact( mainArtifact );
 
-        String versionKey = artifact.getGroupId() + ':' + artifact.getArtifactId();
+        final String versionKey = artifact.getGroupId() + ':' + artifact.getArtifactId();
         String snapshotKey = null;
         if ( artifact.isSnapshot() )
         {
@@ -102,7 +102,7 @@ public class DefaultArtifactDeployer
         }
         request.addMetadata( relatedMetadata.get( versionKey ) );
 
-        for ( ArtifactMetadata metadata : artifact.getMetadataList() )
+        for ( final ArtifactMetadata metadata : artifact.getMetadataList() )
         {
             if ( metadata instanceof ProjectArtifactMetadata )
             {
@@ -129,24 +129,24 @@ public class DefaultArtifactDeployer
         if ( deploymentRepository instanceof DefaultArtifactRepository
             && deploymentRepository.getAuthentication() == null )
         {
-            RemoteRepository.Builder builder = new RemoteRepository.Builder( remoteRepo );
+            final RemoteRepository.Builder builder = new RemoteRepository.Builder( remoteRepo );
             builder.setAuthentication( session.getAuthenticationSelector().getAuthentication( remoteRepo ) );
             builder.setProxy( session.getProxySelector().getProxy( remoteRepo ) );
             remoteRepo = builder.build();
         }
         request.setRepository( remoteRepo );
 
-        DeployResult result;
+        final DeployResult result;
         try
         {
             result = repoSystem.deploy( session, request );
         }
-        catch ( DeploymentException e )
+        catch ( final DeploymentException e )
         {
             throw new ArtifactDeploymentException( e.getMessage(), e );
         }
 
-        for ( Object metadata : result.getMetadata() )
+        for ( final Object metadata : result.getMetadata() )
         {
             if ( metadata.getClass().getName().endsWith( ".internal.VersionsMetadata" ) )
             {

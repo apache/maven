@@ -49,13 +49,13 @@ public final class ProjectUtils
     }
 
     public static List<ArtifactRepository> buildArtifactRepositories(
-        List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+            final List<Repository> repositories, final ArtifactRepositoryFactory artifactRepositoryFactory, final PlexusContainer c )
         throws InvalidRepositoryException
     {
 
-        List<ArtifactRepository> remoteRepositories = new ArrayList<>();
+        final List<ArtifactRepository> remoteRepositories = new ArrayList<>();
 
-        for ( Repository r : repositories )
+        for ( final Repository r : repositories )
         {
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, c ) );
         }
@@ -64,20 +64,20 @@ public final class ProjectUtils
     }
 
     public static ArtifactRepository buildDeploymentArtifactRepository(
-        DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+            final DeploymentRepository repo, final ArtifactRepositoryFactory artifactRepositoryFactory, final PlexusContainer c )
         throws InvalidRepositoryException
     {
         return buildArtifactRepository( repo, artifactRepositoryFactory, c );
     }
 
     public static ArtifactRepository buildArtifactRepository(
-        Repository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+            final Repository repo, final ArtifactRepositoryFactory artifactRepositoryFactory, final PlexusContainer c )
         throws InvalidRepositoryException
     {
-        RepositorySystem repositorySystem = rs( c );
-        RepositorySystemSession session = rss( c );
+        final RepositorySystem repositorySystem = rs( c );
+        final RepositorySystemSession session = rss( c );
 
-        ArtifactRepository repository = repositorySystem.buildArtifactRepository( repo );
+        final ArtifactRepository repository = repositorySystem.buildArtifactRepository( repo );
 
         if ( session != null )
         {
@@ -89,27 +89,27 @@ public final class ProjectUtils
         return repository;
     }
 
-    private static RepositorySystem rs( PlexusContainer c )
+    private static RepositorySystem rs( final PlexusContainer c )
     {
         try
         {
             return c.lookup( RepositorySystem.class );
         }
-        catch ( ComponentLookupException e )
+        catch ( final ComponentLookupException e )
         {
             throw new IllegalStateException( e );
         }
     }
 
-    private static RepositorySystemSession rss( PlexusContainer c )
+    private static RepositorySystemSession rss( final PlexusContainer c )
     {
         try
         {
-            LegacySupport legacySupport = c.lookup( LegacySupport.class );
+            final LegacySupport legacySupport = c.lookup( LegacySupport.class );
 
             return legacySupport.getRepositorySession();
         }
-        catch ( ComponentLookupException e )
+        catch ( final ComponentLookupException e )
         {
             throw new IllegalStateException( e );
         }

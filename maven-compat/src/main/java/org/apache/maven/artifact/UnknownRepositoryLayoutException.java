@@ -34,13 +34,13 @@ public class UnknownRepositoryLayoutException
 
     private final String layoutId;
 
-    public UnknownRepositoryLayoutException( String repositoryId, String layoutId )
+    public UnknownRepositoryLayoutException( final String repositoryId, final String layoutId )
     {
         super( "Cannot find ArtifactRepositoryLayout instance for: " + layoutId, repositoryId );
         this.layoutId = layoutId;
     }
 
-    public UnknownRepositoryLayoutException( String repositoryId, String layoutId, ComponentLookupException e )
+    public UnknownRepositoryLayoutException( final String repositoryId, final String layoutId, final ComponentLookupException e )
     {
         super( "Cannot find ArtifactRepositoryLayout instance for: " + layoutId, repositoryId, e );
         this.layoutId = layoutId;

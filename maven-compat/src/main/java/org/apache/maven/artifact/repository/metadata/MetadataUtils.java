@@ -27,7 +27,7 @@ package org.apache.maven.artifact.repository.metadata;
 class MetadataUtils
 {
 
-    public static Metadata cloneMetadata( Metadata src )
+    public static Metadata cloneMetadata( final Metadata src )
     {
         if ( src == null )
         {

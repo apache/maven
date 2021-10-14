@@ -67,17 +67,17 @@ public class DefaultWagonManager
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    public AuthenticationInfo getAuthenticationInfo( String id )
+    public AuthenticationInfo getAuthenticationInfo( final String id )
     {
-        MavenSession session = legacySupport.getSession();
+        final MavenSession session = legacySupport.getSession();
 
         if ( session != null && id != null )
         {
-            MavenExecutionRequest request = session.getRequest();
+            final MavenExecutionRequest request = session.getRequest();
 
             if ( request != null )
             {
-                List<Server> servers = request.getServers();
+                final List<Server> servers = request.getServers();
 
                 if ( servers != null )
                 {
@@ -85,11 +85,11 @@ public class DefaultWagonManager
                     {
                         if ( id.equalsIgnoreCase( server.getId() ) )
                         {
-                            SettingsDecryptionResult result =
+                            final SettingsDecryptionResult result =
                                 settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( server ) );
                             server = result.getServer();
 
-                            AuthenticationInfo authInfo = new AuthenticationInfo();
+                            final AuthenticationInfo authInfo = new AuthenticationInfo();
                             authInfo.setUserName( server.getUsername() );
                             authInfo.setPassword( server.getPassword() );
                             authInfo.setPrivateKey( server.getPrivateKey() );
@@ -106,17 +106,17 @@ public class DefaultWagonManager
        return new AuthenticationInfo();
     }
 
-    public ProxyInfo getProxy( String protocol )
+    public ProxyInfo getProxy( final String protocol )
     {
-        MavenSession session = legacySupport.getSession();
+        final MavenSession session = legacySupport.getSession();
 
         if ( session != null && protocol != null )
         {
-            MavenExecutionRequest request = session.getRequest();
+            final MavenExecutionRequest request = session.getRequest();
 
             if ( request != null )
             {
-                List<Proxy> proxies = request.getProxies();
+                final List<Proxy> proxies = request.getProxies();
 
                 if ( proxies != null )
                 {
@@ -124,11 +124,11 @@ public class DefaultWagonManager
                     {
                         if ( proxy.isActive() && protocol.equalsIgnoreCase( proxy.getProtocol() ) )
                         {
-                            SettingsDecryptionResult result =
+                            final SettingsDecryptionResult result =
                                 settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( proxy ) );
                             proxy = result.getProxy();
 
-                            ProxyInfo proxyInfo = new ProxyInfo();
+                            final ProxyInfo proxyInfo = new ProxyInfo();
                             proxyInfo.setHost( proxy.getHost() );
                             proxyInfo.setType( proxy.getProtocol() );
                             proxyInfo.setPort( proxy.getPort() );
@@ -146,13 +146,13 @@ public class DefaultWagonManager
         return null;
     }
 
-    public void getArtifact( Artifact artifact, ArtifactRepository repository )
+    public void getArtifact( final Artifact artifact, final ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         getArtifact( artifact, repository, null, false );
     }
 
-    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories )
+    public void getArtifact( final Artifact artifact, final List<ArtifactRepository> remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         getArtifact( artifact, remoteRepositories, null, false );
@@ -162,7 +162,7 @@ public class DefaultWagonManager
     public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
     {
 
-        Mirror mirror = mirrorSelector.getMirror( repository, legacySupport.getSession().getSettings().getMirrors() );
+        final Mirror mirror = mirrorSelector.getMirror( repository, legacySupport.getSession().getSettings().getMirrors() );
 
         if ( mirror != null )
         {

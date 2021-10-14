@@ -53,14 +53,14 @@ public class DefaultConflictResolverFactory
     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
     */
 
-    public ConflictResolver getConflictResolver( String type )
+    public ConflictResolver getConflictResolver( final String type )
         throws ConflictResolverNotFoundException
     {
         try
         {
             return (ConflictResolver) container.lookup( ConflictResolver.ROLE, type );
         }
-        catch ( ComponentLookupException exception )
+        catch ( final ComponentLookupException exception )
         {
             throw new ConflictResolverNotFoundException( "Cannot find conflict resolver of type: " + type );
         }
@@ -72,7 +72,7 @@ public class DefaultConflictResolverFactory
      * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable#contextualize(org.codehaus.plexus.context.Context)
      */
 
-    public void contextualize( Context context )
+    public void contextualize( final Context context )
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );

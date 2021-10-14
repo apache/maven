@@ -54,7 +54,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
-    public void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance )
+    public void assembleBuildInheritance( final Build childBuild, final Build parentBuild, final boolean handleAsInheritance )
     {
         // The build has been set but we want to step in here and fill in
         // values that have not been set by the child.
@@ -120,8 +120,8 @@ public class DefaultModelInheritanceAssembler
         ModelUtils.mergePluginLists( childBuild, parentBuild, handleAsInheritance );
 
         // Plugin management :: aggregate
-        PluginManagement dominantPM = childBuild.getPluginManagement();
-        PluginManagement recessivePM = parentBuild.getPluginManagement();
+        final PluginManagement dominantPM = childBuild.getPluginManagement();
+        final PluginManagement recessivePM = parentBuild.getPluginManagement();
 
         if ( ( dominantPM == null ) && ( recessivePM != null ) )
         {
@@ -134,11 +134,11 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleScmInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleScmInheritance( final Model child, final Model parent, final String childPathAdjustment, final boolean appendPaths )
     {
         if ( parent.getScm() != null )
         {
-            Scm parentScm = parent.getScm();
+            final Scm parentScm = parent.getScm();
 
             Scm childScm = child.getScm();
 
@@ -171,22 +171,22 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    public void copyModel( Model dest, Model source )
+    public void copyModel( final Model dest, final Model source )
     {
         assembleModelInheritance( dest, source, null, false );
     }
 
-    public void assembleModelInheritance( Model child, Model parent, String childPathAdjustment )
+    public void assembleModelInheritance( final Model child, final Model parent, final String childPathAdjustment )
     {
         assembleModelInheritance( child, parent, childPathAdjustment, true );
     }
 
-    public void assembleModelInheritance( Model child, Model parent )
+    public void assembleModelInheritance( final Model child, final Model parent )
     {
         assembleModelInheritance( child, parent, null, true );
     }
 
-    private void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleModelInheritance( final Model child, final Model parent, final String childPathAdjustment, final boolean appendPaths )
     {
         // cannot inherit from null parent.
         if ( parent == null )
@@ -297,18 +297,18 @@ public class DefaultModelInheritanceAssembler
 
         assembleDependencyManagementInheritance( child, parent );
 
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.putAll( parent.getProperties() );
         props.putAll( child.getProperties() );
 
         child.setProperties( props );
     }
 
-    private void assembleDependencyManagementInheritance( Model child, Model parent )
+    private void assembleDependencyManagementInheritance( final Model child, final Model parent )
     {
-        DependencyManagement parentDepMgmt = parent.getDependencyManagement();
+        final DependencyManagement parentDepMgmt = parent.getDependencyManagement();
 
-        DependencyManagement childDepMgmt = child.getDependencyManagement();
+        final DependencyManagement childDepMgmt = child.getDependencyManagement();
 
         if ( parentDepMgmt != null )
         {
@@ -318,15 +318,15 @@ public class DefaultModelInheritanceAssembler
             }
             else
             {
-                List<Dependency> childDeps = childDepMgmt.getDependencies();
+                final List<Dependency> childDeps = childDepMgmt.getDependencies();
 
-                Map<String, Dependency> mappedChildDeps = new TreeMap<>();
-                for ( Dependency dep : childDeps )
+                final Map<String, Dependency> mappedChildDeps = new TreeMap<>();
+                for ( final Dependency dep : childDeps )
                 {
                     mappedChildDeps.put( dep.getManagementKey(), dep );
                 }
 
-                for ( Dependency dep : parentDepMgmt.getDependencies() )
+                for ( final Dependency dep : parentDepMgmt.getDependencies() )
                 {
                     if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
                     {
@@ -337,11 +337,11 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleReportingInheritance( Model child, Model parent )
+    private void assembleReportingInheritance( final Model child, final Model parent )
     {
         // Reports :: aggregate
         Reporting childReporting = child.getReporting();
-        Reporting parentReporting = parent.getReporting();
+        final Reporting parentReporting = parent.getReporting();
 
         if ( parentReporting != null )
         {
@@ -362,7 +362,7 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
+    private static void mergeReportPluginLists( final Reporting child, final Reporting parent, final boolean handleAsInheritance )
     {
         if ( ( child == null ) || ( parent == null ) )
         {
@@ -370,24 +370,24 @@ public class DefaultModelInheritanceAssembler
             return;
         }
 
-        List<ReportPlugin> parentPlugins = parent.getPlugins();
+        final List<ReportPlugin> parentPlugins = parent.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            Map<String, ReportPlugin> assembledPlugins = new TreeMap<>();
+            final Map<String, ReportPlugin> assembledPlugins = new TreeMap<>();
 
-            Map<String, ReportPlugin> childPlugins = child.getReportPluginsAsMap();
+            final Map<String, ReportPlugin> childPlugins = child.getReportPluginsAsMap();
 
-            for ( ReportPlugin parentPlugin : parentPlugins )
+            for ( final ReportPlugin parentPlugin : parentPlugins )
             {
-                String parentInherited = parentPlugin.getInherited();
+                final String parentInherited = parentPlugin.getInherited();
 
                 if ( !handleAsInheritance || ( parentInherited == null ) || Boolean.parseBoolean( parentInherited ) )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
 
-                    ReportPlugin childPlugin = childPlugins.get( parentPlugin.getKey() );
+                    final ReportPlugin childPlugin = childPlugins.get( parentPlugin.getKey() );
 
                     if ( childPlugin != null )
                     {
@@ -405,7 +405,7 @@ public class DefaultModelInheritanceAssembler
                 }
             }
 
-            for ( ReportPlugin childPlugin : childPlugins.values() )
+            for ( final ReportPlugin childPlugin : childPlugins.values() )
             {
                 if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
                 {
@@ -419,12 +419,12 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private static void mergeReportSetDefinitions( ReportSet child, ReportSet parent )
+    private static void mergeReportSetDefinitions( final ReportSet child, final ReportSet parent )
     {
-        List<String> parentReports = parent.getReports();
-        List<String> childReports = child.getReports();
+        final List<String> parentReports = parent.getReports();
+        final List<String> childReports = child.getReports();
 
-        List<String> reports = new ArrayList<>();
+        final List<String> reports = new ArrayList<>();
 
         if ( ( childReports != null ) && !childReports.isEmpty() )
         {
@@ -433,7 +433,7 @@ public class DefaultModelInheritanceAssembler
 
         if ( parentReports != null )
         {
-            for ( String report : parentReports )
+            for ( final String report : parentReports )
             {
                 if ( !reports.contains( report ) )
                 {
@@ -445,7 +445,7 @@ public class DefaultModelInheritanceAssembler
         child.setReports( reports );
 
         Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
-        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+        final Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
 
         childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
 
@@ -453,8 +453,8 @@ public class DefaultModelInheritanceAssembler
     }
 
 
-    public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
-                                                     boolean handleAsInheritance )
+    public static void mergeReportPluginDefinitions( final ReportPlugin child, final ReportPlugin parent,
+                                                     final boolean handleAsInheritance )
     {
         if ( ( child == null ) || ( parent == null ) )
         {
@@ -468,27 +468,27 @@ public class DefaultModelInheritanceAssembler
         }
 
         // from here to the end of the method is dealing with merging of the <executions/> section.
-        String parentInherited = parent.getInherited();
+        final String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = ( parentInherited == null ) || Boolean.parseBoolean( parentInherited );
+        final boolean parentIsInherited = ( parentInherited == null ) || Boolean.parseBoolean( parentInherited );
 
-        List<ReportSet> parentReportSets = parent.getReportSets();
+        final List<ReportSet> parentReportSets = parent.getReportSets();
 
         if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
         {
-            Map<String, ReportSet> assembledReportSets = new TreeMap<>();
+            final Map<String, ReportSet> assembledReportSets = new TreeMap<>();
 
-            Map<String, ReportSet> childReportSets = child.getReportSetsAsMap();
+            final Map<String, ReportSet> childReportSets = child.getReportSetsAsMap();
 
-            for ( Object parentReportSet1 : parentReportSets )
+            for ( final Object parentReportSet1 : parentReportSets )
             {
-                ReportSet parentReportSet = (ReportSet) parentReportSet1;
+                final ReportSet parentReportSet = (ReportSet) parentReportSet1;
 
                 if ( !handleAsInheritance || parentIsInherited )
                 {
                     ReportSet assembledReportSet = parentReportSet;
 
-                    ReportSet childReportSet = childReportSets.get( parentReportSet.getId() );
+                    final ReportSet childReportSet = childReportSets.get( parentReportSet.getId() );
 
                     if ( childReportSet != null )
                     {
@@ -505,9 +505,9 @@ public class DefaultModelInheritanceAssembler
                 }
             }
 
-            for ( Map.Entry<String, ReportSet> entry : childReportSets.entrySet() )
+            for ( final Map.Entry<String, ReportSet> entry : childReportSets.entrySet() )
             {
-                String id = entry.getKey();
+                final String id = entry.getKey();
 
                 if ( !assembledReportSets.containsKey( id ) )
                 {
@@ -522,15 +522,15 @@ public class DefaultModelInheritanceAssembler
 
     }
 
-    private void assembleDependencyInheritance( Model child, Model parent )
+    private void assembleDependencyInheritance( final Model child, final Model parent )
     {
-        Map<String, Dependency> depsMap = new LinkedHashMap<>();
+        final Map<String, Dependency> depsMap = new LinkedHashMap<>();
 
         List<Dependency> deps = parent.getDependencies();
 
         if ( deps != null )
         {
-            for ( Dependency dependency : deps )
+            for ( final Dependency dependency : deps )
             {
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
@@ -540,7 +540,7 @@ public class DefaultModelInheritanceAssembler
 
         if ( deps != null )
         {
-            for ( Dependency dependency : deps )
+            for ( final Dependency dependency : deps )
             {
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
@@ -549,10 +549,10 @@ public class DefaultModelInheritanceAssembler
         child.setDependencies( new ArrayList<>( depsMap.values() ) );
     }
 
-    private void assembleBuildInheritance( Model child, Model parent )
+    private void assembleBuildInheritance( final Model child, final Model parent )
     {
         Build childBuild = child.getBuild();
-        Build parentBuild = parent.getBuild();
+        final Build parentBuild = parent.getBuild();
 
         if ( parentBuild != null )
         {
@@ -566,12 +566,12 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleDistributionInheritance( Model child, Model parent, String childPathAdjustment,
-                                                  boolean appendPaths )
+    private void assembleDistributionInheritance( final Model child, final Model parent, final String childPathAdjustment,
+                                                  final boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )
         {
-            DistributionManagement parentDistMgmt = parent.getDistributionManagement();
+            final DistributionManagement parentDistMgmt = parent.getDistributionManagement();
 
             DistributionManagement childDistMgmt = child.getDistributionManagement();
 
@@ -586,7 +586,7 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getSite() != null )
                 {
-                    Site site = new Site();
+                    final Site site = new Site();
 
                     childDistMgmt.setSite( site );
 
@@ -608,7 +608,7 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getRepository() != null )
                 {
-                    DeploymentRepository repository = copyDistributionRepository( parentDistMgmt.getRepository() );
+                    final DeploymentRepository repository = copyDistributionRepository( parentDistMgmt.getRepository() );
                     childDistMgmt.setRepository( repository );
                 }
             }
@@ -617,7 +617,7 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getSnapshotRepository() != null )
                 {
-                    DeploymentRepository repository =
+                    final DeploymentRepository repository =
                         copyDistributionRepository( parentDistMgmt.getSnapshotRepository() );
                     childDistMgmt.setSnapshotRepository( repository );
                 }
@@ -633,9 +633,9 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private static DeploymentRepository copyDistributionRepository( DeploymentRepository parentRepository )
+    private static DeploymentRepository copyDistributionRepository( final DeploymentRepository parentRepository )
     {
-        DeploymentRepository repository = new DeploymentRepository();
+        final DeploymentRepository repository = new DeploymentRepository();
 
         repository.setId( parentRepository.getId() );
 
@@ -651,7 +651,7 @@ public class DefaultModelInheritanceAssembler
     }
 
     // TODO This should eventually be migrated to DefaultPathTranslator.
-    protected String appendPath( String parentPath, String childPath, String pathAdjustment, boolean appendPaths )
+    protected String appendPath( final String parentPath, final String childPath, final String pathAdjustment, final boolean appendPaths )
     {
         String uncleanPath = parentPath;
 
@@ -670,7 +670,7 @@ public class DefaultModelInheritanceAssembler
 
         String cleanedPath = "";
 
-        int protocolIdx = uncleanPath.indexOf( "://" );
+        final int protocolIdx = uncleanPath.indexOf( "://" );
 
         if ( protocolIdx > -1 )
         {
@@ -687,15 +687,15 @@ public class DefaultModelInheritanceAssembler
     }
 
     // TODO Move this to plexus-utils' PathTool.
-    private static String resolvePath( String uncleanPath )
+    private static String resolvePath( final String uncleanPath )
     {
-        LinkedList<String> pathElements = new LinkedList<>();
+        final LinkedList<String> pathElements = new LinkedList<>();
 
-        StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
+        final StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
 
         while ( tokenizer.hasMoreTokens() )
         {
-            String token = tokenizer.nextToken();
+            final String token = tokenizer.nextToken();
 
             switch ( token )
             {
@@ -720,7 +720,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        StringBuilder cleanedPath = new StringBuilder();
+        final StringBuilder cleanedPath = new StringBuilder();
 
         while ( !pathElements.isEmpty() )
         {
@@ -734,9 +734,9 @@ public class DefaultModelInheritanceAssembler
         return cleanedPath.toString();
     }
 
-    private static void mergeExtensionLists( Build childBuild, Build parentBuild )
+    private static void mergeExtensionLists( final Build childBuild, final Build parentBuild )
     {
-        for ( Extension e : parentBuild.getExtensions() )
+        for ( final Extension e : parentBuild.getExtensions() )
         {
             if ( !childBuild.getExtensions().contains( e ) )
             {

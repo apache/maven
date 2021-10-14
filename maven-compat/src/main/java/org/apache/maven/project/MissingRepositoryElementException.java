@@ -27,12 +27,12 @@ public class MissingRepositoryElementException
     extends InvalidRepositoryException
 {
 
-    public MissingRepositoryElementException( String message, String repositoryId )
+    public MissingRepositoryElementException( final String message, final String repositoryId )
     {
         super( message, repositoryId );
     }
 
-    public MissingRepositoryElementException( String message )
+    public MissingRepositoryElementException( final String message )
     {
         super( message, "-unknown-" );
     }

@@ -36,8 +36,8 @@ public class MetadataResolutionRequest
     }
 
     //--------------------------------------------------------------------
-    public MetadataResolutionRequest( ArtifactMetadata query, ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories )
+    public MetadataResolutionRequest( final ArtifactMetadata query, final ArtifactRepository localRepository,
+                                      final List<ArtifactRepository> remoteRepositories )
     {
         this.query = query;
         this.localRepository = localRepository;
@@ -50,7 +50,7 @@ public class MetadataResolutionRequest
         return query;
     }
 
-    public void setQuery( ArtifactMetadata query )
+    public void setQuery( final ArtifactMetadata query )
     {
         this.query = query;
     }
@@ -60,7 +60,7 @@ public class MetadataResolutionRequest
         return localRepository;
     }
 
-    public void setLocalRepository( ArtifactRepository localRepository )
+    public void setLocalRepository( final ArtifactRepository localRepository )
     {
         this.localRepository = localRepository;
     }
@@ -70,7 +70,7 @@ public class MetadataResolutionRequest
         return remoteRepositories;
     }
 
-    public void setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    public void setRemoteRepositories( final List<ArtifactRepository> remoteRepositories )
     {
         this.remoteRepositories = remoteRepositories;
     }

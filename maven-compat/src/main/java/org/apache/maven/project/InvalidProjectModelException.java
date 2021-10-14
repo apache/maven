@@ -32,7 +32,7 @@ public class InvalidProjectModelException
 {
     private ModelValidationResult validationResult;
 
-    public InvalidProjectModelException( String projectId, String message, File pomLocation )
+    public InvalidProjectModelException( final String projectId, final String message, final File pomLocation )
     {
         super( projectId, message, pomLocation );
     }
@@ -44,14 +44,14 @@ public class InvalidProjectModelException
      * @param validationResult
      * @deprecated use {@link File} constructor for pomLocation
      */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
-                                         ModelValidationResult validationResult )
+    public InvalidProjectModelException( final String projectId, final String pomLocation, final String message,
+                                         final ModelValidationResult validationResult )
     {
         this( projectId, message, new File( pomLocation ), validationResult );
     }
 
-    public InvalidProjectModelException( String projectId, String message, File pomFile,
-                                         ModelValidationResult validationResult )
+    public InvalidProjectModelException( final String projectId, final String message, final File pomFile,
+                                         final ModelValidationResult validationResult )
     {
         super( projectId, message, pomFile );
 
@@ -64,7 +64,7 @@ public class InvalidProjectModelException
      * @param message
      * @deprecated use {@link File} constructor for pomLocation
      */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message )
+    public InvalidProjectModelException( final String projectId, final String pomLocation, final String message )
     {
         this( projectId, message, new File( pomLocation ) );
     }

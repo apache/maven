@@ -29,12 +29,12 @@ public class InversionArtifactFilter
 {
     private final ArtifactFilter toInvert;
 
-    public InversionArtifactFilter( ArtifactFilter toInvert )
+    public InversionArtifactFilter( final ArtifactFilter toInvert )
     {
         this.toInvert = toInvert;
     }
 
-    public boolean include( Artifact artifact )
+    public boolean include( final Artifact artifact )
     {
         return !toInvert.include( artifact );
     }
@@ -48,7 +48,7 @@ public class InversionArtifactFilter
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -60,7 +60,7 @@ public class InversionArtifactFilter
             return false;
         }
 
-        InversionArtifactFilter other = (InversionArtifactFilter) obj;
+        final InversionArtifactFilter other = (InversionArtifactFilter) obj;
 
         return toInvert.equals( other.toInvert );
     }

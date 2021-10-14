@@ -51,7 +51,7 @@ public class DefaultRuntimeInformation
     public void initialize()
         throws InitializationException
     {
-        String mavenVersion = rtInfo.getMavenVersion();
+        final String mavenVersion = rtInfo.getMavenVersion();
 
         if ( StringUtils.isEmpty( mavenVersion ) )
         {

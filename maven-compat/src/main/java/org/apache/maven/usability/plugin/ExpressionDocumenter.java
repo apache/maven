@@ -57,26 +57,26 @@ public class ExpressionDocumenter
         {
             expressionDocumentation = new HashMap<>();
 
-            ClassLoader docLoader = initializeDocLoader();
+            final ClassLoader docLoader = initializeDocLoader();
 
-            for ( String root : EXPRESSION_ROOTS )
+            for ( final String root : EXPRESSION_ROOTS )
             {
-                try ( InputStream docStream = docLoader.getResourceAsStream(
+                try ( final InputStream docStream = docLoader.getResourceAsStream(
                     EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml" ) )
                 {
                     if ( docStream != null )
                     {
-                        Map<String, Expression> doco = parseExpressionDocumentation( docStream );
+                        final Map<String, Expression> doco = parseExpressionDocumentation( docStream );
 
                         expressionDocumentation.putAll( doco );
                     }
                 }
-                catch ( IOException e )
+                catch ( final IOException e )
                 {
                     throw new ExpressionDocumentationException(
                         "Failed to read documentation for expression root: " + root, e );
                 }
-                catch ( XmlPullParserException e )
+                catch ( final XmlPullParserException e )
                 {
                     throw new ExpressionDocumentationException(
                         "Failed to parse documentation for expression root: " + root, e );
@@ -114,22 +114,22 @@ public class ExpressionDocumenter
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static Map<String, Expression> parseExpressionDocumentation( InputStream docStream )
+    private static Map<String, Expression> parseExpressionDocumentation( final InputStream docStream )
         throws IOException, XmlPullParserException
     {
-        Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
+        final Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
 
-        ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
+        final ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
 
-        ExpressionDocumentation documentation = paramdocReader.read( reader, true );
+        final ExpressionDocumentation documentation = paramdocReader.read( reader, true );
 
-        List<Expression> expressions = documentation.getExpressions();
+        final List<Expression> expressions = documentation.getExpressions();
 
-        Map<String, Expression> bySyntax = new HashMap<>();
+        final Map<String, Expression> bySyntax = new HashMap<>();
 
         if ( expressions != null && !expressions.isEmpty() )
         {
-            for ( Expression expression : expressions )
+            for ( final Expression expression : expressions )
             {
                 bySyntax.put( expression.getSyntax(), expression );
             }
@@ -141,9 +141,9 @@ public class ExpressionDocumenter
     private static ClassLoader initializeDocLoader()
         throws ExpressionDocumentationException
     {
-        String myResourcePath = ExpressionDocumenter.class.getName().replace( '.', '/' ) + ".class";
+        final String myResourcePath = ExpressionDocumenter.class.getName().replace( '.', '/' ) + ".class";
 
-        URL myResource = ExpressionDocumenter.class.getClassLoader().getResource( myResourcePath );
+        final URL myResource = ExpressionDocumenter.class.getClassLoader().getResource( myResourcePath );
 
         assert myResource != null : "The resource is this class itself loaded by its own classloader and must exist";
 
@@ -156,12 +156,12 @@ public class ExpressionDocumenter
             myClasspathEntry = myClasspathEntry.substring( "file:".length() );
         }
 
-        URL docResource;
+        final URL docResource;
         try
         {
             docResource = new File( myClasspathEntry ).toURL();
         }
-        catch ( MalformedURLException e )
+        catch ( final MalformedURLException e )
         {
             throw new ExpressionDocumentationException(
                 "Cannot construct expression documentation classpath" + " resource base.", e );

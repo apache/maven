@@ -43,7 +43,7 @@ public class TransferListenerAdapter
 
     private final Map<Resource, Long> transfers;
 
-    public static TransferListener newAdapter( ArtifactTransferListener listener )
+    public static TransferListener newAdapter( final ArtifactTransferListener listener )
     {
         if ( listener == null )
         {
@@ -55,22 +55,22 @@ public class TransferListenerAdapter
         }
     }
 
-    private TransferListenerAdapter( ArtifactTransferListener listener )
+    private TransferListenerAdapter( final ArtifactTransferListener listener )
     {
         this.listener = listener;
         this.artifacts = new IdentityHashMap<>();
         this.transfers = new IdentityHashMap<>();
     }
 
-    public void debug( String message )
+    public void debug( final String message )
     {
     }
 
-    public void transferCompleted( TransferEvent transferEvent )
+    public void transferCompleted( final TransferEvent transferEvent )
     {
-        ArtifactTransferEvent event = wrap( transferEvent );
+        final ArtifactTransferEvent event = wrap( transferEvent );
 
-        Long transferred;
+        final Long transferred;
         synchronized ( transfers )
         {
             transferred = transfers.remove( transferEvent.getResource() );
@@ -88,7 +88,7 @@ public class TransferListenerAdapter
         listener.transferCompleted( event );
     }
 
-    public void transferError( TransferEvent transferEvent )
+    public void transferError( final TransferEvent transferEvent )
     {
         synchronized ( transfers )
         {
@@ -100,12 +100,12 @@ public class TransferListenerAdapter
         }
     }
 
-    public void transferInitiated( TransferEvent transferEvent )
+    public void transferInitiated( final TransferEvent transferEvent )
     {
         listener.transferInitiated( wrap( transferEvent ) );
     }
 
-    public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
+    public void transferProgress( final TransferEvent transferEvent, final byte[] buffer, final int length )
     {
         Long transferred;
         synchronized ( transfers )
@@ -122,7 +122,7 @@ public class TransferListenerAdapter
             transfers.put( transferEvent.getResource(), transferred );
         }
 
-        ArtifactTransferEvent event = wrap( transferEvent );
+        final ArtifactTransferEvent event = wrap( transferEvent );
         event.setDataBuffer( buffer );
         event.setDataOffset( 0 );
         event.setDataLength( length );
@@ -131,12 +131,12 @@ public class TransferListenerAdapter
         listener.transferProgress( event );
     }
 
-    public void transferStarted( TransferEvent transferEvent )
+    public void transferStarted( final TransferEvent transferEvent )
     {
         listener.transferStarted( wrap( transferEvent ) );
     }
 
-    private ArtifactTransferEvent wrap( TransferEvent event )
+    private ArtifactTransferEvent wrap( final TransferEvent event )
     {
         if ( event == null )
         {
@@ -144,11 +144,11 @@ public class TransferListenerAdapter
         }
         else
         {
-            String wagon = event.getWagon().getClass().getName();
+            final String wagon = event.getWagon().getClass().getName();
 
-            ArtifactTransferResource artifact = wrap( event.getWagon().getRepository(), event.getResource() );
+            final ArtifactTransferResource artifact = wrap( event.getWagon().getRepository(), event.getResource() );
 
-            ArtifactTransferEvent evt;
+            final ArtifactTransferEvent evt;
             if ( event.getException() != null )
             {
                 evt = new ArtifactTransferEvent( wagon, event.getException(), event.getRequestType(), artifact );
@@ -164,7 +164,7 @@ public class TransferListenerAdapter
         }
     }
 
-    private ArtifactTransferResource wrap( Repository repository, Resource resource )
+    private ArtifactTransferResource wrap( final Repository repository, final Resource resource )
     {
         if ( resource == null )
         {

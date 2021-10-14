@@ -42,11 +42,11 @@ public class FlatRepositoryLayout
         return "flat";
     }
 
-    public String pathOf( Artifact artifact )
+    public String pathOf( final Artifact artifact )
     {
-        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
+        final ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        StringBuilder path = new StringBuilder( 128 );
+        final StringBuilder path = new StringBuilder( 128 );
 
         path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
 
@@ -63,21 +63,21 @@ public class FlatRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( final ArtifactMetadata metadata, final ArtifactRepository repository )
     {
         return pathOfRepositoryMetadata( metadata.getLocalFilename( repository ) );
     }
 
-    private String pathOfRepositoryMetadata( String filename )
+    private String pathOfRepositoryMetadata( final String filename )
     {
-        StringBuilder path = new StringBuilder( 128 );
+        final StringBuilder path = new StringBuilder( 128 );
 
         path.append( filename );
 
         return path.toString();
     }
 
-    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+    public String pathOfRemoteRepositoryMetadata( final ArtifactMetadata metadata )
     {
         return pathOfRepositoryMetadata( metadata.getRemoteFilename() );
     }

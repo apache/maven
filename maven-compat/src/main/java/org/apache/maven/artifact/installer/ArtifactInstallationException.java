@@ -25,18 +25,18 @@ package org.apache.maven.artifact.installer;
 public class ArtifactInstallationException
     extends Exception
 {
-    public ArtifactInstallationException( String message )
+    public ArtifactInstallationException( final String message )
     {
         super( message );
     }
 
-    public ArtifactInstallationException( Throwable cause )
+    public ArtifactInstallationException( final Throwable cause )
     {
         super( cause );
     }
 
-    public ArtifactInstallationException( String message,
-                                          Throwable cause )
+    public ArtifactInstallationException( final String message,
+                                          final Throwable cause )
     {
         super( message, cause );
     }

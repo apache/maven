@@ -32,7 +32,7 @@ import org.apache.maven.artifact.Artifact;
 public class ManagedVersionMap
     extends HashMap<String, Artifact>
 {
-    public ManagedVersionMap( Map<String, Artifact> map )
+    public ManagedVersionMap( final Map<String, Artifact> map )
     {
         super();
         if ( map != null )
@@ -43,11 +43,11 @@ public class ManagedVersionMap
 
     public String toString()
     {
-        StringBuilder buffer = new StringBuilder( "ManagedVersionMap (" + size() + " entries)\n" );
-        Iterator<String> iter = keySet().iterator();
+        final StringBuilder buffer = new StringBuilder( "ManagedVersionMap (" + size() + " entries)\n" );
+        final Iterator<String> iter = keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = iter.next();
+            final String key = iter.next();
             buffer.append( key ).append( '=' ).append( get( key ) );
             if ( iter.hasNext() )
             {

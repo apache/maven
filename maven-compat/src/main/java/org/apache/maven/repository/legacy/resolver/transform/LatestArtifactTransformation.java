@@ -36,14 +36,14 @@ public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
 
-    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+    public void transformForResolve( final Artifact artifact, final RepositoryRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
             try
             {
-                String version = resolveVersion( artifact, request );
+                final String version = resolveVersion( artifact, request );
                 if ( Artifact.LATEST_VERSION.equals( version ) )
                 {
                     throw new ArtifactNotFoundException( "Unable to determine the latest version", artifact );
@@ -52,25 +52,25 @@ public class LatestArtifactTransformation
                 artifact.setBaseVersion( version );
                 artifact.updateVersion( version, request.getLocalRepository() );
             }
-            catch ( RepositoryMetadataResolutionException e )
+            catch ( final RepositoryMetadataResolutionException e )
             {
                 throw new ArtifactResolutionException( e.getMessage(), artifact, e );
             }
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( final Artifact artifact, final ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
-                                        ArtifactRepository localRepository )
+    public void transformForDeployment( final Artifact artifact, final ArtifactRepository remoteRepository,
+                                        final ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( final Versioning versioning, final String baseVersion )
     {
         return versioning.getLatest();
     }
