@@ -55,8 +55,9 @@ class DefaultProblem
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    DefaultProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
-                                   Exception exception )
+    DefaultProblem( final String message, final Severity severity, final String source, final int lineNumber, 
+                    final int columnNumber,
+                    final Exception exception )
     {
         this.message = message;
         this.severity = ( severity != null ) ? severity : Severity.ERROR;
@@ -83,7 +84,7 @@ class DefaultProblem
 
     public String getLocation()
     {
-        StringBuilder buffer = new StringBuilder( 256 );
+        final StringBuilder buffer = new StringBuilder( 256 );
 
         if ( getSource().length() > 0 )
         {
@@ -149,11 +150,11 @@ class DefaultProblem
     @Override
     public String toString()
     {
-        StringBuilder buffer = new StringBuilder( 128 );
+        final StringBuilder buffer = new StringBuilder( 128 );
 
         buffer.append( '[' ).append( getSeverity() ).append( "] " );
         buffer.append( getMessage() );
-        String location = getLocation();
+        final String location = getLocation();
         if ( !location.isEmpty() )
         {
              buffer.append( " @ " );

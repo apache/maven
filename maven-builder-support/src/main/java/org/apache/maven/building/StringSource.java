@@ -43,7 +43,7 @@ public class StringSource
      *
      * @param content The String representation, may be empty or {@code null}.
      */
-    public StringSource( CharSequence content )
+    public StringSource( final CharSequence content )
     {
         this( content, null );
     }
@@ -54,7 +54,7 @@ public class StringSource
      * @param content The String representation, may be empty or {@code null}.
      * @param location The location to report for this use, may be {@code null}.
      */
-    public StringSource( CharSequence content, String location )
+    public StringSource( final CharSequence content, final String location )
     {
         this.content = ( content != null ) ? content.toString() : "";
         this.location = ( location != null ) ? location : "(memory)";
@@ -97,7 +97,7 @@ public class StringSource
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -114,7 +114,7 @@ public class StringSource
             return false;
         }
 
-        StringSource other = (StringSource) obj;
+        final StringSource other = (StringSource) obj;
         return this.content.equals( other.content );
     }
 }

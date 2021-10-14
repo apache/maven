@@ -35,7 +35,7 @@ public class ProblemCollectorFactory
      * @param problems starting set of problems, may be {@code null}
      * @return a new instance of a ProblemCollector
      */
-    public static ProblemCollector newInstance( List<Problem> problems )
+    public static ProblemCollector newInstance( final List<Problem> problems )
     {
         return new DefaultProblemCollector( problems );
     }

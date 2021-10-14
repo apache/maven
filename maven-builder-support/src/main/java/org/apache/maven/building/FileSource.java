@@ -42,7 +42,7 @@ public class FileSource
      *
      * @param file The file, must not be {@code null}.
      */
-    public FileSource( File file )
+    public FileSource( final File file )
     {
         this.file = Objects.requireNonNull( file, "file cannot be null" ).getAbsoluteFile();
         this.hashCode = Objects.hash( file );
@@ -84,7 +84,7 @@ public class FileSource
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -101,7 +101,7 @@ public class FileSource
             return false;
         }
 
-        FileSource other = (FileSource) obj;
+        final FileSource other = (FileSource) obj;
         return this.file.equals( other.file );
     }
 }

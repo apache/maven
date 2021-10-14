@@ -42,7 +42,7 @@ public class UrlSource
      *
      * @param url The file, must not be {@code null}.
      */
-    public UrlSource( URL url )
+    public UrlSource( final URL url )
     {
         this.url = Objects.requireNonNull( url, "url cannot be null" );
         this.hashCode = Objects.hashCode( url );
@@ -84,7 +84,7 @@ public class UrlSource
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( this == obj )
         {
@@ -101,7 +101,7 @@ public class UrlSource
             return false;
         }
 
-        UrlSource other = (UrlSource) obj;
+        final UrlSource other = (UrlSource) obj;
         return this.url.equals( other.url );
     }
 }

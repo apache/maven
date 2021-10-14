@@ -36,7 +36,7 @@ class DefaultProblemCollector
 
     private String source;
 
-    DefaultProblemCollector( List<Problem> problems )
+    DefaultProblemCollector( final List<Problem> problems )
     {
         this.problems = ( problems != null ) ? problems : new ArrayList<>();
     }
@@ -48,15 +48,16 @@ class DefaultProblemCollector
     }
 
     @Override
-    public void setSource( String source )
+    public void setSource( final String source )
     {
         this.source = source;
     }
 
     @Override
-    public void add( Problem.Severity severity, String message, int line, int column, Exception cause )
+    public void add( final Problem.Severity severity, final String message, final int line, final int column, 
+                     final Exception cause )
     {
-        Problem problem = new DefaultProblem( message, severity, source, line, column, cause );
+        final Problem problem = new DefaultProblem( message, severity, source, line, column, cause );
 
         problems.add( problem );
     }
