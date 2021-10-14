@@ -553,9 +553,8 @@ public class MavenCli
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
 
             // redirect stdout and stderr to file
-            try
+            try ( PrintStream ps = new PrintStream( new FileOutputStream( logFile ) ) )
             {
-                PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
                 System.setOut( ps );
                 System.setErr( ps );
             }

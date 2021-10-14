@@ -350,59 +350,28 @@ public class DefaultUpdateCheckManager
 
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
-            FileInputStream in = null;
-            FileLock lock = null;
-
             try
             {
                 Properties props = new Properties();
 
-                in = new FileInputStream( touchfile );
-                lock = in.getChannel().lock( 0, Long.MAX_VALUE, true );
+                try ( FileInputStream in = new FileInputStream( touchfile ) )
+                {
+                    try ( FileLock lock = in.getChannel().lock( 0, Long.MAX_VALUE, true ) )
+                    {
+                        getLogger().debug( "Reading resolution-state from: " + touchfile );
+                        props.load( in );
 
-                getLogger().debug( "Reading resolution-state from: " + touchfile );
-                props.load( in );
+                        lock.release();
+                        return props;
+                    }
+                }
 
-                lock.release();
-                lock = null;
-
-                in.close();
-                in = null;
-
-                return props;
             }
             catch ( IOException e )
             {
                 getLogger().debug( "Failed to read resolution tracking file " + touchfile, e );
 
                 return null;
-            }
-            finally
-            {
-                if ( lock != null )
-                {
-                    try
-                    {
-                        lock.release();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " + touchfile,
-                                           e );
-                    }
-                }
-
-                if ( in != null )
-                {
-                    try
-                    {
-                        in.close();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " + touchfile, e );
-                    }
-                }
             }
         }
     }
