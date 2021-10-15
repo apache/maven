@@ -35,7 +35,6 @@ under the License.
     <exportedPackage>org.apache.maven.model</exportedPackage>
     <exportedPackage>org.apache.maven.monitor</exportedPackage>
     <exportedPackage>org.apache.maven.plugin</exportedPackage>
-    <exportedPackage>org.apache.maven.plugin.logging</exportedPackage>
     <exportedPackage>org.apache.maven.profiles</exportedPackage>
     <exportedPackage>org.apache.maven.project</exportedPackage>
     <exportedPackage>org.apache.maven.reporting</exportedPackage>
