@@ -92,11 +92,7 @@ public class OperatingSystemProfileActivator
 
         ActivationOS os = activation.getOs();
 
-        if ( os == null )
-        {
-            return false;
-        }
-        return true;
+        return os != null;
     }
 
     private boolean ensureAtLeastOneNonNull( ActivationOS os )

@@ -139,8 +139,7 @@ public class BootstrapCoreExtensionManager
             pluginDependenciesResolver.resolveCoreExtension( plugin, dependencyFilter, repositories, repoSession );
         PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
         root.accept( nlg );
-        List<Artifact> artifacts = nlg.getArtifacts( false );
 
-        return artifacts;
+        return nlg.getArtifacts( false );
     }
 }

@@ -1422,7 +1422,7 @@ public class MavenProject
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.emptySet();
         ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
         artifactsHolder.artifacts = null;
         artifactsHolder.artifactMap = null;

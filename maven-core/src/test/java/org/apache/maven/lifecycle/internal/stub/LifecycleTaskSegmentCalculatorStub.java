@@ -17,10 +17,8 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.GoalTask;
-import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;

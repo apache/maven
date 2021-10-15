@@ -105,9 +105,9 @@ public class PluginParameterException
                 }
             }
 
-            messageBuffer.append( "Inside the definition for plugin \'" );
+            messageBuffer.append( "Inside the definition for plugin '" );
             messageBuffer.append( mojo.getPluginDescriptor().getArtifactId() );
-            messageBuffer.append( "\', specify the following:" ).append( LS ).append( LS );
+            messageBuffer.append( "', specify the following:" ).append( LS ).append( LS );
             messageBuffer.append( "<configuration>" ).append( LS ).append( "  ..." ).append( LS );
             messageBuffer.append( "  <" ).append( param.getName() ).append( '>' );
             if ( isArray || isCollection )
@@ -179,9 +179,9 @@ public class PluginParameterException
         List<Parameter> params = getParameters();
         MojoDescriptor mojo = getMojoDescriptor();
 
-        messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" )
+        messageBuffer.append( "One or more required plugin parameters are invalid/missing for '" )
             .append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ':' ).append( mojo.getGoal() )
-            .append( "\'" ).append( LS );
+            .append( "'" ).append( LS );
 
         int idx = 0;
         for ( Iterator<Parameter> it = params.iterator(); it.hasNext(); idx++ )

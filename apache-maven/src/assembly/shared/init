@@ -20,7 +20,7 @@ if [ -n "$JAVA_HOME" ] ; then
     fi
   fi
 else
-  JAVACMD="`which java`"
+  JAVACMD="`\\unset -f command; \\command -v java`"
 
   if [ ! -x "$JAVACMD" ] ; then
     echo "The java(1) command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started." >&2

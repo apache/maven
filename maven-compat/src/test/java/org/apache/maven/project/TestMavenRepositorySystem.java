@@ -15,14 +15,12 @@ package org.apache.maven.project;
  * the License.
  */
 
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Map;
 
 @Named( "classpath" )
 @Singleton

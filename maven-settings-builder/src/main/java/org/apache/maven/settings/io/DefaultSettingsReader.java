@@ -51,9 +51,7 @@ public class DefaultSettingsReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        Settings settings = read( ReaderFactory.newXmlReader( input ), options );
-
-        return settings;
+        return read( ReaderFactory.newXmlReader( input ), options );
     }
 
     @Override

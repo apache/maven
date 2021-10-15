@@ -119,11 +119,7 @@ public class PropertyProfileActivator
 
         ActivationProperty property = activation.getProperty();
 
-        if ( property == null )
-        {
-            return false;
-        }
-        return true;
+        return property != null;
     }
 
 }

@@ -229,7 +229,7 @@ public class MojoDescriptorCreator
             resolvePluginVersion( plugin, session, project );
         }
 
-        return pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
+        return pluginManager.getMojoDescriptor( plugin, goal.toString(), project.getRemotePluginRepositories(),
                                                 session.getRepositorySession() );
     }
 

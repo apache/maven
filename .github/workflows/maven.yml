@@ -29,21 +29,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ matrix.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ matrix.os }}-
-
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
         with:
           java-version: 8
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
@@ -67,7 +58,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 16, 17-ea]
+        java: [8, 11, 17]
+
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -131,9 +123,11 @@ jobs:
           path: built-maven-wrapper/
 
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Running integration tests
         shell: bash

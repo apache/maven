@@ -1556,13 +1556,15 @@ public class DefaultModelBuilder
 
         if ( importIds.contains( imported ) )
         {
-            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+            StringBuilder message =
+                    new StringBuilder( "The dependencies of type=pom and with scope=import form a cycle: " );
             for ( String modelId : importIds )
             {
-                message += modelId + " -> ";
+                message.append( modelId ).append( " -> " );
             }
-            message += imported;
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
+            message.append( imported );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
+                    message.toString() ) );
 
             return null;
         }

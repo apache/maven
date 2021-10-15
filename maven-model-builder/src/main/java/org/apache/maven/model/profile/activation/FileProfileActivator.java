@@ -141,11 +141,7 @@ public class FileProfileActivator
 
         ActivationFile file = activation.getFile();
 
-        if ( file == null )
-        {
-            return false;
-        }
-        return true;
+        return file != null;
     }
 
 }

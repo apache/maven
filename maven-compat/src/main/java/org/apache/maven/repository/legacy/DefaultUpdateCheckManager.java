@@ -323,7 +323,7 @@ public class DefaultUpdateCheckManager
                 }
                 catch ( NumberFormatException e )
                 {
-                    getLogger().debug( "Cannot parse lastUpdated date: \'" + rawVal + "\'. Ignoring.", e );
+                    getLogger().debug( "Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e );
                 }
             }
         }

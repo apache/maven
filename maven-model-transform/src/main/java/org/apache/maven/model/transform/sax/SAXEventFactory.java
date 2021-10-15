@@ -51,7 +51,7 @@ public final class SAXEventFactory
 
     public SAXEvent endDocument()
     {
-        return () -> contentHandler.endDocument();
+        return contentHandler::endDocument;
     }
 
     public SAXEvent endElement( final String uri, final String localName, final String qName )
@@ -86,7 +86,7 @@ public final class SAXEventFactory
 
     public SAXEvent startDocument()
     {
-        return () -> contentHandler.startDocument();
+        return contentHandler::startDocument;
     }
 
     public SAXEvent startElement( final String uri, final String localName, final String qName, final Attributes atts )
@@ -111,7 +111,7 @@ public final class SAXEventFactory
 
     public SAXEvent endDTD()
     {
-        return () -> lexicalHandler.endDTD();
+        return lexicalHandler::endDTD;
     }
 
     public SAXEvent startEntity( String name )
@@ -127,12 +127,12 @@ public final class SAXEventFactory
 
     public SAXEvent startCDATA()
     {
-        return () -> lexicalHandler.startCDATA();
+        return lexicalHandler::startCDATA;
     }
 
     public SAXEvent endCDATA()
     {
-        return () -> lexicalHandler.endCDATA();
+        return lexicalHandler::endCDATA;
     }
 
     public SAXEvent comment( char[] ch, int start, int length )

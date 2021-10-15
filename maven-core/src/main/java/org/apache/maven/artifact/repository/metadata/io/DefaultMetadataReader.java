@@ -50,9 +50,7 @@ public class DefaultMetadataReader
     {
         Objects.requireNonNull( input, "input cannot be null" );
 
-        Metadata metadata = read( ReaderFactory.newXmlReader( input ), options );
-
-        return metadata;
+        return read( ReaderFactory.newXmlReader( input ), options );
     }
 
     public Metadata read( Reader input, Map<String, ?> options )

@@ -65,6 +65,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase
         assertNotNull( compilerPlugin );
 
         Map executionMap = compilerPlugin.getExecutionsAsMap();
-        assertNull( executionMap.get( "test" ), "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!" );
+        assertNull( executionMap.get( "test" ),
+                "Plugin execution: 'test' should NOT exist in the compiler plugin specification for the child project!" );
     }
 }

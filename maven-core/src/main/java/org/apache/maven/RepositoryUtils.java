@@ -121,7 +121,7 @@ public class RepositoryUtils
             nodeTrail.addAll( trail );
             nodeTrail.add( artifact.getId() );
 
-            if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
+            if ( filter == null || filter.accept( node, Collections.emptyList() ) )
             {
                 artifact.setDependencyTrail( nodeTrail );
                 artifacts.add( artifact );
@@ -324,14 +324,12 @@ public class RepositoryUtils
             exclusions.add( toExclusion( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact,
+        return new Dependency( artifact,
                                             dependency.getScope(),
                                             dependency.getOptional() != null
                                                 ? dependency.isOptional()
                                                 : null,
                                             exclusions );
-
-        return result;
     }
 
     private static Exclusion toExclusion( org.apache.maven.model.Exclusion exclusion )

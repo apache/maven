@@ -61,6 +61,6 @@ public class SessionScopeModule
         bindScope( SessionScoped.class, scope );
         bind( SessionScope.class ).toInstance( scope );
 
-        bind( MavenSession.class ).toProvider( SessionScope.<MavenSession>seededKeyProvider() ).in( scope );
+        bind( MavenSession.class ).toProvider( SessionScope.seededKeyProvider() ).in( scope );
     }
 }
