@@ -367,7 +367,7 @@ public class DefaultModelBuilderFactory
         );
     }
 
-    private static class StubLifecycleBindingsInjector
+    public static class StubLifecycleBindingsInjector
         implements LifecycleBindingsInjector
     {
 

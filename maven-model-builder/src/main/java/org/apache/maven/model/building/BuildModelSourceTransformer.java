@@ -46,7 +46,7 @@ import org.xml.sax.ext.LexicalHandler;
  */
 @Named
 @Singleton
-class BuildModelSourceTransformer extends AbstractModelSourceTransformer
+public class BuildModelSourceTransformer extends AbstractModelSourceTransformer
 {
     @Inject
     @Nullable
