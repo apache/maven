@@ -23,26 +23,22 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.LogFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Mojo {@link LogFactory} backed by Maven internal logging (slf4j).
+ * Implementation of Mojo {@link Log} factory backed by Maven internal logging (slf4j).
  *
  * @since TBD
  */
 @Singleton
 @Named
 public class MojoLogFactory
-    implements LogFactory
 {
-    @Override
     public Log getLog( final Class<?> clazz )
     {
         return new MojoLog( () -> LoggerFactory.getLogger( clazz ) );
     }
 
-    @Override
     public Log getLog( final String name )
     {
         return new MojoLog( () -> LoggerFactory.getLogger( name ) );
