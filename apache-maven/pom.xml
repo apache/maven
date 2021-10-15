@@ -113,10 +113,6 @@ under the License.
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-cipher</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -153,7 +149,7 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <includeArtifactIds>jansi</includeArtifactIds>
-          <includes>org/fusesource/jansi/internal/native/**</includes>
+          <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
         </configuration>
         <executions>
           <execution>

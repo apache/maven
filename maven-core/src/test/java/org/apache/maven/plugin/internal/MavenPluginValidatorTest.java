@@ -52,7 +52,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testValidate()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler() );
+                "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin" );
@@ -66,7 +66,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidGroupId()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler() );
+                "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins.invalid" );
         descriptor.setArtifactId( "maven-it-plugin" );
@@ -80,7 +80,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidArtifactId()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler() );
+                "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin.invalid" );
@@ -94,7 +94,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidVersion()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler() );
+                "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin" );

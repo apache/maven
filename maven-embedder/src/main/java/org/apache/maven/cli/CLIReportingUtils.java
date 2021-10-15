@@ -75,6 +75,13 @@ public final class CLIReportingUtils
         return version.toString();
     }
 
+    public static String showVersionMinimal()
+    {
+        Properties properties = getBuildProperties();
+        String version = reduce( properties.getProperty( BUILD_VERSION_PROPERTY ) );
+        return ( version != null ? version : "<version unknown>" );
+    }
+
     /**
      * Create a human readable string containing the Maven version, buildnumber, and time of build
      *

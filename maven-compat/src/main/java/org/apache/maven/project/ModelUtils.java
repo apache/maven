@@ -103,12 +103,10 @@ public final class ModelUtils
 
                     if ( ( childPlugin != null ) && !assembledPlugins.contains( childPlugin ) )
                     {
-                        Plugin assembledPlugin = childPlugin;
-
                         mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
 
                         // fix for MNG-2221 (assembly cache was not being populated for later reference):
-                        assembledPlugins.add( assembledPlugin );
+                        assembledPlugins.add( childPlugin );
                     }
 
                     // if we're processing this as an inheritance-based merge, and

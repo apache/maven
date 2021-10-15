@@ -104,6 +104,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -387,7 +388,7 @@ public class MavenCli
 
             if ( configFile.isFile() )
             {
-                for ( String arg : new String( Files.readAllBytes( configFile.toPath() ) ).split( "\\s+" ) )
+                for ( String arg : Files.readAllLines( configFile.toPath(), Charset.defaultCharset() ) )
                 {
                     if ( !arg.isEmpty() )
                     {
@@ -439,7 +440,14 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            System.out.println( CLIReportingUtils.showVersion() );
+            if ( cliRequest.commandLine.hasOption( CLIManager.QUIET ) )
+            {
+                System.out.println( CLIReportingUtils.showVersionMinimal() );
+            }
+            else
+            {
+                System.out.println( CLIReportingUtils.showVersion() );
+            }
             throw new ExitException( 0 );
         }
     }
@@ -489,14 +497,15 @@ public class MavenCli
     void logging( CliRequest cliRequest )
     {
         // LOG LEVEL
-        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
-        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
-        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
+        cliRequest.verbose = cliRequest.commandLine.hasOption( CLIManager.VERBOSE )
+                             || cliRequest.commandLine.hasOption( CLIManager.DEBUG );
+        cliRequest.quiet = !cliRequest.verbose && cliRequest.commandLine.hasOption( CLIManager.QUIET );
+        cliRequest.showErrors = cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
 
-        if ( cliRequest.debug )
+        if ( cliRequest.verbose )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
             slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );
@@ -512,18 +521,18 @@ public class MavenCli
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty( STYLE_COLOR_PROPERTY, "auto" );
         styleColor = cliRequest.commandLine.getOptionValue( COLOR, styleColor );
-        if ( "always".equals( styleColor ) )
+        if ( "always".equals( styleColor ) || "yes".equals( styleColor ) || "force".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( true );
         }
-        else if ( "never".equals( styleColor ) )
+        else if ( "never".equals( styleColor ) || "no".equals( styleColor ) || "none".equals( styleColor ) )
         {
             MessageUtils.setColorEnabled( false );
         }
-        else if ( !"auto".equals( styleColor ) )
+        else if ( !"auto".equals( styleColor ) && !"tty".equals( styleColor ) && !"if-tty".equals( styleColor ) )
         {
-            throw new IllegalArgumentException( "Invalid color configuration option [" + styleColor
-                + "]. Supported values are (auto|always|never)." );
+            throw new IllegalArgumentException( "Invalid color configuration value '" + styleColor
+                + "'. Supported are 'auto', 'always', 'never'." );
         }
         else if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE )
             || cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
@@ -574,11 +583,17 @@ public class MavenCli
                         MavenSlf4jWrapperFactory.class.getName(), slf4jLoggerFactory.getClass().getName() );
             }
         }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) )
+        {
+            slf4jLogger.warn( "The option '--debug' is deprecated and may be repurposed as Java debug"
+                    + " in a future version. Use -X/--verbose instead." );
+        }
     }
 
     private void version( CliRequest cliRequest )
     {
-        if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
+        if ( cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             System.out.println( CLIReportingUtils.showVersion() );
         }
@@ -1021,12 +1036,12 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch.",
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the '{}' switch",
                         buffer().strong( "-e" ) );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable full debug logging.",
+                slf4jLogger.error( "Re-run Maven using the '{}' switch to enable verbose output",
                         buffer().strong( "-X" ) );
             }
 
@@ -1360,6 +1375,7 @@ public class MavenCli
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
+        boolean verbose = cliRequest.verbose;
         request.setShowErrors( cliRequest.showErrors ); // default: false
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
@@ -1376,7 +1392,7 @@ public class MavenCli
         request.setUserProperties( cliRequest.userProperties );
         request.setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
         request.setPom( determinePom( commandLine, workingDirectory, baseDirectory ) );
-        request.setTransferListener( determineTransferListener( quiet, commandLine, request ) );
+        request.setTransferListener( determineTransferListener( quiet, verbose, commandLine, request ) );
         request.setExecutionListener( determineExecutionListener() );
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
@@ -1585,6 +1601,7 @@ public class MavenCli
     }
 
     private TransferListener determineTransferListener( final boolean quiet,
+                                                        final boolean verbose,
                                                         final CommandLine commandLine,
                                                         final MavenExecutionRequest request )
     {
@@ -1598,7 +1615,7 @@ public class MavenCli
             // If we're logging to a file then we don't want the console transfer listener as it will spew
             // download progress all over the place
             //
-            return getConsoleTransferListener( commandLine.hasOption( CLIManager.DEBUG ) );
+            return getConsoleTransferListener( verbose );
         }
         else
         {

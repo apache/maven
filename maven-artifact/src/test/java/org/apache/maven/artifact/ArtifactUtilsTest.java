@@ -27,7 +27,9 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link ArtifactUtils}.
@@ -45,13 +47,13 @@ public class ArtifactUtilsTest
     @Test
     public void testIsSnapshot()
     {
-        assertEquals( false, ArtifactUtils.isSnapshot( null ) );
-        assertEquals( false, ArtifactUtils.isSnapshot( "" ) );
-        assertEquals( false, ArtifactUtils.isSnapshot( "1.2.3" ) );
-        assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-SNAPSHOT" ) );
-        assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-snapshot" ) );
-        assertEquals( true, ArtifactUtils.isSnapshot( "1.2.3-20090413.094722-2" ) );
-        assertEquals( false, ArtifactUtils.isSnapshot( "1.2.3-20090413X094722-2"));
+        assertFalse( ArtifactUtils.isSnapshot( null ) );
+        assertFalse( ArtifactUtils.isSnapshot( "" ) );
+        assertFalse( ArtifactUtils.isSnapshot( "1.2.3" ) );
+        assertTrue( ArtifactUtils.isSnapshot( "1.2.3-SNAPSHOT" ) );
+        assertTrue( ArtifactUtils.isSnapshot( "1.2.3-snapshot" ) );
+        assertTrue( ArtifactUtils.isSnapshot( "1.2.3-20090413.094722-2" ) );
+        assertFalse( ArtifactUtils.isSnapshot( "1.2.3-20090413X094722-2" ) );
     }
 
     @Test

@@ -55,10 +55,15 @@ public class DefaultLifecycleBindingsInjector
     implements LifecycleBindingsInjector
 {
 
-    private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
+    private final LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
+
+    private final LifeCyclePluginAnalyzer lifecycle;
 
     @Inject
-    private LifeCyclePluginAnalyzer lifecycle;
+    public DefaultLifecycleBindingsInjector( LifeCyclePluginAnalyzer lifecycle )
+    {
+        this.lifecycle = lifecycle;
+    }
 
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
@@ -99,7 +104,7 @@ public class DefaultLifecycleBindingsInjector
             }
 
             Map<Object, Object> context =
-                Collections.<Object, Object>singletonMap( PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement() );
+                Collections.singletonMap( PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement() );
 
             mergePluginContainer_Plugins( target.getBuild(), source.getBuild(), false, context );
         }

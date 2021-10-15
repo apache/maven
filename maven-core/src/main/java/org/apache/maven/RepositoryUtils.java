@@ -121,7 +121,7 @@ public class RepositoryUtils
             nodeTrail.addAll( trail );
             nodeTrail.add( artifact.getId() );
 
-            if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
+            if ( filter == null || filter.accept( node, Collections.emptyList() ) )
             {
                 artifact.setDependencyTrail( nodeTrail );
                 artifacts.add( artifact );
@@ -279,14 +279,16 @@ public class RepositoryUtils
     public static ArtifactHandler newHandler( Artifact artifact )
     {
         String type = artifact.getProperty( ArtifactProperties.TYPE, artifact.getExtension() );
-        DefaultArtifactHandler handler = new DefaultArtifactHandler( type );
-        handler.setExtension( artifact.getExtension() );
-        handler.setLanguage( artifact.getProperty( ArtifactProperties.LANGUAGE, null ) );
-        String addedToClasspath = artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH, "" );
-        handler.setAddedToClasspath( Boolean.parseBoolean( addedToClasspath ) );
-        String includesDependencies = artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES, "" );
-        handler.setIncludesDependencies( Boolean.parseBoolean( includesDependencies ) );
-        return handler;
+        return new DefaultArtifactHandler(
+            type,
+            artifact.getExtension(),
+            null,
+            null,
+            null,
+            Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES, "" ) ),
+            artifact.getProperty( ArtifactProperties.LANGUAGE, null ),
+            Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH, "" ) )
+        );
     }
 
     public static ArtifactType newArtifactType( String id, ArtifactHandler handler )
@@ -322,14 +324,12 @@ public class RepositoryUtils
             exclusions.add( toExclusion( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact,
+        return new Dependency( artifact,
                                             dependency.getScope(),
                                             dependency.getOptional() != null
                                                 ? dependency.isOptional()
                                                 : null,
                                             exclusions );
-
-        return result;
     }
 
     private static Exclusion toExclusion( org.apache.maven.model.Exclusion exclusion )

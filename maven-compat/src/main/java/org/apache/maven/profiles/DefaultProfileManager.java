@@ -109,7 +109,7 @@ public class DefaultProfileManager
         Profile existing = profilesById.get( profileId );
         if ( existing != null )
         {
-            logger.warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource()
+            logger.warn( "Overriding profile: '" + profileId + "' (source: " + existing.getSource()
                 + ") with new instance from source: " + profile.getSource() );
         }
 
@@ -130,7 +130,7 @@ public class DefaultProfileManager
     {
         if ( !activatedIds.contains( profileId ) )
         {
-            logger.debug( "Profile with id: \'" + profileId + "\' has been explicitly activated." );
+            logger.debug( "Profile with id: '" + profileId + "' has been explicitly activated." );
 
             activatedIds.add( profileId );
         }
@@ -154,7 +154,7 @@ public class DefaultProfileManager
     {
         if ( !deactivatedIds.contains( profileId ) )
         {
-            logger.debug( "Profile with id: \'" + profileId + "\' has been explicitly deactivated." );
+            logger.debug( "Profile with id: '" + profileId + "' has been explicitly deactivated." );
 
             deactivatedIds.add( profileId );
         }

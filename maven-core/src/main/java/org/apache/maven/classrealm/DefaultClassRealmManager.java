@@ -45,9 +45,10 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -73,7 +74,7 @@ public class DefaultClassRealmManager
      */
     private static final ClassLoader PARENT_CLASSLOADER = ClassWorld.class.getClassLoader();
 
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final ClassWorld world;
 
@@ -91,10 +92,10 @@ public class DefaultClassRealmManager
     private final Set<String> providedArtifacts;
 
     @Inject
-    public DefaultClassRealmManager( Logger logger, PlexusContainer container,
-                                     List<ClassRealmManagerDelegate> delegates, CoreExportsProvider exports )
+    public DefaultClassRealmManager( PlexusContainer container,
+                                     List<ClassRealmManagerDelegate> delegates,
+                                     CoreExportsProvider exports )
     {
-        this.logger = logger;
         this.world = ( (MutablePlexusContainer) container ).getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
@@ -244,7 +245,7 @@ public class DefaultClassRealmManager
         Objects.requireNonNull( plugin, "plugin cannot be null" );
 
         Map<String, ClassLoader> foreignImports =
-            Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
+            Collections.singletonMap( "", getMavenApiRealm() );
 
         return createRealm( getKey( plugin, true ), RealmType.Extension, PARENT_CLASSLOADER, null,
                 foreignImports, artifacts );

@@ -36,7 +36,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -57,6 +56,8 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,33 +78,40 @@ import java.util.Properties;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
+    private final ArtifactHandlerManager artifactHandlerManager;
+
+    private final RepositorySystem repoSystem;
+
+    private final LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
+
+    private final WorkspaceReader workspaceRepository;
+
+    private final SettingsDecrypter settingsDecrypter;
+
+    private final EventSpyDispatcher eventSpyDispatcher;
+
+    private final MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
-    private ArtifactHandlerManager artifactHandlerManager;
-
-    @Inject
-    private RepositorySystem repoSystem;
-
-    @Inject
-    @Nullable
-    @Named( "simple" )
-    private LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
-
-    @Inject
-    @Nullable
-    @Named( "ide" )
-    private WorkspaceReader workspaceRepository;
-
-    @Inject
-    private SettingsDecrypter settingsDecrypter;
-
-    @Inject
-    private EventSpyDispatcher eventSpyDispatcher;
-
-    @Inject
-    MavenRepositorySystem mavenRepositorySystem;
+    public DefaultRepositorySystemSessionFactory(
+            ArtifactHandlerManager artifactHandlerManager,
+            RepositorySystem repoSystem,
+            @Nullable @Named( "simple" ) LocalRepositoryManagerFactory simpleLocalRepoMgrFactory,
+            @Nullable @Named( "ide" ) WorkspaceReader workspaceRepository,
+            SettingsDecrypter settingsDecrypter,
+            EventSpyDispatcher eventSpyDispatcher,
+            MavenRepositorySystem mavenRepositorySystem )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.repoSystem = repoSystem;
+        this.simpleLocalRepoMgrFactory = simpleLocalRepoMgrFactory;
+        this.workspaceRepository = workspaceRepository;
+        this.settingsDecrypter = settingsDecrypter;
+        this.eventSpyDispatcher = eventSpyDispatcher;
+        this.mavenRepositorySystem = mavenRepositorySystem;
+    }
 
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
@@ -249,7 +257,7 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
-        if ( Features.buildConsumer().isActive() )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
         {
             session.setFileTransformerManager( a -> getTransformersForArtifact( a, session.getData() ) );
         }

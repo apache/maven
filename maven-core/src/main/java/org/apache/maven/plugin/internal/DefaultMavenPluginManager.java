@@ -25,7 +25,6 @@ import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
@@ -73,8 +72,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -84,6 +81,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,48 +131,49 @@ public class DefaultMavenPluginManager
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private LoggerManager loggerManager;
-
-    @Inject
     private PlexusContainer container;
-
-    @Inject
     private ClassRealmManager classRealmManager;
-
-    @Inject
     private PluginDescriptorCache pluginDescriptorCache;
-
-    @Inject
     private PluginRealmCache pluginRealmCache;
-
-    @Inject
     private PluginDependenciesResolver pluginDependenciesResolver;
-
-    @Inject
     private RuntimeInformation runtimeInformation;
-
-    @Inject
     private ExtensionRealmCache extensionRealmCache;
-
-    @Inject
     private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
     private PluginArtifactsCache pluginArtifactsCache;
-
-    @Inject
     private MavenPluginValidator pluginValidator;
 
-    private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
+    private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
+    private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-    private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
+    @Inject
+    public DefaultMavenPluginManager(
+            PlexusContainer container,
+            ClassRealmManager classRealmManager,
+            PluginDescriptorCache pluginDescriptorCache,
+            PluginRealmCache pluginRealmCache,
+            PluginDependenciesResolver pluginDependenciesResolver,
+            RuntimeInformation runtimeInformation,
+            ExtensionRealmCache extensionRealmCache,
+            PluginVersionResolver pluginVersionResolver,
+            PluginArtifactsCache pluginArtifactsCache,
+            MavenPluginValidator pluginValidator )
+    {
+        this.container = container;
+        this.classRealmManager = classRealmManager;
+        this.pluginDescriptorCache = pluginDescriptorCache;
+        this.pluginRealmCache = pluginRealmCache;
+        this.pluginDependenciesResolver = pluginDependenciesResolver;
+        this.runtimeInformation = runtimeInformation;
+        this.extensionRealmCache = extensionRealmCache;
+        this.pluginVersionResolver = pluginVersionResolver;
+        this.pluginArtifactsCache = pluginArtifactsCache;
+        this.pluginValidator = pluginValidator;
+    }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
-                                                              RepositorySystemSession session )
+                                                             RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositories, session );
@@ -271,9 +271,7 @@ public class DefaultMavenPluginManager
         {
             Reader reader = ReaderFactory.newXmlReader( is );
 
-            PluginDescriptor pluginDescriptor = builder.build( reader, descriptorLocation );
-
-            return pluginDescriptor;
+            return builder.build( reader, descriptorLocation );
         }
         catch ( IOException | PlexusConfigurationException e )
         {
@@ -455,7 +453,7 @@ public class DefaultMavenPluginManager
     private List<Artifact> toMavenArtifacts( DependencyNode root, PreorderNodeListGenerator nlg )
     {
         List<Artifact> artifacts = new ArrayList<>( nlg.getNodes().size() );
-        RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
+        RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.emptyList(), null );
         artifacts.removeIf( artifact -> artifact.getFile() == null );
         return Collections.unmodifiableList( artifacts );
     }
@@ -571,8 +569,8 @@ public class DefaultMavenPluginManager
 
             if ( mojo instanceof Mojo )
             {
-                Logger mojoLogger = loggerManager.getLoggerForComponent( mojoDescriptor.getImplementation() );
-                ( (Mojo) mojo ).setLog( new DefaultLog( mojoLogger ) );
+                Logger mojoLogger = LoggerFactory.getLogger( mojoDescriptor.getImplementation() );
+                ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

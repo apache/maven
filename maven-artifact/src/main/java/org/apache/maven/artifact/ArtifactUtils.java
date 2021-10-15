@@ -44,9 +44,9 @@ public final class ArtifactUtils
             {
                 return true;
             }
-            else if ( Artifact.VERSION_FILE_PATTERN.matcher( version ).matches() )
+            else
             {
-                return true;
+                return Artifact.VERSION_FILE_PATTERN.matcher( version ).matches();
             }
         }
         return false;

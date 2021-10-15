@@ -695,22 +695,22 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "limited-inheritance/child" );
-        assertEquals( null, pom.getValue( "organization/url" ) );
-        assertEquals( null, pom.getValue( "issueManagement/system" ) );
+        assertNull( pom.getValue( "organization/url" ) );
+        assertNull( pom.getValue( "issueManagement/system" ) );
         assertEquals( 0, ( (List<?>) pom.getValue( "ciManagement/notifiers" ) ).size() );
         assertEquals( "child-distros", pom.getValue( "distributionManagement/repository/id" ) );
         assertEquals( "ssh://child.url/distros", pom.getValue( "distributionManagement/repository/url" ) );
-        assertEquals( null, pom.getValue( "distributionManagement/repository/name" ) );
+        assertNull( pom.getValue( "distributionManagement/repository/name" ) );
         assertEquals( true, pom.getValue( "distributionManagement/repository/uniqueVersion" ) );
         assertEquals( "default", pom.getValue( "distributionManagement/repository/layout" ) );
         assertEquals( "child-snaps", pom.getValue( "distributionManagement/snapshotRepository/id" ) );
         assertEquals( "ssh://child.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
-        assertEquals( null, pom.getValue( "distributionManagement/snapshotRepository/name" ) );
+        assertNull( pom.getValue( "distributionManagement/snapshotRepository/name" ) );
         assertEquals( true, pom.getValue( "distributionManagement/snapshotRepository/uniqueVersion" ) );
         assertEquals( "default", pom.getValue( "distributionManagement/snapshotRepository/layout" ) );
         assertEquals( "child-site", pom.getValue( "distributionManagement/site/id" ) );
         assertEquals( "scp://child.url/site", pom.getValue( "distributionManagement/site/url" ) );
-        assertEquals( null, pom.getValue( "distributionManagement/site/name" ) );
+        assertNull( pom.getValue( "distributionManagement/site/name" ) );
     }
 
     @Test
@@ -912,7 +912,7 @@ public class PomConstructionTest
         assertEquals( "CHILD-3", pom.getValue( prefix + "stringParams/stringParam[6]" ) );
         assertEquals( "CHILD-2", pom.getValue( prefix + "stringParams/stringParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "stringParams/stringParam[8]" ) );
-        assertEquals( null, pom.getValue( prefix + "stringParams/stringParam[9]" ) );
+        assertNull( pom.getValue( prefix + "stringParams/stringParam[9]" ) );
         assertEquals( "PARENT-1", pom.getValue( prefix + "listParam/listParam[1]" ) );
         assertEquals( "PARENT-3", pom.getValue( prefix + "listParam/listParam[2]" ) );
         assertEquals( "PARENT-2", pom.getValue( prefix + "listParam/listParam[3]" ) );
@@ -921,7 +921,7 @@ public class PomConstructionTest
         assertEquals( "CHILD-3", pom.getValue( prefix + "listParam/listParam[6]" ) );
         assertEquals( "CHILD-2", pom.getValue( prefix + "listParam/listParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "listParam/listParam[8]" ) );
-        assertEquals( null, pom.getValue( prefix + "listParam/listParam[9]" ) );
+        assertNull( pom.getValue( prefix + "listParam/listParam[9]" ) );
     }
 
     /* MNG-4000 */
@@ -1105,8 +1105,8 @@ public class PomConstructionTest
         assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
         assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
         assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
 
     /** MNG-4053*/
@@ -1118,8 +1118,8 @@ public class PomConstructionTest
         assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
         assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
         assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
 
     @Test
@@ -1130,8 +1130,8 @@ public class PomConstructionTest
         assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
         assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
         assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
-        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertNull( pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
 
     @Test

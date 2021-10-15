@@ -20,7 +20,7 @@ package org.apache.maven.toolchain.java;
  */
 
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * Provides backwards compatibility with Maven 3.2.3 and earlier. Clients that do not require compatibility with Maven

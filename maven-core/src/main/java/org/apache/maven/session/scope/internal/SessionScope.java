@@ -116,7 +116,7 @@ public class SessionScope
     public Memento memento()
     {
         LinkedList<ScopeState> stack = values.get();
-        return new Memento( stack != null ? stack.getFirst().seeded : Collections.<Key<?>, Provider<?>>emptyMap() );
+        return new Memento( stack != null ? stack.getFirst().seeded : Collections.emptyMap() );
     }
 
     public <T> void seed( Class<T> clazz, Provider<T> value )

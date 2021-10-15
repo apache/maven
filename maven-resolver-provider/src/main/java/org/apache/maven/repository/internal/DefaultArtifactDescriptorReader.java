@@ -33,7 +33,6 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ArtifactModelSource;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -65,101 +64,44 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Benjamin Bentmann
  */
 @Named
 @Singleton
-public class DefaultArtifactDescriptorReader
-    implements ArtifactDescriptorReader, Service
+public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 {
-    private RemoteRepositoryManager remoteRepositoryManager;
+    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultArtifactDescriptorReader.class );
 
-    private VersionResolver versionResolver;
-
-    private VersionRangeResolver versionRangeResolver;
-
-    private ArtifactResolver artifactResolver;
-
-    private RepositoryEventDispatcher repositoryEventDispatcher;
-
-    private ModelBuilder modelBuilder;
-
-    public DefaultArtifactDescriptorReader()
-    {
-        // enable no-arg constructor
-    }
+    private final RemoteRepositoryManager remoteRepositoryManager;
+    private final VersionResolver versionResolver;
+    private final VersionRangeResolver versionRangeResolver;
+    private final ArtifactResolver artifactResolver;
+    private final RepositoryEventDispatcher repositoryEventDispatcher;
+    private final ModelBuilder modelBuilder;
 
     @Inject
-    DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
-                                     VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
-                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        setRemoteRepositoryManager( remoteRepositoryManager );
-        setVersionResolver( versionResolver );
-        setVersionRangeResolver( versionRangeResolver );
-        setArtifactResolver( artifactResolver );
-        setModelBuilder( modelBuilder );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
-    }
-
-    public void initService( ServiceLocator locator )
-    {
-        setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
-        setVersionResolver( locator.getService( VersionResolver.class ) );
-        setVersionRangeResolver( locator.getService( VersionRangeResolver.class ) );
-        setArtifactResolver( locator.getService( ArtifactResolver.class ) );
-        modelBuilder = locator.getService( ModelBuilder.class );
-        if ( modelBuilder == null )
-        {
-            setModelBuilder( new DefaultModelBuilderFactory().newInstance() );
-        }
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-    }
-
-    public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
+    public DefaultArtifactDescriptorReader(
+            RemoteRepositoryManager remoteRepositoryManager,
+            VersionResolver versionResolver,
+            VersionRangeResolver versionRangeResolver,
+            ArtifactResolver artifactResolver,
+            ModelBuilder modelBuilder,
+            RepositoryEventDispatcher repositoryEventDispatcher )
     {
         this.remoteRepositoryManager = Objects.requireNonNull( remoteRepositoryManager,
-            "remoteRepositoryManager cannot be null" );
-        return this;
-    }
-
-    public DefaultArtifactDescriptorReader setVersionResolver( VersionResolver versionResolver )
-    {
+                "remoteRepositoryManager cannot be null" );
         this.versionResolver = Objects.requireNonNull( versionResolver, "versionResolver cannot be null" );
-        return this;
-    }
-
-    /** @since 3.2.2 */
-    public DefaultArtifactDescriptorReader setVersionRangeResolver( VersionRangeResolver versionRangeResolver )
-    {
         this.versionRangeResolver =
-            Objects.requireNonNull( versionRangeResolver, "versionRangeResolver cannot be null" );
-        return this;
-    }
-
-    public DefaultArtifactDescriptorReader setArtifactResolver( ArtifactResolver artifactResolver )
-    {
+                Objects.requireNonNull( versionRangeResolver, "versionRangeResolver cannot be null" );
         this.artifactResolver = Objects.requireNonNull( artifactResolver, "artifactResolver cannot be null" );
-        return this;
-    }
-
-    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher(
-        RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
-        return this;
-    }
-
-    public DefaultArtifactDescriptorReader setModelBuilder( ModelBuilder modelBuilder )
-    {
         this.modelBuilder = Objects.requireNonNull( modelBuilder, "modelBuilder cannot be null" );
-        return this;
+        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
+                "repositoryEventDispatcher cannot be null" );
     }
 
     public ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session,
@@ -257,6 +199,7 @@ public class DefaultArtifactDescriptorReader
 
             Model model;
 
+            // TODO hack: don't rebuild model if it was already loaded during reactor resolution
             final WorkspaceReader workspace = session.getWorkspaceReader();
             if ( workspace instanceof MavenWorkspaceReader )
             {
@@ -318,10 +261,20 @@ public class DefaultArtifactDescriptorReader
             if ( relocation != null )
             {
                 result.addRelocation( a );
-                a =
+                Artifact relocatedArtifact =
                     new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
                                            relocation.getVersion() );
-                result.setArtifact( a );
+                if ( LOGGER.isWarnEnabled() )
+                {
+                    String message = "The artifact " + a + " has been relocated to " + relocatedArtifact;
+                    if ( relocation.getMessage() != null )
+                    {
+                        message += ": " + relocation.getMessage();
+                    }
+                    LOGGER.warn( message );
+                }
+                result.setArtifact( relocatedArtifact );
+                a = relocatedArtifact;
             }
             else
             {

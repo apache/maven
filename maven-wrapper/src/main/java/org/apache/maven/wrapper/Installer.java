@@ -34,6 +34,7 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -140,10 +141,12 @@ public class Installer
 
     private List<Path> listDirs( Path distDir ) throws IOException
     {
-        return Files.walk( distDir, 1 )
-                        .filter( p -> !distDir.equals( p ) )
-                        .filter( Files::isDirectory )
-                        .collect( Collectors.toList() );
+        try ( Stream<Path> stream = Files.walk( distDir, 1 ) ) 
+        {
+              return stream.filter( p -> !distDir.equals( p ) )
+                     .filter( Files::isDirectory )
+                     .collect( Collectors.toList() );
+        }
     }
 
     private void setExecutablePermissions( Path mavenHome )

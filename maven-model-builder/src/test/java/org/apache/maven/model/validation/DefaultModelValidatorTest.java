@@ -278,10 +278,10 @@ public class DefaultModelValidatorTest
 
         List<String> messages = result.getErrors();
 
-        assertTrue( messages.contains( "\'modelVersion\' is missing." ) );
-        assertTrue( messages.contains( "\'groupId\' is missing." ) );
-        assertTrue( messages.contains( "\'artifactId\' is missing." ) );
-        assertTrue( messages.contains( "\'version\' is missing." ) );
+        assertTrue( messages.contains( "'modelVersion' is missing." ) );
+        assertTrue( messages.contains( "'groupId' is missing." ) );
+        assertTrue( messages.contains( "'artifactId' is missing." ) );
+        assertTrue( messages.contains( "'version' is missing." ) );
         // type is inherited from the super pom
     }
 
@@ -876,4 +876,20 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 0, 1 );
         assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
     }
+    
+    @Test
+    public void repositoryWithExpression() throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/repository-with-expression.xml" );
+        assertViolations( result, 0, 1, 0 );
+        assertEquals( "'repositories.repository.[repo].url' contains an expression but should be a constant.", result.getErrors().get( 0 ) );
+    }
+    
+    @Test
+    public void repositoryWithBasedirExpression() throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "raw-model/repository-with-basedir-expression.xml" );
+        assertViolations( result, 0, 0, 0 );
+    }
+
 }

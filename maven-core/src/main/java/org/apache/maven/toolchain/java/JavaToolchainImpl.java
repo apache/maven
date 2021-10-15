@@ -23,9 +23,9 @@ import java.io.File;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
+import org.slf4j.Logger;
 
 /**
  * JDK toolchain implementation.

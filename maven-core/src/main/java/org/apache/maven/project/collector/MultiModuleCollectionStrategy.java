@@ -77,7 +77,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             else
             {
                 LOGGER.debug( "Multi module project collection failed:{}"
-                        + "Detected a POM file next to a .mvn folder in a parent directory ({}). "
+                        + "Detected a POM file next to a .mvn directory in a parent directory ({}). "
                         + "Maven assumed that POM file to be the parent of the requested project ({}), but it turned "
                         + "out that it was not. Another project collection strategy will be executed as result.",
                         System.lineSeparator(), moduleProjectPomFile.getAbsolutePath(),

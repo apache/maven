@@ -48,11 +48,12 @@ import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -82,43 +83,56 @@ import static java.util.stream.Collectors.toSet;
 public class DefaultMaven
     implements Maven
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Inject
-    private Logger logger;
-
-    @Inject
     protected ProjectBuilder projectBuilder;
 
-    @Inject
     private LifecycleStarter lifecycleStarter;
 
-    @Inject
     protected PlexusContainer container;
 
-    @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Inject
     private LegacySupport legacySupport;
 
-    @Inject
     private SessionScope sessionScope;
 
-    @Inject
     private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
-    @Inject
-    @Named( GraphBuilder.HINT )
-    private GraphBuilder graphBuilder;
+    private final GraphBuilder graphBuilder;
+
+    private final BuildResumptionAnalyzer buildResumptionAnalyzer;
+
+    private final BuildResumptionDataRepository buildResumptionDataRepository;
+
+    private final SuperPomProvider superPomProvider;
 
     @Inject
-    private BuildResumptionAnalyzer buildResumptionAnalyzer;
-
-    @Inject
-    private BuildResumptionDataRepository buildResumptionDataRepository;
-
-    @Inject
-    private SuperPomProvider superPomProvider;
+    public DefaultMaven(
+            ProjectBuilder projectBuilder,
+            LifecycleStarter lifecycleStarter,
+            PlexusContainer container,
+            ExecutionEventCatapult eventCatapult,
+            LegacySupport legacySupport,
+            SessionScope sessionScope,
+            DefaultRepositorySystemSessionFactory repositorySessionFactory,
+            @Named( GraphBuilder.HINT ) GraphBuilder graphBuilder,
+            BuildResumptionAnalyzer buildResumptionAnalyzer,
+            BuildResumptionDataRepository buildResumptionDataRepository,
+            SuperPomProvider superPomProvider )
+    {
+        this.projectBuilder = projectBuilder;
+        this.lifecycleStarter = lifecycleStarter;
+        this.container = container;
+        this.eventCatapult = eventCatapult;
+        this.legacySupport = legacySupport;
+        this.sessionScope = sessionScope;
+        this.repositorySessionFactory = repositorySessionFactory;
+        this.graphBuilder = graphBuilder;
+        this.buildResumptionAnalyzer = buildResumptionAnalyzer;
+        this.buildResumptionDataRepository = buildResumptionDataRepository;
+        this.superPomProvider = superPomProvider;
+    }
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -357,7 +371,7 @@ public class DefaultMaven
         throws MavenExecutionException
     {
         // CHECKSTYLE_OFF: LineLength
-        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
+        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.emptyList() ) )
         // CHECKSTYLE_ON: LineLength
         {
             listener.afterSessionStart( session );

@@ -20,7 +20,7 @@
 @REM
 @REM Environment Variable Prerequisites
 @REM
-@REM   JAVA_HOME          Must point at your Java Development Kit installation.
+@REM   JAVA_HOME         (Optional) Points to a Java installation.
 @REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
 @REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
 @REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
@@ -35,29 +35,36 @@ title %0
 @if "%MAVEN_BATCH_ECHO%"=="on" echo %MAVEN_BATCH_ECHO%
 
 @REM Execute a user defined script before this one
-if not "%MAVEN_SKIP_RC%"=="" goto skipRcPre
+if not "%MAVEN_SKIP_RC%"=="" goto skipRc
+if exist "%PROGRAMDATA%\mavenrc.cmd" call "%PROGRAMDATA%\mavenrc.cmd" %*
 @REM check for pre script, once with legacy .bat ending and once with .cmd ending
-if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat"
-if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd"
-:skipRcPre
+if exist "%USERPROFILE%\mavenrc_pre.bat" echo Warning: The mavenrc_pre.bat script is deprecated and will be removed in a future version. >&2
+if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
+if exist "%USERPROFILE%\mavenrc_pre.cmd" echo Warning: The mavenrc_pre.cmd script is deprecated and will be removed in a future version. >&2
+if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
+if exist "%USERPROFILE%\mavenrc.cmd" call "%USERPROFILE%\mavenrc.cmd" %*
+:skipRc
 
 @setlocal
 
 set ERROR_CODE=0
 
 @REM ==== START VALIDATION ====
-if not "%JAVA_HOME%"=="" goto OkJHome
+if not "%JAVA_HOME%"=="" goto javaHomeSet
 for %%i in (java.exe) do set "JAVACMD=%%~$PATH:i"
-goto checkJCmd
+goto checkJavaCmd
 
-:OkJHome
+:javaHomeSet
 set "JAVACMD=%JAVA_HOME%\bin\java.exe"
 
-:checkJCmd
 if not exist "%JAVACMD%" (
-  echo The JAVA_HOME environment variable is not defined correctly >&2
-  echo This environment variable is needed to run this program >&2
-  echo NB: JAVA_HOME should point to a JDK not a JRE >&2
+  echo The JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started. >&2
+  echo JAVA_HOME is set to "%JAVA_HOME%", but "%%JAVA_HOME%%\bin\java.exe" does not exist. >&2
   goto error
 )
 
+:checkJavaCmd
+if not exist "%JAVACMD%" (
+  echo The java.exe command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started. >&2
+  goto error
+)

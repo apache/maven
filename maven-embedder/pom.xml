@@ -108,7 +108,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
-      <artifactId>jsr250-api</artifactId>
+      <artifactId>javax.annotation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -123,7 +123,7 @@ under the License.
       <artifactId>org.eclipse.sisu.plexus</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
     <dependency>

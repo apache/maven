@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -75,7 +76,13 @@ public class MavenSession
 
     private boolean parallel;
 
-    private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
+    /**
+     * Plugin context keyed by project ({@link MavenProject#getId()}) and by plugin lookup key
+     * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
+     * {@link Object} values.
+     */
+    @SuppressWarnings( "checkstyle:linelength" )
+    private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
 
 
@@ -192,31 +199,25 @@ public class MavenSession
 
     // Backward compat
 
+
+    /**
+     * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
+     * {@link MavenProject}, never returns {@code null} as if context not present, creates it.
+     *
+     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
+     * implements {@link ConcurrentMap} as well.
+     *
+     */
     public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
 
-        Map<String, Map<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey.get( projectKey );
-
-        if ( pluginContextsByKey == null )
-        {
-            pluginContextsByKey = new ConcurrentHashMap<>();
-
-            pluginContextsByProjectAndPluginKey.put( projectKey, pluginContextsByKey );
-        }
+        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey
+                .computeIfAbsent( projectKey, k -> new ConcurrentHashMap<>() );
 
         String pluginKey = plugin.getPluginLookupKey();
 
-        Map<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
-
-        if ( pluginContext == null )
-        {
-            pluginContext = new ConcurrentHashMap<>();
-
-            pluginContextsByKey.put( pluginKey, pluginContext );
-        }
-
-        return pluginContext;
+        return pluginContextsByKey.computeIfAbsent( pluginKey, k -> new ConcurrentHashMap<>() );
     }
 
     public ProjectDependencyGraph getProjectDependencyGraph()

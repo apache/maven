@@ -91,8 +91,8 @@ public class ReactorManager
         else
         {
             throw new IllegalArgumentException(
-                "Invalid failure behavior (must be one of: \'" + FAIL_FAST + "\', \'" + FAIL_AT_END + "\', \'"
-                    + FAIL_NEVER + "\')." );
+                    "Invalid failure behavior (must be one of: '" + FAIL_FAST + "', '" + FAIL_AT_END + "', '"
+                    + FAIL_NEVER + "')." );
         }
     }
 

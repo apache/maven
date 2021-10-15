@@ -42,7 +42,7 @@ public class CLIManagerTest
         throws Exception
     {
         CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
-        assertTrue( cmdLine.hasOption( CLIManager.DEBUG ) );
+        assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x=1" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "y=2" ) );
     }

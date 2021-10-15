@@ -55,14 +55,12 @@ public class FileProfileActivator
     implements ProfileActivator
 {
 
-    @Inject
-    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
-    public FileProfileActivator setProfileActivationFilePathInterpolator(
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
+    @Inject
+    public FileProfileActivator( ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-        return this;
     }
 
     @Override
@@ -143,11 +141,7 @@ public class FileProfileActivator
 
         ActivationFile file = activation.getFile();
 
-        if ( file == null )
-        {
-            return false;
-        }
-        return true;
+        return file != null;
     }
 
 }

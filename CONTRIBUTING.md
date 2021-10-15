@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-Contributing to Apache Maven 
+Contributing to Apache Maven
 ======================
 
 You have found a bug or you have an idea for a cool new feature? Contributing
@@ -31,9 +31,9 @@ Getting Started
 
 + Make sure you have a [JIRA account](https://issues.apache.org/jira/).
 + Make sure you have a [GitHub account](https://github.com/signup/free).
-+ If you're planning to implement a new feature, it makes sense to discuss your changes 
++ If you're planning to implement a new feature, it makes sense to discuss your changes
   on the [dev list](https://maven.apache.org/mailing-lists.html) first.
-  This way you can make sure you're not wasting your time on something that isn't 
+  This way you can make sure you're not wasting your time on something that isn't
   considered to be in Apache Maven's scope.
 + Submit a ticket for your issue, assuming one does not already exist.
   + Clearly describe the issue, including steps to reproduce when it is a bug.
@@ -52,7 +52,7 @@ There are some guidelines which will make applying PRs easier for us:
 + Respect the original code style: by using the same [codestyle][code-style],
   patches should only highlight the actual difference, not being disturbed by any formatting issues:
   + Only use spaces for indentation.
-  + Create minimal diffs - disable on save actions like reformat source code or organize imports. 
+  + Create minimal diffs - disable on save actions like reformat source code or organize imports.
     If you feel the source code should be reformatted, create a separate PR for this change.
   + Check for unnecessary whitespace with `git diff --check` before committing.
 + Make sure your commit messages are in the proper format. Your commit message should contain the key of the JIRA issue.
@@ -81,7 +81,7 @@ Additional Resources
 + [Apache Maven JIRA project page](https://issues.apache.org/jira/projects/MNG/)
 + [Contributor License Agreement][cla]
 + [General GitHub documentation](https://help.github.com/)
-+ [GitHub pull request documentation](https://help.github.com/send-pull-requests/)
++ [GitHub pull request documentation](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
 + [Apache Maven Twitter Account](https://twitter.com/ASFMavenProject)
 + #Maven IRC channel on freenode.org
 

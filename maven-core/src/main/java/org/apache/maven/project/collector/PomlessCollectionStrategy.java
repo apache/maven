@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Strategy to collect projects for building when the Maven invocation is not in a folder that contains a pom.xml.
+ * Strategy to collect projects for building when the Maven invocation is not in a directory that contains a pom.xml.
  */
 @Named( "PomlessCollectionStrategy" )
 @Singleton

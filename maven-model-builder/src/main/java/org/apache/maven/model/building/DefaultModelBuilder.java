@@ -103,170 +103,321 @@ import org.eclipse.sisu.Nullable;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
-    @Inject
-    private ModelProcessor modelProcessor;
+    private final ModelMerger modelMerger = new FileToRawModelMerger();
+
+    private final ModelProcessor modelProcessor;
+    private final ModelValidator modelValidator;
+    private final ModelNormalizer modelNormalizer;
+    private final ModelInterpolator modelInterpolator;
+    private final ModelPathTranslator modelPathTranslator;
+    private final ModelUrlNormalizer modelUrlNormalizer;
+    private final SuperPomProvider superPomProvider;
+    private final InheritanceAssembler inheritanceAssembler;
+    private final ProfileSelector profileSelector;
+    private final ProfileInjector profileInjector;
+    private final PluginManagementInjector pluginManagementInjector;
+    private final DependencyManagementInjector dependencyManagementInjector;
+    private final DependencyManagementImporter dependencyManagementImporter;
+    private final LifecycleBindingsInjector lifecycleBindingsInjector;
+    private final PluginConfigurationExpander pluginConfigurationExpander;
+    private final ReportConfigurationExpander reportConfigurationExpander;
+    private final ReportingConverter reportingConverter;
+    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
     @Inject
-    private ModelValidator modelValidator;
-
-    @Inject
-    private ModelNormalizer modelNormalizer;
-
-    @Inject
-    private ModelInterpolator modelInterpolator;
-
-    @Inject
-    private ModelPathTranslator modelPathTranslator;
-
-    @Inject
-    private ModelUrlNormalizer modelUrlNormalizer;
-
-    @Inject
-    private SuperPomProvider superPomProvider;
-
-    @Inject
-    private InheritanceAssembler inheritanceAssembler;
-
-    @Inject
-    private ProfileSelector profileSelector;
-
-    @Inject
-    private ProfileInjector profileInjector;
-
-    @Inject
-    private PluginManagementInjector pluginManagementInjector;
-
-    @Inject
-    private DependencyManagementInjector dependencyManagementInjector;
-
-    @Inject
-    private DependencyManagementImporter dependencyManagementImporter;
-
-    @Inject
-    @Nullable
-    private LifecycleBindingsInjector lifecycleBindingsInjector;
-
-    @Inject
-    private PluginConfigurationExpander pluginConfigurationExpander;
-
-    @Inject
-    private ReportConfigurationExpander reportConfigurationExpander;
-
-    @Inject
-    private ReportingConverter reportingConverter;
-
-    private ModelMerger modelMerger = new FileToRawModelMerger();
-
-    @Inject
-    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-
-    public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
+    public DefaultModelBuilder(
+            ModelProcessor modelProcessor,
+            ModelValidator modelValidator,
+            ModelNormalizer modelNormalizer,
+            ModelInterpolator modelInterpolator,
+            ModelPathTranslator modelPathTranslator,
+            ModelUrlNormalizer modelUrlNormalizer,
+            SuperPomProvider superPomProvider,
+            InheritanceAssembler inheritanceAssembler,
+            ProfileSelector profileSelector,
+            ProfileInjector profileInjector,
+            PluginManagementInjector pluginManagementInjector,
+            DependencyManagementInjector dependencyManagementInjector,
+            DependencyManagementImporter dependencyManagementImporter,
+            @Nullable LifecycleBindingsInjector lifecycleBindingsInjector,
+            PluginConfigurationExpander pluginConfigurationExpander,
+            ReportConfigurationExpander reportConfigurationExpander,
+            ReportingConverter reportingConverter,
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
         this.modelProcessor = modelProcessor;
-        return this;
+        this.modelValidator = modelValidator;
+        this.modelNormalizer = modelNormalizer;
+        this.modelInterpolator = modelInterpolator;
+        this.modelPathTranslator = modelPathTranslator;
+        this.modelUrlNormalizer = modelUrlNormalizer;
+        this.superPomProvider = superPomProvider;
+        this.inheritanceAssembler = inheritanceAssembler;
+        this.profileSelector = profileSelector;
+        this.profileInjector = profileInjector;
+        this.pluginManagementInjector = pluginManagementInjector;
+        this.dependencyManagementInjector = dependencyManagementInjector;
+        this.dependencyManagementImporter = dependencyManagementImporter;
+        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+        this.pluginConfigurationExpander = pluginConfigurationExpander;
+        this.reportConfigurationExpander = reportConfigurationExpander;
+        this.reportingConverter = reportingConverter;
+        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#set
+     */
+    @Deprecated
+    public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
+    {
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor) 
+     */
+    @Deprecated
     public DefaultModelBuilder setModelValidator( ModelValidator modelValidator )
     {
-        this.modelValidator = modelValidator;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setModelNormalizer(ModelNormalizer) 
+     */
+    @Deprecated
     public DefaultModelBuilder setModelNormalizer( ModelNormalizer modelNormalizer )
     {
-        this.modelNormalizer = modelNormalizer;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setModelInterpolator(ModelInterpolator) 
+     */
+    @Deprecated
     public DefaultModelBuilder setModelInterpolator( ModelInterpolator modelInterpolator )
     {
-        this.modelInterpolator = modelInterpolator;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#set
+     */
+    @Deprecated
     public DefaultModelBuilder setModelPathTranslator( ModelPathTranslator modelPathTranslator )
     {
-        this.modelPathTranslator = modelPathTranslator;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setModelUrlNormalizer(ModelUrlNormalizer) 
+     */
+    @Deprecated
     public DefaultModelBuilder setModelUrlNormalizer( ModelUrlNormalizer modelUrlNormalizer )
     {
-        this.modelUrlNormalizer = modelUrlNormalizer;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setSuperPomProvider(SuperPomProvider) 
+     */
+    @Deprecated
     public DefaultModelBuilder setSuperPomProvider( SuperPomProvider superPomProvider )
     {
-        this.superPomProvider = superPomProvider;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
-    public DefaultModelBuilder setProfileSelector( ProfileSelector profileSelector )
-    {
-        this.profileSelector = profileSelector;
-        return this;
-    }
-
-    public DefaultModelBuilder setProfileInjector( ProfileInjector profileInjector )
-    {
-        this.profileInjector = profileInjector;
-        return this;
-    }
-
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setInheritanceAssembler(InheritanceAssembler) 
+     */
+    @Deprecated
     public DefaultModelBuilder setInheritanceAssembler( InheritanceAssembler inheritanceAssembler )
     {
-        this.inheritanceAssembler = inheritanceAssembler;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
-    public DefaultModelBuilder setDependencyManagementImporter( DependencyManagementImporter depMgmtImporter )
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#set
+     */
+    @Deprecated
+    public DefaultModelBuilder setProfileSelector( ProfileSelector profileSelector )
     {
-        this.dependencyManagementImporter = depMgmtImporter;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
-    public DefaultModelBuilder setDependencyManagementInjector( DependencyManagementInjector depMgmtInjector )
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setProfileInjector(ProfileInjector) 
+     */
+    @Deprecated
+    public DefaultModelBuilder setProfileInjector( ProfileInjector profileInjector )
     {
-        this.dependencyManagementInjector = depMgmtInjector;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
-    public DefaultModelBuilder setLifecycleBindingsInjector( LifecycleBindingsInjector lifecycleBindingsInjector )
-    {
-        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
-        return this;
-    }
-
-    public DefaultModelBuilder setPluginConfigurationExpander( PluginConfigurationExpander pluginConfigurationExpander )
-    {
-        this.pluginConfigurationExpander = pluginConfigurationExpander;
-        return this;
-    }
-
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setPluginManagementInjector(PluginManagementInjector) 
+     */
+    @Deprecated
     public DefaultModelBuilder setPluginManagementInjector( PluginManagementInjector pluginManagementInjector )
     {
-        this.pluginManagementInjector = pluginManagementInjector;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setDependencyManagementInjector(DependencyManagementInjector)  
+     */
+    @Deprecated
+    public DefaultModelBuilder setDependencyManagementInjector(
+            DependencyManagementInjector dependencyManagementInjector )
+    {
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setDependencyManagementImporter(DependencyManagementImporter) 
+     */
+    @Deprecated
+    public DefaultModelBuilder setDependencyManagementImporter(
+            DependencyManagementImporter dependencyManagementImporter )
+    {
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setLifecycleBindingsInjector(LifecycleBindingsInjector) 
+     */
+    @Deprecated
+    public DefaultModelBuilder setLifecycleBindingsInjector( LifecycleBindingsInjector lifecycleBindingsInjector )
+    {
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setPluginConfigurationExpander(PluginConfigurationExpander) 
+     */
+    @Deprecated
+    public DefaultModelBuilder setPluginConfigurationExpander( PluginConfigurationExpander pluginConfigurationExpander )
+    {
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setReportConfigurationExpander(ReportConfigurationExpander)  
+     */
+    @Deprecated
     public DefaultModelBuilder setReportConfigurationExpander( ReportConfigurationExpander reportConfigurationExpander )
     {
-        this.reportConfigurationExpander = reportConfigurationExpander;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setReportingConverter(ReportingConverter) 
+     */
+    @Deprecated
     public DefaultModelBuilder setReportingConverter( ReportingConverter reportingConverter )
     {
-        this.reportingConverter = reportingConverter;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setProfileActivationFilePathInterpolator(ProfileActivationFilePathInterpolator)
+     */
+    @Deprecated
     public DefaultModelBuilder setProfileActivationFilePathInterpolator(
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-        return this;
+        return new DefaultModelBuilder( modelProcessor, modelValidator, modelNormalizer, modelInterpolator,
+                modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
+                profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
+                lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
+                reportingConverter, profileActivationFilePathInterpolator );
     }
 
     @Override
@@ -274,7 +425,7 @@ public class DefaultModelBuilder
     {
         return new DefaultTransformerContextBuilder();
     }
-    
+
     @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
@@ -418,7 +569,7 @@ public class DefaultModelBuilder
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
             Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
-                                                                                          profileActivationContext, 
+                                                                                          profileActivationContext,
                                                                                           problems );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
@@ -545,7 +696,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private static boolean isNotEmpty( String string ) 
+    private static boolean isNotEmpty( String string )
     {
         return string != null && !string.isEmpty();
     }
@@ -636,7 +787,8 @@ public class DefaultModelBuilder
     public Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking )
     {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( validationLevel )
-            .setLocationTracking( locationTracking );
+            .setLocationTracking( locationTracking )
+            .setModelSource( new FileModelSource( pomFile ) );
         final DefaultModelProblemCollector collector =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
@@ -790,7 +942,8 @@ public class DefaultModelBuilder
         }
 
         Model rawModel;
-        if ( Features.buildConsumer().isActive() && modelSource instanceof FileModelSource )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive()
+            && modelSource instanceof FileModelSource )
         {
             rawModel = readFileModel( request, problems );
             File pomFile = ( (FileModelSource) modelSource ).getFile();
@@ -814,7 +967,7 @@ public class DefaultModelBuilder
             }
             catch ( IOException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V37 ).setException( e ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V40 ).setException( e ) );
             }
         }
         else if ( request.getFileModel() == null )
@@ -1065,7 +1218,7 @@ public class DefaultModelBuilder
             {
                 parentData = readParentExternally( childModel, request, result, problems );
             }
-            
+
             Model parentModel = parentData.getModel();
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {
@@ -1403,13 +1556,15 @@ public class DefaultModelBuilder
 
         if ( importIds.contains( imported ) )
         {
-            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+            StringBuilder message =
+                    new StringBuilder( "The dependencies of type=pom and with scope=import form a cycle: " );
             for ( String modelId : importIds )
             {
-                message += modelId + " -> ";
+                message.append( modelId ).append( " -> " );
             }
-            message += imported;
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
+            message.append( imported );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
+                    message.toString() ) );
 
             return null;
         }

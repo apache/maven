@@ -21,10 +21,10 @@ package org.apache.maven.internal.aether;
 
 import java.io.FileNotFoundException;
 
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.transfer.MetadataNotFoundException;
+import org.slf4j.Logger;
 
 /**
  * @author Benjamin Bentmann
@@ -128,7 +128,7 @@ class LoggingRepositoryListener
         }
         else
         {
-            logger.warn( buffer + ", enable debug logging for more details" );
+            logger.warn( buffer + ", enable verbose output (-X) for more details" );
         }
     }
 

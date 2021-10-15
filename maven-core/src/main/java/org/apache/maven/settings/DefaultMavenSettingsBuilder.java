@@ -46,8 +46,13 @@ public class DefaultMavenSettingsBuilder
     implements MavenSettingsBuilder
 {
 
+    private final SettingsBuilder settingsBuilder;
+
     @Inject
-    private SettingsBuilder settingsBuilder;
+    public DefaultMavenSettingsBuilder( SettingsBuilder settingsBuilder )
+    {
+        this.settingsBuilder = settingsBuilder;
+    }
 
     public Settings buildSettings()
         throws IOException, XmlPullParserException
@@ -94,7 +99,7 @@ public class DefaultMavenSettingsBuilder
         }
         catch ( SettingsBuildingException e )
         {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+            throw new IOException( e.getMessage(), e );
         }
     }
 

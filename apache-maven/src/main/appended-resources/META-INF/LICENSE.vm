@@ -33,9 +33,7 @@ subject to the terms and conditions of the following licenses:
 #*    *### advertise about each non-Maven dependency
 #*    *###
 #*    *### infer SPDX license id
-#*    *##if ( $license.name == "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0" )
-#*      *##set ( $spdx = 'CDDL-1.0' )
-#*    *##elseif ( $MITLicenseNames.contains( $license.name ) )
+#*    *##if ( $MITLicenseNames.contains( $license.name ) )
 #*      *##set ( $spdx = 'MIT' )
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )

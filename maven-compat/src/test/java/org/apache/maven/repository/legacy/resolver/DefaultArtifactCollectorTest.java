@@ -150,7 +150,7 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec f = c1.addDependency( "f", "1.0" );
 
         ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, e.artifact } ) );
-        assertEquals( createSet( new Object[] { a.artifact, b.artifact, e.artifact, c1.artifact, f.artifact } ), 
+        assertEquals( createSet( new Object[] { a.artifact, b.artifact, e.artifact, c1.artifact, f.artifact } ),
                       res.getArtifacts(), "Check artifact list" );
         assertEquals( "1.0", getArtifact( "c", res.getArtifacts() ).getVersion(), "Check version" );
     }

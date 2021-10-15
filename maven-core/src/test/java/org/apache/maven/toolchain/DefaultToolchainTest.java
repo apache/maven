@@ -22,27 +22,22 @@ package org.apache.maven.toolchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.io.InputStream;
 import java.util.Collections;
 
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
-import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
-import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 
 public class DefaultToolchainTest
 {
-    @Mock
-    private Logger logger;
-
-    private MavenToolchainsXpp3Reader reader = new MavenToolchainsXpp3Reader();
+    private final Logger logger = mock( Logger.class );
 
     @BeforeEach
     public void setUp()
@@ -130,21 +125,33 @@ public class DefaultToolchainTest
 
     @Test
     public void testEquals()
-        throws Exception
     {
-        try ( InputStream jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" ) )
-        {
-            PersistedToolchains jdks = reader.read( jdksIS );
-            PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
+        ToolchainModel tm1 = new ToolchainModel();
+        tm1.setType( "jdk" );
+        tm1.addProvide( "version", "1.5" );
+        tm1.addProvide( "vendor", "sun" );
+        Xpp3Dom configuration1 = new Xpp3Dom("configuration");
+        Xpp3Dom jdkHome1 = new Xpp3Dom( "jdkHome" );
+        jdkHome1.setValue("${env.JAVA_HOME}");
+        configuration1.addChild( jdkHome1 );
+        tm1.setConfiguration( configuration1 );
 
-            DefaultToolchain tc1 = new DefaultJavaToolChain( jdks.getToolchains().get( 0 ), null );
-            DefaultToolchain tc2 = new DefaultJavaToolChain( jdksExtra.getToolchains().get( 0 ), null );
+        ToolchainModel tm2 = new ToolchainModel();
+        tm1.setType( "jdk" );
+        tm1.addProvide( "version", "1.4" );
+        tm1.addProvide( "vendor", "sun" );
+        Xpp3Dom configuration2 = new Xpp3Dom("configuration");
+        Xpp3Dom jdkHome2 = new Xpp3Dom( "jdkHome" );
+        jdkHome2.setValue("${env.JAVA_HOME}");
+        configuration2.addChild( jdkHome2 );
+        tm2.setConfiguration( configuration2 );
 
-            assertEquals( tc1, tc1 );
-            assertNotEquals( tc1, tc2 );
-            assertNotEquals( tc2, tc1 );
-            assertEquals( tc2, tc2 );
-        }
+        DefaultToolchain tc1 = new DefaultJavaToolChain( tm1, null );
+        DefaultToolchain tc2 = new DefaultJavaToolChain( tm2, null );
+
+        assertEquals( tc1, tc1 );
+        assertNotEquals( tc1, tc2 );
+        assertNotEquals( tc2, tc1 );
+        assertEquals( tc2, tc2 );
     }
 }

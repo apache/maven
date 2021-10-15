@@ -155,7 +155,7 @@ public class Parameter
 
     public String toString()
     {
-        return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";
+        return "Mojo parameter [name: '" + getName() + "'; alias: '" + getAlias() + "']";
     }
 
     public Requirement getRequirement()

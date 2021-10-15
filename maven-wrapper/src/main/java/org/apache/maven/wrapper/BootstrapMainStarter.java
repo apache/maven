@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author Hans Dockter
@@ -49,11 +50,13 @@ public class BootstrapMainStarter
 
     private Path findLauncherJar( Path mavenHome ) throws RuntimeException, IOException
     {
-        return Files.list( mavenHome.resolve( "boot" ) )
-                        .filter( p -> p.getFileName().toString().matches( "plexus-classworlds-.*\\.jar" )  )
+        try ( Stream<Path> list = Files.list( mavenHome.resolve( "boot" ) ) ) 
+        {
+            return list.filter( p -> p.getFileName().toString().matches( "plexus-classworlds-.*\\.jar" )  )
                         .findFirst()
                         .orElseThrow( () -> new RuntimeException(
                                   String.format( "Couldn't locate the Maven launcher JAR in Maven distribution '%s'.",
                                    mavenHome ) ) );
+        }
     }
 }

@@ -97,7 +97,7 @@ public class FileProfileActivator
                 else
                 {
                     logger.warn( "Failed to interpolate missing file location for profile activator: " + fileString
-                        + ". Run in debug mode (-X) for more information." );
+                        + ", enable verbose output (-X) for more details" );
                 }
             }
         }

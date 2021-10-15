@@ -86,16 +86,14 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
 
             if ( !lockCharacters )
             {
-                charactersSegments.stream().forEach( e ->
-                {
-                    saxEvents.add( () ->
-                    {
-                        if ( acceptEvent( eventState ) )
+                charactersSegments.forEach( e ->
+                        saxEvents.add( () ->
                         {
-                            e.execute();
-                        }
-                    } );
-                } );
+                            if ( acceptEvent( eventState ) )
+                            {
+                                e.execute();
+                            }
+                        } ) );
                 charactersSegments.clear();
             }
 
@@ -127,16 +125,14 @@ abstract class AbstractEventXMLFilter extends AbstractSAXFilter
     protected final void executeEvents() throws SAXException
     {
         final String eventState = getState();
-        charactersSegments.stream().forEach( e ->
-        {
-            saxEvents.add( () ->
-            {
-                if ( acceptEvent( eventState ) )
+        charactersSegments.forEach( e ->
+                saxEvents.add( () ->
                 {
-                    e.execute();
-                }
-            } );
-        } );
+                    if ( acceptEvent( eventState ) )
+                    {
+                        e.execute();
+                    }
+                } ) );
         charactersSegments.clear();
 
         // not with streams due to checked SAXException

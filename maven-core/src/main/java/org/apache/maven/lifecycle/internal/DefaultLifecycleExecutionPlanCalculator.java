@@ -56,7 +56,6 @@ import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -75,34 +74,38 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultLifecycleExecutionPlanCalculator
     implements LifecycleExecutionPlanCalculator
 {
-    @Inject
-    private PluginVersionResolver pluginVersionResolver;
+
+    private final BuildPluginManager pluginManager;
+
+    private final DefaultLifecycles defaultLifeCycles;
+
+    private final MojoDescriptorCreator mojoDescriptorCreator;
+
+    private final LifecyclePluginResolver lifecyclePluginResolver;
+
+    private final LifecycleMappingDelegate standardDelegate;
+
+    private final Map<String, LifecycleMappingDelegate> delegates;
+
+    private final Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
     @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private MojoDescriptorCreator mojoDescriptorCreator;
-
-    @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    @Inject
-    @Named( DefaultLifecycleMappingDelegate.HINT )
-    private LifecycleMappingDelegate standardDelegate;
-
-    @Inject
-    private Map<String, LifecycleMappingDelegate> delegates;
-
-    @Inject
-    private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
-
-    @SuppressWarnings( { "UnusedDeclaration" } )
-    public DefaultLifecycleExecutionPlanCalculator()
+    public DefaultLifecycleExecutionPlanCalculator(
+            BuildPluginManager pluginManager,
+            DefaultLifecycles defaultLifeCycles,
+            MojoDescriptorCreator mojoDescriptorCreator,
+            LifecyclePluginResolver lifecyclePluginResolver,
+            @Named( DefaultLifecycleMappingDelegate.HINT ) LifecycleMappingDelegate standardDelegate,
+            Map<String, LifecycleMappingDelegate> delegates,
+            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators )
     {
+        this.pluginManager = pluginManager;
+        this.defaultLifeCycles = defaultLifeCycles;
+        this.mojoDescriptorCreator = mojoDescriptorCreator;
+        this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.standardDelegate = standardDelegate;
+        this.delegates = delegates;
+        this.mojoExecutionConfigurators = mojoExecutionConfigurators;
     }
 
     // Only used for testing
@@ -115,6 +118,8 @@ public class DefaultLifecycleExecutionPlanCalculator
         this.defaultLifeCycles = defaultLifeCycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.standardDelegate = null;
+        this.delegates = null;
         this.mojoExecutionConfigurators = Collections.singletonMap(
              "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
     }

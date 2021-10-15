@@ -46,8 +46,6 @@ import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
@@ -72,7 +70,7 @@ import java.util.Objects;
 @Named
 @Singleton
 public class DefaultVersionResolver
-    implements VersionResolver, Service
+    implements VersionResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
@@ -83,50 +81,18 @@ public class DefaultVersionResolver
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
-    private MetadataResolver metadataResolver;
-
-    private SyncContextFactory syncContextFactory;
-
-    private RepositoryEventDispatcher repositoryEventDispatcher;
-
-    public DefaultVersionResolver()
-    {
-        // enable no-arg constructor
-    }
+    private final MetadataResolver metadataResolver;
+    private final SyncContextFactory syncContextFactory;
+    private final RepositoryEventDispatcher repositoryEventDispatcher;
 
     @Inject
-    DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
+    public DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
                             RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        setMetadataResolver( metadataResolver );
-        setSyncContextFactory( syncContextFactory );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
-    }
-
-    public void initService( ServiceLocator locator )
-    {
-        setMetadataResolver( locator.getService( MetadataResolver.class ) );
-        setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-    }
-
-    public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
-    {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
-    {
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
-    {
         this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
-        return this;
+                "repositoryEventDispatcher cannot be null" );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )

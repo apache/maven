@@ -124,13 +124,11 @@ public class ArtifactDescriptorReaderDelegate
             exclusions.add( convert( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact, dependency.getScope(),
+        return new Dependency( artifact, dependency.getScope(),
                                             dependency.getOptional() != null
                                                 ? dependency.isOptional()
                                                 : null,
                                             exclusions );
-
-        return result;
     }
 
     private Exclusion convert( org.apache.maven.model.Exclusion exclusion )

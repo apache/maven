@@ -2,13 +2,10 @@
 
 :init
 
-set MAVEN_CMD_LINE_ARGS=%*
+set "CLASSWORLDS_CONF=%MAVEN_HOME%\bin\m2.conf"
 
-@REM Find the project basedir, i.e., the directory that contains the folder ".mvn".
+@REM Find the project basedir, i.e., the directory that contains the directory ".mvn".
 @REM Fallback to current working directory if not found.
-
-set "MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%"
-if not "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
 
 set "EXEC_DIR=%CD%"
 set "WDIR=%EXEC_DIR%"

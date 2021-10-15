@@ -58,7 +58,7 @@ public class DefaultLifecyclesStub
             lifeCycles.put( s, lifecycle );
 
         }
-        return new DefaultLifecycles( lifeCycles, new LoggerStub() );
+        return new DefaultLifecycles( lifeCycles );
     }
 
 }

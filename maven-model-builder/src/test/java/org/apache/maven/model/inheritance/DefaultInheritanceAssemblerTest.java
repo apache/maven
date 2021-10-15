@@ -61,8 +61,7 @@ public class DefaultInheritanceAssemblerTest
     public void setUp()
         throws Exception
     {
-        reader = new DefaultModelReader();
-        reader.setTransformer( new AbstractModelSourceTransformer()
+        reader = new DefaultModelReader( new AbstractModelSourceTransformer()
         {
             @Override
             protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context,

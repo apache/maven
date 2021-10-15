@@ -72,9 +72,9 @@ import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.DefaultModelCache;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -83,6 +83,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultProjectBuilder
@@ -92,32 +94,34 @@ import org.eclipse.aether.resolution.ArtifactResult;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final ModelBuilder modelBuilder;
+    private final ModelProcessor modelProcessor;
+    private final ProjectBuildingHelper projectBuildingHelper;
+    private final MavenRepositorySystem repositorySystem;
+    private final org.eclipse.aether.RepositorySystem repoSystem;
+    private final RemoteRepositoryManager repositoryManager;
+    private final ProjectDependenciesResolver dependencyResolver;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private ModelBuilder modelBuilder;
-
-    @Inject
-    private ModelProcessor modelProcessor;
-
-    @Inject
-    private ProjectBuildingHelper projectBuildingHelper;
-
-    @Inject
-    private MavenRepositorySystem repositorySystem;
-
-    @Inject
-    private org.eclipse.aether.RepositorySystem repoSystem;
-
-    @Inject
-    private RemoteRepositoryManager repositoryManager;
-
-    @Inject
-    private ProjectDependenciesResolver dependencyResolver;
-
-    // ----------------------------------------------------------------------
+    public DefaultProjectBuilder(
+            ModelBuilder modelBuilder,
+            ModelProcessor modelProcessor,
+            ProjectBuildingHelper projectBuildingHelper,
+            MavenRepositorySystem repositorySystem,
+            RepositorySystem repoSystem,
+            RemoteRepositoryManager repositoryManager,
+            ProjectDependenciesResolver dependencyResolver )
+    {
+        this.modelBuilder = modelBuilder;
+        this.modelProcessor = modelProcessor;
+        this.projectBuildingHelper = projectBuildingHelper;
+        this.repositorySystem = repositorySystem;
+        this.repoSystem = repoSystem;
+        this.repositoryManager = repositoryManager;
+        this.dependencyResolver = dependencyResolver;
+    }
+// ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
@@ -400,7 +404,7 @@ public class DefaultProjectBuilder
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
 
-        if ( Features.buildConsumer().isActive() )
+        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
         {
             request.getRepositorySession().getData().set( TransformerContext.KEY,
                                                           config.transformerContextBuilder.build() );

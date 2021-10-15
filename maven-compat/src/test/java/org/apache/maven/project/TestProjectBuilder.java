@@ -19,7 +19,13 @@ import java.io.File;
 import java.util.Collections;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelProcessor;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -28,6 +34,16 @@ import javax.inject.Singleton;
 public class TestProjectBuilder
     extends DefaultProjectBuilder
 {
+    @Inject
+    public TestProjectBuilder(
+            ModelBuilder modelBuilder, ModelProcessor modelProcessor,
+            ProjectBuildingHelper projectBuildingHelper, MavenRepositorySystem repositorySystem,
+            RepositorySystem repoSystem, RemoteRepositoryManager repositoryManager,
+            ProjectDependenciesResolver dependencyResolver )
+    {
+        super( modelBuilder, modelProcessor, projectBuildingHelper, repositorySystem, repoSystem,
+                repositoryManager, dependencyResolver );
+    }
 
     @Override
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )

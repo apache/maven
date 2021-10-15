@@ -40,7 +40,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -48,6 +47,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * BootstrapCoreExtensionManager
@@ -55,7 +56,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 @Named
 public class BootstrapCoreExtensionManager
 {
-    private final Logger log;
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
 
@@ -66,11 +67,10 @@ public class BootstrapCoreExtensionManager
     private final ClassRealm parentRealm;
 
     @Inject
-    public BootstrapCoreExtensionManager( Logger log, DefaultPluginDependenciesResolver pluginDependenciesResolver,
+    public BootstrapCoreExtensionManager( DefaultPluginDependenciesResolver pluginDependenciesResolver,
                                           DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
                                           PlexusContainer container )
     {
-        this.log = log;
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
         this.classWorld = ( (DefaultPlexusContainer) container ).getClassWorld();
@@ -139,8 +139,7 @@ public class BootstrapCoreExtensionManager
             pluginDependenciesResolver.resolveCoreExtension( plugin, dependencyFilter, repositories, repoSession );
         PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
         root.accept( nlg );
-        List<Artifact> artifacts = nlg.getArtifacts( false );
 
-        return artifacts;
+        return nlg.getArtifacts( false );
     }
 }

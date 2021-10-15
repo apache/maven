@@ -35,13 +35,13 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 
 public class DefaultToolchainManagerTest
 {
@@ -61,13 +61,12 @@ public class DefaultToolchainManagerTest
     @BeforeEach
     public void onSetup() throws Exception
     {
-        toolchainManager = new DefaultToolchainManager();
-
         MockitoAnnotations.initMocks( this );
 
-        toolchainManager.factories = new HashMap<>();
-        toolchainManager.factories.put( "basic", toolchainFactory_basicType );
-        toolchainManager.factories.put( "rare", toolchainFactory_rareType );
+        Map<String, ToolchainFactory> factories = new HashMap<>();
+        factories.put( "basic", toolchainFactory_basicType );
+        factories.put( "rare", toolchainFactory_rareType );
+        toolchainManager = new DefaultToolchainManager( factories, logger );
     }
 
     @Test

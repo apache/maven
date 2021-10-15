@@ -70,20 +70,26 @@ public class DefaultPluginManager
     implements PluginManager
 {
 
-    @Inject
-    private PlexusContainer container;
+    private final PlexusContainer container;
+    private final MavenPluginManager pluginManager;
+    private final PluginVersionResolver pluginVersionResolver;
+    private final PluginPrefixResolver pluginPrefixResolver;
+    private final LegacySupport legacySupport;
 
     @Inject
-    private MavenPluginManager pluginManager;
-
-    @Inject
-    private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
-    private PluginPrefixResolver pluginPrefixResolver;
-
-    @Inject
-    private LegacySupport legacySupport;
+    public DefaultPluginManager(
+            PlexusContainer container,
+            MavenPluginManager pluginManager,
+            PluginVersionResolver pluginVersionResolver,
+            PluginPrefixResolver pluginPrefixResolver,
+            LegacySupport legacySupport )
+    {
+        this.container = container;
+        this.pluginManager = pluginManager;
+        this.pluginVersionResolver = pluginVersionResolver;
+        this.pluginPrefixResolver = pluginPrefixResolver;
+        this.legacySupport = legacySupport;
+    }
 
     public void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,

@@ -67,20 +67,22 @@ import org.codehaus.plexus.util.StringUtils;
 public class MojoExecutor
 {
 
-    @Inject
-    private BuildPluginManager pluginManager;
+    private final BuildPluginManager pluginManager;
+    private final MavenPluginManager mavenPluginManager;
+    private final LifecycleDependencyResolver lifeCycleDependencyResolver;
+    private final ExecutionEventCatapult eventCatapult;
 
     @Inject
-    private MavenPluginManager mavenPluginManager;
-
-    @Inject
-    private LifecycleDependencyResolver lifeCycleDependencyResolver;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    public MojoExecutor()
+    public MojoExecutor(
+            BuildPluginManager pluginManager,
+            MavenPluginManager mavenPluginManager,
+            LifecycleDependencyResolver lifeCycleDependencyResolver,
+            ExecutionEventCatapult eventCatapult )
     {
+        this.pluginManager = pluginManager;
+        this.mavenPluginManager = mavenPluginManager;
+        this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
+        this.eventCatapult = eventCatapult;
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
@@ -249,7 +251,7 @@ public class MojoExecutor
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 
             lifeCycleDependencyResolver.resolveProjectDependencies( project, scopesToCollect, scopesToResolve, session,
-                                                                    aggregating, Collections.<Artifact>emptySet() );
+                                                                    aggregating, Collections.emptySet() );
 
             dependencyContext.synchronizeWithProjectState();
         }
@@ -267,7 +269,7 @@ public class MojoExecutor
                     {
                         lifeCycleDependencyResolver.resolveProjectDependencies( aggregatedProject, scopesToCollect,
                                                                                 scopesToResolve, session, aggregating,
-                                                                                Collections.<Artifact>emptySet() );
+                                                                                Collections.emptySet() );
                     }
                 }
             }

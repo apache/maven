@@ -47,8 +47,9 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -66,29 +67,18 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Singleton
 public class MojoDescriptorCreator
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final PluginVersionResolver pluginVersionResolver;
+    private final BuildPluginManager pluginManager;
+    private final PluginPrefixResolver pluginPrefixResolver;
+    private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private PluginVersionResolver pluginVersionResolver;
-
-    @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private PluginPrefixResolver pluginPrefixResolver;
-
-    @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    public MojoDescriptorCreator()
-    {
-    }
-
-    public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
-                                  PluginPrefixResolver pluginPrefixResolver,
-                                  LifecyclePluginResolver lifecyclePluginResolver )
+    public MojoDescriptorCreator(
+            PluginVersionResolver pluginVersionResolver,
+            BuildPluginManager pluginManager,
+            PluginPrefixResolver pluginPrefixResolver,
+            LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
@@ -239,7 +229,7 @@ public class MojoDescriptorCreator
             resolvePluginVersion( plugin, session, project );
         }
 
-        return pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
+        return pluginManager.getMojoDescriptor( plugin, goal.toString(), project.getRemotePluginRepositories(),
                                                 session.getRepositorySession() );
     }
 

@@ -26,7 +26,7 @@ import java.util.Properties;
 import java.util.Objects;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * Default abstract toolchain implementation, to be used as base class for any toolchain implementation
@@ -38,6 +38,7 @@ import org.codehaus.plexus.logging.Logger;
 public abstract class DefaultToolchain // should have been AbstractToolchain...
     implements Toolchain, ToolchainPrivate
 {
+    private final Logger logger;
 
     private String type;
 
@@ -47,8 +48,6 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
     private ToolchainModel model;
 
-    private Logger logger;
-
     /**
      *
      * @param model the model, must not be {@code null}
@@ -57,7 +56,6 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
     protected DefaultToolchain( ToolchainModel model, Logger logger )
     {
         this.model = model;
-
         this.logger = logger;
     }
 

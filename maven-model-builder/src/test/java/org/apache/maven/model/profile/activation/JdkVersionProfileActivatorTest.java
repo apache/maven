@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,12 +35,14 @@ public class JdkVersionProfileActivatorTest
     extends AbstractProfileActivatorTest<JdkVersionProfileActivator>
 {
 
-    public JdkVersionProfileActivatorTest()
+    @Override
+    @BeforeEach
+    void setUp() throws Exception
     {
-        super( JdkVersionProfileActivator.class );
+        activator = new JdkVersionProfileActivator();
     }
 
-    private Profile newProfile( String jdkVersion )
+    private Profile newProfile(String jdkVersion )
     {
         Activation a = new Activation();
         a.setJdk( jdkVersion );
