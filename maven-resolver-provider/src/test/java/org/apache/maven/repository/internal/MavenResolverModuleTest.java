@@ -38,29 +38,30 @@ public class MavenResolverModuleTest
     @Test
     public void smokeTest()
     {
-        Guice.createInjector(new MavenResolverModule(), new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(RepositoryConnectorFactory.class).to(BasicRepositoryConnectorFactory.class);
-                bind(TransporterFactory.class).to(FileTransporterFactory.class);
-            }
+        Guice.createInjector(
+                new MavenResolverModule(),
+                // this is to be added by integrator
+                // Note: using File here for simplicity, Wagon would need even more components
+                new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bind(RepositoryConnectorFactory.class).to(BasicRepositoryConnectorFactory.class);
+                        bind(TransporterFactory.class).to(FileTransporterFactory.class);
+                    }
 
-            @Provides
-            @Singleton
-            Set<RepositoryConnectorFactory> provideRepositoryConnectorFactory(
-                    BasicRepositoryConnectorFactory basicRepositoryConnectorFactory )
-            {
-                return Collections.singleton( basicRepositoryConnectorFactory );
-            }
+                    @Provides
+                    @Singleton
+                    Set<RepositoryConnectorFactory> provideRepositoryConnectorFactory(
+                            BasicRepositoryConnectorFactory basicRepositoryConnectorFactory) {
+                        return Collections.singleton(basicRepositoryConnectorFactory);
+                    }
 
-            @Provides
-            @Singleton
-            Set<TransporterFactory> provideTransporterFactory(
-                    FileTransporterFactory fileTransporterFactory )
-            {
-                return Collections.singleton( fileTransporterFactory );
-            }
-
-        }).getInstance(RepositorySystem.class);
+                    @Provides
+                    @Singleton
+                    Set<TransporterFactory> provideTransporterFactory(
+                            FileTransporterFactory fileTransporterFactory) {
+                        return Collections.singleton(fileTransporterFactory);
+                    }
+                }).getInstance(RepositorySystem.class);
     }
 }
