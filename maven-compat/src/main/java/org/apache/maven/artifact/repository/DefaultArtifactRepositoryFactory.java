@@ -19,7 +19,7 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
@@ -102,7 +102,7 @@ public class DefaultArtifactRepositoryFactory
 
         if ( session != null && repository != null && !isLocalRepository( repository ) )
         {
-            List<ArtifactRepository> repositories = Arrays.asList( repository );
+            List<ArtifactRepository> repositories = Collections.singletonList( repository );
 
             if ( mirrors )
             {

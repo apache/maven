@@ -20,8 +20,8 @@ package org.apache.maven.project;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -258,7 +258,7 @@ public class DefaultProjectBuildingHelper
                      * plugins, yet the components provided by the extension (e.g. artifact handlers) must be
                      * accessible, i.e. we still must import the extension realm into the project realm.
                      */
-                    exports = Arrays.asList( extensionRealm.getId() );
+                    exports = Collections.singletonList( extensionRealm.getId() );
                 }
 
                 for ( String export : exports )

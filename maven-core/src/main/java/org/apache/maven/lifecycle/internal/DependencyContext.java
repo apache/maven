@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.project.MavenProject;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -40,7 +39,7 @@ import java.util.TreeSet;
 public class DependencyContext
 {
 
-    private static final Collection<?> UNRESOLVED = Arrays.asList();
+    private static final Collection<?> UNRESOLVED = Collections.emptyList();
 
     private final MavenProject project;
 

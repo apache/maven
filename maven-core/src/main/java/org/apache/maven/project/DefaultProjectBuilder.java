@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -207,7 +206,7 @@ public class DefaultProjectBuilder
 
             if ( error != null )
             {
-                ProjectBuildingException e = new ProjectBuildingException( Arrays.asList( result ) );
+                ProjectBuildingException e = new ProjectBuildingException( Collections.singletonList( result ) );
                 e.initCause( error );
                 throw e;
             }
@@ -854,9 +853,9 @@ public class DefaultProjectBuilder
                 {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository( r );
                     repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     project.setReleaseArtifactRepository( repo );
                 }
             }
@@ -878,9 +877,9 @@ public class DefaultProjectBuilder
                 {
                     ArtifactRepository repo = MavenRepositorySystem.buildArtifactRepository( r );
                     repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
+                            Collections.singletonList( repo ) );
                     project.setSnapshotArtifactRepository( repo );
                 }
             }

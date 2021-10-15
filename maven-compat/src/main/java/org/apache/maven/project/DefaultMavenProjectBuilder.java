@@ -21,7 +21,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -160,9 +160,12 @@ public class DefaultMavenProjectBuilder
                     try
                     {
                         ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
-                        repositorySystem.injectMirror( request.getRepositorySession(), Arrays.asList( repo ) );
-                        repositorySystem.injectProxy( request.getRepositorySession(), Arrays.asList( repo ) );
-                        repositorySystem.injectAuthentication( request.getRepositorySession(), Arrays.asList( repo ) );
+                        repositorySystem.injectMirror( request.getRepositorySession(),
+                                Collections.singletonList( repo ) );
+                        repositorySystem.injectProxy( request.getRepositorySession(),
+                                Collections.singletonList( repo ) );
+                        repositorySystem.injectAuthentication( request.getRepositorySession(),
+                                Collections.singletonList( repo ) );
                         repos.add( repo );
                     }
                     catch ( InvalidRepositoryException e )

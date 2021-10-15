@@ -20,7 +20,7 @@ package org.apache.maven.settings.crypto;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.settings.Proxy;
@@ -66,7 +66,7 @@ public class DefaultSettingsDecryptionRequest
      */
     public DefaultSettingsDecryptionRequest( Server server )
     {
-        this.servers = new ArrayList<>( Arrays.asList( server ) );
+        this.servers = new ArrayList<>( Collections.singletonList( server ) );
     }
 
     /**
@@ -76,7 +76,7 @@ public class DefaultSettingsDecryptionRequest
      */
     public DefaultSettingsDecryptionRequest( Proxy proxy )
     {
-        this.proxies = new ArrayList<>( Arrays.asList( proxy ) );
+        this.proxies = new ArrayList<>( Collections.singletonList( proxy ) );
     }
 
     @Override

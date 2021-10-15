@@ -31,7 +31,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -60,6 +60,6 @@ public class PomlessCollectionStrategy
         project.setExecutionRoot( true );
         request.setProjectPresent( false );
 
-        return Arrays.asList( project );
+        return Collections.singletonList( project );
     }
 }

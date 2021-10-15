@@ -20,7 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -81,9 +81,9 @@ public final class ProjectUtils
 
         if ( session != null )
         {
-            repositorySystem.injectMirror( session, Arrays.asList( repository ) );
-            repositorySystem.injectProxy( session, Arrays.asList( repository ) );
-            repositorySystem.injectAuthentication( session, Arrays.asList( repository ) );
+            repositorySystem.injectMirror( session, Collections.singletonList( repository ) );
+            repositorySystem.injectProxy( session, Collections.singletonList( repository ) );
+            repositorySystem.injectAuthentication( session, Collections.singletonList( repository ) );
         }
 
         return repository;
