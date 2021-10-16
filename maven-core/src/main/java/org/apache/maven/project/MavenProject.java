@@ -92,9 +92,13 @@ import org.slf4j.LoggerFactory;
 public class MavenProject
     implements Cloneable
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger( MavenProject.class );
+
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
+
     public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
+
     public static final String EMPTY_PROJECT_VERSION = "0";
 
     private Model model;
@@ -106,6 +110,10 @@ public class MavenProject
     private File basedir;
 
     private Set<Artifact> resolvedArtifacts;
+
+    private ArtifactFilter artifactFilter;
+
+    private Set<Artifact> artifacts;
 
     private Artifact parentArtifact;
 
@@ -143,7 +151,8 @@ public class MavenProject
 
     private Artifact artifact;
 
-    private ThreadLocal<ArtifactsHolder> threadLocalArtifactsHolder = newThreadLocalArtifactsHolder();
+    // calculated.
+    private Map<String, Artifact> artifactMap;
 
     private Model originalModel;
 
@@ -176,21 +185,12 @@ public class MavenProject
     public MavenProject()
     {
         Model model = new Model();
+
         model.setGroupId( EMPTY_PROJECT_GROUP_ID );
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
-        setModel( model );
-    }
 
-    private static ThreadLocal<ArtifactsHolder> newThreadLocalArtifactsHolder()
-    {
-        return new ThreadLocal<ArtifactsHolder>()
-        {
-            protected ArtifactsHolder initialValue()
-            {
-                return new ArtifactsHolder();
-            }
-        };
+        setModel( model );
     }
 
     public MavenProject( Model model )
@@ -695,11 +695,10 @@ public class MavenProject
 
     public void setArtifacts( Set<Artifact> artifacts )
     {
-        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
-        artifactsHolder.artifacts = artifacts;
+        this.artifacts = artifacts;
 
         // flush the calculated artifactMap
-        artifactsHolder.artifactMap = null;
+        artifactMap = null;
     }
 
     /**
@@ -712,36 +711,34 @@ public class MavenProject
      */
     public Set<Artifact> getArtifacts()
     {
-        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
-        if ( artifactsHolder.artifacts == null )
+        if ( artifacts == null )
         {
-            if ( artifactsHolder.artifactFilter == null || resolvedArtifacts == null )
+            if ( artifactFilter == null || resolvedArtifacts == null )
             {
-                artifactsHolder.artifacts = new LinkedHashSet<>();
+                artifacts = new LinkedHashSet<>();
             }
             else
             {
-                artifactsHolder.artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
+                artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
                 for ( Artifact artifact : resolvedArtifacts )
                 {
-                    if ( artifactsHolder.artifactFilter.include( artifact ) )
+                    if ( artifactFilter.include( artifact ) )
                     {
-                        artifactsHolder.artifacts.add( artifact );
+                        artifacts.add( artifact );
                     }
                 }
             }
         }
-        return artifactsHolder.artifacts;
+        return artifacts;
     }
 
     public Map<String, Artifact> getArtifactMap()
     {
-        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
-        if ( artifactsHolder.artifactMap == null )
+        if ( artifactMap == null )
         {
-            artifactsHolder.artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
-        return artifactsHolder.artifactMap;
+        return artifactMap;
     }
 
     public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
@@ -1186,8 +1183,7 @@ public class MavenProject
         {
             throw new UnsupportedOperationException( e );
         }
-        // clone must have it's own TL, otherwise the artifacts are intermingled!
-        clone.threadLocalArtifactsHolder = newThreadLocalArtifactsHolder();
+
         clone.deepCopy( this );
 
         return clone;
@@ -1230,13 +1226,17 @@ public class MavenProject
         // copy fields
         file = project.file;
         basedir = project.basedir;
-        threadLocalArtifactsHolder.set( project.threadLocalArtifactsHolder.get().copy() );
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
         if ( project.getDependencyArtifacts() != null )
         {
             setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
+        }
+
+        if ( project.getArtifacts() != null )
+        {
+            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
         }
 
         if ( project.getParentFile() != null )
@@ -1433,9 +1433,8 @@ public class MavenProject
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
         this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
-        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
-        artifactsHolder.artifacts = null;
-        artifactsHolder.artifactMap = null;
+        this.artifacts = null;
+        this.artifactMap = null;
     }
 
     /**
@@ -1448,10 +1447,9 @@ public class MavenProject
      */
     public void setArtifactFilter( ArtifactFilter artifactFilter )
     {
-        ArtifactsHolder artifactsHolder = threadLocalArtifactsHolder.get();
-        artifactsHolder.artifactFilter = artifactFilter;
-        artifactsHolder.artifacts = null;
-        artifactsHolder.artifactMap = null;
+        this.artifactFilter = artifactFilter;
+        this.artifacts = null;
+        this.artifactMap = null;
     }
 
     /**
@@ -1481,7 +1479,13 @@ public class MavenProject
 
     // ----------------------------------------------------------------------------------------------------------------
     //
-    // D E P R E C A T E D - Everything below will be removed for Maven 4.0.0
+    //
+    // D E P R E C A T E D
+    //
+    //
+    // ----------------------------------------------------------------------------------------------------------------
+    //
+    // Everything below will be removed for Maven 4.0.0
     //
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -1502,6 +1506,7 @@ public class MavenProject
         if ( moduleFile != null )
         {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
+
             module = moduleDir.getName();
         }
 
@@ -1822,6 +1827,7 @@ public class MavenProject
     public void setReportArtifacts( Set<Artifact> reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
+
         reportArtifactMap = null;
     }
 
@@ -1838,6 +1844,7 @@ public class MavenProject
         {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getReportArtifacts() );
         }
+
         return reportArtifactMap;
     }
 
@@ -1845,6 +1852,7 @@ public class MavenProject
     public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
+
         extensionArtifactMap = null;
     }
 
@@ -1861,6 +1869,7 @@ public class MavenProject
         {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getExtensionArtifacts() );
         }
+
         return extensionArtifactMap;
     }
 
@@ -1878,6 +1887,7 @@ public class MavenProject
     public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
     {
         Xpp3Dom dom = null;
+
         // ----------------------------------------------------------------------
         // I would like to be able to lookup the Mojo object using a key but
         // we have a limitation in modello that will be remedied shortly. So
@@ -1980,21 +1990,5 @@ public class MavenProject
     public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
     {
         this.projectBuilderConfiguration = projectBuildingRequest;
-    }
-
-    private static class ArtifactsHolder
-    {
-        private ArtifactFilter artifactFilter;
-        private Set<Artifact> artifacts;
-        private Map<String, Artifact> artifactMap;
-
-        ArtifactsHolder copy()
-        {
-           ArtifactsHolder copy = new ArtifactsHolder();
-           copy.artifactFilter = artifactFilter;
-           copy.artifacts = artifacts != null ? new LinkedHashSet<>( artifacts ) : null;
-           copy.artifactMap = artifactMap != null ? new LinkedHashMap<>( artifactMap ) : null;
-           return copy;
-        }
     }
 }
