@@ -21,18 +21,13 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
-import org.mockito.Mockito;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -191,44 +186,6 @@ public class MavenProjectTest
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "POM file is preserved across clone", projectToClone.getFile(), clonedProject.getFile() );
         assertEquals( "Base directory is preserved across clone", projectToClone.getBasedir(), clonedProject.getBasedir() );
-    }
-
-    public void testCloneWithArtifacts()
-        throws InterruptedException
-    {
-        Artifact initialArtifact = Mockito.mock( Artifact.class, "initialArtifact" );
-        MavenProject originalProject = new MavenProject();
-        originalProject.setArtifacts( Collections.singleton( initialArtifact ) );
-        assertEquals( "Sanity check: originalProject returns artifact that has just been set",
-                      Collections.singleton( initialArtifact ), originalProject.getArtifacts() );
-
-        final MavenProject clonedProject = originalProject.clone();
-
-        assertEquals( "Cloned project returns the artifact that was set for the original project",
-                      Collections.singleton( initialArtifact ), clonedProject.getArtifacts() );
-
-        Artifact anotherArtifact = Mockito.mock( Artifact.class, "anotherArtifact" );
-        clonedProject.setArtifacts( Collections.singleton( anotherArtifact ) );
-        assertEquals( "Sanity check: clonedProject returns artifact that has just been set",
-                      Collections.singleton( anotherArtifact ), clonedProject.getArtifacts() );
-
-        assertEquals( "Original project returns the artifact that was set initially (not the one for clonedProject)",
-                      Collections.singleton( initialArtifact ), originalProject.getArtifacts() );
-
-        final AtomicReference<Set<Artifact>> artifactsFromThread = new AtomicReference<>();
-        Thread thread = new Thread( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                artifactsFromThread.set( clonedProject.getArtifacts() );
-            }
-        } );
-        thread.start();
-        thread.join();
-
-        assertEquals( "Another thread does not see the same artifacts",
-                      Collections.emptySet(), artifactsFromThread.get() );
     }
 
     public void testUndefinedOutputDirectory()
