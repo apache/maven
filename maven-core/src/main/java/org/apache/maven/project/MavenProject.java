@@ -1157,14 +1157,9 @@ public class MavenProject
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( 128 );
-        sb.append( "MavenProject: " );
-        sb.append( getGroupId() );
-        sb.append( ':' );
-        sb.append( getArtifactId() );
-        sb.append( ':' );
-        sb.append( getVersion() );
-        sb.append( " @ " );
+        StringBuilder sb =
+            new StringBuilder( 128 ).append( "MavenProject: " ).append( getGroupId() ).append( ':' )
+                .append( getArtifactId() ).append( ':' ).append( getVersion() ).append( " @ " );
 
         try
         {
@@ -1581,12 +1576,9 @@ public class MavenProject
         if ( path != null )
         {
             path = path.trim();
-            if ( path.length() != 0 )
+            if ( ( path.length() != 0 ) && !getScriptSourceRoots().contains( path ) )
             {
-                if ( !getScriptSourceRoots().contains( path ) )
-                {
-                    getScriptSourceRoots().add( path );
-                }
+                getScriptSourceRoots().add( path );
             }
         }
     }
@@ -1637,14 +1629,12 @@ public class MavenProject
                      || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
-
                 dependency.setArtifactId( a.getArtifactId() );
                 dependency.setGroupId( a.getGroupId() );
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
                 dependency.setClassifier( a.getClassifier() );
-
                 list.add( dependency );
             }
         }
@@ -1682,14 +1672,12 @@ public class MavenProject
         for ( Artifact a : getArtifacts() )
         {
             Dependency dependency = new Dependency();
-
             dependency.setArtifactId( a.getArtifactId() );
             dependency.setGroupId( a.getGroupId() );
             dependency.setVersion( a.getVersion() );
             dependency.setScope( a.getScope() );
             dependency.setType( a.getType() );
             dependency.setClassifier( a.getClassifier() );
-
             list.add( dependency );
         }
         return Collections.unmodifiableList( list );
@@ -1713,14 +1701,12 @@ public class MavenProject
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
-
                 dependency.setArtifactId( a.getArtifactId() );
                 dependency.setGroupId( a.getGroupId() );
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
                 dependency.setClassifier( a.getClassifier() );
-
                 list.add( dependency );
             }
         }
@@ -1802,21 +1788,18 @@ public class MavenProject
         }
 
         List<Dependency> list = new ArrayList<>( artifacts.size() );
-
         for ( Artifact a : getArtifacts() )
         {
             // TODO let the scope handler deal with this
             if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
-
                 dependency.setArtifactId( a.getArtifactId() );
                 dependency.setGroupId( a.getGroupId() );
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
                 dependency.setClassifier( a.getClassifier() );
-
                 list.add( dependency );
             }
         }

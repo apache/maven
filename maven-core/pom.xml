@@ -192,7 +192,6 @@ under the License.
               <exclude>plugin-manager.txt</exclude>
               <exclude>project-builder.txt</exclude>
               <exclude>src/site/resources/design/**</exclude>
-              <exclude>src/main/resources/cache-*</exclude>
             </excludes>
           </configuration>
         </plugin>
