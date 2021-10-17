@@ -72,8 +72,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
         catch ( final VerificationException ve )
         {
-            verifier.verifyTextInLog( "mvn <args> -r" );
-            verifyTextNotInLog( verifier, "mvn <args> -rf :module-b" );
+            verifier.verifyTextInLog( "mvn [args] -r" );
+            verifyTextNotInLog( verifier, "mvn [args] -rf :module-b" );
         }
         finally
         {
@@ -143,7 +143,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
         catch ( final VerificationException ve )
         {
-            verifier.verifyTextInLog( "mvn <args> -r" );
+            verifier.verifyTextInLog( "mvn [args] -r" );
         }
         finally
         {
