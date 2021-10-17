@@ -113,7 +113,7 @@ public class ResolutionNode
 
     /**
      * @return {@link List} &lt; {@link String} &gt; with artifact ids
-     * @throws OverConstrainedVersionException
+     * @throws OverConstrainedVersionException if version specification is over constrained
      */
     public List<String> getDependencyTrail()
         throws OverConstrainedVersionException
@@ -172,6 +172,8 @@ public class ResolutionNode
 
     /**
      * Test whether the node is direct or transitive dependency.
+     *
+     * @return whether the node is direct or transitive dependency
      */
     public boolean isChildOfRootNode()
     {

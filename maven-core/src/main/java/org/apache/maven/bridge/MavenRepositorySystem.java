@@ -614,8 +614,8 @@ public class MavenRepositorySystem
     /**
      * Source from org.apache.maven.repository.legacy.LegacyRepositorySystem#getEffectiveRepositories
      *
-     * @param repositories
-     * @return
+     * @param repositories a list of repositories
+     * @return corresponding effective repositories
      * @since 3.6.1
      */
     public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )

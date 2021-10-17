@@ -34,6 +34,7 @@ public interface Source
      * Gets a byte stream to the source contents. Closing the returned stream is the responsibility of the caller.
      *
      * @return A byte stream to the source contents, never {@code null}.
+     * @throws IOException in case of IO issue
      */
     InputStream getInputStream()
         throws IOException;

@@ -72,6 +72,7 @@ public interface ClassRealmRequest
 
     /**
      * @deprecated Use {@link #getParentImports()} instead.
+     * @return imports
      */
     @Deprecated
     List<String> getImports();

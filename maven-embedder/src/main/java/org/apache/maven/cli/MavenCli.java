@@ -217,6 +217,12 @@ public class MavenCli
      * This supports painless invocation by the Verifier during embedded execution of the core ITs.
      * See <a href="http://maven.apache.org/shared/maven-verifier/xref/org/apache/maven/it/Embedded3xLauncher.html">
      * <code>Embedded3xLauncher</code> in <code>maven-verifier</code></a>
+     *
+     * @param args CLI args
+     * @param workingDirectory working directory
+     * @param stdout stdout
+     * @param stderr stderr
+     * @return return code
      */
     public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
     {

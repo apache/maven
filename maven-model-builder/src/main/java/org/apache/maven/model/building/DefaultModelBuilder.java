@@ -167,7 +167,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#set
+     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor) 
      */
     @Deprecated
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
@@ -223,7 +223,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#set
+     * @see DefaultModelBuilderFactory#setModelPathTranslator(ModelPathTranslator)
      */
     @Deprecated
     public DefaultModelBuilder setModelPathTranslator( ModelPathTranslator modelPathTranslator )
@@ -279,7 +279,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#set
+     * @see DefaultModelBuilderFactory#setProfileSelector(ProfileSelector)
      */
     @Deprecated
     public DefaultModelBuilder setProfileSelector( ProfileSelector profileSelector )

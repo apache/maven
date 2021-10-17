@@ -39,7 +39,7 @@ import java.util.List;
  * Could encode these variants as subclasses, but kept in one for now
  *
  * @author bbusjaeger
- * @param <T>
+ * @param <T> the model type
  */
 public class Result<T>
 {

@@ -73,10 +73,16 @@ public interface ArtifactRepository
     @Deprecated
     void setBlacklisted( boolean blackListed );
 
-    /** @since 3.8.1 **/
+    /**
+     * @return whether the repository is blocked
+     * @since 3.8.1
+     **/
     boolean isBlocked();
 
-    /** @since 3.8.1 **/
+    /**
+     * @param blocked block the repository?
+     * @since 3.8.1
+     **/
     void setBlocked( boolean blocked );
 
     //
@@ -84,7 +90,8 @@ public interface ArtifactRepository
     //
     /**
      *
-     * @param artifact
+     * @param artifact an artifact
+     * @return found artifact
      * @since 3.0-alpha-3
      */
     Artifact find( Artifact artifact );
@@ -108,20 +115,26 @@ public interface ArtifactRepository
     boolean isProjectAware();
 
     /**
+     * @param authentication authentication
      * @since 3.0-alpha-3
      */
     void setAuthentication( Authentication authentication );
+
     /**
+     * @return repository authentication
      * @since 3.0-alpha-3
      */
     Authentication getAuthentication();
 
     /**
+     * @param proxy proxy
      * @since 3.0-alpha-3
      */
     void setProxy( Proxy proxy );
+
     /**
      * @since 3.0-alpha-3
+     * @return repository proxy
      */
     Proxy getProxy();
 

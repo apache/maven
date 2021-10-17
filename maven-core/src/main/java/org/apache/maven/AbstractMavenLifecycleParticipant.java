@@ -39,6 +39,9 @@ public abstract class AbstractMavenLifecycleParticipant
      *
      * This callback is intended to allow extensions to manipulate MavenProjects
      * before they are sorted and actual build execution starts.
+     *
+     * @param session the Maven session
+     * @throws MavenExecutionException in case of issue
      */
     public void afterProjectsRead( MavenSession session )
         throws MavenExecutionException
@@ -52,6 +55,9 @@ public abstract class AbstractMavenLifecycleParticipant
      * This callback is intended to allow extensions to inject execution properties,
      * activate profiles and perform similar tasks that affect MavenProject
      * instance construction.
+     *
+     * @param session the Maven session
+     * @throws MavenExecutionException in case of issue
      */
     // TODO This is too early for build extensions, so maybe just remove it?
     public void afterSessionStart( MavenSession session )
@@ -67,6 +73,9 @@ public abstract class AbstractMavenLifecycleParticipant
      * allocated external resources after the build. It is invoked on best-effort
      * basis and may be missed due to an Error or RuntimeException in Maven core
      * code.
+     *
+     * @param session the Maven session
+     * @throws MavenExecutionException in case of issue
      * @since 3.2.1, MNG-5389
      */
     public void afterSessionEnd( MavenSession session )

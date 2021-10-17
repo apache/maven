@@ -45,6 +45,8 @@ public interface ProjectDependenciesResolver
      * @param scopesToResolve The dependency scopes that should be resolved, may be {@code null}.
      * @param session         The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
+     * @throws ArtifactResolutionException in case of resolution issue
+     * @throws ArtifactNotFoundException if an artifact is not found
      */
     Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException;
@@ -57,6 +59,8 @@ public interface ProjectDependenciesResolver
      * @param scopesToResolve The dependency scopes that should be collected and also resolved, may be {@code null}.
      * @param session         The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
+     * @throws ArtifactResolutionException in case of resolution issue
+     * @throws ArtifactNotFoundException if an artifact is not found
      */
     Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
                            Collection<String> scopesToResolve, MavenSession session )
@@ -71,6 +75,8 @@ public interface ProjectDependenciesResolver
      * @param session             The current build session, must not be {@code null}.
      * @param ignoreableArtifacts Artifacts that need not be resolved
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
+     * @throws ArtifactResolutionException in case of resolution issue
+     * @throws ArtifactNotFoundException if an artifact is not found
      */
     Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
                            Collection<String> scopesToResolve, MavenSession session, Set<Artifact> ignoreableArtifacts )
@@ -87,6 +93,8 @@ public interface ProjectDependenciesResolver
      * @param session  The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified projects that match the requested scopes, never
      *         {@code null}.
+     * @throws ArtifactResolutionException in case of resolution issue
+     * @throws ArtifactNotFoundException if an artifact is not found
      */
     Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
                            MavenSession session )

@@ -311,7 +311,7 @@ public class DefaultRepositoryMetadataManager
         return setRepository;
     }
 
-    /**
+    /*
      * TODO share with DefaultPluginMappingManager.
      */
     protected Metadata readMetadata( File mappingFile )

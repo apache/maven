@@ -101,8 +101,7 @@ public class VersionRange
      *
      * @param spec string representation of a version or version range
      * @return a new {@link VersionRange} object that represents the spec
-     * @throws InvalidVersionSpecificationException
-     *
+     * @throws InvalidVersionSpecificationException if invalid version specification
      */
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException

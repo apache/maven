@@ -37,7 +37,12 @@ public class MultipleArtifactsNotFoundException
     private final List<Artifact> resolvedArtifacts;
     private final List<Artifact> missingArtifacts;
 
-    /** @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} */
+    /**
+     * @param originatingArtifact the artifact that was being resolved
+     * @param missingArtifacts    artifacts that could not be resolved
+     * @param remoteRepositories  remote repositories where the missing artifacts were not found
+     * @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)}
+     */
     @Deprecated
     public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
                                                List<Artifact> missingArtifacts,

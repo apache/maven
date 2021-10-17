@@ -46,7 +46,7 @@ public interface ProblemCollector
      * The next messages will be bound to this source. When calling this method again, previous messages keep
      * their source, but the next messages will use the new source.
      *
-     * @param source
+     * @param source a source
      */
     void setSource( String source );
 

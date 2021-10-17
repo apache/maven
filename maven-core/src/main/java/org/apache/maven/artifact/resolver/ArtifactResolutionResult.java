@@ -189,6 +189,9 @@ public class ArtifactResolutionResult
      * TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
      *       DefaultLegacyArtifactCollector
+     *
+     * @param e an exception
+     * @return {@code this}
      */
     public ArtifactResolutionResult addVersionRangeViolation( Exception e )
     {

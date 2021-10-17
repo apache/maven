@@ -40,6 +40,9 @@ public interface WagonManager
     /**
      * this method is only here for backward compat (project-info-reports:dependencies)
      * the default implementation will return an empty AuthenticationInfo
+     *
+     * @param id an id
+     * @return corresponding authentication info
      */
     AuthenticationInfo getAuthenticationInfo( String id );
 

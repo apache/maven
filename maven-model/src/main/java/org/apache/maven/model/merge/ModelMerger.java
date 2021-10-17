@@ -2640,7 +2640,7 @@ public class ModelMerger
 
     /**
      * Use to compute keys for data structures
-     * @param <T>
+     * @param <T> the data structure type
      */
     @FunctionalInterface
     public interface KeyComputer<T> extends Function<T, Object>
