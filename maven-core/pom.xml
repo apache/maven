@@ -217,7 +217,34 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>modello-site-doc</id>
+            <id>modello-site-docs-cache</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/cache-domain.mdo</model>
+              </models>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-cache</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/cache-domain.mdo</model>
+              </models>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-site-docs-extension</id>
             <phase>pre-site</phase>
             <goals>
               <goal>xdoc</goal>
