@@ -1059,7 +1059,7 @@ public class MavenCli
 
             if ( result.canResume() )
             {
-                logBuildResumeHint( "mvn <args> -r" );
+                logBuildResumeHint( "mvn [args] -r" );
             }
             else if ( !failedProjects.isEmpty() )
             {
@@ -1072,7 +1072,7 @@ public class MavenCli
                 if ( !firstFailedProject.equals( sortedProjects.get( 0 ) ) )
                 {
                     String resumeFromSelector = getResumeFromSelector( sortedProjects, firstFailedProject );
-                    logBuildResumeHint( "mvn <args> -rf " + resumeFromSelector );
+                    logBuildResumeHint( "mvn [args] -rf " + resumeFromSelector );
                 }
             }
 
