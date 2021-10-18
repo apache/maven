@@ -250,7 +250,7 @@ public class DefaultMaven
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
-        Result<? extends ProjectDependencyGraph> graphResult = buildGraph( session, result );
+        Result<? extends ProjectDependencyGraph> graphResult = buildGraph( session );
 
         if ( graphResult.hasErrors() )
         {
@@ -306,7 +306,7 @@ public class DefaultMaven
         // not expected that a participant will add or remove projects from the session.
         //
 
-        graphResult = buildGraph( session, result );
+        graphResult = buildGraph( session );
 
         if ( graphResult.hasErrors() )
         {
@@ -671,7 +671,7 @@ public class DefaultMaven
         return index;
     }
 
-    private Result<? extends ProjectDependencyGraph> buildGraph( MavenSession session, MavenExecutionResult result )
+    private Result<? extends ProjectDependencyGraph> buildGraph( MavenSession session )
     {
         Result<? extends ProjectDependencyGraph> graphResult = graphBuilder.build( session );
         for ( ModelProblem problem : graphResult.getProblems() )
