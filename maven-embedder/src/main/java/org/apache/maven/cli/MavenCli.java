@@ -511,6 +511,19 @@ public class MavenCli
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
 
+        String[] verboseLoggers = null;
+        if ( cliRequest.commandLine.hasOption( CLIManager.VERBOSE_LOGGERS ) )
+        {
+            verboseLoggers = cliRequest.commandLine.getOptionValues( CLIManager.VERBOSE_LOGGERS );
+        }
+        if ( verboseLoggers != null )
+        {
+            for ( String verboseLogger : verboseLoggers )
+            {
+                slf4jConfiguration.setLoggerLevel( verboseLogger, Slf4jConfiguration.Level.DEBUG );
+            }
+        }
+
         if ( cliRequest.verbose )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );

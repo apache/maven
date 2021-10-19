@@ -33,11 +33,19 @@ public class BaseSlf4jConfiguration
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( BaseSlf4jConfiguration.class );
 
+    @Override
     public void setRootLoggerLevel( Level level )
     {
         LOGGER.warn( "setRootLoggerLevel: operation not supported" );
     }
 
+    @Override
+    public void setLoggerLevel( final String loggerName, final Level level )
+    {
+        LOGGER.warn( "setLoggerLevel: operation not supported" );
+    }
+
+    @Override
     public void activate()
     {
         LOGGER.warn( "reset(): operation not supported" );

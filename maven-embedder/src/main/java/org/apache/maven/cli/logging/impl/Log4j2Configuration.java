@@ -33,6 +33,12 @@ public class Log4j2Configuration
     @Override
     public void setRootLoggerLevel( Level level )
     {
+        setLoggerLevel( "root", level );
+    }
+
+    @Override
+    public void setLoggerLevel( final String loggerName, final Level level )
+    {
         String value;
         switch ( level )
         {
@@ -48,7 +54,7 @@ public class Log4j2Configuration
                 value = "error";
                 break;
         }
-        System.setProperty( "maven.logging.root.level", value );
+        System.setProperty( "maven.logging." + loggerName +  ".level", value );
     }
 
     @Override

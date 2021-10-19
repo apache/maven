@@ -23,6 +23,8 @@ import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Configuration for slf4j-logback.
  *
@@ -35,6 +37,14 @@ public class LogbackConfiguration
     @Override
     public void setRootLoggerLevel( Level level )
     {
+        setLoggerLevel( Logger.ROOT_LOGGER_NAME, level );
+    }
+
+    @Override
+    public void setLoggerLevel( final String loggerName, final Level level )
+    {
+        requireNonNull( loggerName );
+        requireNonNull( level );
         ch.qos.logback.classic.Level value;
         switch ( level )
         {
@@ -50,7 +60,7 @@ public class LogbackConfiguration
                 value = ch.qos.logback.classic.Level.ERROR;
                 break;
         }
-        ( (ch.qos.logback.classic.Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME ) ).setLevel( value );
+        ( ( ch.qos.logback.classic.Logger ) LoggerFactory.getLogger( loggerName ) ).setLevel( value );
     }
 
     @Override
