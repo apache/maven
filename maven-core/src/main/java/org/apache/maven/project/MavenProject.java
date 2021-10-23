@@ -951,7 +951,7 @@ public class MavenProject
         {
             attachedArtifacts = new ArrayList<>();
         }
-        return Collections.unmodifiableList( attachedArtifacts );
+        return attachedArtifacts;
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,

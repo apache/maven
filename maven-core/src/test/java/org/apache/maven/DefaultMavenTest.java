@@ -34,6 +34,15 @@ public class DefaultMavenTest
     extends AbstractCoreMavenComponentTestCase
 {
 
+    public void testMavenProjectEditArtifacts()
+        throws Exception
+    {
+        MavenProject mavenProject = new MavenProject();
+        DefaultArtifact artifact = new DefaultArtifact( "g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null );
+        mavenProject.getAttachedArtifacts().add( artifact );
+        mavenProject.getAttachedArtifacts().remove( artifact );
+    }
+
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
             throws Exception
     {
