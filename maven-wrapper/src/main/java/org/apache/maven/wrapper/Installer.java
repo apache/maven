@@ -40,6 +40,8 @@ import java.util.zip.ZipFile;
 
 
 /**
+ * Maven distribution installer, eventually using a {@link Downloader} first.
+ *
  * @author Hans Dockter
  */
 public class Installer

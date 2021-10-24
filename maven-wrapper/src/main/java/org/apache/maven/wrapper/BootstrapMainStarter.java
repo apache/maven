@@ -28,6 +28,8 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
+ * Maven starter, from a provided Maven home directory.
+ *
  * @author Hans Dockter
  */
 public class BootstrapMainStarter

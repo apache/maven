@@ -28,6 +28,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 /**
+ * Wrapper executor, running {@link Installer} to get a Maven distribution ready, followed by {@BootstrapMainStarter}
+ * to launch the Maven bootstrap.
+ * 
  * @author Hans Dockter
  */
 public class WrapperExecutor

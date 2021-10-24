@@ -44,6 +44,8 @@ import java.net.URI;
 import java.nio.file.Path;
 
 /**
+ * Maven distribution downloader.
+ *
  * @author Hans Dockter
  */
 public interface Downloader

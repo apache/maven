@@ -28,6 +28,8 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
+ * Main entry point for the Maven Wrapper, delegating wrapper execution to {@link WrapperExecutor}.
+ *
  * @author Hans Dockter
  */
 public class MavenWrapperMain

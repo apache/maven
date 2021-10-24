@@ -25,6 +25,6 @@
 
 Maven Wrapper
 
- Maven Wrapper dowloads Maven distribution if not already in cache, then launches Maven.
+ Maven Wrapper dowloads Maven distribution if not already in cache, installs it, then launches Maven: Maven distributions installed by Maven Wrapper are stored under <<<~/.m2/wrapper/dists>>> by default.
 
- It is called by {{{../apache-maven-wrapper/}<<<mvnw>>>/<<<mvnw.cmd>>> scripts}} that need to be installed in the project and called instead of <<<mvn>>>/<<<mvn.cmd>>>.
+ Maven Wrapper is called by {{{../apache-maven-wrapper/}<<<mvnw>>>/<<<mvnw.cmd>>> scripts}} that need to be installed in the project source tree and called instead of <<<mvn>>>/<<<mvn.cmd>>>.
