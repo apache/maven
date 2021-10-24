@@ -84,3 +84,4 @@ concat_lines() {
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+MAVEN_ARGS="$MAVEN_ARGS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/maven.config"`"

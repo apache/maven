@@ -92,3 +92,10 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 :endReadJvmConfig
 
+if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\maven.config" goto endReadMavenConfig
+
+@setlocal EnableExtensions EnableDelayedExpansion
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\maven.config") do set MAVEN_CONFIG_MAVEN_PROPS=!MAVEN_CONFIG_MAVEN_PROPS! %%a
+@endlocal & set MAVEN_ARGS=%MAVEN_ARGS% %MAVEN_CONFIG_MAVEN_PROPS%
+
+:endReadMavenConfig
