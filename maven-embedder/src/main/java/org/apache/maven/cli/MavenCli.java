@@ -27,8 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,7 +42,6 @@ import java.util.regex.Pattern;
 
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -146,8 +143,6 @@ public class MavenCli {
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
     private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
-
-    private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
@@ -339,36 +334,8 @@ public class MavenCli {
 
         cliManager = new CLIManager();
 
-        List<String> args = new ArrayList<>();
-        CommandLine mavenConfig = null;
         try {
-            File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
-
-            if (configFile.isFile()) {
-                for (String arg : Files.readAllLines(configFile.toPath(), Charset.defaultCharset())) {
-                    if (!arg.isEmpty()) {
-                        args.add(arg);
-                    }
-                }
-
-                mavenConfig = cliManager.parse(args.toArray(new String[0]));
-                List<?> unrecognized = mavenConfig.getArgList();
-                if (!unrecognized.isEmpty()) {
-                    throw new ParseException("Unrecognized maven.config entries: " + unrecognized);
-                }
-            }
-        } catch (ParseException e) {
-            System.err.println("Unable to parse maven.config: " + e.getMessage());
-            cliManager.displayHelp(System.out);
-            throw e;
-        }
-
-        try {
-            if (mavenConfig == null) {
-                cliRequest.commandLine = cliManager.parse(cliRequest.args);
-            } else {
-                cliRequest.commandLine = cliMerge(cliManager.parse(cliRequest.args), mavenConfig);
-            }
+            cliRequest.commandLine = cliManager.parse(cliRequest.args);
         } catch (ParseException e) {
             System.err.println("Unable to parse command line options: " + e.getMessage());
             cliManager.displayHelp(System.out);
@@ -390,36 +357,6 @@ public class MavenCli {
             }
             throw new ExitException(0);
         }
-    }
-
-    private CommandLine cliMerge(CommandLine mavenArgs, CommandLine mavenConfig) {
-        CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
-
-        // the args are easy, cli first then config file
-        for (String arg : mavenArgs.getArgs()) {
-            commandLineBuilder.addArg(arg);
-        }
-        for (String arg : mavenConfig.getArgs()) {
-            commandLineBuilder.addArg(arg);
-        }
-
-        // now add all options, except for -D with cli first then config file
-        List<Option> setPropertyOptions = new ArrayList<>();
-        for (Option opt : mavenArgs.getOptions()) {
-            if (String.valueOf(CLIManager.SET_USER_PROPERTY).equals(opt.getOpt())) {
-                setPropertyOptions.add(opt);
-            } else {
-                commandLineBuilder.addOption(opt);
-            }
-        }
-        for (Option opt : mavenConfig.getOptions()) {
-            commandLineBuilder.addOption(opt);
-        }
-        // finally add the CLI user properties
-        for (Option opt : setPropertyOptions) {
-            commandLineBuilder.addOption(opt);
-        }
-        return commandLineBuilder.build();
     }
 
     /**
