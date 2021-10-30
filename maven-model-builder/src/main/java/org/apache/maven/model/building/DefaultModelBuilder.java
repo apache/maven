@@ -1660,14 +1660,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model,
             ModelBuildingRequest request,
             DefaultModelProblemCollector problems,
-            Collection<String> importIds) {
+            Collection<String> importIds) { // a chain of model ID's that caused this depMgt to be loaded?!
         DependencyManagement depMgmt = model.getDependencyManagement();
 
         if (depMgmt == null) {
             return;
         }
 
-        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
+        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();// the one that's causing the iport to happen?
 
         importIds.add(importing);
 
@@ -1690,7 +1690,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                     importMgmts = new ArrayList<>();
                 }
 
-                importMgmts.add(importMgmt.getDelegate());
+                if (request.isLocationTracking()) {
+                    // Keep track of why this DependencyManagement was imported.
+                    importMgmts.add(
+                        org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
+                                .importedFrom(dependency.getDelegate().getLocation(""))
+                                .build()
+                    );
+                } else {
+                    importMgmts.add(importMgmt.getDelegate());
+                }
             }
         }
 

@@ -32,6 +32,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
+    private final InputLocation importedFrom = null;
 
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
@@ -81,6 +82,13 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     public Map<Object, InputLocation> getLocations() {
         return locations;
+    }
+
+    /**
+     * Gets the input location that caused this model to be read.
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
     }
 
     /**
@@ -168,5 +176,10 @@ public class InputLocation implements Serializable, InputLocationTracker {
          * Method toString.
          */
         String toString(InputLocation location);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s @ %d:%d", source.getLocation(), lineNumber, columnNumber);
     }
 }

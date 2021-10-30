@@ -20,4 +20,6 @@ package org.apache.maven.api.model;
 
 public interface InputLocationTracker {
     InputLocation getLocation(Object field);
+
+    InputLocation getImportedFrom();
 }

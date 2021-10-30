@@ -33,11 +33,19 @@ public class InputSource implements Serializable {
     private final String modelId;
     private final String location;
     private final List<InputSource> inputs;
+    private final InputLocation importedFrom;
 
     public InputSource(String modelId, String location) {
         this.modelId = modelId;
         this.location = location;
         this.inputs = null;
+        this.importedFrom = null;
+    }
+
+    private InputSource(String modelId, String location, InputLocation importedFrom) {
+        this.modelId = modelId;
+        this.location = location;
+        this.importedFrom = importedFrom;
     }
 
     public InputSource(Collection<InputSource> inputs) {
@@ -62,6 +70,14 @@ public class InputSource implements Serializable {
      */
     public String getModelId() {
         return this.modelId;
+    }
+
+    public InputLocation getImportedFrom() {
+        return importedFrom;
+    }
+
+    public InputSource importedFrom(InputLocation importedFrom) {
+        return new InputSource(modelId, location, importedFrom);
     }
 
     @Override
