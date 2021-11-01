@@ -43,6 +43,7 @@ import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginIncompatibleException;
@@ -71,18 +72,22 @@ public class MojoExecutor
     private final MavenPluginManager mavenPluginManager;
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
     private final ExecutionEventCatapult eventCatapult;
+    private final MojosExecutionStrategy mojosExecutionStrategy;
 
     @Inject
     public MojoExecutor(
             BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
-            ExecutionEventCatapult eventCatapult )
+            ExecutionEventCatapult eventCatapult,
+            MojosExecutionStrategy mojosExecutionStrategy
+    )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
         this.eventCatapult = eventCatapult;
+        this.mojosExecutionStrategy = mojosExecutionStrategy;
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
@@ -140,21 +145,22 @@ public class MojoExecutor
         return Collections.unmodifiableCollection( scopes );
     }
 
-    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
-        throws LifecycleExecutionException
+    public void execute( final MavenSession session,
+                         List<MojoExecution> mojoExecutions,
+                         final ProjectIndex projectIndex ) throws LifecycleExecutionException
 
     {
         DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        for ( MojoExecution mojoExecution : mojoExecutions )
+        mojosExecutionStrategy.execute( mojoExecutions, session, mojoExecution ->
         {
             execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
-        }
+        } );
     }
 
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                          DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
         throws LifecycleExecutionException
     {

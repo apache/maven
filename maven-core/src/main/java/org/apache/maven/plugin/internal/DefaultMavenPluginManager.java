@@ -492,6 +492,21 @@ public class DefaultMavenPluginManager
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
 
+        if ( pluginRealm == null )
+        {
+            try
+            {
+                setupPluginRealm( pluginDescriptor, session, null, null, null );
+            }
+            catch ( PluginResolutionException e )
+            {
+                String msg = "Cannot setup plugin realm [mojoDescriptor=" + mojoDescriptor.getId()
+                        + ", pluginDescriptor=" + pluginDescriptor.getId() + "]";
+                throw new PluginConfigurationException( pluginDescriptor, msg, e );
+            }
+            pluginRealm = pluginDescriptor.getClassRealm();
+        }
+
         if ( logger.isDebugEnabled() )
         {
             logger.debug( "Configuring mojo " + mojoDescriptor.getId() + " from plugin realm " + pluginRealm );
