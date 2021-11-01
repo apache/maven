@@ -30,6 +30,7 @@ import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoExecutionStrategy;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginIncompatibleException;
@@ -75,6 +76,9 @@ public class MojoExecutor
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    @Requirement
+    private MojoExecutionStrategy mojoExecutionStrategy;
 
     public MojoExecutor()
     {
@@ -135,21 +139,26 @@ public class MojoExecutor
         return Collections.unmodifiableCollection( scopes );
     }
 
-    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
-        throws LifecycleExecutionException
+    public void execute( final MavenSession session,
+                         List<MojoExecution> mojoExecutions,
+                         final ProjectIndex projectIndex ) throws LifecycleExecutionException
 
     {
-        DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
+        final DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
-        PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
+        final PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        for ( MojoExecution mojoExecution : mojoExecutions )
+        mojoExecutionStrategy.execute( session, mojoExecutions, new MojoExecutionStrategy.Executor( )
         {
-            execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
-        }
+            @Override
+            public void execute( MojoExecution mojoExecution ) throws LifecycleExecutionException
+            {
+                MojoExecutor.this.execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
+            }
+        } );
     }
 
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                          DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
         throws LifecycleExecutionException
     {

@@ -39,14 +39,6 @@ public class MojoExecutorStub
     public List<MojoExecution> executions = Collections.synchronizedList( new ArrayList<MojoExecution>() );
 
     @Override
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
-        throws LifecycleExecutionException
-    {
-        executions.add( mojoExecution );
-    }
-
-    @Override
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
