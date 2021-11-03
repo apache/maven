@@ -1718,18 +1718,11 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
-        {
-            String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
-            if ( defStrs != null )
-            {
-                for ( String defStr : defStrs )
-                {
-                    setCliProperty( defStr, userProperties );
-                }
-            }
-        }
+        final Properties userSpecifiedProperties = commandLine.getOptionProperties(
+                String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ) );
+        userSpecifiedProperties.forEach(
+                ( prop, value ) -> setCliProperty( (String) prop, (String) value, userProperties )
+        );
 
         SystemProperties.addSystemProperties( systemProperties );
 
@@ -1747,27 +1740,8 @@ public class MavenCli
         systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
-    private static void setCliProperty( String property, Properties properties )
+    private static void setCliProperty( String name, String value, Properties properties )
     {
-        String name;
-
-        String value;
-
-        int i = property.indexOf( '=' );
-
-        if ( i <= 0 )
-        {
-            name = property.trim();
-
-            value = "true";
-        }
-        else
-        {
-            name = property.substring( 0, i ).trim();
-
-            value = property.substring( i + 1 );
-        }
-
         properties.setProperty( name, value );
 
         // ----------------------------------------------------------------------
