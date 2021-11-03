@@ -554,6 +554,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
 
+        forkedExecution.setLifecyclePhase( mojoExecution.getLifecyclePhase() );
+
         mojoExecutionConfigurator( forkedExecution ).configure( project, forkedExecution, true );
 
         finalizeMojoConfiguration( forkedExecution );
