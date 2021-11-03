@@ -49,7 +49,7 @@ under the License.
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
-    <commonsCliVersion>1.4</commonsCliVersion>
+    <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>5.8.1</junitVersion>
     <mockitoVersion>3.2.0</mockitoVersion>
