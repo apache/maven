@@ -19,6 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
@@ -32,17 +33,23 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class CacheEventSpy extends AbstractEventSpy
 {
     @Requirement
+    private CacheConfig cacheConfig;
+
+    @Requirement
     private CacheController cacheController;
 
     @Override
     public void onEvent( Object event ) throws Exception
     {
-        if ( event instanceof ExecutionEvent )
+        if ( cacheConfig.isEnabled() )
         {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
-            if ( executionEvent.getType() == ExecutionEvent.Type.SessionEnded )
+            if ( event instanceof ExecutionEvent )
             {
-                cacheController.saveCacheReport( executionEvent.getSession() );
+                ExecutionEvent executionEvent = (ExecutionEvent) event;
+                if ( executionEvent.getType() == ExecutionEvent.Type.SessionEnded )
+                {
+                    cacheController.saveCacheReport( executionEvent.getSession() );
+                }
             }
         }
     }
