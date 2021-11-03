@@ -1718,16 +1718,17 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
+        for ( final Option option : commandLine.getOptions() )
         {
-            String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
-            if ( defStrs != null )
+            final String opt = option.getOpt();
+            // Some options do not have a "short" version (e.g. color, debug).
+            // We are specifically looking for the "-D" option.
+            if ( opt != null && CLIManager.SET_SYSTEM_PROPERTY == opt.charAt( 0 ) )
             {
-                for ( String defStr : defStrs )
-                {
-                    setCliProperty( defStr, userProperties );
-                }
+                final String[] values = option.getValues();
+                final String key = values[0].trim();
+                final String value = values.length == 2 ? values[1] : "true";
+                setCliProperty( key, value, userProperties );
             }
         }
 
@@ -1747,27 +1748,8 @@ public class MavenCli
         systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
-    private static void setCliProperty( String property, Properties properties )
+    private static void setCliProperty( String name, String value, Properties properties )
     {
-        String name;
-
-        String value;
-
-        int i = property.indexOf( '=' );
-
-        if ( i <= 0 )
-        {
-            name = property.trim();
-
-            value = "true";
-        }
-        else
-        {
-            name = property.substring( 0, i ).trim();
-
-            value = property.substring( i + 1 );
-        }
-
         properties.setProperty( name, value );
 
         // ----------------------------------------------------------------------

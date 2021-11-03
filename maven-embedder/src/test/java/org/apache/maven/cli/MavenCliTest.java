@@ -45,11 +45,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -96,7 +96,7 @@ public class MavenCliTest
     @Test
     public void testPerformProfileActivation() throws ParseException
     {
-        final Parser parser = new GnuParser();
+        final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
         options.addOption( Option.builder( Character.toString( CLIManager.ACTIVATE_PROFILES ) ).hasArg().build() );
@@ -122,7 +122,7 @@ public class MavenCliTest
     @Test
     public void testDetermineProjectActivation() throws ParseException
     {
-        final Parser parser = new GnuParser();
+        final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
         options.addOption( Option.builder( CLIManager.PROJECT_LIST ).hasArg().build() );
@@ -490,6 +490,22 @@ public class MavenCliTest
 
         // then
         assertEquals( MessageUtils.stripAnsiCodes( versionOut ), versionOut );
+    }
+
+    @Test
+    public void populateProperties() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx=1", "-Dy", "-D z=2", "compile" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "1" ) );
+        assertThat( request.getUserProperties().getProperty( "y" ), is( "true" ) );
+        assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );
     }
 
     private MavenProject createMavenProject( String groupId, String artifactId )
