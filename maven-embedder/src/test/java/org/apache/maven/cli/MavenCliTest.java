@@ -496,13 +496,14 @@ public class MavenCliTest
     public void populateProperties() throws Exception
     {
         // Arrange
-        CliRequest request = new CliRequest( new String[] { "-Dx=1", "-Dy", "-D z=2", "compile" }, null );
+        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "-Dx=1", "-Dy", "-D z=2", "compile" }, null );
 
         // Act
         cli.cli( request );
         cli.properties( request );
 
         // Assert
+        assertThat( request.getUserProperties().getProperty( "w" ), is( "x=y" ) );
         assertThat( request.getUserProperties().getProperty( "x" ), is( "1" ) );
         assertThat( request.getUserProperties().getProperty( "y" ), is( "true" ) );
         assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );

@@ -24,6 +24,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -1727,7 +1728,16 @@ public class MavenCli
             {
                 final String[] values = option.getValues();
                 final String key = values[0].trim();
-                final String value = values.length == 2 ? values[1] : "true";
+                String value;
+                if ( values.length == 1 )
+                {
+                    value = "true";
+                }
+                else
+                {
+                    // If the property value contains an '=', such as "-Dx=w=y", the values have to be concatenated
+                    value = String.join( "=", ArrayUtils.subarray( values, 1, values.length ) );
+                }
                 setCliProperty( key, value, userProperties );
             }
         }
