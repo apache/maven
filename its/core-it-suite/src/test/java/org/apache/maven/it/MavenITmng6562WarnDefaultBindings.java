@@ -42,8 +42,9 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase + ".txt" );
-        verifier.setForkJvm( true ); // required due to --fos-on-severity
-        verifier.addCliOption( "-fos=WARN" ); // ALSO NO WARNINGS
+        verifier.setForkJvm( true ); // required due to --fail-on-severity
+        verifier.addCliOption( "-fos" );
+        verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
         verifier.executeGoals( Arrays.asList( phase ) );
         verifier.resetStreams();
 
@@ -60,8 +61,9 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase + ".txt" );
-        verifier.setForkJvm( true ); // required due to --fos-on-severity
-        verifier.addCliOption( "-fos=WARN" ); // ALSO NO WARNINGS
+        verifier.setForkJvm( true ); // required due to --fail-on-severity
+        verifier.addCliOption( "-fos" );
+        verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
         verifier.executeGoals( Arrays.asList( phase ) );
         verifier.resetStreams();
 
