@@ -19,7 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.caching.jaxb.DirScanConfigType;
+import org.apache.maven.caching.domain.DirScanConfigType;
 
 import javax.annotation.Nonnull;
 

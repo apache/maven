@@ -20,9 +20,9 @@ package org.apache.maven.caching;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.jaxb.DirScanConfigType;
-import org.apache.maven.caching.jaxb.TagNameType;
-import org.apache.maven.caching.jaxb.TagScanConfigType;
+import org.apache.maven.caching.domain.DirScanConfigType;
+import org.apache.maven.caching.domain.TagNameType;
+import org.apache.maven.caching.domain.TagScanConfigType;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -95,7 +95,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
         }
 
         DirScanConfigType merged = new DirScanConfigType();
-        if ( override.isSetMode() )
+        if ( override.getMode() != null )
         {
             merged.setMode( override.getMode() );
         }

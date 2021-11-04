@@ -36,8 +36,9 @@ import org.apache.maven.caching.ScanConfigProperties;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.ProjectsInputInfoType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.Include;
+import org.apache.maven.caching.domain.ProjectsInputInfoType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
@@ -94,7 +95,6 @@ import static org.apache.commons.lang3.StringUtils.startsWithAny;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.apache.maven.caching.ProjectUtils.isBuilding;
 import static org.apache.maven.caching.ProjectUtils.isSnapshot;
-import static org.apache.maven.caching.jaxb.PathSetType.Include;
 
 /**
  * MavenProjectInput

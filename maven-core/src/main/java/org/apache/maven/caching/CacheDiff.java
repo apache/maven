@@ -22,13 +22,13 @@ package org.apache.maven.caching;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.jaxb.BuildDiffType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.MismatchType;
-import org.apache.maven.caching.jaxb.ProjectsInputInfoType;
-import org.apache.maven.caching.jaxb.PropertyValueType;
+import org.apache.maven.caching.domain.BuildDiffType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.MismatchType;
+import org.apache.maven.caching.domain.ProjectsInputInfoType;
+import org.apache.maven.caching.domain.PropertyValueType;
 import org.apache.maven.caching.xml.CacheConfig;
 
 import java.util.ArrayList;
@@ -232,23 +232,23 @@ public class CacheDiff
     }
 
 
-    private void compareExecutions( BuildInfoType.Executions current, BuildInfoType.Executions baseline )
+    private void compareExecutions( List<CompletedExecutionType> current, List<CompletedExecutionType> baseline )
     {
         Map<String, CompletedExecutionType> baselineExecutionsByKey = new HashMap<>();
-        for ( CompletedExecutionType completedExecutionType : baseline.getExecution() )
+        for ( CompletedExecutionType completedExecutionType : baseline )
         {
             baselineExecutionsByKey.put( completedExecutionType.getExecutionKey(), completedExecutionType );
         }
 
         Map<String, CompletedExecutionType> currentExecutionsByKey = new HashMap<>();
-        for ( CompletedExecutionType e1 : current.getExecution() )
+        for ( CompletedExecutionType e1 : current )
         {
             currentExecutionsByKey.put( e1.getExecutionKey(), e1 );
         }
 
         // such situation normally means different poms and mismatch in effective poms,
         // but in any case it is helpful to report
-        for ( CompletedExecutionType baselineExecution : baseline.getExecution() )
+        for ( CompletedExecutionType baselineExecution : baseline )
         {
             if ( !currentExecutionsByKey.containsKey( baselineExecution.getExecutionKey() ) )
             {
@@ -261,7 +261,7 @@ public class CacheDiff
             }
         }
 
-        for ( CompletedExecutionType currentExecution : current.getExecution() )
+        for ( CompletedExecutionType currentExecution : current )
         {
             if ( !baselineExecutionsByKey.containsKey( currentExecution.getExecutionKey() ) )
             {
@@ -285,7 +285,7 @@ public class CacheDiff
     {
         // TODO add support for skip values
         final List<PropertyValueType> trackedProperties = new ArrayList<>();
-        for ( PropertyValueType propertyValueType : current.getConfiguration().getProperty() )
+        for ( PropertyValueType propertyValueType : current.getConfiguration() )
         {
             if ( propertyValueType.isTracked() )
             {
@@ -298,7 +298,7 @@ public class CacheDiff
         }
 
         final Map<String, PropertyValueType> baselinePropertiesByName = new HashMap<>();
-        for ( PropertyValueType propertyValueType : baseline.getConfiguration().getProperty() )
+        for ( PropertyValueType propertyValueType : baseline.getConfiguration() )
         {
             baselinePropertiesByName.put( propertyValueType.getName(), propertyValueType );
         }

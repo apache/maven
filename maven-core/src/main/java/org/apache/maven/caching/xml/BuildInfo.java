@@ -24,24 +24,22 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.ProjectsInputInfoType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.ProjectsInputInfoType;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,13 +64,7 @@ public class BuildInfo
     {
         this.dto = new BuildInfoType();
         this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLMENTATION_VERSION );
-        try
-        {
-            this.dto.setBuildTime( DatatypeFactory.newInstance().newXMLGregorianCalendar( new GregorianCalendar() ) );
-        }
-        catch ( DatatypeConfigurationException ignore )
-        {
-        }
+        this.dto.setBuildTime( new Date() );
         try
         {
             this.dto.setBuildServer( InetAddress.getLocalHost().getCanonicalHostName() );
@@ -83,10 +75,9 @@ public class BuildInfo
         }
         this.dto.setHashFunction( hashAlgorithm );
         this.dto.setArtifact( artifact );
-        this.dto.setGoals( createGoals( goals ) );
-        this.dto.setAttachedArtifacts( new BuildInfoType.AttachedArtifacts() );
-        this.dto.getAttachedArtifacts().getArtifact().addAll( attachedArtifacts );
-        this.dto.setExecutions( createExecutions( completedExecutions ) );
+        this.dto.setGoals( goals );
+        this.dto.setAttachedArtifacts( attachedArtifacts );
+        this.dto.setExecutions( completedExecutions );
         this.dto.setProjectsInputInfo( projectsInputInfo );
         this.source = CacheSource.BUILD;
     }
@@ -96,30 +87,16 @@ public class BuildInfo
         return source;
     }
 
-    private BuildInfoType.Executions createExecutions( List<CompletedExecutionType> completedExecutions )
-    {
-        BuildInfoType.Executions executions = new BuildInfoType.Executions();
-        executions.getExecution().addAll( completedExecutions );
-        return executions;
-    }
-
     public BuildInfo( BuildInfoType buildInfo, CacheSource source )
     {
         this.dto = buildInfo;
         this.source = source;
     }
 
-    public static BuildInfoType.Goals createGoals( List<String> list )
+    public static List<ArtifactType> createAttachedArtifacts( List<Artifact> artifacts,
+                                                              HashAlgorithm algorithm ) throws IOException
     {
-        BuildInfoType.Goals goals = new BuildInfoType.Goals();
-        goals.getGoal().addAll( list );
-        return goals;
-    }
-
-    public static BuildInfoType.AttachedArtifacts createAttachedArtifacts( List<Artifact> artifacts,
-                                                                           HashAlgorithm algorithm ) throws IOException
-    {
-        BuildInfoType.AttachedArtifacts attachedArtifacts = new BuildInfoType.AttachedArtifacts();
+        List<ArtifactType> attachedArtifacts = new ArrayList<>();
         for ( Artifact artifact : artifacts )
         {
             final ArtifactType dto = DtoUtils.createDto( artifact );
@@ -127,7 +104,7 @@ public class BuildInfo
             {
                 dto.setFileHash( algorithm.hash( artifact.getFile().toPath() ) );
             }
-            attachedArtifacts.getArtifact().add( dto );
+            attachedArtifacts.add( dto );
         }
         return attachedArtifacts;
     }
@@ -148,12 +125,15 @@ public class BuildInfo
 
     private boolean hasCompletedExecution( String mojoExecutionKey )
     {
-        final List<CompletedExecutionType> completedExecutions = dto.getExecutions().getExecution();
-        for ( CompletedExecutionType completedExecution : completedExecutions )
+        final List<CompletedExecutionType> completedExecutions = dto.getExecutions();
+        if ( dto.getExecutions() != null )
         {
-            if ( StringUtils.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
+            for ( CompletedExecutionType completedExecution : completedExecutions )
             {
-                return true;
+                if ( StringUtils.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -168,12 +148,12 @@ public class BuildInfo
     public CompletedExecutionType findMojoExecutionInfo( MojoExecution mojoExecution )
     {
 
-        if ( !dto.isSetExecutions() )
+        if ( dto.getExecutions() == null )
         {
             return null;
         }
 
-        final List<CompletedExecutionType> executions = dto.getExecutions().getExecution();
+        final List<CompletedExecutionType> executions = dto.getExecutions();
         for ( CompletedExecutionType execution : executions )
         {
             if ( StringUtils.equals( execution.getExecutionKey(), mojoExecutionKey( mojoExecution ) ) )
@@ -196,9 +176,9 @@ public class BuildInfo
 
     public List<ArtifactType> getAttachedArtifacts()
     {
-        if ( dto.isSetAttachedArtifacts() )
+        if ( dto.getAttachedArtifacts() != null )
         {
-            return dto.getAttachedArtifacts().getArtifact();
+            return dto.getAttachedArtifacts();
         }
         return Collections.emptyList();
     }
@@ -210,7 +190,7 @@ public class BuildInfo
 
     public String getHighestCompletedGoal()
     {
-        return Iterables.getLast( dto.getGoals().getGoal() );
+        return Iterables.getLast( dto.getGoals() );
     }
 
     public List<MojoExecution> getCachedSegment( List<MojoExecution> mojoExecutions )

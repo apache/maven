@@ -20,8 +20,8 @@ package org.apache.maven.caching;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.TrackedPropertyType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.TrackedPropertyType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
@@ -124,7 +124,7 @@ public class MojoExecutionManager implements MojoCheker
             final String propertyName = trackedProperty.getPropertyName();
 
             String expectedValue = DtoUtils.findPropertyValue( propertyName, completedExecution );
-            if ( expectedValue == null && trackedProperty.isSetDefaultValue() )
+            if ( expectedValue == null && trackedProperty.getDefaultValue() != null )
             {
                 expectedValue = trackedProperty.getDefaultValue();
             }
