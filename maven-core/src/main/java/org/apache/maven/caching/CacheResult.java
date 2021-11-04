@@ -117,6 +117,6 @@ public class CacheResult
 
     public boolean isFinal()
     {
-        return buildInfo != null && buildInfo.getDto().isFinal();
+        return buildInfo != null && buildInfo.getDto().is_final();
     }
 }

@@ -238,11 +238,16 @@ under the License.
             <goals>
               <goal>java</goal>
               <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+              <goal>xsd</goal>
             </goals>
             <configuration>
               <version>1.0.0</version>
               <models>
+                <model>src/main/mdo/cache-config.mdo</model>
                 <model>src/main/mdo/cache-domain.mdo</model>
+                <model>src/main/mdo/cache-diff.mdo</model>
+                <model>src/main/mdo/cache-report.mdo</model>
               </models>
             </configuration>
           </execution>
@@ -278,6 +283,7 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
@@ -298,6 +304,7 @@ under the License.
           </sources>
         </configuration>
       </plugin>
+      -->
     </plugins>
   </build>
 </project>

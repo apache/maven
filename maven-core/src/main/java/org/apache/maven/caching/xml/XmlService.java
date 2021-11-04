@@ -19,27 +19,26 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.jaxb.BuildDiffType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CacheReportType;
-import org.apache.maven.caching.jaxb.ObjectFactory;
+import org.apache.maven.caching.domain.CacheType;
+import org.apache.maven.caching.domain.io.xpp3.CacheConfigXpp3Reader;
+import org.apache.maven.caching.domain.io.xpp3.CacheConfigXpp3Writer;
+import org.apache.maven.caching.domain.io.xpp3.CacheDiffXpp3Reader;
+import org.apache.maven.caching.domain.io.xpp3.CacheDiffXpp3Writer;
+import org.apache.maven.caching.domain.io.xpp3.CacheDomainXpp3Reader;
+import org.apache.maven.caching.domain.BuildDiffType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CacheReportType;
+import org.apache.maven.caching.domain.io.xpp3.CacheDomainXpp3Writer;
+import org.apache.maven.caching.domain.io.xpp3.CacheReportXpp3Reader;
+import org.apache.maven.caching.domain.io.xpp3.CacheReportXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.xml.sax.SAXException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * XmlService
@@ -48,98 +47,94 @@ import java.io.InputStream;
 public class XmlService
 {
 
-    private final ObjectFactory objectFactory;
-    private final JAXBContext jaxbContext;
-    private final Schema schema;
-
-    public XmlService() throws JAXBException, SAXException
+    public byte[] toBytes( CacheType cache ) throws IOException
     {
-        objectFactory = new ObjectFactory();
-        jaxbContext = JAXBContext.newInstance( "org.apache.maven.caching.jaxb", XmlService.class.getClassLoader() );
-
-        SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-        final InputStream domainSchemaStream = getResourceAsStream( "cache-domain.xsd" );
-        final Source domainSchema = new StreamSource( domainSchemaStream );
-        final InputStream configSchemaStream = getResourceAsStream( "cache-config.xsd" );
-        final Source configSchema = new StreamSource( configSchemaStream );
-        schema = sf.newSchema( new Source[] {domainSchema, configSchema} );
-    }
-
-    public byte[] toBytes( BuildInfoType buildInfo )
-    {
-        return serializeXml( objectFactory.createBuild( buildInfo ) );
-    }
-
-    public byte[] toBytes( BuildDiffType diff )
-    {
-        return serializeXml( objectFactory.createDiff( diff ) );
-    }
-
-    public byte[] toBytes( CacheReportType cacheReportType )
-    {
-
-        return serializeXml( objectFactory.createReport( cacheReportType ) );
-    }
-
-    private byte[] serializeXml( JAXBElement<?> element )
-    {
-        try
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setSchema( schema );
-            // output pretty printed
-            jaxbMarshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
-            jaxbMarshaller.setProperty( Marshaller.JAXB_ENCODING, "UTF-8" );
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            jaxbMarshaller.marshal( element, baos );
+            new CacheConfigXpp3Writer().write( baos, cache );
             return baos.toByteArray();
         }
-        catch ( Exception e )
+    }
+
+    public byte[] toBytes( BuildInfoType buildInfo ) throws IOException
+    {
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            throw new RuntimeException( "Errors in jaxb serialization: " + e.toString(), e );
+            new CacheDomainXpp3Writer().write( baos, buildInfo );
+            return baos.toByteArray();
         }
     }
 
-    public <T> T fromFile( Class<T> clazz, File file )
+    public byte[] toBytes( BuildDiffType diff ) throws IOException
     {
-
-        try
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema( schema );
-            JAXBElement<T> result = (JAXBElement<T>) unmarshaller.unmarshal( file );
-            return result.getValue();
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( "Errors in jaxb serialization: " + e.toString(), e );
+            new CacheDiffXpp3Writer().write( baos, diff );
+            return baos.toByteArray();
         }
     }
 
-    public static InputStream getResourceAsStream( String name )
+    public byte[] toBytes( CacheReportType cacheReportType ) throws IOException
     {
-        ClassLoader cl = XmlService.class.getClassLoader();
-        if ( cl == null )
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            // A system class.
-            return ClassLoader.getSystemResourceAsStream( name );
+            new CacheReportXpp3Writer().write( baos, cacheReportType );
+            return baos.toByteArray();
         }
-        return cl.getResourceAsStream( name );
+    }
+
+    public <T> T fromFile( Class<T> clazz, File file ) throws IOException, XmlPullParserException
+    {
+        if ( clazz == BuildInfoType.class )
+        {
+            return clazz.cast( new CacheDomainXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
+        }
+        else if ( clazz == CacheType.class )
+        {
+            return clazz.cast( new CacheConfigXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
+        }
+        else if ( clazz == BuildDiffType.class )
+        {
+            return clazz.cast( new CacheDiffXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
+        }
+        else if ( clazz == CacheReportType.class )
+        {
+            return clazz.cast( new CacheReportXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Unsupported type " + clazz );
+        }
     }
 
     public <T> T fromBytes( Class<T> clazz, byte[] bytes )
     {
         try
         {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema( schema );
-            JAXBElement<T> result = (JAXBElement<T>) unmarshaller.unmarshal( new ByteArrayInputStream( bytes ) );
-            return result.getValue();
-
+            if ( clazz == BuildInfoType.class )
+            {
+                return clazz.cast( new CacheDomainXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+            }
+            else if ( clazz == CacheType.class )
+            {
+                return clazz.cast( new CacheConfigXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+            }
+            else if ( clazz == BuildDiffType.class )
+            {
+                return clazz.cast( new CacheDiffXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+            }
+            else if ( clazz == CacheReportType.class )
+            {
+                return clazz.cast( new CacheReportXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "Unsupported type " + clazz );
+            }
         }
-        catch ( Exception e )
+        catch ( IOException | XmlPullParserException e )
         {
-            throw new RuntimeException( "Errors in jaxb serialization: " + e.toString(), e );
+            throw new RuntimeException( "Unable to parse cache xml element", e );
         }
     }
 }

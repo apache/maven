@@ -18,7 +18,8 @@ under the License.
 -->
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd">
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+  xsd.namespace="org:apache:maven:cache:domain">
   <id>cache-domain</id>
   <name>CacheDomain</name>
   <description><![CDATA[
@@ -35,52 +36,61 @@ under the License.
       <name>BuildInfoType</name>
       <version>1.0.0+</version>
       <description><![CDATA[Root element of the <code>extension.xml</code> file.]]></description>
-        <!--xs:all-->
+      <!--xs:all-->
       <fields>
+        <!-- xs:element name="cacheImplementationVersion" type="xs:string"/-->
         <field>
           <name>cacheImplementationVersion</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="final" type="xs:boolean" minOccurs="0"/-->
-        <!--field>
-          <name>final</name>
+        <!--xs:element name="final" type="xs:boolean" minOccurs="0"/-->
+        <field>
+          <name>_final</name>
           <version>1.0.0+</version>
           <type>Boolean</type>
-          <description></description>
-        </field-->
-            <!--xs:element name="hashFunction" type="xs:string"/-->
+          <alias>final</alias>
+        </field>
+        <!--xs:element name="hashFunction" type="xs:string"/-->
         <field>
           <name>hashFunction</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="buildTime" type="xs:dateTime" minOccurs="0"/-->
-            <!--xs:element name="buildServer" type="xs:string" minOccurs="0"/-->
+        <!--xs:element name="buildTime" type="xs:dateTime" minOccurs="0"/-->
+        <field>
+          <name>buildTime</name>
+          <version>1.0.0+</version>
+          <type>Date</type>
+        </field>
+        <!--xs:element name="buildServer" type="xs:string" minOccurs="0"/-->
         <field>
           <name>buildServer</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="cacheImplementationVersion" type="xs:string"/-->
-            <!--xs:element name="scm" minOccurs="0">
-                <xs:complexType>
-                    <xs:all>
-                        <xs:element name="sourceBranch" type="xs:string" minOccurs="0"/>
-                        <xs:element name="revision" type="xs:string" minOccurs="0"/>
-                    </xs:all>
-                </xs:complexType>
-            </xs:element-->
-            <!--xs:element name="goals">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="goal" type="xs:string" maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element-->
+        <!--xs:element name="scm" minOccurs="0">
+            <xs:complexType>
+                <xs:all>
+                    <xs:element name="sourceBranch" type="xs:string" minOccurs="0"/>
+                    <xs:element name="revision" type="xs:string" minOccurs="0"/>
+                </xs:all>
+            </xs:complexType>
+        </xs:element-->
+        <field>
+          <name>scm</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>Scm</type>
+          </association>
+        </field>
+        <!--xs:element name="goals">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="goal" type="xs:string" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element-->
         <field>
           <name>goals</name>
           <version>1.0.0+</version>
@@ -90,7 +100,7 @@ under the License.
           </association>
           <description></description>
         </field>
-            <!--xs:element name="artifact" type="d:ArtifactType"/-->
+        <!--xs:element name="artifact" type="d:ArtifactType"/-->
         <field>
           <name>artifact</name>
           <version>1.0.0+</version>
@@ -99,109 +109,137 @@ under the License.
           </association>
           <description></description>
         </field>
-            <!--xs:element name="attachedArtifacts">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="artifact" type="d:ArtifactType" minOccurs="0" maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="generatedSources" minOccurs="0">
-                <xs:complexType>
-                    <xs:all>
-                        <xs:element name="relativePath">
-                            <xs:complexType>
-                                <xs:simpleContent>
-                                    <xs:extension base="xs:string">
-                                        <xs:attribute name="artifactFileName" type="xs:string" use="required"/>
-                                    </xs:extension>
-                                </xs:simpleContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:all>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="executions">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="execution" type="d:CompletedExecutionType" minOccurs="0"
-                                    maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="projectsInputInfo" type="d:ProjectsInputInfoType" minOccurs="0"/>-->
+        <!--xs:element name="attachedArtifacts">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="artifact" type="d:ArtifactType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element-->
+        <field>
+          <name>attachedArtifacts</name>
+          <association>
+            <type>ArtifactType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <!--xs:element name="generatedSources" minOccurs="0">
+            <xs:complexType>
+                <xs:all>
+                    <xs:element name="relativePath">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="artifactFileName" type="xs:string" use="required"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:all>
+            </xs:complexType>
+        </xs:element-->
+        <!--xs:element name="executions">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="execution" type="d:CompletedExecutionType" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element-->
+        <field>
+          <name>executions</name>
+          <association>
+            <type>CompletedExecutionType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <!--xs:element name="projectsInputInfo" type="d:ProjectsInputInfoType" minOccurs="0"/-->
+        <field>
+          <name>projectsInputInfo</name>
+          <association>
+            <type>ProjectsInputInfoType</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:element name="scm" minOccurs="0">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="sourceBranch" type="xs:string" minOccurs="0"/>
+                <xs:element name="revision" type="xs:string" minOccurs="0"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element-->
+    <class>
+      <name>Scm</name>
+      <fields>
+        <field>
+          <name>sourceBranch</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>revision</name>
+          <type>String</type>
+        </field>
       </fields>
     </class>
 
     <!--xs:complexType name="ArtifactType"-->
     <class>
       <name>ArtifactType</name>
-        <!--xs:sequence-->
+      <!--xs:sequence-->
       <fields>
-            <!--xs:element name="groupId" type="xs:string"/-->
+        <!--xs:element name="groupId" type="xs:string"/-->
         <field>
           <name>groupId</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="artifactId" type="xs:string"/-->
+        <!--xs:element name="artifactId" type="xs:string"/-->
         <field>
           <name>artifactId</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="version" type="xs:string"/-->
+        <!--xs:element name="version" type="xs:string"/-->
         <field>
           <name>version</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="classifier" type="xs:string" minOccurs="0"/-->
+        <!--xs:element name="classifier" type="xs:string" minOccurs="0"/-->
         <field>
           <name>classifier</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="type" type="xs:string"/-->
+        <!--xs:element name="type" type="xs:string"/-->
         <field>
           <name>type</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="scope" type="xs:string" minOccurs="0"/-->
+        <!--xs:element name="scope" type="xs:string" minOccurs="0"/-->
         <field>
           <name>scope</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="fileName" type="xs:string" minOccurs="0"/-->
+        <!--xs:element name="fileName" type="xs:string" minOccurs="0"/-->
         <field>
           <name>fileName</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="fileHash" type="xs:string" minOccurs="0"/-->
+        <!--xs:element name="fileHash" type="xs:string" minOccurs="0"/-->
         <field>
           <name>fileHash</name>
-          <version>1.0.0+</version>
           <type>String</type>
-          <description></description>
         </field>
-            <!--xs:element name="fileSize" type="xs:nonNegativeInteger" minOccurs="0"/-->
+        <!--xs:element name="fileSize" type="xs:nonNegativeInteger" minOccurs="0"/-->
         <!--field>
           <name>fileSize</name>
-          <version>1.0.0+</version>
           <type>int</type>
-          <description></description>
         </field-->
-        <!--/xs:sequence-->
+        <field>
+          <name>fileSize</name>
+          <type>long</type>
+        </field>
+      <!--/xs:sequence-->
       </fields>
     <!--/xs:complexType-->
     </class>
@@ -218,25 +256,80 @@ under the License.
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
-    </xs:complexType>
+    </xs:complexType-->
+    <class>
+      <name>CompletedExecutionType</name>
+      <fields>
+        <field>
+          <name>executionKey</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>mojoClassName</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <association>
+            <type>PropertyValueType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
 
-    <xs:complexType name="PropertyValueType">
+    <!--xs:complexType name="PropertyValueType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="name" type="xs:string"/>
                 <xs:attribute name="tracked" type="xs:boolean"/>
             </xs:extension>
         </xs:simpleContent>
-    </xs:complexType>
+    </xs:complexType-->
 
-    <xs:complexType name="ProjectsInputInfoType">
+    <class>
+      <name>PropertyValueType</name>
+      <fields>
+        <field xml.content="true">
+          <name>value</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>name</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>tracked</name>
+          <type>Boolean</type>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:complexType name="ProjectsInputInfoType">
         <xs:sequence>
             <xs:element name="checksum" type="xs:string"/>
             <xs:element name="item" type="d:DigestItemType" maxOccurs="unbounded"/>
         </xs:sequence>
-    </xs:complexType>
+    </xs:complexType-->
 
-    <xs:complexType name="DigestItemType">
+    <class>
+      <name>ProjectsInputInfoType</name>
+      <fields>
+        <field>
+          <name>checksum</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>item</name>
+          <association>
+            <type>DigestItemType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:complexType name="DigestItemType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="type" use="required" type="xs:string"/>
@@ -248,49 +341,45 @@ under the License.
                 <xs:attribute name="eol" type="xs:string"/>
             </xs:extension>
         </xs:simpleContent>
-    </xs:complexType>
+    </xs:complexType-->
 
-    <xs:complexType name="CacheReportType">
-        <xs:sequence>
-            <xs:element name="project" type="d:ProjectReportType" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+    <class>
+      <name>DigestItemType</name>
+      <fields>
+        <field xml.content="true">
+          <name>value</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>type</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>hash</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>fileChecksum</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>content</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>isText</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>charset</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>eol</name>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
 
-    <xs:complexType name="ProjectReportType"-->
-        <!--        <xs:sequence>-->
-        <!--            <xs:element name="checksum" type="d:ChecksumReportType"/>-->
-        <!--            <xs:element name="parameters" type="d:PluginsReportType"/>-->
-        <!--        </xs:sequence>-->
-        <!--xs:attribute name="groupId" use="required" type="xs:string"/>
-        <xs:attribute name="artifactId" use="required" type="xs:string"/>
-        <xs:attribute name="checksum" use="required" type="xs:string"/>
-        <xs:attribute name="checksumMatched" type="xs:boolean" use="required"/>
-        <xs:attribute name="lifecycleMatched" type="xs:boolean"/>
-        <xs:attribute name="pluginsMatched" type="xs:boolean"/>
-        <xs:attribute name="source" type="xs:string" use="required"/>
-        <xs:attribute name="sharedToRemote" type="xs:boolean" use="required"/>
-        <xs:attribute name="url" type="xs:anyURI"/>
-    </xs:complexType>
-
-    <xs:complexType name="BuildDiffType">
-        <xs:sequence>
-            <xs:element name="mismatch" type="d:MismatchType" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="MismatchType">
-        <xs:sequence minOccurs="0">
-            <xs:element name="detail" type="d:MismatchDetailType" minOccurs="0"/>
-        </xs:sequence>
-        <xs:attribute name="item" use="required" type="xs:string"/>
-        <xs:attribute name="current" type="xs:string"/>
-        <xs:attribute name="baseline" type="xs:string"/>
-        <xs:attribute name="reason" type="xs:string"/>
-        <xs:attribute name="resolution" type="xs:string"/>
-        <xs:attribute name="context" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="MismatchDetailType"/>
-    -->
   </classes>
 </model>

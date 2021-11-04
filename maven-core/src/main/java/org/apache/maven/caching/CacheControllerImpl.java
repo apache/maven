@@ -31,18 +31,18 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.caching.checksum.KeyUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
+import org.apache.maven.caching.domain.Scm;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.BuildDiffType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CacheReportType;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.ProjectReportType;
-import org.apache.maven.caching.jaxb.ProjectsInputInfoType;
-import org.apache.maven.caching.jaxb.PropertyNameType;
-import org.apache.maven.caching.jaxb.TrackedPropertyType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.BuildDiffType;
+import org.apache.maven.caching.domain.CacheReportType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.ProjectReportType;
+import org.apache.maven.caching.domain.ProjectsInputInfoType;
+import org.apache.maven.caching.domain.PropertyNameType;
+import org.apache.maven.caching.domain.TrackedPropertyType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
@@ -67,7 +67,6 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -143,7 +142,7 @@ public class CacheControllerImpl implements CacheController
 
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
 
-    private volatile BuildInfoType.Scm scm;
+    private volatile Scm scm;
 
     @Override
     @Nonnull
@@ -434,7 +433,7 @@ public class CacheControllerImpl implements CacheController
             final BuildInfo buildInfo = new BuildInfo( session.getGoals(), projectArtifactDto, attachedArtifactDtos,
                     context.getInputInfo(), completedExecution, hashFactory.getAlgorithm() );
             populateGitInfo( buildInfo, session );
-            buildInfo.getDto().setFinal( cacheConfig.isSaveFinal() );
+            buildInfo.getDto().set_final( cacheConfig.isSaveFinal() );
             cacheResults.put( getVersionlessProjectKey( project ), rebuilded( cacheResult, buildInfo ) );
 
             // if package phase presence means new artifacts were packaged
@@ -554,7 +553,7 @@ public class CacheControllerImpl implements CacheController
         {
             final Path file = projectArtifact.getFile().toPath();
             dto.setFileHash( algorithm.hash( file ) );
-            dto.setFileSize( BigInteger.valueOf( Files.size( file ) ) );
+            dto.setFileSize( Files.size( file ) );
         }
         return dto;
     }
@@ -798,7 +797,7 @@ public class CacheControllerImpl implements CacheController
                     }
                     catch ( IOException e )
                     {
-                        scm = new BuildInfoType.Scm();
+                        scm = new Scm();
                         logger.error( "Cannot populate git info", e );
                     }
                 }

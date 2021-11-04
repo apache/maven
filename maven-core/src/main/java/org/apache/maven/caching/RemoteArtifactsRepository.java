@@ -20,7 +20,7 @@ package org.apache.maven.caching;
  */
 
 import com.google.common.base.Optional;
-import org.apache.maven.caching.jaxb.ArtifactType;
+import org.apache.maven.caching.domain.ArtifactType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.project.MavenProject;
 

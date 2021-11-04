@@ -23,14 +23,16 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.ProjectUtils;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.PropertyValueType;
-import org.apache.maven.caching.jaxb.TrackedPropertyType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.PropertyValueType;
+import org.apache.maven.caching.domain.TrackedPropertyType;
 import org.apache.maven.model.Dependency;
 
 import javax.annotation.Nonnull;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.maven.caching.checksum.KeyUtils.getArtifactKey;
@@ -43,12 +45,12 @@ public class DtoUtils
 
     public static String findPropertyValue( String propertyName, CompletedExecutionType completedExecution )
     {
-        final CompletedExecutionType.Configuration configuration = completedExecution.getConfiguration();
+        final List<PropertyValueType> configuration = completedExecution.getConfiguration();
         if ( configuration == null )
         {
             return null;
         }
-        final List<PropertyValueType> properties = configuration.getProperty();
+        final List<PropertyValueType> properties = configuration;
         for ( PropertyValueType property : properties )
         {
             if ( StringUtils.equals( propertyName, property.getName() ) )
@@ -124,7 +126,7 @@ public class DtoUtils
     {
         if ( execution.getConfiguration() == null )
         {
-            execution.setConfiguration( new CompletedExecutionType.Configuration() );
+            execution.setConfiguration( new ArrayList<>() );
         }
         final PropertyValueType valueType = new PropertyValueType();
         valueType.setName( propertyName );
@@ -135,7 +137,7 @@ public class DtoUtils
         final String valueText = String.valueOf( value );
         valueType.setValue( StringUtils.remove( valueText, baseDirPath ) );
         valueType.setTracked( tracked );
-        execution.getConfiguration().getProperty().add( valueType );
+        execution.getConfiguration().add( valueType );
     }
 
     public static boolean containsAllProperties(
@@ -147,12 +149,12 @@ public class DtoUtils
             return true;
         }
 
-        if ( !cachedExecution.isSetConfiguration() )
+        if ( cachedExecution.getConfiguration() == null )
         {
             return false;
         }
 
-        final List<PropertyValueType> executionProperties = cachedExecution.getConfiguration().getProperty();
+        final List<PropertyValueType> executionProperties = cachedExecution.getConfiguration();
         for ( TrackedPropertyType trackedProperty : trackedProperties )
         {
             if ( !contains( executionProperties, trackedProperty.getPropertyName() ) )
@@ -178,42 +180,15 @@ public class DtoUtils
     public static ArtifactType copy( ArtifactType artifact )
     {
         ArtifactType copy = new ArtifactType();
-        if ( artifact.isSetArtifactId() )
-        {
-            copy.setArtifactId( artifact.getArtifactId() );
-        }
-        if ( artifact.isSetGroupId() )
-        {
-            copy.setGroupId( artifact.getGroupId() );
-        }
-        if ( artifact.isSetVersion() )
-        {
-            copy.setVersion( artifact.getVersion() );
-        }
-        if ( artifact.isSetType() )
-        {
-            copy.setType( artifact.getType() );
-        }
-        if ( artifact.isSetClassifier() )
-        {
-            copy.setClassifier( artifact.getClassifier() );
-        }
-        if ( artifact.isSetScope() )
-        {
-            copy.setScope( artifact.getScope() );
-        }
-        if ( artifact.isSetFileName() )
-        {
-            copy.setFileName( artifact.getFileName() );
-        }
-        if ( artifact.isSetFileHash() )
-        {
-            copy.setFileHash( artifact.getFileHash() );
-        }
-        if ( artifact.isSetFileSize() )
-        {
-            copy.setFileSize( artifact.getFileSize() );
-        }
+        copy.setArtifactId( artifact.getArtifactId() );
+        copy.setGroupId( artifact.getGroupId() );
+        copy.setVersion( artifact.getVersion() );
+        copy.setType( artifact.getType() );
+        copy.setClassifier( artifact.getClassifier() );
+        copy.setScope( artifact.getScope() );
+        copy.setFileName( artifact.getFileName() );
+        copy.setFileHash( artifact.getFileHash() );
+        copy.setFileSize( artifact.getFileSize() );
         return copy;
     }
 }
