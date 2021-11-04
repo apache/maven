@@ -33,10 +33,10 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.checksum.MavenProjectInput;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CacheReportType;
-import org.apache.maven.caching.jaxb.ProjectReportType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CacheReportType;
+import org.apache.maven.caching.domain.ProjectReportType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
@@ -268,7 +268,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
         {
             String url;
             final ProjectReportType projectReport = cachedProjectHolder.get();
-            if ( projectReport.isSetUrl() )
+            if ( projectReport.getUrl() != null )
             {
                 url = cachedProjectHolder.get().getUrl();
                 logInfo( "Retrieving baseline buildinfo: " + projectReport.getUrl(), project.getArtifactId() );

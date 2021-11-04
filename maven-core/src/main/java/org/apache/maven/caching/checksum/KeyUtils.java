@@ -21,7 +21,7 @@ package org.apache.maven.caching.checksum;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.jaxb.ArtifactType;
+import org.apache.maven.caching.domain.ArtifactType;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 

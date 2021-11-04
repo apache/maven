@@ -1,0 +1,108 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+  xsd.namespace="org:apache:maven:cache:domain">
+  <id>cache-report</id>
+  <name>CacheReport</name>
+  <description><![CDATA[
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.caching.domain</value>
+    </default>
+  </defaults>
+  <classes>
+
+    <class rootElement="true">
+      <name>CacheReportType</name>
+      <fields>
+        <field>
+          <name>project</name>
+          <association>
+            <type>ProjectReportType</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:complexType name="ProjectReportType"-->
+        <!--        <xs:sequence>-->
+        <!--            <xs:element name="checksum" type="d:ChecksumReportType"/>-->
+        <!--            <xs:element name="parameters" type="d:PluginsReportType"/>-->
+        <!--        </xs:sequence>-->
+        <!--
+        <xs:attribute name="groupId" use="required" type="xs:string"/>
+        <xs:attribute name="artifactId" use="required" type="xs:string"/>
+        <xs:attribute name="checksum" use="required" type="xs:string"/>
+        <xs:attribute name="checksumMatched" type="xs:boolean" use="required"/>
+        <xs:attribute name="lifecycleMatched" type="xs:boolean"/>
+        <xs:attribute name="pluginsMatched" type="xs:boolean"/>
+        <xs:attribute name="source" type="xs:string" use="required"/>
+        <xs:attribute name="sharedToRemote" type="xs:boolean" use="required"/>
+        <xs:attribute name="url" type="xs:anyURI"/>
+    </xs:complexType-->
+
+    <class>
+      <name>ProjectReportType</name>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksum</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksumMatched</name>
+          <type>Boolean</type>
+        </field>
+        <field>
+          <name>lifecycleMatched</name>
+          <type>Boolean</type>
+        </field>
+        <field>
+          <name>pluginsMatched</name>
+          <type>Boolean</type>
+        </field>
+        <field>
+          <name>source</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sharedToRemote</name>
+          <type>Boolean</type>
+        </field>
+        <field>
+          <name>url</name>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+  </classes>
+</model>

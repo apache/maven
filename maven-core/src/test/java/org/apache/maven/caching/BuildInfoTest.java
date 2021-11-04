@@ -25,29 +25,29 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CompletedExecutionType;
-import org.apache.maven.caching.jaxb.DigestItemType;
-import org.apache.maven.caching.jaxb.ProjectsInputInfoType;
-import org.apache.maven.caching.jaxb.PropertyValueType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CompletedExecutionType;
+import org.apache.maven.caching.domain.DigestItemType;
+import org.apache.maven.caching.domain.ProjectsInputInfoType;
+import org.apache.maven.caching.domain.PropertyValueType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.XmlService;
+import org.junit.Test;
 
-import javax.xml.datatype.DatatypeFactory;
 import java.io.File;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.GregorianCalendar;
-
-import static org.apache.maven.caching.xml.BuildInfo.createGoals;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class BuildInfoTest {
 
-    // @Test
+    @Test
     public void name() throws Exception {
 
         XmlService xmlService = new XmlService();
@@ -64,16 +64,16 @@ public class BuildInfoTest {
         artifact.setClassifier("c");
         artifact.setScope("s");
         artifact.setFileName("f");
-        artifact.setFileSize(BigInteger.valueOf(123456));
+        artifact.setFileSize(123456);
         artifact.setFileHash("456L");
 
         BuildInfoType buildInfo = new BuildInfoType();
         buildInfo.setCacheImplementationVersion("cacheImplementationVersion");
         buildInfo.setBuildServer("server");
-        buildInfo.setBuildTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+        buildInfo.setBuildTime(new Date());
         buildInfo.setArtifact(artifact);
         buildInfo.setHashFunction("SHA-256");
-        buildInfo.setGoals(createGoals(Lists.newArrayList("install")));
+        buildInfo.setGoals(Lists.newArrayList("install"));
         final Artifact attachedArtifact = new DefaultArtifact("ag", "aa", "av", "as", "at", "ac", new DefaultArtifactHandler());
         buildInfo.setAttachedArtifacts(BuildInfo.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
         buildInfo.setProjectsInputInfo(main);
@@ -90,17 +90,14 @@ public class BuildInfoTest {
         System.out.println(buildInfo1);
     }
 
-    private BuildInfoType.Executions createExecutions() {
+    private List<CompletedExecutionType> createExecutions() {
         CompletedExecutionType execution = new CompletedExecutionType();
         execution.setExecutionKey("execkey");
-        execution.setConfiguration(new CompletedExecutionType.Configuration());
         PropertyValueType property = new PropertyValueType();
         property.setValue("value");
         property.setName("key");
-        execution.getConfiguration().getProperty().add(property);
-        BuildInfoType.Executions executions = new BuildInfoType.Executions();
-        executions.getExecution().add(execution);
-        return executions;
+        execution.setConfiguration(new ArrayList<>(Arrays.asList(property)));
+        return new ArrayList<>(Arrays.asList(execution));
     }
 
     private DigestItemType createItem(String pom, String s, String hash1) {

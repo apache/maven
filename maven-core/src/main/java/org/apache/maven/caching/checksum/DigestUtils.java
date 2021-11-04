@@ -22,7 +22,7 @@ package org.apache.maven.caching.checksum;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.jaxb.DigestItemType;
+import org.apache.maven.caching.domain.DigestItemType;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.IOException;

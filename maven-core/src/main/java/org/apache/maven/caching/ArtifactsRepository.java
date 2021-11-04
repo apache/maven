@@ -20,7 +20,7 @@ package org.apache.maven.caching;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.jaxb.CacheReportType;
+import org.apache.maven.caching.domain.CacheReportType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.execution.MavenSession;
 

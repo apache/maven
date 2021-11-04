@@ -25,7 +25,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.caching.jaxb.BuildInfoType;
+import org.apache.maven.caching.domain.Scm;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
@@ -155,9 +155,9 @@ public class ProjectUtils
         return System.getProperty( "maven.multiModuleProjectDirectory", session.getExecutionRootDirectory() );
     }
 
-    public static BuildInfoType.Scm readGitInfo( MavenSession session ) throws IOException
+    public static Scm readGitInfo( MavenSession session ) throws IOException
     {
-        final BuildInfoType.Scm scmCandidate = new BuildInfoType.Scm();
+        final Scm scmCandidate = new Scm();
         final Path gitDir = Paths.get( getMultimoduleRoot( session ), ".git" );
         if ( Files.isDirectory( gitDir ) )
         {

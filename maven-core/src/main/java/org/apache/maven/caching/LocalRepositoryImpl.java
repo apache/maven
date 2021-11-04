@@ -31,9 +31,10 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.jaxb.ArtifactType;
-import org.apache.maven.caching.jaxb.BuildInfoType;
-import org.apache.maven.caching.jaxb.CacheReportType;
+import org.apache.maven.caching.domain.ArtifactType;
+import org.apache.maven.caching.domain.BuildInfoType;
+import org.apache.maven.caching.domain.CacheReportType;
+import org.apache.maven.caching.domain.Scm;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
@@ -350,11 +351,11 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
         return Optional.of( orderedFiles.get( 0 ).getLeft() );
     }
 
-    private String getScmRef( BuildInfoType.Scm scm )
+    private String getScmRef( Scm scm )
     {
         if ( scm != null )
         {
-            return scm.isSetSourceBranch() ? scm.getSourceBranch() : scm.getRevision();
+            return scm.getSourceBranch() != null ? scm.getSourceBranch() : scm.getRevision();
         }
         else
         {
