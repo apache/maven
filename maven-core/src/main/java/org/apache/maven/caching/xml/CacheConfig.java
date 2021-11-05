@@ -21,6 +21,7 @@ package org.apache.maven.caching.xml;
 
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
+import org.apache.maven.caching.domain.Exclude;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.domain.Include;
 import org.apache.maven.caching.domain.PropertyNameType;
@@ -65,7 +66,7 @@ public interface CacheConfig
     List<Include> getGlobalIncludePaths();
 
     @Nonnull
-    List<String> getGlobalExcludePaths();
+    List<Exclude> getGlobalExcludePaths();
 
     @Nonnull
     PluginScanConfig getPluginDirScanConfig( Plugin plugin );

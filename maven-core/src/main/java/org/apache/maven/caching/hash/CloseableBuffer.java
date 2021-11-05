@@ -35,22 +35,21 @@ import static org.apache.maven.caching.hash.ReflectionUtils.getMethod;
  */
 public class CloseableBuffer implements AutoCloseable
 {
-    /* Java 8
-    private static final Cleaner CLEANER = doPrivileged((PrivilegedAction<Cleaner>) () -> {
-        final boolean isOldJava = System.getProperty("java.specification.version", "9").startsWith("1.");
-        if (isOldJava) {
-            return DirectCleaner.isSupported() ? new DirectCleaner() : new NoopCleaner();
-        } else {
-            return UnsafeCleaner.isSupported() ? new UnsafeCleaner() : new NoopCleaner();
-        }
-    });
-    */
+
     private static final Cleaner CLEANER = doPrivileged( new PrivilegedAction<Cleaner>()
     {
         @Override
         public Cleaner run()
         {
-            return DirectCleaner.isSupported() ? new DirectCleaner() : new NoopCleaner();
+            final String jsv = System.getProperty( "java.specification.version", "9" );
+            if ( jsv.startsWith( "1." ) )
+            {
+                return DirectCleaner.isSupported() ? new DirectCleaner() : new NoopCleaner();
+            }
+            else
+            {
+                return UnsafeCleaner.isSupported() ? new UnsafeCleaner() : new NoopCleaner();
+            }
         }
     } );
 

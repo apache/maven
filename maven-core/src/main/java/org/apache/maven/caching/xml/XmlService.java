@@ -38,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 /**
@@ -85,47 +86,33 @@ public class XmlService
 
     public <T> T fromFile( Class<T> clazz, File file ) throws IOException, XmlPullParserException
     {
-        if ( clazz == BuildInfoType.class )
-        {
-            return clazz.cast( new CacheDomainXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
-        }
-        else if ( clazz == CacheType.class )
-        {
-            return clazz.cast( new CacheConfigXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
-        }
-        else if ( clazz == BuildDiffType.class )
-        {
-            return clazz.cast( new CacheDiffXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
-        }
-        else if ( clazz == CacheReportType.class )
-        {
-            return clazz.cast( new CacheReportXpp3Reader().read( Files.newInputStream( file.toPath() ) ) );
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Unsupported type " + clazz );
-        }
+        return fromInputStream( clazz, Files.newInputStream( file.toPath() ) );
     }
 
     public <T> T fromBytes( Class<T> clazz, byte[] bytes )
+    {
+        return fromInputStream( clazz, new ByteArrayInputStream( bytes ) );
+    }
+
+    public <T> T fromInputStream( Class<T> clazz, InputStream inputStream )
     {
         try
         {
             if ( clazz == BuildInfoType.class )
             {
-                return clazz.cast( new CacheDomainXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+                return clazz.cast( new CacheDomainXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheType.class )
             {
-                return clazz.cast( new CacheConfigXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+                return clazz.cast( new CacheConfigXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == BuildDiffType.class )
             {
-                return clazz.cast( new CacheDiffXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+                return clazz.cast( new CacheDiffXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheReportType.class )
             {
-                return clazz.cast( new CacheReportXpp3Reader().read( new ByteArrayInputStream( bytes ) ) );
+                return clazz.cast( new CacheReportXpp3Reader().read( inputStream ) );
             }
             else
             {
