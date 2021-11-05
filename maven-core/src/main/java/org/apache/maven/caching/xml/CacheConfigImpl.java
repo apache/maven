@@ -27,6 +27,7 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.PluginScanConfigImpl;
 import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.domain.AttachedOutputs;
+import org.apache.maven.caching.domain.Exclude;
 import org.apache.maven.caching.domain.Include;
 import org.apache.maven.caching.domain.Local;
 import org.apache.maven.caching.domain.ProjectDiscoveryStrategy;
@@ -190,7 +191,7 @@ public class CacheConfigImpl implements CacheConfig
         final GoalReconciliationType reconciliationConfig = findReconciliationConfig( mojoExecution );
         if ( reconciliationConfig != null )
         {
-            return reconciliationConfig.getReconcile();
+            return reconciliationConfig.getReconciles();
         }
         else
         {
@@ -224,7 +225,7 @@ public class CacheConfigImpl implements CacheConfig
             return null;
         }
 
-        final List<GoalReconciliationType> reconciliation = executionControl.getReconcile().getPlugin();
+        final List<GoalReconciliationType> reconciliation = executionControl.getReconcile().getPlugins();
 
         for ( GoalReconciliationType goalReconciliationConfig : reconciliation )
         {
@@ -249,7 +250,7 @@ public class CacheConfigImpl implements CacheConfig
         final GoalReconciliationType reconciliationConfig = findReconciliationConfig( mojoExecution );
         if ( reconciliationConfig != null )
         {
-            return reconciliationConfig.getLog();
+            return reconciliationConfig.getLogs();
         }
         else
         {
@@ -265,7 +266,7 @@ public class CacheConfigImpl implements CacheConfig
         final GoalReconciliationType reconciliationConfig = findReconciliationConfig( mojoExecution );
         if ( reconciliationConfig != null )
         {
-            return reconciliationConfig.getNolog();
+            return reconciliationConfig.getNologs();
         }
         else
         {
@@ -282,7 +283,7 @@ public class CacheConfigImpl implements CacheConfig
 
         if ( pluginConfig != null && pluginConfig.getEffectivePom() != null )
         {
-            return pluginConfig.getEffectivePom().getExcludeProperty();
+            return pluginConfig.getEffectivePom().getExcludeProperties();
         }
         return Collections.emptyList();
     }
@@ -295,7 +296,7 @@ public class CacheConfigImpl implements CacheConfig
             return null;
         }
 
-        final List<PluginConfigurationScanType> pluginConfigs = cacheConfig.getInput().getPlugin();
+        final List<PluginConfigurationScanType> pluginConfigs = cacheConfig.getInput().getPlugins();
         for ( PluginConfigurationScanType pluginConfig : pluginConfigs )
         {
             if ( isPluginMatch( plugin, pluginConfig ) )
@@ -338,7 +339,7 @@ public class CacheConfigImpl implements CacheConfig
         if ( pluginScanConfig != null )
         {
             final ExecutionConfigurationScanType executionScanConfig = findExecutionScanConfig( exec,
-                    pluginScanConfig.getExecution() );
+                    pluginScanConfig.getExecutions() );
             if ( executionScanConfig != null && executionScanConfig.getDirScan() != null )
             {
                 return new PluginScanConfigImpl( executionScanConfig.getDirScan() );
@@ -353,7 +354,7 @@ public class CacheConfigImpl implements CacheConfig
     {
         for ( ExecutionConfigurationScanType executionScanConfig : scanConfigs )
         {
-            if ( executionScanConfig.getExecId().contains( execution.getId() ) )
+            if ( executionScanConfig.getExecIds().contains( execution.getId() ) )
             {
                 return executionScanConfig;
             }
@@ -380,15 +381,15 @@ public class CacheConfigImpl implements CacheConfig
     public List<Include> getGlobalIncludePaths()
     {
         checkInitializedState();
-        return cacheConfig.getInput().getGlobal().getInclude();
+        return cacheConfig.getInput().getGlobal().getIncludes();
     }
 
     @Nonnull
     @Override
-    public List<String> getGlobalExcludePaths()
+    public List<Exclude> getGlobalExcludePaths()
     {
         checkInitializedState();
-        return cacheConfig.getInput().getGlobal().getExclude();
+        return cacheConfig.getInput().getGlobal().getExcludes();
     }
 
     @Nonnull
@@ -439,7 +440,7 @@ public class CacheConfigImpl implements CacheConfig
 
     private boolean executionMatches( MojoExecution execution, ExecutablesType executablesType )
     {
-        final List<PluginSetType> pluginConfigs = executablesType.getPlugin();
+        final List<PluginSetType> pluginConfigs = executablesType.getPlugins();
         for ( PluginSetType pluginConfig : pluginConfigs )
         {
             if ( isPluginMatch( execution.getPlugin(), pluginConfig ) )
@@ -448,20 +449,20 @@ public class CacheConfigImpl implements CacheConfig
             }
         }
 
-        final List<ExecutionIdsListType> executionIds = executablesType.getExecution();
+        final List<ExecutionIdsListType> executionIds = executablesType.getExecutions();
         for ( ExecutionIdsListType executionConfig : executionIds )
         {
-            if ( isPluginMatch( execution.getPlugin(), executionConfig ) && executionConfig.getExecId().contains(
+            if ( isPluginMatch( execution.getPlugin(), executionConfig ) && executionConfig.getExecIds().contains(
                     execution.getExecutionId() ) )
             {
                 return true;
             }
         }
 
-        final List<GoalsListType> pluginsGoalsList = executablesType.getGoals();
+        final List<GoalsListType> pluginsGoalsList = executablesType.getGoalsLists();
         for ( GoalsListType pluginGoals : pluginsGoalsList )
         {
-            if ( isPluginMatch( execution.getPlugin(), pluginGoals ) && pluginGoals.getGoal().contains(
+            if ( isPluginMatch( execution.getPlugin(), pluginGoals ) && pluginGoals.getGoals().contains(
                     execution.getGoal() ) )
             {
                 return true;
@@ -536,7 +537,7 @@ public class CacheConfigImpl implements CacheConfig
     {
         checkInitializedState();
         final AttachedOutputs attachedOutputs = getConfiguration().getAttachedOutputs();
-        return attachedOutputs == null ? Collections.<String>emptyList() : attachedOutputs.getDirName();
+        return attachedOutputs == null ? Collections.<String>emptyList() : attachedOutputs.getDirNames();
     }
 
     @Nonnull
@@ -552,7 +553,7 @@ public class CacheConfigImpl implements CacheConfig
         if ( cacheConfig.getOutput() != null && cacheConfig.getOutput().getExclude() != null )
         {
             List<Pattern> patterns = new ArrayList<>();
-            for ( String pattern : cacheConfig.getOutput().getExclude().getPattern() )
+            for ( String pattern : cacheConfig.getOutput().getExclude().getPatterns() )
             {
                 patterns.add( Pattern.compile( pattern ) );
             }

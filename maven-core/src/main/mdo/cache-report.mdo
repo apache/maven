@@ -19,7 +19,7 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xsd.namespace="org:apache:maven:cache:domain">
+  xsd.namespace="org:apache:maven:cache:report">
   <id>cache-report</id>
   <name>CacheReport</name>
   <description><![CDATA[

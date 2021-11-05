@@ -246,6 +246,7 @@ under the License.
                 <model>src/main/mdo/cache-diff.mdo</model>
                 <model>src/main/mdo/cache-report.mdo</model>
               </models>
+              <outputDirectory>${basedir}/target/generated-sources/modello</outputDirectory>
             </configuration>
           </execution>
           <execution>

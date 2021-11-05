@@ -52,13 +52,13 @@ public class PluginScanConfigImpl implements PluginScanConfig
         // include or exclude is a choice element, could be only obe property set
 
         //noinspection ConstantConditions
-        final List<TagScanConfigType> includes = dto.getInclude();
+        final List<TagScanConfigType> includes = dto.getIncludes();
         if ( !includes.isEmpty() )
         {
             return findTagScanProperties( tagName ) != null;
         }
 
-        return !contains( dto.getExclude(), tagName );
+        return !contains( dto.getExcludes(), tagName );
     }
 
     private boolean contains( List<TagNameType> excludes, String tagName )
@@ -104,11 +104,11 @@ public class PluginScanConfigImpl implements PluginScanConfig
             merged.setMode( dto.getMode() );
         }
 
-        merged.getExclude().addAll( dto.getExclude() );
-        merged.getExclude().addAll( override.getExclude() );
+        merged.getExcludes().addAll( dto.getExcludes() );
+        merged.getExcludes().addAll( override.getExcludes() );
 
-        merged.getInclude().addAll( dto.getInclude() );
-        merged.getInclude().addAll( override.getInclude() );
+        merged.getIncludes().addAll( dto.getIncludes() );
+        merged.getIncludes().addAll( override.getIncludes() );
 
         return new PluginScanConfigImpl( merged );
     }
@@ -128,10 +128,10 @@ public class PluginScanConfigImpl implements PluginScanConfig
 
     private ScanConfigProperties findTagScanProperties( String tagName )
     {
-        ScanConfigProperties scanConfigProperties = findConfigByName( tagName, dto.getInclude() );
+        ScanConfigProperties scanConfigProperties = findConfigByName( tagName, dto.getIncludes() );
         if ( scanConfigProperties == null )
         {
-            scanConfigProperties = findConfigByName( tagName, dto.getTagScanConfig() );
+            scanConfigProperties = findConfigByName( tagName, dto.getTagScanConfigs() );
         }
         return scanConfigProperties;
     }
