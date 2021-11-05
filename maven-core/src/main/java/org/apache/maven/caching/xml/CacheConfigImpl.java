@@ -399,7 +399,7 @@ public class CacheConfigImpl implements CacheConfig
         checkInitializedState();
         final ProjectDiscoveryStrategy projectDiscoveryStrategy =
                 cacheConfig.getConfiguration().getProjectDiscoveryStrategy();
-        if ( projectDiscoveryStrategy.getSpecificVersion() != null )
+        if ( projectDiscoveryStrategy != null && projectDiscoveryStrategy.getSpecificVersion() != null )
         {
             return new SentinelVersionStartegy( projectDiscoveryStrategy.getSpecificVersion() );
         }
