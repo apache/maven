@@ -19,8 +19,10 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
+import org.apache.maven.caching.domain.CacheType;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -28,8 +30,8 @@ public class CacheConfigTest {
 
     @Test
     public void testMU() {
-//        final Path path = Paths.get("W:\\dev\\abfx\\maven-cache-config.xml");
-//        final CacheConfig cacheConfig = CacheConfig.fromFile(path.toFile());
-//        System.out.println(cacheConfig.toString());
+        InputStream is = getClass().getResourceAsStream( "cache-config-instance.xml" );
+        final CacheType cacheConfig = new XmlService().fromInputStream( CacheType.class, is );
+        System.out.println(cacheConfig.toString());
     }
 }

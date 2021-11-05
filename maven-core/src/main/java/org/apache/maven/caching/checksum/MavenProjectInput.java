@@ -33,6 +33,7 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.RemoteArtifactsRepository;
 import org.apache.maven.caching.ScanConfigProperties;
+import org.apache.maven.caching.domain.Exclude;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.hash.HashFactory;
@@ -179,9 +180,10 @@ public class MavenProjectInput
         filteredOutPaths = new ArrayList<>( Arrays.asList( normalizedPath( build.getDirectory() ), // target by default
                 normalizedPath( build.getOutputDirectory() ), normalizedPath( build.getTestOutputDirectory() ) ) );
 
-        for ( String excludePath : config.getGlobalExcludePaths() )
+        List<Exclude> excludes = config.getGlobalExcludePaths();
+        for ( Exclude excludePath : excludes )
         {
-            filteredOutPaths.add( Paths.get( excludePath ) );
+            filteredOutPaths.add( Paths.get( excludePath.getValue() ) );
         }
 
         for ( String propertyName : properties.stringPropertyNames() )

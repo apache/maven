@@ -76,7 +76,7 @@ under the License.
             </xs:sequence>
         </xs:complexType>
         -->
-        <class rootElement="true">
+        <class rootElement="true" xml.tagName="cache">
             <name>CacheType</name>
             <fields>
                 <field>
@@ -320,7 +320,7 @@ under the License.
                     </association>
                 </field>
                 <field>
-                    <name>debug</name>
+                    <name>debugs</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -376,7 +376,7 @@ under the License.
             <name>AttachedOutputs</name>
             <fields>
                 <field>
-                    <name>dirName</name>
+                    <name>dirNames</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -445,7 +445,7 @@ under the License.
                     <description>Global input calculation rules applicable to all projects and plugins in the build</description>
                 </field>
                 <field>
-                    <name>plugin</name>
+                    <name>plugins</name>
                     <association>
                         <type>PluginConfigurationScanType</type>
                         <multiplicity>*</multiplicity>
@@ -520,7 +520,7 @@ under the License.
                     <description>Specifies plugin level rules of configuration processing in search of referenced source files</description>
                 </field>
                 <field>
-                    <name>execution</name>
+                    <name>executions</name>
                     <association>
                         <type>ExecutionConfigurationScanType</type>
                         <multiplicity>*</multiplicity>
@@ -548,7 +548,7 @@ under the License.
             <name>EffectivePom</name>
             <fields>
                 <field>
-                    <name>excludeProperty</name>
+                    <name>excludeProperties</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -583,7 +583,7 @@ under the License.
             <name>ExecutionConfigurationScanType</name>
             <fields>
                 <field>
-                    <name>execId</name>
+                    <name>execIds</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -694,7 +694,7 @@ under the License.
             <name>DirScanConfigType</name>
             <fields>
                 <field>
-                    <name>include</name>
+                    <name>includes</name>
                     <association>
                         <type>TagScanConfigType</type>
                         <multiplicity>*</multiplicity>
@@ -703,7 +703,7 @@ under the License.
                         properties will be takein in calculation (whitelist)</description>
                 </field>
                 <field>
-                    <name>exclude</name>
+                    <name>excludes</name>
                     <association>
                         <type>TagNameType</type>
                         <multiplicity>*</multiplicity>
@@ -711,7 +711,7 @@ under the License.
                     <description>Tag to exclude when scanning plugin configuration for input files (blacklist)</description>
                 </field>
                 <field>
-                    <name>tagScanConfig</name>
+                    <name>tagScanConfigs</name>
                     <association>
                         <type>TagScanConfigType</type>
                         <multiplicity>*</multiplicity>
@@ -769,7 +769,7 @@ under the License.
             <name>OutputTypeExclude</name>
             <fields>
                 <field>
-                    <name>pattern</name>
+                    <name>patterns</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -804,18 +804,27 @@ under the License.
                     <defaultValue>*</defaultValue>
                 </field>
                 <field>
-                    <name>include</name>
+                    <name>includes</name>
                     <association>
                         <type>Include</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
                 <field>
-                    <name>exclude</name>
+                    <name>excludes</name>
                     <association>
-                        <type>String</type>
+                        <type>Exclude</type>
                         <multiplicity>*</multiplicity>
                     </association>
+                </field>
+            </fields>
+        </class>
+        <class>
+            <name>Exclude</name>
+            <fields>
+                <field xml.content="true">
+                    <name>value</name>
+                    <type>String</type>
                 </field>
             </fields>
         </class>
@@ -901,14 +910,14 @@ under the License.
             <superClass>GoalIdType</superClass>
             <fields>
                 <field>
-                    <name>reconcile</name>
+                    <name>reconciles</name>
                     <association>
                         <type>TrackedPropertyType</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
                 <field>
-                    <name>log</name>
+                    <name>logs</name>
                     <association>
                         <type>PropertyNameType</type>
                         <multiplicity>*</multiplicity>
@@ -916,7 +925,7 @@ under the License.
                     <description>Specify property which should be logged to build metadata for exploration</description>
                 </field>
                 <field>
-                    <name>nolog</name>
+                    <name>nologs</name>
                     <association>
                         <type>PropertyNameType</type>
                         <multiplicity>*</multiplicity>
@@ -1057,7 +1066,7 @@ under the License.
             <name>Reconcile</name>
             <fields>
                 <field>
-                    <name>plugin</name>
+                    <name>plugins</name>
                     <association>
                         <type>GoalReconciliationType</type>
                         <multiplicity>*</multiplicity>
@@ -1113,7 +1122,7 @@ under the License.
             <name>ExecutablesType</name>
             <fields>
                 <field>
-                    <name>plugin</name>
+                    <name>plugins</name>
                     <association>
                         <type>PluginSetType</type>
                         <multiplicity>*</multiplicity>
@@ -1121,7 +1130,7 @@ under the License.
                     <description>Specify which executions should run always if present in build regardless of cached status</description>
                 </field>
                 <field>
-                    <name>execution</name>
+                    <name>executions</name>
                     <association>
                         <type>ExecutionIdsListType</type>
                         <multiplicity>*</multiplicity>
@@ -1129,7 +1138,7 @@ under the License.
                     <description>Specify which executions should run always if present in build regardless of cached status</description>
                 </field>
                 <field>
-                    <name>goals</name>
+                    <name>goalsLists</name>
                     <association>
                         <type>GoalsListType</type>
                         <multiplicity>*</multiplicity>
@@ -1162,7 +1171,7 @@ under the License.
             <superClass>CoordinatesBaseType</superClass>
             <fields>
                 <field>
-                    <name>goal</name>
+                    <name>goals</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -1217,7 +1226,7 @@ under the License.
             <superClass>CoordinatesBaseType</superClass>
             <fields>
                 <field>
-                    <name>execId</name>
+                    <name>execIds</name>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
@@ -1250,11 +1259,11 @@ under the License.
         <class>
             <name>CoordinatesBaseType</name>
             <fields>
-                <field>
+                <field xml.attribute="true">
                     <name>groupId</name>
                     <type>String</type>
                 </field>
-                <field>
+                <field xml.attribute="true">
                     <name>artifactId</name>
                     <type>String</type>
                 </field>
@@ -1274,7 +1283,7 @@ under the License.
         <class>
             <name>TagNameType</name>
             <fields>
-                <field>
+                <field xml.attribute="true">
                     <name>tagName</name>
                     <type>String</type>
                     <required>true</required>
