@@ -157,17 +157,6 @@ under the License.
       <version>0.9</version>
     </dependency>
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>2.3.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>2.3.3</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>com.github.albfernandez</groupId>
       <artifactId>juniversalchardet</artifactId>
       <version>2.4.0</version>
@@ -281,28 +270,6 @@ under the License.
           </execution>
         </executions>
       </plugin>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>2.5.0</version>
-        <executions>
-          <execution>
-            <id>xjc</id>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <packageName>org.apache.maven.caching.jaxb</packageName>
-          <sources>
-            <source>src/main/resources/cache-config.xsd</source>
-            <source>src/main/resources/cache-domain.xsd</source>
-          </sources>
-        </configuration>
-      </plugin>
-      -->
     </plugins>
   </build>
 </project>

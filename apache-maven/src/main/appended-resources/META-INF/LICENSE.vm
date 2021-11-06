@@ -42,8 +42,6 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
 #*      *##set ( $spdx = 'ASL-2.0' )
-#*    *##elseif ( $license.url.contains( "www.eclipse.org/org/documents/edl-v10.php" )  )
-#*      *##set ( $spdx = 'EDL-1.0' )
 #*    *##elseif ( $license.url.contains( "www.mozilla.org/en-US/MPL/1.1" )  )
 #*      *##set ( $spdx = 'MPL-1.1' )
 #*    *##elseif ( $license.url.contains( "www.gnu.org/licenses/gpl" )  )

@@ -555,7 +555,6 @@ under the License.
               -->
               <exclude>src/main/appended-resources/licenses/CDDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/EDL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/MPL-1.1.txt</exclude>
               <exclude>src/main/appended-resources/licenses/LGPL-3.0.txt</exclude>
               <exclude>.editorconfig</exclude>
