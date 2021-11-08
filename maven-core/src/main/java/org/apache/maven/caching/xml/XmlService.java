@@ -19,18 +19,18 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.domain.CacheType;
-import org.apache.maven.caching.domain.io.xpp3.CacheConfigXpp3Reader;
-import org.apache.maven.caching.domain.io.xpp3.CacheConfigXpp3Writer;
-import org.apache.maven.caching.domain.io.xpp3.CacheDiffXpp3Reader;
-import org.apache.maven.caching.domain.io.xpp3.CacheDiffXpp3Writer;
-import org.apache.maven.caching.domain.io.xpp3.CacheDomainXpp3Reader;
-import org.apache.maven.caching.domain.BuildDiffType;
-import org.apache.maven.caching.domain.BuildInfoType;
-import org.apache.maven.caching.domain.CacheReportType;
-import org.apache.maven.caching.domain.io.xpp3.CacheDomainXpp3Writer;
-import org.apache.maven.caching.domain.io.xpp3.CacheReportXpp3Reader;
-import org.apache.maven.caching.domain.io.xpp3.CacheReportXpp3Writer;
+import org.apache.maven.caching.xml.config.CacheType;
+import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
+import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
+import org.apache.maven.caching.xml.diff.BuildDiffType;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Reader;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Writer;
+import org.apache.maven.caching.xml.domain.BuildInfoType;
+import org.apache.maven.caching.xml.domain.io.xpp3.CacheDomainXpp3Reader;
+import org.apache.maven.caching.xml.domain.io.xpp3.CacheDomainXpp3Writer;
+import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
+import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

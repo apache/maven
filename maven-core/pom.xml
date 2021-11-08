@@ -218,7 +218,10 @@ under the License.
             <configuration>
               <version>1.0.0</version>
               <models>
+                <model>src/main/mdo/cache-config.mdo</model>
                 <model>src/main/mdo/cache-domain.mdo</model>
+                <model>src/main/mdo/cache-diff.mdo</model>
+                <model>src/main/mdo/cache-report.mdo</model>
               </models>
             </configuration>
           </execution>

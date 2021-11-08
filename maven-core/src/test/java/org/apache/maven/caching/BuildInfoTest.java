@@ -19,18 +19,17 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-
 import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.domain.ArtifactType;
-import org.apache.maven.caching.domain.BuildInfoType;
-import org.apache.maven.caching.domain.CompletedExecutionType;
-import org.apache.maven.caching.domain.DigestItemType;
-import org.apache.maven.caching.domain.ProjectsInputInfoType;
-import org.apache.maven.caching.domain.PropertyValueType;
+import org.apache.maven.caching.xml.domain.ArtifactType;
+import org.apache.maven.caching.xml.domain.BuildInfoType;
+import org.apache.maven.caching.xml.domain.CompletedExecutionType;
+import org.apache.maven.caching.xml.domain.DigestItemType;
+import org.apache.maven.caching.xml.domain.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.domain.PropertyValueType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.XmlService;
 import org.junit.Test;

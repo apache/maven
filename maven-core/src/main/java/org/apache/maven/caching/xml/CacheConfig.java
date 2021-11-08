@@ -21,11 +21,11 @@ package org.apache.maven.caching.xml;
 
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
-import org.apache.maven.caching.domain.Exclude;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.domain.Include;
-import org.apache.maven.caching.domain.PropertyNameType;
-import org.apache.maven.caching.domain.TrackedPropertyType;
+import org.apache.maven.caching.xml.config.Exclude;
+import org.apache.maven.caching.xml.config.Include;
+import org.apache.maven.caching.xml.config.PropertyNameType;
+import org.apache.maven.caching.xml.config.TrackedPropertyType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;

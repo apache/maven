@@ -24,13 +24,13 @@ under the License.
        xsd.namespace="org:apache:maven:cache:config">
     <id>cache-config</id>
     <name>CacheConfig</name>
-    <description><![CDATA[
+    <description><![CDATA[Maven Incremental Build and Cache configuration, stored in <code>.mvn/maven-cache-config.xml</code>
   ]]></description>
 
     <defaults>
         <default>
             <key>package</key>
-            <value>org.apache.maven.caching.domain</value>
+            <value>org.apache.maven.caching.xml.config</value>
         </default>
     </defaults>
 

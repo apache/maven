@@ -27,7 +27,7 @@ under the License.
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.caching.domain</value>
+      <value>org.apache.maven.caching.xml.report</value>
     </default>
   </defaults>
   <classes>
