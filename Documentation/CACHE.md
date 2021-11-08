@@ -17,19 +17,19 @@
 
 ## Overview
 
-Idea of Incremental Maven is to specify module inputs and outputs and make them known to standard maven core. This
+Idea of Incremental Maven is to specify module inputs and outputs and make them known to standard Maven core. This
 allows accurate analysis and determination of out-of-date build artifacts in the build dependencies graph. Making the
 dependency graph analysis deterministic leads to improvements in build times by avoiding re-building unnecessary
 modules.  
-Cache does not make any low-level interventions to build process and delegates actual build work to maven core. This
-guarantees that build results are identical to results produced by standard maven and are fully reproducible.   
-To achieve accurate input and outputs calculation incremental maven combines automatic introspection
+Cache does not make any low-level interventions to build process and delegates actual build work to Maven core. This
+guarantees that build results are identical to results produced by standard Maven and are fully reproducible.   
+To achieve accurate input and outputs calculation incremental Maven combines automatic introspection
 of [project object model](https://maven.apache.org/pom.html#What_is_the_POM) in conjunction with configuration-driven
 rules for fine-grained content and execution control. For content analysis it digests based approach which is more
 reliable over widely used file timestamps in tools like Make or Apache Ant. Deterministic build state allows reliably
 cache even intermediate outputs of build and share them between teams using remote cache. Deterministic inputs
 calculation allows distributed and parallel builds running in heterogeneous environments (like cloud of build agents)
-could efficiently reuse cached build artifacts. Therefore incremental maven is particularly well-suited for large maven
+could efficiently reuse cached build artifacts. Therefore incremental Maven is particularly well-suited for large Maven
 projects that have significant number of small modules. Remote cache in conjunction with precise input identification
 effectively enables "change once - build once" approach.
 
@@ -51,7 +51,7 @@ of today build with some tolerance (implementation, configuration and environmen
 
 ### Implementation insights
 
-At very simple form, the incremental maven is essentially a hash function which takes maven project and produces hash
+At very simple form, the incremental Maven is essentially a hash function which takes Maven project and produces hash
 code (checksum). Then hash value is used to fetch and restore build result.  
 As with any hash, there could be collisions and instabilities. Collision could happen if the same hash produced from the
 different build states and will result in unintended reuse. Instability means that same input yields different hash sums
@@ -79,7 +79,7 @@ verification it's still consumer's responsibility to verify final product qualit
 Given all the information above, the Incremental Maven is recommended to use in scenarios when productivity and
 performance are in priority. Typical cases are:
 
-* Speedup CI. In conjunction with remote cache incremental maven could drastically reduce build times, validate pull
+* Speedup CI. In conjunction with remote cache incremental Maven could drastically reduce build times, validate pull
   requests faster and reduce load on CI nodes
 * Speedup developer builds. By reusing cached builds developers could verify changes much faster and be more productive.
   No more `-DskipTests` and similar.
@@ -92,35 +92,35 @@ This also allows you to validate cache correctness and reconcile cache outcomes 
 
 ## Getting Started
 
-To on-board incremental maven you need to complete several steps:
+To on-board incremental Maven you need to complete several steps:
 
-* Get incremental maven distribution
-* Add cache config in .mvn
+* Get incremental Maven distribution
+* Add cache config in `.mvn`
 * Validate build results and iteratively adjust config to project specifics
-* Migrate CI to incremental maven with remote cache (to get full benefit) - optional
+* Migrate CI to incremental Maven with remote cache (to get full benefit) - optional
 
-### Get incremental maven distribution
+### Get incremental Maven distribution
 
 The recommended way is to add [Takari Maven Wrapper](https://github.com/takari/maven-wrapper) to your project. In that
-case `maven-wrapper.properties` should reference the latest incremental maven distribution:
+case `maven-wrapper.properties` should reference the latest incremental Maven distribution:
 
 ```properties
 distributionUrl=https://your-server/maven-incremental.zip
 wrapperUrl=https://your-server/maven-wrapper-0.5.5.jar
 ```
 
-Benefits of using maven wrapper are following:
+Benefits of using Maven wrapper are following:
 
 * simple distribution across workstations and CI envs
-* maven stays compatible to your branch
+* Maven stays compatible to your branch
 * further upgrades are simplified significantly  
-  If you refuse wrapper - then download, unzip and install it just as usual maven. Further it will be assumed you use
-  maven wrapper (`mvnw`)
+  If you refuse wrapper - then download, unzip and install it just as usual Maven. Further it will be assumed you use
+  Maven wrapper (`mvnw`)
 
 ### Adding cache config
 
-Copy [default config](maven-cache-config.xml) and [xml schema](../maven-core/src/main/resources/cache-config.xsd)
-to [.mvn](https://maven.apache.org/configure.html) dir of yor project.  
+Copy [default config `maven-cache-config.xml`](maven-cache-config.xml)
+to [`.mvn/`](https://maven.apache.org/configure.html) dir of your project.  
 To get overall understanding of cache machinery it is recommended to review the config and read comments. In typical
 scenario you need to adjust:
 
@@ -135,15 +135,15 @@ See also:
 * [Remote cache setup](CACHE-REMOTE.md) - instruction how to setup shared cache
 * [Cache How-To](CACHE-HOWTO.md) - cookbook for frequently encountered questions
 * [Cache Parameters](CACHE-PARAMETERS.md) - description of supported parameters
-* Attached [sample config file](maven-cache-config.xml) and elements annotations in xsd schema. (Ctrl+Q in idea should
+* Attached [sample `maven-cache-config.xml` config file](maven-cache-config.xml) and elements annotations in xsd schema. (Ctrl+Q in idea should
   show annotations in popup)
 
 ### Adjusting cache config
 
-Having incremental maven and the config in place you're all set. To run first cacheable build just
+Having incremental Maven and the config in place you're all set. To run first cacheable build just
 execute: `mvnw clean install`
 
-* Ensure that the config is picked up and incremental maven is picked up. Just check log output - you will notice cache
+* Ensure that the config is picked up and incremental Maven is picked up. Just check log output - you will notice cache
   related output or initialization error message.
 * Navigate to your local repo directory - there should be sibling next to your local repo named `cache`
 * Find `buildinfo.xml` for typical module and review it. Ensure that

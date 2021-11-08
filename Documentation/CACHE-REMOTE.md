@@ -17,7 +17,7 @@
 
 # Overview
 
-This document describes generic approach to cache setup. The process require expertise in maven equivalent to expertise
+This document describes generic approach to cache setup. The process require expertise in Maven equivalent to expertise
 required to author and Maven your project build, it implies good knowledge of both Maven and the project. Due to Maven
 model limitation the process is manual, but allows you to achieve sufficient control and transparency over caching
 logic.
@@ -113,8 +113,8 @@ Once discrepancy between remote and local builds detected cache will fail with d
 in `target/incremental-maven` directory:
 
 ```
-* buildinfo-baseline-3c64673e23259e6f.xml - build specficiation from baseline build
-* buildinfo-db43936e0666ce7.xml - build specification of locall build
+* buildinfo-baseline-3c64673e23259e6f.xml - build specification from baseline build
+* buildinfo-db43936e0666ce7.xml - build specification of local build
 * buildsdiff.xml - comparison report with list of discrepancies 
 ```
 
@@ -242,7 +242,7 @@ relax consistency rules in favor of compatibility, remove property from tracked 
 
 Current implementation doesn't support version changes between cache entries. It will result in cache invalidation for
 each new version.  
-To mitigate the issue please consider migrating off traditional maven release approach - try to use single version id in
+To mitigate the issue please consider migrating off traditional Maven release approach - try to use single version id in
 project (eg `<version>MY-PROJECT-LOCAL</version>`). Such approach simplifies git branching workflow significantly.
 
 Deployment of artifacts with specific version from builds with cache is not supported yet.  

@@ -15,9 +15,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<cache xmlns="org:apache:maven:cache:config:v1"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:config:v1 cache-config.xsd">
+<cache xmlns="org:apache:maven:cache:config:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="org:apache:maven:cache:config:v1 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
 
     <configuration>
         <enabled>true</enabled>

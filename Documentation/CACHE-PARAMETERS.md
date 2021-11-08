@@ -26,8 +26,8 @@ This documents contains various configuration parameters supported by cache engi
 | `-Dremote.cache.configPath=true/false`    | Location of cache configuration file                          | Cache config is not in default location |
 | `-Dremote.cache.enabled=true/false`       | Remote cache and associated features disabled/enabled         | To remove noise from logs then remote cache is not available |
 | `-Dremote.cache.save.enabled=true/false`  | Remote cache save allowed or not                              | To designate nodes which allowed to push in remote shared cache |
-| `-Dremote.cache.save.final=true/false`    | Is it allowed or not to override produced cache               | To ensure that reference build is not overriden by interim build |
-| `-Dremote.cache.failFast=true/false`      | Fail on the first module whcih cannot be restored from cache  | Remote cache setup/tuning/troubleshooting |
+| `-Dremote.cache.save.final=true/false`    | Is it allowed or not to override produced cache               | To ensure that reference build is not overridden by interim build |
+| `-Dremote.cache.failFast=true/false`      | Fail on the first module which cannot be restored from cache  | Remote cache setup/tuning/troubleshooting |
 | `-Dremote.cache.baselineUrl=<http url>`   | Location of baseline build for comparison                     | Remote cache setup/tuning/troubleshooting |
 
 ## Project level properties
