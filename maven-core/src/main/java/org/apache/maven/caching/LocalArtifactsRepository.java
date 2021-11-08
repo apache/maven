@@ -22,7 +22,7 @@ package org.apache.maven.caching;
 import com.google.common.base.Optional;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheSource;
-import org.apache.maven.caching.xml.domain.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.ArtifactType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 

@@ -19,17 +19,15 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/CACHE/DOMAIN/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/cache-domain-${version}.xsd"
-  xsd.namespace="org:apache:maven:cache:domain">
-  <id>cache-domain</id>
-  <name>CacheDomain</name>
-  <description><![CDATA[
+  xsd.namespace="org:apache:maven:cache:buildinfo">
+  <id>cache-buildinfo</id>
+  <name>CacheBuildInfo</name>
+  <description><![CDATA[Cache build info, stored in local <code>lookupinfo.xml</code> or remote <code>buildinfo.xml</code>
   ]]></description>
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.caching.xml.domain</value>
+      <value>org.apache.maven.caching.xml.buildinfo</value>
     </default>
   </defaults>
   <classes>
