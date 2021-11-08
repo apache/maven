@@ -17,18 +17,17 @@
 
 ### Overview
 
-Cache configuration provides you additional control over incremental maven behavior. Follow it step by step to
+Cache configuration provides you additional control over incremental Maven behavior. Follow it step by step to
 understand how it works and figure out your optimal config
 
 ### Minimal config
 
-Absolutely minimal config which enables incremental maven with local cache
+Absolutely minimal config which enables incremental Maven with local cache
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
-<cache xmlns="org:apache:maven:cache:config:v1"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:config:v1 cache-config.xsd">
+<cache xmlns="org:apache:maven:cache:config:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="org:apache:maven:cache:config:v1 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
 
     <configuration>
         <enabled>true</enabled>
@@ -73,7 +72,7 @@ Add all the project specific source code files in `<glob>`. Scala in this case:
 
 ### Adding source directory for bespoke project layouts
 
-In most of the cases incremental maven will recognize directories automatically by build introspection. If not, you can
+In most of the cases incremental Maven will recognize directories automatically by build introspection. If not, you can
 add additional directories with `<include>`. Also you can filter out undesirable dirs and files by using exclude tag
 
 ```xml
@@ -134,7 +133,7 @@ Add `executionControl/runAlways` section
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <cache xmlns="org:apache:maven:cache:config:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:config:v1 cache-config.xsd">
+       xsi:schemaLocation="org:apache:maven:cache:config:v1 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
     <configuration>
         ...
     </configuration>
@@ -157,7 +156,7 @@ Add `executionControl/runAlways` section
 
 ### I occasionally cached build with `-DskipTests=true` and tests do not run now
 
-If you add command line flags to your build, they do not participate in effective pom - maven defers final value
+If you add command line flags to your build, they do not participate in effective pom - Maven defers final value
 resolution to plugin runtime. To invalidate build if filed value is different in runtime, add reconciliation section
 to `executionControl`:
 
@@ -180,7 +179,7 @@ to `executionControl`:
 
 Please notice `skipValue` attribute. It denotes value which forces skipped execution.
 Read `propertyName="skipTests" skipValue="true"` as if property skipTests has value true, plugin will skip execution If
-you declare such value incremental maven will reuse appropriate full-build though technically they are different, but
+you declare such value incremental Maven will reuse appropriate full-build though technically they are different, but
 because full-build is better it is safe to reuse
 
 ### How to renormalize line endings in working copy after committing .gitattributes (git 2.16+)

@@ -19,6 +19,8 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+  xml.namespace="http://maven.apache.org/CACHE/DOMAIN/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/cache-domain-${version}.xsd"
   xsd.namespace="org:apache:maven:cache:domain">
   <id>cache-domain</id>
   <name>CacheDomain</name>
@@ -35,7 +37,7 @@ under the License.
     <class rootElement="true" xml.tagName="build">
       <name>BuildInfoType</name>
       <version>1.0.0+</version>
-      <description><![CDATA[Root element of the <code>extension.xml</code> file.]]></description>
+      <description></description>
       <!--xs:all-->
       <fields>
         <!-- xs:element name="cacheImplementationVersion" type="xs:string"/-->
