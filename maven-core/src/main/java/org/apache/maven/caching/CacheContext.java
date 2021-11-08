@@ -19,7 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.caching.domain.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.domain.ProjectsInputInfoType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 

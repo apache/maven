@@ -20,9 +20,9 @@ package org.apache.maven.caching;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.domain.DirScanConfigType;
-import org.apache.maven.caching.domain.TagNameType;
-import org.apache.maven.caching.domain.TagScanConfigType;
+import org.apache.maven.caching.xml.config.DirScanConfigType;
+import org.apache.maven.caching.xml.config.TagNameType;
+import org.apache.maven.caching.xml.config.TagScanConfigType;
 
 import javax.annotation.Nonnull;
 import java.util.List;

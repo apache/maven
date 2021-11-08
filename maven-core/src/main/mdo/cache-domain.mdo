@@ -29,7 +29,7 @@ under the License.
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.caching.domain</value>
+      <value>org.apache.maven.caching.xml.domain</value>
     </default>
   </defaults>
   <classes>

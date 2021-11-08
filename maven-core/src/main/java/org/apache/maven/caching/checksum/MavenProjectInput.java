@@ -19,7 +19,6 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.StringUtils;
@@ -33,16 +32,16 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.RemoteArtifactsRepository;
 import org.apache.maven.caching.ScanConfigProperties;
-import org.apache.maven.caching.domain.Exclude;
+import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.domain.DigestItemType;
-import org.apache.maven.caching.domain.Include;
-import org.apache.maven.caching.domain.ProjectsInputInfoType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
+import org.apache.maven.caching.xml.config.Exclude;
+import org.apache.maven.caching.xml.config.Include;
+import org.apache.maven.caching.xml.domain.DigestItemType;
+import org.apache.maven.caching.xml.domain.ProjectsInputInfoType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.model.Build;
