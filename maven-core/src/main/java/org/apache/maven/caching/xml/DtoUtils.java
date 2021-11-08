@@ -23,11 +23,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.ProjectUtils;
+import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
+import org.apache.maven.caching.xml.buildinfo.DigestItemType;
+import org.apache.maven.caching.xml.buildinfo.PropertyValueType;
 import org.apache.maven.caching.xml.config.TrackedPropertyType;
-import org.apache.maven.caching.xml.domain.ArtifactType;
-import org.apache.maven.caching.xml.domain.CompletedExecutionType;
-import org.apache.maven.caching.xml.domain.DigestItemType;
-import org.apache.maven.caching.xml.domain.PropertyValueType;
 import org.apache.maven.model.Dependency;
 
 import javax.annotation.Nonnull;

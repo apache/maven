@@ -24,7 +24,7 @@ import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
 import org.apache.maven.caching.xml.config.TrackedPropertyType;
-import org.apache.maven.caching.xml.domain.CompletedExecutionType;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoCheker;

@@ -22,7 +22,7 @@ under the License.
   xsd.namespace="org:apache:maven:cache:report">
   <id>cache-report</id>
   <name>CacheReport</name>
-  <description><![CDATA[
+  <description><![CDATA[Cache report, stored in <code>cache-report.xml</code>
   ]]></description>
   <defaults>
     <default>

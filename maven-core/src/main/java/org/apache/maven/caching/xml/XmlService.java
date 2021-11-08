@@ -22,12 +22,12 @@ package org.apache.maven.caching.xml;
 import org.apache.maven.caching.xml.config.CacheType;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
-import org.apache.maven.caching.xml.diff.BuildDiffType;
-import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Reader;
-import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Writer;
-import org.apache.maven.caching.xml.domain.BuildInfoType;
-import org.apache.maven.caching.xml.domain.io.xpp3.CacheDomainXpp3Reader;
-import org.apache.maven.caching.xml.domain.io.xpp3.CacheDomainXpp3Writer;
+import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
+import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
+import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Writer;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
+import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Reader;
+import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Writer;
 import org.apache.maven.caching.xml.report.CacheReportType;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;
@@ -61,7 +61,7 @@ public class XmlService
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            new CacheDomainXpp3Writer().write( baos, buildInfo );
+            new CacheBuildInfoXpp3Writer().write( baos, buildInfo );
             return baos.toByteArray();
         }
     }
@@ -70,7 +70,7 @@ public class XmlService
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            new CacheDiffXpp3Writer().write( baos, diff );
+            new CacheBuildsDiffXpp3Writer().write( baos, diff );
             return baos.toByteArray();
         }
     }
@@ -100,7 +100,7 @@ public class XmlService
         {
             if ( clazz == BuildInfoType.class )
             {
-                return clazz.cast( new CacheDomainXpp3Reader().read( inputStream ) );
+                return clazz.cast( new CacheBuildInfoXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheType.class )
             {
@@ -108,7 +108,7 @@ public class XmlService
             }
             else if ( clazz == BuildDiffType.class )
             {
-                return clazz.cast( new CacheDiffXpp3Reader().read( inputStream ) );
+                return clazz.cast( new CacheBuildsDiffXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheReportType.class )
             {
