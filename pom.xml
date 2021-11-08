@@ -86,6 +86,7 @@ under the License.
     <module>maven-model</module>
     <module>maven-model-builder</module>
     <module>maven-core</module>
+    <module>maven-caching</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>

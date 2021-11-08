@@ -19,11 +19,11 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.junit.Test;
-
-import java.nio.charset.StandardCharsets;
 
 import static org.apache.maven.caching.hash.HashFactory.SHA256;
 import static org.junit.Assert.assertEquals;

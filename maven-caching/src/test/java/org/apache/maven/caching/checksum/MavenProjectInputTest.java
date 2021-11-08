@@ -19,14 +19,14 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -72,14 +72,14 @@ public class MavenProjectInputTest {
     @Test
     public void testGetDirectoryFiles() {
         List<Path> directoryFiles = new ArrayList<>();
-        MavenProjectInput.walkDirectoryFiles(Paths.get("src/test/resources"), directoryFiles, MavenProjectInput.DEFAULT_GLOB);
+        MavenProjectInput.walkDirectoryFiles(Paths.get("src/test/resources/test-folder"), directoryFiles, MavenProjectInput.DEFAULT_GLOB);
         assertEquals(0, directoryFiles.size()); // pom is filtered out by hardcoded if
     }
 
     @Test
     public void testGetDirectoryFiles2() {
         List<Path> directoryFiles = new ArrayList<>();
-        MavenProjectInput.walkDirectoryFiles(Paths.get("src/test/resources"), directoryFiles, GLOB);
-        assertEquals(4, directoryFiles.size()); // pom is filtered out by hardcoded if
+        MavenProjectInput.walkDirectoryFiles(Paths.get("src/test/resources/test-folder"), directoryFiles, GLOB);
+        assertEquals(1, directoryFiles.size()); // pom is filtered out by hardcoded if
     }
 }
