@@ -21,6 +21,7 @@ import org.apache.maven.lifecycle.internal.*;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,12 +31,11 @@ import java.util.List;
  * @author Kristian Rosenvold
  */
 public class MojoExecutorStub
-    extends MojoExecutor
+    implements MojoExecutor
 { // This is being lazy instead of making interface
 
     public List<MojoExecution> executions = Collections.synchronizedList( new ArrayList<MojoExecution>() );
 
-    @Override
     public void execute(MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                         IDependencyContext dependencyContext, PhaseRecorder phaseRecorder )
         throws LifecycleExecutionException
@@ -50,8 +50,13 @@ public class MojoExecutorStub
         executions.addAll(mojoExecutions);
     }
 
+    @Override
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session, ProjectIndex projectIndex ) throws LifecycleExecutionException
+    {
+        return null;
+    }
 
-    public static MojoDescriptor createMojoDescriptor( String mojoDescription )
+    public static MojoDescriptor createMojoDescriptor(String mojoDescription )
     {
         final PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setArtifactId( mojoDescription );

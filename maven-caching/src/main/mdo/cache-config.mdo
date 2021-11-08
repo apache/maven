@@ -36,48 +36,6 @@ under the License.
 
     <classes>
 
-        <!--
-        <xs:element name="cache" type="c:CacheType">
-            <xs:annotation>
-                <xs:documentation>
-                    Cached build metadata
-                </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:complexType name="CacheType">
-            <xs:sequence>
-                <xs:element name="configuration" type="c:ConfigurationType">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Configuration of major cache properties
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="input" type="c:InputType">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Configuration for source code input files participating in checksum calculation
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="output" type="c:OutputType" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Configuration for output artifacts, it's needed if you want to explicitly include/exclude something from caching
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="executionControl" type="c:ExecutionControlType" minOccurs="0">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Execution rules for plugins in cached mode. Defines which plugins should run always
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-        -->
         <class rootElement="true" xml.tagName="cache">
             <name>CacheType</name>
             <fields>
@@ -86,56 +44,40 @@ under the License.
                     <association>
                         <type>ConfigurationType</type>
                     </association>
+                    <description>Configuration of main cache properties</description>
                 </field>
                 <field>
                     <name>input</name>
                     <association>
                         <type>InputType</type>
                     </association>
+                    <description>Configuration for source code input files participating in checksum calculation</description>
                 </field>
                 <field>
                     <name>output</name>
                     <association>
                         <type>OutputType</type>
                     </association>
+                    <description>Configuration for output artifacts, it's needed if you want to explicitly include/exclude something from caching</description>
                 </field>
                 <field>
                     <name>executionControl</name>
                     <association>
                         <type>ExecutionControlType</type>
                     </association>
+                    <description>Execution rules for plugins in cached mode. Defines which plugins should run always</description>
                 </field>
             </fields>
+            <description>Cache build metadata</description>
         </class>
 
-        <!--
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="url" type="xs:string" minOccurs="0">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        address of remote cache
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                        </xs:sequence>
-                        <xs:attribute name="enabled" type="xs:boolean" default="true"/>
-                        <xs:attribute name="saveToRemote" type="xs:boolean" default="false">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Save output to remote cache. Recommended to enable on CI agents only.
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:attribute>
-                    </xs:complexType>
-          -->
         <class>
             <name>Remote</name>
             <fields>
                 <field>
                     <name>url</name>
                     <type>String</type>
-                    <description>address of remote cache</description>
+                    <description>Address of remote cache</description>
                 </field>
                 <field xml.attribute="true">
                     <name>enabled</name>

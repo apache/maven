@@ -19,9 +19,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<build xmlns="org:apache:maven:cache:domain"
+<build xmlns="org:apache:maven:cache:buildinfo"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:domain cache-domain.xsd">
+       xsi:schemaLocation="org:apache:maven:cache:buildinfo ../../../../../../../../target/generated-sources/modello/cache-buildinfo-1.0.0.xsd">
     <cacheImplementationVersion>v3</cacheImplementationVersion>
     <buildTime>1980-03-23T10:20:15</buildTime>
     <buildServer>my-server.com</buildServer>
@@ -39,13 +39,13 @@ under the License.
         <fileSize>123456</fileSize>
     </artifact>
     <attachedArtifacts>
-        <artifact>
+        <attachedArtifact>
             <groupId>com.my.shared</groupId>
             <artifactId>my-server</artifactId>
             <type>java-source</type>
             <classifier>sources</classifier>
             <fileName>my-server-sources.jar</fileName>
-        </artifact>
+        </attachedArtifact>
     </attachedArtifacts>
     <executions>
         <execution>

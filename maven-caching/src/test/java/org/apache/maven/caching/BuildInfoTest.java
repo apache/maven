@@ -19,6 +19,17 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -33,16 +44,6 @@ import org.apache.maven.caching.xml.buildinfo.PropertyValueType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.XmlService;
 import org.junit.Test;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 public class BuildInfoTest {
 

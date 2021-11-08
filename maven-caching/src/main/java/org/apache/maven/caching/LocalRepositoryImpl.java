@@ -243,10 +243,11 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
                     cacheDirs.add( dir );
                 }
             }
-            if ( cacheDirs.size() > cacheConfig.getMaxLocalBuildsCached() )
+            int maxLocalBuildsCached = cacheConfig.getMaxLocalBuildsCached() - 1;
+            if ( cacheDirs.size() > maxLocalBuildsCached )
             {
                 Collections.sort( cacheDirs, LAST_MODIFIED_COMPARATOR );
-                for ( Path dir : cacheDirs.subList( 0, cacheDirs.size() - cacheConfig.getMaxLocalBuildsCached() ) )
+                for ( Path dir : cacheDirs.subList( 0, cacheDirs.size() - maxLocalBuildsCached ) )
                 {
                     FileUtils.deleteDirectory( dir.toFile() );
                 }
