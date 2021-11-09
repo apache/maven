@@ -23,10 +23,10 @@ import com.google.common.collect.Iterables;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.Artifact;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.logging.Logger;
@@ -47,20 +47,20 @@ import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
 /**
  * BuildInfo
  */
-public class BuildInfo
+public class Build
 {
 
-    final org.apache.maven.caching.xml.buildinfo.BuildInfo dto;
+    final org.apache.maven.caching.xml.build.Build dto;
     CacheSource source;
 
-    public BuildInfo( List<String> goals,
-                      Artifact artifact,
-                      List<Artifact> attachedArtifacts,
-                      ProjectsInputInfo projectsInputInfo,
-                      List<CompletedExecution> completedExecutions,
-                      String hashAlgorithm )
+    public Build( List<String> goals,
+                  Artifact artifact,
+                  List<Artifact> attachedArtifacts,
+                  ProjectsInputInfo projectsInputInfo,
+                  List<CompletedExecution> completedExecutions,
+                  String hashAlgorithm )
     {
-        this.dto = new org.apache.maven.caching.xml.buildinfo.BuildInfo();
+        this.dto = new org.apache.maven.caching.xml.build.Build();
         this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLMENTATION_VERSION );
         this.dto.setBuildTime( new Date() );
         try
@@ -85,9 +85,9 @@ public class BuildInfo
         return source;
     }
 
-    public BuildInfo( org.apache.maven.caching.xml.buildinfo.BuildInfo buildInfo, CacheSource source )
+    public Build( org.apache.maven.caching.xml.build.Build dto, CacheSource source )
     {
-        this.dto = buildInfo;
+        this.dto = dto;
         this.source = source;
     }
 
@@ -181,7 +181,7 @@ public class BuildInfo
         return Collections.emptyList();
     }
 
-    public org.apache.maven.caching.xml.buildinfo.BuildInfo getDto()
+    public org.apache.maven.caching.xml.build.Build getDto()
     {
         return dto;
     }

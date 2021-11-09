@@ -21,7 +21,7 @@ package org.apache.maven.caching;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.xml.report.CacheReport;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.execution.MavenSession;
 
 import java.io.IOException;
@@ -32,9 +32,9 @@ import java.io.IOException;
 public interface ArtifactsRepository
 {
 
-    BuildInfo findBuild( CacheContext context ) throws IOException;
+    Build findBuild( CacheContext context ) throws IOException;
 
-    void saveBuildInfo( CacheResult cacheResult, BuildInfo buildInfo ) throws IOException;
+    void saveBuildInfo( CacheResult cacheResult, Build build ) throws IOException;
 
     void saveArtifactFile( CacheResult cacheResult, Artifact artifact ) throws IOException;
 

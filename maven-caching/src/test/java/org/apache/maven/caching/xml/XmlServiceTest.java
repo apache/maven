@@ -19,8 +19,8 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.buildinfo.BuildInfo;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
+import org.apache.maven.caching.xml.build.Build;
+import org.apache.maven.caching.xml.diff.Diff;
 import org.apache.maven.caching.xml.config.CacheConfig;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-config-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-config-instance.xml" );
-        final CacheConfig cache = new XmlService().fromInputStream( CacheConfig.class, is );
+        final CacheConfig cache = new XmlService().loadCacheConfig( is );
     }
 
     @Test
@@ -62,34 +62,34 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-report-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-report-instance.xml" );
-        final CacheReport cacheReport = new XmlService().fromInputStream( CacheReport.class, is );
+        final CacheReport cacheReport = new XmlService().loadCacheReport( is );
     }
 
     @Test
-    public void testBuildInfo() throws Exception {
+    public void testBuild() throws Exception {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-buildinfo-1.0.0.xsd"));
+        Schema schema = sf.newSchema(getClass().getResource("/cache-build-1.0.0.xsd"));
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setSchema(schema);
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse( getClass().getResource( "cache-buildinfo-instance.xml" ).toString() );
+        Document doc = db.parse( getClass().getResource( "cache-build-instance.xml" ).toString() );
 
-        InputStream is = getClass().getResourceAsStream( "cache-buildinfo-instance.xml" );
-        final BuildInfo buildInfo = new XmlService().fromInputStream( BuildInfo.class, is );
+        InputStream is = getClass().getResourceAsStream( "cache-build-instance.xml" );
+        final Build build = new XmlService().loadBuild( is );
     }
 
     @Test
-    public void testBuildsDiff() throws Exception {
+    public void testDiff() throws Exception {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-buildsdiff-1.0.0.xsd"));
+        Schema schema = sf.newSchema(getClass().getResource("/cache-diff-1.0.0.xsd"));
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setSchema(schema);
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse( getClass().getResource( "cache-buildsdiff-instance.xml" ).toString() );
+        Document doc = db.parse( getClass().getResource( "cache-diff-instance.xml" ).toString() );
 
-        InputStream is = getClass().getResourceAsStream( "cache-buildsdiff-instance.xml" );
-        final BuildDiff buildDiff = new XmlService().fromInputStream( BuildDiff.class, is );
+        InputStream is = getClass().getResourceAsStream( "cache-diff-instance.xml" );
+        final Diff buildDiff = new XmlService().loadDiff( is );
     }
 }

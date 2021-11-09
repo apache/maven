@@ -29,12 +29,12 @@ import java.nio.file.Files;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.caching.xml.buildinfo.BuildInfo;
-import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
-import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Writer;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
-import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Reader;
-import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Writer;
+import org.apache.maven.caching.xml.build.Build;
+import org.apache.maven.caching.xml.build.io.xpp3.CacheBuildXpp3Reader;
+import org.apache.maven.caching.xml.build.io.xpp3.CacheBuildXpp3Writer;
+import org.apache.maven.caching.xml.diff.Diff;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Reader;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Writer;
 import org.apache.maven.caching.xml.config.CacheConfig;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
@@ -60,20 +60,20 @@ public class XmlService
         }
     }
 
-    public byte[] toBytes( BuildInfo buildInfo ) throws IOException
+    public byte[] toBytes( Build build ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            new CacheBuildInfoXpp3Writer().write( baos, buildInfo );
+            new CacheBuildXpp3Writer().write( baos, build );
             return baos.toByteArray();
         }
     }
 
-    public byte[] toBytes( BuildDiff diff ) throws IOException
+    public byte[] toBytes( Diff diff ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
-            new CacheBuildsDiffXpp3Writer().write( baos, diff );
+            new CacheDiffXpp3Writer().write( baos, diff );
             return baos.toByteArray();
         }
     }
@@ -87,31 +87,91 @@ public class XmlService
         }
     }
 
-    public <T> T fromFile( Class<T> clazz, File file ) throws IOException, XmlPullParserException
+    public Build loadBuild( File file ) throws IOException
+    {
+        return fromFile( Build.class, file );
+    }
+
+    public Build loadBuild( byte[] bytes )
+    {
+        return fromBytes( Build.class, bytes );
+    }
+
+    public Build loadBuild( InputStream inputStream )
+    {
+        return fromInputStream( Build.class, inputStream );
+    }
+
+    public CacheConfig loadCacheConfig( File file ) throws IOException
+    {
+        return fromFile( CacheConfig.class, file );
+    }
+
+    public CacheConfig loadCacheConfig( byte[] bytes )
+    {
+        return fromBytes( CacheConfig.class, bytes );
+    }
+
+    public CacheConfig loadCacheConfig( InputStream inputStream )
+    {
+        return fromInputStream( CacheConfig.class, inputStream );
+    }
+
+    public CacheReport loadCacheReport( File file ) throws IOException
+    {
+        return fromFile( CacheReport.class, file );
+    }
+
+    public CacheReport loadCacheReport( byte[] bytes )
+    {
+        return fromBytes( CacheReport.class, bytes );
+    }
+
+    public CacheReport loadCacheReport( InputStream inputStream )
+    {
+        return fromInputStream( CacheReport.class, inputStream );
+    }
+
+    public Diff loadDiff( File file ) throws IOException
+    {
+        return fromFile( Diff.class, file );
+    }
+
+    public Diff loadDiff( byte[] bytes )
+    {
+        return fromBytes( Diff.class, bytes );
+    }
+
+    public Diff loadDiff( InputStream inputStream )
+    {
+        return fromInputStream( Diff.class, inputStream );
+    }
+
+    private <T> T fromFile( Class<T> clazz, File file ) throws IOException
     {
         return fromInputStream( clazz, Files.newInputStream( file.toPath() ) );
     }
 
-    public <T> T fromBytes( Class<T> clazz, byte[] bytes )
+    private <T> T fromBytes( Class<T> clazz, byte[] bytes )
     {
         return fromInputStream( clazz, new ByteArrayInputStream( bytes ) );
     }
 
-    public <T> T fromInputStream( Class<T> clazz, InputStream inputStream )
+    private <T> T fromInputStream( Class<T> clazz, InputStream inputStream )
     {
         try
         {
-            if ( clazz == BuildInfo.class )
+            if ( clazz == Build.class )
             {
-                return clazz.cast( new CacheBuildInfoXpp3Reader().read( inputStream ) );
+                return clazz.cast( new CacheBuildXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheConfig.class )
             {
                 return clazz.cast( new CacheConfigXpp3Reader().read( inputStream ) );
             }
-            else if ( clazz == BuildDiff.class )
+            else if ( clazz == Diff.class )
             {
-                return clazz.cast( new CacheBuildsDiffXpp3Reader().read( inputStream ) );
+                return clazz.cast( new CacheDiffXpp3Reader().read( inputStream ) );
             }
             else if ( clazz == CacheReport.class )
             {

@@ -19,16 +19,16 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/CACHE-BUILDSDIFF/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/cache-buildsdiff-${version}.xsd">
-  <id>cache-buildsdiff</id>
-  <name>CacheBuildsDiff</name>
-  <description><![CDATA[Cache Builds Diff, stored in <code>buildsdiff-${checksum}.xml</code>
+  xml.namespace="http://maven.apache.org/CACHE-DIFF/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/cache-diff-${version}.xsd">
+  <id>cache-diff</id>
+  <name>CacheDiff</name>
+  <description><![CDATA[Cache Builds Diff, stored in <code>diff-${checksum}.xml</code>
   ]]></description>
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.caching.xml.buildsdiff</value>
+      <value>org.apache.maven.caching.xml.diff</value>
     </default>
   </defaults>
   <classes>
@@ -40,7 +40,7 @@ under the License.
     </xs:complexType-->
 
     <class rootElement="true">
-      <name>BuildDiff</name>
+      <name>Diff</name>
       <fields>
         <field>
           <name>mismatches</name>

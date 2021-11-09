@@ -20,9 +20,9 @@ package org.apache.maven.caching;
  */
 
 import com.google.common.base.Optional;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheSource;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 
@@ -41,7 +41,7 @@ public interface LocalArtifactsRepository extends ArtifactsRepository
 
     void clearCache( CacheContext context );
 
-    Optional<BuildInfo> findBestMatchingBuild( MavenSession session, Dependency dependency ) throws IOException;
+    Optional<Build> findBestMatchingBuild( MavenSession session, Dependency dependency ) throws IOException;
 
-    BuildInfo findLocalBuild( CacheContext context ) throws IOException;
+    Build findLocalBuild( CacheContext context ) throws IOException;
 }

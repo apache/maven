@@ -81,8 +81,8 @@ under the License.
           <version>1.1.0</version>
           <models>
             <model>src/main/mdo/cache-config.mdo</model>
-            <model>src/main/mdo/cache-buildinfo.mdo</model>
-            <model>src/main/mdo/cache-buildsdiff.mdo</model>
+            <model>src/main/mdo/cache-build.mdo</model>
+            <model>src/main/mdo/cache-diff.mdo</model>
             <model>src/main/mdo/cache-report.mdo</model>
           </models>
           <version>1.0.0</version>

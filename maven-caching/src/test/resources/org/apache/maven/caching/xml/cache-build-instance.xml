@@ -19,9 +19,9 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<build xmlns="http://maven.apache.org/CACHE-BUILDINFO/1.0.0"
+<build xmlns="http://maven.apache.org/CACHE-BUILD/1.0.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://maven.apache.org/CACHE-BUILDINFO/1.0.0 ../../../../../../../../target/generated-sources/modello/cache-buildinfo-1.0.0.xsd">
+       xsi:schemaLocation="http://maven.apache.org/CACHE-BUILD/1.0.0 ../../../../../../../../target/generated-sources/modello/cache-build-1.0.0.xsd">
     <cacheImplementationVersion>v3</cacheImplementationVersion>
     <buildTime>1980-03-23T10:20:15.000</buildTime>
     <buildServer>my-server.com</buildServer>

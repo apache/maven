@@ -20,8 +20,8 @@ package org.apache.maven.caching;
  */
 
 import com.google.common.base.Optional;
-import org.apache.maven.caching.xml.BuildInfo;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.Build;
+import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
@@ -38,5 +38,5 @@ public interface RemoteArtifactsRepository extends ArtifactsRepository
 
     String getResourceUrl( CacheContext context, String filename );
 
-    Optional<BuildInfo> findBaselineBuild( MavenProject project );
+    Optional<Build> findBaselineBuild( MavenProject project );
 }

@@ -35,16 +35,15 @@ import org.apache.maven.caching.ScanConfigProperties;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -175,7 +174,7 @@ public class MavenProjectInput
         this.processPlugins = Boolean.parseBoolean(
                 properties.getProperty( CACHE_PROCESS_PLUGINS, config.isProcessPlugins() ) );
 
-        Build build = project.getBuild();
+        org.apache.maven.model.Build build = project.getBuild();
         filteredOutPaths = new ArrayList<>( Arrays.asList( normalizedPath( build.getDirectory() ), // target by default
                 normalizedPath( build.getOutputDirectory() ), normalizedPath( build.getTestOutputDirectory() ) ) );
 
@@ -361,7 +360,7 @@ public class MavenProjectInput
 
         List<Plugin> plugins = normalizePlugins( prototype.getBuild().getPlugins() );
 
-        Build build = new Build();
+        org.apache.maven.model.Build build = new org.apache.maven.model.Build();
         build.setPluginManagement( pluginManagement );
         build.setPlugins( plugins );
 
@@ -394,7 +393,7 @@ public class MavenProjectInput
         HashSet<WalkKey> visitedDirs = new HashSet<>();
         ArrayList<Path> collectedFiles = new ArrayList<>();
 
-        Build build = project.getBuild();
+        org.apache.maven.model.Build build = project.getBuild();
 
         final boolean recursive = true;
         startWalk( Paths.get( build.getSourceDirectory() ), dirGlob, recursive, collectedFiles, visitedDirs );
@@ -798,10 +797,10 @@ public class MavenProjectInput
                 if ( partOfMultiModule )
                 {
                     // TODO lookup in remote cache is not necessary for abfx, for versioned projects - make sense
-                    final Optional<BuildInfo> bestMatchResult = localCache.findBestMatchingBuild( session, dependency );
+                    final Optional<Build> bestMatchResult = localCache.findBestMatchingBuild( session, dependency );
                     if ( bestMatchResult.isPresent() )
                     {
-                        final BuildInfo bestMatched = bestMatchResult.get();
+                        final Build bestMatched = bestMatchResult.get();
                         resolved = bestMatched.findArtifact( dependency );
                     }
                 }

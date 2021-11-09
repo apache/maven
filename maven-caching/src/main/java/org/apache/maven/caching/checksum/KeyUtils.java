@@ -20,7 +20,7 @@ package org.apache.maven.caching.checksum;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 

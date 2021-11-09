@@ -36,7 +36,7 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheState;
 import org.apache.maven.execution.ExecutionEvent;
@@ -248,10 +248,10 @@ public class CachingMojoExecutor implements MojoExecutor
                                     PhaseRecorder phaseRecorder ) throws LifecycleExecutionException
     {
 
-        final BuildInfo buildInfo = cacheResult.getBuildInfo();
+        final Build build = cacheResult.getBuildInfo();
         final MavenProject project = cacheResult.getContext().getProject();
         final MavenSession session = cacheResult.getContext().getSession();
-        final List<MojoExecution> cachedSegment = buildInfo.getCachedSegment( mojoExecutions );
+        final List<MojoExecution> cachedSegment = build.getCachedSegment( mojoExecutions );
 
         boolean restored = cacheController.restoreProjectArtifacts( cacheResult );
         if ( !restored )
@@ -274,7 +274,7 @@ public class CachingMojoExecutor implements MojoExecutor
             }
             else
             {
-                restored = verifyCacheConsistency( cacheCandidate, buildInfo, project, session, projectIndex,
+                restored = verifyCacheConsistency( cacheCandidate, build, project, session, projectIndex,
                         dependencyContext, phaseRecorder );
                 if ( !restored )
                 {
@@ -297,7 +297,7 @@ public class CachingMojoExecutor implements MojoExecutor
             }
         }
 
-        for ( MojoExecution mojoExecution : buildInfo.getPostCachedSegment( mojoExecutions ) )
+        for ( MojoExecution mojoExecution : build.getPostCachedSegment( mojoExecutions ) )
         {
             execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
         }
@@ -305,7 +305,7 @@ public class CachingMojoExecutor implements MojoExecutor
     }
 
     private boolean verifyCacheConsistency( MojoExecution cacheCandidate,
-                                            BuildInfo cachedBuildInfo,
+                                            Build cachedBuild,
                                             MavenProject project,
                                             MavenSession session,
                                             ProjectIndex projectIndex,
@@ -314,7 +314,7 @@ public class CachingMojoExecutor implements MojoExecutor
     {
 
         AtomicBoolean consistent = new AtomicBoolean( true );
-        final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cacheController, cachedBuildInfo,
+        final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cacheController, cachedBuild,
                 consistent, logger, cacheConfig );
 
         if ( mojoChecker.needCheck( cacheCandidate, session ) )
