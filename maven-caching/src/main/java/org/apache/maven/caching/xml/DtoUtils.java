@@ -32,7 +32,6 @@ import org.apache.maven.model.Dependency;
 
 import javax.annotation.Nonnull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.maven.caching.checksum.KeyUtils.getArtifactKey;
@@ -45,12 +44,11 @@ public class DtoUtils
 
     public static String findPropertyValue( String propertyName, CompletedExecutionType completedExecution )
     {
-        final List<PropertyValueType> configuration = completedExecution.getConfiguration();
-        if ( configuration == null )
+        final List<PropertyValueType> properties = completedExecution.getProperties();
+        if ( properties == null )
         {
             return null;
         }
-        final List<PropertyValueType> properties = configuration;
         for ( PropertyValueType property : properties )
         {
             if ( StringUtils.equals( propertyName, property.getName() ) )
@@ -124,10 +122,6 @@ public class DtoUtils
                                     String baseDirPath,
                                     boolean tracked )
     {
-        if ( execution.getConfiguration() == null )
-        {
-            execution.setConfiguration( new ArrayList<>() );
-        }
         final PropertyValueType valueType = new PropertyValueType();
         valueType.setName( propertyName );
         if ( value != null && value.getClass().isArray() )
@@ -137,7 +131,7 @@ public class DtoUtils
         final String valueText = String.valueOf( value );
         valueType.setValue( StringUtils.remove( valueText, baseDirPath ) );
         valueType.setTracked( tracked );
-        execution.getConfiguration().add( valueType );
+        execution.addProperty( valueType );
     }
 
     public static boolean containsAllProperties(
@@ -149,12 +143,12 @@ public class DtoUtils
             return true;
         }
 
-        if ( cachedExecution.getConfiguration() == null )
+        if ( cachedExecution.getProperties() == null )
         {
             return false;
         }
 
-        final List<PropertyValueType> executionProperties = cachedExecution.getConfiguration();
+        final List<PropertyValueType> executionProperties = cachedExecution.getProperties();
         for ( TrackedPropertyType trackedProperty : trackedProperties )
         {
             if ( !contains( executionProperties, trackedProperty.getPropertyName() ) )

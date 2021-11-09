@@ -247,7 +247,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     public Optional<BuildInfo> findBaselineBuild( MavenProject project )
     {
         final Optional<List<ProjectReportType>> cachedProjectsHolder = findCacheInfo()
-                .transform( CacheReportType::getProject );
+                .transform( CacheReportType::getProjects );
         if ( !cachedProjectsHolder.isPresent() )
         {
             return Optional.absent();

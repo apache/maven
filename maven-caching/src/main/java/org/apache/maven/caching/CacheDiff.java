@@ -75,7 +75,7 @@ public class CacheDiff
         compareDependencies( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
 
         final BuildDiffType buildDiffType = new BuildDiffType();
-        buildDiffType.getMismatch().addAll( report );
+        buildDiffType.getMismatches().addAll( report );
         return buildDiffType;
     }
 
@@ -100,7 +100,7 @@ public class CacheDiff
 
     public static Optional<DigestItemType> findPom( ProjectsInputInfoType projectInputs )
     {
-        for ( DigestItemType digestItemType : projectInputs.getItem() )
+        for ( DigestItemType digestItemType : projectInputs.getItems() )
         {
             if ( "pom".equals( digestItemType.getType() ) )
             {
@@ -115,7 +115,7 @@ public class CacheDiff
     {
 
         final Map<String, DigestItemType> currentFiles = new HashMap<>();
-        for ( DigestItemType item : current.getItem() )
+        for ( DigestItemType item : current.getItems() )
         {
             if ( "file".equals( item.getType() ) )
             {
@@ -124,7 +124,7 @@ public class CacheDiff
         }
 
         final Map<String, DigestItemType> baselineFiles = new HashMap<>();
-        for ( DigestItemType item : baseline.getItem() )
+        for ( DigestItemType item : baseline.getItems() )
         {
             if ( "file".equals( item.getType() ) )
             {
@@ -181,7 +181,7 @@ public class CacheDiff
     private void compareDependencies( ProjectsInputInfoType current, ProjectsInputInfoType baseline )
     {
         final Map<String, DigestItemType> currentDependencies = new HashMap<>();
-        for ( DigestItemType digestItemType : current.getItem() )
+        for ( DigestItemType digestItemType : current.getItems() )
         {
             if ( "dependency".equals( digestItemType.getType() ) )
             {
@@ -189,7 +189,7 @@ public class CacheDiff
             }
         }
         final Map<String, DigestItemType> baselineDependencies = new HashMap<>();
-        for ( DigestItemType item : baseline.getItem() )
+        for ( DigestItemType item : baseline.getItems() )
         {
             if ( "dependency".equals( item.getType() ) )
             {
@@ -285,7 +285,7 @@ public class CacheDiff
     {
         // TODO add support for skip values
         final List<PropertyValueType> trackedProperties = new ArrayList<>();
-        for ( PropertyValueType propertyValueType : current.getConfiguration() )
+        for ( PropertyValueType propertyValueType : current.getProperties() )
         {
             if ( propertyValueType.isTracked() )
             {
@@ -298,7 +298,7 @@ public class CacheDiff
         }
 
         final Map<String, PropertyValueType> baselinePropertiesByName = new HashMap<>();
-        for ( PropertyValueType propertyValueType : baseline.getConfiguration() )
+        for ( PropertyValueType propertyValueType : baseline.getProperties() )
         {
             baselinePropertiesByName.put( propertyValueType.getName(), propertyValueType );
         }

@@ -269,7 +269,7 @@ under the License.
           <type>String</type>
         </field>
         <field>
-          <name>configuration</name>
+          <name>properties</name>
           <association>
             <type>PropertyValueType</type>
             <multiplicity>*</multiplicity>
@@ -320,7 +320,7 @@ under the License.
           <type>String</type>
         </field>
         <field>
-          <name>item</name>
+          <name>items</name>
           <association>
             <type>DigestItemType</type>
             <multiplicity>*</multiplicity>
