@@ -19,7 +19,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<cacheReportType xmlns="http://maven.apache.org/CACHE-REPORT/1.0.0"
+<cacheReport xmlns="http://maven.apache.org/CACHE-REPORT/1.0.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://maven.apache.org/CACHE-REPORT/1.0.0 ../../../../../../../../target/generated-sources/modello/cache-report-1.0.0.xsd">
 
@@ -29,4 +29,4 @@ under the License.
         </project>
     </projects>
 
-</cacheReportType>
+</cacheReport>

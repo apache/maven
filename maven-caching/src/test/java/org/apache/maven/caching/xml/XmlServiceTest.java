@@ -22,7 +22,7 @@ package org.apache.maven.caching.xml;
 import org.apache.maven.caching.xml.buildinfo.BuildInfo;
 import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
 import org.apache.maven.caching.xml.config.CacheConfig;
-import org.apache.maven.caching.xml.report.CacheReportDto;
+import org.apache.maven.caching.xml.report.CacheReport;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -62,7 +62,7 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-report-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-report-instance.xml" );
-        final CacheReportDto cacheReport = new XmlService().fromInputStream( CacheReportDto.class, is );
+        final CacheReport cacheReport = new XmlService().fromInputStream( CacheReport.class, is );
     }
 
     @Test
