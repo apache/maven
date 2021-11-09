@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -150,15 +149,15 @@ public class ProjectUtils
                 StringUtils.defaultIfEmpty( mojo.getVersion(), "emptyVersion" ) ), ":" );
     }
 
-    public static String getMultimoduleRoot( MavenSession session )
+    public static Path getMultimoduleRoot( MavenSession session )
     {
-        return System.getProperty( "maven.multiModuleProjectDirectory", session.getExecutionRootDirectory() );
+        return session.getRequest().getMultiModuleProjectDirectory().toPath();
     }
 
     public static Scm readGitInfo( MavenSession session ) throws IOException
     {
         final Scm scmCandidate = new Scm();
-        final Path gitDir = Paths.get( getMultimoduleRoot( session ), ".git" );
+        final Path gitDir = getMultimoduleRoot( session ).resolve( ".git" );
         if ( Files.isDirectory( gitDir ) )
         {
             final Path headFile = gitDir.resolve( "HEAD" );

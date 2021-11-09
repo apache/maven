@@ -95,6 +95,8 @@ public class CacheConfigImpl implements CacheConfig
     private volatile CacheState state = CacheState.NOT_INITIALIZED;
     private volatile CacheType cacheConfig;
     private volatile HashFactory hashFactory;
+    private MavenSession session;
+    private MavenProject project;
 
     private final Supplier<List<Pattern>> excludePatterns = Suppliers.memoize( new Supplier<List<Pattern>>()
     {
@@ -115,7 +117,10 @@ public class CacheConfigImpl implements CacheConfig
             return state;
         }
 
-        final String enabled = System.getProperty( CACHE_ENABLED_PROPERTY_NAME, "true" );
+        this.project = project;
+        this.session = session;
+
+        final String enabled = getProperty( CACHE_ENABLED_PROPERTY_NAME, "true" );
         if ( !parseBoolean( enabled ) )
         {
             logger.info( "Cache disabled by command line flag, project will be built fully and not cached" );
@@ -123,25 +128,16 @@ public class CacheConfigImpl implements CacheConfig
             return state;
         }
 
-        Path configPath = null;
+        Path configPath;
 
-        String configPathText = System.getProperty( CONFIG_PATH_PROPERTY_NAME );
+        String configPathText = getProperty( CONFIG_PATH_PROPERTY_NAME, null );
         if ( StringUtils.isNotBlank( configPathText ) )
         {
             configPath = Paths.get( configPathText );
         }
-        if ( configPath == null )
+        else
         {
-            configPathText = project.getProperties().getProperty( CONFIG_PATH_PROPERTY_NAME );
-            if ( StringUtils.isNotBlank( configPathText ) )
-            {
-                configPath = Paths.get( configPathText );
-            }
-        }
-
-        if ( configPath == null )
-        {
-            configPath = Paths.get( getMultimoduleRoot( session ), ".mvn", "maven-cache-config.xml" );
+            configPath = getMultimoduleRoot( session ).resolve( ".mvn" ).resolve( "maven-cache-config.xml" );
         }
 
         if ( !Files.exists( configPath ) )
@@ -510,13 +506,13 @@ public class CacheConfigImpl implements CacheConfig
     @Override
     public boolean isBaselineDiffEnabled()
     {
-        return System.getProperties().containsKey( BASELINE_BUILD_URL_PROPERTY_NAME );
+        return getProperty( BASELINE_BUILD_URL_PROPERTY_NAME, null ) != null;
     }
 
     @Override
     public String getBaselineCacheUrl()
     {
-        return System.getProperty( BASELINE_BUILD_URL_PROPERTY_NAME );
+        return getProperty( BASELINE_BUILD_URL_PROPERTY_NAME, null );
     }
 
     @Override
@@ -582,5 +578,23 @@ public class CacheConfigImpl implements CacheConfig
     private void checkInitializedState()
     {
         checkState( state == CacheState.INITIALIZED, "Cache is not initialized. Actual state: " + state );
+    }
+
+    private String getProperty( String key, String defaultValue )
+    {
+        String value = session.getUserProperties().getProperty( key );
+        if ( value == null )
+        {
+            value = session.getSystemProperties().getProperty( key );
+            if ( value == null )
+            {
+                value = project.getProperties().getProperty( key );
+                if ( value == null )
+                {
+                    value = defaultValue;
+                }
+            }
+        }
+        return value;
     }
 }

@@ -409,7 +409,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     @Override
     public void saveCacheReport( String buildId, MavenSession session, CacheReportType cacheReport ) throws IOException
     {
-        Path path = Paths.get( getMultimoduleRoot( session ), "target", "maven-incremental" );
+        Path path = getMultimoduleRoot( session ).resolve( "target" ).resolve( "maven-incremental" );
         Files.createDirectories( path );
         Files.write( path.resolve( "cache-report." + buildId + ".xml" ), xmlService.toBytes( cacheReport ),
                 TRUNCATE_EXISTING, CREATE );
