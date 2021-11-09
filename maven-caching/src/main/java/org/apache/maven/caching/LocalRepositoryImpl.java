@@ -19,6 +19,26 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -43,25 +63,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -76,7 +78,8 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENT
 /**
  * LocalRepositoryImpl
  */
-@Component( role = LocalArtifactsRepository.class )
+@Singleton
+@Named
 public class LocalRepositoryImpl implements LocalArtifactsRepository
 {
 
@@ -90,19 +93,19 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     private static final Function<Pair<BuildInfo, File>, Long> GET_LAST_MODIFIED =
             pair -> pair.getRight().lastModified();
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     private RemoteArtifactsRepository remoteRepository;
 
-    @Requirement
+    @Inject
     private XmlService xmlService;
 
-    @Requirement
+    @Inject
     private CacheConfig cacheConfig;
 
     private final LoadingCache<Pair<MavenSession, Dependency>, Optional<BuildInfo>> bestBuildCache =

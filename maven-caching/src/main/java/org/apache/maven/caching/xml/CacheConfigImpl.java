@@ -19,6 +19,19 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import org.apache.commons.lang3.StringUtils;
@@ -28,41 +41,30 @@ import org.apache.maven.caching.PluginScanConfigImpl;
 import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.AttachedOutputs;
-import org.apache.maven.caching.xml.config.Exclude;
-import org.apache.maven.caching.xml.config.Include;
-import org.apache.maven.caching.xml.config.Local;
-import org.apache.maven.caching.xml.config.ProjectDiscoveryStrategy;
-import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.CacheType;
 import org.apache.maven.caching.xml.config.ConfigurationType;
 import org.apache.maven.caching.xml.config.CoordinatesBaseType;
+import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.ExecutablesType;
 import org.apache.maven.caching.xml.config.ExecutionConfigurationScanType;
 import org.apache.maven.caching.xml.config.ExecutionControlType;
 import org.apache.maven.caching.xml.config.ExecutionIdsListType;
 import org.apache.maven.caching.xml.config.GoalReconciliationType;
 import org.apache.maven.caching.xml.config.GoalsListType;
+import org.apache.maven.caching.xml.config.Include;
+import org.apache.maven.caching.xml.config.Local;
 import org.apache.maven.caching.xml.config.PluginConfigurationScanType;
 import org.apache.maven.caching.xml.config.PluginSetType;
+import org.apache.maven.caching.xml.config.ProjectDiscoveryStrategy;
 import org.apache.maven.caching.xml.config.PropertyNameType;
+import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.TrackedPropertyType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
-import javax.annotation.Nonnull;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Boolean.TRUE;
@@ -72,8 +74,8 @@ import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
 /**
  * CacheConfigImpl
  */
-@Component( role = CacheConfig.class,
-            instantiationStrategy = "singleton" )
+@Singleton
+@Named
 public class CacheConfigImpl implements CacheConfig
 {
 
@@ -84,10 +86,10 @@ public class CacheConfigImpl implements CacheConfig
     public static final String FAIL_FAST_PROPERTY_NAME = "remote.cache.failFast";
     public static final String BASELINE_BUILD_URL_PROPERTY_NAME = "remote.cache.baselineUrl";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private XmlService xmlService;
 
     private volatile CacheState state = CacheState.NOT_INITIALIZED;

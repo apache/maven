@@ -19,21 +19,6 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.config.CacheType;
-import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
-import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
-import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Writer;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
-import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Reader;
-import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Writer;
-import org.apache.maven.caching.xml.report.CacheReportType;
-import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
-import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,10 +26,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
+import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
+import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Writer;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
+import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Reader;
+import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Writer;
+import org.apache.maven.caching.xml.config.CacheType;
+import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
+import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
+import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
+import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 /**
  * XmlService
  */
-@Component( role = XmlService.class )
+@Singleton
+@Named
 public class XmlService
 {
 

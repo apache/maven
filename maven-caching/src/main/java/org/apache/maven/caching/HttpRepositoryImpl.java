@@ -19,6 +19,17 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -33,48 +44,40 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.checksum.MavenProjectInput;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.report.CacheReportType;
-import org.apache.maven.caching.xml.report.ProjectReportType;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.XmlService;
+import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
+import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.ProjectReportType;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * HttpRepositoryImpl
  */
-@Component( role = RemoteArtifactsRepository.class )
+@Singleton
+@Named
 public class HttpRepositoryImpl implements RemoteArtifactsRepository
 {
 
     public static final String BUILDINFO_XML = "buildinfo.xml";
     public static final String CACHE_REPORT_XML = "cache-report.xml";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     XmlService xmlService;
 
-    @Requirement
+    @Inject
     private CacheConfig cacheConfig;
 
     @SuppressWarnings( {"checkstyle:constantname", "checkstyle:magicnumber"} )
