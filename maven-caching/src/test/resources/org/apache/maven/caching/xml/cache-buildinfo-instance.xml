@@ -19,11 +19,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<build xmlns="org:apache:maven:cache:buildinfo"
+<build xmlns="http://maven.apache.org/CACHE-BUILDINFO/1.0.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:buildinfo ../../../../../../../../target/generated-sources/modello/cache-buildinfo-1.0.0.xsd">
+       xsi:schemaLocation="http://maven.apache.org/CACHE-BUILDINFO/1.0.0 ../../../../../../../../target/generated-sources/modello/cache-buildinfo-1.0.0.xsd">
     <cacheImplementationVersion>v3</cacheImplementationVersion>
-    <buildTime>1980-03-23T10:20:15</buildTime>
+    <buildTime>1980-03-23T10:20:15.000</buildTime>
     <buildServer>my-server.com</buildServer>
     <hashFunction>SHA-256</hashFunction>
     <goals>
@@ -51,14 +51,16 @@ under the License.
         <execution>
             <executionKey>default:check:verify:duplicate-finder-maven-plugin:org.basepom.maven:1.3.0</executionKey>
             <mojoClassName>org.basepom.mojo.duplicatefinder.DuplicateFinderMojo</mojoClassName>
-            <configuration>
+            <properties>
                 <property name="quiet">true</property>
                 <property name="skip">false</property>
-            </configuration>
+            </properties>
         </execution>
     </executions>
     <projectsInputInfo>
         <checksum>0136171ac2c9d9b066805bd09904a25318cfb2037189b20c48e79b20b63b81ed</checksum>
-        <item type="file" hash="834a0056e4881c6c91ad266d24e87cb12e1901859fb169af24efc176b70fcee0">src/main/conf/my-context.xml</item>
+        <items>
+            <item type="file" hash="834a0056e4881c6c91ad266d24e87cb12e1901859fb169af24efc176b70fcee0">src/main/conf/my-context.xml</item>
+        </items>
     </projectsInputInfo>
 </build>
