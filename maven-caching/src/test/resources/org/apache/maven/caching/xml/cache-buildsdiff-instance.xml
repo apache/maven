@@ -19,7 +19,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<buildDiffType xmlns="http://maven.apache.org/CACHE-BUILDSDIFF/1.0.0"
+<buildDiff xmlns="http://maven.apache.org/CACHE-BUILDSDIFF/1.0.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://maven.apache.org/CACHE-BUILDSDIFF/1.0.0 ../../../../../../../../target/generated-sources/modello/cache-buildsdiff-1.0.0.xsd">
 
@@ -28,4 +28,4 @@ under the License.
         <mismatch context="str" />
     </mismatches>
 
-</buildDiffType>
+</buildDiff>
