@@ -24,8 +24,8 @@ import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
-import org.apache.maven.caching.xml.config.PropertyNameType;
-import org.apache.maven.caching.xml.config.TrackedPropertyType;
+import org.apache.maven.caching.xml.config.PropertyName;
+import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -45,15 +45,15 @@ public interface CacheConfig
     CacheState initialize( MavenProject project, MavenSession session );
 
     @Nonnull
-    List<TrackedPropertyType> getTrackedProperties( MojoExecution mojoExecution );
+    List<TrackedProperty> getTrackedProperties( MojoExecution mojoExecution );
 
     boolean isLogAllProperties( MojoExecution mojoExecution );
 
     @Nonnull
-    List<PropertyNameType> getLoggedProperties( MojoExecution mojoExecution );
+    List<PropertyName> getLoggedProperties( MojoExecution mojoExecution );
 
     @Nonnull
-    List<PropertyNameType> getNologProperties( MojoExecution mojoExecution );
+    List<PropertyName> getNologProperties( MojoExecution mojoExecution );
 
     @Nonnull
     List<String> getEffectivePomExcludeProperties( Plugin plugin );

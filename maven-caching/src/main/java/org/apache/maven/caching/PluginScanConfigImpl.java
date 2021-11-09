@@ -20,9 +20,9 @@ package org.apache.maven.caching;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.config.DirScanConfigType;
-import org.apache.maven.caching.xml.config.TagNameType;
-import org.apache.maven.caching.xml.config.TagScanConfigType;
+import org.apache.maven.caching.xml.config.DirScanConfig;
+import org.apache.maven.caching.xml.config.TagExclude;
+import org.apache.maven.caching.xml.config.TagScanConfig;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -33,9 +33,9 @@ import java.util.List;
 public class PluginScanConfigImpl implements PluginScanConfig
 {
 
-    private final DirScanConfigType dto;
+    private final DirScanConfig dto;
 
-    public PluginScanConfigImpl( DirScanConfigType scanConfig )
+    public PluginScanConfigImpl( DirScanConfig scanConfig )
     {
         this.dto = scanConfig;
     }
@@ -52,7 +52,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
         // include or exclude is a choice element, could be only obe property set
 
         //noinspection ConstantConditions
-        final List<TagScanConfigType> includes = dto.getIncludes();
+        final List<TagScanConfig> includes = dto.getIncludes();
         if ( !includes.isEmpty() )
         {
             return findTagScanProperties( tagName ) != null;
@@ -61,9 +61,9 @@ public class PluginScanConfigImpl implements PluginScanConfig
         return !contains( dto.getExcludes(), tagName );
     }
 
-    private boolean contains( List<TagNameType> excludes, String tagName )
+    private boolean contains( List<TagExclude> excludes, String tagName )
     {
-        for ( TagNameType exclude : excludes )
+        for ( TagExclude exclude : excludes )
         {
             if ( StringUtils.equals( exclude.getTagName(), tagName ) )
             {
@@ -83,7 +83,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
             return overrideConfig;
         }
 
-        final DirScanConfigType override = overrideConfig.dto();
+        final DirScanConfig override = overrideConfig.dto();
         if ( override == null )
         {
             return this;
@@ -94,7 +94,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
             return overrideConfig;
         }
 
-        DirScanConfigType merged = new DirScanConfigType();
+        DirScanConfig merged = new DirScanConfig();
         if ( override.getMode() != null )
         {
             merged.setMode( override.getMode() );
@@ -121,7 +121,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
     }
 
     @Override
-    public DirScanConfigType dto()
+    public DirScanConfig dto()
     {
         return dto;
     }
@@ -136,7 +136,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
         return scanConfigProperties;
     }
 
-    private ScanConfigProperties findConfigByName( String tagName, List<TagScanConfigType> configs )
+    private ScanConfigProperties findConfigByName( String tagName, List<TagScanConfig> configs )
     {
 
         if ( configs == null )
@@ -144,7 +144,7 @@ public class PluginScanConfigImpl implements PluginScanConfig
             return null;
         }
 
-        for ( TagScanConfigType config : configs )
+        for ( TagScanConfig config : configs )
         {
             if ( StringUtils.equals( tagName, config.getTagName() ) )
             {

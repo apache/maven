@@ -38,8 +38,8 @@ import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.execution.MavenSession;
@@ -138,7 +138,7 @@ public class MavenProjectInput
     private final RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
     private final CacheConfig config;
-    private final ConcurrentMap<String, DigestItemType> projectArtifactsByKey;
+    private final ConcurrentMap<String, DigestItem> projectArtifactsByKey;
     private final PathIgnoringCaseComparator fileComparator;
     private final DependencyComparator dependencyComparator;
     private final List<Path> filteredOutPaths;
@@ -152,7 +152,7 @@ public class MavenProjectInput
                               MavenSession session,
                               CacheConfig config,
                               ProjectIndex projectIndex,
-                              ConcurrentMap<String, DigestItemType> artifactsByKey,
+                              ConcurrentMap<String, DigestItem> artifactsByKey,
                               RepositorySystem repoSystem,
                               ArtifactHandlerManager artifactHandlerManager,
                               Logger logger,
@@ -197,30 +197,30 @@ public class MavenProjectInput
         this.dependencyComparator = new DependencyComparator();
     }
 
-    public ProjectsInputInfoType calculateChecksum( HashFactory hashFactory ) throws IOException
+    public ProjectsInputInfo calculateChecksum( HashFactory hashFactory ) throws IOException
     {
         long time = Clock.time();
 
         final String effectivePom = getEffectivePom( project.getOriginalEffectiveModel() );
         final SortedSet<Path> inputFiles = getInputFiles();
-        final SortedMap<String, DigestItemType> dependenciesChecksum = getMutableDependencies();
+        final SortedMap<String, DigestItem> dependenciesChecksum = getMutableDependencies();
 
         final long inputTime = Clock.elapsed( time );
         time = Clock.time();
 
         // hash items: effective pom + input files + dependencies
         final int count = 1 + inputFiles.size() + dependenciesChecksum.size();
-        final List<DigestItemType> items = new ArrayList<>( count );
+        final List<DigestItem> items = new ArrayList<>( count );
         final HashChecksum checksum = hashFactory.createChecksum( count );
 
-        Optional<ProjectsInputInfoType> baselineHolder = Optional.absent();
+        Optional<ProjectsInputInfo> baselineHolder = Optional.absent();
         if ( config.isBaselineDiffEnabled() )
         {
             baselineHolder =
                     remoteCache.findBaselineBuild( project ).transform( b -> b.getDto().getProjectsInputInfo() );
         }
 
-        DigestItemType effectivePomChecksum = DigestUtils.pom( checksum, effectivePom );
+        DigestItem effectivePomChecksum = DigestUtils.pom( checksum, effectivePom );
         items.add( effectivePomChecksum );
         final boolean compareWithBaseline = config.isBaselineDiffEnabled() && baselineHolder.isPresent();
         if ( compareWithBaseline )
@@ -231,7 +231,7 @@ public class MavenProjectInput
         boolean sourcesMatched = true;
         for ( Path file : inputFiles )
         {
-            DigestItemType fileDigest = DigestUtils.file( checksum, baseDirPath, file );
+            DigestItem fileDigest = DigestUtils.file( checksum, baseDirPath, file );
             items.add( fileDigest );
             if ( compareWithBaseline )
             {
@@ -244,9 +244,9 @@ public class MavenProjectInput
         }
 
         boolean dependenciesMatched = true;
-        for ( Map.Entry<String, DigestItemType> entry : dependenciesChecksum.entrySet() )
+        for ( Map.Entry<String, DigestItem> entry : dependenciesChecksum.entrySet() )
         {
-            DigestItemType dependencyDigest =
+            DigestItem dependencyDigest =
                     DigestUtils.dependency( checksum, entry.getKey(), entry.getValue().getHash() );
             items.add( dependencyDigest );
             if ( compareWithBaseline )
@@ -260,7 +260,7 @@ public class MavenProjectInput
             logInfo( "Dependencies: " + ( dependenciesMatched ? "MATCHED" : "OUT OF DATE" ) );
         }
 
-        final ProjectsInputInfoType projectsInputInfoType = new ProjectsInputInfoType();
+        final ProjectsInputInfo projectsInputInfoType = new ProjectsInputInfo();
         projectsInputInfoType.setChecksum( checksum.digest() );
         projectsInputInfoType.getItems().addAll( items );
 
@@ -268,7 +268,7 @@ public class MavenProjectInput
 
         if ( logger.isDebugEnabled() )
         {
-            for ( DigestItemType item : projectsInputInfoType.getItems() )
+            for ( DigestItem item : projectsInputInfoType.getItems() )
             {
                 logger.debug( "Hash calculated, item: " + item.getType() + ", hash: " + item.getHash() );
             }
@@ -280,10 +280,10 @@ public class MavenProjectInput
         return projectsInputInfoType;
     }
 
-    private void checkEffectivePomMatch( ProjectsInputInfoType baselineBuild, DigestItemType effectivePomChecksum )
+    private void checkEffectivePomMatch( ProjectsInputInfo baselineBuild, DigestItem effectivePomChecksum )
     {
-        Optional<DigestItemType> pomHolder = Optional.absent();
-        for ( DigestItemType it : baselineBuild.getItems() )
+        Optional<DigestItem> pomHolder = Optional.absent();
+        for ( DigestItem it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( "pom" ) )
             {
@@ -294,7 +294,7 @@ public class MavenProjectInput
 
         if ( pomHolder.isPresent() )
         {
-            DigestItemType pomItem = pomHolder.get();
+            DigestItem pomItem = pomHolder.get();
             final boolean matches = StringUtils.equals( pomItem.getHash(), effectivePomChecksum.getHash() );
             if ( !matches )
             {
@@ -306,10 +306,10 @@ public class MavenProjectInput
         }
     }
 
-    private boolean checkItemMatchesBaseline( ProjectsInputInfoType baselineBuild, DigestItemType fileDigest )
+    private boolean checkItemMatchesBaseline( ProjectsInputInfo baselineBuild, DigestItem fileDigest )
     {
-        Optional<DigestItemType> baselineFileDigest = Optional.absent();
-        for ( DigestItemType it : baselineBuild.getItems() )
+        Optional<DigestItem> baselineFileDigest = Optional.absent();
+        for ( DigestItem it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( fileDigest.getType() )
                     && fileDigest.getValue().equals( it.getValue().trim() ) )
@@ -757,10 +757,10 @@ public class MavenProjectInput
         return false;
     }
 
-    private SortedMap<String, DigestItemType> getMutableDependencies() throws IOException
+    private SortedMap<String, DigestItem> getMutableDependencies() throws IOException
     {
         MultimoduleDiscoveryStrategy strategy = config.getMultimoduleDiscoveryStrategy();
-        SortedMap<String, DigestItemType> result = new TreeMap<>();
+        SortedMap<String, DigestItem> result = new TreeMap<>();
 
         for ( Dependency dependency : project.getDependencies() )
         {
@@ -784,7 +784,7 @@ public class MavenProjectInput
 
             final Artifact dependencyArtifact = repoSystem.createDependencyArtifact( dependency );
             final String artifactKey = KeyUtils.getArtifactKey( dependencyArtifact );
-            DigestItemType resolved = null;
+            DigestItem resolved = null;
             if ( currentlyBuilding )
             {
                 resolved = projectArtifactsByKey.get( artifactKey );
@@ -823,7 +823,7 @@ public class MavenProjectInput
     }
 
     @Nonnull
-    private DigestItemType resolveArtifact( final Artifact dependencyArtifact,
+    private DigestItem resolveArtifact( final Artifact dependencyArtifact,
                                             MultimoduleDiscoveryStrategy strategy ) throws IOException
     {
 

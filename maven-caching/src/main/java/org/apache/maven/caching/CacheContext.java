@@ -19,7 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
@@ -31,10 +31,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CacheContext
 {
     private final MavenProject project;
-    private final ProjectsInputInfoType inputInfo;
+    private final ProjectsInputInfo inputInfo;
     private final MavenSession session;
 
-    public CacheContext( MavenProject project, ProjectsInputInfoType inputInfo, MavenSession session )
+    public CacheContext( MavenProject project, ProjectsInputInfo inputInfo, MavenSession session )
     {
         this.project = checkNotNull( project );
         this.inputInfo = checkNotNull( inputInfo );
@@ -46,7 +46,7 @@ public class CacheContext
         return project;
     }
 
-    public ProjectsInputInfoType getInputInfo()
+    public ProjectsInputInfo getInputInfo()
     {
         return inputInfo;
     }

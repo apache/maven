@@ -22,13 +22,13 @@ package org.apache.maven.caching;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
-import org.apache.maven.caching.xml.buildinfo.PropertyValueType;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
-import org.apache.maven.caching.xml.buildsdiff.MismatchType;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
+import org.apache.maven.caching.xml.buildinfo.PropertyValue;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
+import org.apache.maven.caching.xml.buildsdiff.Mismatch;
 import org.apache.maven.caching.xml.CacheConfig;
 
 import java.util.ArrayList;
@@ -44,11 +44,11 @@ public class CacheDiff
 {
 
     private final CacheConfig config;
-    private final BuildInfoType current;
-    private final BuildInfoType baseline;
-    private final LinkedList<MismatchType> report;
+    private final BuildInfo current;
+    private final BuildInfo baseline;
+    private final LinkedList<Mismatch> report;
 
-    public CacheDiff( BuildInfoType current, BuildInfoType baseline, CacheConfig config )
+    public CacheDiff( BuildInfo current, BuildInfo baseline, CacheConfig config )
     {
         this.current = current;
         this.baseline = baseline;
@@ -56,7 +56,7 @@ public class CacheDiff
         this.report = new LinkedList<>();
     }
 
-    public BuildDiffType compare()
+    public BuildDiff compare()
     {
 
         if ( !StringUtils.equals( current.getHashFunction(), baseline.getHashFunction() ) )
@@ -74,17 +74,17 @@ public class CacheDiff
         compareFiles( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
         compareDependencies( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
 
-        final BuildDiffType buildDiffType = new BuildDiffType();
+        final BuildDiff buildDiffType = new BuildDiff();
         buildDiffType.getMismatches().addAll( report );
         return buildDiffType;
     }
 
-    private void compareEffectivePoms( ProjectsInputInfoType current, ProjectsInputInfoType baseline )
+    private void compareEffectivePoms( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
-        Optional<DigestItemType> currentPom = findPom( current );
+        Optional<DigestItem> currentPom = findPom( current );
         String currentPomHash = currentPom.isPresent() ? currentPom.get().getHash() : null;
 
-        Optional<DigestItemType> baseLinePom = findPom( baseline );
+        Optional<DigestItem> baseLinePom = findPom( baseline );
         String baselinePomHash = baseLinePom.isPresent() ? baseLinePom.get().getHash() : null;
 
         if ( !StringUtils.equals( currentPomHash, baselinePomHash ) )
@@ -98,9 +98,9 @@ public class CacheDiff
         }
     }
 
-    public static Optional<DigestItemType> findPom( ProjectsInputInfoType projectInputs )
+    public static Optional<DigestItem> findPom( ProjectsInputInfo projectInputs )
     {
-        for ( DigestItemType digestItemType : projectInputs.getItems() )
+        for ( DigestItem digestItemType : projectInputs.getItems() )
         {
             if ( "pom".equals( digestItemType.getType() ) )
             {
@@ -111,11 +111,11 @@ public class CacheDiff
         return Optional.absent();
     }
 
-    private void compareFiles( ProjectsInputInfoType current, ProjectsInputInfoType baseline )
+    private void compareFiles( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
 
-        final Map<String, DigestItemType> currentFiles = new HashMap<>();
-        for ( DigestItemType item : current.getItems() )
+        final Map<String, DigestItem> currentFiles = new HashMap<>();
+        for ( DigestItem item : current.getItems() )
         {
             if ( "file".equals( item.getType() ) )
             {
@@ -123,8 +123,8 @@ public class CacheDiff
             }
         }
 
-        final Map<String, DigestItemType> baselineFiles = new HashMap<>();
-        for ( DigestItemType item : baseline.getItems() )
+        final Map<String, DigestItem> baselineFiles = new HashMap<>();
+        for ( DigestItem item : baseline.getItems() )
         {
             if ( "file".equals( item.getType() ) )
             {
@@ -147,12 +147,12 @@ public class CacheDiff
             return;
         }
 
-        for ( Map.Entry<String, DigestItemType> entry : currentFiles.entrySet() )
+        for ( Map.Entry<String, DigestItem> entry : currentFiles.entrySet() )
         {
             String filePath = entry.getKey();
-            DigestItemType currentFile = entry.getValue();
+            DigestItem currentFile = entry.getValue();
             // should be null safe because sets are compared above for differences
-            final DigestItemType baselineFile = baselineFiles.get( filePath );
+            final DigestItem baselineFile = baselineFiles.get( filePath );
             if ( !StringUtils.equals( currentFile.getHash(), baselineFile.getHash() ) )
             {
 
@@ -178,18 +178,18 @@ public class CacheDiff
         }
     }
 
-    private void compareDependencies( ProjectsInputInfoType current, ProjectsInputInfoType baseline )
+    private void compareDependencies( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
-        final Map<String, DigestItemType> currentDependencies = new HashMap<>();
-        for ( DigestItemType digestItemType : current.getItems() )
+        final Map<String, DigestItem> currentDependencies = new HashMap<>();
+        for ( DigestItem digestItemType : current.getItems() )
         {
             if ( "dependency".equals( digestItemType.getType() ) )
             {
                 currentDependencies.put( digestItemType.getValue(), digestItemType );
             }
         }
-        final Map<String, DigestItemType> baselineDependencies = new HashMap<>();
-        for ( DigestItemType item : baseline.getItems() )
+        final Map<String, DigestItem> baselineDependencies = new HashMap<>();
+        for ( DigestItem item : baseline.getItems() )
         {
             if ( "dependency".equals( item.getType() ) )
             {
@@ -214,12 +214,12 @@ public class CacheDiff
             return;
         }
 
-        for ( Map.Entry<String, DigestItemType> entry : currentDependencies.entrySet() )
+        for ( Map.Entry<String, DigestItem> entry : currentDependencies.entrySet() )
         {
             String dependencyKey = entry.getKey();
-            DigestItemType currentDependency = entry.getValue();
+            DigestItem currentDependency = entry.getValue();
             // null safe - sets compared for differences above
-            final DigestItemType baselineDependency = baselineDependencies.get( dependencyKey );
+            final DigestItem baselineDependency = baselineDependencies.get( dependencyKey );
             if ( !StringUtils.equals( currentDependency.getHash(), baselineDependency.getHash() ) )
             {
                 addNewMismatch( dependencyKey, currentDependency.getHash(), baselineDependency.getHash(),
@@ -232,23 +232,23 @@ public class CacheDiff
     }
 
 
-    private void compareExecutions( List<CompletedExecutionType> current, List<CompletedExecutionType> baseline )
+    private void compareExecutions( List<CompletedExecution> current, List<CompletedExecution> baseline )
     {
-        Map<String, CompletedExecutionType> baselineExecutionsByKey = new HashMap<>();
-        for ( CompletedExecutionType completedExecutionType : baseline )
+        Map<String, CompletedExecution> baselineExecutionsByKey = new HashMap<>();
+        for ( CompletedExecution completedExecutionType : baseline )
         {
             baselineExecutionsByKey.put( completedExecutionType.getExecutionKey(), completedExecutionType );
         }
 
-        Map<String, CompletedExecutionType> currentExecutionsByKey = new HashMap<>();
-        for ( CompletedExecutionType e1 : current )
+        Map<String, CompletedExecution> currentExecutionsByKey = new HashMap<>();
+        for ( CompletedExecution e1 : current )
         {
             currentExecutionsByKey.put( e1.getExecutionKey(), e1 );
         }
 
         // such situation normally means different poms and mismatch in effective poms,
         // but in any case it is helpful to report
-        for ( CompletedExecutionType baselineExecution : baseline )
+        for ( CompletedExecution baselineExecution : baseline )
         {
             if ( !currentExecutionsByKey.containsKey( baselineExecution.getExecutionKey() ) )
             {
@@ -261,7 +261,7 @@ public class CacheDiff
             }
         }
 
-        for ( CompletedExecutionType currentExecution : current )
+        for ( CompletedExecution currentExecution : current )
         {
             if ( !baselineExecutionsByKey.containsKey( currentExecution.getExecutionKey() ) )
             {
@@ -275,17 +275,17 @@ public class CacheDiff
                 continue;
             }
 
-            final CompletedExecutionType baselineExecution =
+            final CompletedExecution baselineExecution =
                     baselineExecutionsByKey.get( currentExecution.getExecutionKey() );
             comparePlugins( currentExecution, baselineExecution );
         }
     }
 
-    private void comparePlugins( CompletedExecutionType current, CompletedExecutionType baseline )
+    private void comparePlugins( CompletedExecution current, CompletedExecution baseline )
     {
         // TODO add support for skip values
-        final List<PropertyValueType> trackedProperties = new ArrayList<>();
-        for ( PropertyValueType propertyValueType : current.getProperties() )
+        final List<PropertyValue> trackedProperties = new ArrayList<>();
+        for ( PropertyValue propertyValueType : current.getProperties() )
         {
             if ( propertyValueType.isTracked() )
             {
@@ -297,15 +297,15 @@ public class CacheDiff
             return;
         }
 
-        final Map<String, PropertyValueType> baselinePropertiesByName = new HashMap<>();
-        for ( PropertyValueType propertyValueType : baseline.getProperties() )
+        final Map<String, PropertyValue> baselinePropertiesByName = new HashMap<>();
+        for ( PropertyValue propertyValueType : baseline.getProperties() )
         {
             baselinePropertiesByName.put( propertyValueType.getName(), propertyValueType );
         }
 
-        for ( PropertyValueType p : trackedProperties )
+        for ( PropertyValue p : trackedProperties )
         {
-            final PropertyValueType baselineValue = baselinePropertiesByName.get( p.getName() );
+            final PropertyValue baselineValue = baselinePropertiesByName.get( p.getName() );
             if ( baselineValue == null || !StringUtils.equals( baselineValue.getValue(), p.getValue() ) )
             {
                 addNewMismatch(
@@ -325,7 +325,7 @@ public class CacheDiff
     private void addNewMismatch( String item, String current, String baseline, String reason,
                                  String resolution )
     {
-        final MismatchType mismatch = new MismatchType();
+        final Mismatch mismatch = new Mismatch();
         mismatch.setItem( item );
         mismatch.setCurrent( current );
         mismatch.setBaseline( baseline );
@@ -336,7 +336,7 @@ public class CacheDiff
 
     private void addNewMismatch( String property, String reason, String resolution )
     {
-        final MismatchType mismatchType = new MismatchType();
+        final Mismatch mismatchType = new Mismatch();
         mismatchType.setItem( property );
         mismatchType.setReason( reason );
         mismatchType.setResolution( resolution );

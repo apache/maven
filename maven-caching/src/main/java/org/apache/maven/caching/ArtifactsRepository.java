@@ -20,7 +20,7 @@ package org.apache.maven.caching;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.execution.MavenSession;
 
@@ -38,5 +38,5 @@ public interface ArtifactsRepository
 
     void saveArtifactFile( CacheResult cacheResult, Artifact artifact ) throws IOException;
 
-    void saveCacheReport( String buildId, MavenSession session, CacheReportType cacheReport ) throws IOException;
+    void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException;
 }

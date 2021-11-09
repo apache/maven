@@ -19,11 +19,10 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
-import org.apache.maven.caching.xml.config.CacheType;
-import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
+import org.apache.maven.caching.xml.config.CacheConfig;
+import org.apache.maven.caching.xml.report.CacheReportDto;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -49,7 +48,7 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-config-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-config-instance.xml" );
-        final CacheType cacheConfig = new XmlService().fromInputStream( CacheType.class, is );
+        final CacheConfig cache = new XmlService().fromInputStream( CacheConfig.class, is );
     }
 
     @Test
@@ -63,7 +62,7 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-report-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-report-instance.xml" );
-        final CacheReportType cacheReport = new XmlService().fromInputStream( CacheReportType.class, is );
+        final CacheReportDto cacheReport = new XmlService().fromInputStream( CacheReportDto.class, is );
     }
 
     @Test
@@ -77,7 +76,7 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-buildinfo-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-buildinfo-instance.xml" );
-        final BuildInfoType buildInfo = new XmlService().fromInputStream( BuildInfoType.class, is );
+        final BuildInfo buildInfo = new XmlService().fromInputStream( BuildInfo.class, is );
     }
 
     @Test
@@ -91,6 +90,6 @@ public class XmlServiceTest {
         Document doc = db.parse( getClass().getResource( "cache-buildsdiff-instance.xml" ).toString() );
 
         InputStream is = getClass().getResourceAsStream( "cache-buildsdiff-instance.xml" );
-        final BuildDiffType buildInfo = new XmlService().fromInputStream( BuildDiffType.class, is );
+        final BuildDiff buildDiff = new XmlService().fromInputStream( BuildDiff.class, is );
     }
 }

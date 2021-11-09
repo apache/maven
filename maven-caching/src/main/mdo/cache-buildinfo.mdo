@@ -34,7 +34,7 @@ under the License.
   <classes>
     <!--xs:complexType name="BuildInfoType"-->
     <class rootElement="true" xml.tagName="build">
-      <name>BuildInfoType</name>
+      <name>BuildInfo</name>
       <version>1.0.0+</version>
       <description></description>
       <!--xs:all-->
@@ -106,7 +106,7 @@ under the License.
           <name>artifact</name>
           <version>1.0.0+</version>
           <association>
-            <type>ArtifactType</type>
+            <type>Artifact</type>
           </association>
           <description></description>
         </field>
@@ -120,7 +120,7 @@ under the License.
         <field>
           <name>attachedArtifacts</name>
           <association>
-            <type>ArtifactType</type>
+            <type>Artifact</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -150,7 +150,7 @@ under the License.
         <field>
           <name>executions</name>
           <association>
-            <type>CompletedExecutionType</type>
+            <type>CompletedExecution</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -158,7 +158,7 @@ under the License.
         <field>
           <name>projectsInputInfo</name>
           <association>
-            <type>ProjectsInputInfoType</type>
+            <type>ProjectsInputInfo</type>
           </association>
         </field>
       </fields>
@@ -188,7 +188,7 @@ under the License.
 
     <!--xs:complexType name="ArtifactType"-->
     <class>
-      <name>ArtifactType</name>
+      <name>Artifact</name>
       <!--xs:sequence-->
       <fields>
         <!--xs:element name="groupId" type="xs:string"/-->
@@ -259,7 +259,7 @@ under the License.
         </xs:sequence>
     </xs:complexType-->
     <class>
-      <name>CompletedExecutionType</name>
+      <name>CompletedExecution</name>
       <fields>
         <field>
           <name>executionKey</name>
@@ -272,7 +272,7 @@ under the License.
         <field>
           <name>properties</name>
           <association>
-            <type>PropertyValueType</type>
+            <type>PropertyValue</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -289,7 +289,7 @@ under the License.
     </xs:complexType-->
 
     <class>
-      <name>PropertyValueType</name>
+      <name>PropertyValue</name>
       <fields>
         <field xml.content="true">
           <name>value</name>
@@ -314,7 +314,7 @@ under the License.
     </xs:complexType-->
 
     <class>
-      <name>ProjectsInputInfoType</name>
+      <name>ProjectsInputInfo</name>
       <fields>
         <field>
           <name>checksum</name>
@@ -323,7 +323,7 @@ under the License.
         <field>
           <name>items</name>
           <association>
-            <type>DigestItemType</type>
+            <type>DigestItem</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -345,7 +345,7 @@ under the License.
     </xs:complexType-->
 
     <class>
-      <name>DigestItemType</name>
+      <name>DigestItem</name>
       <fields>
         <field xml.content="true">
           <name>value</name>

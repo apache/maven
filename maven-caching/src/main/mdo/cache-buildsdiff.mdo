@@ -40,12 +40,12 @@ under the License.
     </xs:complexType-->
 
     <class rootElement="true">
-      <name>BuildDiffType</name>
+      <name>BuildDiff</name>
       <fields>
         <field>
           <name>mismatches</name>
           <association>
-            <type>MismatchType</type>
+            <type>Mismatch</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -65,12 +65,12 @@ under the License.
     </xs:complexType-->
 
     <class>
-      <name>MismatchType</name>
+      <name>Mismatch</name>
       <fields>
         <field>
           <name>detail</name>
           <association>
-            <type>MismatchDetailType</type>
+            <type>MismatchDetail</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -103,7 +103,7 @@ under the License.
 
     <!--xs:complexType name="MismatchDetailType"/-->
     <class>
-      <name>MismatchDetailType</name>
+      <name>MismatchDetail</name>
     </class>
 
   </classes>

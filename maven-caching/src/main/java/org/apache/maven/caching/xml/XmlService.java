@@ -29,16 +29,16 @@ import java.nio.file.Files;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
 import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Reader;
 import org.apache.maven.caching.xml.buildinfo.io.xpp3.CacheBuildInfoXpp3Writer;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
 import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Reader;
 import org.apache.maven.caching.xml.buildsdiff.io.xpp3.CacheBuildsDiffXpp3Writer;
-import org.apache.maven.caching.xml.config.CacheType;
+import org.apache.maven.caching.xml.config.CacheConfig;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
-import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -51,7 +51,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class XmlService
 {
 
-    public byte[] toBytes( CacheType cache ) throws IOException
+    public byte[] toBytes( CacheConfig cache ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
@@ -60,7 +60,7 @@ public class XmlService
         }
     }
 
-    public byte[] toBytes( BuildInfoType buildInfo ) throws IOException
+    public byte[] toBytes( BuildInfo buildInfo ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
@@ -69,7 +69,7 @@ public class XmlService
         }
     }
 
-    public byte[] toBytes( BuildDiffType diff ) throws IOException
+    public byte[] toBytes( BuildDiff diff ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
@@ -78,7 +78,7 @@ public class XmlService
         }
     }
 
-    public byte[] toBytes( CacheReportType cacheReportType ) throws IOException
+    public byte[] toBytes( CacheReport cacheReportType ) throws IOException
     {
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream() )
         {
@@ -101,19 +101,19 @@ public class XmlService
     {
         try
         {
-            if ( clazz == BuildInfoType.class )
+            if ( clazz == BuildInfo.class )
             {
                 return clazz.cast( new CacheBuildInfoXpp3Reader().read( inputStream ) );
             }
-            else if ( clazz == CacheType.class )
+            else if ( clazz == CacheConfig.class )
             {
                 return clazz.cast( new CacheConfigXpp3Reader().read( inputStream ) );
             }
-            else if ( clazz == BuildDiffType.class )
+            else if ( clazz == BuildDiff.class )
             {
                 return clazz.cast( new CacheBuildsDiffXpp3Reader().read( inputStream ) );
             }
-            else if ( clazz == CacheReportType.class )
+            else if ( clazz == CacheReport.class )
             {
                 return clazz.cast( new CacheReportXpp3Reader().read( inputStream ) );
             }

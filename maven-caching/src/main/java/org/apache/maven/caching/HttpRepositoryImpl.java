@@ -42,16 +42,14 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.checksum.MavenProjectInput;
-import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.report.CacheReportType;
-import org.apache.maven.caching.xml.report.ProjectReportType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
+import org.apache.maven.caching.xml.report.CacheReport;
+import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
@@ -95,28 +93,29 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     };
 
     @Override
-    public BuildInfo findBuild( CacheContext context )
+    public org.apache.maven.caching.xml.BuildInfo findBuild( CacheContext context )
     {
         final String resourceUrl = getResourceUrl( context, BUILDINFO_XML );
         String artifactId = context.getProject().getArtifactId();
         if ( exists( artifactId, resourceUrl ) )
         {
             final byte[] bytes = getResourceContent( resourceUrl, artifactId );
-            final BuildInfoType dto = xmlService.fromBytes( BuildInfoType.class, bytes );
-            return new BuildInfo( dto, CacheSource.REMOTE );
+            final BuildInfo dto = xmlService.fromBytes( BuildInfo.class, bytes );
+            return new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.REMOTE );
         }
         return null;
     }
 
     @Override
-    public byte[] getArtifactContent( CacheContext context, ArtifactType artifact )
+    public byte[] getArtifactContent( CacheContext context, Artifact artifact )
     {
         return getResourceContent( getResourceUrl( context, artifact.getFileName() ),
                 context.getProject().getArtifactId() );
     }
 
     @Override
-    public void saveBuildInfo( CacheResult cacheResult, BuildInfo buildInfo ) throws IOException
+    public void saveBuildInfo( CacheResult cacheResult, org.apache.maven.caching.xml.BuildInfo buildInfo )
+            throws IOException
     {
         CacheContext context = cacheResult.getContext();
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), BUILDINFO_XML );
@@ -126,7 +125,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
 
 
     @Override
-    public void saveCacheReport( String buildId, MavenSession session, CacheReportType cacheReport ) throws IOException
+    public void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException
     {
         MavenProject rootProject = session.getTopLevelProject();
         final String resourceUrl = cacheConfig.getUrl() + "/" + MavenProjectInput.CACHE_IMPLMENTATION_VERSION
@@ -139,7 +138,8 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     }
 
     @Override
-    public void saveArtifactFile( CacheResult cacheResult, Artifact artifact ) throws IOException
+    public void saveArtifactFile( CacheResult cacheResult,
+                                  org.apache.maven.artifact.Artifact artifact ) throws IOException
     {
         CacheContext context = cacheResult.getContext();
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), ProjectUtils.normalizedName( artifact ) );
@@ -244,20 +244,20 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
         }
     }
 
-    private final AtomicReference<Supplier<Optional<CacheReportType>>> cacheReportSupplier = new AtomicReference<>();
+    private final AtomicReference<Supplier<Optional<CacheReport>>> cacheReportSupplier = new AtomicReference<>();
 
     @Override
-    public Optional<BuildInfo> findBaselineBuild( MavenProject project )
+    public Optional<org.apache.maven.caching.xml.BuildInfo> findBaselineBuild( MavenProject project )
     {
-        final Optional<List<ProjectReportType>> cachedProjectsHolder = findCacheInfo()
-                .transform( CacheReportType::getProjects );
+        final Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
+                .transform( CacheReport::getProjects );
         if ( !cachedProjectsHolder.isPresent() )
         {
             return Optional.absent();
         }
 
-        Optional<ProjectReportType> cachedProjectHolder = Optional.absent();
-        for ( ProjectReportType p : cachedProjectsHolder.get() )
+        Optional<ProjectReport> cachedProjectHolder = Optional.absent();
+        for ( ProjectReport p : cachedProjectsHolder.get() )
         {
             if ( project.getArtifactId().equals( p.getArtifactId() ) && project.getGroupId().equals(
                     p.getGroupId() ) )
@@ -270,7 +270,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
         if ( cachedProjectHolder.isPresent() )
         {
             String url;
-            final ProjectReportType projectReport = cachedProjectHolder.get();
+            final ProjectReport projectReport = cachedProjectHolder.get();
             if ( projectReport.getUrl() != null )
             {
                 url = cachedProjectHolder.get().getUrl();
@@ -288,8 +288,8 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
                 if ( exists( project.getArtifactId(), url ) )
                 {
                     byte[] content = getResourceContent( url, project.getArtifactId() );
-                    final BuildInfoType dto = xmlService.fromBytes( BuildInfoType.class, content );
-                    return Optional.of( new BuildInfo( dto, CacheSource.REMOTE ) );
+                    final BuildInfo dto = xmlService.fromBytes( BuildInfo.class, content );
+                    return Optional.of( new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.REMOTE ) );
                 }
                 else
                 {
@@ -307,17 +307,17 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
         return Optional.absent();
     }
 
-    private Optional<CacheReportType> findCacheInfo()
+    private Optional<CacheReport> findCacheInfo()
     {
 
-        Supplier<Optional<CacheReportType>> candidate = Suppliers.memoize( () ->
+        Supplier<Optional<CacheReport>> candidate = Suppliers.memoize( () ->
         {
             try
             {
                 logInfo( "Downloading baseline cache report from: " + cacheConfig.getBaselineCacheUrl(),
                         "DEBUG" );
                 byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl(), "cache-info" );
-                CacheReportType cacheReportType = xmlService.fromBytes( CacheReportType.class, content );
+                CacheReport cacheReportType = xmlService.fromBytes( CacheReport.class, content );
                 return Optional.of( cacheReportType );
             }
             catch ( Exception e )

@@ -19,7 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.config.DirScanConfigType;
+import org.apache.maven.caching.xml.config.DirScanConfig;
 
 import javax.annotation.Nonnull;
 
@@ -37,5 +37,5 @@ public interface PluginScanConfig
     @Nonnull
     ScanConfigProperties getTagScanProperties( String tagName );
 
-    DirScanConfigType dto();
+    DirScanConfig dto();
 }
