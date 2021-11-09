@@ -34,12 +34,12 @@ under the License.
   <classes>
 
     <class rootElement="true">
-      <name>CacheReportType</name>
+      <name>CacheReport</name>
       <fields>
         <field>
           <name>projects</name>
           <association>
-            <type>ProjectReportType</type>
+            <type>ProjectReport</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -64,7 +64,7 @@ under the License.
     </xs:complexType-->
 
     <class>
-      <name>ProjectReportType</name>
+      <name>ProjectReport</name>
       <fields>
         <field>
           <name>groupId</name>

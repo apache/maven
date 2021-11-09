@@ -20,8 +20,7 @@ package org.apache.maven.caching.checksum;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
@@ -48,14 +47,14 @@ public class KeyUtils
         return StringUtils.joinWith( SEPARATOR, dependency.getGroupId(), dependency.getArtifactId() );
     }
 
-    public static String getArtifactKey( ArtifactType artifact )
+    public static String getArtifactKey( Artifact artifact )
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()
                 + ( artifact.getClassifier() != null ? ":" + artifact.getClassifier() : "" )
                 + ":" + artifact.getVersion();
     }
 
-    public static String getArtifactKey( Artifact artifact )
+    public static String getArtifactKey( org.apache.maven.artifact.Artifact artifact )
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()
                 + ( artifact.getClassifier() != null ? ":" + artifact.getClassifier() : "" )

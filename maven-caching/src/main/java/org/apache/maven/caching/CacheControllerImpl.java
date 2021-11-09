@@ -54,7 +54,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.caching.checksum.KeyUtils;
@@ -66,16 +65,16 @@ import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.DtoUtils;
 import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
 import org.apache.maven.caching.xml.buildinfo.Scm;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
-import org.apache.maven.caching.xml.config.PropertyNameType;
-import org.apache.maven.caching.xml.config.TrackedPropertyType;
-import org.apache.maven.caching.xml.report.CacheReportType;
-import org.apache.maven.caching.xml.report.ProjectReportType;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
+import org.apache.maven.caching.xml.config.PropertyName;
+import org.apache.maven.caching.xml.config.TrackedProperty;
+import org.apache.maven.caching.xml.report.CacheReport;
+import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
@@ -142,7 +141,7 @@ public class CacheControllerImpl implements CacheController
     @Inject
     private XmlService xmlService;
 
-    private final ConcurrentMap<String, DigestItemType> artifactDigestByKey = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
 
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
 
@@ -162,7 +161,7 @@ public class CacheControllerImpl implements CacheController
 
         logInfo( project, "Attempting to restore project from build cache" );
 
-        ProjectsInputInfoType inputInfo = calculateInput( project, session, projectIndex );
+        ProjectsInputInfo inputInfo = calculateInput( project, session, projectIndex );
 
         final CacheContext context = new CacheContext( project, inputInfo, session );
         // remote build first
@@ -224,7 +223,7 @@ public class CacheControllerImpl implements CacheController
             {
 
                 final MavenProject project = context.getProject();
-                final ProjectsInputInfoType inputInfo = context.getInputInfo();
+                final ProjectsInputInfo inputInfo = context.getInputInfo();
 
                 logInfo( project, "Found cached build, restoring from cache " + inputInfo.getChecksum() );
 
@@ -304,7 +303,7 @@ public class CacheControllerImpl implements CacheController
         final CacheContext context = cacheResult.getContext();
         final MavenProject project = context.getProject();
 
-        final ArtifactType artifact = buildInfo.getArtifact();
+        final Artifact artifact = buildInfo.getArtifact();
         artifact.setVersion( project.getVersion() );
 
         try
@@ -324,7 +323,7 @@ public class CacheControllerImpl implements CacheController
                 putChecksum( artifact, context.getInputInfo().getChecksum() );
             }
 
-            for ( ArtifactType attachedArtifact : buildInfo.getAttachedArtifacts() )
+            for ( Artifact attachedArtifact : buildInfo.getAttachedArtifacts() )
             {
                 attachedArtifact.setVersion( project.getVersion() );
                 if ( isNotBlank( attachedArtifact.getFileName() ) )
@@ -369,17 +368,17 @@ public class CacheControllerImpl implements CacheController
         return true;
     }
 
-    private void putChecksum( ArtifactType artifact, String projectChecksum )
+    private void putChecksum( Artifact artifact, String projectChecksum )
     {
 
-        final DigestItemType projectArtifact = DtoUtils.createdDigestedByProjectChecksum( artifact, projectChecksum );
+        final DigestItem projectArtifact = DtoUtils.createdDigestedByProjectChecksum( artifact, projectChecksum );
         final String dependencyKey = KeyUtils.getArtifactKey( artifact );
         artifactDigestByKey.put( dependencyKey, projectArtifact );
 
         if ( !"pom".equals( artifact.getType() ) )
         {
             final ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
-            ArtifactType copy = DtoUtils.copy( artifact );
+            Artifact copy = DtoUtils.copy( artifact );
             copy.setType( artifactHandler.getPackaging() );
             artifactDigestByKey.put( KeyUtils.getArtifactKey( copy ), projectArtifact );
             copy.setType( artifactHandler.getExtension() );
@@ -387,7 +386,7 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private ProjectsInputInfoType calculateInput( MavenProject project, MavenSession session,
+    private ProjectsInputInfo calculateInput( MavenProject project, MavenSession session,
                                                   ProjectIndex projectIndex )
     {
         try
@@ -423,16 +422,16 @@ public class CacheControllerImpl implements CacheController
             attachGeneratedSources( project );
             attachOutputs( project );
 
-            final Artifact projectArtifact = project.getArtifact();
+            final org.apache.maven.artifact.Artifact projectArtifact = project.getArtifact();
             final HashFactory hashFactory = cacheConfig.getHashFactory();
             final HashAlgorithm algorithm = hashFactory.createAlgorithm();
-            final ArtifactType projectArtifactDto = artifactDto( project.getArtifact(), algorithm );
+            final Artifact projectArtifactDto = artifactDto( project.getArtifact(), algorithm );
 
-            final List<Artifact> attachedArtifacts =
+            final List<org.apache.maven.artifact.Artifact> attachedArtifacts =
                     project.getAttachedArtifacts() != null ? project.getAttachedArtifacts() : Collections.emptyList();
-            List<ArtifactType> attachedArtifactDtos = artifactDtos( attachedArtifacts, algorithm );
+            List<Artifact> attachedArtifactDtos = artifactDtos( attachedArtifacts, algorithm );
 
-            List<CompletedExecutionType> completedExecution = buildExecutionInfo( mojoExecutions, executionEvents );
+            List<CompletedExecution> completedExecution = buildExecutionInfo( mojoExecutions, executionEvents );
 
             final BuildInfo buildInfo = new BuildInfo( session.getGoals(), projectArtifactDto, attachedArtifactDtos,
                     context.getInputInfo(), completedExecution, hashFactory.getAlgorithm() );
@@ -450,7 +449,7 @@ public class CacheControllerImpl implements CacheController
                     localCache.saveArtifactFile( cacheResult, projectArtifact );
                     putChecksum( projectArtifactDto, context.getInputInfo().getChecksum() );
                 }
-                for ( Artifact attachedArtifact : attachedArtifacts )
+                for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
                 {
                     if ( attachedArtifact.getFile() != null && isOutputArtifact(
                             attachedArtifact.getFile().getName() ) )
@@ -458,7 +457,7 @@ public class CacheControllerImpl implements CacheController
                         localCache.saveArtifactFile( cacheResult, attachedArtifact );
                     }
                 }
-                for ( ArtifactType attachedArtifactDto : attachedArtifactDtos )
+                for ( Artifact attachedArtifactDto : attachedArtifactDtos )
                 {
                     putChecksum( attachedArtifactDto, context.getInputInfo().getChecksum() );
                 }
@@ -498,11 +497,11 @@ public class CacheControllerImpl implements CacheController
             String outputDirectory = project.getBuild().getDirectory();
             Path reportOutputDir = Paths.get( outputDirectory, "incremental-maven" );
             logInfo( project, "Saving cache builds diff to: " + reportOutputDir );
-            BuildDiffType diff = new CacheDiff( buildInfo.getDto(), baseline.getDto(), cacheConfig ).compare();
+            BuildDiff diff = new CacheDiff( buildInfo.getDto(), baseline.getDto(), cacheConfig ).compare();
             try
             {
                 Files.createDirectories( reportOutputDir );
-                final ProjectsInputInfoType baselineInputs = baseline.getDto().getProjectsInputInfo();
+                final ProjectsInputInfo baselineInputs = baseline.getDto().getProjectsInputInfo();
                 final String checksum = baselineInputs.getChecksum();
                 Files.write( reportOutputDir.resolve( "buildinfo-baseline-" + checksum + ".xml" ),
                         xmlService.toBytes( baseline.getDto() ), TRUNCATE_EXISTING, CREATE );
@@ -510,14 +509,14 @@ public class CacheControllerImpl implements CacheController
                         xmlService.toBytes( buildInfo.getDto() ), TRUNCATE_EXISTING, CREATE );
                 Files.write( reportOutputDir.resolve( "buildsdiff-" + checksum + ".xml" ),
                         xmlService.toBytes( diff ), TRUNCATE_EXISTING, CREATE );
-                final Optional<DigestItemType> pom = CacheDiff.findPom( buildInfo.getDto().getProjectsInputInfo() );
+                final Optional<DigestItem> pom = CacheDiff.findPom( buildInfo.getDto().getProjectsInputInfo() );
                 if ( pom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve( "effective-pom-" + checksum + ".xml" ),
                             pom.get().getValue().getBytes( StandardCharsets.UTF_8 ),
                             TRUNCATE_EXISTING, CREATE );
                 }
-                final Optional<DigestItemType> baselinePom = CacheDiff.findPom( baselineInputs );
+                final Optional<DigestItem> baselinePom = CacheDiff.findPom( baselineInputs );
                 if ( baselinePom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve(
@@ -537,10 +536,11 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private List<ArtifactType> artifactDtos( List<Artifact> attachedArtifacts, HashAlgorithm digest ) throws IOException
+    private List<Artifact> artifactDtos( List<org.apache.maven.artifact.Artifact> attachedArtifacts,
+                                         HashAlgorithm digest ) throws IOException
     {
-        List<ArtifactType> result = new ArrayList<>();
-        for ( Artifact attachedArtifact : attachedArtifacts )
+        List<Artifact> result = new ArrayList<>();
+        for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
         {
             if ( attachedArtifact.getFile() != null && isOutputArtifact( attachedArtifact.getFile().getName() ) )
             {
@@ -550,9 +550,10 @@ public class CacheControllerImpl implements CacheController
         return result;
     }
 
-    private ArtifactType artifactDto( Artifact projectArtifact, HashAlgorithm algorithm ) throws IOException
+    private Artifact artifactDto( org.apache.maven.artifact.Artifact projectArtifact,
+                                  HashAlgorithm algorithm ) throws IOException
     {
-        final ArtifactType dto = DtoUtils.createDto( projectArtifact );
+        final Artifact dto = DtoUtils.createDto( projectArtifact );
         if ( projectArtifact.getFile() != null && projectArtifact.getFile().isFile() )
         {
             final Path file = projectArtifact.getFile().toPath();
@@ -562,15 +563,15 @@ public class CacheControllerImpl implements CacheController
         return dto;
     }
 
-    private List<CompletedExecutionType> buildExecutionInfo( List<MojoExecution> mojoExecutions,
-                                                             Map<String, MojoExecutionEvent> executionEvents )
+    private List<CompletedExecution> buildExecutionInfo( List<MojoExecution> mojoExecutions,
+                                                         Map<String, MojoExecutionEvent> executionEvents )
     {
-        List<CompletedExecutionType> list = new ArrayList<>();
+        List<CompletedExecution> list = new ArrayList<>();
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             final String executionKey = ProjectUtils.mojoExecutionKey( mojoExecution );
             final MojoExecutionEvent executionEvent = executionEvents.get( executionKey );
-            CompletedExecutionType executionInfo = new CompletedExecutionType();
+            CompletedExecution executionInfo = new CompletedExecution();
             executionInfo.setExecutionKey( executionKey );
             executionInfo.setMojoClassName( mojoExecution.getMojoDescriptor().getImplementation() );
             if ( executionEvent != null )
@@ -582,14 +583,14 @@ public class CacheControllerImpl implements CacheController
         return list;
     }
 
-    private void recordMojoProperties( CompletedExecutionType execution, MojoExecutionEvent executionEvent )
+    private void recordMojoProperties( CompletedExecution execution, MojoExecutionEvent executionEvent )
     {
         final MojoExecution mojoExecution = executionEvent.getExecution();
 
         final boolean logAll = cacheConfig.isLogAllProperties( mojoExecution );
-        List<TrackedPropertyType> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
-        List<PropertyNameType> noLogProperties = cacheConfig.getNologProperties( mojoExecution );
-        List<PropertyNameType> forceLogProperties = cacheConfig.getLoggedProperties( mojoExecution );
+        List<TrackedProperty> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
+        List<PropertyName> noLogProperties = cacheConfig.getNologProperties( mojoExecution );
+        List<PropertyName> forceLogProperties = cacheConfig.getLoggedProperties( mojoExecution );
         final Mojo mojo = executionEvent.getMojo();
 
         final File baseDir = executionEvent.getProject().getBasedir();
@@ -630,13 +631,13 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private boolean isExcluded( String propertyName, boolean logAll, List<PropertyNameType> excludedProperties,
-                                List<PropertyNameType> forceLogProperties )
+    private boolean isExcluded( String propertyName, boolean logAll, List<PropertyName> excludedProperties,
+                                List<PropertyName> forceLogProperties )
     {
 
         if ( !forceLogProperties.isEmpty() )
         {
-            for ( PropertyNameType logProperty : forceLogProperties )
+            for ( PropertyName logProperty : forceLogProperties )
             {
                 if ( StringUtils.equals( propertyName, logProperty.getPropertyName() ) )
                 {
@@ -648,7 +649,7 @@ public class CacheControllerImpl implements CacheController
 
         if ( !excludedProperties.isEmpty() )
         {
-            for ( PropertyNameType excludedProperty : excludedProperties )
+            for ( PropertyName excludedProperty : excludedProperties )
             {
                 if ( StringUtils.equals( propertyName, excludedProperty.getPropertyName() ) )
                 {
@@ -661,9 +662,9 @@ public class CacheControllerImpl implements CacheController
         return !logAll;
     }
 
-    private boolean isTracked( String propertyName, List<TrackedPropertyType> trackedProperties )
+    private boolean isTracked( String propertyName, List<TrackedProperty> trackedProperties )
     {
-        for ( TrackedPropertyType trackedProperty : trackedProperties )
+        for ( TrackedProperty trackedProperty : trackedProperties )
         {
             if ( StringUtils.equals( propertyName, trackedProperty.getPropertyName() ) )
             {
@@ -680,8 +681,8 @@ public class CacheControllerImpl implements CacheController
         {
 
             // completion of all mojos checked above, so we expect tp have execution info here
-            final List<TrackedPropertyType> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
-            final CompletedExecutionType cachedExecution = buildInfo.findMojoExecutionInfo( mojoExecution );
+            final List<TrackedProperty> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
+            final CompletedExecution cachedExecution = buildInfo.findMojoExecutionInfo( mojoExecution );
 
             if ( cachedExecution == null )
             {
@@ -753,10 +754,10 @@ public class CacheControllerImpl implements CacheController
         try
         {
 
-            CacheReportType cacheReport = new CacheReportType();
+            CacheReport cacheReport = new CacheReport();
             for ( CacheResult result : cacheResults.values() )
             {
-                ProjectReportType projectReport = new ProjectReportType();
+                ProjectReport projectReport = new ProjectReport();
                 CacheContext context = result.getContext();
                 MavenProject project = context.getProject();
                 projectReport.setGroupId( project.getGroupId() );
@@ -841,7 +842,7 @@ public class CacheControllerImpl implements CacheController
         return outputDir.resolve( relPath );
     }
 
-    private void restoreGeneratedSources( ArtifactType artifact, Path artifactFilePath, MavenProject project )
+    private void restoreGeneratedSources( Artifact artifact, Path artifactFilePath, MavenProject project )
             throws IOException
     {
         final Path targetDir = Paths.get( project.getBuild().getDirectory() );

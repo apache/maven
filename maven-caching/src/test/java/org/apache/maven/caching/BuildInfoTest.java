@@ -31,17 +31,15 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
-import org.apache.maven.caching.xml.buildinfo.PropertyValueType;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
+import org.apache.maven.caching.xml.buildinfo.PropertyValue;
 import org.apache.maven.caching.xml.XmlService;
 import org.junit.Test;
 
@@ -52,12 +50,12 @@ public class BuildInfoTest {
 
         XmlService xmlService = new XmlService();
 
-        ProjectsInputInfoType main = new ProjectsInputInfoType();
+        ProjectsInputInfo main = new ProjectsInputInfo();
         main.setChecksum("dependencyChecksum");
         main.addItem(createItem("pom", "<project><modelVersion>4.0.0</modelVersion></project>", "hash1"));
         main.addItem(createItem("file", Paths.get(".").toString(), "hash2"));
 
-        ArtifactType artifact = new ArtifactType();
+        Artifact artifact = new Artifact();
         artifact.setGroupId("g");
         artifact.setArtifactId("a");
         artifact.setType("t");
@@ -67,15 +65,15 @@ public class BuildInfoTest {
         artifact.setFileSize(123456);
         artifact.setFileHash("456L");
 
-        BuildInfoType buildInfo = new BuildInfoType();
+        BuildInfo buildInfo = new BuildInfo();
         buildInfo.setCacheImplementationVersion("cacheImplementationVersion");
         buildInfo.setBuildServer("server");
         buildInfo.setBuildTime(new Date());
         buildInfo.setArtifact(artifact);
         buildInfo.setHashFunction("SHA-256");
         buildInfo.setGoals(Lists.newArrayList("install"));
-        final Artifact attachedArtifact = new DefaultArtifact("ag", "aa", "av", "as", "at", "ac", new DefaultArtifactHandler());
-        buildInfo.setAttachedArtifacts(BuildInfo.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
+        final org.apache.maven.artifact.Artifact attachedArtifact = new DefaultArtifact("ag", "aa", "av", "as", "at", "ac", new DefaultArtifactHandler());
+        buildInfo.setAttachedArtifacts(org.apache.maven.caching.xml.BuildInfo.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
         buildInfo.setProjectsInputInfo(main);
         buildInfo.setExecutions(createExecutions());
 
@@ -86,22 +84,22 @@ public class BuildInfoTest {
         file.deleteOnExit();
         Files.write(tempFilePath, bytes);
 
-        BuildInfoType buildInfo1 = xmlService.fromFile(BuildInfoType.class, file);
+        BuildInfo buildInfo1 = xmlService.fromFile(BuildInfo.class, file);
         System.out.println(buildInfo1);
     }
 
-    private List<CompletedExecutionType> createExecutions() {
-        CompletedExecutionType execution = new CompletedExecutionType();
+    private List<CompletedExecution> createExecutions() {
+        CompletedExecution execution = new CompletedExecution();
         execution.setExecutionKey("execkey");
-        PropertyValueType property = new PropertyValueType();
+        PropertyValue property = new PropertyValue();
         property.setValue("value");
         property.setName("key");
         execution.addProperty(property);
         return new ArrayList<>(Arrays.asList(execution));
     }
 
-    private DigestItemType createItem(String pom, String s, String hash1) {
-        final DigestItemType d1 = new DigestItemType();
+    private DigestItem createItem(String pom, String s, String hash1) {
+        final DigestItem d1 = new DigestItem();
         d1.setType(pom);
         d1.setHash(s);
         d1.setValue(hash1);

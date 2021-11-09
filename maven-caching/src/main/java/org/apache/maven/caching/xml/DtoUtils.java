@@ -21,13 +21,12 @@ package org.apache.maven.caching.xml;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.ProjectUtils;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.PropertyValueType;
-import org.apache.maven.caching.xml.config.TrackedPropertyType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.PropertyValue;
+import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Dependency;
 
 import javax.annotation.Nonnull;
@@ -42,14 +41,14 @@ import static org.apache.maven.caching.checksum.KeyUtils.getArtifactKey;
 public class DtoUtils
 {
 
-    public static String findPropertyValue( String propertyName, CompletedExecutionType completedExecution )
+    public static String findPropertyValue( String propertyName, CompletedExecution completedExecution )
     {
-        final List<PropertyValueType> properties = completedExecution.getProperties();
+        final List<PropertyValue> properties = completedExecution.getProperties();
         if ( properties == null )
         {
             return null;
         }
-        for ( PropertyValueType property : properties )
+        for ( PropertyValue property : properties )
         {
             if ( StringUtils.equals( propertyName, property.getName() ) )
             {
@@ -59,9 +58,9 @@ public class DtoUtils
         return null;
     }
 
-    public static ArtifactType createDto( Artifact artifact )
+    public static Artifact createDto( org.apache.maven.artifact.Artifact artifact )
     {
-        ArtifactType dto = new ArtifactType();
+        Artifact dto = new Artifact();
         dto.setArtifactId( artifact.getArtifactId() );
         dto.setGroupId( artifact.getGroupId() );
         dto.setVersion( artifact.getVersion() );
@@ -72,9 +71,9 @@ public class DtoUtils
         return dto;
     }
 
-    public static DigestItemType createdDigestedByProjectChecksum( ArtifactType artifact, String projectChecksum )
+    public static DigestItem createdDigestedByProjectChecksum( Artifact artifact, String projectChecksum )
     {
-        DigestItemType dit = new DigestItemType();
+        DigestItem dit = new DigestItem();
         dit.setType( "module" );
         dit.setHash( projectChecksum );
         dit.setFileChecksum( artifact.getFileHash() );
@@ -82,9 +81,9 @@ public class DtoUtils
         return dit;
     }
 
-    public static DigestItemType createDigestedFile( Artifact artifact, String fileHash )
+    public static DigestItem createDigestedFile( org.apache.maven.artifact.Artifact artifact, String fileHash )
     {
-        DigestItemType dit = new DigestItemType();
+        DigestItem dit = new DigestItem();
         dit.setType( "artifact" );
         dit.setHash( fileHash );
         dit.setFileChecksum( fileHash );
@@ -92,7 +91,7 @@ public class DtoUtils
         return dit;
     }
 
-    public static Dependency createDependency( ArtifactType artifact )
+    public static Dependency createDependency( org.apache.maven.artifact.Artifact artifact )
     {
         final Dependency dependency = new Dependency();
         dependency.setArtifactId( artifact.getArtifactId() );
@@ -116,13 +115,13 @@ public class DtoUtils
         return dependency;
     }
 
-    public static void addProperty( CompletedExecutionType execution,
+    public static void addProperty( CompletedExecution execution,
                                     String propertyName,
                                     Object value,
                                     String baseDirPath,
                                     boolean tracked )
     {
-        final PropertyValueType valueType = new PropertyValueType();
+        final PropertyValue valueType = new PropertyValue();
         valueType.setName( propertyName );
         if ( value != null && value.getClass().isArray() )
         {
@@ -135,7 +134,7 @@ public class DtoUtils
     }
 
     public static boolean containsAllProperties(
-            @Nonnull CompletedExecutionType cachedExecution, List<TrackedPropertyType> trackedProperties )
+            @Nonnull CompletedExecution cachedExecution, List<TrackedProperty> trackedProperties )
     {
 
         if ( trackedProperties == null || trackedProperties.isEmpty() )
@@ -148,8 +147,8 @@ public class DtoUtils
             return false;
         }
 
-        final List<PropertyValueType> executionProperties = cachedExecution.getProperties();
-        for ( TrackedPropertyType trackedProperty : trackedProperties )
+        final List<PropertyValue> executionProperties = cachedExecution.getProperties();
+        for ( TrackedProperty trackedProperty : trackedProperties )
         {
             if ( !contains( executionProperties, trackedProperty.getPropertyName() ) )
             {
@@ -159,9 +158,9 @@ public class DtoUtils
         return true;
     }
 
-    public static boolean contains( List<PropertyValueType> executionProperties, String propertyName )
+    public static boolean contains( List<PropertyValue> executionProperties, String propertyName )
     {
-        for ( PropertyValueType executionProperty : executionProperties )
+        for ( PropertyValue executionProperty : executionProperties )
         {
             if ( StringUtils.equals( executionProperty.getName(), propertyName ) )
             {
@@ -171,9 +170,9 @@ public class DtoUtils
         return false;
     }
 
-    public static ArtifactType copy( ArtifactType artifact )
+    public static Artifact copy( Artifact artifact )
     {
-        ArtifactType copy = new ArtifactType();
+        Artifact copy = new Artifact();
         copy.setArtifactId( artifact.getArtifactId() );
         copy.setGroupId( artifact.getGroupId() );
         copy.setVersion( artifact.getVersion() );

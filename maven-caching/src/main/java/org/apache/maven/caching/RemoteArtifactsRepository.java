@@ -21,7 +21,7 @@ package org.apache.maven.caching;
 
 import com.google.common.base.Optional;
 import org.apache.maven.caching.xml.BuildInfo;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
 import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.io.IOException;
 public interface RemoteArtifactsRepository extends ArtifactsRepository
 {
 
-    byte[] getArtifactContent( CacheContext context, ArtifactType artifact ) throws IOException;
+    byte[] getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
 
     byte[] getResourceContent( String resourceUrl, String logReference );
 

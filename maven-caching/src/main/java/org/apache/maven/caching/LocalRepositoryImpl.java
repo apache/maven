@@ -50,15 +50,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.BuildInfo;
 import org.apache.maven.caching.xml.buildinfo.Scm;
-import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.LegacySupport;
@@ -90,7 +88,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     private static final long ONE_DAY_MILLIS = DAYS.toMillis( 1 );
     private static final String EMPTY = "";
     private static final LastModifiedComparator LAST_MODIFIED_COMPARATOR = new LastModifiedComparator();
-    private static final Function<Pair<BuildInfo, File>, Long> GET_LAST_MODIFIED =
+    private static final Function<Pair<org.apache.maven.caching.xml.BuildInfo, File>, Long> GET_LAST_MODIFIED =
             pair -> pair.getRight().lastModified();
 
     @Inject
@@ -108,27 +106,28 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     @Inject
     private CacheConfig cacheConfig;
 
-    private final LoadingCache<Pair<MavenSession, Dependency>, Optional<BuildInfo>> bestBuildCache =
-            CacheBuilder.newBuilder().build(
-                    CacheLoader.from( new Function<Pair<MavenSession, Dependency>, Optional<BuildInfo>>()
+    private final LoadingCache<Pair<MavenSession, Dependency>,
+                               Optional<org.apache.maven.caching.xml.BuildInfo>> bestBuildCache =
+        CacheBuilder.newBuilder().build( CacheLoader.from( new Function<Pair<MavenSession, Dependency>,
+                                           Optional<org.apache.maven.caching.xml.BuildInfo>>()
+            {
+                @Override
+                public Optional<org.apache.maven.caching.xml.BuildInfo> apply( Pair<MavenSession, Dependency> input )
+                {
+                    try
                     {
-                        @Override
-                        public Optional<BuildInfo> apply( Pair<MavenSession, Dependency> input )
-                        {
-                            try
-                            {
-                                return findBestMatchingBuildImpl( input );
-                            }
-                            catch ( IOException e )
-                            {
-                                logger.error( "Cannot find dependency in cache", e );
-                                return Optional.absent();
-                            }
-                        }
-                    } ) );
+                        return findBestMatchingBuildImpl( input );
+                    }
+                    catch ( IOException e )
+                    {
+                        logger.error( "Cannot find dependency in cache", e );
+                        return Optional.absent();
+                    }
+                }
+            } ) );
 
     @Override
-    public BuildInfo findLocalBuild( CacheContext context ) throws IOException
+    public org.apache.maven.caching.xml.BuildInfo findLocalBuild( CacheContext context ) throws IOException
     {
         Path localBuildInfoPath = localBuildPath( context, BUILDINFO_XML, false );
         logDebug( context, "Checking local build info: " + localBuildInfoPath );
@@ -137,8 +136,8 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
             logInfo( context, "Local build found by checksum " + context.getInputInfo().getChecksum() );
             try
             {
-                final BuildInfoType dto = xmlService.fromFile( BuildInfoType.class, localBuildInfoPath.toFile() );
-                return new BuildInfo( dto, CacheSource.LOCAL );
+                final BuildInfo dto = xmlService.fromFile( BuildInfo.class, localBuildInfoPath.toFile() );
+                return new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.LOCAL );
             }
             catch ( Exception e )
             {
@@ -150,7 +149,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public BuildInfo findBuild( CacheContext context ) throws IOException
+    public org.apache.maven.caching.xml.BuildInfo findBuild( CacheContext context ) throws IOException
     {
 
         Path buildInfoPath = remoteBuildPath( context, BUILDINFO_XML );
@@ -161,8 +160,8 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
             logInfo( context, "Downloaded build found by checksum " + context.getInputInfo().getChecksum() );
             try
             {
-                final BuildInfoType dto = xmlService.fromFile( BuildInfoType.class, buildInfoPath.toFile() );
-                return new BuildInfo( dto, CacheSource.REMOTE );
+                final BuildInfo dto = xmlService.fromFile( BuildInfo.class, buildInfoPath.toFile() );
+                return new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.REMOTE );
             }
             catch ( Exception e )
             {
@@ -205,7 +204,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
                 }
             }
 
-            final BuildInfo buildInfo = remoteRepository.findBuild( context );
+            final org.apache.maven.caching.xml.BuildInfo buildInfo = remoteRepository.findBuild( context );
             if ( buildInfo != null )
             {
                 logInfo( context, "Build info downloaded from remote repo, saving to:  " + buildInfoPath );
@@ -271,13 +270,15 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public Optional<BuildInfo> findBestMatchingBuild( MavenSession session, Dependency dependency )
+    public Optional<org.apache.maven.caching.xml.BuildInfo> findBestMatchingBuild(
+            MavenSession session, Dependency dependency )
     {
         return bestBuildCache.getUnchecked( Pair.of( session, dependency ) );
     }
 
 
-    private Optional<BuildInfo> findBestMatchingBuildImpl( Pair<MavenSession, Dependency> dependencySession )
+    private Optional<org.apache.maven.caching.xml.BuildInfo> findBestMatchingBuildImpl(
+            Pair<MavenSession, Dependency> dependencySession )
             throws IOException
     {
         final MavenSession session = dependencySession.getLeft();
@@ -285,7 +286,8 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
 
         final Path artifactCacheDir = artifactCacheDir( session, dependency.getGroupId(), dependency.getArtifactId() );
 
-        final Multimap<Pair<String, String>, Pair<BuildInfo, File>> filesByVersion = ArrayListMultimap.create();
+        final Multimap<Pair<String, String>, Pair<org.apache.maven.caching.xml.BuildInfo, File>>
+                filesByVersion = ArrayListMultimap.create();
 
         Files.walkFileTree( artifactCacheDir, new SimpleFileVisitor<Path>()
         {
@@ -297,9 +299,9 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
                 {
                     try
                     {
-                        final BuildInfoType dto = xmlService.fromFile( BuildInfoType.class, file );
-                        final Pair<BuildInfo, File> buildInfoAndFile = Pair.of( new BuildInfo( dto, CacheSource.LOCAL ),
-                                file );
+                        final BuildInfo dto = xmlService.fromFile( BuildInfo.class, file );
+                        final Pair<org.apache.maven.caching.xml.BuildInfo, File> buildInfoAndFile =
+                                Pair.of( new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.LOCAL ), file );
                         final String cachedVersion = dto.getArtifact().getVersion();
                         final String cachedBranch = getScmRef( dto.getScm() );
                         filesByVersion.put( Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
@@ -329,7 +331,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
 
         final String currentRef = getScmRef( ProjectUtils.readGitInfo( session ) );
         // first lets try by branch and version
-        Collection<Pair<BuildInfo, File>> bestMatched = new LinkedList<>();
+        Collection<Pair<org.apache.maven.caching.xml.BuildInfo, File>> bestMatched = new LinkedList<>();
         if ( isNotBlank( currentRef ) )
         {
             bestMatched = filesByVersion.get( Pair.of( dependency.getVersion(), currentRef ) );
@@ -350,7 +352,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
             bestMatched = filesByVersion.values();
         }
 
-        List<Pair<BuildInfo, File>> orderedFiles = Ordering.natural().onResultOf(
+        List<Pair<org.apache.maven.caching.xml.BuildInfo, File>> orderedFiles = Ordering.natural().onResultOf(
                 GET_LAST_MODIFIED ).reverse().sortedCopy( bestMatched );
         return Optional.of( orderedFiles.get( 0 ).getLeft() );
     }
@@ -368,7 +370,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public Path getArtifactFile( CacheContext context, CacheSource source, ArtifactType artifact ) throws IOException
+    public Path getArtifactFile( CacheContext context, CacheSource source, Artifact artifact ) throws IOException
     {
         if ( source == CacheSource.LOCAL )
         {
@@ -396,7 +398,8 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public void saveBuildInfo( CacheResult cacheResult, BuildInfo buildInfo ) throws IOException
+    public void saveBuildInfo( CacheResult cacheResult, org.apache.maven.caching.xml.BuildInfo buildInfo )
+            throws IOException
     {
         final Path path = localBuildPath( cacheResult.getContext(), BUILDINFO_XML, true );
         Files.write( path, xmlService.toBytes( buildInfo.getDto() ), TRUNCATE_EXISTING, CREATE );
@@ -407,7 +410,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public void saveCacheReport( String buildId, MavenSession session, CacheReportType cacheReport ) throws IOException
+    public void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException
     {
         Path path = getMultimoduleRoot( session ).resolve( "target" ).resolve( "maven-incremental" );
         Files.createDirectories( path );
@@ -421,7 +424,8 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     }
 
     @Override
-    public void saveArtifactFile( CacheResult cacheResult, Artifact artifact ) throws IOException
+    public void saveArtifactFile( CacheResult cacheResult, org.apache.maven.artifact.Artifact artifact )
+            throws IOException
     {
         // safe artifacts to cache
         File artifactFile = artifact.getFile();

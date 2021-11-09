@@ -22,7 +22,7 @@ package org.apache.maven.caching;
 import com.google.common.base.Optional;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheSource;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 
@@ -37,7 +37,7 @@ public interface LocalArtifactsRepository extends ArtifactsRepository
 
     void beforeSave( CacheContext environment ) throws IOException;
 
-    Path getArtifactFile( CacheContext context, CacheSource source, ArtifactType artifact ) throws IOException;
+    Path getArtifactFile( CacheContext context, CacheSource source, Artifact artifact ) throws IOException;
 
     void clearCache( CacheContext context );
 

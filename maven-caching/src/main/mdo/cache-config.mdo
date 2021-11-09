@@ -36,33 +36,33 @@ under the License.
     <classes>
 
         <class rootElement="true" xml.tagName="cache">
-            <name>CacheType</name>
+            <name>CacheConfig</name>
             <fields>
                 <field>
                     <name>configuration</name>
                     <association>
-                        <type>ConfigurationType</type>
+                        <type>Configuration</type>
                     </association>
                     <description>Configuration of main cache properties</description>
                 </field>
                 <field>
                     <name>input</name>
                     <association>
-                        <type>InputType</type>
+                        <type>Input</type>
                     </association>
                     <description>Configuration for source code input files participating in checksum calculation</description>
                 </field>
                 <field>
                     <name>output</name>
                     <association>
-                        <type>OutputType</type>
+                        <type>Output</type>
                     </association>
                     <description>Configuration for output artifacts, it's needed if you want to explicitly include/exclude something from caching</description>
                 </field>
                 <field>
                     <name>executionControl</name>
                     <association>
-                        <type>ExecutionControlType</type>
+                        <type>ExecutionControl</type>
                     </association>
                     <description>Execution rules for plugins in cached mode. Defines which plugins should run always</description>
                 </field>
@@ -220,7 +220,7 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>ConfigurationType</name>
+            <name>Configuration</name>
             <fields>
                 <field>
                     <name>enabled</name>
@@ -378,19 +378,19 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>InputType</name>
+            <name>Input</name>
             <fields>
                 <field>
                     <name>global</name>
                     <association>
-                        <type>PathSetType</type>
+                        <type>PathSet</type>
                     </association>
                     <description>Global input calculation rules applicable to all projects and plugins in the build</description>
                 </field>
                 <field>
                     <name>plugins</name>
                     <association>
-                        <type>PluginConfigurationScanType</type>
+                        <type>PluginConfigurationScan</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Plugin specific input calculation rules</description>
@@ -445,8 +445,8 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>PluginConfigurationScanType</name>
-            <superClass>CoordinatesBaseType</superClass>
+            <name>PluginConfigurationScan</name>
+            <superClass>CoordinatesBase</superClass>
             <fields>
                 <field>
                     <name>effectivePom</name>
@@ -458,14 +458,14 @@ under the License.
                 <field>
                     <name>dirScan</name>
                     <association>
-                        <type>DirScanConfigType</type>
+                        <type>DirScanConfig</type>
                     </association>
                     <description>Specifies plugin level rules of configuration processing in search of referenced source files</description>
                 </field>
                 <field>
                     <name>executions</name>
                     <association>
-                        <type>ExecutionConfigurationScanType</type>
+                        <type>ExecutionConfigurationScan</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specifies execution specific configuration processing in search of referenced source files</description>
@@ -523,7 +523,7 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>ExecutionConfigurationScanType</name>
+            <name>ExecutionConfigurationScan</name>
             <fields>
                 <field>
                     <name>execIds</name>
@@ -535,7 +535,7 @@ under the License.
                 <field>
                     <name>dirScan</name>
                     <association>
-                        <type>DirScanConfigType</type>
+                        <type>DirScanConfig</type>
                     </association>
                     <description>Specifies rules of configuration processing in search of referenced source files</description>
                 </field>
@@ -557,8 +557,8 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>TagScanConfigType</name>
-            <superClass>TagNameType</superClass>
+            <name>TagScanConfig</name>
+            <superClass>TagExclude</superClass>
             <fields>
                 <field xml.attribute="true">
                     <name>recursive</name>
@@ -634,12 +634,12 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>DirScanConfigType</name>
+            <name>DirScanConfig</name>
             <fields>
                 <field>
                     <name>includes</name>
                     <association>
-                        <type>TagScanConfigType</type>
+                        <type>TagScanConfig</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Forces cache to treat property value as input and include in calculation. If set, only included
@@ -648,7 +648,7 @@ under the License.
                 <field>
                     <name>excludes</name>
                     <association>
-                        <type>TagNameType</type>
+                        <type>TagExclude</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Tag to exclude when scanning plugin configuration for input files (blacklist)</description>
@@ -656,7 +656,7 @@ under the License.
                 <field>
                     <name>tagScanConfigs</name>
                     <association>
-                        <type>TagScanConfigType</type>
+                        <type>TagScanConfig</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Additional processing rules for non-blacklisted tags</description>
@@ -696,12 +696,12 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>OutputType</name>
+            <name>Output</name>
             <fields>
                 <field>
                     <name>exclude</name>
                     <association>
-                        <type>OutputTypeExclude</type>
+                        <type>OutputExclude</type>
                     </association>
                     <description>Patterns to exclude output artifacts applicable to all projects in the build</description>
                 </field>
@@ -709,7 +709,7 @@ under the License.
         </class>
 
         <class>
-            <name>OutputTypeExclude</name>
+            <name>OutputExclude</name>
             <fields>
                 <field>
                     <name>patterns</name>
@@ -739,7 +739,7 @@ under the License.
     </xs:complexType>
           -->
         <class>
-            <name>PathSetType</name>
+            <name>PathSet</name>
             <fields>
                 <field>
                     <name>glob</name>
@@ -849,20 +849,20 @@ under the License.
     -->
 
         <class>
-            <name>GoalReconciliationType</name>
-            <superClass>GoalIdType</superClass>
+            <name>GoalReconciliation</name>
+            <superClass>GoalId</superClass>
             <fields>
                 <field>
                     <name>reconciles</name>
                     <association>
-                        <type>TrackedPropertyType</type>
+                        <type>TrackedProperty</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
                 <field>
                     <name>logs</name>
                     <association>
-                        <type>PropertyNameType</type>
+                        <type>PropertyName</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specify property which should be logged to build metadata for exploration</description>
@@ -870,7 +870,7 @@ under the License.
                 <field>
                     <name>nologs</name>
                     <association>
-                        <type>PropertyNameType</type>
+                        <type>PropertyName</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specify property which should not be logged</description>
@@ -946,19 +946,19 @@ under the License.
     -->
 
         <class>
-            <name>ExecutionControlType</name>
+            <name>ExecutionControl</name>
             <fields>
                 <field>
                     <name>runAlways</name>
                     <association>
-                        <type>ExecutablesType</type>
+                        <type>Executables</type>
                     </association>
                     <description>Specify which plugin should run always if present in build regardless of cached status</description>
                 </field>
                 <field>
                     <name>ignoreMissing</name>
                     <association>
-                        <type>ExecutablesType</type>
+                        <type>Executables</type>
                     </association>
                     <description>
                         Specify which executions/plugins/goals do not affect generated artifacts and do not affect build correctness.
@@ -1011,7 +1011,7 @@ under the License.
                 <field>
                     <name>plugins</name>
                     <association>
-                        <type>GoalReconciliationType</type>
+                        <type>GoalReconciliation</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Reconciliation rules for plugin properties which might be affected by command line flags, etc</description>
@@ -1062,12 +1062,12 @@ under the License.
     -->
 
         <class>
-            <name>ExecutablesType</name>
+            <name>Executables</name>
             <fields>
                 <field>
                     <name>plugins</name>
                     <association>
-                        <type>PluginSetType</type>
+                        <type>PluginSet</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specify which executions should run always if present in build regardless of cached status</description>
@@ -1075,7 +1075,7 @@ under the License.
                 <field>
                     <name>executions</name>
                     <association>
-                        <type>ExecutionIdsListType</type>
+                        <type>ExecutionIdsList</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specify which executions should run always if present in build regardless of cached status</description>
@@ -1083,7 +1083,7 @@ under the License.
                 <field>
                     <name>goalsLists</name>
                     <association>
-                        <type>GoalsListType</type>
+                        <type>GoalsList</type>
                         <multiplicity>*</multiplicity>
                     </association>
                     <description>Specify which goals should run always if present in build regardless of cached status</description>
@@ -1110,8 +1110,8 @@ under the License.
     -->
 
         <class>
-            <name>GoalsListType</name>
-            <superClass>CoordinatesBaseType</superClass>
+            <name>GoalsList</name>
+            <superClass>CoordinatesBase</superClass>
             <fields>
                 <field>
                     <name>goals</name>
@@ -1135,8 +1135,8 @@ under the License.
     -->
 
         <class>
-            <name>GoalIdType</name>
-            <superClass>CoordinatesBaseType</superClass>
+            <name>GoalId</name>
+            <superClass>CoordinatesBase</superClass>
             <fields>
                 <field xml.attribute="true">
                     <name>goal</name>
@@ -1165,8 +1165,8 @@ under the License.
     -->
 
         <class>
-            <name>ExecutionIdsListType</name>
-            <superClass>CoordinatesBaseType</superClass>
+            <name>ExecutionIdsList</name>
+            <superClass>CoordinatesBase</superClass>
             <fields>
                 <field>
                     <name>execIds</name>
@@ -1188,8 +1188,8 @@ under the License.
     -->
 
         <class>
-            <name>PluginSetType</name>
-            <superClass>CoordinatesBaseType</superClass>
+            <name>PluginSet</name>
+            <superClass>CoordinatesBase</superClass>
         </class>
 
         <!--
@@ -1200,7 +1200,7 @@ under the License.
     -->
 
         <class>
-            <name>CoordinatesBaseType</name>
+            <name>CoordinatesBase</name>
             <fields>
                 <field xml.attribute="true">
                     <name>groupId</name>
@@ -1224,7 +1224,7 @@ under the License.
     -->
 
         <class>
-            <name>TagNameType</name>
+            <name>TagExclude</name>
             <fields>
                 <field xml.attribute="true">
                     <name>tagName</name>
@@ -1245,7 +1245,7 @@ under the License.
     -->
 
         <class>
-            <name>PropertyNameType</name>
+            <name>PropertyName</name>
             <fields>
                 <field xml.content="true">
                     <name>value</name>
@@ -1290,7 +1290,7 @@ under the License.
           -->
 
         <class>
-            <name>TrackedPropertyType</name>
+            <name>TrackedProperty</name>
             <fields>
                 <field xml.content="true">
                     <name>value</name>

@@ -22,7 +22,7 @@ package org.apache.maven.caching.checksum;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.IOException;
@@ -54,15 +54,15 @@ public class DigestUtils
     };
 
 
-    public static DigestItemType pom( HashChecksum checksum, String effectivePom )
+    public static DigestItem pom( HashChecksum checksum, String effectivePom )
     {
         return item( "pom", effectivePom, checksum.update( effectivePom.getBytes( UTF_8 ) ) );
     }
 
-    public static DigestItemType file( HashChecksum checksum, Path basedir, Path file ) throws IOException
+    public static DigestItem file( HashChecksum checksum, Path basedir, Path file ) throws IOException
     {
         byte[] content = Files.readAllBytes( file );
-        DigestItemType item = item( "file", normalize( basedir, file ), checksum.update( content ) );
+        DigestItem item = item( "file", normalize( basedir, file ), checksum.update( content ) );
         try
         {
             populateContentDetails( file, content, item );
@@ -74,7 +74,7 @@ public class DigestUtils
         return item;
     }
 
-    private static void populateContentDetails( Path file, byte[] content, DigestItemType item ) throws IOException
+    private static void populateContentDetails( Path file, byte[] content, DigestItem item ) throws IOException
     {
         String contentType = Files.probeContentType( file );
         if ( contentType != null )
@@ -136,7 +136,7 @@ public class DigestUtils
         );
     }
 
-    public static DigestItemType dependency( HashChecksum checksum, String key, String hash )
+    public static DigestItem dependency( HashChecksum checksum, String key, String hash )
     {
         return item( "dependency", key, checksum.update( hash ) );
     }
@@ -158,9 +158,9 @@ public class DigestUtils
         }
     }
 
-    private static DigestItemType item( String type, String reference, String hash )
+    private static DigestItem item( String type, String reference, String hash )
     {
-        final DigestItemType item = new DigestItemType();
+        final DigestItem item = new DigestItem();
         item.setType( type );
         item.setValue( reference );
         item.setHash( hash );

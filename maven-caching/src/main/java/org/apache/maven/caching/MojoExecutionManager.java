@@ -23,8 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
-import org.apache.maven.caching.xml.config.TrackedPropertyType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
+import org.apache.maven.caching.xml.config.TrackedProperty;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoCheker;
@@ -86,7 +86,7 @@ public class MojoExecutionManager implements MojoCheker
     public boolean check( MojoExecution execution, Mojo mojo, MavenSession session )
     {
 
-        final CompletedExecutionType completedExecution = buildInfo.findMojoExecutionInfo( execution );
+        final CompletedExecution completedExecution = buildInfo.findMojoExecutionInfo( execution );
         final String fullGoalName = execution.getMojoDescriptor().getFullGoalName();
 
         if ( completedExecution != null && !isParamsMatched( project, execution, mojo, completedExecution ) )
@@ -114,12 +114,12 @@ public class MojoExecutionManager implements MojoCheker
     private boolean isParamsMatched( MavenProject project,
                                      MojoExecution mojoExecution,
                                      Mojo mojo,
-                                     CompletedExecutionType completedExecution )
+                                     CompletedExecution completedExecution )
     {
 
-        List<TrackedPropertyType> tracked = cacheConfig.getTrackedProperties( mojoExecution );
+        List<TrackedProperty> tracked = cacheConfig.getTrackedProperties( mojoExecution );
 
-        for ( TrackedPropertyType trackedProperty : tracked )
+        for ( TrackedProperty trackedProperty : tracked )
         {
             final String propertyName = trackedProperty.getPropertyName();
 

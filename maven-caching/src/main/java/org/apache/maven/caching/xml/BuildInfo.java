@@ -20,15 +20,13 @@ package org.apache.maven.caching.xml;
  */
 
 import com.google.common.collect.Iterables;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.BuildInfoType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.buildinfo.Artifact;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.buildinfo.DigestItem;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.logging.Logger;
@@ -52,17 +50,17 @@ import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
 public class BuildInfo
 {
 
-    final BuildInfoType dto;
+    final org.apache.maven.caching.xml.buildinfo.BuildInfo dto;
     CacheSource source;
 
     public BuildInfo( List<String> goals,
-                      ArtifactType artifact,
-                      List<ArtifactType> attachedArtifacts,
-                      ProjectsInputInfoType projectsInputInfo,
-                      List<CompletedExecutionType> completedExecutions,
+                      Artifact artifact,
+                      List<Artifact> attachedArtifacts,
+                      ProjectsInputInfo projectsInputInfo,
+                      List<CompletedExecution> completedExecutions,
                       String hashAlgorithm )
     {
-        this.dto = new BuildInfoType();
+        this.dto = new org.apache.maven.caching.xml.buildinfo.BuildInfo();
         this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLMENTATION_VERSION );
         this.dto.setBuildTime( new Date() );
         try
@@ -87,19 +85,19 @@ public class BuildInfo
         return source;
     }
 
-    public BuildInfo( BuildInfoType buildInfo, CacheSource source )
+    public BuildInfo( org.apache.maven.caching.xml.buildinfo.BuildInfo buildInfo, CacheSource source )
     {
         this.dto = buildInfo;
         this.source = source;
     }
 
-    public static List<ArtifactType> createAttachedArtifacts( List<Artifact> artifacts,
-                                                              HashAlgorithm algorithm ) throws IOException
+    public static List<Artifact> createAttachedArtifacts( List<org.apache.maven.artifact.Artifact> artifacts,
+                                                          HashAlgorithm algorithm ) throws IOException
     {
-        List<ArtifactType> attachedArtifacts = new ArrayList<>();
-        for ( Artifact artifact : artifacts )
+        List<Artifact> attachedArtifacts = new ArrayList<>();
+        for ( org.apache.maven.artifact.Artifact artifact : artifacts )
         {
-            final ArtifactType dto = DtoUtils.createDto( artifact );
+            final Artifact dto = DtoUtils.createDto( artifact );
             if ( artifact.getFile() != null )
             {
                 dto.setFileHash( algorithm.hash( artifact.getFile().toPath() ) );
@@ -125,10 +123,10 @@ public class BuildInfo
 
     private boolean hasCompletedExecution( String mojoExecutionKey )
     {
-        final List<CompletedExecutionType> completedExecutions = dto.getExecutions();
+        final List<CompletedExecution> completedExecutions = dto.getExecutions();
         if ( dto.getExecutions() != null )
         {
-            for ( CompletedExecutionType completedExecution : completedExecutions )
+            for ( CompletedExecution completedExecution : completedExecutions )
             {
                 if ( StringUtils.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
                 {
@@ -145,7 +143,7 @@ public class BuildInfo
         return "BuildInfo{" + "dto=" + dto + '}';
     }
 
-    public CompletedExecutionType findMojoExecutionInfo( MojoExecution mojoExecution )
+    public CompletedExecution findMojoExecutionInfo( MojoExecution mojoExecution )
     {
 
         if ( dto.getExecutions() == null )
@@ -153,8 +151,8 @@ public class BuildInfo
             return null;
         }
 
-        final List<CompletedExecutionType> executions = dto.getExecutions();
-        for ( CompletedExecutionType execution : executions )
+        final List<CompletedExecution> executions = dto.getExecutions();
+        for ( CompletedExecution execution : executions )
         {
             if ( StringUtils.equals( execution.getExecutionKey(), mojoExecutionKey( mojoExecution ) ) )
             {
@@ -169,12 +167,12 @@ public class BuildInfo
         return dto.getCacheImplementationVersion();
     }
 
-    public ArtifactType getArtifact()
+    public Artifact getArtifact()
     {
         return dto.getArtifact();
     }
 
-    public List<ArtifactType> getAttachedArtifacts()
+    public List<Artifact> getAttachedArtifacts()
     {
         if ( dto.getAttachedArtifacts() != null )
         {
@@ -183,7 +181,7 @@ public class BuildInfo
         return Collections.emptyList();
     }
 
-    public BuildInfoType getDto()
+    public org.apache.maven.caching.xml.buildinfo.BuildInfo getDto()
     {
         return dto;
     }
@@ -225,16 +223,16 @@ public class BuildInfo
         return list;
     }
 
-    public DigestItemType findArtifact( Dependency dependency )
+    public DigestItem findArtifact( Dependency dependency )
     {
 
         if ( ProjectUtils.isPom( dependency ) )
         {
             throw new IllegalArgumentException( "Pom dependencies should not be treated as artifacts: " + dependency );
         }
-        List<ArtifactType> artifacts = new ArrayList<>( getAttachedArtifacts() );
+        List<Artifact> artifacts = new ArrayList<>( getAttachedArtifacts() );
         artifacts.add( getArtifact() );
-        for ( ArtifactType artifact : artifacts )
+        for ( Artifact artifact : artifacts )
         {
             if ( isEquals( dependency, artifact ) )
             {
@@ -244,7 +242,7 @@ public class BuildInfo
         return null;
     }
 
-    private boolean isEquals( Dependency dependency, ArtifactType artifact )
+    private boolean isEquals( Dependency dependency, Artifact artifact )
     {
         return Objects.equals( dependency.getGroupId(), artifact.getArtifactId() ) && Objects.equals(
                 dependency.getArtifactId(), artifact.getArtifactId() ) && Objects.equals( dependency.getType(),
