@@ -19,23 +19,25 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.eventspy.AbstractEventSpy;
-import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Triggers cache report generation on build completion
  */
-@Component( role = EventSpy.class )
+@Singleton
+@Named
 public class CacheEventSpy extends AbstractEventSpy
 {
-    @Requirement
+    @Inject
     private CacheConfig cacheConfig;
 
-    @Requirement
+    @Inject
     private CacheController cacheController;
 
     @Override

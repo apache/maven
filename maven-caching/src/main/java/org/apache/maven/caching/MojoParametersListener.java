@@ -19,30 +19,32 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.execution.MojoExecutionListener;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.execution.MojoExecutionListener;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.Logger;
+
 /**
  * MojoParametersListener
  */
-@Component( role = MojoExecutionListener.class,
-            hint = "MojoParametersListener" )
+@Singleton
+@Named
 public class MojoParametersListener implements MojoExecutionListener
 {
 
     private final ConcurrentMap<MavenProject, Map<String, MojoExecutionEvent>> projectExecutions =
             new ConcurrentHashMap<>();
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     @Override

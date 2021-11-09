@@ -19,51 +19,6 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.caching.checksum.KeyUtils;
-import org.apache.maven.caching.checksum.MavenProjectInput;
-import org.apache.maven.caching.xml.buildinfo.ArtifactType;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
-import org.apache.maven.caching.xml.buildinfo.DigestItemType;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
-import org.apache.maven.caching.xml.buildinfo.Scm;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
-import org.apache.maven.caching.xml.config.PropertyNameType;
-import org.apache.maven.caching.xml.config.TrackedPropertyType;
-import org.apache.maven.caching.xml.report.CacheReportType;
-import org.apache.maven.caching.xml.report.ProjectReportType;
-import org.apache.maven.caching.hash.HashAlgorithm;
-import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.xml.BuildInfo;
-import org.apache.maven.caching.xml.CacheConfig;
-import org.apache.maven.caching.xml.CacheSource;
-import org.apache.maven.caching.xml.DtoUtils;
-import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
-import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.plugin.Mojo;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.ReflectionUtils;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +42,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.caching.checksum.KeyUtils;
+import org.apache.maven.caching.checksum.MavenProjectInput;
+import org.apache.maven.caching.hash.HashAlgorithm;
+import org.apache.maven.caching.hash.HashFactory;
+import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.caching.xml.CacheSource;
+import org.apache.maven.caching.xml.DtoUtils;
+import org.apache.maven.caching.xml.XmlService;
+import org.apache.maven.caching.xml.buildinfo.ArtifactType;
+import org.apache.maven.caching.xml.buildinfo.CompletedExecutionType;
+import org.apache.maven.caching.xml.buildinfo.DigestItemType;
+import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfoType;
+import org.apache.maven.caching.xml.buildinfo.Scm;
+import org.apache.maven.caching.xml.buildsdiff.BuildDiffType;
+import org.apache.maven.caching.xml.config.PropertyNameType;
+import org.apache.maven.caching.xml.config.TrackedPropertyType;
+import org.apache.maven.caching.xml.report.CacheReportType;
+import org.apache.maven.caching.xml.report.ProjectReportType;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.lifecycle.internal.ProjectIndex;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.ReflectionUtils;
+
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -104,38 +106,40 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENT
 /**
  * CacheControllerImpl
  */
-@Component( role = CacheController.class )
+@Singleton
+@Named
 public class CacheControllerImpl implements CacheController
 {
 
     public static final String FILE_SEPARATOR_SUBST = "_";
     private static final String GENERATEDSOURCES = "generatedsources";
     private static final String GENERATEDSOURCES_PREFIX = GENERATEDSOURCES + FILE_SEPARATOR_SUBST;
-    @Requirement
+
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private MavenPluginManager mavenPluginManager;
 
-    @Requirement
+    @Inject
     private MavenProjectHelper projectHelper;
 
-    @Requirement
+    @Inject
     private LocalArtifactsRepository localCache;
 
-    @Requirement
+    @Inject
     private RemoteArtifactsRepository remoteCache;
 
-    @Requirement
+    @Inject
     private CacheConfig cacheConfig;
 
-    @Requirement
+    @Inject
     private RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private ArtifactHandlerManager artifactHandlerManager;
 
-    @Requirement
+    @Inject
     private XmlService xmlService;
 
     private final ConcurrentMap<String, DigestItemType> artifactDigestByKey = new ConcurrentHashMap<>();
