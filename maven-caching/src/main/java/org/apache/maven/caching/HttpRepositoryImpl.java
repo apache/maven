@@ -43,11 +43,11 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.caching.checksum.MavenProjectInput;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
-import org.apache.maven.caching.xml.buildinfo.BuildInfo;
+import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
@@ -93,15 +93,15 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     };
 
     @Override
-    public org.apache.maven.caching.xml.BuildInfo findBuild( CacheContext context )
+    public Build findBuild( CacheContext context )
     {
         final String resourceUrl = getResourceUrl( context, BUILDINFO_XML );
         String artifactId = context.getProject().getArtifactId();
         if ( exists( artifactId, resourceUrl ) )
         {
             final byte[] bytes = getResourceContent( resourceUrl, artifactId );
-            final BuildInfo dto = xmlService.fromBytes( BuildInfo.class, bytes );
-            return new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.REMOTE );
+            final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( bytes );
+            return new Build( dto, CacheSource.REMOTE );
         }
         return null;
     }
@@ -114,12 +114,12 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     }
 
     @Override
-    public void saveBuildInfo( CacheResult cacheResult, org.apache.maven.caching.xml.BuildInfo buildInfo )
+    public void saveBuildInfo( CacheResult cacheResult, Build build )
             throws IOException
     {
         CacheContext context = cacheResult.getContext();
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), BUILDINFO_XML );
-        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( buildInfo.getDto() ) ), resourceUrl,
+        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( build.getDto() ) ), resourceUrl,
                 context.getProject().getArtifactId() );
     }
 
@@ -247,7 +247,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     private final AtomicReference<Supplier<Optional<CacheReport>>> cacheReportSupplier = new AtomicReference<>();
 
     @Override
-    public Optional<org.apache.maven.caching.xml.BuildInfo> findBaselineBuild( MavenProject project )
+    public Optional<Build> findBaselineBuild( MavenProject project )
     {
         final Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
                 .transform( CacheReport::getProjects );
@@ -288,8 +288,8 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
                 if ( exists( project.getArtifactId(), url ) )
                 {
                     byte[] content = getResourceContent( url, project.getArtifactId() );
-                    final BuildInfo dto = xmlService.fromBytes( BuildInfo.class, content );
-                    return Optional.of( new org.apache.maven.caching.xml.BuildInfo( dto, CacheSource.REMOTE ) );
+                    final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( content );
+                    return Optional.of( new Build( dto, CacheSource.REMOTE ) );
                 }
                 else
                 {
@@ -317,7 +317,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
                 logInfo( "Downloading baseline cache report from: " + cacheConfig.getBaselineCacheUrl(),
                         "DEBUG" );
                 byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl(), "cache-info" );
-                CacheReport cacheReportType = xmlService.fromBytes( CacheReport.class, content );
+                CacheReport cacheReportType = xmlService.loadCacheReport( content );
                 return Optional.of( cacheReportType );
             }
             catch ( Exception e )

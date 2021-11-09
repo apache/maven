@@ -22,13 +22,13 @@ package org.apache.maven.caching;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.buildinfo.BuildInfo;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
-import org.apache.maven.caching.xml.buildinfo.PropertyValue;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
-import org.apache.maven.caching.xml.buildsdiff.Mismatch;
+import org.apache.maven.caching.xml.build.Build;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.PropertyValue;
+import org.apache.maven.caching.xml.diff.Diff;
+import org.apache.maven.caching.xml.diff.Mismatch;
 import org.apache.maven.caching.xml.CacheConfig;
 
 import java.util.ArrayList;
@@ -44,11 +44,11 @@ public class CacheDiff
 {
 
     private final CacheConfig config;
-    private final BuildInfo current;
-    private final BuildInfo baseline;
+    private final Build current;
+    private final Build baseline;
     private final LinkedList<Mismatch> report;
 
-    public CacheDiff( BuildInfo current, BuildInfo baseline, CacheConfig config )
+    public CacheDiff( Build current, Build baseline, CacheConfig config )
     {
         this.current = current;
         this.baseline = baseline;
@@ -56,7 +56,7 @@ public class CacheDiff
         this.report = new LinkedList<>();
     }
 
-    public BuildDiff compare()
+    public Diff compare()
     {
 
         if ( !StringUtils.equals( current.getHashFunction(), baseline.getHashFunction() ) )
@@ -74,7 +74,7 @@ public class CacheDiff
         compareFiles( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
         compareDependencies( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
 
-        final BuildDiff buildDiffType = new BuildDiff();
+        final Diff buildDiffType = new Diff();
         buildDiffType.getMismatches().addAll( report );
         return buildDiffType;
     }

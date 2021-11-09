@@ -22,10 +22,10 @@ package org.apache.maven.caching.xml;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.ProjectUtils;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.PropertyValue;
+import org.apache.maven.caching.xml.build.Artifact;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.PropertyValue;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Dependency;
 

@@ -19,7 +19,7 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheSource;
 
 import static java.util.Objects.requireNonNull;
@@ -30,13 +30,13 @@ import static java.util.Objects.requireNonNull;
 public class CacheResult
 {
     private final RestoreStatus status;
-    private final BuildInfo buildInfo;
+    private final Build build;
     private final CacheContext context;
 
-    private CacheResult( RestoreStatus status, BuildInfo buildInfo, CacheContext context )
+    private CacheResult( RestoreStatus status, Build build, CacheContext context )
     {
         this.status = requireNonNull( status );
-        this.buildInfo = buildInfo;
+        this.build = build;
         this.context = context;
     }
 
@@ -51,25 +51,25 @@ public class CacheResult
         return new CacheResult( RestoreStatus.EMPTY, null, null );
     }
 
-    public static CacheResult failure( BuildInfo buildInfo, CacheContext context )
+    public static CacheResult failure( Build build, CacheContext context )
     {
-        requireNonNull( buildInfo );
+        requireNonNull( build );
         requireNonNull( context );
-        return new CacheResult( RestoreStatus.FAILURE, buildInfo, context );
+        return new CacheResult( RestoreStatus.FAILURE, build, context );
     }
 
-    public static CacheResult success( BuildInfo buildInfo, CacheContext context )
+    public static CacheResult success( Build build, CacheContext context )
     {
-        requireNonNull( buildInfo );
+        requireNonNull( build );
         requireNonNull( context );
-        return new CacheResult( RestoreStatus.SUCCESS, buildInfo, context );
+        return new CacheResult( RestoreStatus.SUCCESS, build, context );
     }
 
-    public static CacheResult partialSuccess( BuildInfo buildInfo, CacheContext context )
+    public static CacheResult partialSuccess( Build build, CacheContext context )
     {
-        requireNonNull( buildInfo );
+        requireNonNull( build );
         requireNonNull( context );
-        return new CacheResult( RestoreStatus.PARTIAL, buildInfo, context );
+        return new CacheResult( RestoreStatus.PARTIAL, build, context );
     }
 
     public static CacheResult failure( CacheContext context )
@@ -78,11 +78,11 @@ public class CacheResult
         return new CacheResult( RestoreStatus.FAILURE, null, context );
     }
 
-    public static CacheResult rebuilded( CacheResult orig, BuildInfo buildInfo )
+    public static CacheResult rebuilded( CacheResult orig, Build build )
     {
         requireNonNull( orig );
-        requireNonNull( buildInfo );
-        return new CacheResult( orig.status, buildInfo, orig.context );
+        requireNonNull( build );
+        return new CacheResult( orig.status, build, orig.context );
     }
 
     public boolean isSuccess()
@@ -90,14 +90,14 @@ public class CacheResult
         return status == RestoreStatus.SUCCESS;
     }
 
-    public BuildInfo getBuildInfo()
+    public Build getBuildInfo()
     {
-        return buildInfo;
+        return build;
     }
 
     public CacheSource getSource()
     {
-        return buildInfo != null ? buildInfo.getSource() : null;
+        return build != null ? build.getSource() : null;
     }
 
     public CacheContext getContext()
@@ -117,6 +117,6 @@ public class CacheResult
 
     public boolean isFinal()
     {
-        return buildInfo != null && buildInfo.getDto().is_final();
+        return build != null && build.getDto().is_final();
     }
 }

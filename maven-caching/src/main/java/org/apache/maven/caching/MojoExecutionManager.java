@@ -20,11 +20,11 @@ package org.apache.maven.caching;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.BuildInfo;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.config.TrackedProperty;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
+import org.apache.maven.caching.xml.build.CompletedExecution;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoCheker;
@@ -47,21 +47,21 @@ public class MojoExecutionManager implements MojoCheker
     private final long createdTimestamp;
     private final Logger logger;
     private final MavenProject project;
-    private final BuildInfo buildInfo;
+    private final Build build;
     private final AtomicBoolean consistent;
     private final CacheController cacheController;
     private final CacheConfig cacheConfig;
 
     public MojoExecutionManager( MavenProject project,
                                  CacheController cacheController,
-                                 BuildInfo buildInfo,
+                                 Build build,
                                  AtomicBoolean consistent,
                                  Logger logger, CacheConfig cacheConfig )
     {
         this.createdTimestamp = System.currentTimeMillis();
         this.project = project;
         this.cacheController = cacheController;
-        this.buildInfo = buildInfo;
+        this.build = build;
         this.consistent = consistent;
         this.logger = logger;
         this.cacheConfig = cacheConfig;
@@ -86,7 +86,7 @@ public class MojoExecutionManager implements MojoCheker
     public boolean check( MojoExecution execution, Mojo mojo, MavenSession session )
     {
 
-        final CompletedExecution completedExecution = buildInfo.findMojoExecutionInfo( execution );
+        final CompletedExecution completedExecution = build.findMojoExecutionInfo( execution );
         final String fullGoalName = execution.getMojoDescriptor().getFullGoalName();
 
         if ( completedExecution != null && !isParamsMatched( project, execution, mojo, completedExecution ) )

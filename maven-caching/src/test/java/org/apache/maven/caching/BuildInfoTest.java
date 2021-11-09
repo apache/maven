@@ -34,12 +34,12 @@ import com.google.common.collect.Lists;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
-import org.apache.maven.caching.xml.buildinfo.BuildInfo;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
-import org.apache.maven.caching.xml.buildinfo.PropertyValue;
+import org.apache.maven.caching.xml.Build;
+import org.apache.maven.caching.xml.build.Artifact;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.PropertyValue;
 import org.apache.maven.caching.xml.XmlService;
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class BuildInfoTest {
         artifact.setFileSize(123456);
         artifact.setFileHash("456L");
 
-        BuildInfo buildInfo = new BuildInfo();
+        org.apache.maven.caching.xml.build.Build buildInfo = new org.apache.maven.caching.xml.build.Build();
         buildInfo.setCacheImplementationVersion("cacheImplementationVersion");
         buildInfo.setBuildServer("server");
         buildInfo.setBuildTime(new Date());
@@ -73,7 +73,7 @@ public class BuildInfoTest {
         buildInfo.setHashFunction("SHA-256");
         buildInfo.setGoals(Lists.newArrayList("install"));
         final org.apache.maven.artifact.Artifact attachedArtifact = new DefaultArtifact("ag", "aa", "av", "as", "at", "ac", new DefaultArtifactHandler());
-        buildInfo.setAttachedArtifacts(org.apache.maven.caching.xml.BuildInfo.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
+        buildInfo.setAttachedArtifacts(Build.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
         buildInfo.setProjectsInputInfo(main);
         buildInfo.setExecutions(createExecutions());
 
@@ -84,7 +84,7 @@ public class BuildInfoTest {
         file.deleteOnExit();
         Files.write(tempFilePath, bytes);
 
-        BuildInfo buildInfo1 = xmlService.fromFile(BuildInfo.class, file);
+        org.apache.maven.caching.xml.build.Build buildInfo1 = xmlService.loadBuild(file);
         System.out.println(buildInfo1);
     }
 

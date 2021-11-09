@@ -151,7 +151,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         try
         {
             logger.info( "Loading cache configuration from " + configPath );
-            cacheConfig = xmlService.fromFile( CacheConfig.class, configPath.toFile() );
+            cacheConfig = xmlService.loadCacheConfig( configPath.toFile() );
         }
         catch ( Exception e )
         {

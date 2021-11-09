@@ -19,22 +19,22 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/CACHE-BUILDINFO/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/cache-buildinfo-${version}.xsd">
-  <id>cache-buildinfo</id>
-  <name>CacheBuildInfo</name>
+  xml.namespace="http://maven.apache.org/CACHE-BUILD/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/cache-build-${version}.xsd">
+  <id>cache-build</id>
+  <name>CacheBuild</name>
   <description><![CDATA[Cache build info, stored in local <code>lookupinfo.xml</code> or remote <code>buildinfo.xml</code>
   ]]></description>
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.caching.xml.buildinfo</value>
+      <value>org.apache.maven.caching.xml.build</value>
     </default>
   </defaults>
   <classes>
     <!--xs:complexType name="BuildInfoType"-->
     <class rootElement="true" xml.tagName="build">
-      <name>BuildInfo</name>
+      <name>Build</name>
       <version>1.0.0+</version>
       <description></description>
       <!--xs:all-->

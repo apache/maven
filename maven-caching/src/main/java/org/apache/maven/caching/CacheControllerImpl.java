@@ -60,17 +60,17 @@ import org.apache.maven.caching.checksum.KeyUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashFactory;
-import org.apache.maven.caching.xml.BuildInfo;
+import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.DtoUtils;
 import org.apache.maven.caching.xml.XmlService;
-import org.apache.maven.caching.xml.buildinfo.Artifact;
-import org.apache.maven.caching.xml.buildinfo.CompletedExecution;
-import org.apache.maven.caching.xml.buildinfo.DigestItem;
-import org.apache.maven.caching.xml.buildinfo.ProjectsInputInfo;
-import org.apache.maven.caching.xml.buildinfo.Scm;
-import org.apache.maven.caching.xml.buildsdiff.BuildDiff;
+import org.apache.maven.caching.xml.build.Artifact;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.Scm;
+import org.apache.maven.caching.xml.diff.Diff;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.caching.xml.report.CacheReport;
@@ -186,7 +186,7 @@ public class CacheControllerImpl implements CacheController
 
     private CacheResult findCachedBuild( List<MojoExecution> mojoExecutions, CacheContext context )
     {
-        BuildInfo cachedBuild = null;
+        Build cachedBuild = null;
         try
         {
             cachedBuild = localCache.findBuild( context );
@@ -201,7 +201,7 @@ public class CacheControllerImpl implements CacheController
 
     private CacheResult findLocalBuild( List<MojoExecution> mojoExecutions, CacheContext context )
     {
-        BuildInfo localBuild = null;
+        Build localBuild = null;
         try
         {
             localBuild = localCache.findLocalBuild( context );
@@ -214,7 +214,7 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private CacheResult analyzeResult( CacheContext context, List<MojoExecution> mojoExecutions, BuildInfo info )
+    private CacheResult analyzeResult( CacheContext context, List<MojoExecution> mojoExecutions, Build info )
     {
 
         try
@@ -282,7 +282,7 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private boolean canIgnoreMissingSegment( BuildInfo info, List<MojoExecution> mojoExecutions )
+    private boolean canIgnoreMissingSegment( Build info, List<MojoExecution> mojoExecutions )
     {
         final List<MojoExecution> postCachedSegment = info.getPostCachedSegment( mojoExecutions );
         for ( MojoExecution mojoExecution : postCachedSegment )
@@ -299,11 +299,11 @@ public class CacheControllerImpl implements CacheController
     public boolean restoreProjectArtifacts( CacheResult cacheResult )
     {
 
-        final BuildInfo buildInfo = cacheResult.getBuildInfo();
+        final Build build = cacheResult.getBuildInfo();
         final CacheContext context = cacheResult.getContext();
         final MavenProject project = context.getProject();
 
-        final Artifact artifact = buildInfo.getArtifact();
+        final Artifact artifact = build.getArtifact();
         artifact.setVersion( project.getVersion() );
 
         try
@@ -323,7 +323,7 @@ public class CacheControllerImpl implements CacheController
                 putChecksum( artifact, context.getInputInfo().getChecksum() );
             }
 
-            for ( Artifact attachedArtifact : buildInfo.getAttachedArtifacts() )
+            for ( Artifact attachedArtifact : build.getAttachedArtifacts() )
             {
                 attachedArtifact.setVersion( project.getVersion() );
                 if ( isNotBlank( attachedArtifact.getFileName() ) )
@@ -433,17 +433,17 @@ public class CacheControllerImpl implements CacheController
 
             List<CompletedExecution> completedExecution = buildExecutionInfo( mojoExecutions, executionEvents );
 
-            final BuildInfo buildInfo = new BuildInfo( session.getGoals(), projectArtifactDto, attachedArtifactDtos,
+            final Build build = new Build( session.getGoals(), projectArtifactDto, attachedArtifactDtos,
                     context.getInputInfo(), completedExecution, hashFactory.getAlgorithm() );
-            populateGitInfo( buildInfo, session );
-            buildInfo.getDto().set_final( cacheConfig.isSaveFinal() );
-            cacheResults.put( getVersionlessProjectKey( project ), rebuilded( cacheResult, buildInfo ) );
+            populateGitInfo( build, session );
+            build.getDto().set_final( cacheConfig.isSaveFinal() );
+            cacheResults.put( getVersionlessProjectKey( project ), rebuilded( cacheResult, build ) );
 
             // if package phase presence means new artifacts were packaged
             if ( project.hasLifecyclePhase( "package" ) )
             {
                 localCache.beforeSave( context );
-                localCache.saveBuildInfo( cacheResult, buildInfo );
+                localCache.saveBuildInfo( cacheResult, build );
                 if ( projectArtifact.getFile() != null )
                 {
                     localCache.saveArtifactFile( cacheResult, projectArtifact );
@@ -464,12 +464,12 @@ public class CacheControllerImpl implements CacheController
             }
             else
             {
-                localCache.saveBuildInfo( cacheResult, buildInfo );
+                localCache.saveBuildInfo( cacheResult, build );
             }
 
             if ( cacheConfig.isBaselineDiffEnabled() )
             {
-                produceDiffReport( cacheResult, buildInfo );
+                produceDiffReport( cacheResult, build );
             }
 
         }
@@ -487,17 +487,17 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    public void produceDiffReport( CacheResult cacheResult, BuildInfo buildInfo )
+    public void produceDiffReport( CacheResult cacheResult, Build build )
     {
         MavenProject project = cacheResult.getContext().getProject();
-        Optional<BuildInfo> baselineHolder = remoteCache.findBaselineBuild( project );
+        Optional<Build> baselineHolder = remoteCache.findBaselineBuild( project );
         if ( baselineHolder.isPresent() )
         {
-            BuildInfo baseline = baselineHolder.get();
+            Build baseline = baselineHolder.get();
             String outputDirectory = project.getBuild().getDirectory();
             Path reportOutputDir = Paths.get( outputDirectory, "incremental-maven" );
             logInfo( project, "Saving cache builds diff to: " + reportOutputDir );
-            BuildDiff diff = new CacheDiff( buildInfo.getDto(), baseline.getDto(), cacheConfig ).compare();
+            Diff diff = new CacheDiff( build.getDto(), baseline.getDto(), cacheConfig ).compare();
             try
             {
                 Files.createDirectories( reportOutputDir );
@@ -506,10 +506,10 @@ public class CacheControllerImpl implements CacheController
                 Files.write( reportOutputDir.resolve( "buildinfo-baseline-" + checksum + ".xml" ),
                         xmlService.toBytes( baseline.getDto() ), TRUNCATE_EXISTING, CREATE );
                 Files.write( reportOutputDir.resolve( "buildinfo-" + checksum + ".xml" ),
-                        xmlService.toBytes( buildInfo.getDto() ), TRUNCATE_EXISTING, CREATE );
+                        xmlService.toBytes( build.getDto() ), TRUNCATE_EXISTING, CREATE );
                 Files.write( reportOutputDir.resolve( "buildsdiff-" + checksum + ".xml" ),
                         xmlService.toBytes( diff ), TRUNCATE_EXISTING, CREATE );
-                final Optional<DigestItem> pom = CacheDiff.findPom( buildInfo.getDto().getProjectsInputInfo() );
+                final Optional<DigestItem> pom = CacheDiff.findPom( build.getDto().getProjectsInputInfo() );
                 if ( pom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve( "effective-pom-" + checksum + ".xml" ),
@@ -674,7 +674,7 @@ public class CacheControllerImpl implements CacheController
         return false;
     }
 
-    private boolean isCachedSegmentPropertiesPresent( MavenProject project, BuildInfo buildInfo,
+    private boolean isCachedSegmentPropertiesPresent( MavenProject project, Build build,
                                                       List<MojoExecution> mojoExecutions )
     {
         for ( MojoExecution mojoExecution : mojoExecutions )
@@ -682,7 +682,7 @@ public class CacheControllerImpl implements CacheController
 
             // completion of all mojos checked above, so we expect tp have execution info here
             final List<TrackedProperty> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
-            final CompletedExecution cachedExecution = buildInfo.findMojoExecutionInfo( mojoExecution );
+            final CompletedExecution cachedExecution = build.findMojoExecutionInfo( mojoExecution );
 
             if ( cachedExecution == null )
             {
@@ -788,7 +788,7 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private void populateGitInfo( BuildInfo buildInfo, MavenSession session ) throws IOException
+    private void populateGitInfo( Build build, MavenSession session ) throws IOException
     {
         if ( scm == null )
         {
@@ -808,7 +808,7 @@ public class CacheControllerImpl implements CacheController
                 }
             }
         }
-        buildInfo.getDto().setScm( scm );
+        build.getDto().setScm( scm );
     }
 
     private void zipAndAttachArtifact( MavenProject project, Path dir, String classifier ) throws IOException
