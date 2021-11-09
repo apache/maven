@@ -262,13 +262,13 @@ public class MavenProjectInput
 
         final ProjectsInputInfoType projectsInputInfoType = new ProjectsInputInfoType();
         projectsInputInfoType.setChecksum( checksum.digest() );
-        projectsInputInfoType.getItem().addAll( items );
+        projectsInputInfoType.getItems().addAll( items );
 
         final long checksumTime = Clock.elapsed( time );
 
         if ( logger.isDebugEnabled() )
         {
-            for ( DigestItemType item : projectsInputInfoType.getItem() )
+            for ( DigestItemType item : projectsInputInfoType.getItems() )
             {
                 logger.debug( "Hash calculated, item: " + item.getType() + ", hash: " + item.getHash() );
             }
@@ -283,7 +283,7 @@ public class MavenProjectInput
     private void checkEffectivePomMatch( ProjectsInputInfoType baselineBuild, DigestItemType effectivePomChecksum )
     {
         Optional<DigestItemType> pomHolder = Optional.absent();
-        for ( DigestItemType it : baselineBuild.getItem() )
+        for ( DigestItemType it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( "pom" ) )
             {
@@ -309,7 +309,7 @@ public class MavenProjectInput
     private boolean checkItemMatchesBaseline( ProjectsInputInfoType baselineBuild, DigestItemType fileDigest )
     {
         Optional<DigestItemType> baselineFileDigest = Optional.absent();
-        for ( DigestItemType it : baselineBuild.getItem() )
+        for ( DigestItemType it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( fileDigest.getType() )
                     && fileDigest.getValue().equals( it.getValue().trim() ) )

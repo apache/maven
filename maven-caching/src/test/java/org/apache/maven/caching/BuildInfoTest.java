@@ -54,8 +54,8 @@ public class BuildInfoTest {
 
         ProjectsInputInfoType main = new ProjectsInputInfoType();
         main.setChecksum("dependencyChecksum");
-        main.getItem().add(createItem("pom", "<project><modelVersion>4.0.0</modelVersion></project>", "hash1"));
-        main.getItem().add(createItem("file", Paths.get(".").toString(), "hash2"));
+        main.addItem(createItem("pom", "<project><modelVersion>4.0.0</modelVersion></project>", "hash1"));
+        main.addItem(createItem("file", Paths.get(".").toString(), "hash2"));
 
         ArtifactType artifact = new ArtifactType();
         artifact.setGroupId("g");
@@ -96,7 +96,7 @@ public class BuildInfoTest {
         PropertyValueType property = new PropertyValueType();
         property.setValue("value");
         property.setName("key");
-        execution.setConfiguration(new ArrayList<>(Arrays.asList(property)));
+        execution.addProperty(property);
         return new ArrayList<>(Arrays.asList(execution));
     }
 

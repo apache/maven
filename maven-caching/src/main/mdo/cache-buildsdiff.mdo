@@ -42,7 +42,7 @@ under the License.
       <name>BuildDiffType</name>
       <fields>
         <field>
-          <name>mismatch</name>
+          <name>mismatches</name>
           <association>
             <type>MismatchType</type>
             <multiplicity>*</multiplicity>

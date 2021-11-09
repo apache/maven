@@ -771,7 +771,7 @@ public class CacheControllerImpl implements CacheController
                     projectReport.setSharedToRemote( true );
                     projectReport.setUrl( remoteCache.getResourceUrl( context, BUILDINFO_XML ) );
                 }
-                cacheReport.getProject().add( projectReport );
+                cacheReport.addProject( projectReport );
             }
 
             String buildId = UUID.randomUUID().toString();

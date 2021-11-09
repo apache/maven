@@ -36,7 +36,7 @@ under the License.
       <name>CacheReportType</name>
       <fields>
         <field>
-          <name>project</name>
+          <name>projects</name>
           <association>
             <type>ProjectReportType</type>
             <multiplicity>*</multiplicity>
