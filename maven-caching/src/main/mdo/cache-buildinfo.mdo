@@ -19,7 +19,8 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xsd.namespace="org:apache:maven:cache:buildinfo">
+  xml.namespace="http://maven.apache.org/CACHE-BUILDINFO/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/cache-buildinfo-${version}.xsd">
   <id>cache-buildinfo</id>
   <name>CacheBuildInfo</name>
   <description><![CDATA[Cache build info, stored in local <code>lookupinfo.xml</code> or remote <code>buildinfo.xml</code>

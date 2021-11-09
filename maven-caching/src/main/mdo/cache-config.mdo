@@ -19,9 +19,8 @@ under the License.
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-       xml.namespace="http://maven.apache.org/CACHE/${version}"
-       xml.schemaLocation="http://maven.apache.org/xsd/cache-config-${version}.xsd"
-       xsd.namespace="org:apache:maven:cache:config">
+       xml.namespace="http://maven.apache.org/CACHE-CONFIG/${version}"
+       xml.schemaLocation="http://maven.apache.org/xsd/cache-config-${version}.xsd">
     <id>cache-config</id>
     <name>CacheConfig</name>
     <description><![CDATA[Maven Incremental Build and Cache configuration, stored in <code>.mvn/maven-cache-config.xml</code>
