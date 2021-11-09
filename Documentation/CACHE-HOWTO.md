@@ -26,8 +26,8 @@ Absolutely minimal config which enables incremental Maven with local cache
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
-<cache xmlns="org:apache:maven:cache:config:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:config:v1 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
+<cache xmlns="http://maven.apache.org/CACHE-CONFIG/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/CACHE-CONFIG/1.0.0 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
 
     <configuration>
         <enabled>true</enabled>
@@ -47,14 +47,13 @@ Absolutely minimal config which enables incremental Maven with local cache
 Just add `<remote>` section under `<configuration>`
 
 ```xml
-
-<configuration>
-    <enabled>true</enabled>
-    <hashAlgorithm>XX</hashAlgorithm>
-    <remote>
-        <url>https://yourserver:port</url>
-    </remote>
-</configuration>
+    <configuration>
+        <enabled>true</enabled>
+        <hashAlgorithm>XX</hashAlgorithm>
+        <remote>
+            <url>https://yourserver:port</url>
+        </remote>
+    </configuration>
 ```
 
 ### Adding more file types to input
@@ -62,12 +61,11 @@ Just add `<remote>` section under `<configuration>`
 Add all the project specific source code files in `<glob>`. Scala in this case:
 
 ```xml
-
-<input>
-    <global>
-        <glob>{*.java,*.xml,*.properties,*.scala}</glob>
-    </global>
-</input>
+    <input>
+        <global>
+            <glob>{*.java,*.xml,*.properties,*.scala}</glob>
+        </global>
+    </input>
 ```
 
 ### Adding source directory for bespoke project layouts
@@ -76,14 +74,17 @@ In most of the cases incremental Maven will recognize directories automatically 
 add additional directories with `<include>`. Also you can filter out undesirable dirs and files by using exclude tag
 
 ```xml
-
-<input>
-    <global>
-        <glob>{*.java,*.xml,*.properties,*.scala}</glob>
-        <include>importantdir/</include>
-        <exclude>tempfile.out</exclude>
-    </global>
-</input>
+    <input>
+        <global>
+            <glob>{*.java,*.xml,*.properties,*.scala}</glob>
+            <includes>
+                <include>importantdir/</include>
+            </includes>
+            <excludes>
+                <exclude>tempfile.out</exclude>
+            </excludes>
+        </global>
+    </input>
 ```
 
 ### Plugin property is env specific (breaks checksum and caching)
@@ -91,17 +92,20 @@ add additional directories with `<include>`. Also you can filter out undesirable
 Consider to exclude env specific properties:
 
 ```xml
-
-<input>
-    <global>
-        ...
-    </global>
-    <plugin artifactId="maven-surefire-plugin">
-        <effectivePom>
-            <excludeProperty>argLine</excludeProperty>
-        </effectivePom>
-    </plugin>
-</input>
+    <input>
+        <global>
+            ...
+        </global>
+        <plugins>
+            <plugin artifactId="maven-surefire-plugin">
+                <effectivePom>
+                    <excludeProperties>
+                        <excludeProperty>argLine</excludeProperty>
+                    </excludeProperties>
+                </effectivePom>
+            </plugin>
+        </plugins>
+    </input>
 ```
 
 Implications - builds with different `argLine` will have identical checksum. Validate that is semantically valid.
@@ -112,18 +116,21 @@ If plugin configuration property points to `somedir` it will be scanned with def
 processing rule
 
 ```xml
-
-<input>
-    <global>
-        ...
-    </global>
-    <plugin artifactId="protoc-maven-plugin">
-        <dirScan mode="auto">
-            <!--<protoBaseDirectory>${basedir}/..</protoBaseDirectory>-->
-            <tagScanConfig tagName="protoBaseDirectory" recursive="false" glob="{*.proto}"/>
-        </dirScan>
-    </plugin>
-</input>
+    <input>
+        <global>
+            ...
+        </global>
+        <plugins>
+            <plugin artifactId="protoc-maven-plugin">
+                <dirScan mode="auto">
+                    <!--<protoBaseDirectory>${basedir}/..</protoBaseDirectory>-->
+                    <tagScanConfigs>
+                        <tagScanConfig tagName="protoBaseDirectory" recursive="false" glob="{*.proto}"/>
+                    </tagScanConfigs>
+                </dirScan>
+            </plugin>
+        </plugins>
+    </input>
 ```
 
 ### Local repository is not updated because `install` is cached
@@ -131,27 +138,27 @@ processing rule
 Add `executionControl/runAlways` section
 
 ```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<cache xmlns="org:apache:maven:cache:config:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="org:apache:maven:cache:config:v1 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
-    <configuration>
-        ...
-    </configuration>
-    <input>
-        ...
-    </input>
     <executionControl>
         <runAlways>
-            <plugin artifactId="maven-failsafe-plugin"/>
-            <execution artifactId="maven-dependency-plugin">
-                <execId>unpack-autoupdate</execId>
-            </execution>
-            <goals artifactId="maven-install-plugin">
-                <goal>install</goal>
-            </goals>
+            <plugins>
+                <plugin artifactId="maven-failsafe-plugin"/>
+            </plugins>
+            <executions>
+                <execution artifactId="maven-dependency-plugin">
+                    <execIds>
+                        <execId>unpack-autoupdate</execId>
+                    </execIds>
+                </execution>
+            </executions>
+            <goalsLists>
+                <goalsList artifactId="maven-install-plugin">
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                </goalsList>
+            </goalsLists>
         </runAlways>
     </executionControl>
-</cache>
 ``` 
 
 ### I occasionally cached build with `-DskipTests=true` and tests do not run now
@@ -161,20 +168,30 @@ resolution to plugin runtime. To invalidate build if filed value is different in
 to `executionControl`:
 
 ```xml
-
-<executionControl>
-    <runAlways>
+<?xml version="1.0" encoding="UTF-8" ?>
+<cache xmlns="http://maven.apache.org/CACHE-CONFIG/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/CACHE-CONFIG/1.0.0 http://maven.apache.org/xsd/cache-config-1.0.0.xsd">
+    <configuration>
         ...
-    </runAlways>
-    <reconcile>
-        <plugin artifactId="maven-surefire-plugin" goal="test">
-            <reconcile propertyName="skip" skipValue="true"/>
-            <reconcile propertyName="skipExec" skipValue="true"/>
-            <reconcile propertyName="skipTests" skipValue="true"/>
-            <reconcile propertyName="testFailureIgnore" skipValue="true"/>
-        </plugin>
-    </reconcile>
-</executionControl>
+    </configuration>
+    <executionControl>
+        <runAlways>
+            ...
+        </runAlways>
+        <reconcile>
+            <plugins>
+                <plugin artifactId="maven-surefire-plugin" goal="test">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                        <reconcile propertyName="skipExec" skipValue="true"/>
+                        <reconcile propertyName="skipTests" skipValue="true"/>
+                        <reconcile propertyName="testFailureIgnore" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+            </plugins>
+        </reconcile>
+    </executionControl>
+</cache>
 ```
 
 Please notice `skipValue` attribute. It denotes value which forces skipped execution.
