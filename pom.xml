@@ -86,6 +86,7 @@ under the License.
     <module>maven-model-builder</module>
     <module>maven-model-transform</module>
     <module>maven-core</module>
+    <module>maven-caching</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
@@ -591,6 +592,7 @@ under the License.
               <exclude>src/main/appended-resources/licenses/MIT-jsoup-1.12.1.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/MPL-1.1.txt</exclude>
             </excludes>
           </configuration>
         </plugin>

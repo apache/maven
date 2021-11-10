@@ -64,7 +64,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Named
 @Singleton
-public class MojoExecutor
+public class MojoExecutor implements IMojoExecutor
 {
 
     private final BuildPluginManager pluginManager;

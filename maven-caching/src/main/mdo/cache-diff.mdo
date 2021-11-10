@@ -1,0 +1,110 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+  xml.namespace="http://maven.apache.org/CACHE-DIFF/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/cache-diff-${version}.xsd">
+  <id>cache-diff</id>
+  <name>CacheDiff</name>
+  <description><![CDATA[Cache Builds Diff, stored in <code>diff-${checksum}.xml</code>
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.caching.xml.diff</value>
+    </default>
+  </defaults>
+  <classes>
+
+    <!--xs:complexType name="BuildDiffType">
+        <xs:sequence>
+            <xs:element name="mismatch" type="d:MismatchType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType-->
+
+    <class rootElement="true">
+      <name>Diff</name>
+      <fields>
+        <field>
+          <name>mismatches</name>
+          <association>
+            <type>Mismatch</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:complexType name="MismatchType">
+        <xs:sequence minOccurs="0">
+            <xs:element name="detail" type="d:MismatchDetailType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="item" use="required" type="xs:string"/>
+        <xs:attribute name="current" type="xs:string"/>
+        <xs:attribute name="baseline" type="xs:string"/>
+        <xs:attribute name="reason" type="xs:string"/>
+        <xs:attribute name="resolution" type="xs:string"/>
+        <xs:attribute name="context" type="xs:string"/>
+    </xs:complexType-->
+
+    <class>
+      <name>Mismatch</name>
+      <fields>
+        <field>
+          <name>detail</name>
+          <association>
+            <type>MismatchDetail</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xml.attribute="true">
+          <name>item</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>current</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>baseline</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>reason</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>resolution</name>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>context</name>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+    <!--xs:complexType name="MismatchDetailType"/-->
+    <class>
+      <name>MismatchDetail</name>
+    </class>
+
+  </classes>
+</model>

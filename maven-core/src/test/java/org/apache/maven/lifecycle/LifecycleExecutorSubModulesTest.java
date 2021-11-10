@@ -18,11 +18,11 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
+import org.apache.maven.lifecycle.internal.IMojoExecutor;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.MojoExecutor;
 
 import javax.inject.Inject;
 
@@ -43,7 +43,7 @@ public class LifecycleExecutorSubModulesTest
     private DefaultLifecycles defaultLifeCycles;
 
     @Inject
-    private MojoExecutor mojoExecutor;
+    private IMojoExecutor mojoExecutor;
 
     @Inject
     private LifecycleModuleBuilder lifeCycleBuilder;

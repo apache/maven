@@ -53,7 +53,7 @@ import org.apache.maven.session.scope.internal.SessionScope;
 public class LifecycleModuleBuilder
 {
 
-    private final MojoExecutor mojoExecutor;
+    private final IMojoExecutor mojoExecutor;
     private final BuilderCommon builderCommon;
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
@@ -61,7 +61,7 @@ public class LifecycleModuleBuilder
 
     @Inject
     public LifecycleModuleBuilder(
-            MojoExecutor mojoExecutor,
+            IMojoExecutor mojoExecutor,
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
