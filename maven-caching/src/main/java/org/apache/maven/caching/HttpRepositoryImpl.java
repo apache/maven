@@ -65,17 +65,20 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     public static final String BUILDINFO_XML = "buildinfo.xml";
     public static final String CACHE_REPORT_XML = "cache-report.xml";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger;
+    private final LegacySupport legacySupport;
+    private final XmlService xmlService;
+    private final CacheConfig cacheConfig;
 
     @Inject
-    LegacySupport legacySupport;
-
-    @Inject
-    XmlService xmlService;
-
-    @Inject
-    private CacheConfig cacheConfig;
+    public HttpRepositoryImpl( Logger logger, LegacySupport legacySupport,
+                               XmlService xmlService, CacheConfig cacheConfig )
+    {
+        this.logger = logger;
+        this.legacySupport = legacySupport;
+        this.xmlService = xmlService;
+        this.cacheConfig = cacheConfig;
+    }
 
     @SuppressWarnings( "checkstyle:constantname" )
     private static final ThreadLocal<HttpClient> httpClient =

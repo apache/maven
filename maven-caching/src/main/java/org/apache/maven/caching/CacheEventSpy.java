@@ -34,11 +34,15 @@ import org.apache.maven.execution.ExecutionEvent;
 @Named
 public class CacheEventSpy extends AbstractEventSpy
 {
-    @Inject
-    private CacheConfig cacheConfig;
+    private final CacheConfig cacheConfig;
+    private final CacheController cacheController;
 
     @Inject
-    private CacheController cacheController;
+    public CacheEventSpy( CacheConfig cacheConfig, CacheController cacheController )
+    {
+        this.cacheConfig = cacheConfig;
+        this.cacheController = cacheController;
+    }
 
     @Override
     public void onEvent( Object event ) throws Exception

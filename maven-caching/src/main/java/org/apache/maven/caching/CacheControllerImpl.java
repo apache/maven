@@ -112,38 +112,41 @@ public class CacheControllerImpl implements CacheController
     private static final String GENERATEDSOURCES = "generatedsources";
     private static final String GENERATEDSOURCES_PREFIX = GENERATEDSOURCES + FILE_SEPARATOR_SUBST;
 
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private MavenPluginManager mavenPluginManager;
-
-    @Inject
-    private MavenProjectHelper projectHelper;
-
-    @Inject
-    private LocalArtifactsRepository localCache;
-
-    @Inject
-    private RemoteArtifactsRepository remoteCache;
-
-    @Inject
-    private CacheConfig cacheConfig;
-
-    @Inject
-    private RepositorySystem repoSystem;
-
-    @Inject
-    private ArtifactHandlerManager artifactHandlerManager;
-
-    @Inject
-    private XmlService xmlService;
-
+    private final  Logger logger;
+    private final  MavenPluginManager mavenPluginManager;
+    private final  MavenProjectHelper projectHelper;
+    private final  LocalArtifactsRepository localCache;
+    private final RemoteArtifactsRepository remoteCache;
+    private final  CacheConfig cacheConfig;
+    private final  RepositorySystem repoSystem;
+    private final ArtifactHandlerManager artifactHandlerManager;
+    private final XmlService xmlService;
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
-
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
-
     private volatile Scm scm;
+
+    @Inject
+    public CacheControllerImpl(
+            Logger logger, 
+            MavenPluginManager mavenPluginManager, 
+            MavenProjectHelper projectHelper, 
+            LocalArtifactsRepository localCache, 
+            RemoteArtifactsRepository remoteCache, 
+            CacheConfig cacheConfig, 
+            RepositorySystem repoSystem, 
+            ArtifactHandlerManager artifactHandlerManager, 
+            XmlService xmlService )
+    {
+        this.logger = logger;
+        this.mavenPluginManager = mavenPluginManager;
+        this.projectHelper = projectHelper;
+        this.localCache = localCache;
+        this.remoteCache = remoteCache;
+        this.cacheConfig = cacheConfig;
+        this.repoSystem = repoSystem;
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.xmlService = xmlService;
+    }
 
     @Override
     @Nonnull

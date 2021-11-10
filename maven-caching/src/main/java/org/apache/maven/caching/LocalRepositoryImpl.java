@@ -83,22 +83,27 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     private static final long ONE_DAY_MILLIS = DAYS.toMillis( 1 );
     private static final String EMPTY = "";
 
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private LegacySupport legacySupport;
-
-    @Inject
-    private RemoteArtifactsRepository remoteRepository;
-
-    @Inject
-    private XmlService xmlService;
-
-    @Inject
-    private CacheConfig cacheConfig;
-
+    private final Logger logger;
+    private final LegacySupport legacySupport;
+    private final RemoteArtifactsRepository remoteRepository;
+    private final XmlService xmlService;
+    private final CacheConfig cacheConfig;
     private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
+
+    @Inject
+    public LocalRepositoryImpl(
+            Logger logger,
+            LegacySupport legacySupport,
+            RemoteArtifactsRepository remoteRepository,
+            XmlService xmlService,
+            CacheConfig cacheConfig )
+    {
+        this.logger = logger;
+        this.legacySupport = legacySupport;
+        this.remoteRepository = remoteRepository;
+        this.xmlService = xmlService;
+        this.cacheConfig = cacheConfig;
+    }
 
     @Override
     public Build findLocalBuild( CacheContext context ) throws IOException

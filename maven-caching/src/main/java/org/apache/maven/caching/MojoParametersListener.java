@@ -44,8 +44,13 @@ public class MojoParametersListener implements MojoExecutionListener
     private final ConcurrentMap<MavenProject, Map<String, MojoExecutionEvent>> projectExecutions =
             new ConcurrentHashMap<>();
 
+    private final Logger logger;
+
     @Inject
-    private Logger logger;
+    public MojoParametersListener( Logger logger )
+    {
+        this.logger = logger;
+    }
 
     @Override
     public void beforeMojoExecution( MojoExecutionEvent event )

@@ -83,11 +83,8 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     public static final String FAIL_FAST_PROPERTY_NAME = "remote.cache.failFast";
     public static final String BASELINE_BUILD_URL_PROPERTY_NAME = "remote.cache.baselineUrl";
 
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private XmlService xmlService;
+    private final Logger logger;
+    private final XmlService xmlService;
 
     private volatile CacheState state = CacheState.NOT_INITIALIZED;
     private volatile CacheConfig cacheConfig;
@@ -97,6 +94,12 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
     private List<Pattern> excludePatterns;
 
+    @Inject
+    public CacheConfigImpl( Logger logger, XmlService xmlService )
+    {
+        this.logger = logger;
+        this.xmlService = xmlService;
+    }
 
     @Override
     public synchronized CacheState initialize( MavenProject project, MavenSession session )

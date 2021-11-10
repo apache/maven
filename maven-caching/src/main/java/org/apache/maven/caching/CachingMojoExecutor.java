@@ -83,33 +83,34 @@ import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
 @Priority( 10 )
 public class CachingMojoExecutor implements IMojoExecutor
 {
+    private final Logger logger;
+    private final BuildPluginManager pluginManager;
+    private final MavenPluginManager mavenPluginManager;
+    private final LifecycleDependencyResolver lifeCycleDependencyResolver;
+    private final ExecutionEventCatapult eventCatapult;
+    private final CacheController cacheController;
+    private final CacheConfig cacheConfig;
+    private final MojoParametersListener mojoListener;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private MavenPluginManager mavenPluginManager;
-
-    @Inject
-    private LifecycleDependencyResolver lifeCycleDependencyResolver;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    @Inject
-    private CacheController cacheController;
-
-    @Inject
-    private CacheConfig cacheConfig;
-
-    @Inject
-    private MojoParametersListener mojoListener;
-
-    public CachingMojoExecutor()
+    public CachingMojoExecutor(
+            Logger logger, 
+            BuildPluginManager pluginManager, 
+            MavenPluginManager mavenPluginManager, 
+            LifecycleDependencyResolver lifeCycleDependencyResolver, 
+            ExecutionEventCatapult eventCatapult, 
+            CacheController cacheController, 
+            CacheConfig cacheConfig, 
+            MojoParametersListener mojoListener )
     {
+        this.logger = logger;
+        this.pluginManager = pluginManager;
+        this.mavenPluginManager = mavenPluginManager;
+        this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
+        this.eventCatapult = eventCatapult;
+        this.cacheController = cacheController;
+        this.cacheConfig = cacheConfig;
+        this.mojoListener = mojoListener;
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
