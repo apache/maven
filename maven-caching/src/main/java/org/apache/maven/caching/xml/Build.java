@@ -19,8 +19,8 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import com.google.common.collect.Iterables;
 import org.apache.maven.caching.ProjectUtils;
+import org.apache.maven.caching.Utils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.xml.build.Artifact;
@@ -188,7 +188,7 @@ public class Build
 
     public String getHighestCompletedGoal()
     {
-        return Iterables.getLast( dto.getGoals() );
+        return Utils.getLast( dto.getGoals() ).get();
     }
 
     public List<MojoExecution> getCachedSegment( List<MojoExecution> mojoExecutions )

@@ -23,7 +23,7 @@ import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * CacheContext
@@ -36,9 +36,9 @@ public class CacheContext
 
     public CacheContext( MavenProject project, ProjectsInputInfo inputInfo, MavenSession session )
     {
-        this.project = checkNotNull( project );
-        this.inputInfo = checkNotNull( inputInfo );
-        this.session = checkNotNull( session );
+        this.project = requireNonNull( project );
+        this.inputInfo = requireNonNull( inputInfo );
+        this.session = requireNonNull( session );
     }
 
     public MavenProject getProject()

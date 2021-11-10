@@ -28,28 +28,23 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.caching.Utils.MultiMap;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
@@ -87,9 +82,6 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     private static final long ONE_MINUTE_MILLIS = MINUTES.toMillis( 1 );
     private static final long ONE_DAY_MILLIS = DAYS.toMillis( 1 );
     private static final String EMPTY = "";
-    private static final LastModifiedComparator LAST_MODIFIED_COMPARATOR = new LastModifiedComparator();
-    private static final Function<Pair<Build, File>, Long> GET_LAST_MODIFIED =
-            pair -> pair.getRight().lastModified();
 
     @Inject
     private Logger logger;
@@ -106,25 +98,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     @Inject
     private CacheConfig cacheConfig;
 
-    private final LoadingCache<Pair<MavenSession, Dependency>,
-                               Optional<Build>> bestBuildCache =
-        CacheBuilder.newBuilder().build( CacheLoader.from( new Function<Pair<MavenSession, Dependency>,
-                                           Optional<Build>>()
-            {
-                @Override
-                public Optional<Build> apply( Pair<MavenSession, Dependency> input )
-                {
-                    try
-                    {
-                        return findBestMatchingBuildImpl( input );
-                    }
-                    catch ( IOException e )
-                    {
-                        logger.error( "Cannot find dependency in cache", e );
-                        return Optional.absent();
-                    }
-                }
-            } ) );
+    private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
 
     @Override
     public Build findLocalBuild( CacheContext context ) throws IOException
@@ -177,7 +151,6 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
 
         try
         {
-
             Path lookupInfoPath = remoteBuildPath( context, LOOKUPINFO_XML );
             if ( Files.exists( lookupInfoPath ) )
             {
@@ -248,7 +221,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
             int maxLocalBuildsCached = cacheConfig.getMaxLocalBuildsCached() - 1;
             if ( cacheDirs.size() > maxLocalBuildsCached )
             {
-                Collections.sort( cacheDirs, LAST_MODIFIED_COMPARATOR );
+                cacheDirs.sort( Comparator.comparing( LocalRepositoryImpl::lastModifiedTime ) );
                 for ( Path dir : cacheDirs.subList( 0, cacheDirs.size() - maxLocalBuildsCached ) )
                 {
                     FileUtils.deleteDirectory( dir.toFile() );
@@ -273,88 +246,94 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
     public Optional<Build> findBestMatchingBuild(
             MavenSession session, Dependency dependency )
     {
-        return bestBuildCache.getUnchecked( Pair.of( session, dependency ) );
+        return bestBuildCache.computeIfAbsent( Pair.of( session, dependency ), this::findBestMatchingBuildImpl );
     }
-
 
     private Optional<Build> findBestMatchingBuildImpl(
             Pair<MavenSession, Dependency> dependencySession )
-            throws IOException
     {
-        final MavenSession session = dependencySession.getLeft();
-        final Dependency dependency = dependencySession.getRight();
-
-        final Path artifactCacheDir = artifactCacheDir( session, dependency.getGroupId(), dependency.getArtifactId() );
-
-        final Multimap<Pair<String, String>, Pair<Build, File>>
-                filesByVersion = ArrayListMultimap.create();
-
-        Files.walkFileTree( artifactCacheDir, new SimpleFileVisitor<Path>()
+        try
         {
-            @Override
-            public FileVisitResult visitFile( Path o, BasicFileAttributes basicFileAttributes )
+            final MavenSession session = dependencySession.getLeft();
+            final Dependency dependency = dependencySession.getRight();
+
+            final Path artifactCacheDir =
+                    artifactCacheDir( session, dependency.getGroupId(), dependency.getArtifactId() );
+
+            final MultiMap<Pair<String, String>, Pair<Build, Path>> filesByVersion = new MultiMap<>();
+
+            Files.walkFileTree( artifactCacheDir, new SimpleFileVisitor<Path>()
             {
-                final File file = o.toFile();
-                if ( file.getName().equals( BUILDINFO_XML ) )
+                @Override
+                public FileVisitResult visitFile( Path path, BasicFileAttributes basicFileAttributes )
                 {
-                    try
+                    final File file = path.toFile();
+                    if ( file.getName().equals( BUILDINFO_XML ) )
                     {
-                        final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( file );
-                        final Pair<Build, File> buildInfoAndFile =
-                                Pair.of( new Build( dto, CacheSource.LOCAL ), file );
-                        final String cachedVersion = dto.getArtifact().getVersion();
-                        final String cachedBranch = getScmRef( dto.getScm() );
-                        filesByVersion.put( Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
-                        if ( isNotBlank( cachedBranch ) )
+                        try
                         {
-                            filesByVersion.put( Pair.of( EMPTY, cachedBranch ), buildInfoAndFile );
+                            final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( file );
+                            final Pair<Build, Path> buildInfoAndFile =
+                                    Pair.of( new Build( dto, CacheSource.LOCAL ), path );
+                            final String cachedVersion = dto.getArtifact().getVersion();
+                            final String cachedBranch = getScmRef( dto.getScm() );
+                            filesByVersion.add( Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
+                            if ( isNotBlank( cachedBranch ) )
+                            {
+                                filesByVersion.add( Pair.of( EMPTY, cachedBranch ), buildInfoAndFile );
+                            }
+                            if ( isNotBlank( cachedVersion ) )
+                            {
+                                filesByVersion.add( Pair.of( cachedVersion, EMPTY ), buildInfoAndFile );
+                            }
                         }
-                        if ( isNotBlank( cachedVersion ) )
+                        catch ( Exception e )
                         {
-                            filesByVersion.put( Pair.of( cachedVersion, EMPTY ), buildInfoAndFile );
+                            // version is unusable nothing we can do here
+                            logger.error( "Build info is not compatible to current maven implementation: " + file );
                         }
                     }
-                    catch ( Exception e )
-                    {
-                        // version is unusable nothing we can do here
-                        logger.error( "Build info is not compatible to current maven implementation: " + file );
-                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
+            } );
+
+            if ( filesByVersion.isEmpty() )
+            {
+                return Optional.empty();
             }
-        } );
 
-        if ( filesByVersion.isEmpty() )
-        {
-            return Optional.absent();
-        }
+            final String currentRef = getScmRef( ProjectUtils.readGitInfo( session ) );
+            // first lets try by branch and version
+            Collection<Pair<Build, Path>> bestMatched = new LinkedList<>();
+            if ( isNotBlank( currentRef ) )
+            {
+                bestMatched = filesByVersion.get( Pair.of( dependency.getVersion(), currentRef ) );
+            }
+            if ( bestMatched.isEmpty() )
+            {
+                // then by version
+                bestMatched = filesByVersion.get( Pair.of( dependency.getVersion(), EMPTY ) );
+            }
+            if ( bestMatched.isEmpty() && isNotBlank( currentRef ) )
+            {
+                // then by branch
+                bestMatched = filesByVersion.get( Pair.of( EMPTY, currentRef ) );
+            }
+            if ( bestMatched.isEmpty() )
+            {
+                // ok lets take all
+                bestMatched = filesByVersion.allValues();
+            }
 
-        final String currentRef = getScmRef( ProjectUtils.readGitInfo( session ) );
-        // first lets try by branch and version
-        Collection<Pair<Build, File>> bestMatched = new LinkedList<>();
-        if ( isNotBlank( currentRef ) )
-        {
-            bestMatched = filesByVersion.get( Pair.of( dependency.getVersion(), currentRef ) );
+            return bestMatched.stream()
+                    .max( Comparator.comparing( p -> lastModifiedTime( p.getRight() ) ) )
+                    .map( Pair::getLeft );
         }
-        if ( Iterables.isEmpty( bestMatched ) )
+        catch ( IOException e )
         {
-            // then by version
-            bestMatched = filesByVersion.get( Pair.of( dependency.getVersion(), EMPTY ) );
+            logger.error( "Cannot find dependency in cache", e );
+            return Optional.empty();
         }
-        if ( Iterables.isEmpty( bestMatched ) && isNotBlank( currentRef ) )
-        {
-            // then by branch
-            bestMatched = filesByVersion.get( Pair.of( EMPTY, currentRef ) );
-        }
-        if ( Iterables.isEmpty( bestMatched ) )
-        {
-            // ok lets take all
-            bestMatched = filesByVersion.values();
-        }
-
-        List<Pair<Build, File>> orderedFiles = Ordering.natural().onResultOf(
-                GET_LAST_MODIFIED ).reverse().sortedCopy( bestMatched );
-        return Optional.of( orderedFiles.get( 0 ).getLeft() );
     }
 
     private String getScmRef( Scm scm )
@@ -487,19 +466,16 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
         logger.info( "[CACHE][" + context.getProject().getArtifactId() + "] " + message );
     }
 
-    private static class LastModifiedComparator implements Comparator<Path>
+    private static FileTime lastModifiedTime( Path p )
     {
-        @Override
-        public int compare( Path p1, Path p2 )
+        try
         {
-            try
-            {
-                return Files.getLastModifiedTime( p1 ).compareTo( Files.getLastModifiedTime( p2 ) );
-            }
-            catch ( IOException e )
-            {
-                return 0;
-            }
+            return Files.getLastModifiedTime( p );
+        }
+        catch ( IOException e )
+        {
+            return FileTime.fromMillis( 0 );
         }
     }
+
 }

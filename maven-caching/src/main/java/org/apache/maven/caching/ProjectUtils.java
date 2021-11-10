@@ -19,8 +19,6 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -38,9 +36,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.trim;
 import static org.apache.maven.artifact.Artifact.LATEST_VERSION;
@@ -52,7 +50,7 @@ import static org.apache.maven.artifact.Artifact.SNAPSHOT_VERSION;
 public class ProjectUtils
 {
 
-    private static final List<String> PHASES = Lists.newArrayList(
+    private static final List<String> PHASES = Arrays.asList(
             //clean
             "pre-clean", "clean", "post-clean",
             // default
@@ -71,8 +69,14 @@ public class ProjectUtils
      */
     public static boolean isLaterPhase( String phase, String other )
     {
-        checkArgument( PHASES.contains( phase ), "Unsupported phase: " + phase );
-        checkArgument( PHASES.contains( other ), "Unsupported phase: " + other );
+        if ( !PHASES.contains( phase ) )
+        {
+            throw new IllegalArgumentException( "Unsupported phase: " + phase );
+        }
+        if ( !PHASES.contains( other ) )
+        {
+            throw new IllegalArgumentException( "Unsupported phase: " + other );
+        }
 
         return PHASES.indexOf( phase ) > PHASES.indexOf( other );
     }
@@ -141,7 +145,7 @@ public class ProjectUtils
 
     public static String mojoExecutionKey( MojoExecution mojo )
     {
-        return StringUtils.join( Lists.newArrayList( StringUtils.defaultIfEmpty( mojo.getExecutionId(), "emptyExecId" ),
+        return StringUtils.join( Arrays.asList( StringUtils.defaultIfEmpty( mojo.getExecutionId(), "emptyExecId" ),
                 StringUtils.defaultIfEmpty( mojo.getGoal(), "emptyGoal" ),
                 StringUtils.defaultIfEmpty( mojo.getLifecyclePhase(), "emptyLifecyclePhase" ),
                 StringUtils.defaultIfEmpty( mojo.getArtifactId(), "emptyArtifactId" ),
@@ -189,7 +193,7 @@ public class ProjectUtils
     private static String readFirstLine( Path path, String defaultValue ) throws IOException
     {
         final List<String> lines = Files.readAllLines( path, StandardCharsets.UTF_8 );
-        return Iterables.getFirst( lines, defaultValue );
+        return Utils.getFirst( lines ).orElse( defaultValue );
     }
 
 

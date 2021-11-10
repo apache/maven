@@ -24,15 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -41,6 +39,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.xml.Build;
@@ -78,19 +77,21 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     @Inject
     private CacheConfig cacheConfig;
 
-    @SuppressWarnings( {"checkstyle:constantname", "checkstyle:magicnumber"} )
-    private static final ThreadLocal<HttpClient> httpClient = new ThreadLocal<HttpClient>()
+    @SuppressWarnings( "checkstyle:constantname" )
+    private static final ThreadLocal<HttpClient> httpClient =
+            ThreadLocal.withInitial( HttpRepositoryImpl::newHttpClient );
+
+    @SuppressWarnings( "checkstyle:magicnumber" )
+    private static CloseableHttpClient newHttpClient()
     {
-        @Override
-        protected HttpClient initialValue()
-        {
-            int timeoutSeconds = 60;
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(
-                    timeoutSeconds * 1000 ).setConnectionRequestTimeout( timeoutSeconds * 1000 ).setSocketTimeout(
-                    timeoutSeconds * 1000 ).build();
-            return HttpClientBuilder.create().setDefaultRequestConfig( config ).build();
-        }
-    };
+        int timeoutSeconds = 60;
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout( timeoutSeconds * 1000 )
+                .setConnectionRequestTimeout( timeoutSeconds * 1000 )
+                .setSocketTimeout( timeoutSeconds * 1000 )
+                .build();
+        return HttpClientBuilder.create().setDefaultRequestConfig( config ).build();
+    }
 
     @Override
     public Build findBuild( CacheContext context )
@@ -244,19 +245,19 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
         }
     }
 
-    private final AtomicReference<Supplier<Optional<CacheReport>>> cacheReportSupplier = new AtomicReference<>();
+    private final AtomicReference<Optional<CacheReport>> cacheReportSupplier = new AtomicReference<>();
 
     @Override
     public Optional<Build> findBaselineBuild( MavenProject project )
     {
         final Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
-                .transform( CacheReport::getProjects );
+                .map( CacheReport::getProjects );
         if ( !cachedProjectsHolder.isPresent() )
         {
-            return Optional.absent();
+            return Optional.empty();
         }
 
-        Optional<ProjectReport> cachedProjectHolder = Optional.absent();
+        Optional<ProjectReport> cachedProjectHolder = Optional.empty();
         for ( ProjectReport p : cachedProjectsHolder.get() )
         {
             if ( project.getArtifactId().equals( p.getArtifactId() ) && project.getGroupId().equals(
@@ -301,16 +302,16 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
             {
                 logger.warn( "[CACHE][" + project.getArtifactId() + "] Error restoring baseline build at url: "
                         + projectReport.getUrl() + ", skipping diff" );
-                return Optional.absent();
+                return Optional.empty();
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<CacheReport> findCacheInfo()
     {
-
-        Supplier<Optional<CacheReport>> candidate = Suppliers.memoize( () ->
+        Optional<CacheReport> report = cacheReportSupplier.get();
+        if ( report == null )
         {
             try
             {
@@ -318,18 +319,17 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
                         "DEBUG" );
                 byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl(), "cache-info" );
                 CacheReport cacheReportType = xmlService.loadCacheReport( content );
-                return Optional.of( cacheReportType );
+                report = Optional.of( cacheReportType );
             }
             catch ( Exception e )
             {
                 logger.error( "Error downloading baseline report from: " + cacheConfig.getBaselineCacheUrl()
                         + ", skipping diff.", e );
-                return Optional.absent();
+                report = Optional.empty();
             }
-        } );
-        cacheReportSupplier.compareAndSet( null, candidate );
-
-        return cacheReportSupplier.get().get();
+            cacheReportSupplier.compareAndSet( null, report );
+        }
+        return report;
     }
 
     private void logInfo( String message, String logReference )

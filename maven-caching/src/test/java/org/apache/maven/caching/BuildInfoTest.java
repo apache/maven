@@ -27,10 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.caching.hash.HashFactory;
@@ -71,9 +71,9 @@ public class BuildInfoTest {
         buildInfo.setBuildTime(new Date());
         buildInfo.setArtifact(artifact);
         buildInfo.setHashFunction("SHA-256");
-        buildInfo.setGoals(Lists.newArrayList("install"));
+        buildInfo.setGoals(Collections.singletonList("install"));
         final org.apache.maven.artifact.Artifact attachedArtifact = new DefaultArtifact("ag", "aa", "av", "as", "at", "ac", new DefaultArtifactHandler());
-        buildInfo.setAttachedArtifacts(Build.createAttachedArtifacts(Lists.newArrayList(attachedArtifact), HashFactory.XX.createAlgorithm()));
+        buildInfo.setAttachedArtifacts(Build.createAttachedArtifacts(Collections.singletonList(attachedArtifact), HashFactory.XX.createAlgorithm()));
         buildInfo.setProjectsInputInfo(main);
         buildInfo.setExecutions(createExecutions());
 

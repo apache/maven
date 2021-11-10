@@ -19,8 +19,6 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.xml.build.Build;
 import org.apache.maven.caching.xml.build.CompletedExecution;
@@ -36,6 +34,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for comparing 2 builds
@@ -82,10 +84,10 @@ public class CacheDiff
     private void compareEffectivePoms( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
         Optional<DigestItem> currentPom = findPom( current );
-        String currentPomHash = currentPom.isPresent() ? currentPom.get().getHash() : null;
+        String currentPomHash = currentPom.map( DigestItem::getHash ).orElse( null );
 
         Optional<DigestItem> baseLinePom = findPom( baseline );
-        String baselinePomHash = baseLinePom.isPresent() ? baseLinePom.get().getHash() : null;
+        String baselinePomHash = baseLinePom.map( DigestItem::getHash ).orElse( null );
 
         if ( !StringUtils.equals( currentPomHash, baselinePomHash ) )
         {
@@ -108,35 +110,25 @@ public class CacheDiff
 
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private void compareFiles( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
 
-        final Map<String, DigestItem> currentFiles = new HashMap<>();
-        for ( DigestItem item : current.getItems() )
-        {
-            if ( "file".equals( item.getType() ) )
-            {
-                currentFiles.put( item.getValue(), item );
-            }
-        }
+        final Map<String, DigestItem> currentFiles = current.getItems().stream()
+                .filter( item -> "file".equals( item.getType() ) )
+                .collect( Collectors.toMap( DigestItem::getValue, item -> item ) );
 
-        final Map<String, DigestItem> baselineFiles = new HashMap<>();
-        for ( DigestItem item : baseline.getItems() )
-        {
-            if ( "file".equals( item.getType() ) )
-            {
-                baselineFiles.put( item.getValue(), item );
-            }
-        }
+        final Map<String, DigestItem> baselineFiles = baseline.getItems().stream()
+                .filter( item -> "file".equals( item.getType() ) )
+                .collect( Collectors.toMap( DigestItem::getValue, item -> item ) );
 
-        final Sets.SetView<String> currentVsBaseline = Sets.difference( currentFiles.keySet(), baselineFiles.keySet() );
-        final Sets.SetView<String> baselineVsCurrent = Sets.difference( baselineFiles.keySet(), currentFiles.keySet() );
-
-        if ( !currentVsBaseline.isEmpty() || !baselineVsCurrent.isEmpty() )
+        if ( !Objects.equals( currentFiles.keySet(), baselineFiles.keySet() ) )
         {
+            Set<String> currentVsBaseline = diff( currentFiles.keySet(), baselineFiles.keySet() );
+            Set<String> baselineVsCurrent = diff( baselineFiles.keySet(), currentFiles.keySet() );
+
             addNewMismatch( "source files",
                     "Remote and local cache contain different sets of input files. "
                             + "Added files: " + currentVsBaseline + ". Removed files: " + baselineVsCurrent,
@@ -180,30 +172,19 @@ public class CacheDiff
 
     private void compareDependencies( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
-        final Map<String, DigestItem> currentDependencies = new HashMap<>();
-        for ( DigestItem digestItemType : current.getItems() )
-        {
-            if ( "dependency".equals( digestItemType.getType() ) )
-            {
-                currentDependencies.put( digestItemType.getValue(), digestItemType );
-            }
-        }
-        final Map<String, DigestItem> baselineDependencies = new HashMap<>();
-        for ( DigestItem item : baseline.getItems() )
-        {
-            if ( "dependency".equals( item.getType() ) )
-            {
-                baselineDependencies.put( item.getValue(), item );
-            }
-        }
+        final Map<String, DigestItem> currentDependencies = current.getItems().stream()
+                .filter( item -> "dependency".equals( item.getType() ) )
+                .collect( Collectors.toMap( DigestItem::getValue, item -> item ) );
 
-        final Sets.SetView<String> currentVsBaseline =
-                Sets.difference( currentDependencies.keySet(), baselineDependencies.keySet() );
-        final Sets.SetView<String> baselineVsCurrent =
-                Sets.difference( baselineDependencies.keySet(), currentDependencies.keySet() );
+        final Map<String, DigestItem> baselineDependencies = baseline.getItems().stream()
+                .filter( item -> "dependency".equals( item.getType() ) )
+                .collect( Collectors.toMap( DigestItem::getValue, item -> item ) );
 
-        if ( !currentVsBaseline.isEmpty() || !baselineVsCurrent.isEmpty() )
+        if ( !Objects.equals( currentDependencies.keySet(), baselineDependencies.keySet() ) )
         {
+            Set<String> currentVsBaseline = diff( currentDependencies.keySet(), baselineDependencies.keySet() );
+            Set<String> baselineVsCurrent = diff( baselineDependencies.keySet(), currentDependencies.keySet() );
+
             addNewMismatch( "dependencies files",
                     "Remote and local builds contain different sets of dependencies and cannot be matched. "
                             + "Added dependencies: " + currentVsBaseline + ". Removed dependencies: "
@@ -341,5 +322,13 @@ public class CacheDiff
         mismatchType.setReason( reason );
         mismatchType.setResolution( resolution );
         report.add( mismatchType );
+    }
+
+    private static <T> Set<T> diff( Set<T> a, Set<T> b )
+    {
+        return a.stream()
+                .filter( v -> !b.contains( v ) )
+                .collect( Collectors.toSet() );
+
     }
 }

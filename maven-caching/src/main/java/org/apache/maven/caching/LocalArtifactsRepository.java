@@ -19,15 +19,15 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import com.google.common.base.Optional;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
-
-import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * LocalArtifactsRepository

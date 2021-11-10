@@ -29,22 +29,22 @@ public class HexUtilsTest {
     @Test
     public void testEncodeToHex() {
         //array length = 8 left padded with zeroes
-        assertEquals("0", HexUtils.encode(new byte[8]));
-        assertEquals("0", HexUtils.encode(new byte[1]));
+        assertEquals("0000000000000000", HexUtils.encode(new byte[8]));
+        assertEquals("00", HexUtils.encode(new byte[1]));
 
-        assertEquals("a", HexUtils.encode(new byte[]{10}));
-        assertEquals("a", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 0, 10}));
+        assertEquals("0a", HexUtils.encode(new byte[]{10}));
+        assertEquals("000000000000000a", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 0, 10}));
 
-        assertEquals("100", HexUtils.encode(new byte[]{1, 0}));
-        assertEquals("101", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 1, 1}));
+        assertEquals("0100", HexUtils.encode(new byte[]{1, 0}));
+        assertEquals("0000000000000101", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 1, 1}));
     }
 
     @Test
     public void testDecodeHex() {
-        assertArrayEquals(new byte[]{0}, HexUtils.decode("0"));
-        assertArrayEquals(new byte[]{10}, HexUtils.decode("a"));
-        assertArrayEquals(new byte[]{10}, HexUtils.decode("A"));
-        assertArrayEquals(new byte[]{1, 0}, HexUtils.decode("100"));
+        assertArrayEquals(new byte[]{0}, HexUtils.decode("00"));
+        assertArrayEquals(new byte[]{10}, HexUtils.decode("0a"));
+        assertArrayEquals(new byte[]{10}, HexUtils.decode("0A"));
+        assertArrayEquals(new byte[]{1, 0}, HexUtils.decode("0100"));
     }
 
 }

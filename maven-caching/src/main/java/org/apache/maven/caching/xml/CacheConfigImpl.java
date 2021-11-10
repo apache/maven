@@ -32,8 +32,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.DefaultPluginScanConfig;
 import org.apache.maven.caching.PluginScanConfig;
@@ -66,7 +64,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
@@ -98,14 +95,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     private MavenSession session;
     private MavenProject project;
 
-    private final Supplier<List<Pattern>> excludePatterns = Suppliers.memoize( new Supplier<List<Pattern>>()
-    {
-        @Override
-        public List<Pattern> get()
-        {
-            return compileExcludePatterns();
-        }
-    } );
+    private List<Pattern> excludePatterns;
 
 
     @Override
@@ -543,7 +533,11 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     public List<Pattern> getExcludePatterns()
     {
         checkInitializedState();
-        return excludePatterns.get();
+        if ( excludePatterns == null )
+        {
+            excludePatterns = compileExcludePatterns();
+        }
+        return excludePatterns;
     }
 
     private List<Pattern> compileExcludePatterns()
@@ -577,7 +571,10 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
     private void checkInitializedState()
     {
-        checkState( state == CacheState.INITIALIZED, "Cache is not initialized. Actual state: " + state );
+        if ( state != CacheState.INITIALIZED )
+        {
+            throw new IllegalStateException( "Cache is not initialized. Actual state: " + state );
+        }
     }
 
     private String getProperty( String key, String defaultValue )

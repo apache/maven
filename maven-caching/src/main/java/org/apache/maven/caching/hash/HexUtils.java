@@ -19,38 +19,71 @@ package org.apache.maven.caching.hash;
  * under the License.
  */
 
-import com.google.common.base.CharMatcher;
-import com.google.common.io.BaseEncoding;
+import java.nio.charset.StandardCharsets;
 
 /**
  * HexUtils
  */
+@SuppressWarnings( "checkstyle:MagicNumber" )
 public class HexUtils
 {
 
-    private static final BaseEncoding ENCODING = BaseEncoding.base16().lowerCase();
-    private static final CharMatcher MATCHER = CharMatcher.is( '0' );
+    private static final byte[] ENC_ARRAY;
+    private static final byte[] DEC_ARRAY;
+
+    static
+    {
+        ENC_ARRAY = new byte[16];
+        DEC_ARRAY = new byte[256];
+        for ( byte i = 0; i < 10; i++ )
+        {
+            ENC_ARRAY[i] = ( byte ) ( '0' + i );
+            DEC_ARRAY['0' + i] = i;
+        }
+        for ( byte i = 10; i < 16; i++ )
+        {
+            ENC_ARRAY[i] = ( byte ) ( 'a' + i - 10 );
+            DEC_ARRAY['a' + i - 10] = i;
+            DEC_ARRAY['A' + i - 10] = i;
+        }
+    }
 
     public static String encode( byte[] hash )
     {
-        return trimLeadingZero( ENCODING.encode( hash ) );
+        byte[] hexChars = new byte[hash.length * 2];
+        for ( int j = 0; j < hash.length; j++ )
+        {
+            int v = hash[j] & 0xFF;
+            hexChars[j * 2] = ENC_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = ENC_ARRAY[v & 0x0F];
+        }
+        return new String( hexChars, StandardCharsets.US_ASCII );
     }
 
     public static byte[] decode( String hex )
     {
-        return ENCODING.decode( padLeadingZero( hex ) );
+        int size = hex.length();
+        if ( size % 2 != 0 )
+        {
+            throw new IllegalArgumentException( "String length should be even" );
+        }
+        byte[] bytes = new byte[ size / 2 ];
+        int idx = 0;
+        for ( int i = 0; i < size; i += 2 )
+        {
+            bytes[idx++] = ( byte ) ( DEC_ARRAY[hex.charAt( i )] << 4 | DEC_ARRAY[hex.charAt( i + 1 )] );
+        }
+        return bytes;
     }
 
-    private static String trimLeadingZero( String hex )
+    public static byte[] toByteArray( long value )
     {
-        String value = MATCHER.trimLeadingFrom( hex );
-        return value.isEmpty() ? "0" : value;
+        byte[] result = new byte[8];
+        for ( int i = 7; i >= 0; i-- )
+        {
+            result[i] = ( byte ) ( value & 0xFF );
+            value >>= 8;
+        }
+        return result;
     }
-
-    private static String padLeadingZero( String hex )
-    {
-        String value = hex.toLowerCase();
-        return value.length() % 2 == 0 ? value : "0" + value;
-    }
-
 }

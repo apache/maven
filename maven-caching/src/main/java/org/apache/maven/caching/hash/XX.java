@@ -26,8 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.google.common.primitives.Longs.toByteArray;
-
 /**
  * XX
  */
@@ -64,7 +62,7 @@ public class XX implements Hash.Factory
         @Override
         public byte[] hash( byte[] array )
         {
-            return toByteArray( INSTANCE.hashBytes( array ) );
+            return HexUtils.toByteArray( INSTANCE.hashBytes( array ) );
         }
 
         @Override
@@ -92,7 +90,8 @@ public class XX implements Hash.Factory
         @Override
         public byte[] digest()
         {
-            return toByteArray( INSTANCE.hashBytes( buffer, 0, buffer.position() ) );
+            return HexUtils.toByteArray( INSTANCE.hashBytes( buffer, 0, buffer.position() ) );
         }
     }
+
 }

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
-import static com.google.common.primitives.Longs.toByteArray;
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 import static java.nio.file.StandardOpenOption.READ;
 
@@ -60,7 +59,7 @@ public class XXMM implements Hash.Factory
             try ( FileChannel channel = FileChannel.open( path, READ );
                   CloseableBuffer buffer = CloseableBuffer.mappedBuffer( channel, READ_ONLY ) )
             {
-                return toByteArray( XX.INSTANCE.hashBytes( buffer.getBuffer() ) );
+                return HexUtils.toByteArray( XX.INSTANCE.hashBytes( buffer.getBuffer() ) );
             }
         }
     }

@@ -19,8 +19,35 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -32,9 +59,10 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectUtils;
 import org.apache.maven.caching.RemoteArtifactsRepository;
 import org.apache.maven.caching.ScanConfigProperties;
-import org.apache.maven.caching.hash.HashFactory;
+import org.apache.maven.caching.Utils;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
+import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
@@ -57,33 +85,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import javax.annotation.Nonnull;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentMap;
 
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -212,11 +213,11 @@ public class MavenProjectInput
         final List<DigestItem> items = new ArrayList<>( count );
         final HashChecksum checksum = hashFactory.createChecksum( count );
 
-        Optional<ProjectsInputInfo> baselineHolder = Optional.absent();
+        Optional<ProjectsInputInfo> baselineHolder = Optional.empty();
         if ( config.isBaselineDiffEnabled() )
         {
             baselineHolder =
-                    remoteCache.findBaselineBuild( project ).transform( b -> b.getDto().getProjectsInputInfo() );
+                    remoteCache.findBaselineBuild( project ).map( b -> b.getDto().getProjectsInputInfo() );
         }
 
         DigestItem effectivePomChecksum = DigestUtils.pom( checksum, effectivePom );
@@ -281,7 +282,7 @@ public class MavenProjectInput
 
     private void checkEffectivePomMatch( ProjectsInputInfo baselineBuild, DigestItem effectivePomChecksum )
     {
-        Optional<DigestItem> pomHolder = Optional.absent();
+        Optional<DigestItem> pomHolder = Optional.empty();
         for ( DigestItem it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( "pom" ) )
@@ -307,7 +308,7 @@ public class MavenProjectInput
 
     private boolean checkItemMatchesBaseline( ProjectsInputInfo baselineBuild, DigestItem fileDigest )
     {
-        Optional<DigestItem> baselineFileDigest = Optional.absent();
+        Optional<DigestItem> baselineFileDigest = Optional.empty();
         for ( DigestItem it : baselineBuild.getItems() )
         {
             if ( it.getType().equals( fileDigest.getType() )
@@ -854,7 +855,7 @@ public class MavenProjectInput
                             + ", expected: 1, actual: " + result.getArtifacts() );
         }
 
-        final Artifact resolved = Iterables.getOnlyElement( result.getArtifacts() );
+        final Artifact resolved = Utils.getOnlyElement( result.getArtifacts() );
 
         final HashAlgorithm algorithm = config.getHashFactory().createAlgorithm();
         final String hash = algorithm.hash( resolved.getFile().toPath() );

@@ -34,7 +34,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -47,9 +48,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,9 +68,9 @@ import org.apache.maven.caching.xml.build.CompletedExecution;
 import org.apache.maven.caching.xml.build.DigestItem;
 import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.caching.xml.build.Scm;
-import org.apache.maven.caching.xml.diff.Diff;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.TrackedProperty;
+import org.apache.maven.caching.xml.diff.Diff;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
@@ -153,7 +151,7 @@ public class CacheControllerImpl implements CacheController
                                         List<MojoExecution> mojoExecutions )
     {
 
-        final String highestRequestPhase = Iterables.getLast( mojoExecutions ).getLifecyclePhase();
+        final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
         if ( !ProjectUtils.isLaterPhase( highestRequestPhase, "post-clean" ) )
         {
             return empty();
@@ -255,7 +253,7 @@ public class CacheControllerImpl implements CacheController
                     return failure( info, context );
                 }
 
-                final String highestRequestPhase = Iterables.getLast( mojoExecutions ).getLifecyclePhase();
+                final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
                 final String highestCompletedGoal = info.getHighestCompletedGoal();
                 if ( ProjectUtils.isLaterPhase( highestRequestPhase, highestCompletedGoal ) && !canIgnoreMissingSegment(
                         info, mojoExecutions ) )
@@ -722,27 +720,24 @@ public class CacheControllerImpl implements CacheController
     @Override
     public boolean isForcedExecution( MavenProject project, MojoExecution execution )
     {
-
         if ( cacheConfig.isForcedExecution( execution ) )
         {
             return true;
         }
-        final Properties properties = project.getProperties();
-        final String alwaysRunPlugins = properties.getProperty( "remote.cache.alwaysRunPlugins" );
-        ArrayList<String> alwaysRunPluginsList = new ArrayList<>();
+        String alwaysRunPlugins = project.getProperties().getProperty( "remote.cache.alwaysRunPlugins" );
         if ( alwaysRunPlugins != null )
         {
-            alwaysRunPluginsList = Lists.newArrayList( split( alwaysRunPlugins, "," ) );
-        }
-        for ( String pluginAndGoal : alwaysRunPluginsList )
-        {
-            final String[] tokens = pluginAndGoal.split( ":" );
-            final String alwaysRunPlugin = tokens[0];
-            String alwaysRunGoal = tokens.length == 1 ? "*" : tokens[1];
-            if ( StringUtils.equals( execution.getPlugin().getArtifactId(), alwaysRunPlugin ) && ( "*".equals(
-                    alwaysRunGoal ) || StringUtils.equals( execution.getGoal(), alwaysRunGoal ) ) )
+            String[] alwaysRunPluginsList = split( alwaysRunPlugins, "," );
+            for ( String pluginAndGoal : alwaysRunPluginsList )
             {
-                return true;
+                String[] tokens = pluginAndGoal.split( ":" );
+                String alwaysRunPlugin = tokens[0];
+                String alwaysRunGoal = tokens.length == 1 ? "*" : tokens[1];
+                if ( Objects.equals( execution.getPlugin().getArtifactId(), alwaysRunPlugin )
+                        && ( "*".equals( alwaysRunGoal ) || Objects.equals( execution.getGoal(), alwaysRunGoal ) ) )
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -813,7 +808,6 @@ public class CacheControllerImpl implements CacheController
 
     private void zipAndAttachArtifact( MavenProject project, Path dir, String classifier ) throws IOException
     {
-
         try ( InputStream inputStream = ZipUtils.zipFolder( dir ) )
         {
             File tempFile = File.createTempFile( "maven-incremental", project.getArtifactId() );
