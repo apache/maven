@@ -879,11 +879,11 @@ under the License.
                     <name>logAll</name>
                     <type>boolean</type>
                     <defaultValue>true</defaultValue>
-                    <description>Controls if all plugin properties to be logged (true is default). All the properties logged
+                    <description><![CDATA[Controls if all plugin properties to be logged (true is default). All the properties logged
                         with respect to log/nolog children:
                         * true: logged all if no blacklists (&lt;nolog/&gt;) and whitelists (&lt;log/&gt;) specified on plugin
                         level
-                        * false: logged only tracked and included by whitelists (&lt;log/&gt;) on plugin level
+                        * false: logged only tracked and included by whitelists (&lt;log/&gt;) on plugin level]]>
                     </description>
                 </field>
             </fields>
@@ -1020,14 +1020,14 @@ under the License.
                     <name>logAllProperties</name>
                     <type>boolean</type>
                     <defaultValue>true</defaultValue>
-                    <description>
+                    <description><![CDATA[
                         Controls if all plugin properties to be logged (true is default). All the properties
                         logged with respect to children:
                         * logAll on plugin level overrides global value
                         * true: logged all if no blacklists (&lt;nolog/&gt;) and whitelists (&lt;log/&gt;) specified on
                         plugin level
                         * false: logged only tracked and included by whitelists (&lt;log/&gt;) on plugin level
-                        &lt;log/&gt;
+                        &lt;log/&gt;]]>
                     </description>
                 </field>
             </fields>

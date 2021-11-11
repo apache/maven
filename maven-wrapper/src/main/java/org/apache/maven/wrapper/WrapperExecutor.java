@@ -28,8 +28,8 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 /**
- * Wrapper executor, running {@link Installer} to get a Maven distribution ready, followed by {@BootstrapMainStarter}
- * to launch the Maven bootstrap.
+ * Wrapper executor, running {@link Installer} to get a Maven distribution ready, followed by
+ * {@link BootstrapMainStarter} to launch the Maven bootstrap.
  * 
  * @author Hans Dockter
  */

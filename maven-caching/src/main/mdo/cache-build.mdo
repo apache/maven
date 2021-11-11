@@ -46,7 +46,7 @@ under the License.
           <type>String</type>
         </field>
         <!--xs:element name="final" type="xs:boolean" minOccurs="0"/-->
-        <field>
+        <field xml.tagName="final">
           <name>_final</name>
           <version>1.0.0+</version>
           <type>Boolean</type>
