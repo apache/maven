@@ -33,7 +33,7 @@ If you think you have found a bug, please file an issue in the [Maven Issue Trac
 Incremental Build and Cache
 -------------
 This maven version supports Incremental Build feature which calculates out-of-date modules in the build dependencies graph and improves build times by avoiding re-building unnecessary modules.
-Read [cache guide](Documentation/CACHE.md) for more details
+Read [cache guide](maven-caching/src/site/markdown/CACHE.md) for more details.
 
 Documentation
 -------------
