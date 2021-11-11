@@ -25,13 +25,13 @@ import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * SentinelVersionStartegy
+ * SentinelVersionStrategy
  */
-public class SentinelVersionStartegy implements MultimoduleDiscoveryStrategy
+public class SentinelVersionStrategy implements MultimoduleDiscoveryStrategy
 {
     private final String version;
 
-    public SentinelVersionStartegy( String version )
+    public SentinelVersionStrategy( String version )
     {
         this.version = version;
     }

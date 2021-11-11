@@ -392,9 +392,9 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
                 cacheConfig.getConfiguration().getProjectDiscoveryStrategy();
         if ( projectDiscoveryStrategy != null && projectDiscoveryStrategy.getSpecificVersion() != null )
         {
-            return new SentinelVersionStartegy( projectDiscoveryStrategy.getSpecificVersion() );
+            return new SentinelVersionStrategy( projectDiscoveryStrategy.getSpecificVersion() );
         }
-        return new AllExternalSrategy();
+        return new AllExternalStrategy();
     }
 
     @Nonnull

@@ -24,9 +24,9 @@ import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.model.Dependency;
 
 /**
- * AllExternalSrategy
+ * AllExternalStrategy
  */
-public class AllExternalSrategy implements MultimoduleDiscoveryStrategy
+public class AllExternalStrategy implements MultimoduleDiscoveryStrategy
 {
     @Override
     public boolean isPartOfMultiModule( Dependency dependency )
