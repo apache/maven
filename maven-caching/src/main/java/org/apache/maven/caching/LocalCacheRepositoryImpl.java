@@ -69,11 +69,11 @@ import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
 import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENTATION_VERSION;
 
 /**
- * LocalRepositoryImpl
+ * Local cache repository implementation.
  */
 @Singleton
 @Named
-public class LocalRepositoryImpl implements LocalArtifactsRepository
+public class LocalCacheRepositoryImpl implements LocalCacheRepository
 {
 
     private static final String BUILDINFO_XML = "buildinfo.xml";
@@ -85,16 +85,16 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
 
     private final Logger logger;
     private final LegacySupport legacySupport;
-    private final RemoteArtifactsRepository remoteRepository;
+    private final RemoteCacheRepository remoteRepository;
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
     private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
 
     @Inject
-    public LocalRepositoryImpl(
+    public LocalCacheRepositoryImpl(
             Logger logger,
             LegacySupport legacySupport,
-            RemoteArtifactsRepository remoteRepository,
+            RemoteCacheRepository remoteRepository,
             XmlService xmlService,
             CacheConfig cacheConfig )
     {
@@ -226,7 +226,7 @@ public class LocalRepositoryImpl implements LocalArtifactsRepository
             int maxLocalBuildsCached = cacheConfig.getMaxLocalBuildsCached() - 1;
             if ( cacheDirs.size() > maxLocalBuildsCached )
             {
-                cacheDirs.sort( Comparator.comparing( LocalRepositoryImpl::lastModifiedTime ) );
+                cacheDirs.sort( Comparator.comparing( LocalCacheRepositoryImpl::lastModifiedTime ) );
                 for ( Path dir : cacheDirs.subList( 0, cacheDirs.size() - maxLocalBuildsCached ) )
                 {
                     FileUtils.deleteDirectory( dir.toFile() );

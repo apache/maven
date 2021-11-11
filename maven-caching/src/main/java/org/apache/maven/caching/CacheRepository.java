@@ -19,24 +19,24 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import java.io.IOException;
-import java.util.Optional;
-
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.Build;
-import org.apache.maven.caching.xml.build.Artifact;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.execution.MavenSession;
+
+import java.io.IOException;
 
 /**
- * RemoteArtifactsRepository
+ * Cache repository.
  */
-public interface RemoteArtifactsRepository extends ArtifactsRepository
+public interface CacheRepository
 {
 
-    byte[] getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
+    Build findBuild( CacheContext context ) throws IOException;
 
-    byte[] getResourceContent( String resourceUrl, String logReference );
+    void saveBuildInfo( CacheResult cacheResult, Build build ) throws IOException;
 
-    String getResourceUrl( CacheContext context, String filename );
+    void saveArtifactFile( CacheResult cacheResult, Artifact artifact ) throws IOException;
 
-    Optional<Build> findBaselineBuild( MavenProject project );
+    void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException;
 }

@@ -54,10 +54,10 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.caching.Clock;
-import org.apache.maven.caching.LocalArtifactsRepository;
+import org.apache.maven.caching.LocalCacheRepository;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectUtils;
-import org.apache.maven.caching.RemoteArtifactsRepository;
+import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
 import org.apache.maven.caching.Utils;
 import org.apache.maven.caching.hash.HashAlgorithm;
@@ -133,8 +133,8 @@ public class MavenProjectInput
     private final Logger logger;
     private final MavenProject project;
     private final MavenSession session;
-    private final LocalArtifactsRepository localCache;
-    private final RemoteArtifactsRepository remoteCache;
+    private final LocalCacheRepository localCache;
+    private final RemoteCacheRepository remoteCache;
     private final RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
     private final CacheConfig config;
@@ -156,8 +156,8 @@ public class MavenProjectInput
                               RepositorySystem repoSystem,
                               ArtifactHandlerManager artifactHandlerManager,
                               Logger logger,
-                              LocalArtifactsRepository localCache,
-                              RemoteArtifactsRepository remoteCache )
+                              LocalCacheRepository localCache,
+                              RemoteCacheRepository remoteCache )
     {
         this.project = project;
         this.session = session;

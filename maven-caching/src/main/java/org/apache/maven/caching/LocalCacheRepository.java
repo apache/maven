@@ -30,9 +30,9 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 
 /**
- * LocalArtifactsRepository
+ * Local cache repository.
  */
-public interface LocalArtifactsRepository extends ArtifactsRepository
+public interface LocalCacheRepository extends CacheRepository
 {
 
     void beforeSave( CacheContext environment ) throws IOException;

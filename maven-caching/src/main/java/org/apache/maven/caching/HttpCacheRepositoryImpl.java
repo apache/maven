@@ -55,11 +55,11 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * HttpRepositoryImpl
+ * HTTP remote cache repository implementation.
  */
 @Singleton
 @Named
-public class HttpRepositoryImpl implements RemoteArtifactsRepository
+public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 {
 
     public static final String BUILDINFO_XML = "buildinfo.xml";
@@ -71,7 +71,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
     private final CacheConfig cacheConfig;
 
     @Inject
-    public HttpRepositoryImpl( Logger logger, LegacySupport legacySupport,
+    public HttpCacheRepositoryImpl( Logger logger, LegacySupport legacySupport,
                                XmlService xmlService, CacheConfig cacheConfig )
     {
         this.logger = logger;
@@ -82,7 +82,7 @@ public class HttpRepositoryImpl implements RemoteArtifactsRepository
 
     @SuppressWarnings( "checkstyle:constantname" )
     private static final ThreadLocal<HttpClient> httpClient =
-            ThreadLocal.withInitial( HttpRepositoryImpl::newHttpClient );
+            ThreadLocal.withInitial( HttpCacheRepositoryImpl::newHttpClient );
 
     @SuppressWarnings( "checkstyle:magicnumber" )
     private static CloseableHttpClient newHttpClient()

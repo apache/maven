@@ -96,7 +96,7 @@ import static org.apache.maven.caching.CacheResult.failure;
 import static org.apache.maven.caching.CacheResult.partialSuccess;
 import static org.apache.maven.caching.CacheResult.rebuilded;
 import static org.apache.maven.caching.CacheResult.success;
-import static org.apache.maven.caching.HttpRepositoryImpl.BUILDINFO_XML;
+import static org.apache.maven.caching.HttpCacheRepositoryImpl.BUILDINFO_XML;
 import static org.apache.maven.caching.checksum.KeyUtils.getVersionlessProjectKey;
 import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENTATION_VERSION;
 
@@ -115,8 +115,8 @@ public class CacheControllerImpl implements CacheController
     private final  Logger logger;
     private final  MavenPluginManager mavenPluginManager;
     private final  MavenProjectHelper projectHelper;
-    private final  LocalArtifactsRepository localCache;
-    private final RemoteArtifactsRepository remoteCache;
+    private final  LocalCacheRepository localCache;
+    private final RemoteCacheRepository remoteCache;
     private final  CacheConfig cacheConfig;
     private final  RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
@@ -130,8 +130,8 @@ public class CacheControllerImpl implements CacheController
             Logger logger, 
             MavenPluginManager mavenPluginManager, 
             MavenProjectHelper projectHelper, 
-            LocalArtifactsRepository localCache, 
-            RemoteArtifactsRepository remoteCache, 
+            LocalCacheRepository localCache, 
+            RemoteCacheRepository remoteCache, 
             CacheConfig cacheConfig, 
             RepositorySystem repoSystem, 
             ArtifactHandlerManager artifactHandlerManager, 
