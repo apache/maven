@@ -69,37 +69,7 @@ under the License.
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <exclude>lifecycle-executor.txt</exclude>
-              <exclude>plugin-manager.txt</exclude>
-              <exclude>project-builder.txt</exclude>
-              <exclude>src/site/resources/design/**</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -121,9 +91,6 @@ under the License.
               <goal>xpp3-reader</goal>
               <goal>xpp3-writer</goal>
             </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/generated-sources/modello</outputDirectory>
-            </configuration>
           </execution>
           <execution>
             <id>modello-cache-xsd</id>
@@ -132,7 +99,7 @@ under the License.
               <goal>xsd</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/generated-resources/modello</outputDirectory>
+              <outputDirectory>${basedir}/target/generated-test-resources/modello</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -146,12 +113,12 @@ under the License.
             <id>add-resources</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>add-resource</goal>
+              <goal>add-test-resource</goal>
             </goals>
             <configuration>
               <resources>
                 <resource>
-                  <directory>${basedir}/target/generated-resources/modello</directory>
+                  <directory>${basedir}/target/generated-test-resources/modello</directory>
                 </resource>
               </resources>
             </configuration>
