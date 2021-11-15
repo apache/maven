@@ -53,7 +53,6 @@ public class MavenITmng4410UsageHelpTest
         verifier.resetStreams();
 
         verifier.verifyTextInLog( "--version" );
-        verifier.verifyTextInLog( "--define" );
         verifier.verifyTextInLog( "--debug" );
         verifier.verifyTextInLog( "--batch-mode" );
     }
