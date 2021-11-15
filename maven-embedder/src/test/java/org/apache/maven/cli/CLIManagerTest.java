@@ -41,12 +41,13 @@ public class CLIManagerTest
     public void spacedOptions()
         throws Exception
     {
-        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
+        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 -Dz test".split( " " ) );
         assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "1" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[2], is( "y" ) );
         assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[3], is( "2" ) );
+        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[4], is( "z" ) );
     }
 
 }
