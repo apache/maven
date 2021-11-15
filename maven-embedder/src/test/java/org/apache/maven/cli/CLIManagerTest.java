@@ -20,7 +20,9 @@ package org.apache.maven.cli;
  */
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.ArrayMatching.hasItemInArray;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.cli.CommandLine;
@@ -42,12 +44,16 @@ public class CLIManagerTest
         throws Exception
     {
         CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 -Dz test".split( " " ) );
+
         assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "1" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[2], is( "y" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[3], is( "2" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[4], is( "z" ) );
+
+        String[] properties = cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
+        assertThat( properties[0], is( "x" ) );
+        assertThat( properties[1], is( "1" ) );
+        assertThat( properties[2], is( "y" ) );
+        assertThat( properties[3], is( "2" ) );
+        assertThat( properties[4], is( "z" ) );
+        assertThat( properties, not( hasItemInArray( "test" ) ) );
     }
 
 }
