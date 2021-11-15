@@ -95,7 +95,7 @@ import static org.apache.maven.caching.CacheResult.rebuilded;
 import static org.apache.maven.caching.CacheResult.success;
 import static org.apache.maven.caching.HttpCacheRepositoryImpl.BUILDINFO_XML;
 import static org.apache.maven.caching.checksum.KeyUtils.getVersionlessProjectKey;
-import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENTATION_VERSION;
+import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMENTATION_VERSION;
 
 /**
  * CacheControllerImpl
@@ -229,11 +229,11 @@ public class CacheControllerImpl implements CacheController
                 }
 
                 final String cacheImplementationVersion = info.getCacheImplementationVersion();
-                if ( !CACHE_IMPLMENTATION_VERSION.equals( cacheImplementationVersion ) )
+                if ( !CACHE_IMPLEMENTATION_VERSION.equals( cacheImplementationVersion ) )
                 {
                     logger.warn(
                             "Maven and cached build implementations mismatch, caching might not work correctly. "
-                                    + "Implementation version: " + CACHE_IMPLMENTATION_VERSION + ", cached build: "
+                                    + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: "
                                     + info.getCacheImplementationVersion() );
                 }
 

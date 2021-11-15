@@ -51,7 +51,6 @@ public class RemoteCacheRepositoryFactory
     {
         return SessionUtils.getOrCreate( session, KEY,
                 () -> new HttpCacheRepositoryImpl( logger,
-                        null,
                         xmlService,
                         cacheConfigFactory.getCacheConfig( session ) ) );
     }

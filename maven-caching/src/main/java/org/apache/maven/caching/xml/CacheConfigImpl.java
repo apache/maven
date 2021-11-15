@@ -62,7 +62,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.logging.Logger;
 
 import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.parseBoolean;
 import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
 
 /**

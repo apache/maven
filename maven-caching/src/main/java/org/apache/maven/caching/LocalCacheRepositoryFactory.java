@@ -55,7 +55,6 @@ public class LocalCacheRepositoryFactory
     {
         return SessionUtils.getOrCreate( session, KEY,
                 () -> new LocalCacheRepositoryImpl( logger,
-                        null,
                         remoteCacheRepositoryFactory.getRemoteCacheRepository( session ),
                         xmlService,
                         cacheConfigFactory.getCacheConfig( session ) ) );
