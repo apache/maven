@@ -496,7 +496,7 @@ public class MavenCliTest
     public void populateProperties() throws Exception
     {
         // Arrange
-        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "-Dx=1", "-Dy", "-D z=2", "compile" }, null );
+        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "-Dx=1", "-Dy", "-D", "z=2", "compile" }, null );
 
         // Act
         cli.cli( request );
