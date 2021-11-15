@@ -103,9 +103,9 @@ public class MavenProjectInput
 {
 
     /**
-     * Version ov hashing algorithm implementation. It is recommended to change to simplify remote cache maintenance
+     * Version of hashing algorithm implementation. It is recommended to change to simplify remote cache maintenance
      */
-    public static final String CACHE_IMPLMENTATION_VERSION = "v10";
+    public static final String CACHE_IMPLEMENTATION_VERSION = "v1";
 
     /**
      * property name to pass glob value. The glob to be used to list directory files in plugins scanning
@@ -130,6 +130,7 @@ public class MavenProjectInput
      * Flag to control if we should check values from plugin configs as file system objects
      */
     private static final String CACHE_PROCESS_PLUGINS = "remote.cache.processPlugins";
+
     private final Logger logger;
     private final MavenProject project;
     private final MavenSession session;

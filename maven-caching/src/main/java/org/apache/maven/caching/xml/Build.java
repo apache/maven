@@ -61,7 +61,7 @@ public class Build
                   String hashAlgorithm )
     {
         this.dto = new org.apache.maven.caching.xml.build.Build();
-        this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLMENTATION_VERSION );
+        this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLEMENTATION_VERSION );
         this.dto.setBuildTime( new Date() );
         try
         {

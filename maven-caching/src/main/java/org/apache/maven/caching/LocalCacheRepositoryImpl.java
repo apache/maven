@@ -50,7 +50,6 @@ import org.apache.maven.caching.xml.build.Scm;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
@@ -62,7 +61,7 @@ import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
-import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENTATION_VERSION;
+import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMENTATION_VERSION;
 
 /**
  * Local cache repository implementation.
@@ -78,7 +77,6 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private static final String EMPTY = "";
 
     private final Logger logger;
-    private final LegacySupport legacySupport;
     private final RemoteCacheRepository remoteRepository;
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
@@ -86,13 +84,11 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
 
     public LocalCacheRepositoryImpl(
             Logger logger,
-            LegacySupport legacySupport,
             RemoteCacheRepository remoteRepository,
             XmlService xmlService,
             CacheConfig cacheConfig )
     {
         this.logger = logger;
-        this.legacySupport = legacySupport;
         this.remoteRepository = remoteRepository;
         this.xmlService = xmlService;
         this.cacheConfig = cacheConfig;
@@ -425,7 +421,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private Path artifactCacheDir( MavenSession session, String groupId, String artifactId ) throws IOException
     {
         final String localRepositoryRoot = session.getLocalRepository().getBasedir();
-        final Path path = Paths.get( localRepositoryRoot, "..", "cache", CACHE_IMPLMENTATION_VERSION, groupId,
+        final Path path = Paths.get( localRepositoryRoot, "..", "cache", CACHE_IMPLEMENTATION_VERSION, groupId,
                 artifactId ).normalize();
         if ( !Files.exists( path ) )
         {

@@ -46,7 +46,6 @@ import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
@@ -60,15 +59,13 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public static final String CACHE_REPORT_XML = "cache-report.xml";
 
     private final Logger logger;
-    private final LegacySupport legacySupport;
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
 
-    public HttpCacheRepositoryImpl( Logger logger, LegacySupport legacySupport,
+    public HttpCacheRepositoryImpl( Logger logger,
                                XmlService xmlService, CacheConfig cacheConfig )
     {
         this.logger = logger;
-        this.legacySupport = legacySupport;
         this.xmlService = xmlService;
         this.cacheConfig = cacheConfig;
     }
@@ -125,7 +122,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException
     {
         MavenProject rootProject = session.getTopLevelProject();
-        final String resourceUrl = cacheConfig.getUrl() + "/" + MavenProjectInput.CACHE_IMPLMENTATION_VERSION
+        final String resourceUrl = cacheConfig.getUrl() + "/" + MavenProjectInput.CACHE_IMPLEMENTATION_VERSION
                 + "/" + rootProject.getGroupId()
                 + "/" + rootProject.getArtifactId()
                 + "/" + buildId
@@ -212,7 +209,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
     private String getResourceUrl( String filename, String groupId, String artifactId, String checksum )
     {
-        return cacheConfig.getUrl() + "/" + MavenProjectInput.CACHE_IMPLMENTATION_VERSION + "/" + groupId + "/"
+        return cacheConfig.getUrl() + "/" + MavenProjectInput.CACHE_IMPLEMENTATION_VERSION + "/" + groupId + "/"
                 + artifactId + "/" + checksum + "/" + filename;
     }
 
@@ -256,8 +253,8 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
         Optional<ProjectReport> cachedProjectHolder = Optional.empty();
         for ( ProjectReport p : cachedProjectsHolder.get() )
         {
-            if ( project.getArtifactId().equals( p.getArtifactId() ) && project.getGroupId().equals(
-                    p.getGroupId() ) )
+            if ( project.getArtifactId().equals( p.getArtifactId() )
+                    && project.getGroupId().equals( p.getGroupId() ) )
             {
                 cachedProjectHolder = Optional.of( p );
                 break;
