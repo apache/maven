@@ -38,6 +38,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.caching.xml.CacheConfigFactory;
 import org.apache.maven.caching.xml.CacheState;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -88,8 +89,8 @@ public class CachingMojoExecutor implements IMojoExecutor
     private final MavenPluginManager mavenPluginManager;
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
     private final ExecutionEventCatapult eventCatapult;
-    private final CacheController cacheController;
-    private final CacheConfig cacheConfig;
+    private final CacheControllerFactory cacheControllerFactory;
+    private final CacheConfigFactory cacheConfigFactory;
     private final MojoParametersListener mojoListener;
 
     @Inject
@@ -99,8 +100,8 @@ public class CachingMojoExecutor implements IMojoExecutor
             MavenPluginManager mavenPluginManager, 
             LifecycleDependencyResolver lifeCycleDependencyResolver, 
             ExecutionEventCatapult eventCatapult, 
-            CacheController cacheController, 
-            CacheConfig cacheConfig, 
+            CacheControllerFactory cacheControllerFactory,
+            CacheConfigFactory cacheConfigFactory,
             MojoParametersListener mojoListener )
     {
         this.logger = logger;
@@ -108,8 +109,8 @@ public class CachingMojoExecutor implements IMojoExecutor
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
         this.eventCatapult = eventCatapult;
-        this.cacheController = cacheController;
-        this.cacheConfig = cacheConfig;
+        this.cacheControllerFactory = cacheControllerFactory;
+        this.cacheConfigFactory = cacheConfigFactory;
         this.mojoListener = mojoListener;
     }
 
@@ -171,6 +172,7 @@ public class CachingMojoExecutor implements IMojoExecutor
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
             throws LifecycleExecutionException
     {
+        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
         DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
@@ -179,6 +181,7 @@ public class CachingMojoExecutor implements IMojoExecutor
         final Source source = getSource( mojoExecutions );
 
         // execute clean bound goals before restoring to not interfere/slowdown clean
+        CacheConfig cacheConfig = cacheConfigFactory.getCacheConfig( session );
         CacheState cacheState = DISABLED;
         CacheResult result = CacheResult.empty();
         if ( source == Source.LIFECYCLE )
@@ -188,7 +191,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             {
                 execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
             }
-            cacheState = cacheConfig.initialize( project, session );
+            cacheState = cacheConfig.getState();
             if ( cacheState == INITIALIZED )
             {
                 result = cacheController.findCachedBuild( session, project, projectIndex, mojoExecutions );
@@ -199,7 +202,8 @@ public class CachingMojoExecutor implements IMojoExecutor
         boolean restored = result.isSuccess(); // if partially restored need to save increment
         if ( restorable )
         {
-            restored &= restoreProject( result, mojoExecutions, projectIndex, dependencyContext, phaseRecorder );
+            restored &= restoreProject( result, mojoExecutions, projectIndex,
+                                        dependencyContext, phaseRecorder, cacheConfig );
         }
         else
         {
@@ -246,13 +250,15 @@ public class CachingMojoExecutor implements IMojoExecutor
                                     List<MojoExecution> mojoExecutions,
                                     ProjectIndex projectIndex,
                                     DependencyContext dependencyContext,
-                                    PhaseRecorder phaseRecorder ) throws LifecycleExecutionException
+                                    PhaseRecorder phaseRecorder,
+                                    CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
 
         final Build build = cacheResult.getBuildInfo();
         final MavenProject project = cacheResult.getContext().getProject();
         final MavenSession session = cacheResult.getContext().getSession();
         final List<MojoExecution> cachedSegment = build.getCachedSegment( mojoExecutions );
+        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
 
         boolean restored = cacheController.restoreProjectArtifacts( cacheResult );
         if ( !restored )
@@ -276,7 +282,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             else
             {
                 restored = verifyCacheConsistency( cacheCandidate, build, project, session, projectIndex,
-                        dependencyContext, phaseRecorder );
+                        dependencyContext, phaseRecorder, cacheConfig );
                 if ( !restored )
                 {
                     break;
@@ -311,9 +317,11 @@ public class CachingMojoExecutor implements IMojoExecutor
                                             MavenSession session,
                                             ProjectIndex projectIndex,
                                             DependencyContext dependencyContext,
-                                            PhaseRecorder phaseRecorder ) throws LifecycleExecutionException
+                                            PhaseRecorder phaseRecorder,
+                                            CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
 
+        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
         AtomicBoolean consistent = new AtomicBoolean( true );
         final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cacheController, cachedBuild,
                 consistent, logger, cacheConfig );

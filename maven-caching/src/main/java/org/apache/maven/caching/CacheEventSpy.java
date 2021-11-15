@@ -24,8 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.caching.xml.CacheConfigFactory;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenSession;
 
 /**
  * Triggers cache report generation on build completion
@@ -34,26 +36,29 @@ import org.apache.maven.execution.ExecutionEvent;
 @Named
 public class CacheEventSpy extends AbstractEventSpy
 {
-    private final CacheConfig cacheConfig;
-    private final CacheController cacheController;
+    private final CacheConfigFactory cacheConfigFactory;
+    private final CacheControllerFactory cacheControllerFactory;
 
     @Inject
-    public CacheEventSpy( CacheConfig cacheConfig, CacheController cacheController )
+    public CacheEventSpy( CacheConfigFactory cacheConfigFactory, CacheControllerFactory cacheControllerFactory )
     {
-        this.cacheConfig = cacheConfig;
-        this.cacheController = cacheController;
+        this.cacheConfigFactory = cacheConfigFactory;
+        this.cacheControllerFactory = cacheControllerFactory;
     }
 
     @Override
     public void onEvent( Object event ) throws Exception
     {
-        if ( cacheConfig.isEnabled() )
+        if ( event instanceof ExecutionEvent )
         {
-            if ( event instanceof ExecutionEvent )
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if ( executionEvent.getType() == ExecutionEvent.Type.SessionEnded )
             {
-                ExecutionEvent executionEvent = (ExecutionEvent) event;
-                if ( executionEvent.getType() == ExecutionEvent.Type.SessionEnded )
+                MavenSession session = executionEvent.getSession();
+                CacheConfig cacheConfig = cacheConfigFactory.getCacheConfig( session );
+                if ( cacheConfig.isEnabled() )
                 {
+                    CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
                     cacheController.saveCacheReport( executionEvent.getSession() );
                 }
             }

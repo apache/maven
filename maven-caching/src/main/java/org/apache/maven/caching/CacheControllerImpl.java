@@ -44,9 +44,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -103,8 +100,6 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENT
 /**
  * CacheControllerImpl
  */
-@Singleton
-@Named
 public class CacheControllerImpl implements CacheController
 {
 
@@ -112,30 +107,29 @@ public class CacheControllerImpl implements CacheController
     private static final String GENERATEDSOURCES = "generatedsources";
     private static final String GENERATEDSOURCES_PREFIX = GENERATEDSOURCES + FILE_SEPARATOR_SUBST;
 
-    private final  Logger logger;
-    private final  MavenPluginManager mavenPluginManager;
-    private final  MavenProjectHelper projectHelper;
-    private final  LocalCacheRepository localCache;
-    private final RemoteCacheRepository remoteCache;
-    private final  CacheConfig cacheConfig;
-    private final  RepositorySystem repoSystem;
+    private final Logger logger;
+    private final MavenPluginManager mavenPluginManager;
+    private final MavenProjectHelper projectHelper;
+    private final RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
     private final XmlService xmlService;
+    private final CacheConfig cacheConfig;
+    private final LocalCacheRepository localCache;
+    private final RemoteCacheRepository remoteCache;
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private volatile Scm scm;
 
-    @Inject
     public CacheControllerImpl(
-            Logger logger, 
-            MavenPluginManager mavenPluginManager, 
-            MavenProjectHelper projectHelper, 
-            LocalCacheRepository localCache, 
+            Logger logger,
+            MavenPluginManager mavenPluginManager,
+            MavenProjectHelper projectHelper,
+            RepositorySystem repoSystem,
+            ArtifactHandlerManager artifactHandlerManager,
+            XmlService xmlService,
+            LocalCacheRepository localCache,
             RemoteCacheRepository remoteCache, 
-            CacheConfig cacheConfig, 
-            RepositorySystem repoSystem, 
-            ArtifactHandlerManager artifactHandlerManager, 
-            XmlService xmlService )
+            CacheConfig cacheConfig )
     {
         this.logger = logger;
         this.mavenPluginManager = mavenPluginManager;
@@ -150,7 +144,8 @@ public class CacheControllerImpl implements CacheController
 
     @Override
     @Nonnull
-    public CacheResult findCachedBuild( MavenSession session, MavenProject project, ProjectIndex projectIndex,
+    public CacheResult findCachedBuild( MavenSession session, MavenProject project,
+                                        ProjectIndex projectIndex,
                                         List<MojoExecution> mojoExecutions )
     {
 
@@ -751,7 +746,6 @@ public class CacheControllerImpl implements CacheController
     {
         try
         {
-
             CacheReport cacheReport = new CacheReport();
             for ( CacheResult result : cacheResults.values() )
             {

@@ -38,10 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.caching.Utils.MultiMap;
@@ -71,8 +67,6 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLMENT
 /**
  * Local cache repository implementation.
  */
-@Singleton
-@Named
 public class LocalCacheRepositoryImpl implements LocalCacheRepository
 {
 
@@ -90,7 +84,6 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private final CacheConfig cacheConfig;
     private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
 
-    @Inject
     public LocalCacheRepositoryImpl(
             Logger logger,
             LegacySupport legacySupport,

@@ -27,10 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -57,8 +53,6 @@ import org.codehaus.plexus.logging.Logger;
 /**
  * HTTP remote cache repository implementation.
  */
-@Singleton
-@Named
 public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 {
 
@@ -70,7 +64,6 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
 
-    @Inject
     public HttpCacheRepositoryImpl( Logger logger, LegacySupport legacySupport,
                                XmlService xmlService, CacheConfig cacheConfig )
     {

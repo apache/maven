@@ -26,11 +26,9 @@ import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.TrackedProperty;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -42,7 +40,8 @@ import java.util.regex.Pattern;
 public interface CacheConfig
 {
 
-    CacheState initialize( MavenProject project, MavenSession session );
+    @Nonnull
+    CacheState getState();
 
     @Nonnull
     List<TrackedProperty> getTrackedProperties( MojoExecution mojoExecution );
