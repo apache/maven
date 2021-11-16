@@ -31,14 +31,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
+import org.apache.maven.SessionScoped;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
-import org.apache.maven.caching.xml.CacheConfigFactory;
 import org.apache.maven.caching.xml.CacheState;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -80,7 +79,7 @@ import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
  * Cache-enabled version of the MojoExecutor
  * </p>
  */
-@Singleton
+@SessionScoped
 @Named
 @Priority( 10 )
 public class CachingMojoExecutor implements IMojoExecutor
@@ -91,8 +90,8 @@ public class CachingMojoExecutor implements IMojoExecutor
     private final MavenPluginManager mavenPluginManager;
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
     private final ExecutionEventCatapult eventCatapult;
-    private final CacheControllerFactory cacheControllerFactory;
-    private final CacheConfigFactory cacheConfigFactory;
+    private final CacheController cacheController;
+    private final CacheConfig cacheConfig;
     private final MojoParametersListener mojoListener;
 
     @Inject
@@ -101,16 +100,16 @@ public class CachingMojoExecutor implements IMojoExecutor
             MavenPluginManager mavenPluginManager, 
             LifecycleDependencyResolver lifeCycleDependencyResolver, 
             ExecutionEventCatapult eventCatapult, 
-            CacheControllerFactory cacheControllerFactory,
-            CacheConfigFactory cacheConfigFactory,
+            CacheController cacheController,
+            CacheConfig cacheConfig,
             MojoParametersListener mojoListener )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
         this.eventCatapult = eventCatapult;
-        this.cacheControllerFactory = cacheControllerFactory;
-        this.cacheConfigFactory = cacheConfigFactory;
+        this.cacheController = cacheController;
+        this.cacheConfig = cacheConfig;
         this.mojoListener = mojoListener;
     }
 
@@ -172,7 +171,6 @@ public class CachingMojoExecutor implements IMojoExecutor
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
             throws LifecycleExecutionException
     {
-        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
         DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
@@ -181,7 +179,6 @@ public class CachingMojoExecutor implements IMojoExecutor
         final Source source = getSource( mojoExecutions );
 
         // execute clean bound goals before restoring to not interfere/slowdown clean
-        CacheConfig cacheConfig = cacheConfigFactory.getCacheConfig( session );
         CacheState cacheState = DISABLED;
         CacheResult result = CacheResult.empty();
         if ( source == Source.LIFECYCLE )
@@ -260,7 +257,6 @@ public class CachingMojoExecutor implements IMojoExecutor
         final MavenProject project = cacheResult.getContext().getProject();
         final MavenSession session = cacheResult.getContext().getSession();
         final List<MojoExecution> cachedSegment = build.getCachedSegment( mojoExecutions );
-        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
 
         boolean restored = cacheController.restoreProjectArtifacts( cacheResult );
         if ( !restored )

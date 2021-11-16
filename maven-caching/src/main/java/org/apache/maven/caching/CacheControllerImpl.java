@@ -44,11 +44,14 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.caching.checksum.KeyUtils;
@@ -101,6 +104,8 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMEN
 /**
  * CacheControllerImpl
  */
+@SessionScoped
+@Named
 public class CacheControllerImpl implements CacheController
 {
 
@@ -122,6 +127,7 @@ public class CacheControllerImpl implements CacheController
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private volatile Scm scm;
 
+    @Inject
     public CacheControllerImpl(
             MavenPluginManager mavenPluginManager,
             MavenProjectHelper projectHelper,

@@ -38,8 +38,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.Utils.MultiMap;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
@@ -67,6 +71,8 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMEN
 /**
  * Local cache repository implementation.
  */
+@SessionScoped
+@Named
 public class LocalCacheRepositoryImpl implements LocalCacheRepository
 {
 
@@ -84,6 +90,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private final CacheConfig cacheConfig;
     private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
 
+    @Inject
     public LocalCacheRepositoryImpl(
             RemoteCacheRepository remoteRepository,
             XmlService xmlService,

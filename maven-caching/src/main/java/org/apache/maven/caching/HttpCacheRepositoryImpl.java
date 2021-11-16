@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,6 +40,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
@@ -53,6 +57,8 @@ import org.slf4j.LoggerFactory;
 /**
  * HTTP remote cache repository implementation.
  */
+@SessionScoped
+@Named
 public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 {
 
@@ -64,6 +70,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
 
+    @Inject
     public HttpCacheRepositoryImpl( XmlService xmlService, CacheConfig cacheConfig )
     {
         this.xmlService = xmlService;

@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.DefaultPluginScanConfig;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.PluginScanConfigImpl;
@@ -68,6 +71,8 @@ import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
 /**
  * CacheConfigImpl
  */
+@SessionScoped
+@Named
 public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 {
 
@@ -85,6 +90,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     private final HashFactory hashFactory;
     private final List<Pattern> excludePatterns;
 
+    @Inject
     public CacheConfigImpl( XmlService xmlService, MavenSession session )
     {
         this.session = session;
