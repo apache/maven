@@ -20,6 +20,7 @@ package org.apache.maven.caching;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -82,6 +83,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.artifact.AttachedArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -304,6 +306,8 @@ public class CacheControllerImpl implements CacheController
 
         try
         {
+            File file = null;
+            List<AttachedArtifact> artifacts = new ArrayList<>();
             if ( isNotBlank( artifact.getFileName() ) )
             {
                 // TODO if remote is forced, probably need to refresh or reconcile all files
@@ -314,8 +318,7 @@ public class CacheControllerImpl implements CacheController
                     return false;
                 }
                 LOGGER.debug( "Setting project artifact {} from {}", artifact.getArtifactId(), artifactFile );
-                project.getArtifact().setFile( artifactFile.toFile() );
-                project.getArtifact().setResolved( true );
+                file = artifactFile.toFile();
                 putChecksum( artifact, context.getInputInfo().getChecksum() );
             }
 
@@ -328,12 +331,8 @@ public class CacheControllerImpl implements CacheController
                             attachedArtifact );
                     if ( !Files.exists( attachedArtifactFile ) )
                     {
-                        LOGGER.info( "Missing file for cached build, cannot restore. File: {}",
-                                attachedArtifactFile );
-                        project.getArtifact().setFile( null );
-                        project.getArtifact().setResolved( false );
-                        project.getAttachedArtifacts().clear();
-                        return false;
+                        throw new FileNotFoundException(
+                                "Missing file for cached build, cannot restore. File: " + attachedArtifactFile );
                     }
                     LOGGER.debug( "Attaching artifact {} from {}",
                               artifact.getArtifactId(), attachedArtifactFile );
@@ -344,23 +343,30 @@ public class CacheControllerImpl implements CacheController
                     }
                     else
                     {
-                        projectHelper.attachArtifact( project, attachedArtifact.getType(),
-                                attachedArtifact.getClassifier(), attachedArtifactFile.toFile() );
+                        AttachedArtifact a = new AttachedArtifact( null,
+                                attachedArtifact.getType(), attachedArtifact.getClassifier(), null );
+                        a.setFile( attachedArtifactFile.toFile() );
+                        artifacts.add( a );
                     }
                     putChecksum( attachedArtifact, context.getInputInfo().getChecksum() );
                 }
             }
+            // Actually modify project at the end in case something went wrong during restoration,
+            // in which case, the project is unmodified and we continue with normal build.
+            if ( file != null )
+            {
+                project.getArtifact().setFile( file );
+                project.getArtifact().setResolved( true );
+            }
+            artifacts.forEach( a -> projectHelper.attachArtifact( project,
+                    a.getType(), a.getClassifier(), a.getFile() ) );
+            return true;
         }
         catch ( Exception e )
         {
-            project.getArtifact().setFile( null );
-            project.getArtifact().setResolved( false );
-            project.getAttachedArtifacts().clear();
             LOGGER.error( "Cannot restore cache, continuing with normal build.", e );
             return false;
         }
-
-        return true;
     }
 
     private void putChecksum( Artifact artifact, String projectChecksum )
