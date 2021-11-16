@@ -26,7 +26,8 @@ import javax.inject.Singleton;
 import org.apache.maven.caching.xml.CacheConfigFactory;
 import org.apache.maven.caching.xml.XmlService;
 import org.apache.maven.execution.MavenSession;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @Named
@@ -35,17 +36,17 @@ public class LocalCacheRepositoryFactory
 
     private static final Object KEY =  LocalCacheRepository.class.getName();
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( LocalCacheRepositoryFactory.class );
+
     private final XmlService xmlService;
     private final CacheConfigFactory cacheConfigFactory;
     private final RemoteCacheRepositoryFactory remoteCacheRepositoryFactory;
 
     @Inject
-    public LocalCacheRepositoryFactory( Logger logger, XmlService xmlService,
+    public LocalCacheRepositoryFactory( XmlService xmlService,
                                         CacheConfigFactory cacheConfigFactory,
                                         RemoteCacheRepositoryFactory remoteCacheRepositoryFactory )
     {
-        this.logger = logger;
         this.xmlService = xmlService;
         this.cacheConfigFactory = cacheConfigFactory;
         this.remoteCacheRepositoryFactory = remoteCacheRepositoryFactory;
@@ -54,7 +55,7 @@ public class LocalCacheRepositoryFactory
     public LocalCacheRepository getLocalCacheRepository( MavenSession session )
     {
         return SessionUtils.getOrCreate( session, KEY,
-                () -> new LocalCacheRepositoryImpl( logger,
+                () -> new LocalCacheRepositoryImpl(
                         remoteCacheRepositoryFactory.getRemoteCacheRepository( session ),
                         xmlService,
                         cacheConfigFactory.getCacheConfig( session ) ) );

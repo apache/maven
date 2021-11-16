@@ -80,8 +80,9 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
@@ -107,7 +108,8 @@ public class CacheControllerImpl implements CacheController
     private static final String GENERATEDSOURCES = "generatedsources";
     private static final String GENERATEDSOURCES_PREFIX = GENERATEDSOURCES + FILE_SEPARATOR_SUBST;
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( CacheControllerImpl.class );
+
     private final MavenPluginManager mavenPluginManager;
     private final MavenProjectHelper projectHelper;
     private final RepositorySystem repoSystem;
@@ -121,7 +123,6 @@ public class CacheControllerImpl implements CacheController
     private volatile Scm scm;
 
     public CacheControllerImpl(
-            Logger logger,
             MavenPluginManager mavenPluginManager,
             MavenProjectHelper projectHelper,
             RepositorySystem repoSystem,
@@ -131,7 +132,6 @@ public class CacheControllerImpl implements CacheController
             RemoteCacheRepository remoteCache, 
             CacheConfig cacheConfig )
     {
-        this.logger = logger;
         this.mavenPluginManager = mavenPluginManager;
         this.projectHelper = projectHelper;
         this.localCache = localCache;
@@ -155,7 +155,7 @@ public class CacheControllerImpl implements CacheController
             return empty();
         }
 
-        logInfo( project, "Attempting to restore project from build cache" );
+        LOGGER.info( "Attempting to restore project from build cache" );
 
         ProjectsInputInfo inputInfo = calculateInput( project, session, projectIndex );
 
@@ -166,7 +166,7 @@ public class CacheControllerImpl implements CacheController
         if ( !result.isSuccess() && result.getContext() != null )
         {
 
-            logDebug( project, "Remote cache is incomplete or missing, trying local build" );
+            LOGGER.debug( "Remote cache is incomplete or missing, trying local build" );
 
             CacheResult localBuild = findLocalBuild( mojoExecutions, context );
 
@@ -190,7 +190,7 @@ public class CacheControllerImpl implements CacheController
         }
         catch ( Exception e )
         {
-            logError( context.getProject(), "Cannot read cached build", e );
+            LOGGER.error( "Cannot read cached build", e );
             return cachedBuild != null ? failure( cachedBuild, context ) : failure( context );
         }
     }
@@ -205,49 +205,44 @@ public class CacheControllerImpl implements CacheController
         }
         catch ( Exception e )
         {
-            logError( context.getProject(), "Cannot read local build", e );
+            LOGGER.error( "Cannot read local build", e );
             return localBuild != null ? failure( localBuild, context ) : failure( context );
         }
     }
 
     private CacheResult analyzeResult( CacheContext context, List<MojoExecution> mojoExecutions, Build info )
     {
-
         try
         {
             if ( info != null )
             {
 
-                final MavenProject project = context.getProject();
                 final ProjectsInputInfo inputInfo = context.getInputInfo();
 
-                logInfo( project, "Found cached build, restoring from cache " + inputInfo.getChecksum() );
-
-                if ( logger.isDebugEnabled() )
-                {
-                    logDebug( project, "Cached build details: " + info.toString() );
-                }
+                LOGGER.info( "Found cached build, restoring from cache {}", inputInfo.getChecksum() );
+                LOGGER.debug( "Cached build details: {}", info );
 
                 final String cacheImplementationVersion = info.getCacheImplementationVersion();
                 if ( !CACHE_IMPLEMENTATION_VERSION.equals( cacheImplementationVersion ) )
                 {
-                    logger.warn(
-                            "Maven and cached build implementations mismatch, caching might not work correctly. "
-                                    + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: "
-                                    + info.getCacheImplementationVersion() );
+                    LOGGER.warn(
+                             "Maven and cached build implementations mismatch, caching might not work correctly. "
+                                    + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: {}",
+                             info.getCacheImplementationVersion() );
                 }
 
                 final List<MojoExecution> cachedSegment = info.getCachedSegment( mojoExecutions );
-
-                if ( !info.isAllExecutionsPresent( cachedSegment, logger ) )
+                final List<MojoExecution> missingMojos = info.getMissingExecutions( cachedSegment );
+                if ( !missingMojos.isEmpty() )
                 {
-                    logInfo( project, "Cached build doesn't contains all requested plugin executions, cannot restore" );
+                    LOGGER.warn( "Cached build doesn't contains all requested plugin executions "
+                            + "(missing: {}), cannot restore", missingMojos );
                     return failure( info, context );
                 }
 
-                if ( !isCachedSegmentPropertiesPresent( project, info, cachedSegment ) )
+                if ( !isCachedSegmentPropertiesPresent( context.getProject(), info, cachedSegment ) )
                 {
-                    logInfo( project, "Cached build violates cache rules, cannot restore" );
+                    LOGGER.info( "Cached build violates cache rules, cannot restore" );
                     return failure( info, context );
                 }
 
@@ -256,9 +251,8 @@ public class CacheControllerImpl implements CacheController
                 if ( ProjectUtils.isLaterPhase( highestRequestPhase, highestCompletedGoal ) && !canIgnoreMissingSegment(
                         info, mojoExecutions ) )
                 {
-                    logInfo( project,
-                            "Project restored partially. Highest cached goal: " + highestCompletedGoal + ", requested: "
-                                    + highestRequestPhase );
+                    LOGGER.info( "Project restored partially. Highest cached goal: {}, requested: {}",
+                            highestCompletedGoal, highestRequestPhase );
                     return partialSuccess( info, context );
                 }
 
@@ -266,13 +260,13 @@ public class CacheControllerImpl implements CacheController
             }
             else
             {
-                logInfo( context.getProject(), "Project is not found in cache" );
+                LOGGER.info( "Project is not found in cache" );
                 return empty( context );
             }
         }
         catch ( Exception e )
         {
-            logger.error( "Failed to restore project", e );
+            LOGGER.error( "Failed to restore project", e );
             localCache.clearCache( context );
             return empty( context );
         }
@@ -310,10 +304,10 @@ public class CacheControllerImpl implements CacheController
                 final Path artifactFile = localCache.getArtifactFile( context, cacheResult.getSource(), artifact );
                 if ( !Files.exists( artifactFile ) )
                 {
-                    logInfo( project, "Missing file for cached build, cannot restore. File: " + artifactFile );
+                    LOGGER.info(  "Missing file for cached build, cannot restore. File: {}", artifactFile );
                     return false;
                 }
-                logDebug( project, "Setting project artifact " + artifact.getArtifactId() + " from: " + artifactFile );
+                LOGGER.debug( "Setting project artifact {} from {}", artifact.getArtifactId(), artifactFile );
                 project.getArtifact().setFile( artifactFile.toFile() );
                 project.getArtifact().setResolved( true );
                 putChecksum( artifact, context.getInputInfo().getChecksum() );
@@ -328,16 +322,15 @@ public class CacheControllerImpl implements CacheController
                             attachedArtifact );
                     if ( !Files.exists( attachedArtifactFile ) )
                     {
-                        logInfo( project,
-                                "Missing file for cached build, cannot restore project. File: "
-                                        + attachedArtifactFile );
+                        LOGGER.info( "Missing file for cached build, cannot restore. File: {}",
+                                attachedArtifactFile );
                         project.getArtifact().setFile( null );
                         project.getArtifact().setResolved( false );
                         project.getAttachedArtifacts().clear();
                         return false;
                     }
-                    logDebug( project,
-                            "Attaching artifact " + artifact.getArtifactId() + " from: " + attachedArtifactFile );
+                    LOGGER.debug( "Attaching artifact {} from {}",
+                              artifact.getArtifactId(), attachedArtifactFile );
                     if ( StringUtils.startsWith( attachedArtifact.getClassifier(), GENERATEDSOURCES_PREFIX ) )
                     {
                         // generated sources artifact
@@ -357,7 +350,7 @@ public class CacheControllerImpl implements CacheController
             project.getArtifact().setFile( null );
             project.getArtifact().setResolved( false );
             project.getAttachedArtifacts().clear();
-            logError( project, "Cannot restore cache, continuing with normal build.", e );
+            LOGGER.error( "Cannot restore cache, continuing with normal build.", e );
             return false;
         }
 
@@ -388,7 +381,7 @@ public class CacheControllerImpl implements CacheController
         try
         {
             final MavenProjectInput inputs = new MavenProjectInput( project, session, cacheConfig, projectIndex,
-                    artifactDigestByKey, repoSystem, artifactHandlerManager, logger, localCache, remoteCache );
+                    artifactDigestByKey, repoSystem, artifactHandlerManager, localCache, remoteCache );
             return inputs.calculateChecksum( cacheConfig.getHashFactory() );
         }
         catch ( Exception e )
@@ -406,7 +399,7 @@ public class CacheControllerImpl implements CacheController
 
         if ( context == null || context.getInputInfo() == null )
         {
-            logger.info( "Cannot save project in cache, skipping" );
+            LOGGER.info( "Cannot save project in cache, skipping" );
             return;
         }
 
@@ -471,14 +464,14 @@ public class CacheControllerImpl implements CacheController
         }
         catch ( Exception e )
         {
+            LOGGER.error( "Failed to save project, cleaning cache. Project: {}", project, e );
             try
             {
-                logger.error( "Failed to save project, cleaning cache. Project: " + project, e );
                 localCache.clearCache( context );
             }
             catch ( Exception ex )
             {
-                logger.error( "Failed to clean cache due to unexpected error:", e );
+                LOGGER.error( "Failed to clean cache due to unexpected error:", ex );
             }
         }
     }
@@ -492,7 +485,7 @@ public class CacheControllerImpl implements CacheController
             Build baseline = baselineHolder.get();
             String outputDirectory = project.getBuild().getDirectory();
             Path reportOutputDir = Paths.get( outputDirectory, "incremental-maven" );
-            logInfo( project, "Saving cache builds diff to: " + reportOutputDir );
+            LOGGER.info( "Saving cache builds diff to: {}", reportOutputDir );
             Diff diff = new CacheDiff( build.getDto(), baseline.getDto(), cacheConfig ).compare();
             try
             {
@@ -523,12 +516,12 @@ public class CacheControllerImpl implements CacheController
             }
             catch ( IOException e )
             {
-                logError( project, "Cannot produce build diff for project", e );
+                LOGGER.error( "Cannot produce build diff for project", e );
             }
         }
         else
         {
-            logInfo( project, "Cannot find project in baseline build, skipping diff" );
+            LOGGER.info( "Cannot find project in baseline build, skipping diff" );
         }
     }
 
@@ -615,13 +608,11 @@ public class CacheControllerImpl implements CacheController
             }
             catch ( IllegalAccessException e )
             {
-                logInfo( executionEvent.getProject(),
-                        "Cannot get property " + propertyName + " value from " + mojo + ": " + e.getMessage() );
+                LOGGER.info( "Cannot get property {} value from {}: {}", propertyName, mojo, e.getMessage() );
                 if ( tracked )
                 {
-                    throw new IllegalArgumentException(
-                            "Property configured in cache introspection config for " + mojo + " is not accessible: "
-                                    + propertyName );
+                    throw new IllegalArgumentException( "Property configured in cache introspection config "
+                            + "for " + mojo + " is not accessible: " + propertyName );
                 }
             }
         }
@@ -682,37 +673,19 @@ public class CacheControllerImpl implements CacheController
 
             if ( cachedExecution == null )
             {
-                logInfo( project,
-                        "Execution is not cached. Plugin: " + mojoExecution.getExecutionId() + ", goal"
-                                + mojoExecution.getGoal() );
+                LOGGER.info( "Execution is not cached. Plugin: {}, goal {}",
+                             mojoExecution.getExecutionId(), mojoExecution.getGoal() );
                 return false;
             }
 
             if ( !DtoUtils.containsAllProperties( cachedExecution, trackedProperties ) )
             {
-                logInfo( project, "Build info doesn't match rules. Plugin: " + mojoExecution.getExecutionId() );
+                LOGGER.info( "Build info doesn't match rules. Plugin: {}",
+                             mojoExecution.getExecutionId() );
                 return false;
             }
         }
         return true;
-    }
-
-    private void logDebug( MavenProject project, String message )
-    {
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "[CACHE][" + project.getArtifactId() + "] " + message );
-        }
-    }
-
-    private void logInfo( MavenProject project, String message )
-    {
-        logger.info( "[CACHE][" + project.getArtifactId() + "] " + message );
-    }
-
-    private void logError( MavenProject project, String message, Exception e )
-    {
-        logger.error( "[CACHE][" + project.getArtifactId() + "] " + message, e );
     }
 
     @Override
@@ -776,7 +749,7 @@ public class CacheControllerImpl implements CacheController
         }
         catch ( Exception e )
         {
-            logger.error( "Cannot save incremental build aggregated report", e );
+            LOGGER.error( "Cannot save incremental build aggregated report", e );
         }
     }
 
@@ -795,7 +768,7 @@ public class CacheControllerImpl implements CacheController
                     catch ( IOException e )
                     {
                         scm = new Scm();
-                        logger.error( "Cannot populate git info", e );
+                        LOGGER.error( "Cannot populate git info", e );
                     }
                 }
             }
@@ -903,7 +876,7 @@ public class CacheControllerImpl implements CacheController
             final Path relativePath = parentDir.relativize( candidateSubDir );
             final String classifier = pathToClassifier( relativePath );
             zipAndAttachArtifact( project, candidateSubDir, classifier );
-            logDebug( project, "Attached directory: " + candidateSubDir );
+            LOGGER.debug( "Attached directory: {}", candidateSubDir );
         }
     }
 
@@ -934,4 +907,5 @@ public class CacheControllerImpl implements CacheController
         }
         return true;
     }
+
 }

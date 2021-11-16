@@ -30,7 +30,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.logging.Logger;
 
 @Singleton
 @Named
@@ -39,7 +38,6 @@ public class CacheControllerFactory
 
     private static final Object KEY =  CacheControllerFactory.class.getName();
 
-    private final Logger logger;
     private final XmlService xmlService;
     private final MavenPluginManager mavenPluginManager;
     private final MavenProjectHelper projectHelper;
@@ -50,8 +48,7 @@ public class CacheControllerFactory
     private final RemoteCacheRepositoryFactory remoteCacheRepositoryFactory;
 
     @Inject
-    public CacheControllerFactory( Logger logger,
-                                   XmlService xmlService,
+    public CacheControllerFactory( XmlService xmlService,
                                    MavenPluginManager mavenPluginManager,
                                    MavenProjectHelper projectHelper,
                                    ArtifactHandlerManager artifactHandlerManager,
@@ -60,7 +57,6 @@ public class CacheControllerFactory
                                    LocalCacheRepositoryFactory localCacheRepositoryFactory,
                                    RemoteCacheRepositoryFactory remoteCacheRepositoryFactory )
     {
-        this.logger = logger;
         this.xmlService = xmlService;
         this.mavenPluginManager = mavenPluginManager;
         this.projectHelper = projectHelper;
@@ -74,7 +70,7 @@ public class CacheControllerFactory
     public CacheController getCacheContoller( MavenSession session )
     {
         return SessionUtils.getOrCreate( session, KEY,
-                () -> new CacheControllerImpl( logger,
+                () -> new CacheControllerImpl(
                         mavenPluginManager, projectHelper,
                         repoSystem, artifactHandlerManager,
                         xmlService,

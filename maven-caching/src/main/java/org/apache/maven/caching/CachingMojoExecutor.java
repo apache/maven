@@ -64,9 +64,10 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Priority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.apache.maven.caching.ProjectUtils.isLaterPhase;
 import static org.apache.maven.caching.checksum.KeyUtils.getVersionlessProjectKey;
@@ -84,7 +85,8 @@ import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
 @Priority( 10 )
 public class CachingMojoExecutor implements IMojoExecutor
 {
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( CachingMojoExecutor.class );
+
     private final BuildPluginManager pluginManager;
     private final MavenPluginManager mavenPluginManager;
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
@@ -95,8 +97,7 @@ public class CachingMojoExecutor implements IMojoExecutor
 
     @Inject
     public CachingMojoExecutor(
-            Logger logger, 
-            BuildPluginManager pluginManager, 
+            BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager, 
             LifecycleDependencyResolver lifeCycleDependencyResolver, 
             ExecutionEventCatapult eventCatapult, 
@@ -104,7 +105,6 @@ public class CachingMojoExecutor implements IMojoExecutor
             CacheConfigFactory cacheConfigFactory,
             MojoParametersListener mojoListener )
     {
-        this.logger = logger;
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
@@ -265,9 +265,7 @@ public class CachingMojoExecutor implements IMojoExecutor
         boolean restored = cacheController.restoreProjectArtifacts( cacheResult );
         if ( !restored )
         {
-            logger.info(
-                    "[CACHE][" + project.getArtifactId()
-                            + "] Cannot restore project artifacts, continuing with non cached build" );
+            LOGGER.info( "Cannot restore project artifacts, continuing with non cached build" );
             return false;
         }
 
@@ -276,9 +274,8 @@ public class CachingMojoExecutor implements IMojoExecutor
 
             if ( cacheController.isForcedExecution( project, cacheCandidate ) )
             {
-                logger.info(
-                        "[CACHE][" + project.getArtifactId() + "] Mojo execution is forced by project property: "
-                                + cacheCandidate.getMojoDescriptor().getFullGoalName() );
+                LOGGER.info( "Mojo execution is forced by project property: {}",
+                             cacheCandidate.getMojoDescriptor().getFullGoalName() );
                 execute( session, cacheCandidate, projectIndex, dependencyContext, phaseRecorder );
             }
             else
@@ -323,10 +320,9 @@ public class CachingMojoExecutor implements IMojoExecutor
                                             CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
 
-        CacheController cacheController = cacheControllerFactory.getCacheContoller( session );
         AtomicBoolean consistent = new AtomicBoolean( true );
-        final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cacheController, cachedBuild,
-                consistent, logger, cacheConfig );
+        final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cachedBuild,
+                consistent, cacheConfig );
 
         if ( mojoChecker.needCheck( cacheCandidate, session ) )
         {
@@ -345,9 +341,8 @@ public class CachingMojoExecutor implements IMojoExecutor
         }
         else
         {
-            logger.info(
-                    "[CACHE][" + project.getArtifactId() + "] Skipping plugin execution (cached): "
-                            + cacheCandidate.getMojoDescriptor().getFullGoalName() );
+            LOGGER.info( "Skipping plugin execution (cached): {}",
+                         cacheCandidate.getMojoDescriptor().getFullGoalName() );
         }
 
         return consistent.get();

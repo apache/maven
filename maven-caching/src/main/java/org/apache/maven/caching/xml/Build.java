@@ -29,7 +29,6 @@ import org.apache.maven.caching.xml.build.DigestItem;
 import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
@@ -40,6 +39,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.apache.maven.caching.ProjectUtils.isLaterPhase;
 import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
@@ -107,18 +107,11 @@ public class Build
         return attachedArtifacts;
     }
 
-    public boolean isAllExecutionsPresent( List<MojoExecution> mojos, Logger logger )
+    public List<MojoExecution> getMissingExecutions( List<MojoExecution> mojos )
     {
-        for ( MojoExecution mojo : mojos )
-        {
-            // TODO for strict check we might want exact match
-            if ( !hasCompletedExecution( mojoExecutionKey( mojo ) ) )
-            {
-                logger.error( "Build mojo is not cached: " + mojo );
-                return false;
-            }
-        }
-        return true;
+        return mojos.stream()
+                .filter( mojo -> !hasCompletedExecution( mojoExecutionKey( mojo ) ) )
+                .collect( Collectors.toList() );
     }
 
     private boolean hasCompletedExecution( String mojoExecutionKey )
@@ -128,7 +121,7 @@ public class Build
         {
             for ( CompletedExecution completedExecution : completedExecutions )
             {
-                if ( StringUtils.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
+                if ( Objects.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
                 {
                     return true;
                 }

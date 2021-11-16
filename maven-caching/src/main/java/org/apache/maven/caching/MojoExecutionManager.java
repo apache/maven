@@ -30,8 +30,9 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoCheker;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,26 +45,23 @@ import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
 public class MojoExecutionManager implements MojoCheker
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( MojoExecutionManager.class );
+
     private final long createdTimestamp;
-    private final Logger logger;
     private final MavenProject project;
     private final Build build;
     private final AtomicBoolean consistent;
-    private final CacheController cacheController;
     private final CacheConfig cacheConfig;
 
     public MojoExecutionManager( MavenProject project,
-                                 CacheController cacheController,
                                  Build build,
                                  AtomicBoolean consistent,
-                                 Logger logger, CacheConfig cacheConfig )
+                                 CacheConfig cacheConfig )
     {
         this.createdTimestamp = System.currentTimeMillis();
         this.project = project;
-        this.cacheController = cacheController;
         this.build = build;
         this.consistent = consistent;
-        this.logger = logger;
         this.cacheConfig = cacheConfig;
     }
 
@@ -85,38 +83,31 @@ public class MojoExecutionManager implements MojoCheker
     @Override
     public boolean check( MojoExecution execution, Mojo mojo, MavenSession session )
     {
-
         final CompletedExecution completedExecution = build.findMojoExecutionInfo( execution );
         final String fullGoalName = execution.getMojoDescriptor().getFullGoalName();
 
-        if ( completedExecution != null && !isParamsMatched( project, execution, mojo, completedExecution ) )
+        if ( completedExecution != null && !isParamsMatched( execution, mojo, completedExecution ) )
         {
-            logInfo( project,
-                    "Mojo cached parameters mismatch with actual, forcing full project build. Mojo: " + fullGoalName );
+            LOGGER.info( "Mojo cached parameters mismatch with actual, forcing full project build. Mojo: {}",
+                     fullGoalName );
             consistent.set( false );
         }
 
         if ( consistent.get() )
         {
             long elapsed = System.currentTimeMillis() - createdTimestamp;
-            logInfo( project, "Skipping plugin execution (reconciled in " + elapsed + " millis): " + fullGoalName );
+            LOGGER.info( "Skipping plugin execution (reconciled in {} millis): {}", elapsed, fullGoalName );
         }
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug(
-                    "[CACHE][" + project.getArtifactId() + "] Checked " + fullGoalName + ", resolved mojo: " + mojo
-                            + ", cached params:" + completedExecution );
-        }
+        LOGGER.debug( "Checked {}, resolved mojo: {}, cached params: {}",
+                  fullGoalName, mojo, completedExecution );
         return false;
     }
 
-    private boolean isParamsMatched( MavenProject project,
-                                     MojoExecution mojoExecution,
+    private boolean isParamsMatched( MojoExecution mojoExecution,
                                      Mojo mojo,
                                      CompletedExecution completedExecution )
     {
-
         List<TrackedProperty> tracked = cacheConfig.getTrackedProperties( mojoExecution );
 
         for ( TrackedProperty trackedProperty : tracked )
@@ -136,7 +127,7 @@ public class MojoExecutionManager implements MojoCheker
             }
             catch ( IllegalAccessException e )
             {
-                logError( project, "Cannot extract plugin property " + propertyName + " from mojo " + mojo, e );
+                LOGGER.error( "Cannot extract plugin property {} from mojo {}", propertyName, mojo, e );
                 return false;
             }
 
@@ -144,35 +135,19 @@ public class MojoExecutionManager implements MojoCheker
             {
                 if ( !StringUtils.equals( currentValue, trackedProperty.getSkipValue() ) )
                 {
-                    logInfo( project,
-                            "Plugin parameter mismatch found. Parameter: " + propertyName + ", expected: "
-                                    + expectedValue + ", actual: " + currentValue );
+                    LOGGER.info( "Plugin parameter mismatch found. Parameter: {}, expected: {}, actual: {}",
+                             propertyName, expectedValue, currentValue );
                     return false;
                 }
                 else
                 {
-                    logWarn( project,
-                            "Cache contains plugin execution with skip flag and might be incomplete. Property: "
-                                    + propertyName + ", execution: " + mojoExecutionKey( mojoExecution ) );
+                    LOGGER.warn( "Cache contains plugin execution with skip flag and might be incomplete. "
+                                    + "Property: {}, execution {}",
+                                    propertyName, mojoExecutionKey( mojoExecution ) );
                 }
             }
         }
         return true;
-    }
-
-    private void logInfo( MavenProject project, String message )
-    {
-        logger.info( "[CACHE][" + project.getArtifactId() + "] " + message );
-    }
-
-    private void logError( MavenProject project, String message, Exception e )
-    {
-        logger.error( "[CACHE][" + project.getArtifactId() + "] " + message, e );
-    }
-
-    private void logWarn( MavenProject project, String message )
-    {
-        logger.warn( "[CACHE][" + project.getArtifactId() + "] " + message );
     }
 
 }

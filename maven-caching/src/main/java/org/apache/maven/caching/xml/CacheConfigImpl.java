@@ -59,7 +59,8 @@ import org.apache.maven.feature.Features;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.Boolean.TRUE;
 import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
@@ -76,19 +77,21 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     public static final String FAIL_FAST_PROPERTY_NAME = "remote.cache.failFast";
     public static final String BASELINE_BUILD_URL_PROPERTY_NAME = "remote.cache.baselineUrl";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( CacheConfigImpl.class );
+
     private final MavenSession session;
     private final CacheState state;
     private final CacheConfig cacheConfig;
     private final HashFactory hashFactory;
     private final List<Pattern> excludePatterns;
 
-    public CacheConfigImpl( Logger logger, XmlService xmlService, MavenSession session )
+    public CacheConfigImpl( XmlService xmlService, MavenSession session )
     {
         this.session = session;
 
         if ( !Features.caching( session.getUserProperties() ).isActive() )
         {
-            logger.info( "Cache disabled by command line flag, project will be built fully and not cached" );
+            LOGGER.info( "Cache disabled by command line flag, project will be built fully and not cached" );
             state = CacheState.DISABLED;
             cacheConfig = null;
             hashFactory = null;
@@ -110,7 +113,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
             if ( !Files.exists( configPath ) )
             {
-                logger.info( "Cache configuration is not available at configured path "
+                LOGGER.info( "Cache configuration is not available at configured path "
                                 + configPath + ", cache is disabled" );
                 state = CacheState.DISABLED;
                 cacheConfig = null;
@@ -121,7 +124,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
             {
                 try
                 {
-                    logger.info( "Loading cache configuration from " + configPath );
+                    LOGGER.info( "Loading cache configuration from " + configPath );
                     cacheConfig = xmlService.loadCacheConfig( configPath.toFile() );
                 }
                 catch ( Exception e )
@@ -143,7 +146,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
                     {
                         hashAlgorithm = getConfiguration().getHashAlgorithm();
                         hashFactory = HashFactory.of( hashAlgorithm );
-                        logger.info( "Using " + hashAlgorithm + " hash algorithm for cache" );
+                        LOGGER.info( "Using " + hashAlgorithm + " hash algorithm for cache" );
                     }
                     catch ( Exception e )
                     {

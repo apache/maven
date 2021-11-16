@@ -51,7 +51,8 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -76,19 +77,18 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private static final long ONE_DAY_MILLIS = DAYS.toMillis( 1 );
     private static final String EMPTY = "";
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( LocalCacheRepositoryImpl.class );
+
     private final RemoteCacheRepository remoteRepository;
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
     private final Map<Pair<MavenSession, Dependency>, Optional<Build>> bestBuildCache = new ConcurrentHashMap<>();
 
     public LocalCacheRepositoryImpl(
-            Logger logger,
             RemoteCacheRepository remoteRepository,
             XmlService xmlService,
             CacheConfig cacheConfig )
     {
-        this.logger = logger;
         this.remoteRepository = remoteRepository;
         this.xmlService = xmlService;
         this.cacheConfig = cacheConfig;
@@ -98,10 +98,10 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     public Build findLocalBuild( CacheContext context ) throws IOException
     {
         Path localBuildInfoPath = localBuildPath( context, BUILDINFO_XML, false );
-        logDebug( context, "Checking local build info: " + localBuildInfoPath );
+        LOGGER.debug( "Checking local build info: {}", localBuildInfoPath );
         if ( Files.exists( localBuildInfoPath ) )
         {
-            logInfo( context, "Local build found by checksum " + context.getInputInfo().getChecksum() );
+            LOGGER.info( "Local build found by checksum {}", context.getInputInfo().getChecksum() );
             try
             {
                 org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( localBuildInfoPath.toFile() );
@@ -109,7 +109,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             }
             catch ( Exception e )
             {
-                logger.error( "Local build info is not valid, deleting:  " + localBuildInfoPath, e );
+                LOGGER.info( "Local build info is not valid, deleting: {}", localBuildInfoPath, e );
                 Files.delete( localBuildInfoPath );
             }
         }
@@ -121,11 +121,11 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     {
 
         Path buildInfoPath = remoteBuildPath( context, BUILDINFO_XML );
-        logDebug( context, "Checking if build is already downloaded: " + buildInfoPath );
+        LOGGER.debug( "Checking if build is already downloaded: {}", buildInfoPath );
 
         if ( Files.exists( buildInfoPath ) )
         {
-            logInfo( context, "Downloaded build found by checksum " + context.getInputInfo().getChecksum() );
+            LOGGER.info( "Downloaded build found by checksum {}", context.getInputInfo().getChecksum() );
             try
             {
                 org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( buildInfoPath.toFile() );
@@ -133,7 +133,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             }
             catch ( Exception e )
             {
-                logger.error( "Downloaded build info is not valid, deleting:  " + buildInfoPath, e );
+                LOGGER.info( "Downloaded build info is not valid, deleting: {}", buildInfoPath, e );
                 Files.delete( buildInfoPath );
             }
         }
@@ -156,17 +156,17 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                 //  throttle remote cache calls, maven like
                 if ( now < created + ONE_HOUR_MILLIS && now < lastModified + ONE_MINUTE_MILLIS )
                 { // fresh file, allow lookup every minute
-                    logInfo( context, "Skipping remote lookup, last unsuccessful lookup less than 1m ago." );
+                    LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1m ago." );
                     return null;
                 }
                 else if ( now < created + ONE_DAY_MILLIS && now < lastModified + ONE_HOUR_MILLIS )
                 { // less than 1 day file, allow 1 per hour lookup
-                    logInfo( context, "Skipping remote lookup, last unsuccessful lookup less than 1h ago." );
+                    LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1h ago." );
                     return null;
                 }
                 else if ( now > created + ONE_DAY_MILLIS && now < lastModified + ONE_DAY_MILLIS )
                 {  // more than 1 day file, allow 1 per day lookup
-                    logInfo( context, "Skipping remote lookup, last unsuccessful lookup less than 1d ago." );
+                    LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1d ago." );
                     return null;
                 }
             }
@@ -174,7 +174,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             final Build build = remoteRepository.findBuild( context );
             if ( build != null )
             {
-                logInfo( context, "Build info downloaded from remote repo, saving to:  " + buildInfoPath );
+                LOGGER.info( "Build info downloaded from remote repo, saving to: {}", buildInfoPath );
                 Files.createDirectories( buildInfoPath.getParent() );
                 Files.write( buildInfoPath, xmlService.toBytes( build.getDto() ), CREATE_NEW );
             }
@@ -186,7 +186,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         }
         catch ( Exception e )
         {
-            logger.error( "Remote build info is not valid, cached data is not compatible", e );
+            LOGGER.error( "Remote build info is not valid, cached data is not compatible", e );
             return null;
         }
     }
@@ -284,7 +284,8 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                         catch ( Exception e )
                         {
                             // version is unusable nothing we can do here
-                            logger.error( "Build info is not compatible to current maven implementation: " + file );
+                            LOGGER.info( "Build info is not compatible to current maven "
+                                            + "implementation: {}", file, e );
                         }
                     }
                     return FileVisitResult.CONTINUE;
@@ -325,7 +326,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         }
         catch ( IOException e )
         {
-            logger.error( "Cannot find dependency in cache", e );
+            LOGGER.info( "Cannot find dependency in cache", e );
             return Optional.empty();
         }
     }
@@ -391,7 +392,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                 TRUNCATE_EXISTING, CREATE );
         if ( cacheConfig.isRemoteCacheEnabled() && cacheConfig.isSaveToRemote() )
         {
-            logger.info( "[CACHE] Saving cache report on build completion" );
+            LOGGER.info( "Saving cache report on build completion" );
             remoteRepository.saveCacheReport( buildId, session, cacheReport );
         }
     }
@@ -448,16 +449,6 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     private Path localBuildDir( CacheContext context ) throws IOException
     {
         return buildCacheDir( context ).resolve( "local" );
-    }
-
-    private void logDebug( CacheContext context, String message )
-    {
-        logger.debug( "[CACHE][" + context.getProject().getArtifactId() + "] " + message );
-    }
-
-    private void logInfo( CacheContext context, String message )
-    {
-        logger.info( "[CACHE][" + context.getProject().getArtifactId() + "] " + message );
     }
 
     private static FileTime lastModifiedTime( Path p )

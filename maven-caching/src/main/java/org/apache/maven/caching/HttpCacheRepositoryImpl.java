@@ -47,7 +47,8 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP remote cache repository implementation.
@@ -58,14 +59,13 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public static final String BUILDINFO_XML = "buildinfo.xml";
     public static final String CACHE_REPORT_XML = "cache-report.xml";
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( HttpCacheRepositoryImpl.class );
+
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
 
-    public HttpCacheRepositoryImpl( Logger logger,
-                               XmlService xmlService, CacheConfig cacheConfig )
+    public HttpCacheRepositoryImpl( XmlService xmlService, CacheConfig cacheConfig )
     {
-        this.logger = logger;
         this.xmlService = xmlService;
         this.cacheConfig = cacheConfig;
     }
@@ -90,10 +90,9 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public Build findBuild( CacheContext context )
     {
         final String resourceUrl = getResourceUrl( context, BUILDINFO_XML );
-        String artifactId = context.getProject().getArtifactId();
-        if ( exists( artifactId, resourceUrl ) )
+        if ( exists( resourceUrl ) )
         {
-            final byte[] bytes = getResourceContent( resourceUrl, artifactId );
+            final byte[] bytes = getResourceContent( resourceUrl );
             final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( bytes );
             return new Build( dto, CacheSource.REMOTE );
         }
@@ -103,8 +102,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     @Override
     public byte[] getArtifactContent( CacheContext context, Artifact artifact )
     {
-        return getResourceContent( getResourceUrl( context, artifact.getFileName() ),
-                context.getProject().getArtifactId() );
+        return getResourceContent( getResourceUrl( context, artifact.getFileName() ) );
     }
 
     @Override
@@ -144,7 +142,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     }
 
     @SuppressWarnings( "checkstyle:magicnumber" )
-    private boolean exists( String logReference, String url )
+    private boolean exists( String url )
     {
         HttpHead head = null;
         try
@@ -152,7 +150,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             head = new HttpHead( url );
             HttpResponse response = httpClient.get().execute( head );
             int statusCode = response.getStatusLine().getStatusCode();
-            logger.info( "[CACHE][" + logReference + "] Checking " + url + ". Status: " + statusCode );
+            LOGGER.info( "Checking {}. Status: {}", url, statusCode );
             return statusCode == 200;
         }
         catch ( IOException e )
@@ -169,7 +167,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     }
 
     @SuppressWarnings( "checkstyle:magicnumber" )
-    public byte[] getResourceContent( String url, String logReference )
+    public byte[] getResourceContent( String url )
     {
         HttpGet get = null;
         try
@@ -177,7 +175,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             get = new HttpGet( url );
             HttpResponse response = httpClient.get().execute( get );
             int statusCode = response.getStatusLine().getStatusCode();
-            logger.info( "[CACHE][" + logReference + "] Downloading " + url + ". Status: " + statusCode );
+            LOGGER.info( "Downloading {}. Status: {}", url, statusCode );
             if ( statusCode != 200 )
             {
                 throw new RuntimeException( "Cannot download " + url + ", unexpected status code: " + statusCode );
@@ -227,7 +225,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             httpPut.setEntity( new InputStreamEntity( instream ) );
             HttpResponse response = httpClient.get().execute( httpPut );
             int statusCode = response.getStatusLine().getStatusCode();
-            logInfo( "Saved to remote cache " + url + ". RESPONSE CODE: " + statusCode, logReference );
+            LOGGER.info( "Saved to remote cache {}. Status: {}", url, statusCode );
         }
         finally
         {
@@ -268,33 +266,32 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             if ( projectReport.getUrl() != null )
             {
                 url = cachedProjectHolder.get().getUrl();
-                logInfo( "Retrieving baseline buildinfo: " + projectReport.getUrl(), project.getArtifactId() );
+                LOGGER.info( "Retrieving baseline buildinfo: {}", projectReport.getUrl() );
             }
             else
             {
                 url = getResourceUrl( BUILDINFO_XML, project.getGroupId(),
                         project.getArtifactId(), projectReport.getChecksum() );
-                logInfo( "Baseline project record doesn't have url, trying default location", project.getArtifactId() );
+                LOGGER.info( "Baseline project record doesn't have url, trying default location" );
             }
 
             try
             {
-                if ( exists( project.getArtifactId(), url ) )
+                if ( exists( url ) )
                 {
-                    byte[] content = getResourceContent( url, project.getArtifactId() );
+                    byte[] content = getResourceContent( url );
                     final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( content );
                     return Optional.of( new Build( dto, CacheSource.REMOTE ) );
                 }
                 else
                 {
-                    logInfo( "Project buildinfo not found, skipping diff",
-                            project.getArtifactId() );
+                    LOGGER.info( "Project buildinfo not found, skipping diff" );
                 }
             }
             catch ( Exception e )
             {
-                logger.warn( "[CACHE][" + project.getArtifactId() + "] Error restoring baseline build at url: "
-                        + projectReport.getUrl() + ", skipping diff" );
+                LOGGER.warn( "Error restoring baseline build at url: {}, skipping diff",
+                             projectReport.getUrl() );
                 return Optional.empty();
             }
         }
@@ -308,16 +305,15 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
         {
             try
             {
-                logInfo( "Downloading baseline cache report from: " + cacheConfig.getBaselineCacheUrl(),
-                        "DEBUG" );
-                byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl(), "cache-info" );
+                LOGGER.info( "Downloading baseline cache report from: {}", cacheConfig.getBaselineCacheUrl() );
+                byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl() );
                 CacheReport cacheReportType = xmlService.loadCacheReport( content );
                 report = Optional.of( cacheReportType );
             }
             catch ( Exception e )
             {
-                logger.error( "Error downloading baseline report from: " + cacheConfig.getBaselineCacheUrl()
-                        + ", skipping diff.", e );
+                LOGGER.error( "Error downloading baseline report from: {}, skipping diff.",
+                        cacheConfig.getBaselineCacheUrl(), e );
                 report = Optional.empty();
             }
             cacheReportSupplier.compareAndSet( null, report );
@@ -325,8 +321,4 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
         return report;
     }
 
-    private void logInfo( String message, String logReference )
-    {
-        logger.info( "[CACHE][" + logReference + "] " + message );
-    }
 }

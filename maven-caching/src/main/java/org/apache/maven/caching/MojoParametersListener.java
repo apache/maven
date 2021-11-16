@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -31,7 +30,8 @@ import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MojoParametersListener
@@ -41,23 +41,16 @@ import org.codehaus.plexus.logging.Logger;
 public class MojoParametersListener implements MojoExecutionListener
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( MojoParametersListener.class );
+
     private final ConcurrentMap<MavenProject, Map<String, MojoExecutionEvent>> projectExecutions =
             new ConcurrentHashMap<>();
-
-    private final Logger logger;
-
-    @Inject
-    public MojoParametersListener( Logger logger )
-    {
-        this.logger = logger;
-    }
 
     @Override
     public void beforeMojoExecution( MojoExecutionEvent event )
     {
         final String executionKey = ProjectUtils.mojoExecutionKey( event.getExecution() );
-        logDebug( event.getProject(),
-                "Starting mojo execution: " + executionKey + ", class: " + event.getMojo().getClass() );
+        LOGGER.debug( "Starting mojo execution: {}, class: {}", executionKey, event.getMojo().getClass() );
         final MavenProject project = event.getProject();
         Map<String, MojoExecutionEvent> projectEvents = projectExecutions.get( project );
         if ( projectEvents == null )
@@ -93,17 +86,5 @@ public class MojoParametersListener implements MojoExecutionListener
     {
         projectExecutions.remove( project );
     }
-
-    private void logDebug( MavenProject project, String message )
-    {
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "[CACHE][" + project.getArtifactId() + "] " + message );
-        }
-    }
-
-    //    private void logInfo(String message) {
-    //        logger.info("[CACHE][" + project.getArtifactId() + "] " + message);
-    //    }
 
 }

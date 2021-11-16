@@ -34,7 +34,7 @@ public interface RemoteCacheRepository extends CacheRepository
 
     byte[] getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
 
-    byte[] getResourceContent( String resourceUrl, String logReference );
+    byte[] getResourceContent( String resourceUrl );
 
     String getResourceUrl( CacheContext context, String filename );
 

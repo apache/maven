@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.caching.SessionUtils;
 import org.apache.maven.execution.MavenSession;
-import org.codehaus.plexus.logging.Logger;
 
 @Singleton
 @Named
@@ -34,19 +33,17 @@ public class CacheConfigFactory
 
     private static final Object KEY =  CacheConfigFactory.class.getName();
 
-    private final Logger logger;
     private final XmlService xmlService;
 
     @Inject
-    public CacheConfigFactory( Logger logger, XmlService xmlService )
+    public CacheConfigFactory( XmlService xmlService )
     {
-        this.logger = logger;
         this.xmlService = xmlService;
     }
 
     public CacheConfig getCacheConfig( MavenSession session )
     {
-        return SessionUtils.getOrCreate( session, KEY, () -> new CacheConfigImpl( logger, xmlService, session ) );
+        return SessionUtils.getOrCreate( session, KEY, () -> new CacheConfigImpl( xmlService, session ) );
     }
 
 }

@@ -32,7 +32,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -81,10 +80,11 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -131,7 +131,8 @@ public class MavenProjectInput
      */
     private static final String CACHE_PROCESS_PLUGINS = "remote.cache.processPlugins";
 
-    private final Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger( MavenProjectInput.class );
+
     private final MavenProject project;
     private final MavenSession session;
     private final LocalCacheRepository localCache;
@@ -156,7 +157,6 @@ public class MavenProjectInput
                               ConcurrentMap<String, DigestItem> artifactsByKey,
                               RepositorySystem repoSystem,
                               ArtifactHandlerManager artifactHandlerManager,
-                              Logger logger,
                               LocalCacheRepository localCache,
                               RemoteCacheRepository remoteCache )
     {
@@ -168,7 +168,6 @@ public class MavenProjectInput
         this.baseDirPath = project.getBasedir().toPath().toAbsolutePath();
         this.repoSystem = repoSystem;
         this.artifactHandlerManager = artifactHandlerManager;
-        this.logger = logger;
         this.localCache = localCache;
         this.remoteCache = remoteCache;
         Properties properties = project.getProperties();
@@ -241,7 +240,7 @@ public class MavenProjectInput
         }
         if ( compareWithBaseline )
         {
-            logInfo( "Source code: " + ( sourcesMatched ? "MATCHED" : "OUT OF DATE" ) );
+            LOGGER.info( "Source code: {}", sourcesMatched ? "MATCHED" : "OUT OF DATE" );
         }
 
         boolean dependenciesMatched = true;
@@ -258,7 +257,7 @@ public class MavenProjectInput
 
         if ( compareWithBaseline )
         {
-            logInfo( "Dependencies: " + ( dependenciesMatched ? "MATCHED" : "OUT OF DATE" ) );
+            LOGGER.info( "Dependencies: {}", dependenciesMatched ? "MATCHED" : "OUT OF DATE" );
         }
 
         final ProjectsInputInfo projectsInputInfoType = new ProjectsInputInfo();
@@ -267,17 +266,12 @@ public class MavenProjectInput
 
         final long checksumTime = Clock.elapsed( time );
 
-        if ( logger.isDebugEnabled() )
+        for ( DigestItem item : projectsInputInfoType.getItems() )
         {
-            for ( DigestItem item : projectsInputInfoType.getItems() )
-            {
-                logger.debug( "Hash calculated, item: " + item.getType() + ", hash: " + item.getHash() );
-            }
+            LOGGER.debug( "Hash calculated, item: {}, hash: {}", item.getType(), item.getHash() );
         }
-        logInfo(
-                "Project inputs calculated in " + inputTime + " ms. " + hashFactory.getAlgorithm()
-                        + " checksum [" + projectsInputInfoType.getChecksum() + "] calculated in "
-                        + checksumTime + " ms." );
+        LOGGER.info( "Project inputs calculated in {} ms. {} checksum [{}] calculated in {} ms.",
+                 inputTime, hashFactory.getAlgorithm(), projectsInputInfoType.getChecksum(), checksumTime );
         return projectsInputInfoType;
     }
 
@@ -299,11 +293,10 @@ public class MavenProjectInput
             final boolean matches = StringUtils.equals( pomItem.getHash(), effectivePomChecksum.getHash() );
             if ( !matches )
             {
-                logInfo(
-                        "Mismatch in effective poms. Current: " + effectivePomChecksum.getHash() + ", remote: "
-                                + pomItem.getHash() );
+                LOGGER.info( "Mismatch in effective poms. Current: {}, remote: {}",
+                         effectivePomChecksum.getHash(), pomItem.getHash() );
             }
-            logInfo( "Effective pom: " + ( matches ? "MATCHED" : "OUT OF DATE" ) );
+            LOGGER.info( "Effective pom: {}", matches ? "MATCHED" : "OUT OF DATE" );
         }
     }
 
@@ -327,16 +320,14 @@ public class MavenProjectInput
             matched = StringUtils.equals( hash, fileDigest.getHash() );
             if ( !matched )
             {
-                logInfo(
-                        "Mismatch in " + fileDigest.getType() + ": " + fileDigest.getValue() + ". Local hash: "
-                                + fileDigest.getHash() + ", remote: " + hash );
+                LOGGER.info( "Mismatch in {}: {}. Local hash: {}, remote: {}",
+                        fileDigest.getType(), fileDigest.getValue(), fileDigest.getHash(), hash );
             }
         }
         else
         {
-            logInfo(
-                    "Mismatch in " + fileDigest.getType() + ": " + fileDigest.getValue()
-                            + ". Not found in remote cache" );
+            LOGGER.info( "Mismatch in {}: {}. Not found in remote cache",
+                    fileDigest.getType(), fileDigest.getValue() );
         }
         return matched;
     }
@@ -354,7 +345,7 @@ public class MavenProjectInput
         toHash.setVersion( prototype.getVersion() );
         toHash.setModules( prototype.getModules() );
 
-        Collections.sort( prototype.getDependencies(), dependencyComparator );
+        prototype.getDependencies().sort( dependencyComparator );
         toHash.setDependencies( prototype.getDependencies() );
 
         PluginManagement pluginManagement = prototype.getBuild().getPluginManagement();
@@ -430,9 +421,9 @@ public class MavenProjectInput
 
         long walkKnownPathsFinished = System.currentTimeMillis() - start;
 
-        String message = processPlugins ? "enabled, values will be checked for presence in file system" : "disabled, "
-                + "only tags with attribute " + CACHE_INPUT_NAME + "=\"true\" will be added";
-        logInfo( "Scanning plugins configurations to find input files. Probing is " + message );
+        LOGGER.info( "Scanning plugins configurations to find input files. Probing is {}", processPlugins
+                        ? "enabled, values will be checked for presence in file system"
+                        : "disabled, only tags with attribute " + CACHE_INPUT_NAME + "=\"true\" will be added" );
 
         if ( processPlugins )
         {
@@ -440,7 +431,7 @@ public class MavenProjectInput
         }
         else
         {
-            logInfo( "Skipping check plugins scan (probing is disabled by config)" );
+            LOGGER.info( "Skipping check plugins scan (probing is disabled by config)" );
         }
 
         long pluginsFinished = System.currentTimeMillis() - start - walkKnownPathsFinished;
@@ -451,13 +442,9 @@ public class MavenProjectInput
             sorted.add( collectedFile.normalize().toAbsolutePath() );
         }
 
-        logInfo(
-                "Found " + sorted.size() + " input files. Project dir processing: " + walkKnownPathsFinished
-                        + ", plugins: " + pluginsFinished + " millis" );
-        if ( logger.isDebugEnabled() )
-        {
-            logDebug( "Src input: " + sorted );
-        }
+        LOGGER.info( "Found {} input files. Project dir processing: {}, plugins: {} millis",
+                 sorted.size(), walkKnownPathsFinished, pluginsFinished );
+        LOGGER.debug( "Src input: {}", sorted );
 
         return sorted;
     }
@@ -500,10 +487,7 @@ public class MavenProjectInput
         {
             if ( !isFilteredOutSubpath( normalized ) )
             {
-                if ( logger.isDebugEnabled() )
-                {
-                    logDebug( "Adding: " + normalized );
-                }
+                LOGGER.debug( "Adding: {}", normalized );
                 collectedFiles.add( normalized );
             }
         }
@@ -525,12 +509,12 @@ public class MavenProjectInput
 
             if ( scanConfig.isSkip() )
             {
-                logDebug( "Skipping plugin config scan (skip by config): " + plugin.getArtifactId() );
+                LOGGER.debug( "Skipping plugin config scan (skip by config): {}", plugin.getArtifactId() );
                 continue;
             }
 
             Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
-            logDebug( "Processing plugin config: " + plugin.getArtifactId() );
+            LOGGER.debug( "Processing plugin config: {}", plugin.getArtifactId() );
             if ( configuration != null )
             {
                 addInputsFromPluginConfigs( configuration.getChildren(), scanConfig, files, visitedDirs );
@@ -544,14 +528,13 @@ public class MavenProjectInput
 
                 if ( mergedConfig.isSkip() )
                 {
-                    logDebug(
-                            "Skipping plugin execution config scan (skip by config): "
-                                    + plugin.getArtifactId() + ", execId: " + exec.getId() );
+                    LOGGER.debug( "Skipping plugin execution config scan (skip by config): {}, execId: {}",
+                                    plugin.getArtifactId(), exec.getId() );
                     continue;
                 }
 
                 Xpp3Dom execConfiguration = (Xpp3Dom) exec.getConfiguration();
-                logDebug( "Processing plugin: " + plugin.getArtifactId() + ", execution: " + exec.getId() );
+                LOGGER.debug( "Processing plugin: {}, execution: {}", plugin.getArtifactId(), exec.getId() );
 
                 if ( execConfiguration != null )
                 {
@@ -575,26 +558,17 @@ public class MavenProjectInput
                         key.isRecursive() );
                 if ( isHidden( path ) )
                 {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logDebug( "Skipping subtree (hidden): " + path );
-                    }
+                    LOGGER.debug( "Skipping subtree (hidden): {}", path );
                     return FileVisitResult.SKIP_SUBTREE;
                 }
                 else if ( isFilteredOutSubpath( path ) )
                 {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logDebug( "Skipping subtree (blacklisted): " + path );
-                    }
+                    LOGGER.debug( "Skipping subtree (blacklisted): {}", path );
                     return FileVisitResult.SKIP_SUBTREE;
                 }
                 else if ( visitedDirs.contains( currentDirKey ) )
                 {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logDebug( "Skipping subtree (visited): " + path );
-                    }
+                    LOGGER.debug( "Skipping subtree (visited): {}", path );
                     return FileVisitResult.SKIP_SUBTREE;
                 }
 
@@ -602,17 +576,11 @@ public class MavenProjectInput
 
                 if ( !key.isRecursive() )
                 {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logDebug( "Skipping subtree (non recursive): " + path );
-                    }
+                    LOGGER.debug( "Skipping subtree (non recursive): {}", path );
                     return FileVisitResult.SKIP_SUBTREE;
                 }
 
-                if ( logger.isDebugEnabled() )
-                {
-                    logDebug( "Visiting subtree: " + path );
-                }
+                LOGGER.debug( "Visiting subtree: {}", path );
                 return FileVisitResult.CONTINUE;
             }
         } );
@@ -631,16 +599,17 @@ public class MavenProjectInput
         for ( Xpp3Dom configChild : configurationChildren )
         {
 
-            String tagValue = configChild.getValue();
             String tagName = configChild.getName();
+            String tagValue = configChild.getValue();
 
             if ( !scanConfig.accept( tagName ) )
             {
-                logDebug( "Skipping property (scan config)): " + tagName + ", value: " + stripToEmpty( tagValue ) );
+                LOGGER.debug( "Skipping property (scan config)): {}, value: {}",
+                        tagName, stripToEmpty( tagValue ) );
                 continue;
             }
 
-            logDebug( "Checking xml tag. Tag: " + tagName + ", value: " + stripToEmpty( tagValue ) );
+            LOGGER.debug( "Checking xml tag. Tag: {}, value: {}", tagName, stripToEmpty( tagValue ) );
 
             addInputsFromPluginConfigs( configChild.getChildren(), scanConfig, files, visitedDirs );
 
@@ -648,9 +617,8 @@ public class MavenProjectInput
             final String glob = defaultIfEmpty( propertyConfig.getGlob(), dirGlob );
             if ( "true".equals( configChild.getAttribute( CACHE_INPUT_NAME ) ) )
             {
-                logInfo(
-                        "Found tag marked with " + CACHE_INPUT_NAME + " attribute. Tag: " + tagName
-                                + ", value: " + tagValue );
+                LOGGER.info( "Found tag marked with {} attribute. Tag: {}, value: {}",
+                            CACHE_INPUT_NAME, tagName, tagValue );
                 startWalk( Paths.get( tagValue ), glob, propertyConfig.isRecursive(), files, visitedDirs );
             }
             else
@@ -690,27 +658,8 @@ public class MavenProjectInput
             {
             }
         }
-        if ( logger.isDebugEnabled() )
-        {
-            logDebug( text + ( blacklisted ? ": skipped(blacklisted literal)" : ": invalid path" ) );
-        }
+        LOGGER.debug( "{}: {}", text, blacklisted ? "skipped(blacklisted literal)" : "invalid path" );
         return null;
-    }
-
-    private void logDebug( String message )
-    {
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "[CACHE][" + project.getArtifactId() + "] " + message );
-        }
-    }
-
-    private void logInfo( String message )
-    {
-        if ( logger.isInfoEnabled() )
-        {
-            logger.info( "[CACHE][" + project.getArtifactId() + "] " + message );
-        }
     }
 
     static void walkDirectoryFiles( Path dir, List<Path> collectedFiles, String glob )
@@ -905,7 +854,7 @@ public class MavenProjectInput
                 Xpp3Dom config = (Xpp3Dom) execution.getConfiguration();
                 removeBlacklistedAttributes( config, excludeProperties );
             }
-            Collections.sort( plugin.getDependencies(), dependencyComparator );
+            plugin.getDependencies().sort( dependencyComparator );
         }
         return plugins;
     }
@@ -928,11 +877,6 @@ public class MavenProjectInput
             }
             removeBlacklistedAttributes( child, excludeProperties );
         }
-    }
-
-    public Logger getLogger()
-    {
-        return logger;
     }
 
     public CacheConfig getConfig()
