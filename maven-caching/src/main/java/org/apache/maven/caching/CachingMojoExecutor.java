@@ -188,7 +188,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             {
                 execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
             }
-            cacheState = cacheConfig.getState();
+            cacheState = cacheConfig.initialize();
             if ( cacheState == INITIALIZED )
             {
                 result = cacheController.findCachedBuild( session, project, projectIndex, mojoExecutions );

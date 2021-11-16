@@ -84,92 +84,89 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CacheConfigImpl.class );
 
+    private final XmlService xmlService;
     private final MavenSession session;
-    private final CacheState state;
-    private final CacheConfig cacheConfig;
-    private final HashFactory hashFactory;
-    private final List<Pattern> excludePatterns;
+
+    private CacheState state;
+    private CacheConfig cacheConfig;
+    private HashFactory hashFactory;
+    private List<Pattern> excludePatterns;
 
     @Inject
     public CacheConfigImpl( XmlService xmlService, MavenSession session )
     {
+        this.xmlService = xmlService;
         this.session = session;
-
-        if ( !Features.caching( session.getUserProperties() ).isActive() )
-        {
-            LOGGER.info( "Cache disabled by command line flag, project will be built fully and not cached" );
-            state = CacheState.DISABLED;
-            cacheConfig = null;
-            hashFactory = null;
-            excludePatterns = null;
-        }
-        else
-        {
-            Path configPath;
-
-            String configPathText = getProperty( CONFIG_PATH_PROPERTY_NAME, null );
-            if ( StringUtils.isNotBlank( configPathText ) )
-            {
-                configPath = Paths.get( configPathText );
-            }
-            else
-            {
-                configPath = getMultimoduleRoot( session ).resolve( ".mvn" ).resolve( "maven-cache-config.xml" );
-            }
-
-            if ( !Files.exists( configPath ) )
-            {
-                LOGGER.info( "Cache configuration is not available at configured path "
-                                + configPath + ", cache is disabled" );
-                state = CacheState.DISABLED;
-                cacheConfig = null;
-                hashFactory = null;
-                excludePatterns = null;
-            }
-            else
-            {
-                try
-                {
-                    LOGGER.info( "Loading cache configuration from " + configPath );
-                    cacheConfig = xmlService.loadCacheConfig( configPath.toFile() );
-                }
-                catch ( Exception e )
-                {
-                    throw new IllegalArgumentException(
-                            "Cannot initialize cache because xml config is not valid or not available", e );
-                }
-
-                if ( !cacheConfig.getConfiguration().isEnabled() )
-                {
-                    state = CacheState.DISABLED;
-                    hashFactory = null;
-                    excludePatterns = null;
-                }
-                else
-                {
-                    String hashAlgorithm = null;
-                    try
-                    {
-                        hashAlgorithm = getConfiguration().getHashAlgorithm();
-                        hashFactory = HashFactory.of( hashAlgorithm );
-                        LOGGER.info( "Using " + hashAlgorithm + " hash algorithm for cache" );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new IllegalArgumentException( "Unsupported hashing algorithm: " + hashAlgorithm, e );
-                    }
-
-                    excludePatterns = compileExcludePatterns();
-                    state = CacheState.INITIALIZED;
-                }
-            }
-        }
     }
 
     @Nonnull
     @Override
-    public CacheState getState()
+    public CacheState initialize()
     {
+        if ( state == null )
+        {
+            if ( !Features.caching( session.getUserProperties() ).isActive() )
+            {
+                LOGGER.info( "Cache disabled by command line flag, project will be built fully and not cached" );
+                state = CacheState.DISABLED;
+            }
+            else
+            {
+                Path configPath;
+
+                String configPathText = getProperty( CONFIG_PATH_PROPERTY_NAME, null );
+                if ( StringUtils.isNotBlank( configPathText ) )
+                {
+                    configPath = Paths.get( configPathText );
+                }
+                else
+                {
+                    configPath = getMultimoduleRoot( session ).resolve( ".mvn" ).resolve( "maven-cache-config.xml" );
+                }
+
+                if ( !Files.exists( configPath ) )
+                {
+                    LOGGER.info( "Cache configuration is not available at configured path {}, cache is disabled",
+                            configPath );
+                    state = CacheState.DISABLED;
+                }
+                else
+                {
+                    try
+                    {
+                        LOGGER.info( "Loading cache configuration from {}", configPath );
+                        cacheConfig = xmlService.loadCacheConfig( configPath.toFile() );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new IllegalArgumentException(
+                                "Cannot initialize cache because xml config is not valid or not available", e );
+                    }
+
+                    if ( !cacheConfig.getConfiguration().isEnabled() )
+                    {
+                        state = CacheState.DISABLED;
+                    }
+                    else
+                    {
+                        String hashAlgorithm = null;
+                        try
+                        {
+                            hashAlgorithm = getConfiguration().getHashAlgorithm();
+                            hashFactory = HashFactory.of( hashAlgorithm );
+                            LOGGER.info( "Using {} hash algorithm for cache", hashAlgorithm );
+                        }
+                        catch ( Exception e )
+                        {
+                            throw new IllegalArgumentException( "Unsupported hashing algorithm: " + hashAlgorithm, e );
+                        }
+
+                        excludePatterns = compileExcludePatterns();
+                        state = CacheState.INITIALIZED;
+                    }
+                }
+            }
+        }
         return state;
     }
 
@@ -527,7 +524,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         checkInitializedState();
         final AttachedOutputs attachedOutputs = getConfiguration().getAttachedOutputs();
-        return attachedOutputs == null ? Collections.<String>emptyList() : attachedOutputs.getDirNames();
+        return attachedOutputs == null ? Collections.emptyList() : attachedOutputs.getDirNames();
     }
 
     @Nonnull

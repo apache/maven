@@ -41,7 +41,7 @@ public interface CacheConfig
 {
 
     @Nonnull
-    CacheState getState();
+    CacheState initialize();
 
     @Nonnull
     List<TrackedProperty> getTrackedProperties( MojoExecution mojoExecution );
