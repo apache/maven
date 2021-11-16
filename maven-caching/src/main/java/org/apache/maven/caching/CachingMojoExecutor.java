@@ -209,7 +209,9 @@ public class CachingMojoExecutor implements IMojoExecutor
         {
             for ( MojoExecution mojoExecution : mojoExecutions )
             {
-                if ( source == Source.CLI || isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
+                if ( source == Source.CLI
+                        || mojoExecution.getLifecyclePhase() == null
+                        || isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
                 {
                     execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
                 }
@@ -356,7 +358,8 @@ public class CachingMojoExecutor implements IMojoExecutor
         List<MojoExecution> list = new ArrayList<>();
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
-            if ( isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
+            if ( mojoExecution.getLifecyclePhase() == null
+                    || isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
             {
                 break;
             }

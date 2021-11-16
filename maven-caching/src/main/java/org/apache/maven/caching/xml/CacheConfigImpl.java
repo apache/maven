@@ -110,7 +110,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
             if ( !Files.exists( configPath ) )
             {
-                logger.warn( "Cache configuration is not available at configured path "
+                logger.info( "Cache configuration is not available at configured path "
                                 + configPath + ", cache is disabled" );
                 state = CacheState.DISABLED;
                 cacheConfig = null;
