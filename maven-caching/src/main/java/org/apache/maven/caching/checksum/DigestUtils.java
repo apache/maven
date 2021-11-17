@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.xml.build.DigestItem;
 import org.mozilla.universalchardet.UniversalDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,14 +46,10 @@ import static org.apache.commons.lang3.StringUtils.startsWithAny;
 public class DigestUtils
 {
 
-    private static final ThreadLocal<UniversalDetector> ENCODING_DETECTOR = new ThreadLocal<UniversalDetector>()
-    {
-        @Override
-        protected UniversalDetector initialValue()
-        {
-            return new UniversalDetector( null );
-        }
-    };
+    private static final Logger LOGGER = LoggerFactory.getLogger( DigestUtils.class );
+
+    private static final ThreadLocal<UniversalDetector> ENCODING_DETECTOR =
+            ThreadLocal.withInitial( () -> new UniversalDetector( null ) );
 
 
     public static DigestItem pom( HashChecksum checksum, String effectivePom )
@@ -62,14 +60,15 @@ public class DigestUtils
     public static DigestItem file( HashChecksum checksum, Path basedir, Path file ) throws IOException
     {
         byte[] content = Files.readAllBytes( file );
-        DigestItem item = item( "file", normalize( basedir, file ), checksum.update( content ) );
+        String normalized = normalize( basedir, file );
+        DigestItem item = item( "file", normalized, checksum.update( content ) );
         try
         {
             populateContentDetails( file, content, item );
         }
         catch ( IOException ignore )
         {
-            System.out.println( "hello" );
+            LOGGER.debug( "Failed to compute digest for file {}", normalized, ignore );
         }
         return item;
     }
