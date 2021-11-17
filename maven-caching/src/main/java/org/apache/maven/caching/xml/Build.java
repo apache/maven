@@ -28,7 +28,6 @@ import org.apache.maven.caching.xml.build.DigestItem;
 import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -37,19 +36,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.maven.caching.CacheUtils.mojoExecutionKey;
 
 /**
- * BuildInfo
+ * Build
  */
 public class Build
 {
 
     final org.apache.maven.caching.xml.build.Build dto;
     CacheSource source;
+    volatile Map<String, CompletedExecution> execMap;
 
     public Build( List<String> goals,
                   Artifact artifact,
@@ -114,42 +115,18 @@ public class Build
 
     private boolean hasCompletedExecution( String mojoExecutionKey )
     {
-        final List<CompletedExecution> completedExecutions = dto.getExecutions();
-        if ( dto.getExecutions() != null )
-        {
-            for ( CompletedExecution completedExecution : completedExecutions )
-            {
-                if ( Objects.equals( completedExecution.getExecutionKey(), mojoExecutionKey ) )
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return getExecutionMap().containsKey( mojoExecutionKey );
     }
 
     @Override
     public String toString()
     {
-        return "BuildInfo{" + "dto=" + dto + '}';
+        return "Build{" + "dto=" + dto + '}';
     }
 
     public CompletedExecution findMojoExecutionInfo( MojoExecution mojoExecution )
     {
-        if ( dto.getExecutions() == null )
-        {
-            return null;
-        }
-
-        final List<CompletedExecution> executions = dto.getExecutions();
-        for ( CompletedExecution execution : executions )
-        {
-            if ( StringUtils.equals( execution.getExecutionKey(), mojoExecutionKey( mojoExecution ) ) )
-            {
-                return execution;
-            }
-        }
-        return null;
+        return getExecutionMap().get( mojoExecutionKey( mojoExecution ) );
     }
 
     public String getCacheImplementationVersion()
@@ -201,8 +178,26 @@ public class Build
 
     private boolean isEquals( Dependency dependency, Artifact artifact )
     {
-        return Objects.equals( dependency.getGroupId(), artifact.getArtifactId() ) && Objects.equals(
-                dependency.getArtifactId(), artifact.getArtifactId() ) && Objects.equals( dependency.getType(),
-                artifact.getType() ) && Objects.equals( dependency.getClassifier(), artifact.getClassifier() );
+        return Objects.equals( dependency.getGroupId(), artifact.getGroupId() ) &&
+                Objects.equals( dependency.getArtifactId(), artifact.getArtifactId() ) &&
+                Objects.equals( dependency.getType(), artifact.getType() ) &&
+                Objects.equals( dependency.getClassifier(), artifact.getClassifier() );
+    }
+
+    private Map<String, CompletedExecution> getExecutionMap()
+    {
+        if ( execMap != null )
+        {
+            return execMap;
+        }
+        List<CompletedExecution> executionsList = dto.getExecutions();
+        if ( executionsList == null || executionsList.isEmpty() )
+        {
+            execMap = Collections.emptyMap();
+            return execMap;
+        }
+        execMap = executionsList.stream()
+                .collect( Collectors.toMap( CompletedExecution::getExecutionKey, v -> v ) );
+        return execMap;
     }
 }

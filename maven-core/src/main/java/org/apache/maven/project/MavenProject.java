@@ -145,7 +145,7 @@ public class MavenProject
 
     private List<Profile> activeProfiles = new ArrayList<>();
 
-    private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<>();
+    private final Map<String, List<String>> injectedProfileIds = new LinkedHashMap<>();
 
     private Set<Artifact> dependencyArtifacts;
 
@@ -155,8 +155,6 @@ public class MavenProject
     private Map<String, Artifact> artifactMap;
 
     private Model originalModel;
-
-    private Model originalEffectiveModel;
 
     private Map<String, Artifact> pluginArtifactMap;
 
@@ -170,7 +168,7 @@ public class MavenProject
 
     private Map<String, Artifact> managedVersionMap;
 
-    private Map<String, MavenProject> projectReferences = new HashMap<>();
+    private final Map<String, MavenProject> projectReferences = new HashMap<>();
 
     private boolean executionRoot;
 
@@ -1050,16 +1048,6 @@ public class MavenProject
         return originalModel;
     }
 
-    public Model getOriginalEffectiveModel()
-    {
-        return originalEffectiveModel;
-    }
-
-    public void setOriginalEffectiveModel( Model originalEffectiveModel )
-    {
-        this.originalEffectiveModel = originalEffectiveModel;
-    }
-
     public void setManagedVersionMap( Map<String, Artifact> map )
     {
         managedVersionMap = map;
@@ -1439,7 +1427,7 @@ public class MavenProject
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }
