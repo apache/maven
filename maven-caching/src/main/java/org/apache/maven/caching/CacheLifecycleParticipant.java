@@ -19,44 +19,36 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
+import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.MavenExecutionException;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.xml.CacheConfig;
-import org.apache.maven.eventspy.AbstractEventSpy;
-import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenSession;
 
-/**
- * Triggers cache report generation on build completion
- */
-@Singleton
+@SessionScoped
 @Named
-public class CacheEventSpy extends AbstractEventSpy
+@SuppressWarnings( "unused" )
+public class CacheLifecycleParticipant extends AbstractMavenLifecycleParticipant
 {
-    // Use Providers to bridge the @SessionScope, as the EventSpy can't be scoped
-    private final Provider<CacheConfig> cacheConfig;
-    private final Provider<CacheController> cacheController;
+    private final CacheConfig cacheConfig;
+    private final CacheController cacheController;
 
-    public CacheEventSpy( Provider<CacheConfig> cacheConfig, Provider<CacheController> cacheController )
+    @Inject
+    public CacheLifecycleParticipant( CacheConfig cacheConfig, CacheController cacheController )
     {
         this.cacheConfig = cacheConfig;
         this.cacheController = cacheController;
     }
 
     @Override
-    public void onEvent( Object event ) throws Exception
+    public void afterSessionEnd( MavenSession session ) throws MavenExecutionException
     {
-        if ( event instanceof ExecutionEvent )
+        if ( cacheConfig.isEnabled() )
         {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
-            if ( executionEvent.getType() == ExecutionEvent.Type.SessionEnded )
-            {
-                if ( cacheConfig.get().isEnabled() )
-                {
-                    cacheController.get().saveCacheReport( executionEvent.getSession() );
-                }
-            }
+            cacheController.saveCacheReport( session );
         }
     }
 }
