@@ -52,7 +52,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.caching.Clock;
 import org.apache.maven.caching.LocalCacheRepository;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.CacheUtils;
@@ -198,14 +197,13 @@ public class MavenProjectInput
 
     public ProjectsInputInfo calculateChecksum( HashFactory hashFactory ) throws IOException
     {
-        long time = Clock.time();
+        final long t0 = System.currentTimeMillis();
 
         final String effectivePom = getEffectivePom( project.getOriginalEffectiveModel() );
         final SortedSet<Path> inputFiles = getInputFiles();
         final SortedMap<String, DigestItem> dependenciesChecksum = getMutableDependencies();
 
-        final long inputTime = Clock.elapsed( time );
-        time = Clock.time();
+        final long t1 = System.currentTimeMillis();
 
         // hash items: effective pom + input files + dependencies
         final int count = 1 + inputFiles.size() + dependenciesChecksum.size();
@@ -263,14 +261,14 @@ public class MavenProjectInput
         projectsInputInfoType.setChecksum( checksum.digest() );
         projectsInputInfoType.getItems().addAll( items );
 
-        final long checksumTime = Clock.elapsed( time );
+        final long t2 = System.currentTimeMillis();
 
         for ( DigestItem item : projectsInputInfoType.getItems() )
         {
             LOGGER.debug( "Hash calculated, item: {}, hash: {}", item.getType(), item.getHash() );
         }
         LOGGER.info( "Project inputs calculated in {} ms. {} checksum [{}] calculated in {} ms.",
-                 inputTime, hashFactory.getAlgorithm(), projectsInputInfoType.getChecksum(), checksumTime );
+                t1 - t0, hashFactory.getAlgorithm(), projectsInputInfoType.getChecksum(), t2 - t1 );
         return projectsInputInfoType;
     }
 

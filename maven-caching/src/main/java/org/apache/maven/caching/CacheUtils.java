@@ -19,7 +19,6 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -32,7 +31,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.SessionData;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -69,16 +67,6 @@ public class CacheUtils
         return projectIndex.getProjects().containsKey( BuilderCommon.getKey( key ) );
     }
 
-    public static boolean isPomPackaging( MavenProject project )
-    {
-        return project.getPackaging().equals( "pom" ) && !new File( getSrcDir( project ) ).exists();
-    }
-
-    public static boolean isPom( Artifact artifact )
-    {
-        return artifact.getType().equals( "pom" );
-    }
-
     public static boolean isPom( Dependency dependency )
     {
         return dependency.getType().equals( "pom" );
@@ -89,19 +77,8 @@ public class CacheUtils
         return version.endsWith( SNAPSHOT_VERSION ) || version.endsWith( LATEST_VERSION );
     }
 
-    public static String getTargetDir( MavenProject project )
-    {
-        return FilenameUtils.concat( project.getBasedir().getAbsolutePath(), "target" );
-    }
-
-    public static String getSrcDir( MavenProject project )
-    {
-        return FilenameUtils.concat( project.getBasedir().getAbsolutePath(), "src" );
-    }
-
     public static String normalizedName( Artifact artifact )
     {
-
         if ( artifact.getFile() == null )
         {
             return null;
