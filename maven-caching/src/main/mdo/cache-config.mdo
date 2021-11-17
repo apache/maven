@@ -568,7 +568,6 @@ under the License.
                 <field xml.attribute="true">
                     <name>glob</name>
                     <type>String</type>
-                    <defaultValue>*</defaultValue>
                 </field>
             </fields>
         </class>
@@ -744,7 +743,6 @@ under the License.
                 <field>
                     <name>glob</name>
                     <type>String</type>
-                    <defaultValue>*</defaultValue>
                 </field>
                 <field>
                     <name>includes</name>

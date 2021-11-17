@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -38,18 +37,12 @@ public class MojoExecution
 
     private String goal;
 
-    private String executionId;
+    private final String executionId;
 
     private MojoDescriptor mojoDescriptor;
 
-    private MojoCheker mojoCheker;
-
     private Xpp3Dom configuration;
 
-    public boolean canRun( Mojo mojo, MavenSession session )
-    {
-        return mojoCheker == null || mojoCheker.check( this, mojo, session );
-    }
 
     /**
      * Describes the source of an execution.
@@ -80,7 +73,7 @@ public class MojoExecution
      * The executions to fork before this execution, indexed by the groupId:artifactId:version of the project on which
      * the forked execution are to be run and in reactor build order.
      */
-    private Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<>();
+    private final Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<>();
 
     public MojoExecution( Plugin plugin, String goal, String executionId )
     {
@@ -160,12 +153,7 @@ public class MojoExecution
 
     public String identify()
     {
-        StringBuilder sb = new StringBuilder( 256 );
-
-        sb.append( executionId );
-        sb.append( configuration.toString() );
-
-        return sb.toString();
+        return executionId + configuration.toString();
     }
 
     public String getLifecyclePhase()
@@ -243,10 +231,5 @@ public class MojoExecution
     public void setForkedExecutions( String projectKey, List<MojoExecution> forkedExecutions )
     {
         this.forkedExecutions.put( projectKey, forkedExecutions );
-    }
-
-    public void setMojoExecutionManager( MojoCheker mojoCheker )
-    {
-        this.mojoCheker = mojoCheker;
     }
 }

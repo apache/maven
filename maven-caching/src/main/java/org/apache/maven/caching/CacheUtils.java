@@ -26,6 +26,7 @@ import org.apache.maven.caching.xml.build.Scm;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.SessionData;
 
 import java.io.IOException;
@@ -54,6 +55,11 @@ import static org.apache.maven.artifact.Artifact.SNAPSHOT_VERSION;
  */
 public class CacheUtils
 {
+
+    public static boolean isPom( MavenProject project )
+    {
+        return project.getPackaging().equals( "pom" );
+    }
 
     public static boolean isPom( Dependency dependency )
     {

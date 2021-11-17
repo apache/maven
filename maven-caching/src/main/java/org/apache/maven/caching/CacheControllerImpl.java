@@ -31,6 +31,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,6 +75,7 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -123,8 +125,8 @@ public class CacheControllerImpl implements CacheController
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
-    private final MavenSession mavenSession;
     private volatile Scm scm;
+    private volatile Map<String, MavenProject> projectIndex;
 
     @Inject
     public CacheControllerImpl(
@@ -133,10 +135,9 @@ public class CacheControllerImpl implements CacheController
             ArtifactHandlerManager artifactHandlerManager,
             XmlService xmlService,
             LocalCacheRepository localCache,
-            RemoteCacheRepository remoteCache, 
+            RemoteCacheRepository remoteCache,
             CacheConfig cacheConfig,
-            LifecyclePhasesHelper lifecyclePhasesHelper,
-            MavenSession mavenSession )
+            LifecyclePhasesHelper lifecyclePhasesHelper )
     {
         this.projectHelper = projectHelper;
         this.localCache = localCache;
@@ -146,7 +147,6 @@ public class CacheControllerImpl implements CacheController
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
-        this.mavenSession = mavenSession;
     }
 
     @Override
@@ -229,9 +229,9 @@ public class CacheControllerImpl implements CacheController
                 if ( !CACHE_IMPLEMENTATION_VERSION.equals( cacheImplementationVersion ) )
                 {
                     LOGGER.warn(
-                             "Maven and cached build implementations mismatch, caching might not work correctly. "
+                            "Maven and cached build implementations mismatch, caching might not work correctly. "
                                     + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: {}",
-                             info.getCacheImplementationVersion() );
+                            info.getCacheImplementationVersion() );
                 }
 
                 List<MojoExecution> cachedSegment = lifecyclePhasesHelper.getCachedSegment( mojoExecutions, info );
@@ -308,7 +308,7 @@ public class CacheControllerImpl implements CacheController
                 final Path artifactFile = localCache.getArtifactFile( context, cacheResult.getSource(), artifact );
                 if ( !Files.exists( artifactFile ) )
                 {
-                    LOGGER.info(  "Missing file for cached build, cannot restore. File: {}", artifactFile );
+                    LOGGER.info( "Missing file for cached build, cannot restore. File: {}", artifactFile );
                     return false;
                 }
                 LOGGER.debug( "Setting project artifact {} from {}", artifact.getArtifactId(), artifactFile );
@@ -329,7 +329,7 @@ public class CacheControllerImpl implements CacheController
                                 "Missing file for cached build, cannot restore. File: " + attachedArtifactFile );
                     }
                     LOGGER.debug( "Attaching artifact {} from {}",
-                              artifact.getArtifactId(), attachedArtifactFile );
+                            artifact.getArtifactId(), attachedArtifactFile );
                     if ( StringUtils.startsWith( attachedArtifact.getClassifier(), GENERATEDSOURCES_PREFIX ) )
                     {
                         // generated sources artifact
@@ -382,7 +382,18 @@ public class CacheControllerImpl implements CacheController
     {
         try
         {
-            final MavenProjectInput inputs = new MavenProjectInput( project, session, cacheConfig,
+            if ( this.projectIndex == null )
+            {
+                Map<String, MavenProject> projectMap = new HashMap<>(
+                        session.getProjects().size() * 2
+                );
+                for ( MavenProject p : session.getProjects() )
+                {
+                    projectMap.put( BuilderCommon.getKey( p ), p );
+                }
+                this.projectIndex = projectMap;
+            }
+            final MavenProjectInput inputs = new MavenProjectInput( project, projectIndex, session, cacheConfig,
                     artifactDigestByKey, repoSystem, localCache, remoteCache );
             return inputs.calculateChecksum( cacheConfig.getHashFactory() );
         }
@@ -672,14 +683,14 @@ public class CacheControllerImpl implements CacheController
             if ( cachedExecution == null )
             {
                 LOGGER.info( "Execution is not cached. Plugin: {}, goal {}",
-                             mojoExecution.getExecutionId(), mojoExecution.getGoal() );
+                        mojoExecution.getExecutionId(), mojoExecution.getGoal() );
                 return false;
             }
 
             if ( !DtoUtils.containsAllProperties( cachedExecution, trackedProperties ) )
             {
                 LOGGER.info( "Build info doesn't match rules. Plugin: {}",
-                             mojoExecution.getExecutionId() );
+                        mojoExecution.getExecutionId() );
                 return false;
             }
         }
