@@ -50,7 +50,7 @@ public class LifecyclePhasesHelper
         this.phases = defaultLifecycles.getLifeCycles().stream()
                 .flatMap( lf -> lf.getPhases().stream() )
                 .collect( Collectors.toList() );
-        this.lastCleanPhase = Utils.getLast( cleanLifecycle.getPhases() ).get();
+        this.lastCleanPhase = CacheUtils.getLast( cleanLifecycle.getPhases() );
     }
 
     /**

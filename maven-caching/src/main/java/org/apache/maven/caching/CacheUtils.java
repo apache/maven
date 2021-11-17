@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -47,7 +48,7 @@ import static org.apache.maven.artifact.Artifact.SNAPSHOT_VERSION;
 /**
  * ProjectUtils
  */
-public class ProjectUtils
+public class CacheUtils
 {
 
     public static boolean isBuilding( Dependency dependency, ProjectIndex projectIndex )
@@ -162,9 +163,18 @@ public class ProjectUtils
 
     private static String readFirstLine( Path path, String defaultValue ) throws IOException
     {
-        final List<String> lines = Files.readAllLines( path, StandardCharsets.UTF_8 );
-        return Utils.getFirst( lines ).orElse( defaultValue );
+        return Files.lines( path, StandardCharsets.UTF_8 ).findFirst().orElse( defaultValue );
     }
 
+
+    public static <T> T getLast( List<T> list )
+    {
+        int size = list.size();
+        if ( size > 0 )
+        {
+            return list.get( size - 1 );
+        }
+        throw new NoSuchElementException();
+    }
 
 }

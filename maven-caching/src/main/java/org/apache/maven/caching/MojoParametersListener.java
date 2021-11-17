@@ -49,7 +49,7 @@ public class MojoParametersListener implements MojoExecutionListener
     @Override
     public void beforeMojoExecution( MojoExecutionEvent event )
     {
-        final String executionKey = ProjectUtils.mojoExecutionKey( event.getExecution() );
+        final String executionKey = CacheUtils.mojoExecutionKey( event.getExecution() );
         LOGGER.debug( "Starting mojo execution: {}, class: {}", executionKey, event.getMojo().getClass() );
         final MavenProject project = event.getProject();
         Map<String, MojoExecutionEvent> projectEvents = projectExecutions.get( project );

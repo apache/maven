@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
+import static org.apache.maven.caching.CacheUtils.mojoExecutionKey;
 
 /**
  * MojoExecutionManager

@@ -21,7 +21,7 @@ package org.apache.maven.caching.xml;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.ProjectUtils;
+import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.caching.xml.build.CompletedExecution;
 import org.apache.maven.caching.xml.build.DigestItem;
@@ -67,7 +67,7 @@ public class DtoUtils
         dto.setClassifier( artifact.getClassifier() );
         dto.setType( artifact.getType() );
         dto.setScope( artifact.getScope() );
-        dto.setFileName( ProjectUtils.normalizedName( artifact ) );
+        dto.setFileName( CacheUtils.normalizedName( artifact ) );
         return dto;
     }
 

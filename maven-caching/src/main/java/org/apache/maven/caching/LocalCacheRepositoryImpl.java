@@ -32,11 +32,13 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,7 +46,6 @@ import javax.inject.Named;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.SessionScoped;
-import org.apache.maven.caching.Utils.MultiMap;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
@@ -65,7 +66,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
+import static org.apache.maven.caching.CacheUtils.getMultimoduleRoot;
 import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMENTATION_VERSION;
 
 /**
@@ -261,7 +262,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             final Path artifactCacheDir =
                     artifactCacheDir( session, dependency.getGroupId(), dependency.getArtifactId() );
 
-            final MultiMap<Pair<String, String>, Pair<Build, Path>> filesByVersion = new MultiMap<>();
+            final Map<Pair<String, String>, Collection<Pair<Build, Path>>> filesByVersion = new HashMap<>();
 
             Files.walkFileTree( artifactCacheDir, new SimpleFileVisitor<Path>()
             {
@@ -278,14 +279,14 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                                     Pair.of( new Build( dto, CacheSource.LOCAL ), path );
                             final String cachedVersion = dto.getArtifact().getVersion();
                             final String cachedBranch = getScmRef( dto.getScm() );
-                            filesByVersion.add( Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
+                            add( filesByVersion, Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
                             if ( isNotBlank( cachedBranch ) )
                             {
-                                filesByVersion.add( Pair.of( EMPTY, cachedBranch ), buildInfoAndFile );
+                                add( filesByVersion, Pair.of( EMPTY, cachedBranch ), buildInfoAndFile );
                             }
                             if ( isNotBlank( cachedVersion ) )
                             {
-                                filesByVersion.add( Pair.of( cachedVersion, EMPTY ), buildInfoAndFile );
+                                add( filesByVersion, Pair.of( cachedVersion, EMPTY ), buildInfoAndFile );
                             }
                         }
                         catch ( Exception e )
@@ -304,7 +305,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                 return Optional.empty();
             }
 
-            final String currentRef = getScmRef( ProjectUtils.readGitInfo( session ) );
+            final String currentRef = getScmRef( CacheUtils.readGitInfo( session ) );
             // first lets try by branch and version
             Collection<Pair<Build, Path>> bestMatched = new LinkedList<>();
             if ( isNotBlank( currentRef ) )
@@ -324,7 +325,8 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             if ( bestMatched.isEmpty() )
             {
                 // ok lets take all
-                bestMatched = filesByVersion.allValues();
+                bestMatched = filesByVersion.values().stream()
+                        .flatMap( Collection::stream ).collect( Collectors.toList() );
             }
 
             return bestMatched.stream()
@@ -410,7 +412,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     {
         // safe artifacts to cache
         File artifactFile = artifact.getFile();
-        Path cachePath = localBuildPath( cacheResult.getContext(), ProjectUtils.normalizedName( artifact ), true );
+        Path cachePath = localBuildPath( cacheResult.getContext(), CacheUtils.normalizedName( artifact ), true );
         Files.copy( artifactFile.toPath(), cachePath, StandardCopyOption.REPLACE_EXISTING );
         if ( cacheConfig.isRemoteCacheEnabled() && cacheConfig.isSaveToRemote() && !cacheResult.isFinal() )
         {
@@ -468,6 +470,11 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         {
             return FileTime.fromMillis( 0 );
         }
+    }
+
+    private static <K, V> void add( Map<K, Collection<V>> map, K key, V value )
+    {
+        map.computeIfAbsent( key, k -> new ArrayList<>() ).add( value );
     }
 
 }

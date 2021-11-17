@@ -19,8 +19,7 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.caching.ProjectUtils;
-import org.apache.maven.caching.Utils;
+import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.xml.build.Artifact;
@@ -41,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
+import static org.apache.maven.caching.CacheUtils.mojoExecutionKey;
 
 /**
  * BuildInfo
@@ -180,13 +179,13 @@ public class Build
 
     public String getHighestCompletedGoal()
     {
-        return Utils.getLast( dto.getGoals() ).get();
+        return CacheUtils.getLast( dto.getGoals() );
     }
 
     public DigestItem findArtifact( Dependency dependency )
     {
 
-        if ( ProjectUtils.isPom( dependency ) )
+        if ( CacheUtils.isPom( dependency ) )
         {
             throw new IllegalArgumentException( "Pom dependencies should not be treated as artifacts: " + dependency );
         }

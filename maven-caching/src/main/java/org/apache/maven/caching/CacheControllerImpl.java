@@ -160,7 +160,7 @@ public class CacheControllerImpl implements CacheController
                                         List<MojoExecution> mojoExecutions )
     {
 
-        final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
+        final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
         if ( !lifecyclePhasesHelper.isLaterPhaseThanClean( highestRequestPhase ) )
         {
             return empty();
@@ -257,7 +257,7 @@ public class CacheControllerImpl implements CacheController
                     return failure( info, context );
                 }
 
-                final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
+                final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
                 if ( lifecyclePhasesHelper.isLaterPhaseThanBuild( highestRequestPhase, info )
                         && !canIgnoreMissingSegment( info, mojoExecutions ) )
                 {
@@ -573,7 +573,7 @@ public class CacheControllerImpl implements CacheController
         List<CompletedExecution> list = new ArrayList<>();
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
-            final String executionKey = ProjectUtils.mojoExecutionKey( mojoExecution );
+            final String executionKey = CacheUtils.mojoExecutionKey( mojoExecution );
             final MojoExecutionEvent executionEvent = executionEvents.get( executionKey );
             CompletedExecution executionInfo = new CompletedExecution();
             executionInfo.setExecutionKey( executionKey );
@@ -778,7 +778,7 @@ public class CacheControllerImpl implements CacheController
                 {
                     try
                     {
-                        scm = ProjectUtils.readGitInfo( session );
+                        scm = CacheUtils.readGitInfo( session );
                     }
                     catch ( IOException e )
                     {

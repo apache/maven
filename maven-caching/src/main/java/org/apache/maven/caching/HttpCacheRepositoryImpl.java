@@ -141,7 +141,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
                                   org.apache.maven.artifact.Artifact artifact ) throws IOException
     {
         CacheContext context = cacheResult.getContext();
-        final String resourceUrl = getResourceUrl( cacheResult.getContext(), ProjectUtils.normalizedName( artifact ) );
+        final String resourceUrl = getResourceUrl( cacheResult.getContext(), CacheUtils.normalizedName( artifact ) );
         try ( InputStream inputStream = Files.newInputStream( artifact.getFile().toPath() ) )
         {
             putToRemoteCache( inputStream, resourceUrl, context.getProject().getArtifactId() );

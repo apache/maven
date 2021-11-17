@@ -55,10 +55,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.caching.Clock;
 import org.apache.maven.caching.LocalCacheRepository;
 import org.apache.maven.caching.PluginScanConfig;
-import org.apache.maven.caching.ProjectUtils;
+import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
-import org.apache.maven.caching.Utils;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.hash.HashFactory;
@@ -93,8 +92,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replaceEachRepeatedly;
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
-import static org.apache.maven.caching.ProjectUtils.isBuilding;
-import static org.apache.maven.caching.ProjectUtils.isSnapshot;
+import static org.apache.maven.caching.CacheUtils.isBuilding;
+import static org.apache.maven.caching.CacheUtils.isSnapshot;
 
 /**
  * MavenProjectInput
@@ -723,7 +722,7 @@ public class MavenProjectInput
                 continue;
             }
 
-            if ( ProjectUtils.isPom( dependency ) )
+            if ( CacheUtils.isPom( dependency ) )
             {
                 // POM dependency will be resolved by maven system to actual dependencies
                 // and will contribute to effective pom.
@@ -755,7 +754,7 @@ public class MavenProjectInput
                         resolved = bestMatched.findArtifact( dependency );
                     }
                 }
-                if ( resolved == null && !ProjectUtils.isPom( dependency ) )
+                if ( resolved == null && !CacheUtils.isPom( dependency ) )
                 {
                     try
                     {
@@ -777,13 +776,17 @@ public class MavenProjectInput
                                             MultimoduleDiscoveryStrategy strategy ) throws IOException
     {
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact(
-                dependencyArtifact ).setResolveRoot( true ).setResolveTransitively( false ).setLocalRepository(
-                session.getLocalRepository() ).setRemoteRepositories(
-                project.getRemoteArtifactRepositories() ).setOffline(
-                session.isOffline() || !strategy.isLookupRemoteMavenRepo( dependencyArtifact ) ).setForceUpdate(
-                session.getRequest().isUpdateSnapshots() ).setServers( session.getRequest().getServers() ).setMirrors(
-                session.getRequest().getMirrors() ).setProxies( session.getRequest().getProxies() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+                .setArtifact( dependencyArtifact )
+                .setResolveRoot( true )
+                .setResolveTransitively( false )
+                .setLocalRepository( session.getLocalRepository() )
+                .setRemoteRepositories( project.getRemoteArtifactRepositories() )
+                .setOffline( session.isOffline() || !strategy.isLookupRemoteMavenRepo( dependencyArtifact ) )
+                .setForceUpdate( session.getRequest().isUpdateSnapshots() )
+                .setServers( session.getRequest().getServers() )
+                .setMirrors( session.getRequest().getMirrors() )
+                .setProxies( session.getRequest().getProxies() );
 
         final ArtifactResolutionResult result = repoSystem.resolve( request );
 
@@ -798,14 +801,14 @@ public class MavenProjectInput
                     "Cannot resolve artifact: " + dependencyArtifact + ", missing: " + result.getMissingArtifacts() );
         }
 
-        if ( result.getArtifacts().size() > 1 )
+        if ( result.getArtifacts().size() != 1 )
         {
             throw new IllegalStateException(
                     "Unexpected number of artifacts returned. Requested: " + dependencyArtifact
                             + ", expected: 1, actual: " + result.getArtifacts() );
         }
 
-        final Artifact resolved = Utils.getOnlyElement( result.getArtifacts() );
+        final Artifact resolved = result.getArtifacts().iterator().next();
 
         final HashAlgorithm algorithm = config.getHashFactory().createAlgorithm();
         final String hash = algorithm.hash( resolved.getFile().toPath() );

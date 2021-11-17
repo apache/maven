@@ -66,7 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.maven.caching.ProjectUtils.getMultimoduleRoot;
+import static org.apache.maven.caching.CacheUtils.getMultimoduleRoot;
 
 /**
  * CacheConfigImpl
