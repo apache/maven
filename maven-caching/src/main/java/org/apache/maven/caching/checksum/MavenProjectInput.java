@@ -348,7 +348,8 @@ public class MavenProjectInput
         PluginManagement pluginManagement = prototype.getBuild().getPluginManagement();
         pluginManagement.setPlugins( normalizePlugins( prototype.getBuild().getPluginManagement().getPlugins() ) );
 
-        List<Plugin> plugins = normalizePlugins( prototype.getBuild().getPlugins() );
+        List<Plugin> plugins = prototype.getBuild() != null
+                ? normalizePlugins( prototype.getBuild().getPlugins() ) : new ArrayList<>();
 
         org.apache.maven.model.Build build = new org.apache.maven.model.Build();
         build.setPluginManagement( pluginManagement );
