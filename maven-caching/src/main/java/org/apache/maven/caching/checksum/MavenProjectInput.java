@@ -45,6 +45,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -583,7 +584,12 @@ public class MavenProjectInput
                     return FileVisitResult.SKIP_SUBTREE;
                 }
 
-                walkDirectoryFiles( path, collectedFiles, key.getGlob() );
+                walkDirectoryFiles(
+                        path,
+                        collectedFiles,
+                        key.getGlob(),
+                        entry -> filteredOutPaths.stream()
+                                .anyMatch( it -> it.getFileName().equals( entry.getFileName() ) ) );
 
                 if ( !key.isRecursive() )
                 {
@@ -671,7 +677,7 @@ public class MavenProjectInput
         return null;
     }
 
-    void walkDirectoryFiles( Path dir, List<Path> collectedFiles, String glob )
+    static void walkDirectoryFiles( Path dir, List<Path> collectedFiles, String glob, Predicate<Path> mustBeSkipped )
     {
         if ( !Files.isDirectory( dir ) )
         {
@@ -684,8 +690,7 @@ public class MavenProjectInput
             {
                 for ( Path entry : stream )
                 {
-                    if ( filteredOutPaths.stream()
-                            .anyMatch( path -> path.getFileName().equals( entry.getFileName() ) ) )
+                    if ( mustBeSkipped.test( entry ) )
                     {
                         continue;
                     }
@@ -875,7 +880,8 @@ public class MavenProjectInput
     private List<Plugin> normalizePlugins( List<Plugin> plugins )
     {
         return plugins.stream()
-                .map( it -> {
+                .map( it ->
+                {
                     //do not touch original plugin, work with copy to calculate checksum
                     Plugin plugin = it.clone();
                     List<String> excludeProperties = config.getEffectivePomExcludeProperties( plugin );

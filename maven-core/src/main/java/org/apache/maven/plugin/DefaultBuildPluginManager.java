@@ -134,10 +134,7 @@ public class DefaultBuildPluginManager
 
                 mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
 
-                if ( mojoExecution.canRun( mojo, session ) )
-                {
-                    mojo.execute();
-                }
+                mojo.execute();
 
                 mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
             }

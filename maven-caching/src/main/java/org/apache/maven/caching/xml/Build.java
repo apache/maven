@@ -178,10 +178,10 @@ public class Build
 
     private boolean isEquals( Dependency dependency, Artifact artifact )
     {
-        return Objects.equals( dependency.getGroupId(), artifact.getGroupId() ) &&
-                Objects.equals( dependency.getArtifactId(), artifact.getArtifactId() ) &&
-                Objects.equals( dependency.getType(), artifact.getType() ) &&
-                Objects.equals( dependency.getClassifier(), artifact.getClassifier() );
+        return Objects.equals( dependency.getGroupId(), artifact.getGroupId() )
+                && Objects.equals( dependency.getArtifactId(), artifact.getArtifactId() )
+                && Objects.equals( dependency.getType(), artifact.getType() )
+                && Objects.equals( dependency.getClassifier(), artifact.getClassifier() );
     }
 
     private Map<String, CompletedExecution> getExecutionMap()

@@ -850,10 +850,10 @@ public class CacheControllerImpl implements CacheController
         for ( String sourceRoot : sourceRoots )
         {
             final Path sourceRootPath = Paths.get( sourceRoot );
-            if ( Files.isDirectory( sourceRootPath ) &&
-                    sourceRootPath.startsWith( targetDir ) &&
-                    !( sourceRootPath.startsWith( generatedSourcesDir ) ||
-                            sourceRootPath.startsWith( generatedTestSourcesDir ) ) )
+            if ( Files.isDirectory( sourceRootPath )
+                    && sourceRootPath.startsWith( targetDir )
+                    && !( sourceRootPath.startsWith( generatedSourcesDir )
+                    || sourceRootPath.startsWith( generatedTestSourcesDir ) ) )
             { // dir within target
                 attachDirIfNotEmpty( sourceRootPath, targetDir, project );
             }
