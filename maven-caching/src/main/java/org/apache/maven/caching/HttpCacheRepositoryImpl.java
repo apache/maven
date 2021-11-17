@@ -116,10 +116,8 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public void saveBuildInfo( CacheResult cacheResult, Build build )
             throws IOException
     {
-        CacheContext context = cacheResult.getContext();
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), BUILDINFO_XML );
-        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( build.getDto() ) ), resourceUrl,
-                context.getProject().getArtifactId() );
+        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( build.getDto() ) ), resourceUrl );
     }
 
 
@@ -132,19 +130,17 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
                 + "/" + rootProject.getArtifactId()
                 + "/" + buildId
                 + "/" + CACHE_REPORT_XML;
-        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( cacheReport ) ), resourceUrl,
-                rootProject.getArtifactId() );
+        putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( cacheReport ) ), resourceUrl );
     }
 
     @Override
     public void saveArtifactFile( CacheResult cacheResult,
                                   org.apache.maven.artifact.Artifact artifact ) throws IOException
     {
-        CacheContext context = cacheResult.getContext();
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), CacheUtils.normalizedName( artifact ) );
         try ( InputStream inputStream = Files.newInputStream( artifact.getFile().toPath() ) )
         {
-            putToRemoteCache( inputStream, resourceUrl, context.getProject().getArtifactId() );
+            putToRemoteCache( inputStream, resourceUrl );
         }
     }
 
@@ -219,10 +215,9 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     }
 
     /**
-     * @param logReference
      * @param instream     to be closed externally
      */
-    private void putToRemoteCache( InputStream instream, String url, String logReference ) throws IOException
+    private void putToRemoteCache( InputStream instream, String url ) throws IOException
     {
 
         HttpPut httpPut = null;

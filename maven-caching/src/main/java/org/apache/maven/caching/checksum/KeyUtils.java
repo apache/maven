@@ -49,15 +49,36 @@ public class KeyUtils
 
     public static String getArtifactKey( Artifact artifact )
     {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()
-                + ( artifact.getClassifier() != null ? ":" + artifact.getClassifier() : "" )
-                + ":" + artifact.getVersion();
+        return getArtifactKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getType(),
+                artifact.getClassifier(), artifact.getVersion() );
+    }
+
+    /**
+     * Computes the key for the given artifact, using the given type instead of the one
+     * defined in the artifact.
+     */
+    public static String getArtifactKey( Artifact artifact, String type )
+    {
+        return getArtifactKey( artifact.getGroupId(), artifact.getArtifactId(), type,
+                artifact.getClassifier(), artifact.getVersion() );
     }
 
     public static String getArtifactKey( org.apache.maven.artifact.Artifact artifact )
     {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()
-                + ( artifact.getClassifier() != null ? ":" + artifact.getClassifier() : "" )
-                + ":" + artifact.getVersion();
+        return getArtifactKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getType(),
+                               artifact.getClassifier(), artifact.getVersion() );
+    }
+
+    public static String getArtifactKey( String groupId, String artifactId, String type,
+                                         String classifier, String version )
+    {
+        if ( classifier != null )
+        {
+            return StringUtils.joinWith( SEPARATOR, groupId, artifactId, type, classifier, version );
+        }
+        else
+        {
+            return StringUtils.joinWith( SEPARATOR, groupId, artifactId, type, version );
+        }
     }
 }

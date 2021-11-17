@@ -73,6 +73,7 @@ import static org.apache.maven.caching.CacheUtils.getMultimoduleRoot;
  */
 @SessionScoped
 @Named
+@SuppressWarnings( "unused" )
 public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 {
 

@@ -75,7 +75,6 @@ import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
-import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -105,6 +104,7 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMEN
  */
 @SessionScoped
 @Named
+@SuppressWarnings( "unused" )
 public class CacheControllerImpl implements CacheController
 {
 
@@ -114,7 +114,6 @@ public class CacheControllerImpl implements CacheController
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CacheControllerImpl.class );
 
-    private final MavenPluginManager mavenPluginManager;
     private final MavenProjectHelper projectHelper;
     private final RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
@@ -129,7 +128,6 @@ public class CacheControllerImpl implements CacheController
 
     @Inject
     public CacheControllerImpl(
-            MavenPluginManager mavenPluginManager,
             MavenProjectHelper projectHelper,
             RepositorySystem repoSystem,
             ArtifactHandlerManager artifactHandlerManager,
@@ -139,7 +137,6 @@ public class CacheControllerImpl implements CacheController
             CacheConfig cacheConfig,
             LifecyclePhasesHelper lifecyclePhasesHelper )
     {
-        this.mavenPluginManager = mavenPluginManager;
         this.projectHelper = projectHelper;
         this.localCache = localCache;
         this.remoteCache = remoteCache;
@@ -367,19 +364,20 @@ public class CacheControllerImpl implements CacheController
 
     private void putChecksum( Artifact artifact, String projectChecksum )
     {
-
         final DigestItem projectArtifact = DtoUtils.createdDigestedByProjectChecksum( artifact, projectChecksum );
         final String dependencyKey = KeyUtils.getArtifactKey( artifact );
         artifactDigestByKey.put( dependencyKey, projectArtifact );
 
-        if ( !"pom".equals( artifact.getType() ) )
+        final ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+        String packaging = artifactHandler.getPackaging();
+        if ( !Objects.equals( packaging, artifact.getType() ) )
         {
-            final ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
-            Artifact copy = DtoUtils.copy( artifact );
-            copy.setType( artifactHandler.getPackaging() );
-            artifactDigestByKey.put( KeyUtils.getArtifactKey( copy ), projectArtifact );
-            copy.setType( artifactHandler.getExtension() );
-            artifactDigestByKey.put( KeyUtils.getArtifactKey( copy ), projectArtifact );
+            artifactDigestByKey.put( KeyUtils.getArtifactKey( artifact, packaging ), projectArtifact );
+        }
+        String extension = artifactHandler.getExtension();
+        if ( !Objects.equals( extension, artifact.getType() ) && !Objects.equals( extension, packaging ) )
+        {
+            artifactDigestByKey.put( KeyUtils.getArtifactKey( artifact, extension ), projectArtifact );
         }
     }
 
@@ -389,7 +387,7 @@ public class CacheControllerImpl implements CacheController
         try
         {
             final MavenProjectInput inputs = new MavenProjectInput( project, session, cacheConfig, projectIndex,
-                    artifactDigestByKey, repoSystem, artifactHandlerManager, localCache, remoteCache );
+                    artifactDigestByKey, repoSystem, localCache, remoteCache );
             return inputs.calculateChecksum( cacheConfig.getHashFactory() );
         }
         catch ( Exception e )
@@ -761,7 +759,7 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private void populateGitInfo( Build build, MavenSession session ) throws IOException
+    private void populateGitInfo( Build build, MavenSession session )
     {
         if ( scm == null )
         {

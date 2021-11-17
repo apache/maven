@@ -49,7 +49,6 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.caching.LocalCacheRepository;
@@ -136,7 +135,6 @@ public class MavenProjectInput
     private final LocalCacheRepository localCache;
     private final RemoteCacheRepository remoteCache;
     private final RepositorySystem repoSystem;
-    private final ArtifactHandlerManager artifactHandlerManager;
     private final CacheConfig config;
     private final ConcurrentMap<String, DigestItem> projectArtifactsByKey;
     private final PathIgnoringCaseComparator fileComparator;
@@ -154,7 +152,6 @@ public class MavenProjectInput
                               ProjectIndex projectIndex,
                               ConcurrentMap<String, DigestItem> artifactsByKey,
                               RepositorySystem repoSystem,
-                              ArtifactHandlerManager artifactHandlerManager,
                               LocalCacheRepository localCache,
                               RemoteCacheRepository remoteCache )
     {
@@ -165,7 +162,6 @@ public class MavenProjectInput
         this.projectArtifactsByKey = artifactsByKey;
         this.baseDirPath = project.getBasedir().toPath().toAbsolutePath();
         this.repoSystem = repoSystem;
-        this.artifactHandlerManager = artifactHandlerManager;
         this.localCache = localCache;
         this.remoteCache = remoteCache;
         Properties properties = project.getProperties();
@@ -345,17 +341,22 @@ public class MavenProjectInput
         prototype.getDependencies().sort( dependencyComparator );
         toHash.setDependencies( prototype.getDependencies() );
 
-        PluginManagement pluginManagement = prototype.getBuild().getPluginManagement();
-        pluginManagement.setPlugins( normalizePlugins( prototype.getBuild().getPluginManagement().getPlugins() ) );
+        if ( prototype.getBuild() != null )
+        {
+            org.apache.maven.model.Build build = new org.apache.maven.model.Build();
 
-        List<Plugin> plugins = prototype.getBuild() != null
-                ? normalizePlugins( prototype.getBuild().getPlugins() ) : new ArrayList<>();
+            PluginManagement pluginManagement = prototype.getBuild().getPluginManagement();
+            if ( pluginManagement != null )
+            {
+                pluginManagement.setPlugins( normalizePlugins( pluginManagement.getPlugins() ) );
+            }
+            build.setPluginManagement( pluginManagement );
 
-        org.apache.maven.model.Build build = new org.apache.maven.model.Build();
-        build.setPluginManagement( pluginManagement );
-        build.setPlugins( plugins );
+            List<Plugin> plugins = normalizePlugins( prototype.getBuild().getPlugins() );
+            build.setPlugins( plugins );
 
-        toHash.setBuild( build );
+            toHash.setBuild( build );
+        }
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 

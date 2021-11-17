@@ -81,6 +81,7 @@ import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
 @SessionScoped
 @Named
 @Priority( 10 )
+@SuppressWarnings( "unused" )
 public class CachingMojoExecutor implements IMojoExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( CachingMojoExecutor.class );
@@ -463,7 +464,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 
             lifeCycleDependencyResolver.resolveProjectDependencies( project, scopesToCollect, scopesToResolve, session,
-                    aggregating, Collections.<Artifact>emptySet() );
+                    aggregating, Collections.emptySet() );
 
             dependencyContext.synchronizeWithProjectState();
         }
@@ -480,7 +481,7 @@ public class CachingMojoExecutor implements IMojoExecutor
                     if ( aggregatedProject != project )
                     {
                         lifeCycleDependencyResolver.resolveProjectDependencies( aggregatedProject, scopesToCollect,
-                                scopesToResolve, session, aggregating, Collections.<Artifact>emptySet() );
+                                scopesToResolve, session, aggregating, Collections.emptySet() );
                     }
                 }
             }

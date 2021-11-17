@@ -74,6 +74,7 @@ import static org.apache.maven.caching.checksum.MavenProjectInput.CACHE_IMPLEMEN
  */
 @SessionScoped
 @Named
+@SuppressWarnings( "unused" )
 public class LocalCacheRepositoryImpl implements LocalCacheRepository
 {
 
