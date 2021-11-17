@@ -50,37 +50,6 @@ import static org.apache.maven.artifact.Artifact.SNAPSHOT_VERSION;
 public class ProjectUtils
 {
 
-    private static final List<String> PHASES = Arrays.asList(
-            //clean
-            "pre-clean", "clean", "post-clean",
-            // default
-            "validate", "initialize", "generate-sources", "process-sources", "generate-resources", "process-resources",
-            "compile", "process-classes", "generate-test-sources", "process-test-sources", "generate-test-resources",
-            "process-test-resources", "test-compile", "process-test-classes", "test", "prepare-package", "package",
-            "pre-integration-test", "integration-test", "post-integration-test", "verify", "install", "deploy",
-            //site
-            "pre-site", "site", "post-site", "site-deploy" );
-
-    /**
-     * @param phase
-     * @param other
-     * @return true if the given phase is later than the other in maven lifecycle. Example: isLaterPhase("install",
-     * "clean") returns true;
-     */
-    public static boolean isLaterPhase( String phase, String other )
-    {
-        if ( !PHASES.contains( phase ) )
-        {
-            throw new IllegalArgumentException( "Unsupported phase: " + phase );
-        }
-        if ( !PHASES.contains( other ) )
-        {
-            throw new IllegalArgumentException( "Unsupported phase: " + other );
-        }
-
-        return PHASES.indexOf( phase ) > PHASES.indexOf( other );
-    }
-
     public static boolean isBuilding( Dependency dependency, ProjectIndex projectIndex )
     {
         final MavenProject key = new MavenProject();
@@ -145,7 +114,8 @@ public class ProjectUtils
 
     public static String mojoExecutionKey( MojoExecution mojo )
     {
-        return StringUtils.join( Arrays.asList( StringUtils.defaultIfEmpty( mojo.getExecutionId(), "emptyExecId" ),
+        return StringUtils.join( Arrays.asList(
+                StringUtils.defaultIfEmpty( mojo.getExecutionId(), "emptyExecId" ),
                 StringUtils.defaultIfEmpty( mojo.getGoal(), "emptyGoal" ),
                 StringUtils.defaultIfEmpty( mojo.getLifecyclePhase(), "emptyLifecyclePhase" ),
                 StringUtils.defaultIfEmpty( mojo.getArtifactId(), "emptyArtifactId" ),

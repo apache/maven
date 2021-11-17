@@ -117,6 +117,9 @@ public class DefaultLifecycles
         return phaseToLifecycleMap;
     }
 
+    /**
+     * Returns an ordered list of lifecycles
+     */
     public List<Lifecycle> getLifeCycles()
     {
         List<String> lifecycleIds = Arrays.asList( STANDARD_LIFECYCLES );

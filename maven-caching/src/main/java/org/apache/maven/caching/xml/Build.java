@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.apache.maven.caching.ProjectUtils.isLaterPhase;
 import static org.apache.maven.caching.ProjectUtils.mojoExecutionKey;
 
 /**
@@ -182,38 +181,6 @@ public class Build
     public String getHighestCompletedGoal()
     {
         return Utils.getLast( dto.getGoals() ).get();
-    }
-
-    public List<MojoExecution> getCachedSegment( List<MojoExecution> mojoExecutions )
-    {
-        List<MojoExecution> list = new ArrayList<>();
-        for ( MojoExecution mojoExecution : mojoExecutions )
-        {
-            if ( !isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
-            {
-                continue;
-            }
-            if ( isLaterPhase( mojoExecution.getLifecyclePhase(), getHighestCompletedGoal() ) )
-            {
-                break;
-            }
-            list.add( mojoExecution );
-        }
-        return list;
-
-    }
-
-    public List<MojoExecution> getPostCachedSegment( List<MojoExecution> mojoExecutions )
-    {
-        List<MojoExecution> list = new ArrayList<>();
-        for ( MojoExecution mojoExecution : mojoExecutions )
-        {
-            if ( isLaterPhase( mojoExecution.getLifecyclePhase(), getHighestCompletedGoal() ) )
-            {
-                list.add( mojoExecution );
-            }
-        }
-        return list;
     }
 
     public DigestItem findArtifact( Dependency dependency )

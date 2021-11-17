@@ -127,6 +127,7 @@ public class CacheControllerImpl implements CacheController
     private final RemoteCacheRepository remoteCache;
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
+    private final LifecyclePhasesHelper lifecyclePhasesHelper;
     private volatile Scm scm;
 
     @Inject
@@ -138,7 +139,8 @@ public class CacheControllerImpl implements CacheController
             XmlService xmlService,
             LocalCacheRepository localCache,
             RemoteCacheRepository remoteCache, 
-            CacheConfig cacheConfig )
+            CacheConfig cacheConfig,
+            LifecyclePhasesHelper lifecyclePhasesHelper )
     {
         this.mavenPluginManager = mavenPluginManager;
         this.projectHelper = projectHelper;
@@ -148,6 +150,7 @@ public class CacheControllerImpl implements CacheController
         this.repoSystem = repoSystem;
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
+        this.lifecyclePhasesHelper = lifecyclePhasesHelper;
     }
 
     @Override
@@ -158,7 +161,7 @@ public class CacheControllerImpl implements CacheController
     {
 
         final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
-        if ( !ProjectUtils.isLaterPhase( highestRequestPhase, "post-clean" ) )
+        if ( !lifecyclePhasesHelper.isLaterPhaseThanClean( highestRequestPhase ) )
         {
             return empty();
         }
@@ -239,8 +242,8 @@ public class CacheControllerImpl implements CacheController
                              info.getCacheImplementationVersion() );
                 }
 
-                final List<MojoExecution> cachedSegment = info.getCachedSegment( mojoExecutions );
-                final List<MojoExecution> missingMojos = info.getMissingExecutions( cachedSegment );
+                List<MojoExecution> cachedSegment = lifecyclePhasesHelper.getCachedSegment( mojoExecutions, info );
+                List<MojoExecution> missingMojos = info.getMissingExecutions( cachedSegment );
                 if ( !missingMojos.isEmpty() )
                 {
                     LOGGER.warn( "Cached build doesn't contains all requested plugin executions "
@@ -255,12 +258,11 @@ public class CacheControllerImpl implements CacheController
                 }
 
                 final String highestRequestPhase = Utils.getLast( mojoExecutions ).get().getLifecyclePhase();
-                final String highestCompletedGoal = info.getHighestCompletedGoal();
-                if ( ProjectUtils.isLaterPhase( highestRequestPhase, highestCompletedGoal ) && !canIgnoreMissingSegment(
-                        info, mojoExecutions ) )
+                if ( lifecyclePhasesHelper.isLaterPhaseThanBuild( highestRequestPhase, info )
+                        && !canIgnoreMissingSegment( info, mojoExecutions ) )
                 {
                     LOGGER.info( "Project restored partially. Highest cached goal: {}, requested: {}",
-                            highestCompletedGoal, highestRequestPhase );
+                            info.getHighestCompletedGoal(), highestRequestPhase );
                     return partialSuccess( info, context );
                 }
 
@@ -282,7 +284,8 @@ public class CacheControllerImpl implements CacheController
 
     private boolean canIgnoreMissingSegment( Build info, List<MojoExecution> mojoExecutions )
     {
-        final List<MojoExecution> postCachedSegment = info.getPostCachedSegment( mojoExecutions );
+        final List<MojoExecution> postCachedSegment =
+                lifecyclePhasesHelper.getPostCachedSegment( mojoExecutions, info );
         for ( MojoExecution mojoExecution : postCachedSegment )
         {
             if ( !cacheConfig.canIgnore( mojoExecution ) )

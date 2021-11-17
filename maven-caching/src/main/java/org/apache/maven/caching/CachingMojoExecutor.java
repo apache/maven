@@ -68,7 +68,6 @@ import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.maven.caching.ProjectUtils.isLaterPhase;
 import static org.apache.maven.caching.checksum.KeyUtils.getVersionlessProjectKey;
 import static org.apache.maven.caching.xml.CacheState.DISABLED;
 import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
@@ -93,6 +92,7 @@ public class CachingMojoExecutor implements IMojoExecutor
     private final CacheController cacheController;
     private final CacheConfig cacheConfig;
     private final MojoParametersListener mojoListener;
+    private final LifecyclePhasesHelper lifecyclePhasesHelper;
 
     @Inject
     public CachingMojoExecutor(
@@ -102,7 +102,8 @@ public class CachingMojoExecutor implements IMojoExecutor
             ExecutionEventCatapult eventCatapult, 
             CacheController cacheController,
             CacheConfig cacheConfig,
-            MojoParametersListener mojoListener )
+            MojoParametersListener mojoListener,
+            LifecyclePhasesHelper lifecyclePhasesHelper )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
@@ -111,6 +112,7 @@ public class CachingMojoExecutor implements IMojoExecutor
         this.cacheController = cacheController;
         this.cacheConfig = cacheConfig;
         this.mojoListener = mojoListener;
+        this.lifecyclePhasesHelper = lifecyclePhasesHelper;
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
@@ -208,7 +210,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             {
                 if ( source == Source.CLI
                         || mojoExecution.getLifecyclePhase() == null
-                        || isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
+                        || lifecyclePhasesHelper.isLaterPhaseThanClean( mojoExecution.getLifecyclePhase() ) )
                 {
                     execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
                 }
@@ -256,7 +258,7 @@ public class CachingMojoExecutor implements IMojoExecutor
         final Build build = cacheResult.getBuildInfo();
         final MavenProject project = cacheResult.getContext().getProject();
         final MavenSession session = cacheResult.getContext().getSession();
-        final List<MojoExecution> cachedSegment = build.getCachedSegment( mojoExecutions );
+        final List<MojoExecution> cachedSegment = lifecyclePhasesHelper.getCachedSegment( mojoExecutions, build );
 
         boolean restored = cacheController.restoreProjectArtifacts( cacheResult );
         if ( !restored )
@@ -299,7 +301,7 @@ public class CachingMojoExecutor implements IMojoExecutor
             }
         }
 
-        for ( MojoExecution mojoExecution : build.getPostCachedSegment( mojoExecutions ) )
+        for ( MojoExecution mojoExecution : lifecyclePhasesHelper.getPostCachedSegment( mojoExecutions, build ) )
         {
             execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
         }
@@ -350,7 +352,7 @@ public class CachingMojoExecutor implements IMojoExecutor
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             if ( mojoExecution.getLifecyclePhase() == null
-                    || isLaterPhase( mojoExecution.getLifecyclePhase(), "post-clean" ) )
+                    || lifecyclePhasesHelper.isLaterPhaseThanClean( mojoExecution.getLifecyclePhase() ) )
             {
                 break;
             }
