@@ -83,7 +83,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.project.artifact.AttachedArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -310,7 +309,7 @@ public class CacheControllerImpl implements CacheController
         try
         {
             File file = null;
-            List<AttachedArtifact> artifacts = new ArrayList<>();
+            List<ArtifactToAttach> artifacts = new ArrayList<>();
             if ( isNotBlank( artifact.getFileName() ) )
             {
                 // TODO if remote is forced, probably need to refresh or reconcile all files
@@ -346,10 +345,7 @@ public class CacheControllerImpl implements CacheController
                     }
                     else
                     {
-                        AttachedArtifact a = new AttachedArtifact( null,
-                                attachedArtifact.getType(), attachedArtifact.getClassifier(), null );
-                        a.setFile( attachedArtifactFile.toFile() );
-                        artifacts.add( a );
+                        artifacts.add( new ArtifactToAttach( attachedArtifact, attachedArtifactFile ) );
                     }
                     putChecksum( attachedArtifact, context.getInputInfo().getChecksum() );
                 }
@@ -361,8 +357,7 @@ public class CacheControllerImpl implements CacheController
                 project.getArtifact().setFile( file );
                 project.getArtifact().setResolved( true );
             }
-            artifacts.forEach( a -> projectHelper.attachArtifact( project,
-                    a.getType(), a.getClassifier(), a.getFile() ) );
+            artifacts.forEach( a -> projectHelper.attachArtifact( project, a.type, a.classifier, a.file ) );
             return true;
         }
         catch ( Exception e )
@@ -921,6 +916,26 @@ public class CacheControllerImpl implements CacheController
             }
         }
         return true;
+    }
+
+    private static class ArtifactToAttach
+    {
+
+        private final String type;
+        private final String classifier;
+        private final File file;
+
+        ArtifactToAttach( String type, String classifier, File file )
+        {
+            this.type = type;
+            this.classifier = classifier;
+            this.file = file;
+        }
+
+        ArtifactToAttach( Artifact attachedArtifact, Path attachedArtifactFile )
+        {
+            this( attachedArtifact.getType(), attachedArtifact.getClassifier(), attachedArtifactFile.toFile() );
+        }
     }
 
 }
