@@ -128,7 +128,6 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
     @Override
     public Build findBuild( CacheContext context ) throws IOException
     {
-
         Path buildInfoPath = remoteBuildPath( context, BUILDINFO_XML );
         LOGGER.debug( "Checking if build is already downloaded: {}", buildInfoPath );
 

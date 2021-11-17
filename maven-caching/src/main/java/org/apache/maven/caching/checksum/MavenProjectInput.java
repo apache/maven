@@ -457,7 +457,6 @@ public class MavenProjectInput
                             List<Path> collectedFiles,
                             Set<WalkKey> visitedDirs )
     {
-
         Path normalized = candidate.isAbsolute() ? candidate : baseDirPath.resolve( candidate );
         normalized = normalized.toAbsolutePath().normalize();
         WalkKey key = new WalkKey( normalized, glob, recursive );
@@ -499,11 +498,9 @@ public class MavenProjectInput
 
     private void collectFromPlugins( List<Path> files, HashSet<WalkKey> visitedDirs )
     {
-
         List<Plugin> plugins = project.getBuild().getPlugins();
         for ( Plugin plugin : plugins )
         {
-
             PluginScanConfig scanConfig = config.getPluginDirScanConfig( plugin );
 
             if ( scanConfig.isSkip() )
@@ -521,7 +518,6 @@ public class MavenProjectInput
 
             for ( PluginExecution exec : plugin.getExecutions() )
             {
-
                 final PluginScanConfig executionScanConfig = config.getExecutionDirScanConfig( plugin, exec );
                 PluginScanConfig mergedConfig = scanConfig.mergeWith( executionScanConfig );
 
@@ -589,7 +585,6 @@ public class MavenProjectInput
                                              PluginScanConfig scanConfig,
                                              List<Path> files, HashSet<WalkKey> visitedDirs )
     {
-
         if ( configurationChildren == null )
         {
             return;
@@ -597,7 +592,6 @@ public class MavenProjectInput
 
         for ( Xpp3Dom configChild : configurationChildren )
         {
-
             String tagName = configChild.getName();
             String tagValue = configChild.getValue();
 
@@ -775,7 +769,6 @@ public class MavenProjectInput
     private DigestItem resolveArtifact( final Artifact dependencyArtifact,
                                             MultimoduleDiscoveryStrategy strategy ) throws IOException
     {
-
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
                 .setArtifact( dependencyArtifact )
                 .setResolveRoot( true )

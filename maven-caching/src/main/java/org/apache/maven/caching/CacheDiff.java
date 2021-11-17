@@ -60,7 +60,6 @@ public class CacheDiff
 
     public Diff compare()
     {
-
         if ( !StringUtils.equals( current.getHashFunction(), baseline.getHashFunction() ) )
         {
             addNewMismatch(
@@ -115,7 +114,6 @@ public class CacheDiff
 
     private void compareFiles( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
-
         final Map<String, DigestItem> currentFiles = current.getItems().stream()
                 .filter( item -> "file".equals( item.getType() ) )
                 .collect( Collectors.toMap( DigestItem::getValue, item -> item ) );
@@ -147,7 +145,6 @@ public class CacheDiff
             final DigestItem baselineFile = baselineFiles.get( filePath );
             if ( !StringUtils.equals( currentFile.getHash(), baselineFile.getHash() ) )
             {
-
                 String reason = "File content is different.";
                 if ( currentFile.getEol() != null && baselineFile.getEol() != null && !StringUtils.equals(
                         baselineFile.getEol(), currentFile.getEol() ) )

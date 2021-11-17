@@ -201,7 +201,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
     private GoalReconciliation findReconciliationConfig( MojoExecution mojoExecution )
     {
-
         if ( cacheConfig.getExecutionControl() == null )
         {
             return null;
@@ -217,7 +216,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
         for ( GoalReconciliation goalReconciliationConfig : reconciliation )
         {
-
             final String goal = mojoExecution.getGoal();
 
             if ( isPluginMatch( mojoExecution.getPlugin(), goalReconciliationConfig ) && StringUtils.equals( goal,
@@ -278,7 +276,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 
     private PluginConfigurationScan findPluginScanConfig( Plugin plugin )
     {
-
         if ( cacheConfig.getInput() == null )
         {
             return null;

@@ -32,7 +32,6 @@ public class WalkKey
 
     public WalkKey( Path normalized, String glob, boolean recursive )
     {
-
         this.normalized = normalized;
         this.glob = glob;
         this.recursive = recursive;

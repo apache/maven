@@ -153,7 +153,6 @@ public class CacheControllerImpl implements CacheController
                                         ProjectIndex projectIndex,
                                         List<MojoExecution> mojoExecutions )
     {
-
         final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
         if ( !lifecyclePhasesHelper.isLaterPhaseThanClean( highestRequestPhase ) )
         {
@@ -170,7 +169,6 @@ public class CacheControllerImpl implements CacheController
 
         if ( !result.isSuccess() && result.getContext() != null )
         {
-
             LOGGER.debug( "Remote cache is incomplete or missing, trying local build" );
 
             CacheResult localBuild = findLocalBuild( mojoExecutions, context );
@@ -221,7 +219,6 @@ public class CacheControllerImpl implements CacheController
         {
             if ( info != null )
             {
-
                 final ProjectsInputInfo inputInfo = context.getInputInfo();
 
                 LOGGER.info( "Found cached build, restoring from cache {}", inputInfo.getChecksum() );
@@ -293,7 +290,6 @@ public class CacheControllerImpl implements CacheController
     @Override
     public boolean restoreProjectArtifacts( CacheResult cacheResult )
     {
-
         final Build build = cacheResult.getBuildInfo();
         final CacheContext context = cacheResult.getContext();
         final MavenProject project = context.getProject();
@@ -400,7 +396,6 @@ public class CacheControllerImpl implements CacheController
     public void save( CacheResult cacheResult, List<MojoExecution> mojoExecutions,
                       Map<String, MojoExecutionEvent> executionEvents )
     {
-
         CacheContext context = cacheResult.getContext();
 
         if ( context == null || context.getInputInfo() == null )
@@ -413,7 +408,6 @@ public class CacheControllerImpl implements CacheController
         final MavenSession session = context.getSession();
         try
         {
-
             attachGeneratedSources( project );
             attachOutputs( project );
 
@@ -627,7 +621,6 @@ public class CacheControllerImpl implements CacheController
     private boolean isExcluded( String propertyName, boolean logAll, List<PropertyName> excludedProperties,
                                 List<PropertyName> forceLogProperties )
     {
-
         if ( !forceLogProperties.isEmpty() )
         {
             for ( PropertyName logProperty : forceLogProperties )
@@ -672,7 +665,6 @@ public class CacheControllerImpl implements CacheController
     {
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
-
             // completion of all mojos checked above, so we expect tp have execution info here
             final List<TrackedProperty> trackedProperties = cacheConfig.getTrackedProperties( mojoExecution );
             final CompletedExecution cachedExecution = build.findMojoExecutionInfo( mojoExecution );
@@ -910,7 +902,6 @@ public class CacheControllerImpl implements CacheController
 
     private static class ArtifactToAttach
     {
-
         private final String type;
         private final String classifier;
         private final File file;

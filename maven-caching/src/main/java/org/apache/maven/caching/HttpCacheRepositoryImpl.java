@@ -219,7 +219,6 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
      */
     private void putToRemoteCache( InputStream instream, String url ) throws IOException
     {
-
         HttpPut httpPut = null;
         try
         {

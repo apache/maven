@@ -77,7 +77,6 @@ public class PluginScanConfigImpl implements PluginScanConfig
     @Override
     public PluginScanConfig mergeWith( final PluginScanConfig overrideConfig )
     {
-
         if ( dto == null )
         {
             return overrideConfig;
@@ -138,7 +137,6 @@ public class PluginScanConfigImpl implements PluginScanConfig
 
     private ScanConfigProperties findConfigByName( String tagName, List<TagScanConfig> configs )
     {
-
         if ( configs == null )
         {
             return null;

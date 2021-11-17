@@ -136,7 +136,6 @@ public class Build
 
     public CompletedExecution findMojoExecutionInfo( MojoExecution mojoExecution )
     {
-
         if ( dto.getExecutions() == null )
         {
             return null;
@@ -184,7 +183,6 @@ public class Build
 
     public DigestItem findArtifact( Dependency dependency )
     {
-
         if ( CacheUtils.isPom( dependency ) )
         {
             throw new IllegalArgumentException( "Pom dependencies should not be treated as artifacts: " + dependency );

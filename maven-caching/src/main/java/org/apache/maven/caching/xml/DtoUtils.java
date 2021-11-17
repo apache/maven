@@ -136,7 +136,6 @@ public class DtoUtils
     public static boolean containsAllProperties(
             @Nonnull CompletedExecution cachedExecution, List<TrackedProperty> trackedProperties )
     {
-
         if ( trackedProperties == null || trackedProperties.isEmpty() )
         {
             return true;

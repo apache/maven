@@ -255,7 +255,6 @@ public class CachingMojoExecutor implements IMojoExecutor
                                     PhaseRecorder phaseRecorder,
                                     CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
-
         final Build build = cacheResult.getBuildInfo();
         final MavenProject project = cacheResult.getContext().getProject();
         final MavenSession session = cacheResult.getContext().getSession();
@@ -270,7 +269,6 @@ public class CachingMojoExecutor implements IMojoExecutor
 
         for ( MojoExecution cacheCandidate : cachedSegment )
         {
-
             if ( cacheController.isForcedExecution( project, cacheCandidate ) )
             {
                 LOGGER.info( "Mojo execution is forced by project property: {}",
@@ -318,7 +316,6 @@ public class CachingMojoExecutor implements IMojoExecutor
                                             PhaseRecorder phaseRecorder,
                                             CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
-
         AtomicBoolean consistent = new AtomicBoolean( true );
         final MojoExecutionManager mojoChecker = new MojoExecutionManager( project, cachedBuild,
                 consistent, cacheConfig );
