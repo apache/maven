@@ -30,15 +30,24 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.SessionData;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -175,6 +184,68 @@ public class CacheUtils
             return list.get( size - 1 );
         }
         throw new NoSuchElementException();
+    }
+
+    public static <T> T getOrCreate( MavenSession session, Object key, Supplier<T> supplier )
+    {
+        SessionData data = session.getRepositorySession().getData();
+        while ( true )
+        {
+            T t = (T) data.get( key );
+            if ( t == null )
+            {
+                t = supplier.get();
+                if ( data.set( key, null, t ) )
+                {
+                    continue;
+                }
+            }
+            return t;
+        }
+    }
+
+    public static void zip( Path dir, Path zip ) throws IOException
+    {
+        try ( ZipOutputStream zipOutputStream = new ZipOutputStream( Files.newOutputStream( zip ) ) )
+        {
+            Files.walkFileTree( dir, new SimpleFileVisitor<Path>()
+            {
+                @Override
+                public FileVisitResult visitFile( Path path, BasicFileAttributes basicFileAttributes )
+                        throws IOException
+                {
+                    final ZipEntry zipEntry = new ZipEntry( dir.relativize( path ).toString() );
+                    zipOutputStream.putNextEntry( zipEntry );
+                    Files.copy( path, zipOutputStream );
+                    zipOutputStream.closeEntry();
+                    return FileVisitResult.CONTINUE;
+                }
+            } );
+        }
+    }
+
+    public static void unzip( Path zip, Path out ) throws IOException
+    {
+        try ( ZipInputStream zis = new ZipInputStream( Files.newInputStream( zip ) ) )
+        {
+            ZipEntry entry = zis.getNextEntry();
+            while ( entry != null )
+            {
+                Path file = out.resolve( entry.getName() );
+                if ( entry.isDirectory() )
+                {
+                    Files.createDirectory( file );
+                }
+                else
+                {
+                    Path parent = file.getParent();
+                    Files.createDirectories( parent );
+                    Files.copy( zis, file );
+                }
+                Files.setLastModifiedTime( file, FileTime.fromMillis( entry.getTime() ) );
+                entry = zis.getNextEntry();
+            }
+        }
     }
 
 }

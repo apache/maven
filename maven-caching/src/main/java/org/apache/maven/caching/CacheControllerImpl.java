@@ -22,14 +22,12 @@ package org.apache.maven.caching;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -788,13 +786,10 @@ public class CacheControllerImpl implements CacheController
 
     private void zipAndAttachArtifact( MavenProject project, Path dir, String classifier ) throws IOException
     {
-        try ( InputStream inputStream = ZipUtils.zipFolder( dir ) )
-        {
-            File tempFile = File.createTempFile( "maven-incremental", project.getArtifactId() );
-            tempFile.deleteOnExit();
-            Files.copy( inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
-            projectHelper.attachArtifact( project, "zip", classifier, tempFile );
-        }
+        Path temp = Files.createTempFile( "maven-incremental", project.getArtifactId() );
+        temp.toFile().deleteOnExit();
+        CacheUtils.zip( dir, temp );
+        projectHelper.attachArtifact( project, "zip", classifier, temp.toFile() );
     }
 
     private String pathToClassifier( Path relative )
@@ -821,18 +816,15 @@ public class CacheControllerImpl implements CacheController
     {
         final Path targetDir = Paths.get( project.getBuild().getDirectory() );
         final Path outputDir = classifierToPath( targetDir, artifact.getClassifier() );
-        try ( InputStream is = Files.newInputStream( artifactFilePath ) )
+        if ( Files.exists( outputDir ) )
         {
-            if ( Files.exists( outputDir ) )
-            {
-                FileUtils.cleanDirectory( outputDir.toFile() );
-            }
-            else
-            {
-                Files.createDirectories( outputDir );
-            }
-            ZipUtils.unzip( is, outputDir );
+            FileUtils.cleanDirectory( outputDir.toFile() );
         }
+        else
+        {
+            Files.createDirectories( outputDir );
+        }
+        CacheUtils.unzip( artifactFilePath, outputDir );
     }
 
     //TODO: move to config

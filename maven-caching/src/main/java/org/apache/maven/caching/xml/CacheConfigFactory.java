@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.caching.SessionUtils;
+import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.execution.MavenSession;
 
 @Singleton
@@ -43,7 +43,7 @@ public class CacheConfigFactory
 
     public CacheConfig getCacheConfig( MavenSession session )
     {
-        return SessionUtils.getOrCreate( session, KEY, () -> new CacheConfigImpl( xmlService, session ) );
+        return CacheUtils.getOrCreate( session, KEY, () -> new CacheConfigImpl( xmlService, session ) );
     }
 
 }
