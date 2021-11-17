@@ -1,0 +1,40 @@
+name: Eat Your Own Dogfood CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn verify -e -B -V -DdistributionFileName=apache-maven
+
+      - name: Build Temp Directory
+        shell: bash
+        run: |
+          set +e
+
+          if [ ! -n "$" ]; then
+            fail "Missing var"
+          fi
+
+      - name: Extract tar.gz
+
+      - name: Build With Own Dogfood
+
+      - name: Clean with Maven
+        run: mvn clean
