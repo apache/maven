@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultLifecycles
 {
-    public static final String[] STANDARD_LIFECYCLES = { "default", "clean", "site", "wrapper" };
+    public static final String[] STANDARD_LIFECYCLES = { "clean", "default", "site", "wrapper" };
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
