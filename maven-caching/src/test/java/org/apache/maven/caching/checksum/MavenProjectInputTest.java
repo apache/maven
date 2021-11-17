@@ -72,7 +72,7 @@ public class MavenProjectInputTest
                 Paths.get( "src/test/resources/test-folder" ),
                 directoryFiles,
                 MavenProjectInput.DEFAULT_GLOB,
-                it -> true );
+                it -> false );
         assertEquals( 0, directoryFiles.size() ); // pom is filtered out by hardcoded if
     }
 
@@ -84,7 +84,7 @@ public class MavenProjectInputTest
                 Paths.get( "src/test/resources/test-folder" ),
                 directoryFiles,
                 GLOB,
-                it -> true );
+                it -> false );
         assertEquals( 1, directoryFiles.size() ); // pom is filtered out by hardcoded if
     }
 }
