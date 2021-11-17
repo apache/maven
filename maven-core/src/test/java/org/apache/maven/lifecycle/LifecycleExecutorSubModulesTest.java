@@ -18,7 +18,6 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
-import org.apache.maven.lifecycle.internal.IMojoExecutor;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
@@ -26,6 +25,7 @@ import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 
 import javax.inject.Inject;
 
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,7 +43,7 @@ public class LifecycleExecutorSubModulesTest
     private DefaultLifecycles defaultLifeCycles;
 
     @Inject
-    private IMojoExecutor mojoExecutor;
+    private MojoExecutor mojoExecutor;
 
     @Inject
     private LifecycleModuleBuilder lifeCycleBuilder;

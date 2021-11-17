@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -67,7 +68,6 @@ import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -90,7 +90,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replaceEachRepeatedly;
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
-import static org.apache.maven.caching.CacheUtils.isBuilding;
 import static org.apache.maven.caching.CacheUtils.isSnapshot;
 
 /**
@@ -143,13 +142,11 @@ public class MavenProjectInput
     private final Path baseDirPath;
     private final String dirGlob;
     private final boolean processPlugins;
-    private final ProjectIndex projectIndex;
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     public MavenProjectInput( MavenProject project,
                               MavenSession session,
                               CacheConfig config,
-                              ProjectIndex projectIndex,
                               ConcurrentMap<String, DigestItem> artifactsByKey,
                               RepositorySystem repoSystem,
                               LocalCacheRepository localCache,
@@ -158,7 +155,6 @@ public class MavenProjectInput
         this.project = project;
         this.session = session;
         this.config = config;
-        this.projectIndex = projectIndex;
         this.projectArtifactsByKey = artifactsByKey;
         this.baseDirPath = project.getBasedir().toPath().toAbsolutePath();
         this.repoSystem = repoSystem;
@@ -708,7 +704,7 @@ public class MavenProjectInput
         for ( Dependency dependency : project.getDependencies() )
         {
             // saved to index by the end of dependency build
-            final boolean currentlyBuilding = isBuilding( dependency, projectIndex );
+            final boolean currentlyBuilding = isBuilding( dependency );
             final boolean partOfMultiModule = strategy.isPartOfMultiModule( dependency );
             if ( !currentlyBuilding && !partOfMultiModule && !isSnapshot( dependency.getVersion() ) )
             {
@@ -763,6 +759,14 @@ public class MavenProjectInput
             result.put( artifactKey, resolved );
         }
         return result;
+    }
+
+    private boolean isBuilding( Dependency dependency )
+    {
+        return session.getProjects().stream()
+                .anyMatch( p -> Objects.equals( p.getGroupId(), dependency.getGroupId() )
+                        && Objects.equals( p.getArtifactId(), dependency.getArtifactId() )
+                        && Objects.equals( p.getVersion(), dependency.getVersion() ) );
     }
 
     @Nonnull

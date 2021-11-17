@@ -21,7 +21,6 @@ package org.apache.maven.caching;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -36,7 +35,6 @@ public interface CacheController
 
     CacheResult findCachedBuild( MavenSession session,
                                  MavenProject project,
-                                 ProjectIndex projectIndex,
                                  List<MojoExecution> mojoExecutions );
 
     boolean restoreProjectArtifacts( CacheResult cacheResult );

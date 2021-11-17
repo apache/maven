@@ -85,7 +85,25 @@ public class LifecyclePhasesHelper
     }
 
     /**
-     * Computes the list of segments that are cached.
+     * Computes the list of mojos executions in the clean phase
+     */
+    public List<MojoExecution> getCleanSegment( List<MojoExecution> mojoExecutions )
+    {
+        List<MojoExecution> list = new ArrayList<>();
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            if ( mojoExecution.getLifecyclePhase() == null
+                    || isLaterPhaseThanClean( mojoExecution.getLifecyclePhase() ) )
+            {
+                break;
+            }
+            list.add( mojoExecution );
+        }
+        return list;
+    }
+
+    /**
+     * Computes the list of mojos executions that are cached.
      */
     public List<MojoExecution> getCachedSegment( List<MojoExecution> mojoExecutions, Build build )
     {
@@ -106,7 +124,7 @@ public class LifecyclePhasesHelper
     }
 
     /**
-     * Computes the list of segments that will have to be executed after cache restoration.
+     * Computes the list of mojos executions that will have to be executed after cache restoration.
      */
     public List<MojoExecution> getPostCachedSegment( List<MojoExecution> mojoExecutions, Build build )
     {

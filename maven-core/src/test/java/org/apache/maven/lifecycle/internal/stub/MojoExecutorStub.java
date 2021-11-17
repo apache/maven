@@ -18,14 +18,13 @@ package org.apache.maven.lifecycle.internal.stub;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
-import org.apache.maven.lifecycle.internal.IDependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.PhaseRecorder;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -47,16 +46,10 @@ public class MojoExecutorStub
             BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
-            ExecutionEventCatapult eventCatapult )
+            ExecutionEventCatapult eventCatapult,
+            MojosExecutionStrategy mojosExecutionStrategy )
     {
-        super( pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult );
-    }
-
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
-                         IDependencyContext dependencyContext, PhaseRecorder phaseRecorder )
-        throws LifecycleExecutionException
-    {
-        executions.add( mojoExecution );
+        super( pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult, mojosExecutionStrategy );
     }
 
     @Override

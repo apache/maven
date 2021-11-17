@@ -24,11 +24,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.caching.xml.build.Scm;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.SessionData;
 
 import java.io.IOException;
@@ -57,15 +54,6 @@ import static org.apache.maven.artifact.Artifact.SNAPSHOT_VERSION;
  */
 public class CacheUtils
 {
-
-    public static boolean isBuilding( Dependency dependency, ProjectIndex projectIndex )
-    {
-        final MavenProject key = new MavenProject();
-        key.setGroupId( dependency.getGroupId() );
-        key.setArtifactId( dependency.getArtifactId() );
-        key.setVersion( dependency.getVersion() );
-        return projectIndex.getProjects().containsKey( BuilderCommon.getKey( key ) );
-    }
 
     public static boolean isPom( Dependency dependency )
     {

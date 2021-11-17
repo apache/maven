@@ -37,7 +37,7 @@ import java.util.TreeSet;
  * @author Kristian Rosenvold (class extract only)
  */
 // TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
-public class DependencyContext implements IDependencyContext
+public class DependencyContext
 {
 
     private static final Collection<?> UNRESOLVED = Arrays.asList();
@@ -66,44 +66,37 @@ public class DependencyContext implements IDependencyContext
         scopesToResolveForAggregatedProjects = Collections.synchronizedSet( new TreeSet<>() );
     }
 
-    @Override
     public MavenProject getProject()
     {
         return project;
     }
 
-    @Override
     public Collection<String> getScopesToCollectForCurrentProject()
     {
         return scopesToCollectForCurrentProject;
     }
 
-    @Override
     public Collection<String> getScopesToResolveForCurrentProject()
     {
         return scopesToResolveForCurrentProject;
     }
 
-    @Override
     public Collection<String> getScopesToCollectForAggregatedProjects()
     {
         return scopesToCollectForAggregatedProjects;
     }
 
-    @Override
     public Collection<String> getScopesToResolveForAggregatedProjects()
     {
         return scopesToResolveForAggregatedProjects;
     }
 
-    @Override
     public boolean isResolutionRequiredForCurrentProject()
     {
         return lastDependencyArtifacts != project.getDependencyArtifacts()
                 || ( lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size() );
     }
 
-    @Override
     public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,
                                                               Collection<String> scopesToResolve )
     {
@@ -111,7 +104,6 @@ public class DependencyContext implements IDependencyContext
             || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
     }
 
-    @Override
     public void synchronizeWithProjectState()
     {
         lastDependencyArtifacts = project.getDependencyArtifacts();

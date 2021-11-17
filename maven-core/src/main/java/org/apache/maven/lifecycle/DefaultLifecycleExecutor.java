@@ -32,7 +32,7 @@ import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
-import org.apache.maven.lifecycle.internal.IMojoExecutor;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
@@ -66,7 +66,7 @@ public class DefaultLifecycleExecutor
     private final DefaultLifecycles defaultLifeCycles;
     private final LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
     private final LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
-    private final IMojoExecutor mojoExecutor;
+    private final MojoExecutor mojoExecutor;
     private final LifecycleStarter lifecycleStarter;
     private final MojoDescriptorCreator mojoDescriptorCreator;
 
@@ -76,7 +76,7 @@ public class DefaultLifecycleExecutor
             DefaultLifecycles defaultLifeCycles,
             LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
             LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator,
-            IMojoExecutor mojoExecutor,
+            MojoExecutor mojoExecutor,
             LifecycleStarter lifecycleStarter,
             MojoDescriptorCreator mojoDescriptorCreator )
     {

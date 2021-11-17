@@ -74,7 +74,6 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -124,6 +123,7 @@ public class CacheControllerImpl implements CacheController
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
+    private final MavenSession mavenSession;
     private volatile Scm scm;
 
     @Inject
@@ -135,7 +135,8 @@ public class CacheControllerImpl implements CacheController
             LocalCacheRepository localCache,
             RemoteCacheRepository remoteCache, 
             CacheConfig cacheConfig,
-            LifecyclePhasesHelper lifecyclePhasesHelper )
+            LifecyclePhasesHelper lifecyclePhasesHelper,
+            MavenSession mavenSession )
     {
         this.projectHelper = projectHelper;
         this.localCache = localCache;
@@ -145,12 +146,12 @@ public class CacheControllerImpl implements CacheController
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
+        this.mavenSession = mavenSession;
     }
 
     @Override
     @Nonnull
     public CacheResult findCachedBuild( MavenSession session, MavenProject project,
-                                        ProjectIndex projectIndex,
                                         List<MojoExecution> mojoExecutions )
     {
         final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
@@ -161,7 +162,7 @@ public class CacheControllerImpl implements CacheController
 
         LOGGER.info( "Attempting to restore project from build cache" );
 
-        ProjectsInputInfo inputInfo = calculateInput( project, session, projectIndex );
+        ProjectsInputInfo inputInfo = calculateInput( project, session );
 
         final CacheContext context = new CacheContext( project, inputInfo, session );
         // remote build first
@@ -377,12 +378,11 @@ public class CacheControllerImpl implements CacheController
         }
     }
 
-    private ProjectsInputInfo calculateInput( MavenProject project, MavenSession session,
-                                                  ProjectIndex projectIndex )
+    private ProjectsInputInfo calculateInput( MavenProject project, MavenSession session )
     {
         try
         {
-            final MavenProjectInput inputs = new MavenProjectInput( project, session, cacheConfig, projectIndex,
+            final MavenProjectInput inputs = new MavenProjectInput( project, session, cacheConfig,
                     artifactDigestByKey, repoSystem, localCache, remoteCache );
             return inputs.calculateChecksum( cacheConfig.getHashFactory() );
         }
