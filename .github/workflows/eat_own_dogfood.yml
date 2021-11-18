@@ -47,6 +47,7 @@ jobs:
           if [ -f ${{ env.TAR_BALL }} ]; then
             temp_dir=$(mktemp -d)
             tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
+            echo "tar.gz file \"${{ env.TAR_BALL }}\" succesfully extracted in temporarily directory \"$temp_dir.\""
             echo "TEMP_MAVEN_DIR=$temp_dir" >> $GITHUB_ENV
           else
             echo "${{ env.TAR_BALL }} does not exist."
