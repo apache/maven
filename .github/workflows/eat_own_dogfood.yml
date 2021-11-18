@@ -28,8 +28,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
 
     steps:
       - uses: actions/checkout@v2
@@ -54,6 +52,8 @@ jobs:
             echo "${{ env.TAR_BALL }} does not exist."
             exit 1;
           fi
+        env:
+          TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
 
       - name: Clean With Maven
         run: mvn clean
@@ -67,6 +67,6 @@ jobs:
             export PATH=$maven_bin_dir:$PATH
             mvn verify -e -B -V -DdistributionFileName=apache-maven
           else
-            echo "$maven_bin_dir not found."
+            echo "$maven_bin_dir does not exist."
             exit 1;
           fi
