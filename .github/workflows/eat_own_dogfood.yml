@@ -28,6 +28,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
@@ -43,11 +46,14 @@ jobs:
         shell: bash
         run: |
           set +e
-          temp_dir=$(mktemp -d)
-
-          tar -xzf apache-maven/target/apache-maven-bin.tar.gz -C "$temp_dir" --strip 1
-
-          echo "TEMP_MAVEN_DIR=$temp_dir" >> $GITHUB_ENV
+          if [ -f ${{ env.TAR_BALL }} ]; then
+            temp_dir=$(mktemp -d)
+            tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
+            echo "TEMP_MAVEN_DIR=$temp_dir" >> $GITHUB_ENV
+          else
+            echo "${{ env.TAR_BALL }} does not exist."
+            exit 1;
+          fi
 
       - name: Clean With Maven
         run: mvn clean
@@ -56,9 +62,11 @@ jobs:
         shell: bash
         run: |
           set +e
-
-          export PATH=${{ env.TEMP_MAVEN_DIR }}/bin:$PATH
-
-          mvn --version
-
-          mvn verify -e -B -V -DdistributionFileName=apache-maven
+          maven_bin_dir=${{ env.TEMP_MAVEN_DIR }}/bin
+          if [ -d $maven_bin_dir ]; then
+            export PATH=$maven_bin_dir:$PATH
+            mvn verify -e -B -V -DdistributionFileName=apache-maven
+          else
+            echo "$maven_bin_dir not found."
+            exit 1;
+          fi
