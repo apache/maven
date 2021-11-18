@@ -61,7 +61,6 @@ import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
@@ -194,7 +193,7 @@ public class MavenProjectInput
         this.dependencyComparator = new DependencyComparator();
     }
 
-    public ProjectsInputInfo calculateChecksum( HashFactory hashFactory ) throws IOException
+    public ProjectsInputInfo calculateChecksum() throws IOException
     {
         final long t0 = System.currentTimeMillis();
 
@@ -207,7 +206,7 @@ public class MavenProjectInput
         // hash items: effective pom + input files + dependencies
         final int count = 1 + inputFiles.size() + dependenciesChecksum.size();
         final List<DigestItem> items = new ArrayList<>( count );
-        final HashChecksum checksum = hashFactory.createChecksum( count );
+        final HashChecksum checksum = config.getHashFactory().createChecksum( count );
 
         Optional<ProjectsInputInfo> baselineHolder = Optional.empty();
         if ( config.isBaselineDiffEnabled() )
@@ -267,7 +266,7 @@ public class MavenProjectInput
             LOGGER.debug( "Hash calculated, item: {}, hash: {}", item.getType(), item.getHash() );
         }
         LOGGER.info( "Project inputs calculated in {} ms. {} checksum [{}] calculated in {} ms.",
-                t1 - t0, hashFactory.getAlgorithm(), projectsInputInfoType.getChecksum(), t2 - t1 );
+                t1 - t0, config.getHashFactory().getAlgorithm(), projectsInputInfoType.getChecksum(), t2 - t1 );
         return projectsInputInfoType;
     }
 
