@@ -126,7 +126,7 @@ public class CacheControllerImpl implements CacheController
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
-    private final Map<String, MavenProject> projectIndex;
+    private volatile Map<String, MavenProject> projectIndex;
     private volatile Scm scm;
 
     @Inject
@@ -149,8 +149,6 @@ public class CacheControllerImpl implements CacheController
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
-        this.projectIndex = session.getProjects().stream()
-                .collect( Collectors.toMap( BuilderCommon::getKey, Function.identity() ) );
     }
 
     @Override
@@ -386,6 +384,11 @@ public class CacheControllerImpl implements CacheController
     {
         try
         {
+            if ( projectIndex == null )
+            {
+                projectIndex = session.getProjects().stream()
+                        .collect( Collectors.toMap( BuilderCommon::getKey, Function.identity() ) );
+            }
             final MavenProjectInput inputs = new MavenProjectInput( project, projectIndex, session, cacheConfig,
                     artifactDigestByKey, repoSystem, localCache, remoteCache );
             return inputs.calculateChecksum();
