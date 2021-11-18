@@ -93,8 +93,8 @@ public class DependencyContext
 
     public boolean isResolutionRequiredForCurrentProject()
     {
-        return lastDependencyArtifacts != project.getDependencyArtifacts()
-                || ( lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size() );
+        return lastDependencyArtifacts != project.getDependencyArtifacts() || ( lastDependencyArtifacts != null
+            && lastDependencyArtifactCount != lastDependencyArtifacts.size() );
     }
 
     public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,

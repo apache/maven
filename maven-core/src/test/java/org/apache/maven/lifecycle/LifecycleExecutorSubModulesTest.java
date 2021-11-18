@@ -22,10 +22,10 @@ import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 
 import javax.inject.Inject;
 
-import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

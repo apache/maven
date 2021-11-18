@@ -65,6 +65,7 @@ public class MojoExecutorStub
         return null;
     }
 
+
     public static MojoDescriptor createMojoDescriptor( String mojoDescription )
     {
         final PluginDescriptor descriptor = new PluginDescriptor();

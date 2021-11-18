@@ -74,8 +74,8 @@ public class DefaultBuildPluginManager
      * @param repositories
      * @param session
      * @return PluginDescriptor The component descriptor for the Maven plugin.
-     * @throws PluginNotFoundException          The plugin could not be found in any repositories.
-     * @throws PluginResolutionException        The plugin could be found but could not be resolved.
+     * @throws PluginNotFoundException The plugin could not be found in any repositories.
+     * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException
      */
     public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories,
@@ -150,20 +150,20 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
-            ps.println(
-                    "A required class was missing while executing " + mojoDescriptor.getId() + ": " + e.getMessage() );
+            ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
+                + e.getMessage() );
             pluginRealm.display( ps );
 
             Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
@@ -172,8 +172,8 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -187,8 +187,8 @@ public class DefaultBuildPluginManager
         }
         catch ( ClassCastException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -200,8 +200,8 @@ public class DefaultBuildPluginManager
         }
         catch ( RuntimeException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             throw e;
         }
@@ -218,8 +218,8 @@ public class DefaultBuildPluginManager
     }
 
     /**
-     * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this call, which is not nice.
-     *
+     * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
+     *      call, which is not nice.
      * @throws PluginResolutionException
      */
     public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )

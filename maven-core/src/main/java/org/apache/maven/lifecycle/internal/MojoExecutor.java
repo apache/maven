@@ -145,9 +145,8 @@ public class MojoExecutor
         return Collections.unmodifiableCollection( scopes );
     }
 
-    public void execute( final MavenSession session,
-                         List<MojoExecution> mojoExecutions,
-                         final ProjectIndex projectIndex ) throws LifecycleExecutionException
+    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
+        throws LifecycleExecutionException
 
     {
         DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );

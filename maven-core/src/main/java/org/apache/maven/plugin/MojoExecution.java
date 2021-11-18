@@ -19,13 +19,13 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * MojoExecution
@@ -37,12 +37,11 @@ public class MojoExecution
 
     private String goal;
 
-    private final String executionId;
+    private String executionId;
 
     private MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
-
 
     /**
      * Describes the source of an execution.
@@ -64,8 +63,8 @@ public class MojoExecution
     private Source source = Source.LIFECYCLE;
 
     /**
-     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase this
-     * mojo execution is going to run in.
+     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
+     * this mojo execution is going to run in.
      */
     private String lifecyclePhase;
 
@@ -73,7 +72,7 @@ public class MojoExecution
      * The executions to fork before this execution, indexed by the groupId:artifactId:version of the project on which
      * the forked execution are to be run and in reactor build order.
      */
-    private final Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<>();
+    private Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<>();
 
     public MojoExecution( Plugin plugin, String goal, String executionId )
     {
@@ -153,7 +152,12 @@ public class MojoExecution
 
     public String identify()
     {
-        return executionId + configuration.toString();
+        StringBuilder sb = new StringBuilder( 256 );
+
+        sb.append( executionId );
+        sb.append( configuration.toString() );
+
+        return sb.toString();
     }
 
     public String getLifecyclePhase()
@@ -232,4 +236,5 @@ public class MojoExecution
     {
         this.forkedExecutions.put( projectKey, forkedExecutions );
     }
+
 }
