@@ -31,7 +31,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,7 +40,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -125,8 +126,8 @@ public class CacheControllerImpl implements CacheController
     private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
+    private final Map<String, MavenProject> projectIndex;
     private volatile Scm scm;
-    private volatile Map<String, MavenProject> projectIndex;
 
     @Inject
     public CacheControllerImpl(
@@ -137,7 +138,8 @@ public class CacheControllerImpl implements CacheController
             LocalCacheRepository localCache,
             RemoteCacheRepository remoteCache,
             CacheConfig cacheConfig,
-            LifecyclePhasesHelper lifecyclePhasesHelper )
+            LifecyclePhasesHelper lifecyclePhasesHelper,
+            MavenSession session )
     {
         this.projectHelper = projectHelper;
         this.localCache = localCache;
@@ -147,6 +149,8 @@ public class CacheControllerImpl implements CacheController
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
+        this.projectIndex = session.getProjects().stream()
+                .collect( Collectors.toMap( BuilderCommon::getKey, Function.identity() ) );
     }
 
     @Override
@@ -382,15 +386,6 @@ public class CacheControllerImpl implements CacheController
     {
         try
         {
-            if ( this.projectIndex == null )
-            {
-                Map<String, MavenProject> projectMap = new HashMap<>( session.getProjects().size() * 2 );
-                for ( MavenProject p : session.getProjects() )
-                {
-                    projectMap.put( BuilderCommon.getKey( p ), p );
-                }
-                this.projectIndex = projectMap;
-            }
             final MavenProjectInput inputs = new MavenProjectInput( project, projectIndex, session, cacheConfig,
                     artifactDigestByKey, repoSystem, localCache, remoteCache );
             return inputs.calculateChecksum( cacheConfig.getHashFactory() );
