@@ -52,14 +52,13 @@ jobs:
       - name: Clean With Maven
         run: mvn clean
 
-      - name: Change Maven Version
-        run: export PATH=${{ env.TEMP_MAVEN_DIR }}/bin:$PATH
-
       - name: Build With Own Dogfood
         shell: bash
         run: |
           set +e
 
+          export PATH=${{ env.TEMP_MAVEN_DIR }}/bin:$PATH
+
           mvn --version
 
-          mvn mvn verify -e -B -V -DdistributionFileName=apache-maven
+          mvn verify -e -B -V -DdistributionFileName=apache-maven
