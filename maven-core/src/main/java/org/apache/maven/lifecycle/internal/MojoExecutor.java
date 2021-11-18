@@ -154,9 +154,7 @@ public class MojoExecutor
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
         mojosExecutionStrategy.execute( mojoExecutions, session, mojoExecution ->
-        {
-            execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
-        } );
+                execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder ) );
     }
 
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
