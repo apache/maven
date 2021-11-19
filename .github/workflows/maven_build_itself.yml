@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Eat Your Own Dogfood CI
+name: Can Maven build itself
 
 on: [push, pull_request]
 
@@ -28,7 +28,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
@@ -40,7 +39,7 @@ jobs:
       - name: Build with Maven
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
 
-      - name: Extract Tarball
+      - name: Extract tarball
         shell: bash
         run: |
           set +e
@@ -56,10 +55,10 @@ jobs:
         env:
           TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
 
-      - name: Clean With Maven
+      - name: Clean with Maven
         run: mvn clean
 
-      - name: Build With Own Dogfood
+      - name: Build again with Maven SNAPSHOT
         shell: bash
         run: |
           set +e
