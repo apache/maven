@@ -24,6 +24,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        java: [8, 11, 17]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -32,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: 'maven'
 
@@ -46,8 +47,14 @@ jobs:
           if [ -f ${{ env.TAR_BALL }} ]; then
             temp_dir=$(mktemp -d)
             tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
-            echo "tar.gz file \"${{ env.TAR_BALL }}\" succesfully extracted in temporarily directory \"$temp_dir.\""
-            echo "TEMP_MAVEN_DIR=$temp_dir" >> $GITHUB_ENV
+            maven_bin_dir=${{ env.TEMP_MAVEN_DIR }}/bin
+            if [ -d $maven_bin_dir ]; then
+              echo "tar.gz file \"${{ env.TAR_BALL }}\" succesfully extracted in temporarily directory \"$temp_dir.\""
+              echo "TEMP_MAVEN_BIN_DIR=$maven_bin_dir" >> $GITHUB_ENV
+            else
+              echo "$maven_bin_dir does not exist."
+              exit 1;
+            fi
           else
             echo "${{ env.TAR_BALL }} does not exist."
             exit 1;
@@ -62,11 +69,5 @@ jobs:
         shell: bash
         run: |
           set +e
-          maven_bin_dir=${{ env.TEMP_MAVEN_DIR }}/bin
-          if [ -d $maven_bin_dir ]; then
-            export PATH=$maven_bin_dir:$PATH
-            mvn verify -e -B -V -DdistributionFileName=apache-maven
-          else
-            echo "$maven_bin_dir does not exist."
-            exit 1;
-          fi
+          export PATH=${{ env.TEMP_MAVEN_BIN_DIR }}:$PATH
+          mvn verify -e -B -V -DdistributionFileName=apache-maven
