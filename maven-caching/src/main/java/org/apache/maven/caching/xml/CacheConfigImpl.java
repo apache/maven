@@ -82,6 +82,8 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     public static final String SAVE_NON_OVERRIDEABLE_NAME = "remote.cache.save.final";
     public static final String FAIL_FAST_PROPERTY_NAME = "remote.cache.failFast";
     public static final String BASELINE_BUILD_URL_PROPERTY_NAME = "remote.cache.baselineUrl";
+    public static final String LAZY_RESTORE_PROPERTY_NAME = "remote.cache.lazyRestore";
+    public static final String RESTORE_GENERATED_SOURCES_PROPERTY_NAME = "remote.cache.restoreGeneratedSources";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CacheConfigImpl.class );
 
@@ -335,7 +337,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     }
 
     private ExecutionConfigurationScan findExecutionScanConfig( PluginExecution execution,
-                                                                    List<ExecutionConfigurationScan> scanConfigs )
+                                                                List<ExecutionConfigurationScan> scanConfigs )
     {
         for ( ExecutionConfigurationScan executionScanConfig : scanConfigs )
         {
@@ -501,6 +503,21 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         return getProperty( BASELINE_BUILD_URL_PROPERTY_NAME, null );
     }
+
+    @Override
+    public boolean isLazyRestore()
+    {
+        final String lazyRestore = getProperty( LAZY_RESTORE_PROPERTY_NAME, "false" );
+        return Boolean.parseBoolean( lazyRestore );
+    }
+
+    @Override
+    public boolean isRestoreGeneratedSources()
+    {
+        final String restoreGeneratedSources = getProperty( RESTORE_GENERATED_SOURCES_PROPERTY_NAME, "true" );
+        return Boolean.parseBoolean( restoreGeneratedSources );
+    }
+
 
     @Override
     public String getUrl()

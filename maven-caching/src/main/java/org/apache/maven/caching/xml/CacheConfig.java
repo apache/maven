@@ -105,4 +105,19 @@ public interface CacheConfig
     boolean isBaselineDiffEnabled();
 
     String getBaselineCacheUrl();
+
+    /**
+     * Artifacts restore policy. Eager policy (default) resolves all cached artifacts before restoring project and
+     * allows safe to fallback ro normal execution in case of restore failure. Lazy policy restores artifacts on demand
+     * minimizing need for downloading any artifacts from cache
+     * <p>
+     * Use: -Dremote.cache.lazyRestore=(true|false)
+     */
+    boolean isLazyRestore();
+
+    /**
+     * Flag to restore (default) or not generated sources as it might be desired to disable it in continuous integration
+     * scenarios
+     */
+    boolean isRestoreGeneratedSources();
 }
