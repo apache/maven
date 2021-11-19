@@ -19,10 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +33,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Kristian Rosenvold
@@ -82,6 +87,7 @@ public class DefaultLifecyclesTest
 
     @Test
     public void testCustomLifecycle()
+        throws ComponentLookupException
     {
         List<Lifecycle> myLifecycles = new ArrayList<>();
         Lifecycle myLifecycle = new Lifecycle( "etl",
@@ -90,8 +96,12 @@ public class DefaultLifecyclesTest
         myLifecycles.add( myLifecycle );
         myLifecycles.addAll( defaultLifeCycles.getLifeCycles() );
 
-        DefaultLifecycles dl = new DefaultLifecycles( myLifecycles.stream()
-                                                            .collect( Collectors.toMap( l -> l.getId(), l -> l ) ) );
+        Map<String, Lifecycle> lifeCycles = myLifecycles.stream()
+                .collect( Collectors.toMap( Lifecycle::getId, l -> l ) );
+        PlexusContainer mockedPlexusContainer = mock( PlexusContainer.class );
+        when( mockedPlexusContainer.lookupMap( Lifecycle.class ) ).thenReturn( lifeCycles );
+
+        DefaultLifecycles dl = new DefaultLifecycles( mockedPlexusContainer );
 
         assertThat( dl.getLifeCycles().get( 0 ).getId(), is( "clean" ) );
         assertThat( dl.getLifeCycles().get( 1 ).getId(), is( "default" ) );
