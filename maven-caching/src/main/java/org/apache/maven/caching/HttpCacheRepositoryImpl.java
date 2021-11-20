@@ -32,10 +32,10 @@ import javax.inject.Named;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -97,9 +97,9 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     public Build findBuild( CacheContext context )
     {
         final String resourceUrl = getResourceUrl( context, BUILDINFO_XML );
-        if ( exists( resourceUrl ) )
+        final byte[] bytes = getResourceContent( resourceUrl );
+        if ( bytes != null )
         {
-            final byte[] bytes = getResourceContent( resourceUrl );
             final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( bytes );
             return new Build( dto, CacheSource.REMOTE );
         }
@@ -144,44 +144,24 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
         }
     }
 
-    @SuppressWarnings( "checkstyle:magicnumber" )
-    private boolean exists( String url )
-    {
-        HttpHead head = null;
-        try
-        {
-            head = new HttpHead( url );
-            HttpResponse response = httpClient.get().execute( head );
-            int statusCode = response.getStatusLine().getStatusCode();
-            LOGGER.info( "Checking {}. Status: {}", url, statusCode );
-            return statusCode == 200;
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( "Cannot check " + url, e );
-        }
-        finally
-        {
-            if ( head != null )
-            {
-                head.releaseConnection();
-            }
-        }
-    }
-
-    @SuppressWarnings( "checkstyle:magicnumber" )
+    /**
+     * Downloads content of the resource
+     * 
+     * @return null or content
+     */
     public byte[] getResourceContent( String url )
     {
         HttpGet get = null;
         try
         {
             get = new HttpGet( url );
+            LOGGER.info( "Downloading {}", url );
             HttpResponse response = httpClient.get().execute( get );
             int statusCode = response.getStatusLine().getStatusCode();
-            LOGGER.info( "Downloading {}. Status: {}", url, statusCode );
-            if ( statusCode != 200 )
+            if ( statusCode != HttpStatus.SC_OK )
             {
-                throw new RuntimeException( "Cannot download " + url + ", unexpected status code: " + statusCode );
+                LOGGER.info( "Cannot download {}, status code: {}", url, statusCode );
+                return null;
             }
             try ( InputStream content = response.getEntity().getContent() )
             {
@@ -215,7 +195,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     }
 
     /**
-     * @param instream     to be closed externally
+     * @param instream to be closed externally
      */
     private void putToRemoteCache( InputStream instream, String url ) throws IOException
     {
@@ -278,9 +258,9 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
             try
             {
-                if ( exists( url ) )
+                byte[] content = getResourceContent( url );
+                if ( content != null )
                 {
-                    byte[] content = getResourceContent( url );
                     final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( content );
                     return Optional.of( new Build( dto, CacheSource.REMOTE ) );
                 }
