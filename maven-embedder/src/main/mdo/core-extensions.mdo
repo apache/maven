@@ -82,6 +82,14 @@
           <required>true</required>
           <type>String</type>
         </field>
+        <field>
+          <name>classloadingStrategy</name>
+          <description>The classloading strategy (self-first, parent-first, plugin)</description>
+          <version>1.1.0+</version>
+          <defaultValue>self-first</defaultValue>
+          <required>false</required>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

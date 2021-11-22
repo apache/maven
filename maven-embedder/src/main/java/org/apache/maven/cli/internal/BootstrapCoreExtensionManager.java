@@ -31,6 +31,8 @@ import javax.inject.Named;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.model.Plugin;
@@ -66,6 +68,8 @@ public class BootstrapCoreExtensionManager
 
     private final DefaultRepositorySystemSessionFactory repositorySystemSessionFactory;
 
+    private final CoreExportsProvider coreExportsProvider;
+
     private final ClassWorld classWorld;
 
     private final ClassRealm parentRealm;
@@ -73,10 +77,12 @@ public class BootstrapCoreExtensionManager
     @Inject
     public BootstrapCoreExtensionManager( DefaultPluginDependenciesResolver pluginDependenciesResolver,
                                           DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
+                                          CoreExportsProvider coreExportsProvider,
                                           PlexusContainer container )
     {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
+        this.coreExportsProvider = coreExportsProvider;
         this.classWorld = ( (DefaultPlexusContainer) container ).getClassWorld();
         this.parentRealm = container.getContainerRealm();
     }
@@ -121,14 +127,39 @@ public class BootstrapCoreExtensionManager
     {
         String realmId =
             "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion();
-        ClassRealm realm = classWorld.newRealm( realmId, null );
-        log.debug( "Populating class realm " + realm.getId() );
-        realm.setParentRealm( parentRealm );
+        ClassRealm realm;
+        Set<String> providedArtifacts = Collections.emptySet();
+        if ( "parent-first".equals( extension.getClassloadingStrategy() ) )
+        {
+            realm = classWorld.newRealm( realmId, null );
+            realm.importFrom( parentRealm, "" );
+        }
+        else if ( "plugin".equals( extension.getClassloadingStrategy() ) )
+        {
+            realm = classWorld.newRealm( realmId, null );
+            CoreExports coreExports = this.coreExportsProvider.get();
+            coreExports.getExportedPackages().forEach( ( p, cl ) -> realm.importFrom( cl, p ) );
+            providedArtifacts = coreExports.getExportedArtifacts();
+        }
+        else
+        {
+            realm = classWorld.newRealm( realmId, null );
+            realm.setParentRealm( parentRealm );
+        }
+        log.debug( "Populating class realm {}", realm.getId() );
         for ( Artifact artifact : artifacts )
         {
-            File file = artifact.getFile();
-            log.debug( "  Included " + file );
-            realm.addURL( file.toURI().toURL() );
+            String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
+            if ( providedArtifacts.contains( id ) )
+            {
+                log.debug( "  Excluded {}", id );
+            }
+            else
+            {
+                File file = artifact.getFile();
+                log.debug( "  Included {}", file );
+                realm.addURL( file.toURI().toURL() );
+            }
         }
         return CoreExtensionEntry.discoverFrom( realm, Collections.singleton( artifacts.get( 0 ).getFile() ) );
     }
