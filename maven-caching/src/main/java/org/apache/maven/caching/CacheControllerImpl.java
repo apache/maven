@@ -111,8 +111,7 @@ public class CacheControllerImpl implements CacheController
 {
 
     public static final String FILE_SEPARATOR_SUBST = "_";
-    private static final String GENERATEDSOURCES = "generatedsources";
-    private static final String GENERATEDSOURCES_PREFIX = GENERATEDSOURCES + FILE_SEPARATOR_SUBST;
+    private static final String BUILD_PREFIX = "build" + FILE_SEPARATOR_SUBST;
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CacheControllerImpl.class );
 
@@ -332,7 +331,7 @@ public class CacheControllerImpl implements CacheController
                     }
                     LOGGER.debug( "Attaching artifact {} from {}",
                             artifact.getArtifactId(), attachedArtifactFile );
-                    if ( StringUtils.startsWith( attachedArtifact.getClassifier(), GENERATEDSOURCES_PREFIX ) )
+                    if ( StringUtils.startsWith( attachedArtifact.getClassifier(), BUILD_PREFIX ) )
                     {
                         // generated sources artifact
                         restoreGeneratedSources( attachedArtifact, attachedArtifactFile, project );
@@ -415,17 +414,27 @@ public class CacheControllerImpl implements CacheController
         final MavenSession session = context.getSession();
         try
         {
-            attachGeneratedSources( project );
-            attachOutputs( project );
-
-            final org.apache.maven.artifact.Artifact projectArtifact = project.getArtifact();
             final HashFactory hashFactory = cacheConfig.getHashFactory();
-            final HashAlgorithm algorithm = hashFactory.createAlgorithm();
-            final Artifact projectArtifactDto = artifactDto( project.getArtifact(), algorithm );
-
-            final List<org.apache.maven.artifact.Artifact> attachedArtifacts =
-                    project.getAttachedArtifacts() != null ? project.getAttachedArtifacts() : Collections.emptyList();
-            List<Artifact> attachedArtifactDtos = artifactDtos( attachedArtifacts, algorithm );
+            final org.apache.maven.artifact.Artifact projectArtifact = project.getArtifact();
+            final List<org.apache.maven.artifact.Artifact> attachedArtifacts;
+            final List<Artifact> attachedArtifactDtos;
+            final Artifact projectArtifactDto;
+            if ( project.hasLifecyclePhase( "package" ) )
+            {
+                final HashAlgorithm algorithm = hashFactory.createAlgorithm();
+                attachGeneratedSources( project );
+                attachOutputs( project );
+                attachedArtifacts = project.getAttachedArtifacts() != null
+                        ? project.getAttachedArtifacts() : Collections.emptyList();
+                attachedArtifactDtos = artifactDtos( attachedArtifacts, algorithm );
+                projectArtifactDto = artifactDto( project.getArtifact(), algorithm );
+            }
+            else
+            {
+                attachedArtifacts = Collections.emptyList();
+                attachedArtifactDtos = new ArrayList<>();
+                projectArtifactDto = null;
+            }
 
             List<CompletedExecution> completedExecution = buildExecutionInfo( mojoExecutions, executionEvents );
 
@@ -566,7 +575,8 @@ public class CacheControllerImpl implements CacheController
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             final String executionKey = CacheUtils.mojoExecutionKey( mojoExecution );
-            final MojoExecutionEvent executionEvent = executionEvents.get( executionKey );
+            final MojoExecutionEvent executionEvent =
+                    executionEvents != null ? executionEvents.get( executionKey ) : null;
             CompletedExecution executionInfo = new CompletedExecution();
             executionInfo.setExecutionKey( executionKey );
             executionInfo.setMojoClassName( mojoExecution.getMojoDescriptor().getImplementation() );
@@ -798,12 +808,12 @@ public class CacheControllerImpl implements CacheController
             segments.add( relative.getName( i ).toFile().getName() );
         }
         // todo handle _ in file names
-        return GENERATEDSOURCES_PREFIX + StringUtils.join( segments.iterator(), FILE_SEPARATOR_SUBST );
+        return BUILD_PREFIX + StringUtils.join( segments.iterator(), FILE_SEPARATOR_SUBST );
     }
 
     private Path classifierToPath( Path outputDir, String classifier )
     {
-        classifier = StringUtils.removeStart( classifier, GENERATEDSOURCES_PREFIX );
+        classifier = StringUtils.removeStart( classifier, BUILD_PREFIX );
         final String relPath = replace( classifier, FILE_SEPARATOR_SUBST, File.separator );
         return outputDir.resolve( relPath );
     }
