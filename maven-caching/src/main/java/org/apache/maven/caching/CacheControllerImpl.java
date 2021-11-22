@@ -326,7 +326,8 @@ public class CacheControllerImpl implements CacheController
                 {
                     if ( StringUtils.startsWith( attachedArtifactInfo.getClassifier(), BUILD_PREFIX ) )
                     {
-                        // restoring generated sources might be unnecessary in CI, could be disabled for performance reasons
+                        // restoring generated sources might be unnecessary in CI, could be disabled for
+                        // performance reasons
                         if ( cacheConfig.isRestoreGeneratedSources() )
                         {
                             // generated sources artifact
@@ -340,8 +341,8 @@ public class CacheControllerImpl implements CacheController
                         Future<File> downloadTask =
                                 createDownloadTask( cacheResult, context, project, attachedArtifactInfo );
                         final RestoredArtifact restoredAttachedArtifact =
-                                restoredArtifact( restoredProjectArtifact == null ? project.getArtifact() :
-                                                restoredProjectArtifact,
+                                restoredArtifact( restoredProjectArtifact == null ? project.getArtifact()
+                                                : restoredProjectArtifact,
                                         attachedArtifactInfo.getType(),
                                         attachedArtifactInfo.getClassifier(),
                                         downloadTask );
@@ -371,8 +372,8 @@ public class CacheControllerImpl implements CacheController
      * with restored from cache artifacts
      */
     private RestoredArtifact restoredArtifact( org.apache.maven.artifact.Artifact parent, String artifactType,
-                                              String artifactClassifier,
-                                              Future<File> artifactFile )
+                                               String artifactClassifier,
+                                               Future<File> artifactFile )
     {
         ArtifactHandler handler = null;
 
@@ -393,11 +394,12 @@ public class CacheControllerImpl implements CacheController
 
         return artifact;
     }
-    
+
     private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
                                              Artifact artifact )
     {
-        final FutureTask<File> downloadTask = new FutureTask<>( () -> {
+        final FutureTask<File> downloadTask = new FutureTask<>( () -> 
+        {
             try
             {
                 LOGGER.debug( "Downloading artifact {}", artifact.getArtifactId() );
@@ -588,7 +590,7 @@ public class CacheControllerImpl implements CacheController
                 if ( baselinePom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve(
-                                    "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
+                            "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
                             baselinePom.get().getValue().getBytes( StandardCharsets.UTF_8 ),
                             TRUNCATE_EXISTING, CREATE );
                 }
