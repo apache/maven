@@ -1,0 +1,8 @@
+<extensions>
+    <extension>
+        <groupId>org.apache.maven.its.mng7160</groupId>
+        <artifactId>extension</artifactId>
+        <version>1.0</version>
+        <classloadingStrategy>plugin</classloadingStrategy>
+    </extension>
+</extensions>
