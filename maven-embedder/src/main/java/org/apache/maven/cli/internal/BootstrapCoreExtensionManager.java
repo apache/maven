@@ -32,7 +32,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
-import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.model.Plugin;
@@ -68,7 +67,7 @@ public class BootstrapCoreExtensionManager
 
     private final DefaultRepositorySystemSessionFactory repositorySystemSessionFactory;
 
-    private final CoreExportsProvider coreExportsProvider;
+    private final CoreExports coreExports;
 
     private final ClassWorld classWorld;
 
@@ -77,12 +76,12 @@ public class BootstrapCoreExtensionManager
     @Inject
     public BootstrapCoreExtensionManager( DefaultPluginDependenciesResolver pluginDependenciesResolver,
                                           DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
-                                          CoreExportsProvider coreExportsProvider,
+                                          CoreExports coreExports,
                                           PlexusContainer container )
     {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
-        this.coreExportsProvider = coreExportsProvider;
+        this.coreExports = coreExports;
         this.classWorld = ( (DefaultPlexusContainer) container ).getClassWorld();
         this.parentRealm = container.getContainerRealm();
     }
@@ -137,7 +136,6 @@ public class BootstrapCoreExtensionManager
         else if ( "plugin".equals( extension.getClassloadingStrategy() ) )
         {
             realm = classWorld.newRealm( realmId, null );
-            CoreExports coreExports = this.coreExportsProvider.get();
             coreExports.getExportedPackages().forEach( ( p, cl ) -> realm.importFrom( cl, p ) );
             providedArtifacts = coreExports.getExportedArtifacts();
         }
