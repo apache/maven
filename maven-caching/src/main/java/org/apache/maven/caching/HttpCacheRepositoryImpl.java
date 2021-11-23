@@ -52,8 +52,6 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Configurable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +195,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
      */
     private void putToRemoteCache( InputStream instream, String url ) throws IOException
     {
-        HttpPut httpPut = new HttpPut( url );;
+        HttpPut httpPut = new HttpPut( url );
         try
         {
             httpPut.setEntity( new InputStreamEntity( instream ) );
@@ -217,7 +215,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     @Override
     public Optional<Build> findBaselineBuild( MavenProject project )
     {
-        final Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
+        Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
                 .map( CacheReport::getProjects );
         
         if ( !cachedProjectsHolder.isPresent() )
