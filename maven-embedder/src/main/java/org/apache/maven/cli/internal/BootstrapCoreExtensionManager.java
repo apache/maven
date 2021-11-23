@@ -128,12 +128,12 @@ public class BootstrapCoreExtensionManager
             "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion();
         ClassRealm realm;
         Set<String> providedArtifacts = Collections.emptySet();
-        if ( "parent-first".equals( extension.getClassloadingStrategy() ) )
+        if ( "parent-first".equals( extension.getClassLoadingStrategy() ) )
         {
             realm = classWorld.newRealm( realmId, null );
             realm.importFrom( parentRealm, "" );
         }
-        else if ( "plugin".equals( extension.getClassloadingStrategy() ) )
+        else if ( "plugin".equals( extension.getClassLoadingStrategy() ) )
         {
             realm = classWorld.newRealm( realmId, null );
             coreExports.getExportedPackages().forEach( ( p, cl ) -> realm.importFrom( cl, p ) );

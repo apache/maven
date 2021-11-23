@@ -83,8 +83,8 @@
           <type>String</type>
         </field>
         <field>
-          <name>classloadingStrategy</name>
-          <description>The classloading strategy (self-first, parent-first, plugin)</description>
+          <name>classLoadingStrategy</name>
+          <description>The class loading strategy: 'self-first' (the default), 'parent-first' (loads classes from the parent, then from the extension) or 'plugin' (follows the rules from extensions defined as plugins).</description>
           <version>1.1.0+</version>
           <defaultValue>self-first</defaultValue>
           <required>false</required>
