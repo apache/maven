@@ -24,7 +24,9 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.execution.MavenSession;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Cache repository.
@@ -32,7 +34,8 @@ import java.io.IOException;
 public interface CacheRepository
 {
 
-    Build findBuild( CacheContext context ) throws IOException;
+    @Nonnull
+    Optional<Build> findBuild( CacheContext context ) throws IOException;
 
     void saveBuildInfo( CacheResult cacheResult, Build build ) throws IOException;
 

@@ -193,91 +193,92 @@ public class CacheControllerImpl implements CacheController
 
     private CacheResult findCachedBuild( List<MojoExecution> mojoExecutions, CacheContext context )
     {
-        Build cachedBuild = null;
+        Optional<Build> cachedBuild = Optional.empty();
         try
         {
             cachedBuild = localCache.findBuild( context );
-            return analyzeResult( context, mojoExecutions, cachedBuild );
+            if ( cachedBuild.isPresent() )
+            {
+                return analyzeResult( context, mojoExecutions, cachedBuild.get() );
+            }
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Cannot read cached build", e );
-            return cachedBuild != null ? failure( cachedBuild, context ) : failure( context );
+            LOGGER.error( "Cannot read cached remote build", e );
         }
+        return cachedBuild.map( build -> failure( build, context ) )
+                .orElseGet( () -> empty( context ) );
     }
 
     private CacheResult findLocalBuild( List<MojoExecution> mojoExecutions, CacheContext context )
     {
-        Build localBuild = null;
+        Optional<Build> localBuild = Optional.empty();
         try
         {
             localBuild = localCache.findLocalBuild( context );
-            return analyzeResult( context, mojoExecutions, localBuild );
+            if ( localBuild.isPresent() )
+            {
+                return analyzeResult( context, mojoExecutions, localBuild.get() );
+            }
         }
         catch ( Exception e )
         {
             LOGGER.error( "Cannot read local build", e );
-            return localBuild != null ? failure( localBuild, context ) : failure( context );
         }
+        return localBuild.map( build -> failure( build, context ) )
+                .orElseGet( () -> empty( context ) );
     }
 
-    private CacheResult analyzeResult( CacheContext context, List<MojoExecution> mojoExecutions, Build info )
+    private CacheResult analyzeResult( CacheContext context, List<MojoExecution> mojoExecutions, Build build )
     {
         try
         {
-            if ( info != null )
+            final ProjectsInputInfo inputInfo = context.getInputInfo();
+
+            LOGGER.info( "Found cached build, restoring from cache {}", inputInfo.getChecksum() );
+            LOGGER.debug( "Cached build details: {}", build );
+
+            final String cacheImplementationVersion = build.getCacheImplementationVersion();
+            if ( !CACHE_IMPLEMENTATION_VERSION.equals( cacheImplementationVersion ) )
             {
-                final ProjectsInputInfo inputInfo = context.getInputInfo();
-
-                LOGGER.info( "Found cached build, restoring from cache {}", inputInfo.getChecksum() );
-                LOGGER.debug( "Cached build details: {}", info );
-
-                final String cacheImplementationVersion = info.getCacheImplementationVersion();
-                if ( !CACHE_IMPLEMENTATION_VERSION.equals( cacheImplementationVersion ) )
-                {
-                    LOGGER.warn(
-                            "Maven and cached build implementations mismatch, caching might not work correctly. "
-                                    + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: {}",
-                            info.getCacheImplementationVersion() );
-                }
-
-                List<MojoExecution> cachedSegment = lifecyclePhasesHelper.getCachedSegment( mojoExecutions, info );
-                List<MojoExecution> missingMojos = info.getMissingExecutions( cachedSegment );
-                if ( !missingMojos.isEmpty() )
-                {
-                    LOGGER.warn( "Cached build doesn't contains all requested plugin executions "
-                            + "(missing: {}), cannot restore", missingMojos );
-                    return failure( info, context );
-                }
-
-                if ( !isCachedSegmentPropertiesPresent( context.getProject(), info, cachedSegment ) )
-                {
-                    LOGGER.info( "Cached build violates cache rules, cannot restore" );
-                    return failure( info, context );
-                }
-
-                final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
-                if ( lifecyclePhasesHelper.isLaterPhaseThanBuild( highestRequestPhase, info )
-                        && !canIgnoreMissingSegment( info, mojoExecutions ) )
-                {
-                    LOGGER.info( "Project restored partially. Highest cached goal: {}, requested: {}",
-                            info.getHighestCompletedGoal(), highestRequestPhase );
-                    return partialSuccess( info, context );
-                }
-
-                return success( info, context );
+                LOGGER.warn(
+                        "Maven and cached build implementations mismatch, caching might not work correctly. "
+                                + "Implementation version: " + CACHE_IMPLEMENTATION_VERSION + ", cached build: {}",
+                        build.getCacheImplementationVersion() );
             }
-            else
+
+            List<MojoExecution> cachedSegment = lifecyclePhasesHelper.getCachedSegment( mojoExecutions, build );
+            List<MojoExecution> missingMojos = build.getMissingExecutions( cachedSegment );
+            if ( !missingMojos.isEmpty() )
             {
-                LOGGER.info( "Project is not found in cache" );
-                return empty( context );
+                LOGGER.warn( "Cached build doesn't contains all requested plugin executions "
+                        + "(missing: {}), cannot restore", missingMojos );
+                return failure( build, context );
             }
+
+            if ( !isCachedSegmentPropertiesPresent( context.getProject(), build, cachedSegment ) )
+            {
+                LOGGER.info( "Cached build violates cache rules, cannot restore" );
+                return failure( build, context );
+            }
+
+            final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
+            if ( lifecyclePhasesHelper.isLaterPhaseThanBuild( highestRequestPhase, build )
+                    && !canIgnoreMissingSegment( build, mojoExecutions ) )
+            {
+                LOGGER.info( "Project restored partially. Highest cached goal: {}, requested: {}",
+                        build.getHighestCompletedGoal(), highestRequestPhase );
+                return partialSuccess( build, context );
+            }
+
+            return success( build, context );
+
         }
         catch ( Exception e )
         {
             LOGGER.error( "Failed to restore project", e );
             localCache.clearCache( context );
-            return empty( context );
+            return failure( build, context );
         }
     }
 
