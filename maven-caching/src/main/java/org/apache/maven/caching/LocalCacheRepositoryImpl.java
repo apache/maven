@@ -58,7 +58,6 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,7 +217,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             }
 
             List<Path> cacheDirs = new ArrayList<>();
-            try ( final DirectoryStream<Path> paths = Files.newDirectoryStream( artifactCacheDir ) )
+            try ( DirectoryStream<Path> paths = Files.newDirectoryStream( artifactCacheDir ) )
             {
                 for ( Path dir : paths )
                 {
