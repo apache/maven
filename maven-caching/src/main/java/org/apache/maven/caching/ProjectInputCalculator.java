@@ -1,4 +1,4 @@
-package org.apache.maven.caching.xml;
+package org.apache.maven.caching;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,15 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.project.MavenProject;
 
 /**
- * AllExternalStrategy
+ *
  */
-public class AllExternalStrategy implements MultimoduleDiscoveryStrategy
+public interface ProjectInputCalculator
 {
-    @Override
-    public boolean isPartOfMultiModule( Dependency dependency )
-    {
-        return false;
-    }
 
-    @Override
-    public boolean isLookupRemoteMavenRepo( Artifact artifact )
-    {
-        return true;
-    }
+    ProjectsInputInfo calculateInput( MavenProject project );
+
 }

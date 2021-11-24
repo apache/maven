@@ -19,9 +19,12 @@ package org.apache.maven.caching;
  * under the License.
  */
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -31,6 +34,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,9 +46,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.function.Function;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -52,14 +58,13 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.caching.artifact.RestoredArtifact;
-import org.apache.maven.caching.checksum.KeyUtils;
-import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.Build;
@@ -79,7 +84,6 @@ import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -122,16 +126,15 @@ public class CacheControllerImpl implements CacheController
     private static final Logger LOGGER = LoggerFactory.getLogger( CacheControllerImpl.class );
 
     private final MavenProjectHelper projectHelper;
-    private final RepositorySystem repoSystem;
     private final ArtifactHandlerManager artifactHandlerManager;
     private final XmlService xmlService;
     private final CacheConfig cacheConfig;
     private final LocalCacheRepository localCache;
     private final RemoteCacheRepository remoteCache;
-    private final ConcurrentMap<String, DigestItem> artifactDigestByKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CacheResult> cacheResults = new ConcurrentHashMap<>();
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
     private volatile Map<String, MavenProject> projectIndex;
+    private final ProjectInputCalculator projectInputCalculator;
     private volatile Scm scm;
 
     @Inject
@@ -143,6 +146,7 @@ public class CacheControllerImpl implements CacheController
             LocalCacheRepository localCache,
             RemoteCacheRepository remoteCache,
             CacheConfig cacheConfig,
+            ProjectInputCalculator projectInputCalculator,
             LifecyclePhasesHelper lifecyclePhasesHelper,
             MavenSession session )
     {
@@ -150,10 +154,10 @@ public class CacheControllerImpl implements CacheController
         this.localCache = localCache;
         this.remoteCache = remoteCache;
         this.cacheConfig = cacheConfig;
-        this.repoSystem = repoSystem;
         this.artifactHandlerManager = artifactHandlerManager;
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
+        this.projectInputCalculator = projectInputCalculator;
     }
 
     @Override
@@ -169,7 +173,7 @@ public class CacheControllerImpl implements CacheController
 
         LOGGER.info( "Attempting to restore project from build cache" );
 
-        ProjectsInputInfo inputInfo = calculateInput( project, session );
+        ProjectsInputInfo inputInfo = projectInputCalculator.calculateInput( project );
 
         final CacheContext context = new CacheContext( project, inputInfo, session );
         // remote build first
@@ -184,6 +188,10 @@ public class CacheControllerImpl implements CacheController
             if ( localBuild.isSuccess() || ( localBuild.isPartialSuccess() && !result.isPartialSuccess() ) )
             {
                 result = localBuild;
+            }
+            else
+            {
+                LOGGER.info( "Local build was not found by checksum " + inputInfo.getChecksum() );
             }
         }
         cacheResults.put( getVersionlessProjectKey( project ), result );
@@ -311,17 +319,23 @@ public class CacheControllerImpl implements CacheController
             if ( build.getArtifact() != null && isNotBlank( build.getArtifact().getFileName() ) )
             {
                 final Artifact artifactInfo = build.getArtifact();
+                String originalVersion = artifactInfo.getVersion();
                 artifactInfo.setVersion( project.getVersion() );
                 // TODO if remote is forced, probably need to refresh or reconcile all files
-                final Future<File> downloadTask = createDownloadTask( cacheResult, context, project, artifactInfo );
+                final Future<File> downloadTask = createDownloadTask(
+                        cacheResult,
+                        context,
+                        project,
+                        artifactInfo,
+                        originalVersion );
                 restoredProjectArtifact =
                         restoredArtifact( project.getArtifact(), artifactInfo.getType(), artifactInfo.getClassifier(),
                                 downloadTask );
-                putChecksum( artifactInfo, context.getInputInfo().getChecksum() );
             }
 
             for ( Artifact attachedArtifactInfo : build.getAttachedArtifacts() )
             {
+                String originalVersion = attachedArtifactInfo.getVersion();
                 attachedArtifactInfo.setVersion( project.getVersion() );
                 if ( isNotBlank( attachedArtifactInfo.getFileName() ) )
                 {
@@ -340,7 +354,13 @@ public class CacheControllerImpl implements CacheController
                     else
                     {
                         Future<File> downloadTask =
-                                createDownloadTask( cacheResult, context, project, attachedArtifactInfo );
+                                createDownloadTask(
+                                        cacheResult,
+                                        context,
+                                        project,
+                                        attachedArtifactInfo,
+                                        originalVersion
+                                );
                         final RestoredArtifact restoredAttachedArtifact =
                                 restoredArtifact( restoredProjectArtifact == null ? project.getArtifact()
                                                 : restoredProjectArtifact,
@@ -349,7 +369,6 @@ public class CacheControllerImpl implements CacheController
                                         downloadTask );
                         restoredAttachedArtifacts.add( restoredAttachedArtifact );
                     }
-                    putChecksum( attachedArtifactInfo, context.getInputInfo().getChecksum() );
                 }
             }
             // Actually modify project at the end in case something went wrong during restoration,
@@ -358,7 +377,7 @@ public class CacheControllerImpl implements CacheController
             {
                 project.setArtifact( restoredProjectArtifact );
             }
-            restoredAttachedArtifacts.forEach( a -> project.addAttachedArtifact( a ) );
+            restoredAttachedArtifacts.forEach( project::addAttachedArtifact );
             return true;
         }
         catch ( Exception e )
@@ -396,10 +415,109 @@ public class CacheControllerImpl implements CacheController
         return artifact;
     }
 
-    private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
-                                             Artifact artifact )
+    //we might store in cache artifact which was build with previous version
+    //1.0-SNAPSHOT is kept in cache but real version of project is 2.0
+    //for pom packaging this is done automatically by maven but for jar and other there might be
+    //sensitive metadata with previous version. Versions mismatch could lead errors
+    private Path adjustArchiveArtifactVersion( MavenProject project, String originalArtifactVersion, Path artifactFile )
+            throws IOException
     {
-        final FutureTask<File> downloadTask = new FutureTask<>( () -> 
+
+        File file = artifactFile.toFile();
+        if ( project.getVersion().equals( originalArtifactVersion ) || !isArchive( file ) )
+        {
+            return artifactFile;
+        }
+
+        String currentVersion = project.getVersion();
+        File tmpJarFile = File.createTempFile( artifactFile.toFile().getName(),
+                '.' + FilenameUtils.getExtension( file.getName() ) );
+        tmpJarFile.deleteOnExit();
+        String originalImplVersion = Attributes.Name.IMPLEMENTATION_VERSION + ": " + originalArtifactVersion;
+        String implVersion = Attributes.Name.IMPLEMENTATION_VERSION + ": " + currentVersion;
+        String commonXmlOriginalVersion = "<version>" + originalArtifactVersion + "</version>";
+        String commonXmlVersion = "<version>" + currentVersion + "</version>";
+        String originalPomPropsVersion = "version=" + originalArtifactVersion;
+        String pomPropsVersion = "version=" + currentVersion;
+        try ( JarFile jarFile = new JarFile( artifactFile.toFile() ) )
+        {
+            try ( JarOutputStream jos = new JarOutputStream(
+                    new BufferedOutputStream( new FileOutputStream( tmpJarFile ) ) ) )
+            {
+                //Copy original jar file to the temporary one.
+                Enumeration<JarEntry> jarEntries = jarFile.entries();
+                byte[] buffer = new byte[1024];
+                while ( jarEntries.hasMoreElements() )
+                {
+                    JarEntry entry = jarEntries.nextElement();
+                    String entryName = entry.getName();
+
+                    if ( entryName.startsWith( "META-INF/maven" )
+                            && ( entryName.endsWith( "plugin.xml" ) || entryName.endsWith( "plugin-help.xml" ) ) )
+                    {
+                        replaceEntry( jarFile, entry, commonXmlOriginalVersion, commonXmlVersion, jos );
+                        continue;
+                    }
+
+                    if ( entryName.endsWith( "pom.xml" ) )
+                    {
+                        replaceEntry( jarFile, entry, commonXmlOriginalVersion, commonXmlVersion, jos );
+                        continue;
+                    }
+
+                    if ( entryName.endsWith( "pom.properties" ) )
+                    {
+                        replaceEntry( jarFile, entry, originalPomPropsVersion, pomPropsVersion, jos );
+                        continue;
+                    }
+
+                    if ( JarFile.MANIFEST_NAME.equals( entryName ) )
+                    {
+                        replaceEntry( jarFile, entry, originalImplVersion, implVersion, jos );
+                        continue;
+                    }
+                    jos.putNextEntry( entry );
+                    try ( InputStream entryInputStream = jarFile.getInputStream( entry ) )
+                    {
+                        int bytesRead;
+                        while ( ( bytesRead = entryInputStream.read( buffer ) ) != -1 )
+                        {
+                            jos.write( buffer, 0, bytesRead );
+                        }
+                    }
+                }
+            }
+        }
+        return tmpJarFile.toPath();
+    }
+
+    private static void replaceEntry( JarFile jarFile, JarEntry entry,
+                                      String toReplace, String replacement, JarOutputStream jos ) throws IOException
+    {
+        String fullManifest = IOUtils.toString( jarFile.getInputStream( entry ), StandardCharsets.UTF_8 );
+        String modified = fullManifest.replaceAll( toReplace, replacement );
+
+        byte[] bytes = modified.getBytes( StandardCharsets.UTF_8 );
+        JarEntry newEntry = new JarEntry( entry.getName() );
+        jos.putNextEntry( newEntry );
+        jos.write( bytes );
+    }
+
+    private static boolean isArchive( File file )
+    {
+        String fileName = file.getName();
+        if ( !file.isFile() || file.isHidden() )
+        {
+            return false;
+        }
+        return fileName.endsWith( ".jar" ) || fileName.endsWith( ".zip" )
+                || fileName.endsWith( ".war" ) || fileName.endsWith( ".ear" );
+    }
+
+    private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
+                                             Artifact artifact, String originalVersion )
+    {
+        final FutureTask<File> downloadTask = new FutureTask<>( () ->
         {
             try
             {
@@ -412,7 +530,7 @@ public class CacheControllerImpl implements CacheController
                             "Missing file for cached build, cannot restore. File: " + artifactFile );
                 }
                 LOGGER.debug( "Downloaded artifact " + artifact.getArtifactId() + " to: " + artifactFile );
-                return artifactFile.toFile();
+                return adjustArchiveArtifactVersion( project, originalVersion, artifactFile ).toFile();
             }
             catch ( IOException e )
             {
@@ -424,44 +542,6 @@ public class CacheControllerImpl implements CacheController
             downloadTask.run();
         }
         return downloadTask;
-    }
-
-    private void putChecksum( Artifact artifact, String projectChecksum )
-    {
-        final DigestItem projectArtifact = DtoUtils.createdDigestedByProjectChecksum( artifact, projectChecksum );
-        final String dependencyKey = KeyUtils.getArtifactKey( artifact );
-        artifactDigestByKey.put( dependencyKey, projectArtifact );
-
-        final ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
-        String packaging = artifactHandler.getPackaging();
-        if ( !Objects.equals( packaging, artifact.getType() ) )
-        {
-            artifactDigestByKey.put( KeyUtils.getArtifactKey( artifact, packaging ), projectArtifact );
-        }
-        String extension = artifactHandler.getExtension();
-        if ( !Objects.equals( extension, artifact.getType() ) && !Objects.equals( extension, packaging ) )
-        {
-            artifactDigestByKey.put( KeyUtils.getArtifactKey( artifact, extension ), projectArtifact );
-        }
-    }
-
-    private ProjectsInputInfo calculateInput( MavenProject project, MavenSession session )
-    {
-        try
-        {
-            if ( projectIndex == null )
-            {
-                projectIndex = session.getProjects().stream()
-                        .collect( Collectors.toMap( BuilderCommon::getKey, Function.identity() ) );
-            }
-            final MavenProjectInput inputs = new MavenProjectInput( project, projectIndex, session, cacheConfig,
-                    artifactDigestByKey, repoSystem, localCache, remoteCache );
-            return inputs.calculateChecksum();
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( "Failed to calculate checksums for " + project.getArtifactId(), e );
-        }
     }
 
     @Override
@@ -518,7 +598,6 @@ public class CacheControllerImpl implements CacheController
                 if ( projectArtifact.getFile() != null )
                 {
                     localCache.saveArtifactFile( cacheResult, projectArtifact );
-                    putChecksum( projectArtifactDto, context.getInputInfo().getChecksum() );
                 }
                 for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
                 {
@@ -527,10 +606,6 @@ public class CacheControllerImpl implements CacheController
                     {
                         localCache.saveArtifactFile( cacheResult, attachedArtifact );
                     }
-                }
-                for ( Artifact attachedArtifactDto : attachedArtifactDtos )
-                {
-                    putChecksum( attachedArtifactDto, context.getInputInfo().getChecksum() );
                 }
             }
             else
@@ -591,7 +666,7 @@ public class CacheControllerImpl implements CacheController
                 if ( baselinePom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve(
-                            "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
+                                    "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
                             baselinePom.get().getValue().getBytes( StandardCharsets.UTF_8 ),
                             TRUNCATE_EXISTING, CREATE );
                 }

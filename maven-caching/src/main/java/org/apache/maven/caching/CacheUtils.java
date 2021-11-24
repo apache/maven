@@ -100,8 +100,7 @@ public class CacheUtils
                 StringUtils.defaultIfEmpty( mojo.getGoal(), "emptyGoal" ),
                 StringUtils.defaultIfEmpty( mojo.getLifecyclePhase(), "emptyLifecyclePhase" ),
                 StringUtils.defaultIfEmpty( mojo.getArtifactId(), "emptyArtifactId" ),
-                StringUtils.defaultIfEmpty( mojo.getGroupId(), "emptyGroupId" ),
-                StringUtils.defaultIfEmpty( mojo.getVersion(), "emptyVersion" ) ), ":" );
+                StringUtils.defaultIfEmpty( mojo.getGroupId(), "emptyGroupId" ) ), ":" );
     }
 
     public static Path getMultimoduleRoot( MavenSession session )

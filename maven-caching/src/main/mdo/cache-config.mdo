@@ -128,25 +128,6 @@ under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="projectDiscoveryStrategy" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        Specifies how to identify belonging to a cached project then submodule is being build.
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:choice>
-                        <xs:element name="specificVersion" type="xs:string">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Any project dependency this this version will be considered cache eligible and will
-                                    be processed cache aware
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:choice>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="remote">
                 <xs:complexType>
                     <xs:sequence>

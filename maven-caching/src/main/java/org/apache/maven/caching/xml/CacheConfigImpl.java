@@ -36,7 +36,6 @@ import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.DefaultPluginScanConfig;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.PluginScanConfigImpl;
-import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.AttachedOutputs;
 import org.apache.maven.caching.xml.config.CacheConfig;
@@ -53,7 +52,6 @@ import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.caching.xml.config.Local;
 import org.apache.maven.caching.xml.config.PluginConfigurationScan;
 import org.apache.maven.caching.xml.config.PluginSet;
-import org.apache.maven.caching.xml.config.ProjectDiscoveryStrategy;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.TrackedProperty;
@@ -377,20 +375,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         checkInitializedState();
         return cacheConfig.getInput().getGlobal().getExcludes();
-    }
-
-    @Nonnull
-    @Override
-    public MultimoduleDiscoveryStrategy getMultimoduleDiscoveryStrategy()
-    {
-        checkInitializedState();
-        final ProjectDiscoveryStrategy projectDiscoveryStrategy =
-                cacheConfig.getConfiguration().getProjectDiscoveryStrategy();
-        if ( projectDiscoveryStrategy != null && projectDiscoveryStrategy.getSpecificVersion() != null )
-        {
-            return new SentinelVersionStrategy( projectDiscoveryStrategy.getSpecificVersion() );
-        }
-        return new AllExternalStrategy();
     }
 
     @Nonnull

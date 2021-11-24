@@ -21,7 +21,6 @@ package org.apache.maven.caching.checksum;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.xml.build.Artifact;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -34,17 +33,17 @@ public class KeyUtils
 
     public static String getProjectKey( MavenProject project )
     {
-        return StringUtils.joinWith( SEPARATOR, project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        return getProjectKey( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+    }
+
+    public static String getProjectKey( String groupId, String artifactId, String version )
+    {
+        return StringUtils.joinWith( SEPARATOR, groupId, artifactId, version );
     }
 
     public static String getVersionlessProjectKey( MavenProject project )
     {
         return StringUtils.joinWith( SEPARATOR, project.getGroupId(), project.getArtifactId() );
-    }
-
-    public static String getVersionlessDependencyKey( Dependency dependency )
-    {
-        return StringUtils.joinWith( SEPARATOR, dependency.getGroupId(), dependency.getArtifactId() );
     }
 
     public static String getArtifactKey( Artifact artifact )
@@ -53,9 +52,15 @@ public class KeyUtils
                 artifact.getClassifier(), artifact.getVersion() );
     }
 
+    public static String getVersionlessArtifactKey( org.apache.maven.artifact.Artifact artifact )
+    {
+        return getVersionlessArtifactKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getType(),
+                artifact.getClassifier() );
+    }
+
+
     /**
-     * Computes the key for the given artifact, using the given type instead of the one
-     * defined in the artifact.
+     * Computes the key for the given artifact, using the given type instead of the one defined in the artifact.
      */
     public static String getArtifactKey( Artifact artifact, String type )
     {
@@ -66,7 +71,7 @@ public class KeyUtils
     public static String getArtifactKey( org.apache.maven.artifact.Artifact artifact )
     {
         return getArtifactKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getType(),
-                               artifact.getClassifier(), artifact.getVersion() );
+                artifact.getClassifier(), artifact.getVersion() );
     }
 
     public static String getArtifactKey( String groupId, String artifactId, String type,
@@ -79,6 +84,19 @@ public class KeyUtils
         else
         {
             return StringUtils.joinWith( SEPARATOR, groupId, artifactId, type, version );
+        }
+    }
+
+    public static String getVersionlessArtifactKey( String groupId, String artifactId, String type,
+                                                    String classifier )
+    {
+        if ( classifier != null )
+        {
+            return StringUtils.joinWith( SEPARATOR, groupId, artifactId, type, classifier );
+        }
+        else
+        {
+            return StringUtils.joinWith( SEPARATOR, groupId, artifactId, type );
         }
     }
 }

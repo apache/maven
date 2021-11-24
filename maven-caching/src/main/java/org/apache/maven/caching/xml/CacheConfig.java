@@ -20,7 +20,6 @@ package org.apache.maven.caching.xml;
  */
 
 import org.apache.maven.caching.PluginScanConfig;
-import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
@@ -72,9 +71,6 @@ public interface CacheConfig
 
     @Nonnull
     PluginScanConfig getExecutionDirScanConfig( Plugin plugin, PluginExecution exec );
-
-    @Nonnull
-    MultimoduleDiscoveryStrategy getMultimoduleDiscoveryStrategy();
 
     @Nonnull
     HashFactory getHashFactory();
