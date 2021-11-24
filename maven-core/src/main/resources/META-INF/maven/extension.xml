@@ -30,6 +30,7 @@ under the License.
     <exportedPackage>org.apache.maven.exception</exportedPackage>
     <exportedPackage>org.apache.maven.execution</exportedPackage>
     <exportedPackage>org.apache.maven.execution.scope</exportedPackage>
+    <exportedPackage>org.apache.maven.feature</exportedPackage>
     <exportedPackage>org.apache.maven.graph</exportedPackage>
     <exportedPackage>org.apache.maven.lifecycle</exportedPackage>
     <exportedPackage>org.apache.maven.model</exportedPackage>
@@ -39,7 +40,7 @@ under the License.
     <exportedPackage>org.apache.maven.project</exportedPackage>
     <exportedPackage>org.apache.maven.reporting</exportedPackage>
     <exportedPackage>org.apache.maven.repository</exportedPackage>
-    <exportedPackage>org.apache.maven.rtinfo</exportedPackage>
+    <exportedPackage>org.apache.maven.rtinfo.*</exportedPackage>
     <exportedPackage>org.apache.maven.settings</exportedPackage>
     <exportedPackage>org.apache.maven.toolchain</exportedPackage>
     <exportedPackage>org.apache.maven.usability</exportedPackage>
@@ -93,6 +94,7 @@ under the License.
     <exportedPackage>org.codehaus.plexus.lifecycle</exportedPackage>
     <exportedPackage>org.codehaus.plexus.logging</exportedPackage>
     <exportedPackage>org.codehaus.plexus.personality</exportedPackage>
+    <exportedPackage>org.eclipse.sisu.*</exportedPackage>
 
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
