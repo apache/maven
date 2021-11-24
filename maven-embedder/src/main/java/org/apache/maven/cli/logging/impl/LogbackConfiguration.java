@@ -19,6 +19,7 @@ package org.apache.maven.cli.logging.impl;
  * under the License.
  */
 
+import ch.qos.logback.classic.Level;
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,10 @@ public class LogbackConfiguration
         ch.qos.logback.classic.Level value;
         switch ( level )
         {
+            case TRACE:
+                value = ch.qos.logback.classic.Level.TRACE;
+                break;
+
             case DEBUG:
                 value = ch.qos.logback.classic.Level.DEBUG;
                 break;

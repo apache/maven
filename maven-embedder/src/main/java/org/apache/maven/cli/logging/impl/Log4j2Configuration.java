@@ -36,6 +36,10 @@ public class Log4j2Configuration
         String value;
         switch ( level )
         {
+            case TRACE:
+                value = "trace";
+                break;
+
             case DEBUG:
                 value = "debug";
                 break;

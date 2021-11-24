@@ -505,13 +505,19 @@ public class MavenCli
         // LOG LEVEL
         cliRequest.verbose = cliRequest.commandLine.hasOption( CLIManager.VERBOSE )
                              || cliRequest.commandLine.hasOption( CLIManager.DEBUG );
+        cliRequest.veryVerbose = cliRequest.commandLine.hasOption( CLIManager.VERY_VERBOSE );
         cliRequest.quiet = !cliRequest.verbose && cliRequest.commandLine.hasOption( CLIManager.QUIET );
         cliRequest.showErrors = cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
 
-        if ( cliRequest.verbose )
+        if ( cliRequest.veryVerbose )
+        {
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.TRACE );
+        }
+        else if ( cliRequest.verbose )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
             slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );

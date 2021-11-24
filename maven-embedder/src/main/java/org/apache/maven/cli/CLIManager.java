@@ -48,6 +48,8 @@ public class CLIManager
 
     public static final char VERBOSE = 'X';
 
+    public static final String VERY_VERBOSE = "XX";
+
     public static final char ERRORS = 'e';
 
     public static final char HELP = 'h';
@@ -127,7 +129,8 @@ public class CLIManager
         options.addOption( Option.builder( Character.toString( OFFLINE ) ).longOpt( "offline" ).desc( "Work offline" ).build() );
         options.addOption( Option.builder( Character.toString( VERSION ) ).longOpt( "version" ).desc( "Display version information" ).build() );
         options.addOption( Option.builder( Character.toString( QUIET ) ).longOpt( "quiet" ).desc( "Quiet output - only show errors" ).build() );
-        options.addOption( Option.builder( Character.toString( VERBOSE ) ).longOpt( "verbose" ).longOpt( "verbose" ).desc( "Produce execution verbose output" ).build() );
+        options.addOption( Option.builder( Character.toString( VERBOSE ) ).longOpt( "verbose" ).desc( "Produce execution verbose output" ).build() );
+        options.addOption( Option.builder( VERY_VERBOSE ).longOpt( "very-verbose" ).desc( "Produce very verbose output" ).build() );
         options.addOption( Option.builder( Character.toString( ERRORS ) ).longOpt( "errors" ).desc( "Produce execution error messages" ).build() );
         options.addOption( Option.builder( Character.toString( NON_RECURSIVE ) ).longOpt( "non-recursive" ).desc( "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators" ).build() );
         options.addOption( Option.builder( Character.toString( UPDATE_SNAPSHOTS ) ).longOpt( "update-snapshots" ).desc( "Forces a check for missing releases and updated snapshots on remote repositories" ).build() );

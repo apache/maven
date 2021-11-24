@@ -44,6 +44,8 @@ public class CliRequest
 
     boolean verbose;
 
+    boolean veryVerbose;
+
     boolean quiet;
 
     boolean showErrors = true;

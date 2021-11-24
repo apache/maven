@@ -33,7 +33,7 @@ public interface Slf4jConfiguration
      */
     enum Level
     {
-        DEBUG, INFO, ERROR
+        TRACE, DEBUG, INFO, ERROR
     }
 
     /**
