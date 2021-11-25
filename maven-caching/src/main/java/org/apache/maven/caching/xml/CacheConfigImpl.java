@@ -58,7 +58,6 @@ import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
@@ -78,6 +77,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
 {
 
     public static final String CONFIG_PATH_PROPERTY_NAME = "remote.cache.configPath";
+    public static final String CACHE_ENABLED_PROPERTY_NAME = "remote.cache.enabled";
     public static final String SAVE_TO_REMOTE_PROPERTY_NAME = "remote.cache.save.enabled";
     public static final String SAVE_NON_OVERRIDEABLE_NAME = "remote.cache.save.final";
     public static final String FAIL_FAST_PROPERTY_NAME = "remote.cache.failFast";
@@ -108,7 +108,8 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         if ( state == null )
         {
-            if ( !Features.caching( session.getUserProperties() ).isActive() )
+            final String enabled = getProperty( CACHE_ENABLED_PROPERTY_NAME, "true" );
+            if ( !Boolean.parseBoolean( enabled ) )
             {
                 LOGGER.info( "Cache disabled by command line flag, project will be built fully and not cached" );
                 state = CacheState.DISABLED;
@@ -518,7 +519,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return Boolean.parseBoolean( restoreGeneratedSources );
     }
 
-
     @Override
     public String getUrl()
     {
@@ -526,6 +526,12 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return getRemote().getUrl();
     }
 
+    @Override
+    public String getTransport()
+    {
+        checkInitializedState();
+        return getRemote().getTransport();
+    }
 
     @Override
     public int getMaxLocalBuildsCached()

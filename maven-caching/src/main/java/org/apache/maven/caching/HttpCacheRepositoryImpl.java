@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * HTTP remote cache repository implementation.
  */
 @SessionScoped
-@Named
+@Named( "http" )
 public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 {
 
@@ -96,7 +96,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
     @Nonnull
     @Override
-    public Optional<Build> findBuild( CacheContext context )
+    public Optional<Build> findBuild( CacheContext context ) throws IOException
     {
         final String resourceUrl = getResourceUrl( context, BUILDINFO_XML );
         return getResourceContent( resourceUrl )
@@ -105,7 +105,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
     @Nonnull
     @Override
-    public Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact )
+    public Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact ) throws IOException
     {
         return getResourceContent( getResourceUrl( context, artifact.getFileName() ) );
     }
@@ -148,7 +148,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
      * @return null or content
      */
     @Nonnull
-    public Optional<byte[]> getResourceContent( String url )
+    public Optional<byte[]> getResourceContent( String url ) throws IOException
     {
         HttpGet get = new HttpGet( url );
         try
@@ -165,10 +165,6 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             {
                 return Optional.of( IOUtils.toByteArray( content ) );
             }
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( "Cannot get " + url, e );
         }
         finally
         {
