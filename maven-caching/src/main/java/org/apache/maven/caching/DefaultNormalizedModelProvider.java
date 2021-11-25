@@ -47,7 +47,6 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
 
     private final CacheConfig cacheConfig;
     private final MultiModuleSupport multiModuleSupport;
-    //private final MultiModuleSupport multiModuleSupport;
     private final ConcurrentMap<String, Model> modelCache = new ConcurrentHashMap<>();
 
     @Inject
