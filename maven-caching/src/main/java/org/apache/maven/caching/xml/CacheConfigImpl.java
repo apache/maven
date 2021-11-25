@@ -519,7 +519,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return Boolean.parseBoolean( restoreGeneratedSources );
     }
 
-
     @Override
     public String getUrl()
     {
@@ -527,6 +526,12 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return getRemote().getUrl();
     }
 
+    @Override
+    public String getTransport()
+    {
+        checkInitializedState();
+        return getRemote().getTransport();
+    }
 
     @Override
     public int getMaxLocalBuildsCached()

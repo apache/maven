@@ -83,6 +83,8 @@ public interface CacheConfig
 
     String getUrl();
 
+    String getTransport();
+
     boolean isEnabled();
 
     boolean isRemoteCacheEnabled();
