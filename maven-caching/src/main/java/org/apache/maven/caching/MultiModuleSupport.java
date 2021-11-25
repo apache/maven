@@ -1,4 +1,4 @@
-package org.apache.maven.caching.checksum;
+package org.apache.maven.caching;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,15 +19,17 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 
-/**
- * MultimoduleDiscoveryStrategy
- */
-public interface MultimoduleDiscoveryStrategy
+import java.util.Optional;
+
+public interface MultiModuleSupport
 {
-    boolean isPartOfMultiModule( Dependency dependency );
 
-    boolean isLookupRemoteMavenRepo( Artifact dependency );
+    Optional<MavenProject> tryToResolveProject( String groupId, String artifactId, String version );
+
+    boolean isPartOfMultiModule( String groupId, String artifactId, String version );
+
+    boolean isPartOfSession( String groupId, String artifactId, String version );
+
 }

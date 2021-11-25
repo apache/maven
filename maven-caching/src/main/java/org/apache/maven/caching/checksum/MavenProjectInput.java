@@ -44,9 +44,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -54,14 +52,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.caching.LocalCacheRepository;
+import org.apache.maven.caching.MultiModuleSupport;
+import org.apache.maven.caching.NormalizedModelProvider;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.CacheUtils;
+import org.apache.maven.caching.ProjectInputCalculator;
 import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
 import org.apache.maven.caching.xml.build.DigestItem;
@@ -69,12 +68,10 @@ import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
@@ -134,37 +131,36 @@ public class MavenProjectInput
 
     private final MavenProject project;
     private final MavenSession session;
-    private final LocalCacheRepository localCache;
     private final RemoteCacheRepository remoteCache;
     private final RepositorySystem repoSystem;
     private final CacheConfig config;
-    private final ConcurrentMap<String, DigestItem> projectArtifactsByKey;
     private final PathIgnoringCaseComparator fileComparator;
-    private final DependencyComparator dependencyComparator;
     private final List<Path> filteredOutPaths;
+    private final NormalizedModelProvider normalizedModelProvider;
+    private final MultiModuleSupport multiModuleSupport;
+    private final ProjectInputCalculator projectInputCalculator;
     private final Path baseDirPath;
     private final String dirGlob;
     private final boolean processPlugins;
-    private final Map<String, MavenProject> projectIndex;
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     public MavenProjectInput( MavenProject project,
-                              Map<String, MavenProject> projectIndex,
+                              NormalizedModelProvider normalizedModelProvider,
+                              MultiModuleSupport multiModuleSupport,
+                              ProjectInputCalculator projectInputCalculator,
                               MavenSession session,
                               CacheConfig config,
-                              ConcurrentMap<String, DigestItem> artifactsByKey,
                               RepositorySystem repoSystem,
-                              LocalCacheRepository localCache,
                               RemoteCacheRepository remoteCache )
     {
         this.project = project;
+        this.normalizedModelProvider = normalizedModelProvider;
+        this.multiModuleSupport = multiModuleSupport;
+        this.projectInputCalculator = projectInputCalculator;
         this.session = session;
         this.config = config;
-        this.projectIndex = projectIndex;
-        this.projectArtifactsByKey = artifactsByKey;
         this.baseDirPath = project.getBasedir().toPath().toAbsolutePath();
         this.repoSystem = repoSystem;
-        this.localCache = localCache;
         this.remoteCache = remoteCache;
         Properties properties = project.getProperties();
         this.dirGlob = properties.getProperty( CACHE_INPUT_GLOB_NAME, config.getDefaultGlob() );
@@ -190,16 +186,15 @@ public class MavenProjectInput
         }
 
         this.fileComparator = new PathIgnoringCaseComparator();
-        this.dependencyComparator = new DependencyComparator();
     }
 
     public ProjectsInputInfo calculateChecksum() throws IOException
     {
         final long t0 = System.currentTimeMillis();
 
-        final String effectivePom = getEffectivePom( project.getModel() );
+        final String effectivePom = getEffectivePom( normalizedModelProvider.normalizedModel( project ) );
         final SortedSet<Path> inputFiles = isPom( project ) ? Collections.emptySortedSet() : getInputFiles();
-        final SortedMap<String, DigestItem> dependenciesChecksum = getMutableDependencies();
+        final SortedMap<String, String> dependenciesChecksum = getMutableDependencies();
 
         final long t1 = System.currentTimeMillis();
 
@@ -239,10 +234,10 @@ public class MavenProjectInput
         }
 
         boolean dependenciesMatched = true;
-        for ( Map.Entry<String, DigestItem> entry : dependenciesChecksum.entrySet() )
+        for ( Map.Entry<String, String> entry : dependenciesChecksum.entrySet() )
         {
             DigestItem dependencyDigest =
-                    DigestUtils.dependency( checksum, entry.getKey(), entry.getValue().getHash() );
+                    DigestUtils.dependency( checksum, entry.getKey(), entry.getValue() );
             items.add( dependencyDigest );
             if ( compareWithBaseline )
             {
@@ -327,48 +322,6 @@ public class MavenProjectInput
         return matched;
     }
 
-    //prototype must not be affected
-    private Model normalizeModel( Model prototype )
-    {
-        // TODO validate status of the model - it should be in resolved state
-        Model toHash = new Model();
-
-        toHash.setGroupId( prototype.getGroupId() );
-        toHash.setArtifactId( prototype.getArtifactId() );
-        toHash.setVersion( prototype.getVersion() );
-        toHash.setModules( prototype.getModules() );
-
-        toHash.setDependencies(
-                prototype.getDependencies().stream()
-                        .sorted( dependencyComparator )
-                        .collect( Collectors.toList() )
-        );
-
-        org.apache.maven.model.Build protoBuild = prototype.getBuild();
-        if ( protoBuild == null )
-        {
-            return toHash;
-        }
-
-        org.apache.maven.model.Build buildToHash = new org.apache.maven.model.Build();
-
-        List<Plugin> plugins = normalizePlugins( prototype.getBuild().getPlugins() );
-        buildToHash.setPlugins( plugins );
-
-        PluginManagement pluginManagement = buildToHash.getPluginManagement();
-        //if it is not a pom packaging no need to track plugin management section in effective pom
-        //as it contributes into plugins section
-        if ( pluginManagement != null && isPom( this.project ) )
-        {
-            PluginManagement pluginManagementToHash = pluginManagement.clone();
-            pluginManagementToHash.setPlugins( normalizePlugins( pluginManagement.getPlugins() ) );
-            buildToHash.setPluginManagement( pluginManagementToHash );
-        }
-
-        toHash.setBuild( buildToHash );
-        return toHash;
-    }
-
     /**
      * @param prototype effective model fully resolved by maven build. Do not pass here just parsed Model.
      */
@@ -380,7 +333,7 @@ public class MavenProjectInput
         try
         {
             writer = WriterFactory.newXmlWriter( output );
-            new MavenXpp3Writer().write( writer, normalizeModel( prototype ) );
+            new MavenXpp3Writer().write( writer, prototype );
 
             //normalize env specifics
             final String[] searchList = {baseDirPath.toString(), "\\", "windows", "linux"};
@@ -725,10 +678,9 @@ public class MavenProjectInput
         return false;
     }
 
-    private SortedMap<String, DigestItem> getMutableDependencies() throws IOException
+    private SortedMap<String, String> getMutableDependencies() throws IOException
     {
-        MultimoduleDiscoveryStrategy strategy = config.getMultimoduleDiscoveryStrategy();
-        SortedMap<String, DigestItem> result = new TreeMap<>();
+        SortedMap<String, String> result = new TreeMap<>();
 
         for ( Dependency dependency : project.getDependencies() )
         {
@@ -743,67 +695,41 @@ public class MavenProjectInput
             }
 
             // saved to index by the end of dependency build
-            final boolean currentlyBuilding = isBuilding( dependency );
-            final boolean partOfMultiModule = strategy.isPartOfMultiModule( dependency );
-            if ( !currentlyBuilding && !partOfMultiModule && !isSnapshot( dependency.getVersion() ) )
+            MavenProject dependencyProject = multiModuleSupport.tryToResolveProject(
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion() )
+                    .orElse( null );
+            boolean isSnapshot = isSnapshot( dependency.getVersion() );
+            if ( dependencyProject == null && !isSnapshot )
             {
                 // external immutable dependency, should skip
                 continue;
             }
-
-            final Artifact dependencyArtifact = repoSystem.createDependencyArtifact( dependency );
-            final String artifactKey = KeyUtils.getArtifactKey( dependencyArtifact );
-            DigestItem resolved = null;
-            if ( currentlyBuilding )
+            String projectHash;
+            if ( dependencyProject != null ) //part of multi module
             {
-                resolved = projectArtifactsByKey.get( artifactKey );
-                if ( resolved == null )
-                {
-                    throw new DependencyNotResolvedException( "Expected dependency not resolved: " + dependency );
-                }
+                projectHash = projectInputCalculator.calculateInput( dependencyProject ).getChecksum();
             }
-            else
+            else //this is a snapshot dependency
             {
-                if ( partOfMultiModule )
-                {
-                    // TODO lookup in remote cache is not necessary for abfx, for versioned projects - make sense
-                    final Optional<Build> bestMatchResult = localCache.findBestMatchingBuild( session, dependency );
-                    if ( bestMatchResult.isPresent() )
-                    {
-                        final Build bestMatched = bestMatchResult.get();
-                        resolved = bestMatched.findArtifact( dependency );
-                    }
-                }
-                if ( resolved != null )
-                {
-                    continue;
-                }
-                try
-                {
-                    resolved = resolveArtifact( dependencyArtifact, strategy );
-                }
-                catch ( Exception e )
-                {
-                    throw new RuntimeException( "Cannot resolve dependency " + dependency, e );
-                }
+                DigestItem resolved = resolveArtifact(
+                        repoSystem.createDependencyArtifact( dependency ),
+                        false
+                );
+                projectHash = resolved.getHash();
             }
-            result.put( artifactKey, resolved );
+            result.put(
+                    KeyUtils.getVersionlessArtifactKey( repoSystem.createDependencyArtifact( dependency ) ),
+                    projectHash
+            );
         }
         return result;
     }
 
-    private boolean isBuilding( Dependency dependency )
-    {
-        final MavenProject key = new MavenProject();
-        key.setGroupId( dependency.getGroupId() );
-        key.setArtifactId( dependency.getArtifactId() );
-        key.setVersion( dependency.getVersion() );
-        return projectIndex.containsKey( BuilderCommon.getKey( key ) );
-    }
-
     @Nonnull
     private DigestItem resolveArtifact( final Artifact dependencyArtifact,
-                                        MultimoduleDiscoveryStrategy strategy ) throws IOException
+                                        boolean isOffline ) throws IOException
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
                 .setArtifact( dependencyArtifact )
@@ -811,7 +737,7 @@ public class MavenProjectInput
                 .setResolveTransitively( false )
                 .setLocalRepository( session.getLocalRepository() )
                 .setRemoteRepositories( project.getRemoteArtifactRepositories() )
-                .setOffline( session.isOffline() || !strategy.isLookupRemoteMavenRepo( dependencyArtifact ) )
+                .setOffline( session.isOffline() || isOffline )
                 .setForceUpdate( session.getRequest().isUpdateSnapshots() )
                 .setServers( session.getRequest().getServers() )
                 .setMirrors( session.getRequest().getMirrors() )
@@ -863,76 +789,4 @@ public class MavenProjectInput
         }
     }
 
-    /**
-     * DependencyComparator
-     */
-    public static class DependencyComparator implements Comparator<Dependency>
-    {
-        @Override
-        public int compare( Dependency d1, Dependency d2 )
-        {
-            return d1.getArtifactId().compareTo( d2.getArtifactId() );
-        }
-
-    }
-
-    private List<Plugin> normalizePlugins( List<Plugin> plugins )
-    {
-        return plugins.stream()
-                .map( it ->
-                {
-                    //do not touch original plugin, work with copy to calculate checksum
-                    Plugin plugin = it.clone();
-                    List<String> excludeProperties = config.getEffectivePomExcludeProperties( plugin );
-                    removeBlacklistedAttributes( (Xpp3Dom) plugin.getConfiguration(), excludeProperties );
-                    for ( PluginExecution execution : plugin.getExecutions() )
-                    {
-                        Xpp3Dom config = (Xpp3Dom) execution.getConfiguration();
-                        removeBlacklistedAttributes( config, excludeProperties );
-                    }
-                    //list could be immutable here hence we must not modify it but set new one
-                    plugin.setDependencies(
-                            it.getDependencies().stream()
-                                    .sorted( dependencyComparator )
-                                    .collect( Collectors.toList() )
-                    );
-                    return plugin;
-                } )
-                .collect( Collectors.toList() );
-    }
-
-    private void removeBlacklistedAttributes( Xpp3Dom node, List<String> excludeProperties )
-    {
-        if ( node == null )
-        {
-            return;
-        }
-
-        Xpp3Dom[] children = node.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            Xpp3Dom child = children[i];
-            if ( excludeProperties.contains( child.getName() ) )
-            {
-                node.removeChild( i );
-                continue;
-            }
-            removeBlacklistedAttributes( child, excludeProperties );
-        }
-    }
-
-    public CacheConfig getConfig()
-    {
-        return config;
-    }
-
-    public MavenSession getSession()
-    {
-        return session;
-    }
-
-    public MavenProject getProject()
-    {
-        return project;
-    }
 }
