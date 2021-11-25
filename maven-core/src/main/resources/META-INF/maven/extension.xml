@@ -94,7 +94,6 @@ under the License.
     <exportedPackage>org.codehaus.plexus.lifecycle</exportedPackage>
     <exportedPackage>org.codehaus.plexus.logging</exportedPackage>
     <exportedPackage>org.codehaus.plexus.personality</exportedPackage>
-    <exportedPackage>org.eclipse.sisu.*</exportedPackage>
 
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
