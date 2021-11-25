@@ -26,17 +26,23 @@ import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.project.MavenProject;
 
+import javax.annotation.Nonnull;
+
 /**
  * Remote cache repository.
  */
 public interface RemoteCacheRepository extends CacheRepository
 {
 
-    byte[] getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
+    @Nonnull
+    Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
 
-    byte[] getResourceContent( String resourceUrl ) throws IOException;
+    @Nonnull
+    Optional<byte[]> getResourceContent( String resourceUrl ) throws IOException;
 
+    @Nonnull
     String getResourceUrl( CacheContext context, String filename );
 
+    @Nonnull
     Optional<Build> findBaselineBuild( MavenProject project );
 }

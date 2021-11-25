@@ -21,6 +21,7 @@ package org.apache.maven.caching;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +41,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -103,8 +105,9 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         this.cacheConfig = cacheConfig;
     }
 
+    @Nonnull
     @Override
-    public Build findLocalBuild( CacheContext context ) throws IOException
+    public Optional<Build> findLocalBuild( CacheContext context ) throws IOException
     {
         Path localBuildInfoPath = localBuildPath( context, BUILDINFO_XML, false );
         LOGGER.debug( "Checking local build info: {}", localBuildInfoPath );
@@ -114,7 +117,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             try
             {
                 org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( localBuildInfoPath.toFile() );
-                return new Build( dto, CacheSource.LOCAL );
+                return Optional.of( new Build( dto, CacheSource.LOCAL ) );
             }
             catch ( Exception e )
             {
@@ -122,11 +125,12 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                 Files.delete( localBuildInfoPath );
             }
         }
-        return null;
+        return Optional.empty();
     }
 
+    @Nonnull
     @Override
-    public Build findBuild( CacheContext context ) throws IOException
+    public Optional<Build> findBuild( CacheContext context ) throws IOException
     {
         Path buildInfoPath = remoteBuildPath( context, BUILDINFO_XML );
         LOGGER.debug( "Checking if build is already downloaded: {}", buildInfoPath );
@@ -137,7 +141,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             try
             {
                 org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( buildInfoPath.toFile() );
-                return new Build( dto, CacheSource.REMOTE );
+                return Optional.of( new Build( dto, CacheSource.REMOTE ) );
             }
             catch ( Exception e )
             {
@@ -148,7 +152,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
 
         if ( !cacheConfig.isRemoteCacheEnabled() )
         {
-            return null;
+            return Optional.empty();
         }
 
         try
@@ -165,26 +169,26 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                 if ( now < created + ONE_HOUR_MILLIS && now < lastModified + ONE_MINUTE_MILLIS )
                 { // fresh file, allow lookup every minute
                     LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1m ago." );
-                    return null;
+                    return Optional.empty();
                 }
                 else if ( now < created + ONE_DAY_MILLIS && now < lastModified + ONE_HOUR_MILLIS )
                 { // less than 1 day file, allow 1 per hour lookup
                     LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1h ago." );
-                    return null;
+                    return Optional.empty();
                 }
                 else if ( now > created + ONE_DAY_MILLIS && now < lastModified + ONE_DAY_MILLIS )
                 {  // more than 1 day file, allow 1 per day lookup
                     LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1d ago." );
-                    return null;
+                    return Optional.empty();
                 }
             }
 
-            final Build build = remoteRepository.findBuild( context );
-            if ( build != null )
+            final Optional<Build> build = remoteRepository.findBuild( context );
+            if ( build.isPresent() )
             {
                 LOGGER.info( "Build info downloaded from remote repo, saving to: {}", buildInfoPath );
                 Files.createDirectories( buildInfoPath.getParent() );
-                Files.write( buildInfoPath, xmlService.toBytes( build.getDto() ), CREATE_NEW );
+                Files.write( buildInfoPath, xmlService.toBytes( build.get().getDto() ), CREATE_NEW );
             }
             else
             {
@@ -195,7 +199,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         catch ( Exception e )
         {
             LOGGER.error( "Remote build info is not valid, cached data is not compatible", e );
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -213,11 +217,14 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             }
 
             List<Path> cacheDirs = new ArrayList<>();
-            for ( Path dir : Files.newDirectoryStream( artifactCacheDir ) )
+            try ( DirectoryStream<Path> paths = Files.newDirectoryStream( artifactCacheDir ) )
             {
-                if ( Files.isDirectory( dir ) )
+                for ( Path dir : paths )
                 {
-                    cacheDirs.add( dir );
+                    if ( Files.isDirectory( dir ) )
+                    {
+                        cacheDirs.add( dir );
+                    }
                 }
             }
             int maxLocalBuildsCached = cacheConfig.getMaxLocalBuildsCached() - 1;
@@ -244,6 +251,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         }
     }
 
+    @Nonnull
     @Override
     public Optional<Build> findBestMatchingBuild(
             MavenSession session, Dependency dependency )
@@ -251,6 +259,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
         return bestBuildCache.computeIfAbsent( Pair.of( session, dependency ), this::findBestMatchingBuildImpl );
     }
 
+    @Nonnull
     private Optional<Build> findBestMatchingBuildImpl(
             Pair<MavenSession, Dependency> dependencySession )
     {
@@ -364,10 +373,10 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             Path cachePath = remoteBuildPath( context, artifact.getFileName() );
             if ( !Files.exists( cachePath ) && cacheConfig.isRemoteCacheEnabled() )
             {
-                final byte[] artifactContent = remoteRepository.getArtifactContent( context, artifact );
-                if ( artifactContent != null )
+                final Optional<byte[]> artifactContent = remoteRepository.getArtifactContent( context, artifact );
+                if ( artifactContent.isPresent() )
                 {
-                    Files.write( cachePath, artifactContent, CREATE_NEW );
+                    Files.write( cachePath, artifactContent.get(), CREATE_NEW );
                 }
             }
             return cachePath;

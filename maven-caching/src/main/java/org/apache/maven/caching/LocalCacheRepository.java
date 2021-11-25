@@ -29,6 +29,8 @@ import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 
+import javax.annotation.Nonnull;
+
 /**
  * Local cache repository.
  */
@@ -41,7 +43,9 @@ public interface LocalCacheRepository extends CacheRepository
 
     void clearCache( CacheContext context );
 
+    @Nonnull
     Optional<Build> findBestMatchingBuild( MavenSession session, Dependency dependency ) throws IOException;
 
-    Build findLocalBuild( CacheContext context ) throws IOException;
+    @Nonnull
+    Optional<Build> findLocalBuild( CacheContext context ) throws IOException;
 }
