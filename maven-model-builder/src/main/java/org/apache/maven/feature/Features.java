@@ -38,11 +38,6 @@ public final class Features
         return new Feature( userProperties, "maven.experimental.buildconsumer", "true" );
     }
 
-    public static Feature caching( Properties userProperties )
-    {
-        return new Feature( userProperties, "maven.experimental.caching", "true" );
-    }
-
     /**
      * Represents some feature
      *
