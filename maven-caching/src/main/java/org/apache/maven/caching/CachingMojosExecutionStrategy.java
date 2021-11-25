@@ -22,6 +22,7 @@ package org.apache.maven.caching;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,7 +47,6 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.ReflectionUtils;
-import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
