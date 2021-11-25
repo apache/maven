@@ -23,6 +23,7 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
+import org.apache.maven.caching.xml.config.MultiModule;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Plugin;
@@ -30,6 +31,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -55,6 +57,9 @@ public interface CacheConfig
 
     @Nonnull
     List<String> getEffectivePomExcludeProperties( Plugin plugin );
+
+    @Nullable
+    MultiModule getMultiModule();
 
     String isProcessPlugins();
 

@@ -21,6 +21,9 @@ package org.apache.maven.caching;
 
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.checksum.KeyUtils;
+import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.caching.xml.config.Discovery;
+import org.apache.maven.caching.xml.config.MultiModule;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
@@ -42,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,6 +57,7 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultMultiModuleSupport.class );
 
     private final ProjectBuilder projectBuilder;
+    private final CacheConfig cacheConfig;
     private final MavenSession session;
 
     private volatile boolean built;
@@ -60,9 +65,12 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
     private volatile Map<String, MavenProject> sessionProjectMap;
 
     @Inject
-    public DefaultMultiModuleSupport( ProjectBuilder projectBuilder, MavenSession session )
+    public DefaultMultiModuleSupport( ProjectBuilder projectBuilder,
+                                      CacheConfig cacheConfig,
+                                      MavenSession session )
     {
         this.projectBuilder = projectBuilder;
+        this.cacheConfig = cacheConfig;
         this.session = session;
     }
 
@@ -126,8 +134,10 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
         {
             return;
         }
-        //TODO: re-work hardcode
-        Set<String> scanProfiles = Collections.singleton( "abfx-all" );
+        Set<String> scanProfiles = new TreeSet<>( Optional.ofNullable( cacheConfig.getMultiModule() )
+                .map( MultiModule::getDiscovery )
+                .map( Discovery::getScanProfiles )
+                .orElse( Collections.emptyList() ) );
         MavenProject currentProject = session.getCurrentProject();
         File multiModulePomFile = getMultiModulePomFile( session );
 
