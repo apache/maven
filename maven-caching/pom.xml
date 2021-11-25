@@ -43,7 +43,7 @@ under the License.
       <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
-          <version>4.5.6</version>
+          <version>4.5.13</version>
       </dependency>
       <dependency>
           <groupId>net.openhft</groupId>
@@ -71,6 +71,15 @@ under the License.
       <dependency>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-utils</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-http</artifactId>
+          <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.maven.resolver</groupId>
+          <artifactId>maven-resolver-util</artifactId>
       </dependency>
       <dependency>
           <groupId>com.google.code.findbugs</groupId>

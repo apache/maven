@@ -89,6 +89,12 @@ under the License.
                     <defaultValue>false</defaultValue>
                     <description>Save output to remote cache. Recommended to enable on CI agents only.</description>
                 </field>
+                <field xml.attribute="true">
+                    <name>transport</name>
+                    <type>String</type>
+                    <defaultValue>http</defaultValue>
+                    <description>The transport to use, either 'http' or 'wagon'.</description>
+                </field>
             </fields>
         </class>
 
