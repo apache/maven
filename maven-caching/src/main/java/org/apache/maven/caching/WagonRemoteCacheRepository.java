@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -307,20 +307,18 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
-    public Build findBuild( CacheContext context ) throws IOException
+    @Nonnull
+    public Optional<Build> findBuild( CacheContext context ) throws IOException
     {
         final String resourceUrl = doGetResourceUrl( context, BUILDINFO_XML );
-        final byte[] bytes = getResourceContent( resourceUrl );
-        if ( bytes != null )
-        {
-            final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( bytes );
-            return new Build( dto, CacheSource.REMOTE );
-        }
-        return null;
+        return getResourceContent( resourceUrl )
+                .map( content -> new Build( xmlService.loadBuild( content ), CacheSource.REMOTE ) );
     }
 
     @Override
-    public byte[] getArtifactContent( CacheContext context, org.apache.maven.caching.xml.build.Artifact artifact )
+    @Nonnull
+    public Optional<byte[]> getArtifactContent( CacheContext context,
+                                                org.apache.maven.caching.xml.build.Artifact artifact )
             throws IOException
     {
         return getResourceContent( doGetResourceUrl( context, artifact.getFileName() ) );
@@ -377,7 +375,8 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
-    public byte[] getResourceContent( String resourceUrl ) throws IOException
+    @Nonnull
+    public Optional<byte[]> getResourceContent( String resourceUrl ) throws IOException
     {
         return doGetResource( resourceUrl );
     }
@@ -420,16 +419,8 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
 
             try
             {
-                byte[] content = getResourceContent( url );
-                if ( content != null )
-                {
-                    final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( content );
-                    return Optional.of( new Build( dto, CacheSource.REMOTE ) );
-                }
-                else
-                {
-                    LOGGER.info( "Project buildinfo not found, skipping diff" );
-                }
+                return getResourceContent( url )
+                        .map( content -> new Build( xmlService.loadBuild( content ), CacheSource.REMOTE ) );
             }
             catch ( Exception e )
             {
@@ -449,9 +440,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
             try
             {
                 LOGGER.info( "Downloading baseline cache report from: {}", cacheConfig.getBaselineCacheUrl() );
-                byte[] content = getResourceContent( cacheConfig.getBaselineCacheUrl() );
-                CacheReport cacheReportType = xmlService.loadCacheReport( content );
-                report = Optional.of( cacheReportType );
+                report = getResourceContent( cacheConfig.getBaselineCacheUrl() ).map( xmlService::loadCacheReport );
             }
             catch ( Exception e )
             {
@@ -540,7 +529,8 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         temp.delete();
     }
 
-    private byte[] doGetResource( String resourceName ) throws IOException
+    @Nonnull
+    private Optional<byte[]> doGetResource( String resourceName ) throws IOException
     {
         try
         {
@@ -551,7 +541,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
                 {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ( ( StreamingWagon ) wagon ).getToStream( resourceName, baos );
-                    return baos.toByteArray();
+                    return Optional.of( baos.toByteArray() );
                 }
                 else
                 {
@@ -559,7 +549,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
                     try
                     {
                         wagon.get( resourceName, temp );
-                        return Files.readAllBytes( temp.toPath() );
+                        return Optional.of( Files.readAllBytes( temp.toPath() ) );
                     }
                     finally
                     {
