@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.Nonnull;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,6 +46,7 @@ import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.XmlService;
+import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.ProjectReport;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -307,7 +307,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
-    @Nonnull
     public Optional<Build> findBuild( CacheContext context ) throws IOException
     {
         final String resourceUrl = doGetResourceUrl( context, BUILDINFO_XML );
@@ -316,9 +315,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
-    @Nonnull
-    public Optional<byte[]> getArtifactContent( CacheContext context,
-                                                org.apache.maven.caching.xml.build.Artifact artifact )
+    public Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact )
             throws IOException
     {
         return getResourceContent( doGetResourceUrl( context, artifact.getFileName() ) );
@@ -375,7 +372,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
-    @Nonnull
     public Optional<byte[]> getResourceContent( String resourceUrl ) throws IOException
     {
         return doGetResource( resourceUrl );
@@ -384,52 +380,48 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     @Override
     public Optional<Build> findBaselineBuild( MavenProject project )
     {
-        final Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
+        Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
                 .map( CacheReport::getProjects );
+
         if ( !cachedProjectsHolder.isPresent() )
         {
             return Optional.empty();
         }
 
-        Optional<ProjectReport> cachedProjectHolder = Optional.empty();
-        for ( ProjectReport p : cachedProjectsHolder.get() )
+        final List<ProjectReport> projects = cachedProjectsHolder.get();
+        final Optional<ProjectReport> projectReportHolder = projects.stream().filter( p ->
+                project.getArtifactId().equals( p.getArtifactId() )
+                        && project.getGroupId().equals( p.getGroupId() ) ).findFirst();
+
+        if ( !projectReportHolder.isPresent() )
         {
-            if ( project.getArtifactId().equals( p.getArtifactId() )
-                    && project.getGroupId().equals( p.getGroupId() ) )
-            {
-                cachedProjectHolder = Optional.of( p );
-                break;
-            }
+            return Optional.empty();
         }
 
-        if ( cachedProjectHolder.isPresent() )
-        {
-            String url;
-            final ProjectReport projectReport = cachedProjectHolder.get();
-            if ( projectReport.getUrl() != null )
-            {
-                url = cachedProjectHolder.get().getUrl();
-                LOGGER.info( "Retrieving baseline buildinfo: {}", projectReport.getUrl() );
-            }
-            else
-            {
-                url = doGetResourceUrl( BUILDINFO_XML, project, projectReport.getChecksum() );
-                LOGGER.info( "Baseline project record doesn't have url, trying default location" );
-            }
+        final ProjectReport projectReport = projectReportHolder.get();
 
-            try
-            {
-                return getResourceContent( url )
-                        .map( content -> new Build( xmlService.loadBuild( content ), CacheSource.REMOTE ) );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.warn( "Error restoring baseline build at url: {}, skipping diff",
-                        projectReport.getUrl() );
-                return Optional.empty();
-            }
+        String url;
+        if ( projectReport.getUrl() != null )
+        {
+            url = projectReport.getUrl();
+            LOGGER.info( "Retrieving baseline buildinfo: {}", url );
         }
-        return Optional.empty();
+        else
+        {
+            url = doGetResourceUrl( BUILDINFO_XML, project, projectReport.getChecksum() );
+            LOGGER.info( "Baseline project record doesn't have url, trying default location {}", url );
+        }
+
+        try
+        {
+            return getResourceContent( url )
+                    .map( content -> new Build( xmlService.loadBuild( content ), CacheSource.REMOTE ) );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.warn( "Error restoring baseline build at url: {}, skipping diff", url, e );
+            return Optional.empty();
+        }
     }
 
     private Optional<CacheReport> findCacheInfo()
@@ -440,7 +432,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
             try
             {
                 LOGGER.info( "Downloading baseline cache report from: {}", cacheConfig.getBaselineCacheUrl() );
-                report = getResourceContent( cacheConfig.getBaselineCacheUrl() ).map( xmlService::loadCacheReport );
+                return getResourceContent( cacheConfig.getBaselineCacheUrl() ).map( xmlService::loadCacheReport );
             }
             catch ( Exception e )
             {
@@ -529,7 +521,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         temp.delete();
     }
 
-    @Nonnull
     private Optional<byte[]> doGetResource( String resourceName ) throws IOException
     {
         try

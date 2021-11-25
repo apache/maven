@@ -38,7 +38,7 @@ public interface RemoteCacheRepository extends CacheRepository
     Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
 
     @Nonnull
-    Optional<byte[]> getResourceContent( String resourceUrl )  throws IOException;
+    Optional<byte[]> getResourceContent( String resourceUrl ) throws IOException;
 
     @Nonnull
     String getResourceUrl( CacheContext context, String filename );
