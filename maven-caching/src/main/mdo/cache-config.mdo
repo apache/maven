@@ -237,17 +237,21 @@ under the License.
                 <field>
                     <name>enabled</name>
                     <type>boolean</type>
+                    <defaultValue>true</defaultValue>
                 </field>
                 <field>
                     <name>hashAlgorithm</name>
                     <type>String</type>
+                    <defaultValue>XX</defaultValue>
                     <description>One of XX, XXMM, SHA-1, SHA-256, SHA-384, SHA-512</description>
                 </field>
                 <field>
                     <name>validateXml</name>
                     <type>boolean</type>
-                    <defaultValue>true</defaultValue>
-                    <description>Validate cache config and builds metadata against xsd.</description>
+                    <defaultValue>false</defaultValue>
+                    <description>Validate cache config and builds metadata against xsd.
+                        TODO: not implemented
+                    </description>
                 </field>
                 <field>
                     <name>projectDiscoveryStrategy</name>
@@ -580,6 +584,7 @@ under the License.
                 <field xml.attribute="true">
                     <name>glob</name>
                     <type>String</type>
+                    <defaultValue>*</defaultValue>
                 </field>
             </fields>
         </class>
@@ -755,6 +760,7 @@ under the License.
                 <field>
                     <name>glob</name>
                     <type>String</type>
+                    <defaultValue>*</defaultValue>
                 </field>
                 <field>
                     <name>includes</name>
@@ -796,7 +802,6 @@ under the License.
                 <field xml.attribute="true">
                     <name>glob</name>
                     <type>String</type>
-                    <defaultValue>*</defaultValue>
                 </field>
             </fields>
         </class>
