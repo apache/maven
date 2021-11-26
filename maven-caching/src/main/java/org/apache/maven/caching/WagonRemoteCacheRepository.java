@@ -131,7 +131,8 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
 
         cacheConfig.initialize();
 
-        RemoteRepository repo = new RemoteRepository.Builder( "cache", "cache", cacheConfig.getUrl() ).build();
+        RemoteRepository repo = new RemoteRepository.Builder(
+                cacheConfig.getId(), "cache", cacheConfig.getUrl() ).build();
         RemoteRepository mirror = session.getMirrorSelector().getMirror( repo );
         RemoteRepository repoOrMirror = mirror != null ? mirror : repo;
         Proxy proxy = session.getProxySelector().getProxy( repoOrMirror );

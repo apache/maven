@@ -95,6 +95,12 @@ under the License.
                     <defaultValue>http</defaultValue>
                     <description>The transport to use, either 'http' or 'wagon'.</description>
                 </field>
+                <field xml.attribute="true">
+                    <name>id</name>
+                    <type>String</type>
+                    <defaultValue>cache</defaultValue>
+                    <description>The repository id used to find authentication / mirror information in maven settings, default to 'cache'.</description>
+                </field>
             </fields>
         </class>
 

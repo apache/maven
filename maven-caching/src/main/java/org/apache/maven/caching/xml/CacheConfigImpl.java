@@ -520,13 +520,20 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     }
 
     @Override
+    public String getId()
+    {
+        checkInitializedState();
+        return getRemote().getId();
+    }
+
+    @Override
     public String getUrl()
     {
         checkInitializedState();
         return getRemote().getUrl();
     }
 
-    @Override
+     @Override
     public String getTransport()
     {
         checkInitializedState();

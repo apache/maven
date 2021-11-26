@@ -81,6 +81,8 @@ public interface CacheConfig
 
     boolean isForcedExecution( MojoExecution execution );
 
+    String getId();
+
     String getUrl();
 
     String getTransport();
