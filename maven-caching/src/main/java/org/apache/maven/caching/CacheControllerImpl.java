@@ -495,7 +495,7 @@ public class CacheControllerImpl implements CacheController
     private static void replaceEntry( JarFile jarFile, JarEntry entry,
                                       String toReplace, String replacement, JarOutputStream jos ) throws IOException
     {
-        String fullManifest = IOUtils.toString( jarFile.getInputStream( entry ), StandardCharsets.UTF_8.toString() );
+        String fullManifest = IOUtils.toString( jarFile.getInputStream( entry ), StandardCharsets.UTF_8.name() );
         String modified = fullManifest.replaceAll( toReplace, replacement );
 
         byte[] bytes = modified.getBytes( StandardCharsets.UTF_8 );

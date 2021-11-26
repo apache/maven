@@ -207,6 +207,6 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
 
     private static File getMultiModulePomFile( MavenSession session )
     {
-        return new File( session.getRequest().getMultiModuleProjectDirectory() + "/pom.xml" );
+        return CacheUtils.getMultimoduleRoot( session ).resolve( "pom.xml" ).toFile();
     }
 }
