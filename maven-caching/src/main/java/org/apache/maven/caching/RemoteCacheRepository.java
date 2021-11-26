@@ -20,6 +20,7 @@ package org.apache.maven.caching;
  */
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.apache.maven.caching.xml.Build;
@@ -34,11 +35,12 @@ import javax.annotation.Nonnull;
 public interface RemoteCacheRepository extends CacheRepository
 {
 
-    @Nonnull
-    Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact ) throws IOException;
-
-    @Nonnull
-    Optional<byte[]> getResourceContent( String resourceUrl ) throws IOException;
+    /**
+     * Download an artifact to the given location.
+     * Returns <code>true</code> if success, <code>false</code> if the artifact does not exists
+     *   and throws an <code>IOException</code> if a problem occurs.
+     */
+    boolean getArtifactContent( CacheContext context, Artifact artifact, Path target ) throws IOException;
 
     @Nonnull
     String getResourceUrl( CacheContext context, String filename );

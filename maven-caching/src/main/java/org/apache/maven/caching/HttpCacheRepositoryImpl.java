@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -105,9 +106,9 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
     @Nonnull
     @Override
-    public Optional<byte[]> getArtifactContent( CacheContext context, Artifact artifact ) throws IOException
+    public boolean getArtifactContent( CacheContext context, Artifact artifact, Path target ) throws IOException
     {
-        return getResourceContent( getResourceUrl( context, artifact.getFileName() ) );
+        return getResourceContent( getResourceUrl( context, artifact.getFileName() ), target );
     }
 
     @Override
@@ -164,6 +165,31 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
             try ( InputStream content = response.getEntity().getContent() )
             {
                 return Optional.of( IOUtils.toByteArray( content ) );
+            }
+        }
+        finally
+        {
+            get.releaseConnection();
+        }
+    }
+
+    public boolean getResourceContent( String url, Path target ) throws IOException
+    {
+        HttpGet get = new HttpGet( url );
+        try
+        {
+            LOGGER.info( "Downloading {}", url );
+            HttpResponse response = httpClient.get().execute( get );
+            int statusCode = response.getStatusLine().getStatusCode();
+            if ( statusCode != HttpStatus.SC_OK )
+            {
+                LOGGER.info( "Cannot download {}, status code: {}", url, statusCode );
+                return false;
+            }
+            try ( InputStream content = response.getEntity().getContent() )
+            {
+                Files.copy( content, target );
+                return true;
             }
         }
         finally

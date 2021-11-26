@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -47,23 +49,17 @@ public class WagonProvider
     }
 
     public Wagon lookup( String roleHint )
-        throws Exception
+        throws ComponentLookupException
     {
         return container.lookup( Wagon.class, roleHint );
     }
 
     public void release( Wagon wagon )
+            throws ComponentLifecycleException
     {
-        try
+        if ( wagon != null )
         {
-            if ( wagon != null )
-            {
-                container.release( wagon );
-            }
-        }
-        catch ( Exception e )
-        {
-            // too bad
+            container.release( wagon );
         }
     }
 
