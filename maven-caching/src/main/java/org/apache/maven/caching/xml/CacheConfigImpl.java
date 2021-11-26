@@ -133,7 +133,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
                 if ( !Files.exists( configPath ) )
                 {
                     LOGGER.info( "Cache configuration is not available at configured path {}, "
-                                    + "cache is enabled with defaults", configPath );
+                            + "cache is enabled with defaults", configPath );
                     cacheConfig = new CacheConfig();
                 }
                 else
@@ -557,7 +557,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return getRemote().getUrl();
     }
 
-     @Override
+    @Override
     public String getTransport()
     {
         checkInitializedState();
