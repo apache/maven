@@ -35,9 +35,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,7 +95,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
 
-        for ( Lifecycle lifecycle : getOrderedLifecycles() )
+        for ( Lifecycle lifecycle : defaultLifeCycles.getLifeCycles() )
         {
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
@@ -129,25 +126,6 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         return plugins.keySet();
-    }
-
-    private List<Lifecycle> getOrderedLifecycles()
-    {
-        // NOTE: The lifecycle order can affect implied execution ids so we better be deterministic.
-
-        List<Lifecycle> lifecycles = new ArrayList<>( defaultLifeCycles.getLifeCycles() );
-
-        Collections.sort( lifecycles, new Comparator<Lifecycle>()
-        {
-
-            public int compare( Lifecycle l1, Lifecycle l2 )
-            {
-                return l1.getId().compareTo( l2.getId() );
-            }
-
-        } );
-
-        return lifecycles;
     }
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )

@@ -17,13 +17,12 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.PhaseRecorder;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,18 +38,16 @@ public class MojoExecutorStub
     public List<MojoExecution> executions = Collections.synchronizedList( new ArrayList<MojoExecution>() );
 
     @Override
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
-        throws LifecycleExecutionException
-    {
-        executions.add( mojoExecution );
-    }
-
-    @Override
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
-        executions.addAll(mojoExecutions);
+        executions.addAll( mojoExecutions );
+    }
+
+    @Override
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session, ProjectIndex projectIndex ) throws LifecycleExecutionException
+    {
+        return null;
     }
 
 

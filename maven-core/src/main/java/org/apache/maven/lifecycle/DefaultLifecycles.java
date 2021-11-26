@@ -43,7 +43,7 @@ import java.util.Set;
 @Component( role = DefaultLifecycles.class )
 public class DefaultLifecycles
 {
-    public static final String[] STANDARD_LIFECYCLES = { "default", "clean", "site" };
+    public static final String[] STANDARD_LIFECYCLES = { "clean", "default", "site" };
 
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
@@ -108,6 +108,9 @@ public class DefaultLifecycles
         return phaseToLifecycleMap;
     }
 
+    /**
+     * Returns an ordered list of lifecycles
+     */
     public List<Lifecycle> getLifeCycles()
     {
         // ensure canonical order of standard lifecycles
