@@ -19,8 +19,6 @@ package org.apache.maven.caching.artifact;
  * under the License.
  */
 
-import org.apache.commons.lang3.concurrent.ConcurrentException;
-import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -70,7 +68,7 @@ public class RestoredArtifact extends DefaultArtifact
                 {
                     LOGGER.trace( "Artifact file {} is not yet retrieved, downloading directly",
                             getDependencyConflictId() );
-                    ( (RunnableFuture) fileFuture ).run();
+                    ( (RunnableFuture<?>) fileFuture ).run();
                 }
                 catch ( RuntimeException e )
                 {
@@ -94,15 +92,13 @@ public class RestoredArtifact extends DefaultArtifact
         {
             Thread.currentThread().interrupt();
             throw new InvalidArtifactRTException( getGroupId(), getArtifactId(),
-                    getVersion(), getType(),
-                    "Interrupted while retrieving artifact file" );
+                    getVersion(), getType(), "Interrupted while retrieving artifact file", e );
         }
         catch ( ExecutionException e )
         {
-            final ConcurrentException cause = ConcurrentUtils.extractCause( e );
             throw new InvalidArtifactRTException( getGroupId(), getArtifactId(),
                     getVersion(), getType(), "Error retrieving artifact file",
-                    cause );
+                    e.getCause() );
         }
     }
 

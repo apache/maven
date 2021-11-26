@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Function;
@@ -398,30 +399,25 @@ public class CacheControllerImpl implements CacheController
 
     private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
                                              Artifact artifact )
+            throws ExecutionException, InterruptedException
     {
         final FutureTask<File> downloadTask = new FutureTask<>( () -> 
         {
-            try
+            LOGGER.debug( "Downloading artifact {}", artifact.getArtifactId() );
+            final Path artifactFile = localCache.getArtifactFile( context, cacheResult.getSource(),
+                    artifact );
+            if ( !Files.exists( artifactFile ) )
             {
-                LOGGER.debug( "Downloading artifact {}", artifact.getArtifactId() );
-                final Path artifactFile = localCache.getArtifactFile( context, cacheResult.getSource(),
-                        artifact );
-                if ( !Files.exists( artifactFile ) )
-                {
-                    throw new FileNotFoundException(
-                            "Missing file for cached build, cannot restore. File: " + artifactFile );
-                }
-                LOGGER.debug( "Downloaded artifact " + artifact.getArtifactId() + " to: " + artifactFile );
-                return artifactFile.toFile();
+                throw new FileNotFoundException(
+                        "Missing file for cached build, cannot restore. File: " + artifactFile );
             }
-            catch ( IOException e )
-            {
-                throw new RuntimeException( "Cannot download artifact: " + artifact.getArtifactId(), e );
-            }
+            LOGGER.debug( "Downloaded artifact " + artifact.getArtifactId() + " to: " + artifactFile );
+            return artifactFile.toFile();
         } );
         if ( !cacheConfig.isLazyRestore() )
         {
             downloadTask.run();
+            downloadTask.get();
         }
         return downloadTask;
     }
