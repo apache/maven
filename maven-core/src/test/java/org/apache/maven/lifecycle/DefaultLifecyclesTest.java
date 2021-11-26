@@ -50,9 +50,11 @@ public class DefaultLifecyclesTest
     {
         final List<Lifecycle> cycles = defaultLifeCycles.getLifeCycles();
         assertNotNull( cycles );
-        final Lifecycle lifecycle = cycles.get( 0 );
-        assertEquals( "default", lifecycle.getId() );
-        assertEquals( 23, lifecycle.getPhases().size() );
+        final Lifecycle lifecycle0 = cycles.get( 0 );
+        assertEquals( "clean", lifecycle0.getId() );
+        final Lifecycle lifecycle1 = cycles.get( 1 );
+        assertEquals( "default", lifecycle1.getId() );
+        assertEquals( 23, lifecycle1.getPhases().size() );
 
     }
 
