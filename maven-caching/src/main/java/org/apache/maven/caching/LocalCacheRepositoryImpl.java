@@ -373,10 +373,9 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             Path cachePath = remoteBuildPath( context, artifact.getFileName() );
             if ( !Files.exists( cachePath ) && cacheConfig.isRemoteCacheEnabled() )
             {
-                final Optional<byte[]> artifactContent = remoteRepository.getArtifactContent( context, artifact );
-                if ( artifactContent.isPresent() )
+                if ( !remoteRepository.getArtifactContent( context, artifact, cachePath ) )
                 {
-                    Files.write( cachePath, artifactContent.get(), CREATE_NEW );
+                    Files.deleteIfExists( cachePath );
                 }
             }
             return cachePath;
