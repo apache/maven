@@ -110,7 +110,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
 
-        for ( Lifecycle lifecycle : getOrderedLifecycles() )
+        for ( Lifecycle lifecycle : defaultLifeCycles.getLifeCycles() )
         {
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
