@@ -364,7 +364,7 @@ public class CacheControllerImpl implements CacheController
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Cannot restore cache, continuing with normal build.", e );
+            LOGGER.debug( "Cannot restore cache, continuing with normal build.", e );
             return false;
         }
     }
