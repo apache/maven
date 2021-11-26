@@ -134,16 +134,28 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
         {
             return;
         }
-        Set<String> scanProfiles = new TreeSet<>( Optional.ofNullable( cacheConfig.getMultiModule() )
-                .map( MultiModule::getDiscovery )
-                .map( Discovery::getScanProfiles )
-                .orElse( Collections.emptyList() ) );
+
+        Optional<Discovery> multiModuleDiscovery =
+                Optional.ofNullable( cacheConfig.getMultiModule() ).map( MultiModule::getDiscovery );
+
+        //no discovery configuration, use only projects in session
+        if ( !multiModuleDiscovery.isPresent() )
+        {
+            projectMap = buildProjectMap( session.getProjects() );
+            return;
+        }
+
+        Set<String> scanProfiles = new TreeSet<>(
+                multiModuleDiscovery
+                        .map( Discovery::getScanProfiles )
+                        .orElse( Collections.emptyList() ) );
         MavenProject currentProject = session.getCurrentProject();
         File multiModulePomFile = getMultiModulePomFile( session );
 
         ProjectBuildingRequest projectBuildingRequest = currentProject.getProjectBuildingRequest();
         boolean profilesMatched = projectBuildingRequest.getActiveProfileIds().containsAll( scanProfiles );
 
+        //we are building from root with the same profiles, no need to re-scan the whole multi-module project
         if ( currentProject.getFile().getAbsolutePath().equals( multiModulePomFile.getAbsolutePath() )
                 && profilesMatched )
         {

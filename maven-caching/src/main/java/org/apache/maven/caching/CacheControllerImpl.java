@@ -44,7 +44,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.jar.Attributes;
@@ -517,7 +516,6 @@ public class CacheControllerImpl implements CacheController
 
     private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
                                              Artifact artifact, String originalVersion )
-            throws ExecutionException, InterruptedException
     {
         final FutureTask<File> downloadTask = new FutureTask<>( () ->
         {
@@ -535,7 +533,6 @@ public class CacheControllerImpl implements CacheController
         if ( !cacheConfig.isLazyRestore() )
         {
             downloadTask.run();
-            downloadTask.get();
         }
         return downloadTask;
     }
