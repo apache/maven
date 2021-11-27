@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
@@ -89,6 +90,6 @@ public class DefaultModelBuilderFactoryTest
     {
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
-        return reader.read( new FileInputStream( file ) );
+        return reader.read( Files.newInputStream( file.toPath() ) );
     }
 }

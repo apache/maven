@@ -87,11 +87,11 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -228,7 +228,7 @@ public class DefaultMavenPluginManager
 
                 if ( pluginXml.isFile() )
                 {
-                    try ( InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ) )
+                    try ( InputStream is = new BufferedInputStream( Files.newInputStream( pluginXml.toPath() ) ) )
                     {
                         pluginDescriptor = parsePluginDescriptor( is, plugin, pluginXml.getAbsolutePath() );
                     }

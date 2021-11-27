@@ -20,11 +20,11 @@ package org.apache.maven.artifact;
  */
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -271,7 +271,7 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
         {
             artifactFile.getParentFile().mkdirs();
         }
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), StandardCharsets.ISO_8859_1) )
+        try ( Writer writer = new OutputStreamWriter( Files.newOutputStream( artifactFile.toPath() ), StandardCharsets.ISO_8859_1) )
         {
             writer.write( artifact.getId() );
         }
@@ -282,7 +282,7 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
 
         String md5path = repository.pathOf( artifact ) + ".md5";
         File md5artifactFile = new File( repository.getBasedir(), md5path );
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( md5artifactFile ), StandardCharsets.ISO_8859_1) )
+        try ( Writer writer = new OutputStreamWriter( Files.newOutputStream(  md5artifactFile.toPath() ), StandardCharsets.ISO_8859_1) )
         {
             writer.append( printHexBinary( digest ) );
         }

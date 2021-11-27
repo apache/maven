@@ -26,9 +26,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -83,7 +83,7 @@ public class ExtensionDescriptorBuilder
 
             if ( pluginXml.canRead() )
             {
-                try ( InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ) )
+                try ( InputStream is = new BufferedInputStream( Files.newInputStream( pluginXml.toPath() ) ) )
                 {
                     extensionDescriptor = build( is );
                 }
