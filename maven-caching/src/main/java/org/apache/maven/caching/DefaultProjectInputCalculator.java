@@ -79,6 +79,9 @@ public class DefaultProjectInputCalculator implements ProjectInputCalculator
                 + ", artifactId=" + project.getArtifactId() + "]" );
 
         String key = BuilderCommon.getKey( project );
+        //NOTE: Do not use ConcurrentHashMap.computeIfAbsent() here because of recursive calls
+        //this could lead to runtime exception - IllegalStateException("Recursive update")
+        //in jdk 8 the result of attempt to modify items with the same hash code could lead to infinite loop
         ProjectsInputInfo projectsInputInfo = checkSumMap.get( key );
         if ( projectsInputInfo != null )
         {
