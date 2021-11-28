@@ -19,46 +19,8 @@ package org.apache.maven.caching;
  * under the License.
  */
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.maven.SessionScoped;
@@ -93,6 +55,34 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.regex.Pattern;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
@@ -135,6 +125,7 @@ public class CacheControllerImpl implements CacheController
     private final LifecyclePhasesHelper lifecyclePhasesHelper;
     private volatile Map<String, MavenProject> projectIndex;
     private final ProjectInputCalculator projectInputCalculator;
+    private final RestoredArtifactHandler restoreArtifactHandler;
     private volatile Scm scm;
 
     @Inject
@@ -147,6 +138,7 @@ public class CacheControllerImpl implements CacheController
             RemoteCacheRepository remoteCache,
             CacheConfig cacheConfig,
             ProjectInputCalculator projectInputCalculator,
+            RestoredArtifactHandler restoreArtifactHandler,
             LifecyclePhasesHelper lifecyclePhasesHelper,
             MavenSession session )
     {
@@ -158,6 +150,7 @@ public class CacheControllerImpl implements CacheController
         this.xmlService = xmlService;
         this.lifecyclePhasesHelper = lifecyclePhasesHelper;
         this.projectInputCalculator = projectInputCalculator;
+        this.restoreArtifactHandler = restoreArtifactHandler;
     }
 
     @Override
@@ -415,104 +408,6 @@ public class CacheControllerImpl implements CacheController
         return artifact;
     }
 
-    //we might store in cache artifact which was build with previous version
-    //1.0-SNAPSHOT is kept in cache but real version of project is 2.0
-    //for pom packaging this is done automatically by maven but for jar and other there might be
-    //sensitive metadata with previous version. Versions mismatch could lead errors
-    private Path adjustArchiveArtifactVersion( MavenProject project, String originalArtifactVersion, Path artifactFile )
-            throws IOException
-    {
-
-        File file = artifactFile.toFile();
-        if ( project.getVersion().equals( originalArtifactVersion ) || !isArchive( file ) )
-        {
-            return artifactFile;
-        }
-
-        String currentVersion = project.getVersion();
-        File tmpJarFile = File.createTempFile( artifactFile.toFile().getName(),
-                '.' + FilenameUtils.getExtension( file.getName() ) );
-        tmpJarFile.deleteOnExit();
-        String originalImplVersion = Attributes.Name.IMPLEMENTATION_VERSION + ": " + originalArtifactVersion;
-        String implVersion = Attributes.Name.IMPLEMENTATION_VERSION + ": " + currentVersion;
-        String commonXmlOriginalVersion = "<version>" + originalArtifactVersion + "</version>";
-        String commonXmlVersion = "<version>" + currentVersion + "</version>";
-        String originalPomPropsVersion = "version=" + originalArtifactVersion;
-        String pomPropsVersion = "version=" + currentVersion;
-        try ( JarFile jarFile = new JarFile( artifactFile.toFile() ) )
-        {
-            try ( JarOutputStream jos = new JarOutputStream(
-                    new BufferedOutputStream( new FileOutputStream( tmpJarFile ) ) ) )
-            {
-                //Copy original jar file to the temporary one.
-                Enumeration<JarEntry> jarEntries = jarFile.entries();
-                byte[] buffer = new byte[1024];
-                while ( jarEntries.hasMoreElements() )
-                {
-                    JarEntry entry = jarEntries.nextElement();
-                    String entryName = entry.getName();
-
-                    if ( entryName.startsWith( "META-INF/maven" )
-                            && ( entryName.endsWith( "plugin.xml" ) || entryName.endsWith( "plugin-help.xml" ) ) )
-                    {
-                        replaceEntry( jarFile, entry, commonXmlOriginalVersion, commonXmlVersion, jos );
-                        continue;
-                    }
-
-                    if ( entryName.endsWith( "pom.xml" ) )
-                    {
-                        replaceEntry( jarFile, entry, commonXmlOriginalVersion, commonXmlVersion, jos );
-                        continue;
-                    }
-
-                    if ( entryName.endsWith( "pom.properties" ) )
-                    {
-                        replaceEntry( jarFile, entry, originalPomPropsVersion, pomPropsVersion, jos );
-                        continue;
-                    }
-
-                    if ( JarFile.MANIFEST_NAME.equals( entryName ) )
-                    {
-                        replaceEntry( jarFile, entry, originalImplVersion, implVersion, jos );
-                        continue;
-                    }
-                    jos.putNextEntry( entry );
-                    try ( InputStream entryInputStream = jarFile.getInputStream( entry ) )
-                    {
-                        int bytesRead;
-                        while ( ( bytesRead = entryInputStream.read( buffer ) ) != -1 )
-                        {
-                            jos.write( buffer, 0, bytesRead );
-                        }
-                    }
-                }
-            }
-        }
-        return tmpJarFile.toPath();
-    }
-
-    private static void replaceEntry( JarFile jarFile, JarEntry entry,
-                                      String toReplace, String replacement, JarOutputStream jos ) throws IOException
-    {
-        String fullManifest = IOUtils.toString( jarFile.getInputStream( entry ), StandardCharsets.UTF_8.name() );
-        String modified = fullManifest.replaceAll( toReplace, replacement );
-
-        byte[] bytes = modified.getBytes( StandardCharsets.UTF_8 );
-        JarEntry newEntry = new JarEntry( entry.getName() );
-        jos.putNextEntry( newEntry );
-        jos.write( bytes );
-    }
-
-    private static boolean isArchive( File file )
-    {
-        String fileName = file.getName();
-        if ( !file.isFile() || file.isHidden() )
-        {
-            return false;
-        }
-        return fileName.endsWith( ".jar" ) || fileName.endsWith( ".zip" )
-                || fileName.endsWith( ".war" ) || fileName.endsWith( ".ear" );
-    }
 
     private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
                                              Artifact artifact, String originalVersion )
@@ -528,7 +423,10 @@ public class CacheControllerImpl implements CacheController
                         "Missing file for cached build, cannot restore. File: " + artifactFile );
             }
             LOGGER.debug( "Downloaded artifact " + artifact.getArtifactId() + " to: " + artifactFile );
-            return adjustArchiveArtifactVersion( project, originalVersion, artifactFile ).toFile();
+            return restoreArtifactHandler.adjustArchiveArtifactVersion(
+                    project,
+                    originalVersion,
+                    artifactFile ).toFile();
         } );
         if ( !cacheConfig.isLazyRestore() )
         {
