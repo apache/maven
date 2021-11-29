@@ -40,10 +40,47 @@ public class CLIManagerTest
     }
 
     @Test
-    public void spacedOptions()
+    public void spacedOptionsShort()
         throws Exception
     {
-        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 -Dz test".split( " " ) );
+        CommandLine cmdLine = cliManager.parse( "-X -Dv -Dw=1 -D x=2 -D y -D z=3 test".split( " " ) );
+
+        assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
+
+        String[] properties = cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
+        assertThat( properties[0], is( "v" ) );
+        assertThat( properties[1], is( "w" ) );
+        assertThat( properties[2], is( "1" ) );
+        assertThat( properties[3], is( "x" ) );
+        assertThat( properties[4], is( "2" ) );
+        assertThat( properties[5], is( "y" ) );
+        assertThat( properties[6], is( "z" ) );
+        assertThat( properties[7], is( "3" ) );
+        assertThat( properties, not( hasItemInArray( "test" ) ) );
+    }
+
+    @Test
+    public void spacedOptionsLong()
+            throws Exception
+    {
+        CommandLine cmdLine = cliManager.parse( "-X --define x=1 --define y --define z=2 test".split( " " ) );
+
+        assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
+
+        String[] properties = cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
+        assertThat( properties[0], is( "x" ) );
+        assertThat( properties[1], is( "1" ) );
+        assertThat( properties[2], is( "y" ) );
+        assertThat( properties[3], is( "z" ) );
+        assertThat( properties[4], is( "2" ) );
+        assertThat( properties, not( hasItemInArray( "test" ) ) );
+    }
+
+    @Test
+    public void spacedOptions2()
+            throws Exception
+    {
+        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
 
         assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
 
@@ -52,8 +89,6 @@ public class CLIManagerTest
         assertThat( properties[1], is( "1" ) );
         assertThat( properties[2], is( "y" ) );
         assertThat( properties[3], is( "2" ) );
-        assertThat( properties[4], is( "z" ) );
         assertThat( properties, not( hasItemInArray( "test" ) ) );
     }
-
 }
