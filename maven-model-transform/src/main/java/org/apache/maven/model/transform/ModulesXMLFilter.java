@@ -19,93 +19,29 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import java.util.List;
 
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
+import org.apache.maven.model.transform.pull.NodeBufferingParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Remove all modules, this is just buildtime information
  *
  * @author Robert Scholte
+ * @author Guillaume Nodet
  * @since 4.0.0
  */
 class ModulesXMLFilter
-    extends AbstractEventXMLFilter
+    extends NodeBufferingParser
 {
-    private boolean parsingModules;
-
-    private String state;
-
-    ModulesXMLFilter()
+    ModulesXMLFilter( XmlPullParser xmlPullParser )
     {
-        super();
+        super( xmlPullParser, "modules" );
     }
 
-    ModulesXMLFilter( AbstractSAXFilter parent )
+    protected void process( List<Event> buffer )
     {
-        super( parent );
+        // Do nothing, as we want to delete those nodes completely
     }
 
-    @Override
-    public void startElement( String uri, String localName, String qName, Attributes atts )
-        throws SAXException
-    {
-        if ( !parsingModules && "modules".equals( localName ) )
-        {
-            parsingModules = true;
-        }
-
-        if ( parsingModules )
-        {
-            state = localName;
-        }
-
-        super.startElement( uri, localName, qName, atts );
-    }
-
-    @Override
-    public void endElement( String uri, String localName, String qName )
-        throws SAXException
-    {
-        if ( parsingModules )
-        {
-            switch ( localName )
-            {
-                case "modules":
-                    executeEvents();
-
-                    parsingModules = false;
-                    break;
-                default:
-                    super.endElement( uri, localName, qName );
-                    break;
-            }
-        }
-        else
-        {
-            super.endElement( uri, localName, qName );
-        }
-
-        // for this simple structure resetting to modules it sufficient
-        state = "modules";
-    }
-
-    @Override
-    protected boolean isParsing()
-    {
-        return parsingModules;
-    }
-
-    @Override
-    protected String getState()
-    {
-        return state;
-    }
-
-    @Override
-    protected boolean acceptEvent( String state )
-    {
-        return false;
-    }
 }

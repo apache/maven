@@ -19,23 +19,23 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLFilter;
+import org.apache.maven.model.transform.pull.BufferingParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * This filter will skip all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters, even though the elements match
+ * Should be used in case of a DOM that should not be effected by other filters, even though the elements match.
  *
  * @author Robert Scholte
+ * @author Guillaume Nodet
  * @since 4.0.0
  */
-class FastForwardFilter extends AbstractSAXFilter
+class FastForwardFilter extends BufferingParser
 {
     /**
      * DOM elements of pom
@@ -53,75 +53,51 @@ class FastForwardFilter extends AbstractSAXFilter
 
     private int domDepth = 0;
 
-    private ContentHandler originalHandler;
-
-    FastForwardFilter()
+    FastForwardFilter( XmlPullParser xmlPullParser )
     {
-        super();
-    }
-
-    FastForwardFilter( AbstractSAXFilter parent )
-    {
-        super( parent );
+        super( xmlPullParser );
     }
 
     @Override
-    public void startElement( String uri, String localName, String qName, Attributes atts )
-        throws SAXException
+    protected boolean accept() throws XmlPullParserException, IOException
     {
-        super.startElement( uri, localName, qName, atts );
-        if ( domDepth > 0 )
+        if ( xmlPullParser.getEventType() == START_TAG )
         {
-            domDepth++;
-        }
-        else
-        {
-            final String key = state.peek() + '.' + localName;
-            switch ( key )
+            String localName = xmlPullParser.getName();
+            if ( domDepth > 0 )
             {
-                case "execution.configuration":
-                case "plugin.configuration":
-                case "plugin.goals":
-                case "profile.reports":
-                case "project.reports":
-                case "reportSet.configuration":
-                    domDepth++;
-
-                    originalHandler = getContentHandler();
-
-                    ContentHandler outputContentHandler = getContentHandler();
-                    while ( outputContentHandler instanceof XMLFilter )
-                    {
-                        outputContentHandler = ( (XMLFilter) outputContentHandler ).getContentHandler();
-                    }
-                    setContentHandler( outputContentHandler );
-                    break;
-                default:
-                    break;
+                domDepth++;
             }
-            state.push( localName );
+            else
+            {
+                final String key = state.peek() + '/' + localName;
+                switch ( key )
+                {
+                    case "execution/configuration":
+                    case "plugin/configuration":
+                    case "plugin/goals":
+                    case "profile/reports":
+                    case "project/reports":
+                    case "reportSet/configuration":
+                        domDepth++;
+                        disable();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            state.add( localName );
         }
-    }
-
-    @Override
-    public void endElement( String uri, String localName, String qName )
-        throws SAXException
-    {
-        if ( domDepth > 0 )
+        else if ( xmlPullParser.getEventType() == END_TAG )
         {
             domDepth--;
-
             if ( domDepth == 0 )
             {
-                setContentHandler( originalHandler );
+                enable();
             }
-        }
-        else
-        {
             state.pop();
         }
-        super.endElement( uri, localName, qName );
+        return true;
     }
-
 
 }

@@ -25,30 +25,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
 
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-    protected String omitXmlDeclaration()
+    protected XmlPullParser getFilter( XmlPullParser orgParser )
     {
-        return "no";
-    }
-
-    @Override
-    protected AbstractSAXFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
-        throws SAXException, ParserConfigurationException, TransformerConfigurationException
-    {
-        final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory( lexicalHandlerConsumer, true )
+        final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory( true )
         {
             @Override
             protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
@@ -82,10 +69,9 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 
         };
 
-        RawToConsumerPomXMLFilter filter =
-            new RawToConsumerPomXMLFilterFactory( buildPomXMLFilterFactory ).get( Paths.get( "pom.xml" ) );
-        filter.setFeature( "http://xml.org/sax/features/namespaces", true );
-        return filter;
+        XmlPullParser parser = new RawToConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
+                        .get( orgParser, Paths.get( "pom.xml" ) );
+        return parser;
     }
 
     @Test
@@ -254,8 +240,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
                         + "<!--post-in-->"
                         + "</modules>"
                         + "<!--after--></project>";
-        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<project><!--before--><!--after--></project>";
+        String expected = "<project><!--before--><!--after--></project>";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
     }

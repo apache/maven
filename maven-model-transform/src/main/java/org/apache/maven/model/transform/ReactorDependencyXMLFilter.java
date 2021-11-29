@@ -19,153 +19,95 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.util.List;
 import java.util.function.BiFunction;
 
-import org.apache.maven.model.transform.sax.SAXEventUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.apache.maven.model.transform.pull.NodeBufferingParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Will apply the version if the dependency is part of the reactor
  *
  * @author Robert Scholte
+ * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class ReactorDependencyXMLFilter extends AbstractEventXMLFilter
+public class ReactorDependencyXMLFilter extends NodeBufferingParser
 {
-    private boolean parsingDependency;
-
-    // states
-    private String state;
-
-    // whiteSpace after <dependency>, to be used to position <version>
-    private String dependencyWhitespace;
-
-    private boolean hasVersion;
-
-    private String groupId;
-
-    private String artifactId;
-
     private final BiFunction<String, String, String> reactorVersionMapper;
 
-    public ReactorDependencyXMLFilter( BiFunction<String, String, String> reactorVersionMapper )
+    public ReactorDependencyXMLFilter( XmlPullParser xmlPullParser,
+                                       BiFunction<String, String, String> reactorVersionMapper )
     {
+        super( xmlPullParser, "dependency" );
         this.reactorVersionMapper = reactorVersionMapper;
     }
 
-    @Override
-    public void startElement( String uri, String localName, String qName, Attributes atts )
-        throws SAXException
+    protected void process( List<Event> buffer )
     {
-        if ( !parsingDependency && "dependency".equals( localName ) )
+        // whiteSpace after <dependency>, to be used to position <version>
+        String dependencyWhitespace = "";
+        boolean hasVersion = false;
+        String groupId = null;
+        String artifactId = null;
+        String tagName = null;
+        for ( int i = 0; i < buffer.size(); i++ )
         {
-            parsingDependency = true;
-        }
-
-        if ( parsingDependency )
-        {
-            state = localName;
-
-            hasVersion |= "version".equals( localName );
-        }
-        super.startElement( uri, localName, qName, atts );
-    }
-
-    @Override
-    public void characters( char[] ch, int start, int length )
-        throws SAXException
-    {
-        if ( parsingDependency )
-        {
-            final String eventState = state;
-            String value = new String( ch, start, length );
-            switch ( eventState )
+            Event event = buffer.get( i );
+            if ( event.event == START_TAG )
             {
-                case "dependency":
-                    dependencyWhitespace = nullSafeAppend( dependencyWhitespace, value );
-                    break;
-                case "groupId":
-                    groupId = nullSafeAppend( groupId, value );
-                    break;
-                case "artifactId":
-                    artifactId = nullSafeAppend( artifactId, value );
-                    break;
-                default:
-                    break;
+                tagName = event.name;
+                hasVersion |= "version".equals( tagName );
             }
-        }
-        super.characters( ch, start, length );
-    }
-
-    @Override
-    public void endElement( String uri, final String localName, String qName )
-        throws SAXException
-    {
-        if ( parsingDependency )
-        {
-            switch ( localName )
+            else if ( event.event == TEXT )
             {
-                case "dependency":
-                    if ( !hasVersion )
+                if ( event.text.matches( "\\s+" ) )
+                {
+                    if ( dependencyWhitespace.isEmpty() )
                     {
-                        String version = getVersion();
-
-                        // dependency is not part of reactor, probably it is managed
-                        if ( version != null )
-                        {
-                            try ( Includer i = super.include() )
-                            {
-                                if ( dependencyWhitespace != null )
-                                {
-                                    super.characters( dependencyWhitespace.toCharArray(), 0,
-                                                      dependencyWhitespace.length() );
-
-                                }
-                                String versionQName = SAXEventUtils.renameQName( qName, "version" );
-
-                                super.startElement( uri, "version", versionQName, null );
-                                super.characters( version.toCharArray(), 0, version.length() );
-                                super.endElement( uri, "version", versionQName );
-                            }
-                        }
+                        dependencyWhitespace = event.text;
                     }
-                    super.executeEvents();
-
-                    parsingDependency = false;
-
-                    // reset
-                    hasVersion = false;
-                    dependencyWhitespace = null;
-                    groupId = null;
-                    artifactId = null;
-
-                    break;
-                default:
-                    break;
+                }
+                else if ( "groupId".equals( tagName ) )
+                {
+                    groupId = nullSafeAppend( groupId, event.text );
+                }
+                else if ( "artifactId".equals( tagName ) )
+                {
+                    artifactId = nullSafeAppend( artifactId, event.text );
+                }
+            }
+            else if ( event.event == END_TAG && "dependency".equals( event.name ) )
+            {
+                String version = reactorVersionMapper.apply( groupId, artifactId  );
+                if ( !hasVersion && version != null )
+                {
+                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
+                    Event e = new Event();
+                    e.event = TEXT;
+                    e.text = dependencyWhitespace;
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = START_TAG;
+                    e.namespace = buffer.get( 0 ).namespace;
+                    e.prefix = buffer.get( 0 ).prefix;
+                    e.name = "version";
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = TEXT;
+                    e.text = version;
+                    buffer.add( pos++, e );
+                    e = new Event();
+                    e.event = END_TAG;
+                    e.name = "version";
+                    e.namespace = buffer.get( 0 ).namespace;
+                    e.prefix = buffer.get( 0 ).prefix;
+                    buffer.add( pos++, e );
+                }
+                break;
             }
         }
-
-        super.endElement( uri, localName, qName );
-
-        state = "";
-    }
-
-    private String getVersion()
-    {
-        return reactorVersionMapper.apply( groupId, artifactId  );
-    }
-
-    @Override
-    protected boolean isParsing()
-    {
-        return parsingDependency;
-    }
-
-    @Override
-    protected String getState()
-    {
-        return state;
+        buffer.forEach( this::pushEvent );
     }
 
 }

@@ -19,32 +19,43 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParentXMLFilterTest
     extends AbstractXMLFilterTests
 {
-    @Override
-    protected ParentXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
-        throws TransformerException, SAXException, ParserConfigurationException
-    {
-        ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.of( new RelativeProject( "GROUPID",
-                                                                                           "ARTIFACTID",
-                                                                                           "1.0.0" ) ) );
-        filter.setProjectPath( Paths.get( "pom.xml").toAbsolutePath() );
-        lexicalHandlerConsumer.accept( filter );
+    private Function<XmlPullParser, ParentXMLFilter> filterCreator;
 
+    @BeforeEach
+    void reset() {
+        filterCreator = null;
+    }
+
+    @Override
+    protected ParentXMLFilter getFilter( XmlPullParser parser )
+    {
+        Function<XmlPullParser, ParentXMLFilter> filterCreator =
+            (this.filterCreator != null ? this.filterCreator : this::createFilter);
+        return filterCreator.apply(parser);
+    }
+
+    protected ParentXMLFilter createFilter( XmlPullParser parser ) {
+        return createFilter( parser,
+                x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
+                Paths.get( "pom.xml").toAbsolutePath() );
+    }
+
+    protected ParentXMLFilter createFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath ) {
+        ParentXMLFilter filter = new ParentXMLFilter( parser, pathMapper, projectPath );
         return filter;
     }
 
@@ -52,7 +63,7 @@ public class ParentXMLFilterTest
     public void testMinimum()
         throws Exception
     {
-        String input = "<parent/>";
+        String input = "<project><parent /></project>";
         String expected = input;
         String actual = transform( input );
         assertEquals( expected, actual );
@@ -62,11 +73,11 @@ public class ParentXMLFilterTest
     public void testNoRelativePath()
         throws Exception
     {
-        String input = "<parent>"
+        String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
             + "<version>VERSION</version>"
-            + "</parent>";
+            + "</parent></project>";
         String expected = input;
 
         String actual = transform( input );
@@ -78,15 +89,19 @@ public class ParentXMLFilterTest
     public void testDefaultRelativePath()
         throws Exception
     {
-        String input = "<parent>"
-            + "<groupId>GROUPID</groupId>"
-            + "<artifactId>ARTIFACTID</artifactId>"
-            + "</parent>";
-        String expected = "<parent>"
-                        + "<groupId>GROUPID</groupId>"
-                        + "<artifactId>ARTIFACTID</artifactId>"
-                        + "<version>1.0.0</version>"
-                        + "</parent>";
+        String input = "<project>\n"
+            + "  <parent>\n"
+            + "    <groupId>GROUPID</groupId>\n"
+            + "    <artifactId>ARTIFACTID</artifactId>\n"
+            + "  </parent>\n"
+            + "</project>";
+        String expected = "<project>" + System.lineSeparator()
+                        + "  <parent>" + System.lineSeparator()
+                        + "    <groupId>GROUPID</groupId>" + System.lineSeparator()
+                        + "    <artifactId>ARTIFACTID</artifactId>" + System.lineSeparator()
+                        + "    <version>1.0.0</version>" + System.lineSeparator()
+                        + "  </parent>" + System.lineSeparator()
+                        + "</project>";
 
         String actual = transform( input );
 
@@ -103,16 +118,16 @@ public class ParentXMLFilterTest
     public void testEmptyRelativePathNoVersion()
         throws Exception
     {
-        String input = "<parent>"
+        String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
             + "<relativePath></relativePath>"
-            + "</parent>";
-        String expected = "<parent>"
+            + "</parent></project>";
+        String expected = "<project><parent>"
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
-                        + "<relativePath/>" // SAX optimization, however "" != null ...
-                        + "</parent>";
+                        + "<relativePath />" // SAX optimization, however "" != null ...
+                        + "</parent></project>";
 
         String actual = transform( input );
 
@@ -123,17 +138,17 @@ public class ParentXMLFilterTest
     public void testNoVersion()
         throws Exception
     {
-        String input = "<parent>"
+        String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
             + "<relativePath>RELATIVEPATH</relativePath>"
-            + "</parent>";
-        String expected = "<parent>"
+            + "</parent></project>";
+        String expected = "<project><parent>"
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
                         + "<relativePath>RELATIVEPATH</relativePath>"
                         + "<version>1.0.0</version>"
-                        + "</parent>";
+                        + "</parent></project>";
 
         String actual = transform( input );
 
@@ -144,17 +159,16 @@ public class ParentXMLFilterTest
     public void testInvalidRelativePath()
         throws Exception
     {
-        ParentXMLFilter filter = new ParentXMLFilter( x -> Optional.ofNullable( null ) );
-        filter.setProjectPath( Paths.get( "pom.xml").toAbsolutePath() );
+        filterCreator = parser -> createFilter(parser, x -> Optional.ofNullable( null ), Paths.get( "pom.xml").toAbsolutePath() );
 
-        String input = "<parent>"
+        String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
             + "<relativePath>RELATIVEPATH</relativePath>"
-            + "</parent>";
+            + "</parent></project>";
         String expected = input;
 
-        String actual = transform( input, filter );
+        String actual = transform( input );
 
         assertEquals( expected, actual );
     }
@@ -163,18 +177,18 @@ public class ParentXMLFilterTest
     public void testRelativePathAndVersion()
         throws Exception
     {
-        String input = "<parent>"
+        String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"
             + "<artifactId>ARTIFACTID</artifactId>"
             + "<relativePath>RELATIVEPATH</relativePath>"
             + "<version>1.0.0</version>"
-            + "</parent>";
-        String expected = "<parent>"
+            + "</parent></project>";
+        String expected = "<project><parent>"
                         + "<groupId>GROUPID</groupId>"
                         + "<artifactId>ARTIFACTID</artifactId>"
                         + "<relativePath>RELATIVEPATH</relativePath>"
                         + "<version>1.0.0</version>"
-                        + "</parent>";
+                        + "</parent></project>";
 
         String actual = transform( input );
 
@@ -185,17 +199,20 @@ public class ParentXMLFilterTest
     public void testWithWeirdNamespace()
         throws Exception
     {
-        String input = "<relativePath:parent xmlns:relativePath=\"relativePath\">"
+        String input = "<relativePath:project xmlns:relativePath=\"relativePath\">"
+            + "<relativePath:parent>"
             + "<relativePath:groupId>GROUPID</relativePath:groupId>"
             + "<relativePath:artifactId>ARTIFACTID</relativePath:artifactId>"
             + "<relativePath:relativePath>RELATIVEPATH</relativePath:relativePath>"
-            + "</relativePath:parent>";
-        String expected = "<relativePath:parent xmlns:relativePath=\"relativePath\">"
+            + "</relativePath:parent></relativePath:project>";
+        String expected = "<relativePath:project xmlns:relativePath=\"relativePath\">"
+                        + "<relativePath:parent>"
                         + "<relativePath:groupId>GROUPID</relativePath:groupId>"
                         + "<relativePath:artifactId>ARTIFACTID</relativePath:artifactId>"
                         + "<relativePath:relativePath>RELATIVEPATH</relativePath:relativePath>"
                         + "<relativePath:version>1.0.0</relativePath:version>"
-                        + "</relativePath:parent>";
+                        + "</relativePath:parent>"
+                        + "</relativePath:project>";
 
         String actual = transform( input );
 

@@ -22,17 +22,9 @@ package org.apache.maven.model.transform;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.apache.maven.model.transform.sax.Factories;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * Base implementation for providing the BuildToRawPomXML.
@@ -44,74 +36,42 @@ public class BuildToRawPomXMLFilterFactory
 {
     private final boolean consume;
 
-    private final Consumer<LexicalHandler> lexicalHandlerConsumer;
-
-    public BuildToRawPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer )
+    public BuildToRawPomXMLFilterFactory()
     {
-        this( lexicalHandlerConsumer, false );
+        this( false );
     }
 
-    public BuildToRawPomXMLFilterFactory( Consumer<LexicalHandler> lexicalHandlerConsumer, boolean consume )
+    public BuildToRawPomXMLFilterFactory( boolean consume )
     {
-        this.lexicalHandlerConsumer = lexicalHandlerConsumer;
         this.consume = consume;
     }
 
     /**
      *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
-     * @throws SAXException
-     * @throws ParserConfigurationException
-     * @throws TransformerConfigurationException
      */
-    public final BuildToRawPomXMLFilter get( Path projectFile )
-        throws SAXException, ParserConfigurationException, TransformerConfigurationException
+    public final XmlPullParser get( XmlPullParser orgParser, Path projectFile )
+
     {
-        AbstractSAXFilter parent = new AbstractSAXFilter();
-        parent.setParent( getXMLReader() );
-        if ( lexicalHandlerConsumer != null )
-        {
-            lexicalHandlerConsumer.accept( parent );
-        }
+        XmlPullParser parser = orgParser;
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
-            ReactorDependencyXMLFilter reactorDependencyXMLFilter =
-                new ReactorDependencyXMLFilter( getDependencyKeyToVersionMapper() );
-            reactorDependencyXMLFilter.setParent( parent );
-            parent.setLexicalHandler( reactorDependencyXMLFilter );
-            parent = reactorDependencyXMLFilter;
+            parser = new ReactorDependencyXMLFilter( parser, getDependencyKeyToVersionMapper() );
         }
 
         if ( getRelativePathMapper() != null )
         {
-            ParentXMLFilter parentFilter = new ParentXMLFilter( getRelativePathMapper() );
-            parentFilter.setProjectPath( projectFile.getParent() );
-            parentFilter.setParent( parent );
-            parent.setLexicalHandler( parentFilter );
-            parent = parentFilter;
+            parser = new ParentXMLFilter( parser, getRelativePathMapper(), projectFile.getParent() );
         }
 
-        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( consume );
+        CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( parser, consume );
         getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
         getRevision().ifPresent( ciFriendlyFilter::setRevision );
         getSha1().ifPresent( ciFriendlyFilter::setSha1 );
+        parser = ciFriendlyFilter;
 
-        if ( ciFriendlyFilter.isSet() )
-        {
-            ciFriendlyFilter.setParent( parent );
-            parent.setLexicalHandler( ciFriendlyFilter );
-            parent = ciFriendlyFilter;
-        }
-
-        return new BuildToRawPomXMLFilter( parent );
-    }
-
-    private XMLReader getXMLReader() throws SAXException, ParserConfigurationException
-    {
-        XMLReader xmlReader = Factories.newXMLReader();
-        xmlReader.setFeature( "http://xml.org/sax/features/namespaces", true );
-        return xmlReader;
+        return parser;
     }
 
     /**
