@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -56,6 +57,7 @@ import org.apache.maven.caching.xml.config.MultiModule;
 import org.apache.maven.caching.xml.config.PathSet;
 import org.apache.maven.caching.xml.config.PluginConfigurationScan;
 import org.apache.maven.caching.xml.config.PluginSet;
+import org.apache.maven.caching.xml.config.ProjectVersioning;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.TrackedProperty;
@@ -577,6 +579,14 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         checkInitializedState();
         final AttachedOutputs attachedOutputs = getConfiguration().getAttachedOutputs();
         return attachedOutputs == null ? Collections.emptyList() : attachedOutputs.getDirNames();
+    }
+
+    @Override
+    public boolean adjustMetaInfVersion()
+    {
+        return Optional.ofNullable( getConfiguration().getProjectVersioning() )
+                .map( ProjectVersioning::isAdjustMetaInf )
+                .orElse( false );
     }
 
     @Nonnull

@@ -102,6 +102,8 @@ public interface CacheConfig
 
     List<String> getAttachedOutputs();
 
+    boolean adjustMetaInfVersion();
+
     boolean canIgnore( MojoExecution mojoExecution );
 
     @Nonnull

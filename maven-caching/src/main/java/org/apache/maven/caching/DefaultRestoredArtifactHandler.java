@@ -21,10 +21,12 @@ package org.apache.maven.caching;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.BufferedOutputStream;
@@ -49,14 +51,28 @@ public class DefaultRestoredArtifactHandler implements RestoredArtifactHandler
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultRestoredArtifactHandler.class );
     private static final String DIR_NAME = "cache-build-tmp";
 
+    private final boolean adjustMetaInfVersion;
+
+    @Inject
+    public DefaultRestoredArtifactHandler( CacheConfig cacheConfig )
+    {
+        this.adjustMetaInfVersion = cacheConfig.adjustMetaInfVersion();
+    }
+
     @Override
     public Path adjustArchiveArtifactVersion( MavenProject project, String originalArtifactVersion, Path artifactFile )
             throws IOException
     {
+        if ( !adjustMetaInfVersion )
+        {
+            //option is disabled in cache configuration, return file as is
+            return artifactFile;
+        }
 
         File file = artifactFile.toFile();
         if ( project.getVersion().equals( originalArtifactVersion ) || !CacheUtils.isArchive( file ) )
         {
+            //versions of artifact and building project are the same or this is not an archive, return file as is
             return artifactFile;
         }
 
