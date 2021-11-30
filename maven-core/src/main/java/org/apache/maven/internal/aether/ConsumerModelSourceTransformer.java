@@ -23,91 +23,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TransformerHandler;
-
-import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.apache.maven.xml.internal.DefaultConsumerPomXMLFilterFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
+import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
+import org.apache.maven.model.transform.pull.XmlUtils;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
+import org.codehaus.plexus.util.xml.pull.MXParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-class ConsumerModelSourceTransformer extends AbstractModelSourceTransformer
+class ConsumerModelSourceTransformer
 {
-    @Override
-    protected AbstractSAXFilter getSAXFilter( Path pomFile,
-                                              TransformerContext context,
-                                              Consumer<LexicalHandler> lexicalHandlerConsumer )
-        throws TransformerConfigurationException, SAXException, ParserConfigurationException
+    public InputStream transform( Path pomFile, TransformerContext context )
+            throws IOException, XmlPullParserException
     {
-        return new DefaultConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context,
-                                                                        lexicalHandlerConsumer, true ) ).get( pomFile );
-    }
+        XmlStreamReader reader = ReaderFactory.newXmlReader( Files.newInputStream( pomFile ) );
+        XmlPullParser parser = new MXParser( EntityReplacementMap.defaultEntityReplacementMap );
+        parser.setInput( reader );
+        parser = new RawToConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context, true ) )
+                .get( parser, pomFile );
 
-    /**
-     * This transformer will ensure that encoding and version are kept.
-     * However, it cannot prevent:
-     * <ul>
-     *   <li>attributes will be on one line</li>
-     *   <li>Unnecessary whitespace before the rootelement will be removed</li>
-     * </ul>
-     */
-    @Override
-    protected TransformerHandler getTransformerHandler( Path pomFile )
-        throws IOException, org.apache.maven.model.building.TransformerException
-    {
-        final TransformerHandler transformerHandler;
-
-        final SAXTransformerFactory transformerFactory = getTransformerFactory();
-
-        // Keep same encoding+version
-        try ( InputStream input = Files.newInputStream( pomFile ) )
-        {
-            XMLStreamReader streamReader =
-                XMLInputFactory.newFactory().createXMLStreamReader( input );
-
-            transformerHandler = transformerFactory.newTransformerHandler();
-
-            final String encoding = streamReader.getCharacterEncodingScheme();
-            final String version = streamReader.getVersion();
-
-            Transformer transformer = transformerHandler.getTransformer();
-            transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
-            if ( encoding == null && version == null )
-            {
-                transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
-            }
-            else
-            {
-                transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
-
-                if ( encoding != null )
-                {
-                    transformer.setOutputProperty( OutputKeys.ENCODING, encoding );
-                }
-                if ( version != null )
-                {
-                    transformer.setOutputProperty( OutputKeys.VERSION, version );
-                }
-            }
-        }
-        catch ( XMLStreamException | TransformerConfigurationException e )
-        {
-            throw new org.apache.maven.model.building.TransformerException(
-                               "Failed to detect XML encoding and version", e );
-        }
-        return transformerHandler;
+        return XmlUtils.writeDocument( reader, parser );
     }
 
 }

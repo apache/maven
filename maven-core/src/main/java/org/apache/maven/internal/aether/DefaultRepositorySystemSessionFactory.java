@@ -19,6 +19,19 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -26,7 +39,6 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -37,6 +49,7 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -58,19 +71,6 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @since 3.3.0
@@ -310,7 +310,7 @@ public class DefaultRepositorySystemSessionFactory
                     {
                         return new ConsumerModelSourceTransformer().transform( pomFile.toPath(), context );
                     }
-                    catch ( TransformerException e )
+                    catch ( XmlPullParserException e )
                     {
                         throw new TransformException( e );
                     }

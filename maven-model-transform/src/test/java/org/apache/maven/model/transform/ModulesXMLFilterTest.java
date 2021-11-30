@@ -19,23 +19,19 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
-
-import java.util.function.Consumer;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.ext.LexicalHandler;
+
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class ModulesXMLFilterTest
     extends AbstractXMLFilterTests
 {
 
     @Override
-    protected ModulesXMLFilter getFilter( Consumer<LexicalHandler> lexicalHandlerConsumer )
+    protected ModulesXMLFilter getFilter( XmlPullParser parser )
     {
-        ModulesXMLFilter filter = new ModulesXMLFilter();
-        lexicalHandlerConsumer.accept( filter );
-        return filter;
+        return new ModulesXMLFilter( parser );
     }
 
     @Test

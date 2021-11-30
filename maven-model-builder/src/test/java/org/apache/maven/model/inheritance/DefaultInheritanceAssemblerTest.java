@@ -22,22 +22,16 @@ package org.apache.maven.model.inheritance;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.function.Consumer;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.TransformerException;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
@@ -64,9 +58,8 @@ public class DefaultInheritanceAssemblerTest
         reader = new DefaultModelReader( new AbstractModelSourceTransformer()
         {
             @Override
-            protected AbstractSAXFilter getSAXFilter( Path pomFile, TransformerContext context,
-                                                      Consumer<LexicalHandler> lexicalHandlerConsumer )
-                throws TransformerConfigurationException, SAXException, ParserConfigurationException
+            public XmlPullParser transform( XmlPullParser parser, Path pomFile, TransformerContext context )
+                    throws IOException, TransformerException
             {
                 return null;
             }

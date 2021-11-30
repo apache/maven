@@ -19,17 +19,18 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
+
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class RelativePathXMLFilterTest
     extends AbstractXMLFilterTests
 {
     @Override
-    protected RelativePathXMLFilter getFilter()
+    protected RelativePathXMLFilter getFilter(XmlPullParser parser)
     {
-        return new RelativePathXMLFilter();
+        return new RelativePathXMLFilter(parser);
     }
 
     @Test

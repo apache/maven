@@ -23,13 +23,11 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
 import org.apache.maven.model.transform.RelativeProject;
-import org.xml.sax.ext.LexicalHandler;
 
 /**
  * A BuildPomXMLFilterFactory which is context aware
@@ -44,14 +42,12 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     /**
      *
      * @param context a set of data to extract values from as required for the build pom
-     * @param lexicalHandlerConsumer the lexical handler consumer
      * @param consume {@code true} if this factory is being used for creating the consumer pom, otherwise {@code false}
      */
     public DefaultBuildPomXMLFilterFactory( TransformerContext context,
-                                            Consumer<LexicalHandler> lexicalHandlerConsumer,
                                             boolean consume )
     {
-        super( lexicalHandlerConsumer, consume );
+        super( consume );
         this.context = context;
     }
 
