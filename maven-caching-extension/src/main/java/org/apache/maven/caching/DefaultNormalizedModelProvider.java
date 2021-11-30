@@ -35,7 +35,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @SessionScoped
 @Named
@@ -124,11 +123,10 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
                 {
                     Plugin copy = plugin.clone();
                     List<String> excludeProperties = cacheConfig.getEffectivePomExcludeProperties( copy );
-                    removeBlacklistedAttributes( ( Xpp3Dom ) copy.getConfiguration(), excludeProperties );
+                    removeBlacklistedAttributes( copy.getConfiguration(), excludeProperties );
                     for ( PluginExecution execution : copy.getExecutions() )
                     {
-                        Xpp3Dom config = ( Xpp3Dom ) execution.getConfiguration();
-                        removeBlacklistedAttributes( config, excludeProperties );
+                        removeBlacklistedAttributes( execution.getConfiguration(), excludeProperties );
                     }
 
                     copy.setDependencies(
@@ -148,20 +146,20 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
                 } ).collect( Collectors.toList() );
     }
 
-    private void removeBlacklistedAttributes( Xpp3Dom node, List<String> excludeProperties )
+    private void removeBlacklistedAttributes( Object node, List<String> excludeProperties )
     {
         if ( node == null )
         {
             return;
         }
 
-        Xpp3Dom[] children = node.getChildren();
+        Object[] children = Xpp3DomUtils.getChildren( node );
         int indexToRemove = 0;
-        for ( Xpp3Dom child : children )
+        for ( Object child : children )
         {
-            if ( excludeProperties.contains( child.getName() ) )
+            if ( excludeProperties.contains( Xpp3DomUtils.getName( child ) ) )
             {
-                node.removeChild( indexToRemove );
+                Xpp3DomUtils.removeChild( node, indexToRemove );
                 continue;
             }
             indexToRemove++;

@@ -56,6 +56,7 @@ import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectInputCalculator;
 import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
+import org.apache.maven.caching.Xpp3DomUtils;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.xml.CacheConfig;
@@ -75,7 +76,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -477,11 +477,11 @@ public class MavenProjectInput
                 continue;
             }
 
-            Xpp3Dom configuration = ( Xpp3Dom ) plugin.getConfiguration();
+            Object configuration = plugin.getConfiguration();
             LOGGER.debug( "Processing plugin config: {}", plugin.getArtifactId() );
             if ( configuration != null )
             {
-                addInputsFromPluginConfigs( configuration.getChildren(), scanConfig, files, visitedDirs );
+                addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( configuration ), scanConfig, files, visitedDirs );
             }
 
             for ( PluginExecution exec : plugin.getExecutions() )
@@ -496,12 +496,13 @@ public class MavenProjectInput
                     continue;
                 }
 
-                Xpp3Dom execConfiguration = ( Xpp3Dom ) exec.getConfiguration();
+                Object execConfiguration = exec.getConfiguration();
                 LOGGER.debug( "Processing plugin: {}, execution: {}", plugin.getArtifactId(), exec.getId() );
 
                 if ( execConfiguration != null )
                 {
-                    addInputsFromPluginConfigs( execConfiguration.getChildren(), mergedConfig, files, visitedDirs );
+                    addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( execConfiguration ), mergedConfig, files,
+                            visitedDirs );
                 }
             }
         }
@@ -555,7 +556,7 @@ public class MavenProjectInput
         } );
     }
 
-    private void addInputsFromPluginConfigs( Xpp3Dom[] configurationChildren,
+    private void addInputsFromPluginConfigs( Object[] configurationChildren,
             PluginScanConfig scanConfig,
             List<Path> files, HashSet<WalkKey> visitedDirs )
     {
@@ -564,10 +565,10 @@ public class MavenProjectInput
             return;
         }
 
-        for ( Xpp3Dom configChild : configurationChildren )
+        for ( Object configChild : configurationChildren )
         {
-            String tagName = configChild.getName();
-            String tagValue = configChild.getValue();
+            String tagName = Xpp3DomUtils.getName( configChild );
+            String tagValue = Xpp3DomUtils.getValue( configChild );
 
             if ( !scanConfig.accept( tagName ) )
             {
@@ -578,11 +579,11 @@ public class MavenProjectInput
 
             LOGGER.debug( "Checking xml tag. Tag: {}, value: {}", tagName, stripToEmpty( tagValue ) );
 
-            addInputsFromPluginConfigs( configChild.getChildren(), scanConfig, files, visitedDirs );
+            addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( configChild ), scanConfig, files, visitedDirs );
 
             final ScanConfigProperties propertyConfig = scanConfig.getTagScanProperties( tagName );
             final String glob = defaultIfEmpty( propertyConfig.getGlob(), dirGlob );
-            if ( "true".equals( configChild.getAttribute( CACHE_INPUT_NAME ) ) )
+            if ( "true".equals( Xpp3DomUtils.getAttribute( configChild, CACHE_INPUT_NAME ) ) )
             {
                 LOGGER.info( "Found tag marked with {} attribute. Tag: {}, value: {}",
                         CACHE_INPUT_NAME, tagName, tagValue );
