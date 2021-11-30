@@ -27,7 +27,6 @@ subject to the terms and conditions of the following licenses:
 #set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses )
-#*  *##set ( $artifactId = $project.artifact.artifactId )
 #*  *##set ( $groupId = $project.artifact.groupId )
 #*  *##set ( $directory = 'lib' )
 #*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) )
@@ -38,8 +37,6 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'MIT' )
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' )
-#*    *##elseif ( $license.name == "Mozilla Public License Version 1.1" || $artifactId == "juniversalchardet" )
-#*      *##set ( $spdx = 'MPL-1.1' )
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
 #*      *##set ( $spdx = 'Apache-2.0' )
 #*    *##else
