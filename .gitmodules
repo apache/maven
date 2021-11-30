@@ -1,0 +1,8 @@
+[submodule "maven3"]
+	path = maven/maven3
+	url = https://github.com/apache/maven.git
+	branch = MNG-7129-3.8.x
+[submodule "maven4"]
+	path = maven/maven4
+	url = https://github.com/apache/maven.git
+	branch = MNG-7129-master
