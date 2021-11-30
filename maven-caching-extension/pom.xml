@@ -126,7 +126,7 @@ under the License.
                             <goal>xsd</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/generated-test-resources/modello</outputDirectory>
+                            <outputDirectory>${basedir}/target/generated-resources/modello</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -140,12 +140,12 @@ under the License.
                         <id>add-resources</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>add-test-resource</goal>
+                            <goal>add-resource</goal>
                         </goals>
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/target/generated-test-resources/modello</directory>
+                                    <directory>${basedir}/target/generated-resources/modello</directory>
                                 </resource>
                             </resources>
                         </configuration>
