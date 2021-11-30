@@ -25,9 +25,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -36,7 +38,6 @@ import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.DefaultPluginScanConfig;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.PluginScanConfigImpl;
-import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.AttachedOutputs;
 import org.apache.maven.caching.xml.config.CacheConfig;
@@ -52,10 +53,11 @@ import org.apache.maven.caching.xml.config.GoalsList;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.caching.xml.config.Input;
 import org.apache.maven.caching.xml.config.Local;
+import org.apache.maven.caching.xml.config.MultiModule;
 import org.apache.maven.caching.xml.config.PathSet;
 import org.apache.maven.caching.xml.config.PluginConfigurationScan;
 import org.apache.maven.caching.xml.config.PluginSet;
-import org.apache.maven.caching.xml.config.ProjectDiscoveryStrategy;
+import org.apache.maven.caching.xml.config.ProjectVersioning;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.Remote;
 import org.apache.maven.caching.xml.config.TrackedProperty;
@@ -133,7 +135,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
                 if ( !Files.exists( configPath ) )
                 {
                     LOGGER.info( "Cache configuration is not available at configured path {}, "
-                                    + "cache is enabled with defaults", configPath );
+                            + "cache is enabled with defaults", configPath );
                     cacheConfig = new CacheConfig();
                 }
                 else
@@ -307,6 +309,14 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return Collections.emptyList();
     }
 
+    @Nullable
+    @Override
+    public MultiModule getMultiModule()
+    {
+        checkInitializedState();
+        return cacheConfig.getConfiguration().getMultiModule();
+    }
+
     private PluginConfigurationScan findPluginScanConfig( Plugin plugin )
     {
         if ( cacheConfig.getInput() == null )
@@ -408,20 +418,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         checkInitializedState();
         return cacheConfig.getInput().getGlobal().getExcludes();
-    }
-
-    @Nonnull
-    @Override
-    public MultimoduleDiscoveryStrategy getMultimoduleDiscoveryStrategy()
-    {
-        checkInitializedState();
-        final ProjectDiscoveryStrategy projectDiscoveryStrategy =
-                cacheConfig.getConfiguration().getProjectDiscoveryStrategy();
-        if ( projectDiscoveryStrategy != null && projectDiscoveryStrategy.getSpecificVersion() != null )
-        {
-            return new SentinelVersionStrategy( projectDiscoveryStrategy.getSpecificVersion() );
-        }
-        return new AllExternalStrategy();
     }
 
     @Nonnull
@@ -563,7 +559,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         return getRemote().getUrl();
     }
 
-     @Override
+    @Override
     public String getTransport()
     {
         checkInitializedState();
@@ -583,6 +579,14 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
         checkInitializedState();
         final AttachedOutputs attachedOutputs = getConfiguration().getAttachedOutputs();
         return attachedOutputs == null ? Collections.emptyList() : attachedOutputs.getDirNames();
+    }
+
+    @Override
+    public boolean adjustMetaInfVersion()
+    {
+        return Optional.ofNullable( getConfiguration().getProjectVersioning() )
+                .map( ProjectVersioning::isAdjustMetaInf )
+                .orElse( false );
     }
 
     @Nonnull

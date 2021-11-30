@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -312,6 +313,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     }
 
     @Override
+    @Nonnull
     public Optional<Build> findBuild( CacheContext context ) throws IOException
     {
         final String resourceUrl = doGetResourceUrl( context, BUILDINFO_XML );

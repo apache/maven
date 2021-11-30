@@ -1,4 +1,4 @@
-package org.apache.maven.caching.checksum;
+package org.apache.maven.caching;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,15 +19,15 @@ package org.apache.maven.caching.checksum;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.project.MavenProject;
 
 /**
- * MultimoduleDiscoveryStrategy
+ *
  */
-public interface MultimoduleDiscoveryStrategy
+public interface ProjectInputCalculator
 {
-    boolean isPartOfMultiModule( Dependency dependency );
 
-    boolean isLookupRemoteMavenRepo( Artifact dependency );
+    ProjectsInputInfo calculateInput( MavenProject project );
+
 }

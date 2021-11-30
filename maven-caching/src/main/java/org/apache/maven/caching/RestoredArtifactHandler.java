@@ -1,4 +1,4 @@
-package org.apache.maven.caching.xml;
+package org.apache.maven.caching;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,17 @@ package org.apache.maven.caching.xml;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.caching.checksum.MultimoduleDiscoveryStrategy;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 
-/**
- * AllExternalStrategy
- */
-public class AllExternalStrategy implements MultimoduleDiscoveryStrategy
+import java.io.IOException;
+import java.nio.file.Path;
+
+public interface RestoredArtifactHandler
 {
-    @Override
-    public boolean isPartOfMultiModule( Dependency dependency )
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isLookupRemoteMavenRepo( Artifact artifact )
-    {
-        return true;
-    }
+    //we might store in cache artifact which was build with previous version
+    //1.0-SNAPSHOT is kept in cache but real version of project is 2.0
+    //for pom packaging this is done automatically by maven but for jar and other there might be
+    //sensitive metadata with previous version. Versions mismatch could lead errors
+    Path adjustArchiveArtifactVersion( MavenProject project, String originalArtifactVersion, Path artifactFile )
+            throws IOException;
 }

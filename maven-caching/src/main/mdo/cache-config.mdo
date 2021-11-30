@@ -106,130 +106,71 @@ under the License.
 
         <!--
 
-    <xs:complexType name="ConfigurationType">
-        <xs:sequence>
-            <xs:element name="enabled" type="xs:boolean"/>
-            <xs:element name="hashAlgorithm">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="XX">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    64 bit XX family hashing. Fast, but higher probability of collisions
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:enumeration>
-                        <xs:enumeration value="XXMM">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    64 bit XX family hashing, with usage of Memory Mapped Buffer
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:enumeration>
-                        <xs:enumeration value="SHA-1"/>
-                        <xs:enumeration value="SHA-256"/>
-                        <xs:enumeration value="SHA-384"/>
-                        <xs:enumeration value="SHA-512"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-            <xs:element name="validateXml" type="xs:boolean" default="true">
-                <xs:annotation>
-                    <xs:documentation>
-                        Validate cache config and builds metadata against xsd.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="projectDiscoveryStrategy" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        Specifies how to identify belonging to a cached project then submodule is being build.
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:choice>
-                        <xs:element name="specificVersion" type="xs:string">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Any project dependency this this version will be considered cache eligible and will
-                                    be processed cache aware
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:choice>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="remote">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="url" type="xs:string" minOccurs="0">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    address of remote cache
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
-                    <xs:attribute name="saveToRemote" type="xs:boolean" default="false">
-                        <xs:annotation>
-                            <xs:documentation>
-                                Save output to remote cache. Recommended to enable on CI agents only.
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="attachedOutputs" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="dirName" type="xs:string" minOccurs="0" maxOccurs="unbounded">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Directory name in build output directory to attach to cached artifacts
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="local">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="maxBuildsCached" type="xs:positiveInteger" default="3">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Maximum number of cached build per artifact in local cache. First created cache (the
-                                    oldest) is
-                                    evicted if breached.
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="debug" minOccurs="0" maxOccurs="unbounded">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="FileHash">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Causes file hash is saved in build metadata
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:enumeration>
-                        <xs:enumeration value="EffectivePom">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Causes effective pom info is saved in build metadata
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:enumeration>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
+    <xs:complexType name="Configuration">
+        <xs:annotation>
+          <xs:documentation source="version">0.0.0+</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+          <xs:element minOccurs="0" name="enabled" type="xs:boolean" default="true">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="hashAlgorithm" type="xs:string" default="XX">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+              <xs:documentation source="description">One of XX, XXMM, SHA-1, SHA-256, SHA-384, SHA-512</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="validateXml" type="xs:boolean" default="false">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+              <xs:documentation source="description">Validate cache config and builds metadata against xsd.
+                TODO: not implemented
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="multiModule" type="MultiModule">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+              <xs:documentation source="description">Specifies related to multi module projects configuration.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="projectVersioning" type="ProjectVersioning">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+              <xs:documentation source="description">Specifies parameters to handle project version changes.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="remote" type="Remote">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="attachedOutputs" type="AttachedOutputs">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="local" type="Local">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" name="debugs">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+              <xs:documentation source="description">FileHash (causes file hash is saved in build metadata) or
+                EffectivePom (causes effective pom info is saved in build metadata)</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="debug" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:all>
+      </xs:complexType>
           -->
         <class>
             <name>Configuration</name>
@@ -254,11 +195,18 @@ under the License.
                     </description>
                 </field>
                 <field>
-                    <name>projectDiscoveryStrategy</name>
+                    <name>multiModule</name>
                     <association>
-                        <type>ProjectDiscoveryStrategy</type>
+                        <type>MultiModule</type>
                     </association>
-                    <description>Specifies how to identify belonging to a cached project then submodule is being build.</description>
+                    <description>Specifies related to multi module projects configuration.</description>
+                </field>
+                <field>
+                    <name>projectVersioning</name>
+                    <association>
+                        <type>ProjectVersioning</type>
+                    </association>
+                    <description>Specifies parameters to handle project version changes.</description>
                 </field>
                 <field>
                     <name>remote</name>
@@ -304,19 +252,95 @@ under the License.
             </xs:choice>
         </xs:complexType>
         -->
+
         <class>
-            <name>ProjectDiscoveryStrategy</name>
+            <name>MultiModule</name>
             <fields>
                 <field>
-                    <name>specificVersion</name>
-                    <type>String</type>
-                    <description>
-                        Any project dependency this this version will be considered cache eligible and will
-                        be processed cache aware
-                    </description>
+                    <name>discovery</name>
+                    <association>
+                        <type>Discovery</type>
+                    </association>
+                    <description>Section to specify how to discover multi module projects.</description>
                 </field>
             </fields>
         </class>
+
+        <!--
+        <xs:complexType name="MultiModule">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+            <xs:all>
+              <xs:element minOccurs="0" name="discovery" type="Discovery">
+                <xs:annotation>
+                  <xs:documentation source="version">0.0.0+</xs:documentation>
+                  <xs:documentation source="description">Section to specify how to discover multi module projects.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:all>
+        </xs:complexType>
+        -->
+
+         <class>
+            <name>Discovery</name>
+            <fields>
+                <field>
+                    <name>scanProfiles</name>
+                    <association>
+                        <type>String</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <description>Profiles to discover multi module project</description>
+                </field>
+            </fields>
+        </class>
+
+        <!--
+        <xs:complexType name="Discovery">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+            <xs:all>
+              <xs:element minOccurs="0" name="scanProfiles">
+                <xs:annotation>
+                  <xs:documentation source="version">0.0.0+</xs:documentation>
+                  <xs:documentation source="description">Profiles to discover multi module project</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="scanProfile" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+        </xs:complexType>
+        -->
+
+        <class>
+            <name>ProjectVersioning</name>
+            <fields>
+                <field xml.attribute="true">
+                    <name>adjustMetaInf</name>
+                    <type>boolean</type>
+                    <description>Determines whether version in metadata must be changed according to building project version.</description>
+                </field>
+            </fields>
+        </class>
+
+        <!--
+          <xs:complexType name="ProjectVersioning">
+            <xs:annotation>
+              <xs:documentation source="version">0.0.0+</xs:documentation>
+            </xs:annotation>
+            <xs:attribute name="adjustMetaInf" type="xs:boolean" default="false" use="optional">
+              <xs:annotation>
+                <xs:documentation source="version">0.0.0+</xs:documentation>
+                <xs:documentation source="description">Determines whether version in metadata must be changed according to building project version.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+       -->
 
         <!--
                     <xs:complexType>

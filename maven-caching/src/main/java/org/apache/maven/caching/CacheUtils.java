@@ -29,6 +29,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.SessionData;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -100,8 +101,7 @@ public class CacheUtils
                 StringUtils.defaultIfEmpty( mojo.getGoal(), "emptyGoal" ),
                 StringUtils.defaultIfEmpty( mojo.getLifecyclePhase(), "emptyLifecyclePhase" ),
                 StringUtils.defaultIfEmpty( mojo.getArtifactId(), "emptyArtifactId" ),
-                StringUtils.defaultIfEmpty( mojo.getGroupId(), "emptyGroupId" ),
-                StringUtils.defaultIfEmpty( mojo.getVersion(), "emptyVersion" ) ), ":" );
+                StringUtils.defaultIfEmpty( mojo.getGroupId(), "emptyGroupId" ) ), ":" );
     }
 
     public static Path getMultimoduleRoot( MavenSession session )
@@ -174,6 +174,17 @@ public class CacheUtils
             return t;
         }
     }
+
+    public static boolean isArchive( File file )
+    {
+        String fileName = file.getName();
+        if ( !file.isFile() || file.isHidden() )
+        {
+            return false;
+        }
+        return StringUtils.endsWithAny( fileName, ".jar", ".zip", ".war", ".ear" );
+    }
+
 
     public static void zip( Path dir, Path zip ) throws IOException
     {

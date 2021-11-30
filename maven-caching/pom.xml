@@ -125,7 +125,7 @@ under the License.
               <goal>xsd</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/generated-test-resources/modello</outputDirectory>
+              <outputDirectory>${basedir}/target/generated-resources/modello</outputDirectory>
             </configuration>
           </execution>
         </executions>
