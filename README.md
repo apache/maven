@@ -21,6 +21,7 @@ Incremental Build and Cache
 -------------
 This project provides an Incremental Build and Caching features which calculates out-of-date modules in the build dependencies graph and improves build times by avoiding re-building unnecessary modules.
 Read [cache guide](maven-caching-extension/src/site/markdown/CACHE.md) for more details.
+
 License
 -------
 This code is under the [Apache License, Version 2.0, January 2004][license].
