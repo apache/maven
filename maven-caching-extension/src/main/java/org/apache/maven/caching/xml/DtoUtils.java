@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,10 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.xml;
 
+import java.util.List;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.CacheUtils;
@@ -28,10 +29,6 @@ import org.apache.maven.caching.xml.build.DigestItem;
 import org.apache.maven.caching.xml.build.PropertyValue;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Dependency;
-
-import javax.annotation.Nonnull;
-
-import java.util.List;
 
 import static org.apache.maven.caching.checksum.KeyUtils.getArtifactKey;
 
@@ -116,10 +113,10 @@ public class DtoUtils
     }
 
     public static void addProperty( CompletedExecution execution,
-                                    String propertyName,
-                                    Object value,
-                                    String baseDirPath,
-                                    boolean tracked )
+            String propertyName,
+            Object value,
+            String baseDirPath,
+            boolean tracked )
     {
         final PropertyValue valueType = new PropertyValue();
         valueType.setName( propertyName );

@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,6 +26,7 @@ import java.nio.file.Path;
  */
 public class HashChecksum
 {
+
     private final Hash.Algorithm algorithm;
     private final Hash.Checksum checksum;
 

@@ -18,16 +18,13 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 public class MavenProjectInputTest
 {

@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.nio.charset.StandardCharsets;
 
@@ -67,7 +66,7 @@ public class HexUtils
         {
             throw new IllegalArgumentException( "String length should be even" );
         }
-        byte[] bytes = new byte[ size / 2 ];
+        byte[] bytes = new byte[size / 2];
         int idx = 0;
         for ( int i = 0; i < size; i += 2 )
         {

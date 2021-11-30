@@ -1,5 +1,3 @@
-package org.apache.maven.caching.checksum;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,14 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.checksum;
 
 /**
  * DependencyNotResolvedException
  */
 public class DependencyNotResolvedException extends RuntimeException
 {
+
     public DependencyNotResolvedException( String message )
     {
         super( message );

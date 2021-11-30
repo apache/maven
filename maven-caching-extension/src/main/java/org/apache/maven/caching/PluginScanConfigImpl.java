@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.util.List;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.xml.config.DirScanConfig;
 import org.apache.maven.caching.xml.config.TagExclude;
 import org.apache.maven.caching.xml.config.TagScanConfig;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * PluginScanConfigImpl

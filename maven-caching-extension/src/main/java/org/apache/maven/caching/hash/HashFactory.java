@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import java.util.Map;
  */
 public enum HashFactory
 {
+
     SHA1( new SHA( "SHA-1" ) ),
     SHA256( new SHA( "SHA-256" ) ),
     SHA384( new SHA( "SHA-384" ) ),

@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,11 +26,13 @@ import java.nio.file.Path;
  */
 public class Hash
 {
+
     /**
      * Algorithm
      */
     public interface Algorithm
     {
+
         byte[] hash( byte[] array );
 
         byte[] hash( Path path ) throws IOException;
@@ -42,6 +43,7 @@ public class Hash
      */
     public interface Checksum
     {
+
         void update( byte[] hash );
 
         byte[] digest();
@@ -52,6 +54,7 @@ public class Hash
      */
     public interface Factory
     {
+
         String getAlgorithm();
 
         Algorithm algorithm();

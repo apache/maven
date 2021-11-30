@@ -1,5 +1,3 @@
-package org.apache.maven.caching.checksum;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.checksum;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.caching.xml.build.Artifact;
@@ -58,7 +57,6 @@ public class KeyUtils
                 artifact.getClassifier() );
     }
 
-
     /**
      * Computes the key for the given artifact, using the given type instead of the one defined in the artifact.
      */
@@ -75,7 +73,7 @@ public class KeyUtils
     }
 
     public static String getArtifactKey( String groupId, String artifactId, String type,
-                                         String classifier, String version )
+            String classifier, String version )
     {
         if ( classifier != null )
         {
@@ -88,7 +86,7 @@ public class KeyUtils
     }
 
     public static String getVersionlessArtifactKey( String groupId, String artifactId, String type,
-                                                    String classifier )
+            String classifier )
     {
         if ( classifier != null )
         {

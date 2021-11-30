@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,8 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.caching.xml.CacheConfig;
-import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,6 +31,15 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @Named
@@ -83,7 +81,7 @@ public class DefaultRestoredArtifactHandler implements RestoredArtifactHandler
         if ( tempDirName.mkdirs() )
         {
             LOGGER.debug( "Temporary directory to restore artifact was created [artifactFile={}, "
-                            + "originalVersion={}, tempDir={}]",
+                    + "originalVersion={}, tempDir={}]",
                     artifactFile, originalArtifactVersion, tempDirName );
         }
 
@@ -150,7 +148,7 @@ public class DefaultRestoredArtifactHandler implements RestoredArtifactHandler
     }
 
     private static void replaceEntry( JarFile jarFile, JarEntry entry,
-                                      String toReplace, String replacement, JarOutputStream jos ) throws IOException
+            String toReplace, String replacement, JarOutputStream jos ) throws IOException
     {
         String fullManifest = IOUtils.toString( jarFile.getInputStream( entry ), StandardCharsets.UTF_8.name() );
         String modified = fullManifest.replaceAll( toReplace, replacement );

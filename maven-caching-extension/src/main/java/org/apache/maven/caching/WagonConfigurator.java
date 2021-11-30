@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -42,6 +40,7 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 public class WagonConfigurator
 {
+
     private final PlexusContainer container;
 
     /**
@@ -56,7 +55,7 @@ public class WagonConfigurator
     }
 
     public void configure( Wagon wagon, Object configuration )
-        throws Exception
+            throws Exception
     {
         requireNonNull( wagon, "wagon cannot be null" );
         requireNonNull( configuration, "configuration cannot be null" );
@@ -64,11 +63,11 @@ public class WagonConfigurator
         PlexusConfiguration config;
         if ( configuration instanceof PlexusConfiguration )
         {
-            config = (PlexusConfiguration) configuration;
+            config = ( PlexusConfiguration ) configuration;
         }
         else if ( configuration instanceof Xpp3Dom )
         {
-            config = new XmlPlexusConfiguration( (Xpp3Dom) configuration );
+            config = new XmlPlexusConfiguration( ( Xpp3Dom ) configuration );
         }
         else
         {
@@ -82,19 +81,19 @@ public class WagonConfigurator
     }
 
     static class WagonComponentConfigurator
-        extends AbstractComponentConfigurator
+            extends AbstractComponentConfigurator
     {
 
         @Override
         public void configureComponent( Object component, PlexusConfiguration configuration,
-                                        ExpressionEvaluator expressionEvaluator, ClassRealm containerRealm,
-                                        ConfigurationListener listener )
-            throws ComponentConfigurationException
+                ExpressionEvaluator expressionEvaluator, ClassRealm containerRealm,
+                ConfigurationListener listener )
+                throws ComponentConfigurationException
         {
             ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
 
             converter.processConfiguration( converterLookup, component, containerRealm, configuration,
-                                            expressionEvaluator, listener );
+                    expressionEvaluator, listener );
         }
 
     }

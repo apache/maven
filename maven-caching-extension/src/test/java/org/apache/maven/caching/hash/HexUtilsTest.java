@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,33 +16,53 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HexUtilsTest {
+public class HexUtilsTest
+{
 
     @Test
-    public void testEncodeToHex() {
+    public void testEncodeToHex()
+    {
         //array length = 8 left padded with zeroes
-        assertEquals("0000000000000000", HexUtils.encode(new byte[8]));
-        assertEquals("00", HexUtils.encode(new byte[1]));
+        assertEquals( "0000000000000000", HexUtils.encode( new byte[8] ) );
+        assertEquals( "00", HexUtils.encode( new byte[1] ) );
 
-        assertEquals("0a", HexUtils.encode(new byte[]{10}));
-        assertEquals("000000000000000a", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 0, 10}));
+        assertEquals( "0a", HexUtils.encode( new byte[]
+        { 10
+        } ) );
+        assertEquals( "000000000000000a", HexUtils.encode( new byte[]
+        { 0, 0, 0, 0, 0, 0, 0, 10
+        } ) );
 
-        assertEquals("0100", HexUtils.encode(new byte[]{1, 0}));
-        assertEquals("0000000000000101", HexUtils.encode(new byte[]{0, 0, 0, 0, 0, 0, 1, 1}));
+        assertEquals( "0100", HexUtils.encode( new byte[]
+        { 1, 0
+        } ) );
+        assertEquals( "0000000000000101", HexUtils.encode( new byte[]
+        { 0, 0, 0, 0, 0, 0, 1, 1
+        } ) );
     }
 
     @Test
-    public void testDecodeHex() {
-        assertArrayEquals(new byte[]{0}, HexUtils.decode("00"));
-        assertArrayEquals(new byte[]{10}, HexUtils.decode("0a"));
-        assertArrayEquals(new byte[]{10}, HexUtils.decode("0A"));
-        assertArrayEquals(new byte[]{1, 0}, HexUtils.decode("0100"));
+    public void testDecodeHex()
+    {
+        assertArrayEquals( new byte[]
+        { 0
+        }, HexUtils.decode( "00" ) );
+        assertArrayEquals( new byte[]
+        { 10
+        }, HexUtils.decode( "0a" ) );
+        assertArrayEquals( new byte[]
+        { 10
+        }, HexUtils.decode( "0A" ) );
+        assertArrayEquals( new byte[]
+        { 1, 0
+        }, HexUtils.decode( "0100" ) );
     }
 
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.caching.xml.build.Scm;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.SessionData;
+package org.apache.maven.caching;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +34,15 @@ import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.caching.xml.build.Scm;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.SessionData;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -140,12 +138,10 @@ public class CacheUtils
         return scmCandidate;
     }
 
-
     private static String readFirstLine( Path path, String defaultValue ) throws IOException
     {
         return Files.lines( path, StandardCharsets.UTF_8 ).findFirst().orElse( defaultValue );
     }
-
 
     public static <T> T getLast( List<T> list )
     {
@@ -162,7 +158,7 @@ public class CacheUtils
         SessionData data = session.getRepositorySession().getData();
         while ( true )
         {
-            T t = (T) data.get( key );
+            T t = ( T ) data.get( key );
             if ( t == null )
             {
                 t = supplier.get();
@@ -185,13 +181,13 @@ public class CacheUtils
         return StringUtils.endsWithAny( fileName, ".jar", ".zip", ".war", ".ear" );
     }
 
-
     public static void zip( Path dir, Path zip ) throws IOException
     {
         try ( ZipOutputStream zipOutputStream = new ZipOutputStream( Files.newOutputStream( zip ) ) )
         {
             Files.walkFileTree( dir, new SimpleFileVisitor<Path>()
             {
+
                 @Override
                 public FileVisitResult visitFile( Path path, BasicFileAttributes basicFileAttributes )
                         throws IOException

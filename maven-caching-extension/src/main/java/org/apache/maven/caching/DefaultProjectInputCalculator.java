@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,14 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.xml.CacheConfig;
@@ -30,17 +35,11 @@ import org.apache.maven.repository.RepositorySystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 @SessionScoped
 @Named
 public class DefaultProjectInputCalculator implements ProjectInputCalculator
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectInputCalculator.class );
 
     private final MavenSession mavenSession;
@@ -53,16 +52,15 @@ public class DefaultProjectInputCalculator implements ProjectInputCalculator
     private final ConcurrentMap<String, ProjectsInputInfo> checkSumMap = new ConcurrentHashMap<>();
 
     private static final ThreadLocal<Set<String>> CURRENTLY_CALCULATING = ThreadLocal.withInitial(
-            LinkedHashSet::new
-    );
+            LinkedHashSet::new );
 
     @Inject
     public DefaultProjectInputCalculator( MavenSession mavenSession,
-                                          RemoteCacheRepository remoteCache,
-                                          CacheConfig cacheConfig,
-                                          RepositorySystem repoSystem,
-                                          NormalizedModelProvider rawModelProvider,
-                                          MultiModuleSupport multiModuleSupport )
+            RemoteCacheRepository remoteCache,
+            CacheConfig cacheConfig,
+            RepositorySystem repoSystem,
+            NormalizedModelProvider rawModelProvider,
+            MultiModuleSupport multiModuleSupport )
     {
         this.mavenSession = mavenSession;
         this.remoteCache = remoteCache;
@@ -94,7 +92,7 @@ public class DefaultProjectInputCalculator implements ProjectInputCalculator
     }
 
     private ProjectsInputInfo calculateInputInternal( String key,
-                                                      MavenProject project )
+            MavenProject project )
     {
         Set<String> projectsSet = CURRENTLY_CALCULATING.get();
 
@@ -114,8 +112,7 @@ public class DefaultProjectInputCalculator implements ProjectInputCalculator
                     mavenSession,
                     cacheConfig,
                     repoSystem,
-                    remoteCache
-            );
+                    remoteCache );
             return input.calculateChecksum();
         }
         catch ( Exception e )

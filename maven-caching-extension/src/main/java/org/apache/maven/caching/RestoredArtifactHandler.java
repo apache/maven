@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.project.MavenProject;
+package org.apache.maven.caching;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import org.apache.maven.project.MavenProject;
 
 public interface RestoredArtifactHandler
 {
+
     //we might store in cache artifact which was build with previous version
     //1.0-SNAPSHOT is kept in cache but real version of project is 2.0
     //for pom packaging this is done automatically by maven but for jar and other there might be

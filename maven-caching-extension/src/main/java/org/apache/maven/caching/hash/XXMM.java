@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -31,6 +30,7 @@ import static java.nio.file.StandardOpenOption.READ;
  */
 public class XXMM implements Hash.Factory
 {
+
     private static final ThreadLocal<CloseableBuffer> BUFFER = new ThreadLocal<>();
 
     @Override
@@ -53,11 +53,12 @@ public class XXMM implements Hash.Factory
 
     private static class Algorithm extends XX.Algorithm
     {
+
         @Override
         public byte[] hash( Path path ) throws IOException
         {
             try ( FileChannel channel = FileChannel.open( path, READ );
-                  CloseableBuffer buffer = CloseableBuffer.mappedBuffer( channel, READ_ONLY ) )
+                    CloseableBuffer buffer = CloseableBuffer.mappedBuffer( channel, READ_ONLY ) )
             {
                 return HexUtils.toByteArray( XX.INSTANCE.hashBytes( buffer.getBuffer() ) );
             }

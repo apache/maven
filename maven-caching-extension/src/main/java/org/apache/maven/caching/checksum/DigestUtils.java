@@ -1,5 +1,3 @@
-package org.apache.maven.caching.checksum;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,7 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.hash.HashChecksum;
-import org.apache.maven.caching.xml.build.DigestItem;
-import org.mozilla.universalchardet.UniversalDetector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.maven.caching.checksum;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -33,6 +24,13 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.caching.hash.HashChecksum;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.mozilla.universalchardet.UniversalDetector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.containsAny;
@@ -48,9 +46,8 @@ public class DigestUtils
 
     private static final Logger LOGGER = LoggerFactory.getLogger( DigestUtils.class );
 
-    private static final ThreadLocal<UniversalDetector> ENCODING_DETECTOR =
-            ThreadLocal.withInitial( () -> new UniversalDetector( null ) );
-
+    private static final ThreadLocal<UniversalDetector> ENCODING_DETECTOR = ThreadLocal
+            .withInitial( () -> new UniversalDetector( null ) );
 
     public static DigestItem pom( HashChecksum checksum, String effectivePom )
     {
@@ -107,13 +104,12 @@ public class DigestUtils
         return startsWith( contentType, "text/" )
                 || containsAny( contentType, "+json", "+xml" ) // common mime type suffixes
                 || equalsAny( contentType, // some common text types
-                "application/json",
-                "application/rtf",
-                "application/x-sh",
-                "application/xml",
-                "application/javascript",
-                "application/sql"
-        );
+                        "application/json",
+                        "application/rtf",
+                        "application/x-sh",
+                        "application/xml",
+                        "application/javascript",
+                        "application/sql" );
     }
 
     private static boolean isBinary( String contentType )
@@ -121,18 +117,17 @@ public class DigestUtils
         return startsWithAny( contentType, "image/", "audio/", "video/", "font/" )
                 || containsAny( contentType, "+zip", "+gzip" )
                 || equalsAny( contentType,
-                "application/octet-stream",
-                "application/java-archive",
-                "application/x-bzip",
-                "application/x-bzip2",
-                "application/zip",
-                "application/gzip",
-                "application/x-tar",
-                "application/msword",
-                "application/vnd.ms-excel",
-                "application/vnd.ms-powerpoint",
-                "application/pdf"
-        );
+                        "application/octet-stream",
+                        "application/java-archive",
+                        "application/x-bzip",
+                        "application/x-bzip2",
+                        "application/zip",
+                        "application/gzip",
+                        "application/x-tar",
+                        "application/msword",
+                        "application/vnd.ms-excel",
+                        "application/vnd.ms-powerpoint",
+                        "application/pdf" );
     }
 
     public static DigestItem dependency( HashChecksum checksum, String key, String hash )

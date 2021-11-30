@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,16 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
@@ -30,19 +37,11 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
-
 @SessionScoped
 @Named
 public class DefaultNormalizedModelProvider implements NormalizedModelProvider
 {
+
     private static final String NORMALIZED_VERSION = "cache-extension-version";
 
     private final CacheConfig cacheConfig;
@@ -69,9 +68,9 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
         //prefer project from multimodule than reactor because effective pom of reactor project
         //could be built with maven local/remote dependencies but not with artifacts from cache
         MavenProject projectToNormalize = multiModuleSupport.tryToResolveProject(
-                        project.getGroupId(),
-                        project.getArtifactId(),
-                        project.getVersion() )
+                project.getGroupId(),
+                project.getArtifactId(),
+                project.getVersion() )
                 .orElse( project );
         Model prototype = projectToNormalize.getModel();
 
@@ -125,10 +124,10 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
                 {
                     Plugin copy = plugin.clone();
                     List<String> excludeProperties = cacheConfig.getEffectivePomExcludeProperties( copy );
-                    removeBlacklistedAttributes( (Xpp3Dom) copy.getConfiguration(), excludeProperties );
+                    removeBlacklistedAttributes( ( Xpp3Dom ) copy.getConfiguration(), excludeProperties );
                     for ( PluginExecution execution : copy.getExecutions() )
                     {
-                        Xpp3Dom config = (Xpp3Dom) execution.getConfiguration();
+                        Xpp3Dom config = ( Xpp3Dom ) execution.getConfiguration();
                         removeBlacklistedAttributes( config, excludeProperties );
                     }
 
@@ -137,9 +136,7 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
                                     copy.getDependencies()
                                             .stream()
                                             .sorted( DefaultNormalizedModelProvider::compareDependencies )
-                                            .collect( Collectors.toList() )
-                            )
-                    );
+                                            .collect( Collectors.toList() ) ) );
                     if ( multiModuleSupport.isPartOfMultiModule(
                             copy.getGroupId(),
                             copy.getArtifactId(),
@@ -148,8 +145,7 @@ public class DefaultNormalizedModelProvider implements NormalizedModelProvider
                         copy.setVersion( NORMALIZED_VERSION );
                     }
                     return copy;
-                }
-        ).collect( Collectors.toList() );
+                } ).collect( Collectors.toList() );
     }
 
     private void removeBlacklistedAttributes( Xpp3Dom node, List<String> excludeProperties )

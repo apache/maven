@@ -18,10 +18,8 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.junit.jupiter.api.Test;
@@ -30,9 +28,11 @@ import static org.apache.maven.caching.hash.HashFactory.XX;
 import static org.apache.maven.caching.hash.HashFactory.XXMM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XXHashTest {
-    private static final byte[] HELLO_ARRAY = "hello".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] WORLD_ARRAY = "world".getBytes(StandardCharsets.UTF_8);
+public class XXHashTest
+{
+
+    private static final byte[] HELLO_ARRAY = "hello".getBytes( StandardCharsets.UTF_8 );
+    private static final byte[] WORLD_ARRAY = "world".getBytes( StandardCharsets.UTF_8 );
     private static final long HELLO_LONG = 2794345569481354659L;
     private static final long WORLD_LONG = -1767385783675760145L;
     private static final String EMPTY_HASH = "ef46db3751d8e999";
@@ -45,87 +45,101 @@ public class XXHashTest {
     private static final HashAlgorithm ALGORITHM = XX.createAlgorithm();
 
     @Test
-    public void testEmptyArray() {
+    public void testEmptyArray()
+    {
         byte[] emptyArray = new byte[0];
-        String hash = ALGORITHM.hash(emptyArray);
-        assertEquals(EMPTY_HASH, hash);
+        String hash = ALGORITHM.hash( emptyArray );
+        assertEquals( EMPTY_HASH, hash );
     }
 
     @Test
-    public void testSimpleHash() {
-        String helloHash = ALGORITHM.hash(HELLO_ARRAY);
-        assertEquals(HELLO_HASH, helloHash);
+    public void testSimpleHash()
+    {
+        String helloHash = ALGORITHM.hash( HELLO_ARRAY );
+        assertEquals( HELLO_HASH, helloHash );
 
-        String worldHash = ALGORITHM.hash(WORLD_ARRAY);
-        assertEquals(WORLD_HASH, worldHash);
+        String worldHash = ALGORITHM.hash( WORLD_ARRAY );
+        assertEquals( WORLD_HASH, worldHash );
     }
 
     @Test
-    public void testSimpleChecksum() {
-        String helloChecksum = ALGORITHM.hash(longToBytes(1, HELLO_LONG));
-        assertEquals(HELLO_CHECKSUM, helloChecksum);
+    public void testSimpleChecksum()
+    {
+        String helloChecksum = ALGORITHM.hash( longToBytes( 1, HELLO_LONG ) );
+        assertEquals( HELLO_CHECKSUM, helloChecksum );
 
-        String worldChecksum = ALGORITHM.hash(longToBytes(1, WORLD_LONG));
-        assertEquals(WORLD_CHECKSUM, worldChecksum);
+        String worldChecksum = ALGORITHM.hash( longToBytes( 1, WORLD_LONG ) );
+        assertEquals( WORLD_CHECKSUM, worldChecksum );
 
-        String checksum = ALGORITHM.hash(longToBytes(2, HELLO_LONG, WORLD_LONG));
-        assertEquals(FULL_CHECKSUM, checksum);
+        String checksum = ALGORITHM.hash( longToBytes( 2, HELLO_LONG, WORLD_LONG ) );
+        assertEquals( FULL_CHECKSUM, checksum );
     }
 
     @Test
-    public void testEmptyBuffer() {
-        assertEmptyBuffer(XX.createChecksum(0));
-        assertEmptyBuffer(XXMM.createChecksum(0));
+    public void testEmptyBuffer()
+    {
+        assertEmptyBuffer( XX.createChecksum( 0 ) );
+        assertEmptyBuffer( XXMM.createChecksum( 0 ) );
     }
 
     @Test
-    public void testSingleHash() {
-        assertSingleHash(XX.createChecksum(1));
-        assertSingleHash(XXMM.createChecksum(1));
+    public void testSingleHash()
+    {
+        assertSingleHash( XX.createChecksum( 1 ) );
+        assertSingleHash( XXMM.createChecksum( 1 ) );
     }
 
     @Test
-    public void testSingleChecksum() {
-        assertSingleChecksum(XX.createChecksum(1));
-        assertSingleChecksum(XXMM.createChecksum(1));
+    public void testSingleChecksum()
+    {
+        assertSingleChecksum( XX.createChecksum( 1 ) );
+        assertSingleChecksum( XXMM.createChecksum( 1 ) );
     }
 
     @Test
-    public void testNotFullChecksum() {
-        assertSingleChecksum(XX.createChecksum(2));
-        assertSingleChecksum(XXMM.createChecksum(2));
+    public void testNotFullChecksum()
+    {
+        assertSingleChecksum( XX.createChecksum( 2 ) );
+        assertSingleChecksum( XXMM.createChecksum( 2 ) );
     }
 
     @Test
-    public void testFullChecksum() {
-        assertFullChecksum(XX.createChecksum(2));
-        assertFullChecksum(XXMM.createChecksum(2));
+    public void testFullChecksum()
+    {
+        assertFullChecksum( XX.createChecksum( 2 ) );
+        assertFullChecksum( XXMM.createChecksum( 2 ) );
     }
 
-    private void assertEmptyBuffer(HashChecksum checksum) {
-        assertEquals(EMPTY_HASH, checksum.digest());
+    private void assertEmptyBuffer( HashChecksum checksum )
+    {
+        assertEquals( EMPTY_HASH, checksum.digest() );
     }
 
-    private void assertSingleHash(HashChecksum checksum) {
-        assertEquals(HELLO_HASH, checksum.update(HELLO_ARRAY));
-        assertEquals(HELLO_CHECKSUM, checksum.digest());
+    private void assertSingleHash( HashChecksum checksum )
+    {
+        assertEquals( HELLO_HASH, checksum.update( HELLO_ARRAY ) );
+        assertEquals( HELLO_CHECKSUM, checksum.digest() );
     }
 
-    private void assertSingleChecksum(HashChecksum checksum) {
-        assertEquals(HELLO_HASH, checksum.update(HELLO_HASH));
-        assertEquals(HELLO_CHECKSUM, checksum.digest());
+    private void assertSingleChecksum( HashChecksum checksum )
+    {
+        assertEquals( HELLO_HASH, checksum.update( HELLO_HASH ) );
+        assertEquals( HELLO_CHECKSUM, checksum.digest() );
     }
 
-    private void assertFullChecksum(HashChecksum checksum) {
-        assertEquals(HELLO_HASH, checksum.update(HELLO_HASH));
-        assertEquals(WORLD_HASH, checksum.update(WORLD_HASH));
-        assertEquals(FULL_CHECKSUM, checksum.digest());
+    private void assertFullChecksum( HashChecksum checksum )
+    {
+        assertEquals( HELLO_HASH, checksum.update( HELLO_HASH ) );
+        assertEquals( WORLD_HASH, checksum.update( WORLD_HASH ) );
+        assertEquals( FULL_CHECKSUM, checksum.digest() );
     }
 
-    private byte[] longToBytes(int size, long... values) {
-        final ByteBuffer buffer = ByteBuffer.allocate(size * Long.SIZE / Byte.SIZE);
-        for (long value : values) {
-            buffer.putLong(value);
+    private byte[] longToBytes( int size, long... values )
+    {
+        final ByteBuffer buffer = ByteBuffer.allocate( size * Long.SIZE / Byte.SIZE );
+        for ( long value : values )
+        {
+            buffer.putLong( value );
         }
         return buffer.array();
     }

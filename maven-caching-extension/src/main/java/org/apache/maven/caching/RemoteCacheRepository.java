@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,15 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
-
+import javax.annotation.Nonnull;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.project.MavenProject;
-
-import javax.annotation.Nonnull;
 
 /**
  * Remote cache repository.
@@ -38,7 +35,7 @@ public interface RemoteCacheRepository extends CacheRepository
     /**
      * Download an artifact to the given location.
      * Returns <code>true</code> if success, <code>false</code> if the artifact does not exists
-     *   and throws an <code>IOException</code> if a problem occurs.
+     * and throws an <code>IOException</code> if a problem occurs.
      */
     boolean getArtifactContent( CacheContext context, Artifact artifact, Path target ) throws IOException;
 

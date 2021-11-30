@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,8 +40,8 @@ public class MojoParametersListener implements MojoExecutionListener
 
     private static final Logger LOGGER = LoggerFactory.getLogger( MojoParametersListener.class );
 
-    private final ConcurrentMap<MavenProject, Map<String, MojoExecutionEvent>> projectExecutions =
-            new ConcurrentHashMap<>();
+    @SuppressWarnings( "checkstyle:LineLength" )
+    private final ConcurrentMap<MavenProject, Map<String, MojoExecutionEvent>> projectExecutions = new ConcurrentHashMap<>();
 
     @Override
     public void beforeMojoExecution( MojoExecutionEvent event )

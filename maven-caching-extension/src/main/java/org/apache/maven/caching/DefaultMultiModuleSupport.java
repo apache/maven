@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,22 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.checksum.KeyUtils;
 import org.apache.maven.caching.xml.CacheConfig;
@@ -33,21 +46,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @SessionScoped
 @Named
@@ -66,8 +64,8 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
 
     @Inject
     public DefaultMultiModuleSupport( ProjectBuilder projectBuilder,
-                                      CacheConfig cacheConfig,
-                                      MavenSession session )
+            CacheConfig cacheConfig,
+            MavenSession session )
     {
         this.projectBuilder = projectBuilder;
         this.cacheConfig = cacheConfig;
@@ -104,8 +102,7 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
         }
         sessionProjectMap = session.getProjects().stream().collect( Collectors.toMap(
                 KeyUtils::getProjectKey,
-                Function.identity()
-        ) );
+                Function.identity() ) );
         return sessionProjectMap;
     }
 
@@ -135,8 +132,8 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
             return;
         }
 
-        Optional<Discovery> multiModuleDiscovery =
-                Optional.ofNullable( cacheConfig.getMultiModule() ).map( MultiModule::getDiscovery );
+        Optional<Discovery> multiModuleDiscovery = Optional.ofNullable( cacheConfig.getMultiModule() )
+                .map( MultiModule::getDiscovery );
 
         //no discovery configuration, use only projects in session
         if ( !multiModuleDiscovery.isPresent() )
@@ -175,8 +172,7 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
         buildingRequest.setProfiles(
                 buildingRequest.getProfiles().stream()
                         .peek( it -> it.setProperties( new Properties() ) )
-                        .collect( Collectors.toList() )
-        );
+                        .collect( Collectors.toList() ) );
         if ( !profilesMatched )
         {
             Set<String> profiles = new LinkedHashSet<>( buildingRequest.getActiveProfileIds() );
@@ -189,8 +185,7 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
             List<ProjectBuildingResult> buildingResults = projectBuilder.build(
                     Collections.singletonList( multiModulePomFile ),
                     true,
-                    buildingRequest
-            );
+                    buildingRequest );
             LOGGER.info( "Multi module project model calculated [activeProfiles={}, time={} ms ",
                     buildingRequest.getActiveProfileIds(), System.currentTimeMillis() - t0 );
 
@@ -213,8 +208,7 @@ public class DefaultMultiModuleSupport implements MultiModuleSupport
     {
         return projectList.stream().collect( Collectors.toMap(
                 KeyUtils::getProjectKey,
-                Function.identity()
-        ) );
+                Function.identity() ) );
     }
 
     private static File getMultiModulePomFile( MavenSession session )

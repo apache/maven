@@ -45,19 +45,15 @@ under the License.
         <maven3Version>3.9.0-SNAPSHOT</maven3Version>
         <maven4Version>4.0.0-alpha-1-SNAPSHOT</maven4Version>
 
+        <formatter-maven-plugin.version>2.17.0</formatter-maven-plugin.version>
+        <impsort-maven-plugin.version>1.6.2</impsort-maven-plugin.version>
+
         <commonsCliVersion>1.4</commonsCliVersion>
         <commonsLangVersion>3.12.0</commonsLangVersion>
         <junitVersion>5.8.1</junitVersion>
         <mockitoVersion>3.2.0</mockitoVersion>
-        <plexusVersion>2.1.0</plexusVersion>
-        <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-        <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
-        <guiceVersion>4.2.3</guiceVersion>
-        <guavaVersion>30.1-jre</guavaVersion>
-        <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-        <sisuVersion>0.3.5</sisuVersion>
+        <plexusUtilsVersion>3.4.1</plexusUtilsVersion>
         <wagonVersion>3.4.3</wagonVersion>
-        <jsoupVersion>1.12.1</jsoupVersion>
         <securityDispatcherVersion>2.0</securityDispatcherVersion>
         <cipherVersion>2.0</cipherVersion>
         <modelloVersion>1.11</modelloVersion>
@@ -67,9 +63,6 @@ under the License.
         <xmlunitVersion>2.6.4</xmlunitVersion>
         <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
         <!-- Control the name of the distribution and information output by mvn -->
-        <distributionId>apache-maven</distributionId>
-        <distributionShortName>Maven</distributionShortName>
-        <distributionName>Apache Maven</distributionName>
         <maven.site.path>ref/4-LATEST</maven.site.path>
         <project.build.outputTimestamp>2021-04-05T08:12:18Z</project.build.outputTimestamp>
     </properties>
@@ -289,12 +282,69 @@ under the License.
                             <exclude>src/test/resources*/**</exclude>
                             <exclude>src/test/projects/**</exclude>
                             <exclude>src/test/remote-repo/**</exclude>
+                            <exclude>build/maven-header.txt</exclude>
                         </excludes>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>${formatter-maven-plugin.version}</version>
+                    <configuration>
+                        <configFile>${maven.multiModuleProjectDirectory}/build/eclipse-formatter-config.xml</configFile>
+                        <skip>${format.skip}</skip>
+                        <lineEnding>KEEP</lineEnding>
+                        <cachedir>${project.build.directory}/cache</cachedir>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>impsort-maven-plugin</artifactId>
+                    <version>${impsort-maven-plugin.version}</version>
+                    <configuration>
+                        <removeUnused>true</removeUnused>
+                        <staticAfter>true</staticAfter>
+                        <lineEnding>KEEP</lineEnding>
+                        <skip>${format.skip}</skip>
+                        <cachedir>${project.build.directory}/cache</cachedir>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-utils</artifactId>
+                            <version>3.4.1</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>format</id>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sort-imports</id>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
@@ -323,6 +373,7 @@ under the License.
                 <configuration>
                     <violationSeverity>info</violationSeverity>
                     <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>
+                    <headerLocation>${maven.multiModuleProjectDirectory}/build/maven-header.txt</headerLocation>
                 </configuration>
                 <dependencies>
                     <dependency>

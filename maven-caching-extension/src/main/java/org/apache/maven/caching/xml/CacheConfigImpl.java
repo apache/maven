@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.xml;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,12 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.DefaultPluginScanConfig;
@@ -338,10 +335,10 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     private boolean isPluginMatch( Plugin plugin, CoordinatesBase pluginConfig )
     {
         return StringUtils.equals( pluginConfig.getArtifactId(),
-                plugin.getArtifactId() ) && ( pluginConfig.getGroupId() == null || StringUtils.equals(
-                pluginConfig.getGroupId(), plugin.getGroupId() ) );
+                plugin.getArtifactId() )
+                && ( pluginConfig.getGroupId() == null || StringUtils.equals(
+                        pluginConfig.getGroupId(), plugin.getGroupId() ) );
     }
-
 
     @Nonnull
     @Override
@@ -378,7 +375,7 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     }
 
     private ExecutionConfigurationScan findExecutionScanConfig( PluginExecution execution,
-                                                                List<ExecutionConfigurationScan> scanConfigs )
+            List<ExecutionConfigurationScan> scanConfigs )
     {
         for ( ExecutionConfigurationScan executionScanConfig : scanConfigs )
         {
@@ -491,7 +488,6 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         return state == CacheState.INITIALIZED;
     }
-
 
     @Override
     public boolean isRemoteCacheEnabled()

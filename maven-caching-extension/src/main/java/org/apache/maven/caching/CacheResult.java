@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheSource;
@@ -29,6 +28,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class CacheResult
 {
+
     private final RestoreStatus status;
     private final Build build;
     private final CacheContext context;

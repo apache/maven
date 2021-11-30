@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.xml.Build;
@@ -55,7 +52,6 @@ import static org.apache.maven.caching.checksum.KeyUtils.getVersionlessProjectKe
 import static org.apache.maven.caching.xml.CacheState.DISABLED;
 import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
 
-
 /**
  * <p>
  * Cache-enabled version of the MojoExecutor
@@ -67,6 +63,7 @@ import static org.apache.maven.caching.xml.CacheState.INITIALIZED;
 @SuppressWarnings( "unused" )
 public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
 {
+
     private static final Logger LOGGER = LoggerFactory.getLogger( CachingMojosExecutionStrategy.class );
 
     private final CacheController cacheController;
@@ -91,8 +88,8 @@ public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
     }
 
     public void execute( List<MojoExecution> mojoExecutions,
-                         MavenSession session,
-                         MojoExecutionRunner mojoExecutionRunner )
+            MavenSession session,
+            MojoExecutionRunner mojoExecutionRunner )
             throws LifecycleExecutionException
     {
         final MavenProject project = session.getCurrentProject();
@@ -165,9 +162,9 @@ public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
     }
 
     private boolean restoreProject( CacheResult cacheResult,
-                                    List<MojoExecution> mojoExecutions,
-                                    MojoExecutionRunner mojoExecutionRunner,
-                                    CacheConfig cacheConfig ) throws LifecycleExecutionException
+            List<MojoExecution> mojoExecutions,
+            MojoExecutionRunner mojoExecutionRunner,
+            CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
         final Build build = cacheResult.getBuildInfo();
         final MavenProject project = cacheResult.getContext().getProject();
@@ -222,11 +219,11 @@ public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
     }
 
     private boolean verifyCacheConsistency( MojoExecution cacheCandidate,
-                                            Build cachedBuild,
-                                            MavenProject project,
-                                            MavenSession session,
-                                            MojoExecutionRunner mojoExecutionRunner,
-                                            CacheConfig cacheConfig ) throws LifecycleExecutionException
+            Build cachedBuild,
+            MavenProject project,
+            MavenSession session,
+            MojoExecutionRunner mojoExecutionRunner,
+            CacheConfig cacheConfig ) throws LifecycleExecutionException
     {
         long createdTimestamp = System.currentTimeMillis();
         boolean consistent = true;
@@ -282,8 +279,8 @@ public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
     }
 
     private boolean isParamsMatched( MojoExecution mojoExecution,
-                                     Mojo mojo,
-                                     CompletedExecution completedExecution )
+            Mojo mojo,
+            CompletedExecution completedExecution )
     {
         List<TrackedProperty> tracked = cacheConfig.getTrackedProperties( mojoExecution );
 
@@ -319,7 +316,7 @@ public class CachingMojosExecutionStrategy implements MojosExecutionStrategy
                 else
                 {
                     LOGGER.warn( "Cache contains plugin execution with skip flag and might be incomplete. "
-                                    + "Property: {}, execution {}",
+                            + "Property: {}, execution {}",
                             propertyName, mojoExecutionKey( mojoExecution ) );
                 }
             }

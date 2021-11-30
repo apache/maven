@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ThreadLocalBuffer
 {
+
     private static final ConcurrentMap<CloseableBuffer, Boolean> LOCALS = new ConcurrentHashMap<>();
 
     public static ByteBuffer get( ThreadLocal<CloseableBuffer> local, int capacity )
@@ -71,7 +71,7 @@ public class ThreadLocalBuffer
 
     private static ByteBuffer clear( CloseableBuffer buffer )
     {
-        return (ByteBuffer) buffer.getBuffer().clear();
+        return ( ByteBuffer ) buffer.getBuffer().clear();
     }
 
     private static void close( CloseableBuffer buffer )

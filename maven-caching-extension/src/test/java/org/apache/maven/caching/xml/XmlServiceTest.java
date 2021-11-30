@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,34 +16,34 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.caching.xml.build.Build;
-import org.apache.maven.caching.xml.diff.Diff;
-import org.apache.maven.caching.xml.config.CacheConfig;
-import org.apache.maven.caching.xml.report.CacheReport;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.caching.xml;
 
 import java.io.InputStream;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
+import org.apache.maven.caching.xml.build.Build;
+import org.apache.maven.caching.xml.config.CacheConfig;
+import org.apache.maven.caching.xml.diff.Diff;
+import org.apache.maven.caching.xml.report.CacheReport;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
-public class XmlServiceTest {
+public class XmlServiceTest
+{
 
     @Test
-    @Disabled("cache-build-1.0.0.xsd not found")
-    public void testConfig() throws Exception {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-config-1.0.0.xsd"));
+    @Disabled( "cache-build-1.0.0.xsd not found" )
+    public void testConfig() throws Exception
+    {
+        SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+        Schema schema = sf.newSchema( getClass().getResource( "/cache-config-1.0.0.xsd" ) );
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setSchema(schema);
+        dbf.setNamespaceAware( true );
+        dbf.setSchema( schema );
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse( getClass().getResource( "cache-config-instance.xml" ).toString() );
 
@@ -54,13 +52,14 @@ public class XmlServiceTest {
     }
 
     @Test
-    @Disabled("cache-build-1.0.0.xsd not found")
-    public void testReport() throws Exception {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-report-1.0.0.xsd"));
+    @Disabled( "cache-build-1.0.0.xsd not found" )
+    public void testReport() throws Exception
+    {
+        SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+        Schema schema = sf.newSchema( getClass().getResource( "/cache-report-1.0.0.xsd" ) );
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setSchema(schema);
+        dbf.setNamespaceAware( true );
+        dbf.setSchema( schema );
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse( getClass().getResource( "cache-report-instance.xml" ).toString() );
 
@@ -69,13 +68,14 @@ public class XmlServiceTest {
     }
 
     @Test
-    @Disabled("cache-build-1.0.0.xsd not found")
-    public void testBuild() throws Exception {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-build-1.0.0.xsd"));
+    @Disabled( "cache-build-1.0.0.xsd not found" )
+    public void testBuild() throws Exception
+    {
+        SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+        Schema schema = sf.newSchema( getClass().getResource( "/cache-build-1.0.0.xsd" ) );
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setSchema(schema);
+        dbf.setNamespaceAware( true );
+        dbf.setSchema( schema );
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse( getClass().getResource( "cache-build-instance.xml" ).toString() );
 
@@ -84,13 +84,14 @@ public class XmlServiceTest {
     }
 
     @Test
-    @Disabled("cache-build-1.0.0.xsd not found")
-    public void testDiff() throws Exception {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(getClass().getResource("/cache-diff-1.0.0.xsd"));
+    @Disabled( "cache-build-1.0.0.xsd not found" )
+    public void testDiff() throws Exception
+    {
+        SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+        Schema schema = sf.newSchema( getClass().getResource( "/cache-diff-1.0.0.xsd" ) );
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setSchema(schema);
+        dbf.setNamespaceAware( true );
+        dbf.setSchema( schema );
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse( getClass().getResource( "cache-diff-instance.xml" ).toString() );
 

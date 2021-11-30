@@ -1,0 +1,20 @@
+^/\*\s*$
+^ \* Licensed to the Apache Software Foundation \(ASF\) under one\s*$
+^ \* or more contributor license agreements.  See the NOTICE file\s*$
+^ \* distributed with this work for additional information\s*$
+^ \* regarding copyright ownership.  The ASF licenses this file\s*$
+^ \* to you under the Apache License, Version 2.0 \(the\s*$
+^ \* "License"\)\; you may not use this file except in compliance\s*$
+^ \* with the License.  You may obtain a copy of the License at\s*$
+^ \*\s*$
+^ \*\s+http://www\.apache\.org/licenses/LICENSE-2\.0\s*$
+^ \*\s*$
+^ \* Unless required by applicable law or agreed to in writing,\s*$
+^ \* software distributed under the License is distributed on an\s*$
+^ \* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\s*$
+^ \* KIND, either express or implied.  See the License for the\s*$
+^ \* specific language governing permissions and limitations\s*$
+^ \* under the License.\s*$
+^ \*/\s*$
+^package
+^\s*$

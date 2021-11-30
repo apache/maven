@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,19 +24,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.caching.xml.build.Build;
 import org.apache.maven.caching.xml.build.io.xpp3.CacheBuildXpp3Reader;
 import org.apache.maven.caching.xml.build.io.xpp3.CacheBuildXpp3Writer;
-import org.apache.maven.caching.xml.diff.Diff;
-import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Reader;
-import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Writer;
 import org.apache.maven.caching.xml.config.CacheConfig;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Reader;
 import org.apache.maven.caching.xml.config.io.xpp3.CacheConfigXpp3Writer;
+import org.apache.maven.caching.xml.diff.Diff;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Reader;
+import org.apache.maven.caching.xml.diff.io.xpp3.CacheDiffXpp3Writer;
 import org.apache.maven.caching.xml.report.CacheReport;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Reader;
 import org.apache.maven.caching.xml.report.io.xpp3.CacheReportXpp3Writer;

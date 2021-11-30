@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,11 +26,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -80,8 +77,8 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     }
 
     @SuppressWarnings( "checkstyle:constantname" )
-    private static final ThreadLocal<HttpClient> httpClient =
-            ThreadLocal.withInitial( HttpCacheRepositoryImpl::newHttpClient );
+    private static final ThreadLocal<HttpClient> httpClient = ThreadLocal
+            .withInitial( HttpCacheRepositoryImpl::newHttpClient );
 
     @SuppressWarnings( "checkstyle:magicnumber" )
     private static CloseableHttpClient newHttpClient()
@@ -119,7 +116,6 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
         putToRemoteCache( new ByteArrayInputStream( xmlService.toBytes( build.getDto() ) ), resourceUrl );
     }
 
-
     @Override
     public void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException
     {
@@ -134,7 +130,7 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
 
     @Override
     public void saveArtifactFile( CacheResult cacheResult,
-                                  org.apache.maven.artifact.Artifact artifact ) throws IOException
+            org.apache.maven.artifact.Artifact artifact ) throws IOException
     {
         final String resourceUrl = getResourceUrl( cacheResult.getContext(), CacheUtils.normalizedName( artifact ) );
         try ( InputStream inputStream = Files.newInputStream( artifact.getFile().toPath() ) )
@@ -239,24 +235,25 @@ public class HttpCacheRepositoryImpl implements RemoteCacheRepository
     {
         Optional<List<ProjectReport>> cachedProjectsHolder = findCacheInfo()
                 .map( CacheReport::getProjects );
-        
+
         if ( !cachedProjectsHolder.isPresent() )
         {
             return Optional.empty();
         }
 
         final List<ProjectReport> projects = cachedProjectsHolder.get();
-        final Optional<ProjectReport> projectReportHolder = projects.stream().filter( p ->
-                project.getArtifactId().equals( p.getArtifactId() )
-                        && project.getGroupId().equals( p.getGroupId() ) ).findFirst();
+        final Optional<ProjectReport> projectReportHolder = projects.stream()
+                .filter( p -> project.getArtifactId().equals( p.getArtifactId() )
+                        && project.getGroupId().equals( p.getGroupId() ) )
+                .findFirst();
 
         if ( !projectReportHolder.isPresent() )
         {
             return Optional.empty();
         }
-        
+
         final ProjectReport projectReport = projectReportHolder.get();
-       
+
         String url;
         if ( projectReport.getUrl() != null )
         {

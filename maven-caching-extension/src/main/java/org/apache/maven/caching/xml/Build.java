@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,7 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.caching.CacheUtils;
-import org.apache.maven.caching.checksum.MavenProjectInput;
-import org.apache.maven.caching.hash.HashAlgorithm;
-import org.apache.maven.caching.xml.build.Artifact;
-import org.apache.maven.caching.xml.build.CompletedExecution;
-import org.apache.maven.caching.xml.build.DigestItem;
-import org.apache.maven.caching.xml.build.ProjectsInputInfo;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.MojoExecution;
+package org.apache.maven.caching.xml;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -39,6 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.maven.caching.CacheUtils;
+import org.apache.maven.caching.checksum.MavenProjectInput;
+import org.apache.maven.caching.hash.HashAlgorithm;
+import org.apache.maven.caching.xml.build.Artifact;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.MojoExecution;
 
 import static org.apache.maven.caching.CacheUtils.mojoExecutionKey;
 
@@ -53,11 +51,11 @@ public class Build
     volatile Map<String, CompletedExecution> execMap;
 
     public Build( List<String> goals,
-                  Artifact artifact,
-                  List<Artifact> attachedArtifacts,
-                  ProjectsInputInfo projectsInputInfo,
-                  List<CompletedExecution> completedExecutions,
-                  String hashAlgorithm )
+            Artifact artifact,
+            List<Artifact> attachedArtifacts,
+            ProjectsInputInfo projectsInputInfo,
+            List<CompletedExecution> completedExecutions,
+            String hashAlgorithm )
     {
         this.dto = new org.apache.maven.caching.xml.build.Build();
         this.dto.setCacheImplementationVersion( MavenProjectInput.CACHE_IMPLEMENTATION_VERSION );
@@ -91,7 +89,7 @@ public class Build
     }
 
     public static List<Artifact> createAttachedArtifacts( List<org.apache.maven.artifact.Artifact> artifacts,
-                                                          HashAlgorithm algorithm ) throws IOException
+            HashAlgorithm algorithm ) throws IOException
     {
         List<Artifact> attachedArtifacts = new ArrayList<>();
         for ( org.apache.maven.artifact.Artifact artifact : artifacts )

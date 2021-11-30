@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,35 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,34 +81,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.regex.Pattern;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
@@ -156,7 +154,7 @@ public class CacheControllerImpl implements CacheController
     @Override
     @Nonnull
     public CacheResult findCachedBuild( MavenSession session, MavenProject project,
-                                        List<MojoExecution> mojoExecutions )
+            List<MojoExecution> mojoExecutions )
     {
         final String highestRequestPhase = CacheUtils.getLast( mojoExecutions ).getLifecyclePhase();
         if ( !lifecyclePhasesHelper.isLaterPhaseThanClean( highestRequestPhase ) )
@@ -285,8 +283,8 @@ public class CacheControllerImpl implements CacheController
 
     private boolean canIgnoreMissingSegment( Build info, List<MojoExecution> mojoExecutions )
     {
-        final List<MojoExecution> postCachedSegment =
-                lifecyclePhasesHelper.getPostCachedSegment( mojoExecutions, info );
+        final List<MojoExecution> postCachedSegment = lifecyclePhasesHelper.getPostCachedSegment( mojoExecutions,
+                info );
         for ( MojoExecution mojoExecution : postCachedSegment )
         {
             if ( !cacheConfig.canIgnore( mojoExecution ) )
@@ -321,9 +319,9 @@ public class CacheControllerImpl implements CacheController
                         project,
                         artifactInfo,
                         originalVersion );
-                restoredProjectArtifact =
-                        restoredArtifact( project.getArtifact(), artifactInfo.getType(), artifactInfo.getClassifier(),
-                                downloadTask );
+                restoredProjectArtifact = restoredArtifact( project.getArtifact(), artifactInfo.getType(),
+                        artifactInfo.getClassifier(),
+                        downloadTask );
             }
 
             for ( Artifact attachedArtifactInfo : build.getAttachedArtifacts() )
@@ -346,20 +344,18 @@ public class CacheControllerImpl implements CacheController
                     }
                     else
                     {
-                        Future<File> downloadTask =
-                                createDownloadTask(
-                                        cacheResult,
-                                        context,
-                                        project,
-                                        attachedArtifactInfo,
-                                        originalVersion
-                                );
-                        final RestoredArtifact restoredAttachedArtifact =
-                                restoredArtifact( restoredProjectArtifact == null ? project.getArtifact()
-                                                : restoredProjectArtifact,
-                                        attachedArtifactInfo.getType(),
-                                        attachedArtifactInfo.getClassifier(),
-                                        downloadTask );
+                        Future<File> downloadTask = createDownloadTask(
+                                cacheResult,
+                                context,
+                                project,
+                                attachedArtifactInfo,
+                                originalVersion );
+                        final RestoredArtifact restoredAttachedArtifact = restoredArtifact(
+                                restoredProjectArtifact == null ? project.getArtifact()
+                                        : restoredProjectArtifact,
+                                attachedArtifactInfo.getType(),
+                                attachedArtifactInfo.getClassifier(),
+                                downloadTask );
                         restoredAttachedArtifacts.add( restoredAttachedArtifact );
                     }
                 }
@@ -385,8 +381,8 @@ public class CacheControllerImpl implements CacheController
      * with restored from cache artifacts
      */
     private RestoredArtifact restoredArtifact( org.apache.maven.artifact.Artifact parent, String artifactType,
-                                               String artifactClassifier,
-                                               Future<File> artifactFile )
+            String artifactClassifier,
+            Future<File> artifactFile )
     {
         ArtifactHandler handler = null;
 
@@ -408,9 +404,8 @@ public class CacheControllerImpl implements CacheController
         return artifact;
     }
 
-
     private Future<File> createDownloadTask( CacheResult cacheResult, CacheContext context, MavenProject project,
-                                             Artifact artifact, String originalVersion )
+            Artifact artifact, String originalVersion )
     {
         final FutureTask<File> downloadTask = new FutureTask<>( () ->
         {
@@ -437,7 +432,7 @@ public class CacheControllerImpl implements CacheController
 
     @Override
     public void save( CacheResult cacheResult, List<MojoExecution> mojoExecutions,
-                      Map<String, MojoExecutionEvent> executionEvents )
+            Map<String, MojoExecutionEvent> executionEvents )
     {
         CacheContext context = cacheResult.getContext();
 
@@ -557,7 +552,7 @@ public class CacheControllerImpl implements CacheController
                 if ( baselinePom.isPresent() )
                 {
                     Files.write( reportOutputDir.resolve(
-                                    "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
+                            "effective-pom-baseline-" + baselineInputs.getChecksum() + ".xml" ),
                             baselinePom.get().getValue().getBytes( StandardCharsets.UTF_8 ),
                             TRUNCATE_EXISTING, CREATE );
                 }
@@ -574,7 +569,7 @@ public class CacheControllerImpl implements CacheController
     }
 
     private List<Artifact> artifactDtos( List<org.apache.maven.artifact.Artifact> attachedArtifacts,
-                                         HashAlgorithm digest ) throws IOException
+            HashAlgorithm digest ) throws IOException
     {
         List<Artifact> result = new ArrayList<>();
         for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
@@ -588,7 +583,7 @@ public class CacheControllerImpl implements CacheController
     }
 
     private Artifact artifactDto( org.apache.maven.artifact.Artifact projectArtifact,
-                                  HashAlgorithm algorithm ) throws IOException
+            HashAlgorithm algorithm ) throws IOException
     {
         final Artifact dto = DtoUtils.createDto( projectArtifact );
         if ( projectArtifact.getFile() != null && projectArtifact.getFile().isFile() )
@@ -601,14 +596,14 @@ public class CacheControllerImpl implements CacheController
     }
 
     private List<CompletedExecution> buildExecutionInfo( List<MojoExecution> mojoExecutions,
-                                                         Map<String, MojoExecutionEvent> executionEvents )
+            Map<String, MojoExecutionEvent> executionEvents )
     {
         List<CompletedExecution> list = new ArrayList<>();
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             final String executionKey = CacheUtils.mojoExecutionKey( mojoExecution );
-            final MojoExecutionEvent executionEvent =
-                    executionEvents != null ? executionEvents.get( executionKey ) : null;
+            final MojoExecutionEvent executionEvent = executionEvents != null ? executionEvents.get( executionKey )
+                    : null;
             CompletedExecution executionInfo = new CompletedExecution();
             executionInfo.setExecutionKey( executionKey );
             executionInfo.setMojoClassName( mojoExecution.getMojoDescriptor().getImplementation() );
@@ -668,7 +663,7 @@ public class CacheControllerImpl implements CacheController
     }
 
     private boolean isExcluded( String propertyName, boolean logAll, List<PropertyName> excludedProperties,
-                                List<PropertyName> forceLogProperties )
+            List<PropertyName> forceLogProperties )
     {
         if ( !forceLogProperties.isEmpty() )
         {
@@ -710,7 +705,7 @@ public class CacheControllerImpl implements CacheController
     }
 
     private boolean isCachedSegmentPropertiesPresent( MavenProject project, Build build,
-                                                      List<MojoExecution> mojoExecutions )
+            List<MojoExecution> mojoExecutions )
     {
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
@@ -893,7 +888,7 @@ public class CacheControllerImpl implements CacheController
             if ( Files.isDirectory( sourceRootPath )
                     && sourceRootPath.startsWith( targetDir )
                     && !( sourceRootPath.startsWith( generatedSourcesDir )
-                    || sourceRootPath.startsWith( generatedTestSourcesDir ) ) )
+                            || sourceRootPath.startsWith( generatedTestSourcesDir ) ) )
             { // dir within target
                 attachDirIfNotEmpty( sourceRootPath, targetDir, project );
             }
@@ -927,6 +922,7 @@ public class CacheControllerImpl implements CacheController
         final MutableBoolean hasFiles = new MutableBoolean();
         Files.walkFileTree( candidateSubDir, new SimpleFileVisitor<Path>()
         {
+
             @Override
             public FileVisitResult visitFile( Path path, BasicFileAttributes basicFileAttributes )
             {

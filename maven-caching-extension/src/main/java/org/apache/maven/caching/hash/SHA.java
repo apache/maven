@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,6 +28,7 @@ import java.security.MessageDigest;
  */
 public class SHA implements Hash.Factory
 {
+
     private static final ThreadLocal<MessageDigest> ALGORITHM = new ThreadLocal<>();
     private static final ThreadLocal<MessageDigest> CHECKSUM = new ThreadLocal<>();
 
@@ -59,6 +59,7 @@ public class SHA implements Hash.Factory
 
     private static class Algorithm implements Hash.Algorithm
     {
+
         private final MessageDigest digest;
 
         private Algorithm( MessageDigest digest )
@@ -81,6 +82,7 @@ public class SHA implements Hash.Factory
 
     private static class Checksum implements Hash.Checksum
     {
+
         private final MessageDigest digest;
 
         private Checksum( MessageDigest digest )

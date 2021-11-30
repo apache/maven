@@ -1,5 +1,3 @@
-package org.apache.maven.caching.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,19 @@ package org.apache.maven.caching.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.InvalidArtifactRTException;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.maven.caching.artifact;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.InvalidArtifactRTException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -46,7 +44,7 @@ public class RestoredArtifact extends DefaultArtifact
     private volatile Future<File> fileFuture;
 
     public RestoredArtifact( Artifact parent, Future<File> fileFuture, String type, String classifier,
-                             ArtifactHandler handler )
+            ArtifactHandler handler )
     {
         super( parent.getGroupId(), parent.getArtifactId(), parent.getVersionRange(), parent.getScope(), type,
                 classifier, handler, parent.isOptional() );
@@ -68,7 +66,7 @@ public class RestoredArtifact extends DefaultArtifact
                 {
                     LOGGER.trace( "Artifact file {} is not yet retrieved, downloading directly",
                             getDependencyConflictId() );
-                    ( (RunnableFuture<?>) fileFuture ).run();
+                    ( ( RunnableFuture<?> ) fileFuture ).run();
                 }
                 catch ( RuntimeException e )
                 {
@@ -101,7 +99,6 @@ public class RestoredArtifact extends DefaultArtifact
                     e.getCause() );
         }
     }
-
 
     @Override
     public void setFile( File destination )

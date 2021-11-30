@@ -1,5 +1,3 @@
-package org.apache.maven.caching.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,12 @@ package org.apache.maven.caching.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.xml;
 
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.hash.HashFactory;
 import org.apache.maven.caching.xml.config.Exclude;
@@ -29,11 +32,6 @@ import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * CacheConfig

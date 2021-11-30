@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
@@ -32,8 +31,8 @@ public interface NormalizedModelProvider
 {
 
     /**
-     * @param project - the project which model will be calculated for
-     * @return normalized model for project
+     * @param  project - the project which model will be calculated for
+     * @return         normalized model for project
      */
     Model normalizedModel( MavenProject project );
 

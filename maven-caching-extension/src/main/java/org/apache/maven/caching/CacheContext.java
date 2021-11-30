@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import org.apache.maven.caching.xml.build.ProjectsInputInfo;
 import org.apache.maven.execution.MavenSession;
@@ -30,6 +29,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class CacheContext
 {
+
     private final MavenProject project;
     private final ProjectsInputInfo inputInfo;
     private final MavenSession session;

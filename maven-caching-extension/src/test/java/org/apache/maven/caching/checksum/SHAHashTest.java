@@ -18,9 +18,7 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import java.nio.charset.StandardCharsets;
-
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.junit.jupiter.api.Test;
@@ -28,9 +26,11 @@ import org.junit.jupiter.api.Test;
 import static org.apache.maven.caching.hash.HashFactory.SHA256;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SHAHashTest {
-    private static final byte[] HELLO_ARRAY = "hello".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] WORLD_ARRAY = "world".getBytes(StandardCharsets.UTF_8);
+public class SHAHashTest
+{
+
+    private static final byte[] HELLO_ARRAY = "hello".getBytes( StandardCharsets.UTF_8 );
+    private static final byte[] WORLD_ARRAY = "world".getBytes( StandardCharsets.UTF_8 );
     private static final String EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
     private static final String HELLO_HASH = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824";
     private static final String WORLD_HASH = "486ea46224d1bb4fb680f34f7c9ad96a8f24ec88be73ea8e5a6c65260e9cb8a7";
@@ -39,34 +39,37 @@ public class SHAHashTest {
     private static final String FULL_CHECKSUM = "7305db9b2abccd706c256db3d97e5ff48d677cfe4d3a5904afb7da0e3950e1e2";
 
     private static final HashAlgorithm ALGORITHM = SHA256.createAlgorithm();
-    private static final HashChecksum CHECKSUM = SHA256.createChecksum(0);
+    private static final HashChecksum CHECKSUM = SHA256.createChecksum( 0 );
 
     @Test
-    public void testEmptyArray() {
+    public void testEmptyArray()
+    {
         byte[] emptyArray = new byte[0];
-        String hash = ALGORITHM.hash(emptyArray);
-        assertEquals(EMPTY_HASH, hash);
+        String hash = ALGORITHM.hash( emptyArray );
+        assertEquals( EMPTY_HASH, hash );
     }
 
     @Test
-    public void testSimpleHash() {
-        String helloHash = ALGORITHM.hash(HELLO_ARRAY);
-        assertEquals(HELLO_HASH, helloHash);
+    public void testSimpleHash()
+    {
+        String helloHash = ALGORITHM.hash( HELLO_ARRAY );
+        assertEquals( HELLO_HASH, helloHash );
 
-        String worldHash = ALGORITHM.hash(WORLD_ARRAY);
-        assertEquals(WORLD_HASH, worldHash);
+        String worldHash = ALGORITHM.hash( WORLD_ARRAY );
+        assertEquals( WORLD_HASH, worldHash );
     }
 
     @Test
-    public void testSimpleChecksum() {
-        assertEquals(HELLO_HASH, CHECKSUM.update(HELLO_ARRAY));
-        assertEquals(HELLO_CHECKSUM, CHECKSUM.digest());
+    public void testSimpleChecksum()
+    {
+        assertEquals( HELLO_HASH, CHECKSUM.update( HELLO_ARRAY ) );
+        assertEquals( HELLO_CHECKSUM, CHECKSUM.digest() );
 
-        assertEquals(WORLD_HASH, CHECKSUM.update(WORLD_ARRAY));
-        assertEquals(WORLD_CHECKSUM, CHECKSUM.digest());
+        assertEquals( WORLD_HASH, CHECKSUM.update( WORLD_ARRAY ) );
+        assertEquals( WORLD_CHECKSUM, CHECKSUM.digest() );
 
-        assertEquals(HELLO_HASH, CHECKSUM.update(HELLO_ARRAY));
-        assertEquals(WORLD_HASH, CHECKSUM.update(WORLD_ARRAY));
-        assertEquals(FULL_CHECKSUM, CHECKSUM.digest());
+        assertEquals( HELLO_HASH, CHECKSUM.update( HELLO_ARRAY ) );
+        assertEquals( WORLD_HASH, CHECKSUM.update( WORLD_ARRAY ) );
+        assertEquals( FULL_CHECKSUM, CHECKSUM.digest() );
     }
 }

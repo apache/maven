@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +39,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.SessionScoped;
@@ -177,7 +174,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                     return Optional.empty();
                 }
                 else if ( now > created + ONE_DAY_MILLIS && now < lastModified + ONE_DAY_MILLIS )
-                {  // more than 1 day file, allow 1 per day lookup
+                { // more than 1 day file, allow 1 per day lookup
                     LOGGER.info( "Skipping remote lookup, last unsuccessful lookup less than 1d ago." );
                     return Optional.empty();
                 }
@@ -268,13 +265,14 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
             final MavenSession session = dependencySession.getLeft();
             final Dependency dependency = dependencySession.getRight();
 
-            final Path artifactCacheDir =
-                    artifactCacheDir( session, dependency.getGroupId(), dependency.getArtifactId() );
+            final Path artifactCacheDir = artifactCacheDir( session, dependency.getGroupId(),
+                    dependency.getArtifactId() );
 
             final Map<Pair<String, String>, Collection<Pair<Build, Path>>> filesByVersion = new HashMap<>();
 
             Files.walkFileTree( artifactCacheDir, new SimpleFileVisitor<Path>()
             {
+
                 @Override
                 public FileVisitResult visitFile( Path path, BasicFileAttributes basicFileAttributes )
                 {
@@ -284,8 +282,8 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                         try
                         {
                             final org.apache.maven.caching.xml.build.Build dto = xmlService.loadBuild( file );
-                            final Pair<Build, Path> buildInfoAndFile =
-                                    Pair.of( new Build( dto, CacheSource.LOCAL ), path );
+                            final Pair<Build, Path> buildInfoAndFile = Pair.of( new Build( dto, CacheSource.LOCAL ),
+                                    path );
                             final String cachedVersion = dto.getArtifact().getVersion();
                             final String cachedBranch = getScmRef( dto.getScm() );
                             add( filesByVersion, Pair.of( cachedVersion, cachedBranch ), buildInfoAndFile );
@@ -302,7 +300,7 @@ public class LocalCacheRepositoryImpl implements LocalCacheRepository
                         {
                             // version is unusable nothing we can do here
                             LOGGER.info( "Build info is not compatible to current maven "
-                                            + "implementation: {}", file, e );
+                                    + "implementation: {}", file, e );
                         }
                     }
                     return FileVisitResult.CONTINUE;

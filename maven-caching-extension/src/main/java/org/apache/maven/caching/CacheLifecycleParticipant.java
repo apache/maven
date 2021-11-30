@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.SessionScoped;
@@ -33,6 +31,7 @@ import org.apache.maven.execution.MavenSession;
 @SuppressWarnings( "unused" )
 public class CacheLifecycleParticipant extends AbstractMavenLifecycleParticipant
 {
+
     private final CacheConfig cacheConfig;
     private final CacheController cacheController;
 

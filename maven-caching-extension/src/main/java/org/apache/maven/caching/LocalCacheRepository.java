@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,18 +16,17 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
-
+import javax.annotation.Nonnull;
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.caching.xml.CacheSource;
 import org.apache.maven.caching.xml.build.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
-
-import javax.annotation.Nonnull;
 
 /**
  * Local cache repository.

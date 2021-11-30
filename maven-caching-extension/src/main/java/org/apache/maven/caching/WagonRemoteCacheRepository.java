@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,12 +35,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nonnull;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.maven.SessionScoped;
 import org.apache.maven.caching.checksum.MavenProjectInput;
 import org.apache.maven.caching.xml.Build;
@@ -83,6 +80,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings( "unused" )
 public class WagonRemoteCacheRepository implements RemoteCacheRepository
 {
+
     public static final String BUILDINFO_XML = "buildinfo.xml";
     public static final String CACHE_REPORT_XML = "cache-report.xml";
 
@@ -90,7 +88,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
     private static final String CONFIG_PROP_FILE_MODE = "remote.caching.wagon.perms.fileMode";
     private static final String CONFIG_PROP_DIR_MODE = "remote.caching.wagon.perms.dirMode";
     private static final String CONFIG_PROP_GROUP = "remote.caching.wagon.perms.group";
-
 
     private static final Logger LOGGER = LoggerFactory.getLogger( HttpCacheRepositoryImpl.class );
 
@@ -114,11 +111,11 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
 
     @Inject
     public WagonRemoteCacheRepository( MavenSession mavenSession,
-                                       XmlService xmlService,
-                                       CacheConfig cacheConfig,
-                                       WagonProvider wagonProvider,
-                                       WagonConfigurator wagonConfigurator,
-                                       RepositorySystem repositorySystem )
+            XmlService xmlService,
+            CacheConfig cacheConfig,
+            WagonProvider wagonProvider,
+            WagonConfigurator wagonConfigurator,
+            RepositorySystem repositorySystem )
             throws RepositoryException
     {
         this.xmlService = xmlService;
@@ -139,10 +136,9 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         Proxy proxy = session.getProxySelector().getProxy( repoOrMirror );
         Authentication auth = session.getAuthenticationSelector().getAuthentication( repoOrMirror );
         repository = new RemoteRepository.Builder( repoOrMirror )
-                        .setProxy( proxy )
-                        .setAuthentication( auth )
-                        .build();
-
+                .setProxy( proxy )
+                .setAuthentication( auth )
+                .build();
 
         wagonRepo = new Repository( repository.getId(), repository.getUrl() );
         wagonRepo.setPermissions( getPermissions( repository.getId(), session ) );
@@ -172,9 +168,9 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         this.headers = new Properties();
         this.headers.put( "User-Agent", ConfigUtils.getString( session, ConfigurationProperties.DEFAULT_USER_AGENT,
                 ConfigurationProperties.USER_AGENT ) );
-        Map<?, ?> headers =
-                ConfigUtils.getMap( session, null, ConfigurationProperties.HTTP_HEADERS + "." + repository.getId(),
-                        ConfigurationProperties.HTTP_HEADERS );
+        Map<?, ?> headers = ConfigUtils.getMap( session, null,
+                ConfigurationProperties.HTTP_HEADERS + "." + repository.getId(),
+                ConfigurationProperties.HTTP_HEADERS );
         if ( headers != null )
         {
             this.headers.putAll( headers );
@@ -196,7 +192,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
             }
         }
     }
-
 
     private static RepositoryPermissions getPermissions( String repoId, RepositorySystemSession session )
     {
@@ -232,6 +227,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         {
             auth = new AuthenticationInfo()
             {
+
                 @Override
                 public String getUserName()
                 {
@@ -273,6 +269,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
             {
                 prox = new ProxyInfo()
                 {
+
                     @Override
                     public String getUserName()
                     {
@@ -336,7 +333,6 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         doPut( resourceUrl, xmlService.toBytes( build.getDto() ) );
     }
 
-
     @Override
     public void saveCacheReport( String buildId, MavenSession session, CacheReport cacheReport ) throws IOException
     {
@@ -347,7 +343,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
 
     @Override
     public void saveArtifactFile( CacheResult cacheResult,
-                                  org.apache.maven.artifact.Artifact artifact ) throws IOException
+            org.apache.maven.artifact.Artifact artifact ) throws IOException
     {
         final String resourceUrl = doGetResourceUrl( cacheResult.getContext(), CacheUtils.normalizedName( artifact ) );
         doPut( resourceUrl, artifact.getFile().toPath() );
@@ -390,9 +386,10 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         }
 
         final List<ProjectReport> projects = cachedProjectsHolder.get();
-        final Optional<ProjectReport> projectReportHolder = projects.stream().filter( p ->
-                project.getArtifactId().equals( p.getArtifactId() )
-                        && project.getGroupId().equals( p.getGroupId() ) ).findFirst();
+        final Optional<ProjectReport> projectReportHolder = projects.stream()
+                .filter( p -> project.getArtifactId().equals( p.getArtifactId() )
+                        && project.getGroupId().equals( p.getGroupId() ) )
+                .findFirst();
 
         if ( !projectReportHolder.isPresent() )
         {
@@ -619,12 +616,10 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
         }
 
         RepositorySystemSession session = mavenSession.getRepositorySession();
-        int connectTimeout =
-                ConfigUtils.getInteger( session, ConfigurationProperties.DEFAULT_CONNECT_TIMEOUT,
-                        ConfigurationProperties.CONNECT_TIMEOUT );
-        int requestTimeout =
-                ConfigUtils.getInteger( session, ConfigurationProperties.DEFAULT_REQUEST_TIMEOUT,
-                        ConfigurationProperties.REQUEST_TIMEOUT );
+        int connectTimeout = ConfigUtils.getInteger( session, ConfigurationProperties.DEFAULT_CONNECT_TIMEOUT,
+                ConfigurationProperties.CONNECT_TIMEOUT );
+        int requestTimeout = ConfigUtils.getInteger( session, ConfigurationProperties.DEFAULT_REQUEST_TIMEOUT,
+                ConfigurationProperties.REQUEST_TIMEOUT );
 
         wagon.setTimeout( Math.max( Math.max( connectTimeout, requestTimeout ), 0 ) );
 

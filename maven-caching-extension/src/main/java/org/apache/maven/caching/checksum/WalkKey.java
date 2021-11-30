@@ -1,5 +1,3 @@
-package org.apache.maven.caching.checksum;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.checksum;
 
 import java.nio.file.Path;
 
@@ -26,6 +25,7 @@ import java.nio.file.Path;
  */
 public class WalkKey
 {
+
     private final Path normalized;
     private final String glob;
     private final boolean recursive;
@@ -49,7 +49,7 @@ public class WalkKey
             return false;
         }
 
-        WalkKey key = (WalkKey) o;
+        WalkKey key = ( WalkKey ) o;
 
         if ( recursive != key.recursive )
         {

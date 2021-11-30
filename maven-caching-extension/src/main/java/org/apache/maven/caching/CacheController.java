@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
+import java.util.List;
+import java.util.Map;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * CacheController
@@ -34,14 +32,14 @@ public interface CacheController
 {
 
     CacheResult findCachedBuild( MavenSession session,
-                                 MavenProject project,
-                                 List<MojoExecution> mojoExecutions );
+            MavenProject project,
+            List<MojoExecution> mojoExecutions );
 
     boolean restoreProjectArtifacts( CacheResult cacheResult );
 
     void save( CacheResult cacheResult,
-               List<MojoExecution> mojoExecutions,
-               Map<String, MojoExecutionEvent> executionEvents );
+            List<MojoExecution> mojoExecutions,
+            Map<String, MojoExecutionEvent> executionEvents );
 
     boolean isForcedExecution( MavenProject project, MojoExecution execution );
 

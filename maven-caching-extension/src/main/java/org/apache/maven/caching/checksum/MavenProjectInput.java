@@ -1,5 +1,3 @@
-package org.apache.maven.caching.checksum;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.checksum;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.checksum;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,17 +44,15 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Predicate;
-
 import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.MultiModuleSupport;
 import org.apache.maven.caching.NormalizedModelProvider;
 import org.apache.maven.caching.PluginScanConfig;
-import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.ProjectInputCalculator;
 import org.apache.maven.caching.RemoteCacheRepository;
 import org.apache.maven.caching.ScanConfigProperties;
@@ -145,13 +142,13 @@ public class MavenProjectInput
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     public MavenProjectInput( MavenProject project,
-                              NormalizedModelProvider normalizedModelProvider,
-                              MultiModuleSupport multiModuleSupport,
-                              ProjectInputCalculator projectInputCalculator,
-                              MavenSession session,
-                              CacheConfig config,
-                              RepositorySystem repoSystem,
-                              RemoteCacheRepository remoteCache )
+            NormalizedModelProvider normalizedModelProvider,
+            MultiModuleSupport multiModuleSupport,
+            ProjectInputCalculator projectInputCalculator,
+            MavenSession session,
+            CacheConfig config,
+            RepositorySystem repoSystem,
+            RemoteCacheRepository remoteCache )
     {
         this.project = project;
         this.normalizedModelProvider = normalizedModelProvider;
@@ -206,8 +203,7 @@ public class MavenProjectInput
         Optional<ProjectsInputInfo> baselineHolder = Optional.empty();
         if ( config.isBaselineDiffEnabled() )
         {
-            baselineHolder =
-                    remoteCache.findBaselineBuild( project ).map( b -> b.getDto().getProjectsInputInfo() );
+            baselineHolder = remoteCache.findBaselineBuild( project ).map( b -> b.getDto().getProjectsInputInfo() );
         }
 
         DigestItem effectivePomChecksum = DigestUtils.pom( checksum, effectivePom );
@@ -236,8 +232,7 @@ public class MavenProjectInput
         boolean dependenciesMatched = true;
         for ( Map.Entry<String, String> entry : dependenciesChecksum.entrySet() )
         {
-            DigestItem dependencyDigest =
-                    DigestUtils.dependency( checksum, entry.getKey(), entry.getValue() );
+            DigestItem dependencyDigest = DigestUtils.dependency( checksum, entry.getKey(), entry.getValue() );
             items.add( dependencyDigest );
             if ( compareWithBaseline )
             {
@@ -336,8 +331,12 @@ public class MavenProjectInput
             new MavenXpp3Writer().write( writer, prototype );
 
             //normalize env specifics
-            final String[] searchList = {baseDirPath.toString(), "\\", "windows", "linux"};
-            final String[] replacementList = {"", "/", "os.classifier", "os.classifier"};
+            final String[] searchList =
+            { baseDirPath.toString(), "\\", "windows", "linux"
+            };
+            final String[] replacementList =
+            { "", "/", "os.classifier", "os.classifier"
+            };
 
             return replaceEachRepeatedly( output.toString(), searchList, replacementList );
 
@@ -421,10 +420,10 @@ public class MavenProjectInput
      * entry point for directory walk
      */
     private void startWalk( Path candidate,
-                            String glob,
-                            boolean recursive,
-                            List<Path> collectedFiles,
-                            Set<WalkKey> visitedDirs )
+            String glob,
+            boolean recursive,
+            List<Path> collectedFiles,
+            Set<WalkKey> visitedDirs )
     {
         Path normalized = candidate.isAbsolute() ? candidate : baseDirPath.resolve( candidate );
         normalized = normalized.toAbsolutePath().normalize();
@@ -478,7 +477,7 @@ public class MavenProjectInput
                 continue;
             }
 
-            Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
+            Xpp3Dom configuration = ( Xpp3Dom ) plugin.getConfiguration();
             LOGGER.debug( "Processing plugin config: {}", plugin.getArtifactId() );
             if ( configuration != null )
             {
@@ -497,7 +496,7 @@ public class MavenProjectInput
                     continue;
                 }
 
-                Xpp3Dom execConfiguration = (Xpp3Dom) exec.getConfiguration();
+                Xpp3Dom execConfiguration = ( Xpp3Dom ) exec.getConfiguration();
                 LOGGER.debug( "Processing plugin: {}, execution: {}", plugin.getArtifactId(), exec.getId() );
 
                 if ( execConfiguration != null )
@@ -509,14 +508,15 @@ public class MavenProjectInput
     }
 
     private Path walkDir( final WalkKey key,
-                          final List<Path> collectedFiles,
-                          final Set<WalkKey> visitedDirs ) throws IOException
+            final List<Path> collectedFiles,
+            final Set<WalkKey> visitedDirs ) throws IOException
     {
         return Files.walkFileTree( key.getPath(), new SimpleFileVisitor<Path>()
         {
+
             @Override
             public FileVisitResult preVisitDirectory( Path path,
-                                                      BasicFileAttributes basicFileAttributes ) throws IOException
+                    BasicFileAttributes basicFileAttributes ) throws IOException
             {
                 WalkKey currentDirKey = new WalkKey( path.toAbsolutePath().normalize(), key.getGlob(),
                         key.isRecursive() );
@@ -556,8 +556,8 @@ public class MavenProjectInput
     }
 
     private void addInputsFromPluginConfigs( Xpp3Dom[] configurationChildren,
-                                             PluginScanConfig scanConfig,
-                                             List<Path> files, HashSet<WalkKey> visitedDirs )
+            PluginScanConfig scanConfig,
+            List<Path> files, HashSet<WalkKey> visitedDirs )
     {
         if ( configurationChildren == null )
         {
@@ -614,7 +614,7 @@ public class MavenProjectInput
                 || startsWithAny( text, "com.", "org.", "io.", "java.", "javax." ) // java packages
                 || startsWithAny( text, "${env." ) // env variables in maven notation
                 || startsWithAny( text, "http:", "https:", "scm:", "ssh:", "git:", "svn:", "cp:",
-                "classpath:" ); // urls identified by common protocols
+                        "classpath:" ); // urls identified by common protocols
         if ( !blacklisted )
         {
             try
@@ -696,9 +696,9 @@ public class MavenProjectInput
 
             // saved to index by the end of dependency build
             MavenProject dependencyProject = multiModuleSupport.tryToResolveProject(
-                            dependency.getGroupId(),
-                            dependency.getArtifactId(),
-                            dependency.getVersion() )
+                    dependency.getGroupId(),
+                    dependency.getArtifactId(),
+                    dependency.getVersion() )
                     .orElse( null );
             boolean isSnapshot = isSnapshot( dependency.getVersion() );
             if ( dependencyProject == null && !isSnapshot )
@@ -715,21 +715,19 @@ public class MavenProjectInput
             {
                 DigestItem resolved = resolveArtifact(
                         repoSystem.createDependencyArtifact( dependency ),
-                        false
-                );
+                        false );
                 projectHash = resolved.getHash();
             }
             result.put(
                     KeyUtils.getVersionlessArtifactKey( repoSystem.createDependencyArtifact( dependency ) ),
-                    projectHash
-            );
+                    projectHash );
         }
         return result;
     }
 
     @Nonnull
     private DigestItem resolveArtifact( final Artifact dependencyArtifact,
-                                        boolean isOffline ) throws IOException
+            boolean isOffline ) throws IOException
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
                 .setArtifact( dependencyArtifact )
@@ -775,6 +773,7 @@ public class MavenProjectInput
      */
     public static class PathIgnoringCaseComparator implements Comparator<Path>
     {
+
         @Override
         public int compare( Path f1, Path f2 )
         {

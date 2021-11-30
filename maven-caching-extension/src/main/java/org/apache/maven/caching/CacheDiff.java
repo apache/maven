@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,7 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.caching.xml.build.Build;
-import org.apache.maven.caching.xml.build.CompletedExecution;
-import org.apache.maven.caching.xml.build.DigestItem;
-import org.apache.maven.caching.xml.build.ProjectsInputInfo;
-import org.apache.maven.caching.xml.build.PropertyValue;
-import org.apache.maven.caching.xml.diff.Diff;
-import org.apache.maven.caching.xml.diff.Mismatch;
-import org.apache.maven.caching.xml.CacheConfig;
+package org.apache.maven.caching;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +27,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.caching.xml.CacheConfig;
+import org.apache.maven.caching.xml.build.Build;
+import org.apache.maven.caching.xml.build.CompletedExecution;
+import org.apache.maven.caching.xml.build.DigestItem;
+import org.apache.maven.caching.xml.build.ProjectsInputInfo;
+import org.apache.maven.caching.xml.build.PropertyValue;
+import org.apache.maven.caching.xml.diff.Diff;
+import org.apache.maven.caching.xml.diff.Mismatch;
 
 /**
  * Utility class for comparing 2 builds
@@ -67,8 +65,7 @@ public class CacheDiff
                     current.getHashFunction(),
                     baseline.getHashFunction(),
                     "Different algorithms render caches not comparable and cached could not be reused",
-                    "Ensure the same algorithm as remote"
-            );
+                    "Ensure the same algorithm as remote" );
         }
         compareEffectivePoms( current.getProjectsInputInfo(), baseline.getProjectsInputInfo() );
         compareExecutions( current.getExecutions(), baseline.getExecutions() );
@@ -94,8 +91,7 @@ public class CacheDiff
                     "effectivePom", currentPomHash, baselinePomHash,
                     "Difference in effective pom suggests effectively different builds which cannot be reused",
                     "Compare raw content of effective poms and eliminate differences. "
-                            + "See How-To for common techniques"
-            );
+                            + "See How-To for common techniques" );
         }
     }
 
@@ -112,6 +108,7 @@ public class CacheDiff
         return Optional.empty();
     }
 
+    @SuppressWarnings( "checkstyle:LineLength" )
     private void compareFiles( ProjectsInputInfo current, ProjectsInputInfo baseline )
     {
         final Map<String, DigestItem> currentFiles = current.getItems().stream()
@@ -132,8 +129,7 @@ public class CacheDiff
                             + "Added files: " + currentVsBaseline + ". Removed files: " + baselineVsCurrent,
                     "To match remote and local caches should have identical file sets."
                             + " Unnecessary and transient files must be filtered out to make file sets match"
-                            + " - see configuration guide"
-            );
+                            + " - see configuration guide" );
             return;
         }
 
@@ -161,8 +157,7 @@ public class CacheDiff
 
                 addNewMismatch( filePath, currentFile.getHash(), baselineFile.getHash(), reason,
                         "Different content manifests different build outcome. "
-                                + "Ensure that difference is not caused by environment specifics, like line separators"
-                );
+                                + "Ensure that difference is not caused by environment specifics, like line separators" );
             }
         }
     }
@@ -187,8 +182,7 @@ public class CacheDiff
                             + "Added dependencies: " + currentVsBaseline + ". Removed dependencies: "
                             + baselineVsCurrent,
                     "Remote and local builds should have identical dependencies. "
-                            + "The difference manifests changes in downstream dependencies or introduced snapshots."
-            );
+                            + "The difference manifests changes in downstream dependencies or introduced snapshots." );
             return;
         }
 
@@ -203,12 +197,10 @@ public class CacheDiff
                 addNewMismatch( dependencyKey, currentDependency.getHash(), baselineDependency.getHash(),
                         "Downstream project or snapshot changed",
                         "Find downstream project and investigate difference in the downstream project. "
-                                + "Enable fail fast mode and single threaded execution to simplify debug."
-                );
+                                + "Enable fail fast mode and single threaded execution to simplify debug." );
             }
         }
     }
-
 
     private void compareExecutions( List<CompletedExecution> current, List<CompletedExecution> baseline )
     {
@@ -234,8 +226,7 @@ public class CacheDiff
                         baselineExecution.getExecutionKey(),
                         "Baseline build contains excessive plugin " + baselineExecution.getExecutionKey(),
                         "Different set of plugins produces different build results. "
-                                + "Exclude non-critical plugins or make sure plugin sets match"
-                );
+                                + "Exclude non-critical plugins or make sure plugin sets match" );
             }
         }
 
@@ -248,13 +239,12 @@ public class CacheDiff
                         "Cached build doesn't contain plugin " + currentExecution.getExecutionKey(),
                         "Different set of plugins produces different build results. "
                                 + "Filter out non-critical plugins or make sure remote cache always run full build "
-                                + "with all plugins"
-                );
+                                + "with all plugins" );
                 continue;
             }
 
-            final CompletedExecution baselineExecution =
-                    baselineExecutionsByKey.get( currentExecution.getExecutionKey() );
+            final CompletedExecution baselineExecution = baselineExecutionsByKey
+                    .get( currentExecution.getExecutionKey() );
             comparePlugins( currentExecution, baselineExecution );
         }
     }
@@ -294,14 +284,13 @@ public class CacheDiff
                                 + " has mismatch in tracked property and cannot be reused",
                         "Align properties between remote and local build or remove property from tracked "
                                 + "list if mismatch could be tolerated. In some cases it is possible to add skip value "
-                                + "to ignore lax mismatch"
-                );
+                                + "to ignore lax mismatch" );
             }
         }
     }
 
     private void addNewMismatch( String item, String current, String baseline, String reason,
-                                 String resolution )
+            String resolution )
     {
         final Mismatch mismatch = new Mismatch();
         mismatch.setItem( item );

@@ -1,5 +1,3 @@
-package org.apache.maven.caching;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,15 @@ package org.apache.maven.caching;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.caching.xml.Build;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -44,7 +41,7 @@ public class LifecyclePhasesHelper
 
     @Inject
     public LifecyclePhasesHelper( DefaultLifecycles defaultLifecycles,
-                                  @Named( "clean" ) Lifecycle cleanLifecycle )
+            @Named( "clean" ) Lifecycle cleanLifecycle )
     {
         this.defaultLifecycles = Objects.requireNonNull( defaultLifecycles );
         this.phases = defaultLifecycles.getLifeCycles().stream()

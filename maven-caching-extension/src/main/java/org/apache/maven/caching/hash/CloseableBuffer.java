@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -38,6 +37,7 @@ public class CloseableBuffer implements AutoCloseable
 
     private static final Cleaner CLEANER = doPrivileged( new PrivilegedAction<Cleaner>()
     {
+
         @Override
         public Cleaner run()
         {
@@ -88,6 +88,7 @@ public class CloseableBuffer implements AutoCloseable
         // Java 8: () -> CLEANER.clean(buffer)
         boolean done = doPrivileged( new PrivilegedAction<Boolean>()
         {
+
             @Override
             public Boolean run()
             {
@@ -103,11 +104,13 @@ public class CloseableBuffer implements AutoCloseable
     // Java 8: @FunctionalInterface
     private interface Cleaner
     {
+
         boolean clean( ByteBuffer buffer );
     }
 
     private static class NoopCleaner implements Cleaner
     {
+
         @Override
         public boolean clean( ByteBuffer buffer )
         {
@@ -117,6 +120,7 @@ public class CloseableBuffer implements AutoCloseable
 
     private static class DirectCleaner implements Cleaner
     {
+
         private static final Method ATTACHMENT = getMethod( "sun.nio.ch.DirectBuffer",
                 "attachment" );
         private static final Method CLEANER = getMethod( "sun.nio.ch.DirectBuffer", "cleaner" );
@@ -152,6 +156,7 @@ public class CloseableBuffer implements AutoCloseable
 
     private static class UnsafeCleaner implements Cleaner
     {
+
         // Java 9: getMethod("jdk.internal.misc.Unsafe", "invokeCleaner", ByteBuffer.class);
         private static final Method INVOKE_CLEANER = getMethod( "sun.misc.Unsafe", "invokeCleaner", ByteBuffer.class );
         private static final Object UNSAFE = getField( "sun.misc.Unsafe", "theUnsafe" );

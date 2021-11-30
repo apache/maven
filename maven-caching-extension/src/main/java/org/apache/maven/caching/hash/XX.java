@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,20 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import net.openhft.hashing.LongHashFunction;
+package org.apache.maven.caching.hash;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.openhft.hashing.LongHashFunction;
 
 /**
  * XX
  */
 public class XX implements Hash.Factory
 {
+
     static final LongHashFunction INSTANCE = LongHashFunction.xx();
 
     @Override
@@ -59,6 +58,7 @@ public class XX implements Hash.Factory
 
     static class Algorithm implements Hash.Algorithm
     {
+
         @Override
         public byte[] hash( byte[] array )
         {
@@ -74,6 +74,7 @@ public class XX implements Hash.Factory
 
     static class Checksum implements Hash.Checksum
     {
+
         private final ByteBuffer buffer;
 
         Checksum( ByteBuffer buffer )

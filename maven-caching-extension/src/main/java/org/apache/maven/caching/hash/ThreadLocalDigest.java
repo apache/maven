@@ -1,5 +1,3 @@
-package org.apache.maven.caching.hash;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.caching.hash;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.caching.hash;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,6 +27,7 @@ import java.util.Objects;
  */
 public class ThreadLocalDigest
 {
+
     public static MessageDigest get( ThreadLocal<MessageDigest> local, String algorithm )
     {
         final MessageDigest digest = local.get();
