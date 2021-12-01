@@ -74,16 +74,6 @@ public class IntegrationTestExtension implements BeforeAllCallback, TestTemplate
         return Stream.of( maven3, maven4 ).map( p -> new MavenTemplate( m, p ) );
     }
 
-    //    @Override
-    //    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    //        return parameterContext.getParameter().getType() == Verifier.class;
-    //    }
-    //
-    //    @Override
-    //    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    //        return null;
-    //    }
-
     private static void buildMaven() throws Exception
     {
         if ( initialized )
