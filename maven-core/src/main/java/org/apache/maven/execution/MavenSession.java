@@ -20,6 +20,7 @@ package org.apache.maven.execution;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -240,7 +241,17 @@ public class MavenSession
     {
         try
         {
-            return (MavenSession) super.clone();
+            MavenSession thisClone = ( MavenSession ) super.clone();
+            if ( projects != null )
+            {
+                List<MavenProject> clonedProjects = new ArrayList<>( projects.size() );
+                for ( MavenProject project : projects )
+                {
+                    clonedProjects.add( project.clone() );
+                }
+                thisClone.setProjects( clonedProjects );
+            }
+            return thisClone;
         }
         catch ( CloneNotSupportedException e )
         {
