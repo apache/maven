@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>parallel-testbed</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <modules>
+        <module>child1</module>
+        <module>child2</module>
+        <module>child3</module>
+        <module>child4</module>
+        <module>child5</module>
+        <module>child6</module>
+        <module>child7</module>
+        <module>child8</module>
+        <module>child9</module>
+        <module>child10</module>
+        <module>child11</module>
+        <module>child12</module>
+        <module>child13</module>
+        <module>child14</module>
+        <module>child15</module>
+        <module>child16</module>
+        <module>child17</module>
+        <module>child18</module>
+        <module>child19</module>
+        <module>child20</module>
+        <module>child21</module>
+        <module>child22</module>
+        <module>child23</module>
+        <module>child24</module>
+        <module>child25</module>
+        <module>child26</module>
+        <module>child27</module>
+        <module>child28</module>
+        <module>child29</module>
+        <module>child30</module>
+        <module>child31</module>
+        <module>child32</module>
+        <module>child33</module>
+        <module>child34</module>
+        <module>child35</module>
+        <module>child36</module>
+        <module>child37</module>
+        <module>child38</module>
+        <module>child39</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

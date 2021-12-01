@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // Tests that don't run stable and need to be fixed
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
+        suite.addTestSuite( MavenITmng7335MissingJarInParallelBuild.class );
         suite.addTestSuite( MavenITmng4463DependencyManagementImportVersionRanges.class );
         suite.addTestSuite( MavenITmng7112ProjectsWithNonRecursiveTest.class );
         suite.addTestSuite( MavenITmng7128BlockExternalHttpReactorTest.class );
