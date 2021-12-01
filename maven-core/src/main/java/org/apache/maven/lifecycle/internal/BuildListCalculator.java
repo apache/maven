@@ -22,12 +22,12 @@ package org.apache.maven.lifecycle.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -60,12 +60,17 @@ public class BuildListCalculator
             }
             for ( MavenProject project : projects )
             {
-                BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
                 MavenSession copiedSession = session.clone();
+                copiedSession.setProjects( clone( copiedSession.getProjects(), project ) );
                 copiedSession.setCurrentProject( project );
                 projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
             }
         }
         return new ProjectBuildList( projectBuilds );
+    }
+
+    private List<MavenProject> clone( List<MavenProject> projects, MavenProject current )
+    {
+        return projects.stream().map( p -> p == current ? current : p.clone() ).collect( Collectors.toList() );
     }
 }
