@@ -268,7 +268,7 @@ under the License.
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
-                        <argLine>-Xmx256m</argLine>
+                        <argLine>-Xmx256m --add-exports java.base/sun.nio.ch=ALL-UNNAMED</argLine>
                         <environmentVariables>
                             <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
                         </environmentVariables>
