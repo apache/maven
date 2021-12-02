@@ -56,12 +56,14 @@ import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
+import org.apache.maven.model.building.ModelCache;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
+import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -111,7 +113,8 @@ public class DefaultProjectBuilder
     @Requirement
     private ProjectDependenciesResolver dependencyResolver;
 
-    private final ReactorModelCache modelCache = new ReactorModelCache();
+    @Requirement
+    private ModelCacheFactory modelCacheFactory;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -122,7 +125,8 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( pomFile, new FileModelSource( pomFile ),
-                new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
+                new InternalConfig( request, null,
+                        useGlobalModelCache() ? createModelCache( request.getRepositorySession() ) : null ) );
     }
 
     private boolean useGlobalModelCache()
@@ -135,7 +139,8 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( null, modelSource,
-                 new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null ) );
+                 new InternalConfig( request, null,
+                         useGlobalModelCache() ? createModelCache( request.getRepositorySession() ) : null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -306,7 +311,8 @@ public class DefaultProjectBuilder
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
-        InternalConfig config = new InternalConfig( request, null, useGlobalModelCache() ? getModelCache() : null );
+        InternalConfig config = new InternalConfig( request, null,
+                useGlobalModelCache() ? createModelCache( request.getRepositorySession() ) : null );
 
         boolean localProject;
 
@@ -369,7 +375,7 @@ public class DefaultProjectBuilder
         ReactorModelPool modelPool = new ReactorModelPool();
 
         InternalConfig config = new InternalConfig( request, modelPool,
-                useGlobalModelCache() ? getModelCache() : new ReactorModelCache() );
+                useGlobalModelCache() ? createModelCache( request.getRepositorySession() ) : new ReactorModelCache() );
 
         Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
@@ -1058,9 +1064,9 @@ public class DefaultProjectBuilder
 
         private final ReactorModelPool modelPool;
 
-        private final ReactorModelCache modelCache;
+        private final ModelCache modelCache;
 
-        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )
+        InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ModelCache modelCache )
         {
             this.request = request;
             this.modelPool = modelPool;
@@ -1073,9 +1079,9 @@ public class DefaultProjectBuilder
 
     }
 
-    private ReactorModelCache getModelCache()
+    private ModelCache createModelCache( RepositorySystemSession session )
     {
-        return this.modelCache;
+        return modelCacheFactory.createCache( session );
     }
 
 }

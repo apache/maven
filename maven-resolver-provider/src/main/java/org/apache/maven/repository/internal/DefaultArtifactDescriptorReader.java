@@ -93,6 +93,8 @@ public class DefaultArtifactDescriptorReader
 
     private ModelBuilder modelBuilder;
 
+    private ModelCacheFactory modelCacheFactory;
+
     public DefaultArtifactDescriptorReader()
     {
         // enable no-arg constructor
@@ -101,7 +103,8 @@ public class DefaultArtifactDescriptorReader
     @Inject
     DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
                                      VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
-                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher )
+                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher,
+                                     ModelCacheFactory modelCacheFactory )
     {
         setRemoteRepositoryManager( remoteRepositoryManager );
         setVersionResolver( versionResolver );
@@ -109,6 +112,7 @@ public class DefaultArtifactDescriptorReader
         setArtifactResolver( artifactResolver );
         setModelBuilder( modelBuilder );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
+        setModelCacheFactory( modelCacheFactory );
     }
 
     public void initService( ServiceLocator locator )
@@ -123,6 +127,7 @@ public class DefaultArtifactDescriptorReader
             setModelBuilder( new DefaultModelBuilderFactory().newInstance() );
         }
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
+        setModelCacheFactory( locator.getService( ModelCacheFactory.class ) );
     }
 
     public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
@@ -163,6 +168,13 @@ public class DefaultArtifactDescriptorReader
     public DefaultArtifactDescriptorReader setModelBuilder( ModelBuilder modelBuilder )
     {
         this.modelBuilder = Objects.requireNonNull( modelBuilder, "modelBuilder cannot be null" );
+        return this;
+    }
+
+    public DefaultArtifactDescriptorReader setModelCacheFactory( ModelCacheFactory modelCacheFactory )
+    {
+        this.modelCacheFactory = Objects.requireNonNull( modelCacheFactory,
+                "modelCacheFactory cannot be null" );
         return this;
     }
 
@@ -280,7 +292,7 @@ public class DefaultArtifactDescriptorReader
                 modelRequest.setTwoPhaseBuilding( false );
                 modelRequest.setSystemProperties( toProperties( session.getUserProperties(),
                                                                 session.getSystemProperties() ) );
-                modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
+                modelRequest.setModelCache( modelCacheFactory.createCache( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
                                                                          request.getRequestContext(), artifactResolver,
                                                                          versionRangeResolver, remoteRepositoryManager,

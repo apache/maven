@@ -145,6 +145,8 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
             .setSystemProperties( executionProperties );
 
+        initRepoSession( configuration );
+
         List<MavenProject> projects = new ArrayList<>();
 
         if ( pom != null )
@@ -172,8 +174,6 @@ public abstract class AbstractCoreMavenComponentTestCase
             project.setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
             projects.add( project );
         }
-
-        initRepoSession( configuration );
 
         MavenSession session =
             new MavenSession( getContainer(), configuration.getRepositorySession(), request,

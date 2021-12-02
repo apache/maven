@@ -62,6 +62,8 @@ public final class MavenAetherModule
         .to( VersionsMetadataGeneratorFactory.class ).in( Singleton.class );
         bind( ModelBuilder.class ) //
         .toInstance( new DefaultModelBuilderFactory().newInstance() );
+        bind( ModelCacheFactory.class )
+            .to( DefaultModelCacheFactory.class ).in( Singleton.class );
     }
 
     @Provides
