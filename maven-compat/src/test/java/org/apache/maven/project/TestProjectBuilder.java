@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 
@@ -39,10 +40,10 @@ public class TestProjectBuilder
             ModelBuilder modelBuilder, ModelProcessor modelProcessor,
             ProjectBuildingHelper projectBuildingHelper, MavenRepositorySystem repositorySystem,
             RepositorySystem repoSystem, RemoteRepositoryManager repositoryManager,
-            ProjectDependenciesResolver dependencyResolver )
+            ProjectDependenciesResolver dependencyResolver, ModelCacheFactory modelCacheFactory )
     {
         super( modelBuilder, modelProcessor, projectBuildingHelper, repositorySystem, repoSystem,
-                repositoryManager, dependencyResolver );
+                repositoryManager, dependencyResolver, modelCacheFactory );
     }
 
     @Override

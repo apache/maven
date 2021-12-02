@@ -71,7 +71,7 @@ import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
-import org.apache.maven.repository.internal.DefaultModelCache;
+import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
@@ -102,6 +102,7 @@ public class DefaultProjectBuilder
     private final org.eclipse.aether.RepositorySystem repoSystem;
     private final RemoteRepositoryManager repositoryManager;
     private final ProjectDependenciesResolver dependencyResolver;
+    private final ModelCacheFactory modelCacheFactory;
 
     @Inject
     public DefaultProjectBuilder(
@@ -111,7 +112,8 @@ public class DefaultProjectBuilder
             MavenRepositorySystem repositorySystem,
             RepositorySystem repoSystem,
             RemoteRepositoryManager repositoryManager,
-            ProjectDependenciesResolver dependencyResolver )
+            ProjectDependenciesResolver dependencyResolver,
+            ModelCacheFactory modelCacheFactory )
     {
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
@@ -120,6 +122,7 @@ public class DefaultProjectBuilder
         this.repoSystem = repoSystem;
         this.repositoryManager = repositoryManager;
         this.dependencyResolver = dependencyResolver;
+        this.modelCacheFactory = modelCacheFactory;
     }
 // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -286,7 +289,7 @@ public class DefaultProjectBuilder
         // this is a hint that we want to build 1 file, so don't cache. See MNG-7063
         if ( config.modelPool != null )
         {
-            request.setModelCache( DefaultModelCache.newInstance( config.session ) );
+            request.setModelCache( modelCacheFactory.createCache( config.session ) );
         }
         request.setTransformerContextBuilder( config.transformerContextBuilder );
 
