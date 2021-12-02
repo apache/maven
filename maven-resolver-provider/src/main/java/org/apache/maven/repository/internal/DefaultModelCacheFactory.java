@@ -25,6 +25,9 @@ import javax.inject.Singleton;
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositorySystemSession;
 
+/**
+ * Default implementation of {@link ModelCacheFactory}.
+ */
 @Singleton
 @Named
 public class DefaultModelCacheFactory implements ModelCacheFactory

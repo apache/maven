@@ -22,6 +22,9 @@ package org.apache.maven.repository.internal;
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositorySystemSession;
 
+/**
+ * Factory for {@link ModelCache} objects.
+ */
 public interface ModelCacheFactory
 {
 
