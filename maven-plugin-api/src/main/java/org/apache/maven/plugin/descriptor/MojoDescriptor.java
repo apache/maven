@@ -532,12 +532,8 @@ public class MojoDescriptor
         {
             MojoDescriptor other = (MojoDescriptor) object;
 
-            if ( !Objects.equals( getPluginDescriptor(), other.getPluginDescriptor() ) )
-            {
-                return false;
-            }
-
-            return Objects.equals( getGoal(), other.getGoal() );
+            return Objects.equals( getPluginDescriptor(), other.getPluginDescriptor() )
+                    && Objects.equals( getGoal(), other.getGoal() );
         }
 
         return false;
