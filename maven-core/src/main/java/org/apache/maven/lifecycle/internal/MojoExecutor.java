@@ -78,7 +78,7 @@ public class MojoExecutor
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
     private final ExecutionEventCatapult eventCatapult;
 
-    private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock( true );
+    private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
     @Inject
     public MojoExecutor(
