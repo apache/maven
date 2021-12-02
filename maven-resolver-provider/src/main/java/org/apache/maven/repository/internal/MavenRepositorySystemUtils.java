@@ -79,6 +79,7 @@ public final class MavenRepositorySystemUtils
         locator.addService( VersionRangeResolver.class, DefaultVersionRangeResolver.class );
         locator.addService( MetadataGeneratorFactory.class, SnapshotMetadataGeneratorFactory.class );
         locator.addService( MetadataGeneratorFactory.class, VersionsMetadataGeneratorFactory.class );
+        locator.addService( ModelCacheFactory.class, DefaultModelCacheFactory.class );
         return locator;
     }
 
