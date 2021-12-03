@@ -263,7 +263,6 @@ public class MojoExecutor
         @SuppressWarnings( { "unchecked", "rawtypes" } )
         private Lock getProjectLock( MavenSession session )
         {
-            final Lock acquiredProjectLock;
             SessionData data = session.getRepositorySession().getData();
             // TODO: when resolver 1.7.3 is released, the code below should be changed to
             // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
@@ -276,8 +275,7 @@ public class MojoExecutor
                 data.set( ProjectLock.class, null, new ConcurrentHashMap<>() );
                 locks = ( Map ) data.get( ProjectLock.class );
             }
-            acquiredProjectLock = locks.computeIfAbsent( session.getCurrentProject(), p -> new ReentrantLock() );
-            return acquiredProjectLock;
+            return locks.computeIfAbsent( session.getCurrentProject(), p -> new ReentrantLock() );
         }
     }
 
