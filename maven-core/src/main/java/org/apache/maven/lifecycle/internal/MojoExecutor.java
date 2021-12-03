@@ -265,6 +265,9 @@ public class MojoExecutor
         {
             final Lock acquiredProjectLock;
             SessionData data = session.getRepositorySession().getData();
+            // TODO: when resolver 1.7.3 is released, the code below should be changed to
+            // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
+            // TODO:         ProjectLock.class, l -> new ConcurrentHashMap<>() );
             Map<MavenProject, Lock> locks = ( Map ) data.get( ProjectLock.class );
             // initialize the value if not already done (in case of a concurrent access) to the method
             if ( locks == null )
