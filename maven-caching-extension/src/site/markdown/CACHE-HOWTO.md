@@ -22,7 +22,7 @@ understand how it works and figure out your optimal config
 
 ### Minimal config
 
-Absolutely minimal config which enables incremental Maven with local cache
+Absolutely minimal config
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
