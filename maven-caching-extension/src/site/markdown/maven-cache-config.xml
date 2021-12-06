@@ -16,35 +16,65 @@
  limitations under the License.
 -->
 <cache xmlns="http://maven.apache.org/CACHE-CONFIG/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://maven.apache.org/CACHE-CONFIG/1.0.0 ../maven-caching/target/generated-resources/modello/cache-config-1.0.0.xsd">
+       xsi:schemaLocation="http://maven.apache.org/CACHE-CONFIG/1.0.0 C:\Users\alexa\IdeaProjects\maven-personal-fork\maven-caching-extension\target\generated-site\resources\xsd\cache-config-1.0.0.xsd">
 
     <configuration>
+        <!-- enable/disable cache-->
         <enabled>true</enabled>
-        <hashAlgorithm>SHA-256</hashAlgorithm>
-        <validateXml>true</validateXml>
-        <projectDiscoveryStrategy>
-            <specificVersion>PROJECT-LOCAL</specificVersion>
-        </projectDiscoveryStrategy>
-        <remote enabled="true">
+        <hashAlgorithm>XX</hashAlgorithm>
+        <!-- Auto correct META-INF -->
+        <projectVersioning adjustMetaInf="true"/>
+        <!-- Discovery of multi module in subtree build -->
+        <multiModule>
+            <discovery>
+                <!-- profiles to activate full project (all modules) to discover reactor dependencies-->
+                <scanProfiles>
+                    <scanProfile>fill-project</scanProfile>
+                </scanProfiles>
+            </discovery>
+        </multiModule>
+        <!-- Remote cache id (references server record from settings.xml) and transport (http or wagon)  -->
+        <remote enabled="true" id="my-build-cache" transport="wagon">
             <url>http://host:port</url>
         </remote>
+        <!-- Local cache config -->
         <local>
-            <maxBuildsCached>3</maxBuildsCached>
+            <!-- housekeeping options -->
+            <maxBuildsCached>10</maxBuildsCached>
         </local>
     </configuration>
 
     <input>
-        <global>
-            <glob>
-                {*.java,*.groovy,*.yaml,*.svcd,*.proto,*assembly.xml,assembly*.xml,*logback.xml,*.vm,*.ini,*.jks,*.properties,*.sh,*.bat}
-            </glob>
-            <includes>
-                <include>src/</include>
-            </includes>
-            <excludes>
-                <exclude>pom.xml</exclude>
-            </excludes>
-        </global>
+        <!-- default fileset applied on a project directory -->
+        <defaultFileSet>
+            <!-- By default, include src/**, all source and resources directory -->
+            <include>
+                <globs>
+                    <!-- glob expressions -->
+                    <glob>*.{java,properties}</glob>
+                    <glob>/home/*/*</glob>
+                </globs>
+                <patterns>
+                    <pattern>(cat|dog)-[0-3][0-5][0-9]\.xml</pattern>
+                </patterns>
+            </include>
+            <!-- Output directories are excluded by default -->
+            <exclude>
+                <globs>
+                    <glob>*.{iml,log}</glob>
+                </globs>
+                <patterns>
+                    <pattern>(cat|dog)-[0-3][0-5][0-9]\.xml</pattern>
+                </patterns>
+            </exclude>
+        </defaultFileSet>
+        <!-- more directories to include -->
+        <fileSets>
+            <fileSet directory="additional-directory">
+                <include/>
+                <exclude/>
+            </fileSet>
+        </fileSets>
         <plugins>
             <plugin artifactId="codegen">
                 <effectivePom>

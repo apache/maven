@@ -57,6 +57,7 @@ import org.apache.maven.caching.xml.config.PluginSet;
 import org.apache.maven.caching.xml.config.ProjectVersioning;
 import org.apache.maven.caching.xml.config.PropertyName;
 import org.apache.maven.caching.xml.config.Remote;
+import org.apache.maven.caching.xml.config.Selector;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -539,6 +540,20 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
     {
         final String restoreGeneratedSources = getProperty( RESTORE_GENERATED_SOURCES_PROPERTY_NAME, "true" );
         return Boolean.parseBoolean( restoreGeneratedSources );
+    }
+
+    @Override
+    public Selector getDefaultSelector()
+    {
+        checkInitializedState();
+        return cacheConfig.getInput().getDefaultFileSet();
+    }
+
+    @Override
+    public List<Selector> getExtraSelectors()
+    {
+        checkInitializedState();
+        return cacheConfig.getInput().getFileSets();
     }
 
     @Override

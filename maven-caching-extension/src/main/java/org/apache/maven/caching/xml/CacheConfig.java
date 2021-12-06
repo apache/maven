@@ -28,6 +28,7 @@ import org.apache.maven.caching.xml.config.Exclude;
 import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.caching.xml.config.MultiModule;
 import org.apache.maven.caching.xml.config.PropertyName;
+import org.apache.maven.caching.xml.config.Selector;
 import org.apache.maven.caching.xml.config.TrackedProperty;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -125,4 +126,8 @@ public interface CacheConfig
      * scenarios
      */
     boolean isRestoreGeneratedSources();
+
+    Selector getDefaultSelector();
+
+    List<Selector> getExtraSelectors();
 }

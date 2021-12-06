@@ -16,35 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.caching.checksum;
+package org.apache.maven.caching.checksum.input;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -52,25 +25,20 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.caching.MultiModuleSupport;
 import org.apache.maven.caching.NormalizedModelProvider;
-import org.apache.maven.caching.PluginScanConfig;
 import org.apache.maven.caching.ProjectInputCalculator;
 import org.apache.maven.caching.RemoteCacheRepository;
-import org.apache.maven.caching.ScanConfigProperties;
-import org.apache.maven.caching.Xpp3DomUtils;
+import org.apache.maven.caching.checksum.DependencyNotResolvedException;
+import org.apache.maven.caching.checksum.DigestUtils;
+import org.apache.maven.caching.checksum.KeyUtils;
 import org.apache.maven.caching.hash.HashAlgorithm;
 import org.apache.maven.caching.hash.HashChecksum;
 import org.apache.maven.caching.xml.CacheConfig;
 import org.apache.maven.caching.xml.DtoUtils;
 import org.apache.maven.caching.xml.build.DigestItem;
 import org.apache.maven.caching.xml.build.ProjectsInputInfo;
-import org.apache.maven.caching.xml.config.Exclude;
-import org.apache.maven.caching.xml.config.Include;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
@@ -79,76 +47,75 @@ import org.codehaus.plexus.util.WriterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.commons.lang3.StringUtils.contains;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import javax.annotation.Nonnull;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.StringUtils.replaceEachRepeatedly;
-import static org.apache.commons.lang3.StringUtils.startsWithAny;
-import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.apache.maven.caching.CacheUtils.isPom;
 import static org.apache.maven.caching.CacheUtils.isSnapshot;
 
 /**
  * MavenProjectInput
  */
-public class MavenProjectInput
+public class MavenProjectInput2
 {
 
-    /**
-     * Version of hashing algorithm implementation. It is recommended to change to simplify remote cache maintenance
-     */
-    public static final String CACHE_IMPLEMENTATION_VERSION = "v1";
 
     /**
      * property name to pass glob value. The glob to be used to list directory files in plugins scanning
      */
     private static final String CACHE_INPUT_GLOB_NAME = "remote.cache.input.glob";
     /**
-     * default glob, bbsdk/abfx specific
-     */
-    public static final String DEFAULT_GLOB = "{*.java,*.groovy,*.yaml,*.svcd,*.proto,*assembly.xml,assembly"
-            + "*.xml,*logback.xml,*.vm,*.ini,*.jks,*.properties,*.sh,*.bat}";
-    /**
      * property name prefix to pass input files with project properties. smth like remote.cache.input.1 will be
      * accepted
      */
     private static final String CACHE_INPUT_NAME = "remote.cache.input";
     /**
-     * property name prefix to exclude files from input. smth like remote.cache.exclude.1 should be set in project
-     * props
-     */
-    private static final String CACHE_EXCLUDE_NAME = "remote.cache.exclude";
-    /**
      * Flag to control if we should check values from plugin configs as file system objects
      */
     private static final String CACHE_PROCESS_PLUGINS = "remote.cache.processPlugins";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( MavenProjectInput.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( MavenProjectInput2.class );
 
     private final MavenProject project;
     private final MavenSession session;
     private final RemoteCacheRepository remoteCache;
     private final RepositorySystem repoSystem;
     private final CacheConfig config;
-    private final PathIgnoringCaseComparator fileComparator;
-    private final List<Path> filteredOutPaths;
     private final NormalizedModelProvider normalizedModelProvider;
     private final MultiModuleSupport multiModuleSupport;
     private final ProjectInputCalculator projectInputCalculator;
     private final Path baseDirPath;
-    private final String dirGlob;
     private final boolean processPlugins;
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    public MavenProjectInput( MavenProject project,
-            NormalizedModelProvider normalizedModelProvider,
-            MultiModuleSupport multiModuleSupport,
-            ProjectInputCalculator projectInputCalculator,
-            MavenSession session,
-            CacheConfig config,
-            RepositorySystem repoSystem,
-            RemoteCacheRepository remoteCache )
+    public MavenProjectInput2( MavenProject project,
+                               NormalizedModelProvider normalizedModelProvider,
+                               MultiModuleSupport multiModuleSupport,
+                               ProjectInputCalculator projectInputCalculator,
+                               MavenSession session,
+                               CacheConfig config,
+                               RepositorySystem repoSystem,
+                               RemoteCacheRepository remoteCache )
     {
         this.project = project;
         this.normalizedModelProvider = normalizedModelProvider;
@@ -160,11 +127,8 @@ public class MavenProjectInput
         this.repoSystem = repoSystem;
         this.remoteCache = remoteCache;
         Properties properties = project.getProperties();
-        this.dirGlob = properties.getProperty( CACHE_INPUT_GLOB_NAME, config.getDefaultGlob() );
         this.processPlugins = Boolean.parseBoolean(
                 properties.getProperty( CACHE_PROCESS_PLUGINS, config.isProcessPlugins() ) );
-
-
     }
 
     public ProjectsInputInfo calculateChecksum() throws IOException
@@ -314,11 +278,11 @@ public class MavenProjectInput
 
             //normalize env specifics
             final String[] searchList =
-            { baseDirPath.toString(), "\\", "windows", "linux"
-            };
+                    {baseDirPath.toString(), "\\", "windows", "linux"
+                    };
             final String[] replacementList =
-            { "", "/", "os.classifier", "os.classifier"
-            };
+                    {"", "/", "os.classifier", "os.classifier"
+                    };
 
             return replaceEachRepeatedly( output.toString(), searchList, replacementList );
 
@@ -332,41 +296,10 @@ public class MavenProjectInput
     private SortedSet<Path> getInputFiles()
     {
         long start = System.currentTimeMillis();
-        HashSet<WalkKey> visitedDirs = new HashSet<>();
-        ArrayList<Path> collectedFiles = new ArrayList<>();
 
-        org.apache.maven.model.Build build = project.getBuild();
-
-        final boolean recursive = true;
-        startWalk( Paths.get( build.getSourceDirectory() ), dirGlob, recursive, collectedFiles, visitedDirs );
-        for ( Resource resource : build.getResources() )
-        {
-            startWalk( Paths.get( resource.getDirectory() ), dirGlob, recursive, collectedFiles, visitedDirs );
-        }
-
-        startWalk( Paths.get( build.getTestSourceDirectory() ), dirGlob, recursive, collectedFiles, visitedDirs );
-        for ( Resource testResource : build.getTestResources() )
-        {
-            startWalk( Paths.get( testResource.getDirectory() ), dirGlob, recursive, collectedFiles, visitedDirs );
-        }
-
-        Properties properties = project.getProperties();
-        for ( String name : properties.stringPropertyNames() )
-        {
-            if ( name.startsWith( CACHE_INPUT_NAME ) )
-            {
-                String path = properties.getProperty( name );
-                startWalk( Paths.get( path ), dirGlob, recursive, collectedFiles, visitedDirs );
-            }
-        }
-
-        List<Include> includes = config.getGlobalIncludePaths();
-        for ( Include include : includes )
-        {
-            final String path = include.getValue();
-            final String glob = defaultIfEmpty( include.getGlob(), dirGlob );
-            startWalk( Paths.get( path ), glob, include.isRecursive(), collectedFiles, visitedDirs );
-        }
+        WalksBuilder builder = new WalksBuilder( project, config.getDefaultSelector(), config.getExtraSelectors() );
+        FilesCollector filesCollector = new FilesCollector( project.getBasedir().toPath(), builder.build() );
+        ArrayList<Path> collectedFiles = new ArrayList<>( filesCollector.collect() );
 
         long walkKnownPathsFinished = System.currentTimeMillis() - start;
 
@@ -376,7 +309,9 @@ public class MavenProjectInput
 
         if ( processPlugins )
         {
-            collectFromPlugins( collectedFiles, visitedDirs );
+            PluginsScanner scanner = new PluginsScanner( project, config );
+            List<InputFile> pluginsFileSet = scanner.getInputFiles();
+            collectedFiles.addAll( pluginsFileSet.stream().map( it -> it.path ).collect( Collectors.toList() ) );
         }
         else
         {
@@ -385,7 +320,7 @@ public class MavenProjectInput
 
         long pluginsFinished = System.currentTimeMillis() - start - walkKnownPathsFinished;
 
-        TreeSet<Path> sorted = new TreeSet<>( fileComparator );
+        TreeSet<Path> sorted = new TreeSet<>( new PathIgnoringCaseComparator() );
         for ( Path collectedFile : collectedFiles )
         {
             sorted.add( collectedFile.normalize().toAbsolutePath() );
@@ -396,269 +331,6 @@ public class MavenProjectInput
         LOGGER.debug( "Src input: {}", sorted );
 
         return sorted;
-    }
-
-    /**
-     * entry point for directory walk
-     */
-    private void startWalk( Path candidate,
-            String glob,
-            boolean recursive,
-            List<Path> collectedFiles,
-            Set<WalkKey> visitedDirs )
-    {
-        Path normalized = candidate.isAbsolute() ? candidate : baseDirPath.resolve( candidate );
-        normalized = normalized.toAbsolutePath().normalize();
-        WalkKey key = new WalkKey( normalized, glob, recursive );
-        if ( visitedDirs.contains( key ) || !Files.exists( normalized ) )
-        {
-            return;
-        }
-
-        if ( Files.isDirectory( normalized ) )
-        {
-            if ( baseDirPath.startsWith( normalized ) )
-            { // requested to walk parent, can do only non recursive
-                key = new WalkKey( normalized, glob, false );
-            }
-            try
-            {
-                walkDir( key, collectedFiles, visitedDirs );
-                visitedDirs.add( key );
-            }
-            catch ( IOException e )
-            {
-                throw new RuntimeException( e );
-            }
-        }
-        else
-        {
-            if ( !isFilteredOutSubpath( normalized ) )
-            {
-                LOGGER.debug( "Adding: {}", normalized );
-                collectedFiles.add( normalized );
-            }
-        }
-    }
-
-    private Path normalizedPath( String directory )
-    {
-        return Paths.get( directory ).normalize();
-    }
-
-    private void collectFromPlugins( List<Path> files, HashSet<WalkKey> visitedDirs )
-    {
-        List<Plugin> plugins = project.getBuild().getPlugins();
-        for ( Plugin plugin : plugins )
-        {
-            PluginScanConfig scanConfig = config.getPluginDirScanConfig( plugin );
-
-            if ( scanConfig.isSkip() )
-            {
-                LOGGER.debug( "Skipping plugin config scan (skip by config): {}", plugin.getArtifactId() );
-                continue;
-            }
-
-            Object configuration = plugin.getConfiguration();
-            LOGGER.debug( "Processing plugin config: {}", plugin.getArtifactId() );
-            if ( configuration != null )
-            {
-                addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( configuration ), scanConfig, files, visitedDirs );
-            }
-
-            for ( PluginExecution exec : plugin.getExecutions() )
-            {
-                final PluginScanConfig executionScanConfig = config.getExecutionDirScanConfig( plugin, exec );
-                PluginScanConfig mergedConfig = scanConfig.mergeWith( executionScanConfig );
-
-                if ( mergedConfig.isSkip() )
-                {
-                    LOGGER.debug( "Skipping plugin execution config scan (skip by config): {}, execId: {}",
-                            plugin.getArtifactId(), exec.getId() );
-                    continue;
-                }
-
-                Object execConfiguration = exec.getConfiguration();
-                LOGGER.debug( "Processing plugin: {}, execution: {}", plugin.getArtifactId(), exec.getId() );
-
-                if ( execConfiguration != null )
-                {
-                    addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( execConfiguration ), mergedConfig, files,
-                            visitedDirs );
-                }
-            }
-        }
-    }
-
-    private Path walkDir( final WalkKey key,
-            final List<Path> collectedFiles,
-            final Set<WalkKey> visitedDirs ) throws IOException
-    {
-        return Files.walkFileTree( key.getPath(), new SimpleFileVisitor<Path>()
-        {
-
-            @Override
-            public FileVisitResult preVisitDirectory( Path path,
-                    BasicFileAttributes basicFileAttributes ) throws IOException
-            {
-                WalkKey currentDirKey = new WalkKey( path.toAbsolutePath().normalize(), key.getGlob(),
-                        key.isRecursive() );
-                if ( isHidden( path ) )
-                {
-                    LOGGER.debug( "Skipping subtree (hidden): {}", path );
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                else if ( isFilteredOutSubpath( path ) )
-                {
-                    LOGGER.debug( "Skipping subtree (blacklisted): {}", path );
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                else if ( visitedDirs.contains( currentDirKey ) )
-                {
-                    LOGGER.debug( "Skipping subtree (visited): {}", path );
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-
-                walkDirectoryFiles(
-                        path,
-                        collectedFiles,
-                        key.getGlob(),
-                        entry -> filteredOutPaths.stream()
-                                .anyMatch( it -> it.getFileName().equals( entry.getFileName() ) ) );
-
-                if ( !key.isRecursive() )
-                {
-                    LOGGER.debug( "Skipping subtree (non recursive): {}", path );
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-
-                LOGGER.debug( "Visiting subtree: {}", path );
-                return FileVisitResult.CONTINUE;
-            }
-        } );
-    }
-
-    private void addInputsFromPluginConfigs( Object[] configurationChildren,
-            PluginScanConfig scanConfig,
-            List<Path> files, HashSet<WalkKey> visitedDirs )
-    {
-        if ( configurationChildren == null )
-        {
-            return;
-        }
-
-        for ( Object configChild : configurationChildren )
-        {
-            String tagName = Xpp3DomUtils.getName( configChild );
-            String tagValue = Xpp3DomUtils.getValue( configChild );
-
-            if ( !scanConfig.accept( tagName ) )
-            {
-                LOGGER.debug( "Skipping property (scan config)): {}, value: {}",
-                        tagName, stripToEmpty( tagValue ) );
-                continue;
-            }
-
-            LOGGER.debug( "Checking xml tag. Tag: {}, value: {}", tagName, stripToEmpty( tagValue ) );
-
-            addInputsFromPluginConfigs( Xpp3DomUtils.getChildren( configChild ), scanConfig, files, visitedDirs );
-
-            final ScanConfigProperties propertyConfig = scanConfig.getTagScanProperties( tagName );
-            final String glob = defaultIfEmpty( propertyConfig.getGlob(), dirGlob );
-            if ( "true".equals( Xpp3DomUtils.getAttribute( configChild, CACHE_INPUT_NAME ) ) )
-            {
-                LOGGER.info( "Found tag marked with {} attribute. Tag: {}, value: {}",
-                        CACHE_INPUT_NAME, tagName, tagValue );
-                startWalk( Paths.get( tagValue ), glob, propertyConfig.isRecursive(), files, visitedDirs );
-            }
-            else
-            {
-                final Path candidate = getPathOrNull( tagValue );
-                if ( candidate != null )
-                {
-                    startWalk( candidate, glob, propertyConfig.isRecursive(), files, visitedDirs );
-                    if ( "descriptorRef".equals( tagName ) )
-                    { // hardcoded logic for assembly plugin which could reference files omitting .xml suffix
-                        startWalk( Paths.get( tagValue + ".xml" ), glob, propertyConfig.isRecursive(), files,
-                                visitedDirs );
-                    }
-                }
-            }
-        }
-    }
-
-    private Path getPathOrNull( String text )
-    {
-        // small optimization to not probe not-paths
-        boolean blacklisted = isBlank( text )
-                || equalsAnyIgnoreCase( text, "true", "false", "utf-8", "null", "\\" ) // common values
-                || contains( text, "*" ) // tag value is a glob or regex - unclear how to process
-                || ( contains( text, ":" ) && !contains( text, ":\\" ) )// artifactId
-                || startsWithAny( text, "com.", "org.", "io.", "java.", "javax." ) // java packages
-                || startsWithAny( text, "${env." ) // env variables in maven notation
-                || startsWithAny( text, "http:", "https:", "scm:", "ssh:", "git:", "svn:", "cp:",
-                        "classpath:" ); // urls identified by common protocols
-        if ( !blacklisted )
-        {
-            try
-            {
-                return Paths.get( text );
-            }
-            catch ( Exception ignore )
-            {
-            }
-        }
-        LOGGER.debug( "{}: {}", text, blacklisted ? "skipped(blacklisted literal)" : "invalid path" );
-        return null;
-    }
-
-    static void walkDirectoryFiles( Path dir, List<Path> collectedFiles, String glob, Predicate<Path> mustBeSkipped )
-    {
-        if ( !Files.isDirectory( dir ) )
-        {
-            return;
-        }
-
-        try
-        {
-            try ( DirectoryStream<Path> stream = Files.newDirectoryStream( dir, glob ) )
-            {
-                for ( Path entry : stream )
-                {
-                    if ( mustBeSkipped.test( entry ) )
-                    {
-                        continue;
-                    }
-                    File file = entry.toFile();
-                    if ( file.isFile() && !isHidden( entry ) )
-                    {
-                        collectedFiles.add( entry );
-                    }
-                }
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( "Cannot process directory: " + dir, e );
-        }
-    }
-
-    private static boolean isHidden( Path entry ) throws IOException
-    {
-        return Files.isHidden( entry ) || entry.toFile().getName().startsWith( "." );
-    }
-
-    private boolean isFilteredOutSubpath( Path path )
-    {
-        Path normalized = path.normalize();
-        for ( Path filteredOutDir : filteredOutPaths )
-        {
-            if ( normalized.startsWith( filteredOutDir ) )
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private SortedMap<String, String> getMutableDependencies() throws IOException
@@ -679,9 +351,9 @@ public class MavenProjectInput
 
             // saved to index by the end of dependency build
             MavenProject dependencyProject = multiModuleSupport.tryToResolveProject(
-                    dependency.getGroupId(),
-                    dependency.getArtifactId(),
-                    dependency.getVersion() )
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion() )
                     .orElse( null );
             boolean isSnapshot = isSnapshot( dependency.getVersion() );
             if ( dependencyProject == null && !isSnapshot )
@@ -710,7 +382,7 @@ public class MavenProjectInput
 
     @Nonnull
     private DigestItem resolveArtifact( final Artifact dependencyArtifact,
-            boolean isOffline ) throws IOException
+                                        boolean isOffline ) throws IOException
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
                 .setArtifact( dependencyArtifact )

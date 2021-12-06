@@ -47,7 +47,7 @@ public class CacheLifecycleParticipant extends AbstractMavenLifecycleParticipant
     {
         if ( cacheConfig.isEnabled() )
         {
-            cacheController.saveCacheReport( session );
+            //            cacheController.saveCacheReport( session );
         }
     }
 }

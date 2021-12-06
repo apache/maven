@@ -215,12 +215,6 @@ under the License.
                     </association>
                 </field>
                 <field>
-                    <name>attachedOutputs</name>
-                    <association>
-                        <type>AttachedOutputs</type>
-                    </association>
-                </field>
-                <field>
                     <name>local</name>
                     <association>
                         <type>Local</type>
@@ -390,7 +384,7 @@ under the License.
                 <field>
                     <name>maxBuildsCached</name>
                     <type>int</type>
-                    <defaultValue>3</defaultValue>
+                    <defaultValue>10</defaultValue>
                     <description>Maximum number of cached build per artifact in local cache. First created cache (the
                         oldest) is evicted if breached.</description>
                 </field>
@@ -421,9 +415,17 @@ under the License.
             <name>Input</name>
             <fields>
                 <field>
-                    <name>global</name>
+                    <name>defaultFileSet</name>
                     <association>
-                        <type>PathSet</type>
+                        <type>Selector</type>
+                    </association>
+                    <description>Global input calculation rules applicable to all projects and plugins in the build</description>
+                </field>
+                <field>
+                    <name>fileSets</name>
+                    <association>
+                        <type>Selector</type>
+                        <multiplicity>*</multiplicity>
                     </association>
                     <description>Global input calculation rules applicable to all projects and plugins in the build</description>
                 </field>
@@ -745,6 +747,12 @@ under the License.
                     </association>
                     <description>Patterns to exclude output artifacts applicable to all projects in the build</description>
                 </field>
+                <field>
+                    <name>attachedOutputs</name>
+                    <association>
+                        <type>AttachedOutputs</type>
+                    </association>
+                </field>
             </fields>
         </class>
 
@@ -779,53 +787,43 @@ under the License.
     </xs:complexType>
           -->
         <class>
+            <name>Selector</name>
+            <fields>
+                <field xml.attribute="true">
+                    <name>directory</name>
+                    <type>String</type>
+                    <defaultValue>.</defaultValue>
+                </field>
+                <field>
+                    <name>include</name>
+                    <association>
+                        <type>PathSet</type>
+                    </association>
+                </field>
+                <field>
+                    <name>exclude</name>
+                    <association>
+                        <type>PathSet</type>
+                    </association>
+                </field>
+            </fields>
+        </class>
+        <class>
             <name>PathSet</name>
             <fields>
                 <field>
-                    <name>glob</name>
-                    <type>String</type>
-                    <defaultValue>*</defaultValue>
-                </field>
-                <field>
-                    <name>includes</name>
+                    <name>globs</name>
                     <association>
-                        <type>Include</type>
+                        <type>String</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
                 <field>
-                    <name>excludes</name>
+                    <name>patterns</name>
                     <association>
-                        <type>Exclude</type>
+                        <type>String</type>
                         <multiplicity>*</multiplicity>
                     </association>
-                </field>
-            </fields>
-        </class>
-        <class>
-            <name>Exclude</name>
-            <fields>
-                <field xml.content="true">
-                    <name>value</name>
-                    <type>String</type>
-                </field>
-            </fields>
-        </class>
-        <class>
-            <name>Include</name>
-            <fields>
-                <field xml.content="true">
-                    <name>value</name>
-                    <type>String</type>
-                </field>
-                <field xml.attribute="true">
-                    <name>recursive</name>
-                    <type>boolean</type>
-                    <defaultValue>true</defaultValue>
-                </field>
-                <field xml.attribute="true">
-                    <name>glob</name>
-                    <type>String</type>
                 </field>
             </fields>
         </class>
