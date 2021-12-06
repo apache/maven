@@ -22,6 +22,13 @@ package org.apache.maven.plugin;
 /**
  * An exception occurring during the execution of a plugin (such as a compilation failure).<br>
  * Throwing this exception causes a "BUILD FAILURE" message to be displayed.
+ * The behavior when Maven catches this exception depends on the 
+ * <a href="https://maven.apache.org/ref/current/maven-embedder/cli.html"> CLI options {@code --fail-x}</a>. 
+ * By default it will exit the Maven process immediately with a failure response code as soon as this is thrown
+ * but you can relax it to defer this to the end of the build and even completely ignore it.
+ * For a more strict way of handling look at {@link MojoExecutionException}.
+ * 
+ * @see MojoExecutionException
  *
  * @author Brett Porter
  */

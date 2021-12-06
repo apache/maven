@@ -20,9 +20,14 @@ package org.apache.maven.plugin;
  */
 
 /**
- * An exception occurring during the execution of a plugin.<br>
+ * A fatal exception occurring during the execution of a plugin.<br>
  * Throwing this exception causes a "BUILD ERROR" message to be displayed.
+ * This will always break the build and exit the Maven process <i>immediately</i> with a failure response code
+ * as soon as this is thrown.
+ * For a potentially more relaxed way of handling look at {@link MojoFailureException}.
  *
+ * @see MojoFailureException
+ * 
  * @author Brett Porter
  */
 public class MojoExecutionException
