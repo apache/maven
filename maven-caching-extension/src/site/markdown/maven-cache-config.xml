@@ -35,7 +35,7 @@
         <local>
             <maxBuildsCached>3</maxBuildsCached>
         </local>
-        <projectVersioning adadjustMetaInf="true"/>
+        <projectVersioning adjustMetaInf="true"/>
     </configuration>
 
     <input>

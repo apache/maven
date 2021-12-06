@@ -26,11 +26,12 @@ transparency over caching logic.
 Before you start, please keep in mind basic principles:
 
 * Cache is key based, the key is produced by HashTree-like technique. The key is produced by hashing every configured
-  source code file, every dependency and effective pom (including plugin parameters) should match into a single key.
-* There is no built-in normalization of line endings in this implementation, file checksums calculation is raw bytes
+  source code file, every dependency and effective pom (including plugin parameters). Every element's hash contributes
+  to the key. In order to produce the same key there engine must consume exactly the same hashes.
+* There is no built-in normalization of line endings in this implementation, file hash calculation is raw bytes
   based. The most obvious implication could be illustrated by a simple Git checkout. By default, git will check out
   source code with CRLF line endings on win and LF on Linux. Because of that builds over same commit on a Linux agent
-  and local build on Windows workstation will yield different checksums.
+  and local build on Windows workstation will yield different hashes.
 * Parameters of plugins are reconciled in runtime. For example to avoid of accidentally reusing builds which never run
   tests ensure that critical surefire parameters are tracked (`skipTests` and similar) in config. The same applies for
   all over plugins.
@@ -51,11 +52,11 @@ Also, you likely will need to do code changes as long as you go.
 
 ## Setup http server to store artifacts
 
-In order to share build results cache needs a shared storage. Basically any http server which supports http PUT/GET/HEAD
-operations will suffice (Nginx, Apache or similar). Add the url to config and change `remote@enabled` to true:
+In order to share build results cache needs a shared storage. The simplest option is to set up a http server which
+supports http PUT/GET/HEAD operations will suffice (Nginx, Apache or similar). Add the url to config and
+change `remote@enabled` to true:
 
 ```xml
-
 <remote enabled="true">
     <url>http://your-buildcache-url</url>
 </remote>
@@ -64,10 +65,13 @@ operations will suffice (Nginx, Apache or similar). Add the url to config and ch
 If proxy or authentication is required to access remote cache, add server record to settings.xml as described
 in [Servers](https://maven.apache.org/settings.html#Servers). The server should be referenced from cache config:
 
-```xml
-
-<TBD/>
 ```
+TBD
+```
+
+Beside the http server, remote cache could be configured using any storage which is supported
+by [Maven Wagon](https://maven.apache.org/wagon/). That includes a wide set of options, including SSH, FTP and many
+others. See Wagon documentation for a full list of options and other details.
 
 ## Build selection
 
@@ -133,32 +137,31 @@ envs for file types specific to this project
 
 ## Issue 2: Effective poms mismatch because of plugins injection by profiles
 
-Different profiles between remote and local builds likely result in different text of effective poms and break
-checksums. Solution: instead of adding/removing specific plugins by profiles, set default value of the plugin's `skip`
-or `disabled` flag in a profile properties instead. Instead of:
+Different profiles between remote and local builds likely result in different text of effective poms. As effective pom
+contributes hash value to the key that could lead to cache misses. Solution: instead of adding/removing specific plugins
+by profiles, set default value of the plugin's `skip` or `disabled` flag in a profile properties instead. Instead of:
 
-  ```
-  <profiles>
-    <profile>
-      <id>run-plugin-in-ci-only</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>surefire-report-maven-plugin</artifactId>
-            <configuration>
-              <!-- my configuration -->
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  ```
+```xml
+<profiles>
+  <profile>
+    <id>run-plugin-in-ci-only</id>
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>surefire-report-maven-plugin</artifactId>
+          <configuration>
+            <!-- my configuration -->
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
+</profiles>
+```
 
 Use:
 
 ```xml
-
 <properties>
     <!-- default value -->
     <skip.plugin.property>true</skip.plugin.property>
@@ -192,11 +195,10 @@ xpath (`item type="pom"`).
 
 Potential reason: Sometimes it is not possible to avoid discrepancies in different environments - for example if plugin
 takes command line as parameter, it will be likely different on Win and linux. Such commands will appear in effective
-pom as a different literal values and will result in checksum mismatch Solution: filter out such properties from cache
-effective pom:
+pom as a different literal values and will result in a different effective pom hash and cache key mismatch. Solution:
+filter out such properties from effective pom:
 
 ```xml
-
 <input>
     <global>
         ...
@@ -209,12 +211,12 @@ effective pom:
 </input>
 ```
 
-## Issue 4: Unexpected or transient files in checksum calculation
+## Issue 4: Unexpected or transient files in cache key calculation
 
 Potential reasons: plugins or tests emit temporary files (logs and similar) in non-standard locations. Solution: adjust
 global exclusions list to filter out the unexpected files:
 
-```
+```xml
 <global>
     <exclude>tempfile.out</exclude>
 </global>
@@ -228,7 +230,7 @@ Tracked property in config means it is critical for determining is build up to d
 for any plugin for a number of reasons. Example: local build is using java target 1.6, remote: 1.8. `buildsdiff.xml`
 will produce something like
 
-```
+```xml
 <mismatch item="target"
           current="1.8"
           baseline="1.6"

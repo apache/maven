@@ -33,7 +33,18 @@ TBD
 
 ## Disable cache
 
-To disable cache just need to remove extension
+Disable in config:
+```xml
+<cache>
+  <configuration>
+    <enabled>true</enabled>
+  </configuration>
+</cache>
+```
+On command line:
+```
+-Dremote.cache.enabled=false
+```
 
 ## IDE support
 

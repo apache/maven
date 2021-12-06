@@ -24,7 +24,7 @@ Various setup options which affect cache performance.
 Tuning of cache performance could reduce both resources consumption and build execution time but that is not guaranteed.
 In many scenarios build time of invalidated (changed) projects could be dominating in overall build time. Performance
 wins achieved by a faster cache engine might not correlate with final build times in straightforward way. As usual with
-performance, effect of performance optimizations should be carefully measured in real build like scenarios.
+performance, effect of performance optimizations should be carefully measured in relevant scenarios.
 
 ## Hash algorithm selection
 
@@ -34,12 +34,10 @@ scenarios [XX](https://cyan4973.github.io/xxHash/) or XXMM (memory mapped files)
 performance.
 
 ```xml
-
 <hashAlgorithm>XX</hashAlgorithm>
 ```
 
 or
-
 ```xml
 
 <hashAlgorithm>XXMM</hashAlgorithm>
@@ -47,12 +45,11 @@ or
 
 ## Filter out unnecessary/huge artifacts
 
-Price of uploading and downloading from cache of huge artifacts could be significant. In many scenarios assembling war
-or zip archive could be done more efficiently locally from cached jars than storing bundles. In order to filter out
+Price of uploading and downloading from cache of huge artifacts could be significant. In many scenarios assembling WAR,
+EAR or ZIP archive could be done more efficiently locally from cached JARs than storing bundles. In order to filter out
 artifacts add configuration section:
 
 ```xml
-
 <cache>
     <output>
         <exclude>
@@ -85,14 +82,14 @@ continuous integration. To disable add command line flag
 -Dremote.cache.restoreGeneratedSources=false";
 ```
 
-## Disable post-processing of archives(jars, wars, etc) META-INF
+## Disable post-processing of archives(JARs, WARs, etc) META-INF
 
-Post-processing is disabled by default, but some projects cache could be configured to auto-correct metadata (like
-version). This could be rather expensive as it requires copying and repacking archive entries.  
-If metadata state is not relevant for the build (continuous integration, `verify` scenarios) consider disabling it:
+Post-processing is disabled by default, but for some projects cache could be configured to auto-correct metadata (most
+notably [MANIFEST.MF `Implementation-Version`](https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Main_Attributes))
+. This could be rather expensive as it requires copying and repacking archive entries. If metadata state is not relevant
+for the build (continuous integration, `verify` scenarios and similar) consider disabling it:
 
 ```xml
-
 <cache>
     <configuration>
         ...
@@ -101,7 +98,6 @@ If metadata state is not relevant for the build (continuous integration, `verify
     </configuration>
     ...
 </cache>
-
 ```
 
 

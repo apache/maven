@@ -35,10 +35,10 @@ should give noticeable benefits in medium and small sized projects as well.
 Idea of Incremental Maven is to calculate key from module inputs, store outputs in cache and restore them later
 transparently to the standard Maven core. In order to calculate the key cache engine analyzes source code, build flow,
 plugins and their parameters. This allows to deterministically associate each project state with unique key and restore
-up-to-date(not changed) projects from cache and rebuild out-of-date(changed) ones. Restoring artifacts associated with a
-particular project state improves build times by avoiding re-building unnecessary modules. Cache does not make any
-interventions to actual build execution process and delegates actual build work to Maven core. This guarantees that
-build results are identical to results produced cache are equivalent for result produced by a standard Maven.   
+up-to-date (not changed) projects from cache and rebuild out-of-date(changed) ones. Restoring artifacts associated with
+a particular project state improves build times by avoiding re-building unnecessary modules. Cache does not make any
+interventions to actual build execution process and fully delegates build work to Maven core. This ensures that
+artifacts produced in presence of cache are equivalent to result produced by a standard Maven build.   
 To achieve accurate key calculation incremental Maven combines automatic introspection
 of [project object model](https://maven.apache.org/pom.html#What_is_the_POM) and allows fine-grained tuning by means of
 configuration file and xml attributes. Source code content fingerprinting is digests based which is more reliable over
@@ -51,30 +51,35 @@ identification effectively enables "change once - build once" approach across al
 
 ### Maven insights
 
-The challenge of implementing build cache in Maven is that domain model is overly generic and doesn't has dedicated api
-for build inputs. Because of that, even 2 identically looking build from the same source code could normally produce 2
+The challenge of implementing build cache in Maven is that domain model is overly generic and doesn't have dedicated api
+for build inputs. Because of that, even 2 identically looking builds from the same source code could normally produce 2
 different results. The question here is tolerance level - can you accept particular discrepancies or not. For most of
 teams artifacts produced in the same build environment from the same source code will be considered equivalent and
 technical differences between them (like different timestamps in jar manifests) could be ignored. Now consider scenario
 when artifact is first produced with compiler X and cached. Later, without touching source code, compiler changes to Y
-and build yields significantly different outcomes of compilation. Ask yourself a question \- am I consider artifacts of
-such builds equivalent? Both Yes and No outcomes are pretty possible and could be even desirable in different scenarios.
-When productivity and performance are the primary concerns it could be desirable to tolerate insignificant discrepancies
-and maximise reuse of cached builds. As long as correctness is in focus there could be demand to comply with the exact
-release process. In the same way as with classic Maven, decision stays with you - what is acceptable difference between
-builds. In the same way as with classic Maven the previous build is just an approximation of today build with some
-tolerance (implementation, configuration and environment driven).
+and build yields significantly different outcomes of compilation. Should the produced artifacts be considered as
+equivalent? Both Yes and No answers are possible and could be even desirable in different scenarios. When productivity
+and performance are the primary concerns it could be desirable to tolerate insignificant discrepancies and maximise
+reuse of cached builds. As long as correctness is in focus there could be demand to comply with the exact release
+process. In the same way as with classic Maven, correctness is ensured by proper build configuration and controllable
+build environments. In the same way as with classic Maven the previous build is just an approximation of today build
+with some tolerance (implementation, configuration and environment driven).
 
 ### Implementation insights
 
-At very simple form, the incremental Maven is essentially a hash function which takes Maven project and produces hash
-code (checksum). Then hash value is used to fetch and restore build result. As with any hash, there could be collisions
-and instabilities. Collision could happen if the same hash produced from the semantically different build states and
-will result in unintended reuse. Instability means that same input yields different hash sums in different runs -
-resulting in cache misses. The ultimate target is to find tradeoff between correctness and performance by means of
-configuration. In current implementation this is achieved by configuring cache processing rules in an xml file. To avoid
-unintentional collisions and achieve better correctness need to ensure that every critical file and plugin parameter
-accounted in build inputs. In order to achieve better reuse need to:
+At very simple form, the incremental Maven is essentially a hash function which takes Maven project and produces cache
+key for a project. Then the key is used to store and restore build results. Because of different factors there could be
+collisions and instabilities in the produced key. Collision could happen if the same key produced from the semantically
+different build states and will result in unintended reuse. Instability means that same input yields different key in
+different runs resulting in cache misses. The ultimate target is to find tradeoff between correctness and performance by
+means of configuration. In current implementation this is achieved by configuring cache processing rules in xml file.
+
+In order to achieve better correctness need to:
+
+* Verify that every relevant file is selected as input to engine
+* Add critical plugin parameters to reconciliation (because they could be overridden from command line)
+
+In order to achieve better reuse need to:
 
 * ensure that non-critical files (test logs, readme and similar) are filtered out from build inputs.
 * non-critical plugin parameters (like number of threads in build)  are filtered out from build inputs
