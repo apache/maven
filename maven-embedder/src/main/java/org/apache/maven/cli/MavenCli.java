@@ -48,7 +48,6 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
@@ -796,7 +795,7 @@ public class MavenCli
 
                 configure( cliRequest );
 
-                MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
+                MavenExecutionRequest request = cliRequest.request.copy();
 
                 populateRequest( cliRequest, request );
 

@@ -512,4 +512,11 @@ public interface MavenExecutionRequest
      * @since 3.3.0
      */
     Map<String, Object> getData();
+    
+    /**
+     * @return a copy of this
+     * @since 3.7.0
+     */
+    MavenExecutionRequest copy();
+    
 }

@@ -164,6 +164,7 @@ public class DefaultMavenExecutionRequest
     {
     }
 
+    @Deprecated
     public static MavenExecutionRequest copy( MavenExecutionRequest original )
     {
         DefaultMavenExecutionRequest copy = new DefaultMavenExecutionRequest();
@@ -1271,5 +1272,11 @@ public class DefaultMavenExecutionRequest
         }
 
         return data;
+    }
+
+    @Override
+    public MavenExecutionRequest copy()
+    {
+        return copy( this );
     }
 }

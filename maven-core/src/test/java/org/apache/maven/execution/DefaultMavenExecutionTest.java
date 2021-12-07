@@ -38,7 +38,7 @@ public class DefaultMavenExecutionTest
     public void testCopyDefault()
     {
         MavenExecutionRequest original = new DefaultMavenExecutionRequest();
-        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy( original );
+        MavenExecutionRequest copy = original.copy();
         assertNotNull( copy );
         assertNotSame( copy, original );
     }
