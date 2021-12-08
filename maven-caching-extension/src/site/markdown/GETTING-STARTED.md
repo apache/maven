@@ -66,4 +66,4 @@ checks could reduce both performance and cache efficiency (hit rate).
 To leverage remote cache feature there should a shared storage provide. Any technology supported
 by [Maven Wagon](https://maven.apache.org/wagon/) will suffice. In simplest form it could be a http web server which
 supports get/put operations ([Nginx OSS](http://nginx.org/en/) with fs module or any other equivalent).
-See [Remote cache setup](CACHE-REMOTE.md) for detailed description of cache setup
+See [Remote cache setup](REMOTE-CACHE.md) for detailed description of cache setup

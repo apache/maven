@@ -124,7 +124,7 @@ project's `target/incremental-maven` directory:
 ```
 
 Review `buildsdiff.xml` file and eliminate detected discrepancies. You can also diff build-info files directly to get
-low level insights. See techniques to configure cache in [How-To](CACHE-HOWTO.md) and troubleshooting of typical issues
+low level insights. See techniques to configure cache in [How-To](HOW-TO.md) and troubleshooting of typical issues
 in the section below.
 
 # Common issues
