@@ -200,14 +200,16 @@ public class MavenCli
 
     public static int main( String[] args, ClassWorld classWorld )
     {
-        MavenCli cli = new MavenCli();
-
         MessageUtils.systemInstall();
         MessageUtils.registerShutdownHook();
-        int result = cli.doMain( new CliRequest( args, classWorld ) );
-        MessageUtils.systemUninstall();
-
-        return result;
+        try
+        {
+            return doMain( args, classWorld );
+        }
+        finally
+        {
+            MessageUtils.systemUninstall();
+        }
     }
 
     // TODO need to externalize CliRequest
@@ -319,13 +321,13 @@ public class MavenCli
         }
         catch ( BuildAbort e )
         {
-            CLIReportingUtils.showError( slf4jLogger, "ABORTED", e, cliRequest.showErrors );
+            showError( "ABORTED", e, cliRequest.showErrors );
 
             return 2;
         }
         catch ( Exception e )
         {
-            CLIReportingUtils.showError( slf4jLogger, "Error executing Maven.", e, cliRequest.showErrors );
+            showError( "Error executing Maven.", e, cliRequest.showErrors );
 
             return 1;
         }
@@ -351,8 +353,7 @@ public class MavenCli
             String basedirProperty = System.getProperty( MULTIMODULE_PROJECT_DIRECTORY );
             if ( basedirProperty == null )
             {
-                System.err.format(
-                    "-D%s system property is not set.", MULTIMODULE_PROJECT_DIRECTORY );
+                printErr( String.format( "-D%s system property is not set.", MULTIMODULE_PROJECT_DIRECTORY ) );
                 throw new ExitException( 1 );
             }
             File basedir = new File( basedirProperty );
@@ -387,7 +388,7 @@ public class MavenCli
         //
         slf4jLogger = new Slf4jStdoutLogger();
 
-        cliManager = new CLIManager();
+        cliManager = createCliManager();
 
         List<String> args = new ArrayList<>();
         CommandLine mavenConfig = null;
@@ -415,8 +416,7 @@ public class MavenCli
         }
         catch ( ParseException e )
         {
-            System.err.println( "Unable to parse maven.config: " + e.getMessage() );
-            cliManager.displayHelp( System.out );
+            printError( "Unable to parse maven.config: ", e );
             throw e;
         }
 
@@ -433,17 +433,47 @@ public class MavenCli
         }
         catch ( ParseException e )
         {
-            System.err.println( "Unable to parse command line options: " + e.getMessage() );
-            cliManager.displayHelp( System.out );
+            printError( "Unable to parse command line options: ", e );
             throw e;
         }
+    }
+
+    protected void showError( String message, Throwable e, boolean showStackTrace )
+    {
+        CLIReportingUtils.showError( slf4jLogger, message, e, showStackTrace );
+    }
+
+    protected void printError( String message, ParseException e )
+    {
+        printErr( message + e.getMessage() );
+        printHelp();
+    }
+
+    protected void printHelp()
+    {
+        cliManager.displayHelp( System.out );
+    }
+
+    protected void printOut( String message )
+    {
+        System.out.println( message );
+    }
+
+    protected void printErr( String message )
+    {
+        System.err.println( message );
+    }
+
+    protected CLIManager createCliManager()
+    {
+        return new CLIManager();
     }
 
     protected void informativeCommands( CliRequest cliRequest ) throws ExitException
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
-            cliManager.displayHelp( System.out );
+            printHelp();
             throw new ExitException( 0 );
         }
 
@@ -451,11 +481,11 @@ public class MavenCli
         {
             if ( cliRequest.commandLine.hasOption( CLIManager.QUIET ) )
             {
-                System.out.println( CLIReportingUtils.showVersionMinimal() );
+                printOut( CLIReportingUtils.showVersionMinimal() );
             }
             else
             {
-                System.out.println( CLIReportingUtils.showVersion() );
+                printOut( CLIReportingUtils.showVersion() );
             }
             throw new ExitException( 0 );
         }
@@ -604,7 +634,7 @@ public class MavenCli
     {
         if ( cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            System.out.println( CLIReportingUtils.showVersion() );
+            printOut( CLIReportingUtils.showVersion() );
         }
     }
 
@@ -670,8 +700,11 @@ public class MavenCli
         List<File> extClassPath = parseExtClasspath( cliRequest );
 
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom( coreRealm );
+
+        List<CoreExtension> extensionsDesc = loadCoreExtensionsDescriptors( cliRequest.multiModuleProjectDirectory );
+
         List<CoreExtensionEntry> extensions =
-            loadCoreExtensions( cliRequest, coreRealm, coreEntry.getExportedArtifacts() );
+            loadCoreExtensions( extensionsDesc, coreRealm, coreEntry.getExportedArtifacts() );
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
@@ -689,15 +722,7 @@ public class MavenCli
 
         final CoreExports exports = new CoreExports( containerRealm, exportedArtifacts, exportedPackages );
 
-        DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
-        {
-            @Override
-            protected void configure()
-            {
-                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                bind( CoreExports.class ).toInstance( exports );
-            }
-        } );
+        DefaultPlexusContainer container = new DefaultPlexusContainer( cc, createModule( exports ) );
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm( null );
@@ -713,8 +738,14 @@ public class MavenCli
 
         customizeContainer( container );
 
-        container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+        populateFromContainer( cliRequest, container );
 
+        return container;
+    }
+
+    protected void populateFromContainer( CliRequest cliRequest, PlexusContainer container )
+            throws ComponentLookupException
+    {
         eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
 
         DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
@@ -740,18 +771,29 @@ public class MavenCli
         toolchainsBuilder = container.lookup( ToolchainsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
+    }
 
-        return container;
+    protected AbstractModule createModule( CoreExports exports )
+    {
+        return new AbstractModule()
+        {
+            @Override
+            protected void configure()
+            {
+                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+                bind( CoreExports.class ).toInstance( exports );
+            }
+        };
     }
 
     protected List<CoreExtension> loadCoreExtensionsDescriptors( File multiModuleProjectDirectory )
     {
-        if ( cliRequest.multiModuleProjectDirectory == null )
+        if ( multiModuleProjectDirectory == null )
         {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File( cliRequest.multiModuleProjectDirectory, EXTENSIONS_FILENAME );
+        File extensionsFile = new File( multiModuleProjectDirectory, EXTENSIONS_FILENAME );
         if ( !extensionsFile.isFile() )
         {
             return Collections.emptyList();
@@ -759,14 +801,31 @@ public class MavenCli
 
         try
         {
-            List<CoreExtension> extensions = readCoreExtensionsDescriptor( extensionsFile );
+            return readCoreExtensionsDescriptor( extensionsFile );
+        }
+        catch ( Exception e )
+        {
+            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
+        }
+
+        return Collections.emptyList();
+    }
+
+    protected List<CoreExtensionEntry> loadCoreExtensions(
+                List<CoreExtension> extensions,
+                ClassRealm containerRealm,
+                Set<String> providedArtifacts )
+    {
+
+        try
+        {
             if ( extensions.isEmpty() )
             {
                 return Collections.emptyList();
             }
 
             ContainerConfiguration cc = new DefaultContainerConfiguration() //
-                .setClassWorld( cliRequest.classWorld ) //
+                .setClassWorld( containerRealm.getWorld() ) //
                 .setRealm( containerRealm ) //
                 .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
                 .setAutoWiring( true ) //
@@ -784,6 +843,9 @@ public class MavenCli
 
             try
             {
+                CliRequest cliRequest = new CliRequest( new String[0], classWorld );
+                cliRequest.commandLine = new CommandLine.Builder().build();
+
                 container.setLookupRealm( null );
 
                 container.setLoggerManager( plexusLoggerManager );
@@ -792,9 +854,11 @@ public class MavenCli
 
                 Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
-                executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
-
                 configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
+
+                eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
+
+                properties( cliRequest );
 
                 configure( cliRequest );
 
@@ -812,7 +876,6 @@ public class MavenCli
             }
             finally
             {
-                executionRequestPopulator = null;
                 container.dispose();
             }
         }
@@ -823,7 +886,7 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
+            slf4jLogger.warn( "Failed to load extensions", e );
         }
         return Collections.emptyList();
     }
@@ -939,8 +1002,7 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-            System.out.println(
-                cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+            printOut( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
 
             throw new ExitException( 0 );
         }
@@ -986,7 +1048,7 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
             String masterPasswd = cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
-            System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+            printOut( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
             throw new ExitException( 0 );
         }
@@ -1014,7 +1076,7 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( request );
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = doExecute( request );
 
         eventSpyDispatcher.onEvent( result );
 
@@ -1101,7 +1163,13 @@ public class MavenCli
         }
     }
 
-    private void logBuildResumeHint( String resumeBuildHint )
+    protected MavenExecutionResult doExecute( MavenExecutionRequest request )
+    {
+        MavenExecutionResult result = maven.execute( request );
+        return result;
+    }
+
+    protected void logBuildResumeHint( String resumeBuildHint )
     {
         slf4jLogger.error( "" );
         slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
@@ -1720,7 +1788,7 @@ public class MavenCli
 
     protected void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
     {
-        EnvironmentUtils.addEnvVars( systemProperties );
+        addEnvVars( systemProperties );
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -1741,7 +1809,7 @@ public class MavenCli
             }
         }
 
-        SystemProperties.addSystemProperties( systemProperties );
+        addSystemProperties( systemProperties );
 
         // ----------------------------------------------------------------------
         // Properties containing info about the currently running version of Maven
@@ -1755,6 +1823,16 @@ public class MavenCli
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString( buildProperties );
         systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
+    }
+
+    protected void addSystemProperties( Properties systemProperties )
+    {
+        SystemProperties.addSystemProperties( systemProperties );
+    }
+
+    protected void addEnvVars( Properties systemProperties )
+    {
+        EnvironmentUtils.addEnvVars( systemProperties );
     }
 
     protected void setCliProperty( String property, Properties properties )
