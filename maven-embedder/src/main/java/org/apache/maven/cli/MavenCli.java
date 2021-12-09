@@ -144,37 +144,41 @@ public class MavenCli
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
         new File( System.getProperty( "maven.conf" ), "toolchains.xml" );
 
-    private static final String EXT_CLASS_PATH = "maven.ext.class.path";
+    public static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
-    private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
+    public static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
 
-    private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
+    public static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
-    private ClassWorld classWorld;
+    protected static final Pattern LAST_ANSI_SEQUENCE = Pattern.compile( "(\u001B\\[[;\\d]*[ -/]*[@-~])[^\u001B]*$" );
 
-    private LoggerManager plexusLoggerManager;
+    protected static final String ANSI_RESET = "\u001B\u005Bm";
 
-    private ILoggerFactory slf4jLoggerFactory;
+    protected ClassWorld classWorld;
 
-    private Logger slf4jLogger;
+    protected LoggerManager plexusLoggerManager;
 
-    private EventSpyDispatcher eventSpyDispatcher;
+    protected ILoggerFactory slf4jLoggerFactory;
 
-    private ModelProcessor modelProcessor;
+    protected Logger slf4jLogger;
 
-    private Maven maven;
+    protected EventSpyDispatcher eventSpyDispatcher;
 
-    private MavenExecutionRequestPopulator executionRequestPopulator;
+    protected ModelProcessor modelProcessor;
 
-    private ToolchainsBuilder toolchainsBuilder;
+    protected Maven maven;
 
-    private DefaultSecDispatcher dispatcher;
+    protected MavenExecutionRequestPopulator executionRequestPopulator;
 
-    private Map<String, ConfigurationProcessor> configurationProcessors;
+    protected ToolchainsBuilder toolchainsBuilder;
 
-    private CLIManager cliManager;
+    protected DefaultSecDispatcher dispatcher;
+
+    protected Map<String, ConfigurationProcessor> configurationProcessors;
+
+    protected CLIManager cliManager;
 
     public MavenCli()
     {
@@ -334,7 +338,7 @@ public class MavenCli
         }
     }
 
-    void initialize( CliRequest cliRequest )
+    protected void initialize( CliRequest cliRequest )
         throws ExitException
     {
         if ( cliRequest.workingDirectory == null )
@@ -374,7 +378,7 @@ public class MavenCli
         }
     }
 
-    void cli( CliRequest cliRequest )
+    protected void cli( CliRequest cliRequest )
         throws Exception
     {
         //
@@ -435,7 +439,7 @@ public class MavenCli
         }
     }
 
-    private void informativeCommands( CliRequest cliRequest ) throws ExitException
+    protected void informativeCommands( CliRequest cliRequest ) throws ExitException
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
@@ -457,7 +461,7 @@ public class MavenCli
         }
     }
 
-    private CommandLine cliMerge( CommandLine mavenArgs, CommandLine mavenConfig )
+    protected CommandLine cliMerge( CommandLine mavenArgs, CommandLine mavenConfig )
     {
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
 
@@ -499,7 +503,7 @@ public class MavenCli
     /**
      * configure logging
      */
-    void logging( CliRequest cliRequest )
+    protected void logging( CliRequest cliRequest )
     {
         // LOG LEVEL
         cliRequest.verbose = cliRequest.commandLine.hasOption( CLIManager.VERBOSE )
@@ -596,7 +600,7 @@ public class MavenCli
         }
     }
 
-    private void version( CliRequest cliRequest )
+    protected void version( CliRequest cliRequest )
     {
         if ( cliRequest.verbose || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
@@ -604,7 +608,7 @@ public class MavenCli
         }
     }
 
-    private void commands( CliRequest cliRequest )
+    protected void commands( CliRequest cliRequest )
     {
         if ( cliRequest.showErrors )
         {
@@ -644,12 +648,12 @@ public class MavenCli
 
     //Needed to make this method package visible to make writing a unit test possible
     //Maybe it's better to move some of those methods to separate class (SoC).
-    void properties( CliRequest cliRequest )
+    protected void properties( CliRequest cliRequest )
     {
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
 
-    PlexusContainer container( CliRequest cliRequest )
+    protected PlexusContainer container( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.classWorld == null )
@@ -740,8 +744,7 @@ public class MavenCli
         return container;
     }
 
-    private List<CoreExtensionEntry> loadCoreExtensions( CliRequest cliRequest, ClassRealm containerRealm,
-                                                         Set<String> providedArtifacts )
+    protected List<CoreExtension> loadCoreExtensionsDescriptors( File multiModuleProjectDirectory )
     {
         if ( cliRequest.multiModuleProjectDirectory == null )
         {
@@ -825,7 +828,7 @@ public class MavenCli
         return Collections.emptyList();
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor( File extensionsFile )
+    protected List<CoreExtension> readCoreExtensionsDescriptor( File extensionsFile )
         throws IOException, XmlPullParserException
     {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
@@ -838,8 +841,8 @@ public class MavenCli
 
     }
 
-    private ClassRealm setupContainerRealm( ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath,
-                                            List<CoreExtensionEntry> extensions )
+    protected ClassRealm setupContainerRealm( ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath,
+                                              List<CoreExtensionEntry> extensions )
         throws Exception
     {
         if ( !extClassPath.isEmpty() || !extensions.isEmpty() )
@@ -885,7 +888,7 @@ public class MavenCli
         return copy;
     }
 
-    private List<File> parseExtClasspath( CliRequest cliRequest )
+    protected List<File> parseExtClasspath( CliRequest cliRequest )
     {
         String extClassPath = cliRequest.userProperties.getProperty( EXT_CLASS_PATH );
         if ( extClassPath == null )
@@ -913,7 +916,7 @@ public class MavenCli
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
-    private void encryption( CliRequest cliRequest )
+    protected void encryption( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
@@ -989,7 +992,7 @@ public class MavenCli
         }
     }
 
-    private void repository( CliRequest cliRequest )
+    protected void repository( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean(
@@ -999,7 +1002,7 @@ public class MavenCli
         }
     }
 
-    private int execute( CliRequest cliRequest )
+    protected int execute( CliRequest cliRequest )
         throws MavenExecutionRequestPopulationException
     {
         MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
@@ -1115,14 +1118,13 @@ public class MavenCli
      *   were fine, but they are still before one which reported errors.
      * <p>Then the returned value is {@code groupId:artifactId} when there is a name clash and
      * {@code :artifactId} if there is no conflict.
-     * This method is made package-private for testing purposes.
      *
      * @param mavenProjects Maven projects which are part of build execution.
      * @param firstFailedProject The first project which has failed.
      * @return Value for -rf flag to resume build exactly from place where it failed ({@code :artifactId} in general
      * and {@code groupId:artifactId} when there is a name clash).
      */
-    String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject firstFailedProject )
+    protected String getResumeFromSelector( List<MavenProject> mavenProjects, MavenProject firstFailedProject )
     {
         boolean hasOverlappingArtifactId = mavenProjects.stream()
                 .filter( project -> firstFailedProject.getArtifactId().equals( project.getArtifactId() ) )
@@ -1136,8 +1138,8 @@ public class MavenCli
         return ":" + firstFailedProject.getArtifactId();
     }
 
-    private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
-                             boolean showErrors )
+    protected void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
+                               boolean showErrors )
     {
         String referenceKey = "";
 
@@ -1210,11 +1212,7 @@ public class MavenCli
         }
     }
 
-    private static final Pattern LAST_ANSI_SEQUENCE = Pattern.compile( "(\u001B\\[[;\\d]*[ -/]*[@-~])[^\u001B]*$" );
-
-    private static final String ANSI_RESET = "\u001B\u005Bm";
-
-    private void configure( CliRequest cliRequest )
+    protected void configure( CliRequest cliRequest )
         throws Exception
     {
         //
@@ -1278,7 +1276,7 @@ public class MavenCli
         }
     }
 
-    void toolchains( CliRequest cliRequest )
+    protected void toolchains( CliRequest cliRequest )
         throws Exception
     {
         File userToolchainsFile;
@@ -1360,7 +1358,7 @@ public class MavenCli
         }
     }
 
-    private Object getLocation( Source source, File defaultLocation )
+    protected Object getLocation( Source source, File defaultLocation )
     {
         if ( source != null )
         {
@@ -1374,9 +1372,8 @@ public class MavenCli
         return populateRequest( cliRequest, cliRequest.request );
     }
 
-    private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
+    protected MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
     {
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
@@ -1455,7 +1452,7 @@ public class MavenCli
         return request;
     }
 
-    private String determineLocalRepositoryPath( final MavenExecutionRequest request )
+    protected String determineLocalRepositoryPath( final MavenExecutionRequest request )
     {
         String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
         if ( userDefinedLocalRepo != null )
@@ -1466,7 +1463,9 @@ public class MavenCli
         return request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
     }
 
-    private File determinePom( final CommandLine commandLine, final String workingDirectory, final File baseDirectory )
+    protected File determinePom( final CommandLine commandLine,
+                                 final String workingDirectory,
+                                 final File baseDirectory )
     {
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
@@ -1498,7 +1497,7 @@ public class MavenCli
     }
 
     // Visible for testing
-    static void performProjectActivation( final CommandLine commandLine, final ProjectActivation projectActivation )
+    protected void performProjectActivation( final CommandLine commandLine, final ProjectActivation projectActivation )
     {
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
@@ -1535,7 +1534,7 @@ public class MavenCli
     }
 
     // Visible for testing
-    static void performProfileActivation( final CommandLine commandLine, final ProfileActivation profileActivation )
+    protected void performProfileActivation( final CommandLine commandLine, final ProfileActivation profileActivation )
     {
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
@@ -1571,7 +1570,7 @@ public class MavenCli
         }
     }
 
-    private ExecutionListener determineExecutionListener()
+    protected ExecutionListener determineExecutionListener()
     {
         ExecutionListener executionListener = new ExecutionEventLogger();
         if ( eventSpyDispatcher != null )
@@ -1584,7 +1583,7 @@ public class MavenCli
         }
     }
 
-    private String determineReactorFailureBehaviour( final CommandLine commandLine )
+    protected String determineReactorFailureBehaviour( final CommandLine commandLine )
     {
         if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
         {
@@ -1605,7 +1604,7 @@ public class MavenCli
         }
     }
 
-    private TransferListener determineTransferListener( final boolean quiet,
+    protected TransferListener determineTransferListener( final boolean quiet,
                                                         final boolean verbose,
                                                         final CommandLine commandLine,
                                                         final MavenExecutionRequest request )
@@ -1629,7 +1628,7 @@ public class MavenCli
         }
     }
 
-    private String determineMakeBehavior( final CommandLine cl )
+    protected String determineMakeBehavior( final CommandLine cl )
     {
         if ( cl.hasOption( CLIManager.ALSO_MAKE ) && !cl.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
@@ -1649,7 +1648,7 @@ public class MavenCli
         }
     }
 
-    private String determineGlobalCheckPolicy( final CommandLine commandLine )
+    protected String determineGlobalCheckPolicy( final CommandLine commandLine )
     {
         if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
         {
@@ -1665,9 +1664,9 @@ public class MavenCli
         }
     }
 
-    private void disableOnPresentOption( final CommandLine commandLine,
-                                         final String option,
-                                         final Consumer<Boolean> setting )
+    protected void disableOnPresentOption( final CommandLine commandLine,
+                                           final String option,
+                                           final Consumer<Boolean> setting )
     {
         if ( commandLine.hasOption( option ) )
         {
@@ -1675,16 +1674,16 @@ public class MavenCli
         }
     }
 
-    private void disableOnPresentOption( final CommandLine commandLine,
-                                         final char option,
-                                         final Consumer<Boolean> setting )
+    protected void disableOnPresentOption( final CommandLine commandLine,
+                                           final char option,
+                                           final Consumer<Boolean> setting )
     {
         disableOnPresentOption( commandLine, String.valueOf( option ), setting );
     }
 
-    private void enableOnPresentOption( final CommandLine commandLine,
-                                        final String option,
-                                        final Consumer<Boolean> setting )
+    protected void enableOnPresentOption( final CommandLine commandLine,
+                                          final String option,
+                                          final Consumer<Boolean> setting )
     {
         if ( commandLine.hasOption( option ) )
         {
@@ -1692,16 +1691,16 @@ public class MavenCli
         }
     }
 
-    private void enableOnPresentOption( final CommandLine commandLine,
-                                        final char option,
-                                        final Consumer<Boolean> setting )
+    protected void enableOnPresentOption( final CommandLine commandLine,
+                                          final char option,
+                                          final Consumer<Boolean> setting )
     {
         enableOnPresentOption( commandLine, String.valueOf( option ), setting );
     }
 
-    private void enableOnAbsentOption( final CommandLine commandLine,
-                                       final char option,
-                                       final Consumer<Boolean> setting )
+    protected void enableOnAbsentOption( final CommandLine commandLine,
+                                         final char option,
+                                         final Consumer<Boolean> setting )
     {
         if ( !commandLine.hasOption( option ) )
         {
@@ -1709,7 +1708,7 @@ public class MavenCli
         }
     }
 
-    int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
+    protected int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
     {
         int procs = Runtime.getRuntime().availableProcessors();
         return (int) ( Float.parseFloat( threadConfiguration.replace( "C", "" ) ) * procs );
@@ -1719,7 +1718,7 @@ public class MavenCli
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
+    protected void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
     {
         EnvironmentUtils.addEnvVars( systemProperties );
 
@@ -1758,7 +1757,7 @@ public class MavenCli
         systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
-    private static void setCliProperty( String property, Properties properties )
+    protected void setCliProperty( String property, Properties properties )
     {
         String name;
 

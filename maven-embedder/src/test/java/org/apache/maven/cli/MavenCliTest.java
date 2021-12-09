@@ -20,8 +20,6 @@ package org.apache.maven.cli;
  */
 
 import static java.util.Arrays.asList;
-import static org.apache.maven.cli.MavenCli.performProfileActivation;
-import static org.apache.maven.cli.MavenCli.performProjectActivation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -101,20 +99,21 @@ public class MavenCliTest
         final Options options = new Options();
         options.addOption( Option.builder( Character.toString( CLIManager.ACTIVATE_PROFILES ) ).hasArg().build() );
 
+        MavenCli cli = new MavenCli();
         ProfileActivation activation;
 
         activation = new ProfileActivation();
-        performProfileActivation( parser.parse( options, new String[]{ "-P", "test1,+test2,?test3,+?test4" } ), activation );
+        cli.performProfileActivation( parser.parse( options, new String[]{ "-P", "test1,+test2,?test3,+?test4" } ), activation );
         assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
         assertThat( activation.getOptionalActiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
 
         activation = new ProfileActivation();
-        performProfileActivation( parser.parse( options, new String[]{ "-P", "!test1,-test2,-?test3,!?test4" } ), activation );
+        cli.performProfileActivation( parser.parse( options, new String[]{ "-P", "!test1,-test2,-?test3,!?test4" } ), activation );
         assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
         assertThat( activation.getOptionalInactiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
 
         activation = new ProfileActivation();
-        performProfileActivation( parser.parse( options, new String[]{ "-P", "-test1,+test2" } ), activation );
+        cli.performProfileActivation( parser.parse( options, new String[]{ "-P", "-test1,+test2" } ), activation );
         assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test2" ) );
         assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1" ) );
     }
@@ -127,20 +126,21 @@ public class MavenCliTest
         final Options options = new Options();
         options.addOption( Option.builder( CLIManager.PROJECT_LIST ).hasArg().build() );
 
+        MavenCli cli = new MavenCli();
         ProjectActivation activation;
 
         activation = new ProjectActivation();
-        performProjectActivation( parser.parse( options, new String[]{ "-pl", "test1,+test2,?test3,+?test4" } ), activation );
+        cli.performProjectActivation( parser.parse( options, new String[]{ "-pl", "test1,+test2,?test3,+?test4" } ), activation );
         assertThat( activation.getRequiredActiveProjectSelectors(), containsInAnyOrder( "test1", "test2" ) );
         assertThat( activation.getOptionalActiveProjectSelectors(), containsInAnyOrder( "test3", "test4" ) );
 
         activation = new ProjectActivation();
-        performProjectActivation( parser.parse( options, new String[]{ "-pl", "!test1,-test2,-?test3,!?test4" } ), activation );
+        cli.performProjectActivation( parser.parse( options, new String[]{ "-pl", "!test1,-test2,-?test3,!?test4" } ), activation );
         assertThat( activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder( "test1", "test2" ) );
         assertThat( activation.getOptionalInactiveProjectSelectors(), containsInAnyOrder( "test3", "test4" ) );
 
         activation = new ProjectActivation();
-        performProjectActivation( parser.parse( options, new String[]{ "-pl", "-test1,+test2" } ), activation );
+        cli.performProjectActivation( parser.parse( options, new String[]{ "-pl", "-test1,+test2" } ), activation );
         assertThat( activation.getRequiredActiveProjectSelectors(), containsInAnyOrder( "test2" ) );
         assertThat( activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder( "test1" ) );
     }
