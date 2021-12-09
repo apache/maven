@@ -36,11 +36,16 @@ public class Slf4jLoggerManager
     implements LoggerManager
 {
 
-    private ILoggerFactory loggerFactory;
+    private final ILoggerFactory loggerFactory;
 
     public Slf4jLoggerManager()
     {
-        loggerFactory = LoggerFactory.getILoggerFactory();
+        this( LoggerFactory.getILoggerFactory() );
+    }
+
+    public Slf4jLoggerManager( ILoggerFactory loggerFactory )
+    {
+        this.loggerFactory = loggerFactory;
     }
 
     public Logger getLoggerForComponent( String role )
@@ -55,9 +60,7 @@ public class Slf4jLoggerManager
      */
     public Logger getLoggerForComponent( String role, String hint )
     {
-        return ( null == hint
-            ? getLoggerForComponent( role )
-            : new Slf4jLogger( loggerFactory.getLogger( role + '.' + hint ) ) );
+        return getLoggerForComponent( hint != null ? role + "." + hint : role );
     }
 
     //

@@ -20,7 +20,7 @@ package org.apache.maven.execution;
  */
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -319,7 +319,7 @@ public class MavenSession
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
                          MavenProject project )
     {
-        this( container, request, result, Arrays.asList( new MavenProject[]{project} ) );
+        this( container, request, result, Collections.singletonList( project ) );
     }
 
     @Deprecated
