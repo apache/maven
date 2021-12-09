@@ -284,7 +284,6 @@ public class MavenCli
         }
     }
 
-    // TODO need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
         PlexusContainer localContainer = null;

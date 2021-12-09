@@ -54,7 +54,7 @@ public class CliRequest
 
     MavenExecutionRequest request;
 
-    CliRequest( String[] args, ClassWorld classWorld )
+    public CliRequest( String[] args, ClassWorld classWorld )
     {
         this.args = args;
         this.classWorld = classWorld;
