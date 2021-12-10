@@ -704,7 +704,7 @@ public class MavenCli
         List<CoreExtension> extensionsDesc = loadCoreExtensionsDescriptors( cliRequest.multiModuleProjectDirectory );
 
         List<CoreExtensionEntry> extensions =
-            loadCoreExtensions( extensionsDesc, coreRealm, coreEntry.getExportedArtifacts() );
+            loadCoreExtensions( cliRequest, extensionsDesc, coreRealm, coreEntry.getExportedArtifacts() );
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
@@ -812,6 +812,7 @@ public class MavenCli
     }
 
     protected List<CoreExtensionEntry> loadCoreExtensions(
+                CliRequest cliRequest,
                 List<CoreExtension> extensions,
                 ClassRealm containerRealm,
                 Set<String> providedArtifacts )
@@ -843,9 +844,6 @@ public class MavenCli
 
             try
             {
-                CliRequest cliRequest = new CliRequest( new String[0], classWorld );
-                cliRequest.commandLine = new CommandLine.Builder().build();
-
                 container.setLookupRealm( null );
 
                 container.setLoggerManager( plexusLoggerManager );
@@ -853,6 +851,8 @@ public class MavenCli
                 container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
                 Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
+
+                executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
 
                 configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
 
