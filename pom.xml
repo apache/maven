@@ -30,12 +30,12 @@ under the License.
         <relativePath/>
     </parent>
 
-    <groupId>org.apache.maven.caching</groupId>
-    <artifactId>maven-caching</artifactId>
+    <groupId>org.apache.maven.extensions</groupId>
+    <artifactId>maven-caching-extension</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
-    <name>Apache Maven Caching</name>
+    <name>Apache Maven Caching Extension</name>
     <inceptionYear>2021</inceptionYear>
 
     <properties>
@@ -67,263 +67,105 @@ under the License.
         <project.build.outputTimestamp>2021-04-05T08:12:18Z</project.build.outputTimestamp>
     </properties>
 
-    <modules>
-        <module>maven-caching-extension</module>
-    </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.maven.caching</groupId>
-                <artifactId>maven-caching-extension</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-bom</artifactId>
-                <version>${maven4Version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4jVersion}</version>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.1</version>
-                <optional>true</optional>
-            </dependency>
-            <!--  Wagon -->
-            <dependency>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-provider-api</artifactId>
-                <version>${wagonVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-file</artifactId>
-                <version>${wagonVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-http</artifactId>
-                <version>${wagonVersion}</version>
-                <classifier>shaded</classifier>
-            </dependency>
-            <!--  Repository -->
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-api</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-spi</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-impl</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-util</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-connector-basic</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.resolver</groupId>
-                <artifactId>maven-resolver-transport-wagon</artifactId>
-                <version>${resolverVersion}</version>
-            </dependency>
-            <!--  Commons -->
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${commonsCliVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-jxpath</groupId>
-                <artifactId>commons-jxpath</artifactId>
-                <version>${jxpathVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commonsLangVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-sec-dispatcher</artifactId>
-                <version>${securityDispatcherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-utils</artifactId>
-                <version>${plexusUtilsVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-cipher</artifactId>
-                <version>${cipherVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockitoVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.xmlunit</groupId>
-                <artifactId>xmlunit-assertj</artifactId>
-                <version>${xmlunitVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.xmlunit</groupId>
-                <artifactId>xmlunit-core</artifactId>
-                <version>${xmlunitVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.xmlunit</groupId>
-                <artifactId>xmlunit-matchers</artifactId>
-                <version>${xmlunitVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>2.2</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-testing</artifactId>
-                <version>1.0.0</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <type>pom</type>
-                <version>${junitVersion}</version>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-        <!--bootstrap-start-comment-->
-    </dependencyManagement>
-    <!--bootstrap-end-comment-->
-    <!--bootstrap-start-comment-->
     <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven4Version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>zero-allocation-hashing</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.albfernandez</groupId>
+            <artifactId>juniversalchardet</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commonsLangVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>${plexusUtilsVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-http</artifactId>
+            <version>${wagonVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-util</artifactId>
+            <version>${resolverVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-verifier</artifactId>
+            <version>1.7.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <!--bootstrap-end-comment-->
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M5</version>
-                    <configuration>
-                        <argLine>-Xmx256m --add-exports java.base/sun.nio.ch=ALL-UNNAMED</argLine>
-                        <environmentVariables>
-                            <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
-                        </environmentVariables>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.rat</groupId>
-                    <artifactId>apache-rat-plugin</artifactId>
-                    <configuration>
-                        <excludes>
-                            <exclude>.asf.yaml</exclude>
-                            <exclude>src/test/resources*/**</exclude>
-                            <exclude>src/test/projects/**</exclude>
-                            <exclude>src/test/remote-repo/**</exclude>
-                            <exclude>build/maven-header.txt</exclude>
-                            <exclude>.gitmodules</exclude>
-                            <exclude>maven/**</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>net.revelc.code.formatter</groupId>
-                    <artifactId>formatter-maven-plugin</artifactId>
-                    <version>${formatter-maven-plugin.version}</version>
-                    <configuration>
-                        <configFile>${maven.multiModuleProjectDirectory}/build/eclipse-formatter-config.xml</configFile>
-                        <skip>${format.skip}</skip>
-                        <lineEnding>KEEP</lineEnding>
-                        <cachedir>${project.build.directory}/cache</cachedir>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>net.revelc.code</groupId>
-                    <artifactId>impsort-maven-plugin</artifactId>
-                    <version>${impsort-maven-plugin.version}</version>
-                    <configuration>
-                        <removeUnused>true</removeUnused>
-                        <staticAfter>true</staticAfter>
-                        <lineEnding>KEEP</lineEnding>
-                        <skip>${format.skip}</skip>
-                        <cachedir>${project.build.directory}/cache</cachedir>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.codehaus.plexus</groupId>
-                            <artifactId>plexus-utils</artifactId>
-                            <version>3.4.1</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>.asf.yaml</exclude>
+                        <exclude>src/test/resources*/**</exclude>
+                        <exclude>src/test/projects/**</exclude>
+                        <exclude>src/test/remote-repo/**</exclude>
+                        <exclude>src/build/maven-header.txt</exclude>
+                        <exclude>.gitmodules</exclude>
+                        <exclude>maven/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
+                <version>${formatter-maven-plugin.version}</version>
+                <configuration>
+                    <configFile>${maven.multiModuleProjectDirectory}/src/build/eclipse-formatter-config.xml</configFile>
+                    <skip>${format.skip}</skip>
+                    <lineEnding>KEEP</lineEnding>
+                    <cachedir>${project.build.directory}/cache</cachedir>
+                </configuration>
                 <executions>
                     <execution>
                         <id>format</id>
@@ -337,6 +179,21 @@ under the License.
             <plugin>
                 <groupId>net.revelc.code</groupId>
                 <artifactId>impsort-maven-plugin</artifactId>
+                <version>${impsort-maven-plugin.version}</version>
+                <configuration>
+                    <removeUnused>true</removeUnused>
+                    <staticAfter>true</staticAfter>
+                    <lineEnding>KEEP</lineEnding>
+                    <skip>${format.skip}</skip>
+                    <cachedir>${project.build.directory}/cache</cachedir>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-utils</artifactId>
+                        <version>3.4.1</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>sort-imports</id>
@@ -374,8 +231,8 @@ under the License.
                 <version>3.1.2</version>
                 <configuration>
                     <violationSeverity>info</violationSeverity>
-                    <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>
-                    <headerLocation>${maven.multiModuleProjectDirectory}/build/maven-header.txt</headerLocation>
+                    <suppressionsLocation>${maven.multiModuleProjectDirectory}/src/build/checkstyle-suppressions.xml</suppressionsLocation>
+                    <headerLocation>${maven.multiModuleProjectDirectory}/src/build/maven-header.txt</headerLocation>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -389,6 +246,98 @@ under the License.
                         <version>3</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.modello</groupId>
+                <artifactId>modello-maven-plugin</artifactId>
+                <configuration>
+                    <models>
+                        <model>src/main/mdo/cache-config.mdo</model>
+                        <model>src/main/mdo/cache-build.mdo</model>
+                        <model>src/main/mdo/cache-diff.mdo</model>
+                        <model>src/main/mdo/cache-report.mdo</model>
+                    </models>
+                    <version>1.0.0</version>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>modello-cache</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xpp3-reader</goal>
+                            <goal>xpp3-writer</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>modello-cache-xsd</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>xsd</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/generated-resources/modello</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/generated-resources/modello</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>-Xmx256m --add-exports java.base/sun.nio.ch=ALL-UNNAMED</argLine>
+                    <environmentVariables>
+                        <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
+                    </environmentVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>**/its/**</excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>**/its/**</includes>
+                            <systemPropertyVariables>
+                                <project.version>${project.version}</project.version>
+                                <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
