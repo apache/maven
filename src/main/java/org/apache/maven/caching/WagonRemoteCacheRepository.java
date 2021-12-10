@@ -569,7 +569,7 @@ public class WagonRemoteCacheRepository implements RemoteCacheRepository
 
     private File createTempFile() throws IOException
     {
-        return File.createTempFile( "maven-caching-", ".temp" );
+        return File.createTempFile( "maven-build-cache-", ".temp" );
     }
 
     @SuppressWarnings( "ResultOfMethodCallIgnored" )

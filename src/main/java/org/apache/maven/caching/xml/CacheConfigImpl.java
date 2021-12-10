@@ -126,7 +126,8 @@ public class CacheConfigImpl implements org.apache.maven.caching.xml.CacheConfig
                 }
                 else
                 {
-                    configPath = getMultimoduleRoot( session ).resolve( ".mvn" ).resolve( "maven-cache-config.xml" );
+                    configPath = getMultimoduleRoot( session ).resolve( ".mvn" )
+                            .resolve( "maven-build-cache-config.xml" );
                 }
 
                 if ( !Files.exists( configPath ) )

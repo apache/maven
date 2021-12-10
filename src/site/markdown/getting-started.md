@@ -36,7 +36,7 @@ To on-board incremental Maven you need to complete several steps:
 
 ### Adding cache config
 
-Copy [default config `maven-cache-config.xml`](maven-cache-config.xml)
+Copy [default config `maven-build-cache-config.xml`](../resources/maven-build-cache-config.xml)
 to [`.mvn/`](https://maven.apache.org/configure.html) directory of your project.  
 To get overall understanding of cache machinery it is recommended to review the config and read comments. In typical
 scenario you need to adjust:

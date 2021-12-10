@@ -23,7 +23,7 @@ under the License.
        xml.schemaLocation="http://maven.apache.org/xsd/cache-config-${version}.xsd">
     <id>cache-config</id>
     <name>CacheConfig</name>
-    <description><![CDATA[Maven Incremental Build and Cache configuration, stored in <code>.mvn/maven-cache-config.xml</code>
+    <description><![CDATA[Maven Incremental Build and Cache configuration, stored in <code>.mvn/maven-build-cache-config.xml</code>
   ]]></description>
 
     <defaults>

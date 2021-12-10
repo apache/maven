@@ -33,7 +33,7 @@
         <extensions>
             <extension>
                 <groupId>org.apache.maven.extensions</groupId>
-                <artifactId>maven-caching-extension</artifactId>
+                <artifactId>maven-build-cache-extension</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </extension>
         </extensions>

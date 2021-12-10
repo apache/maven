@@ -32,7 +32,7 @@ should give noticeable benefits in medium and small sized projects as well.
 
 ### Cache concepts
 
-Idea of Incremental Maven is to calculate key from module inputs, store outputs in cache and restore them later
+The idea of the build cache is to calculate key from module inputs, store outputs in cache and restore them later
 transparently to the standard Maven core. In order to calculate the key cache engine analyzes source code, build flow,
 plugins and their parameters. This allows to deterministically associate each project state with unique key and restore
 up-to-date (not changed) projects from cache and rebuild out-of-date(changed) ones. Restoring artifacts associated with
@@ -67,7 +67,7 @@ with some tolerance (implementation, configuration and environment driven).
 
 ### Implementation insights
 
-At very simple form, the incremental Maven is essentially a hash function which takes Maven project and produces cache
+At very simple form, the build cache Maven is essentially a hash function which takes Maven project and produces cache
 key for a project. Then the key is used to store and restore build results. Because of different factors there could be
 collisions and instabilities in the produced key. Collision could happen if the same key produced from the semantically
 different build states and will result in unintended reuse. Instability means that same input yields different key in
@@ -104,7 +104,7 @@ still build owner's responsibility to verify build outcomes.
 Given all the information above, the Incremental Maven is recommended to use in scenarios when productivity and
 performance are in priority. Typical cases are:
 
-* Continuous integration. In conjunction with remote cache incremental Maven could drastically reduce build times,
+* Continuous integration. In conjunction with remote cache, the extension could drastically reduce build times,
   validate pull requests faster and reduce load on CI nodes
 * Speedup developer builds. By reusing cached builds developers could verify changes much faster and be more productive.
   No more `-DskipTests` and similar.

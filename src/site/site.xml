@@ -48,7 +48,7 @@ under the License.
     </menu>
 
     <menu name="Reference">
-      <item name="maven-cache-config.xml" href="cache-config.html"/>
+      <item name="maven-build-cache-config.xml" href="cache-config.html"/>
     </menu>
 
     <menu name="Cache Internals">
