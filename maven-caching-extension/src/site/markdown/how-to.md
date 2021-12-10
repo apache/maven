@@ -22,7 +22,7 @@ understand how it works and figure out your optimal config
 
 ### Minimal config
 
-Absolutely minimal config which enables incremental Maven with local cache
+Absolutely minimal config
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -87,7 +87,7 @@ add additional directories with `<include>`. Also you can filter out undesirable
     </input>
 ```
 
-### Plugin property is env specific (breaks checksum and caching)
+### Plugin property is env specific and yields different cache key in different environments
 
 Consider to exclude env specific properties:
 
@@ -108,7 +108,7 @@ Consider to exclude env specific properties:
     </input>
 ```
 
-Implications - builds with different `argLine` will have identical checksum. Validate that is semantically valid.
+Implications - builds with different `argLine` will have identical key. Validate that is semantically valid.
 
 ### Plugin property points to directory where only subset of files is relevant
 
