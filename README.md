@@ -15,12 +15,20 @@
  limitations under the License.
 -->
 Apache Maven Build Cache Extension
-====================
+==================================
 
-Incremental Build and Cache
--------------
-This project provides an Incremental Build and Caching features which calculates out-of-date modules in the build dependencies graph and improves build times by avoiding re-building unnecessary modules.
-Read [cache guide](src/site/markdown/CACHE.md) for more details.
+This project provides a Build Cache Extension feature which calculates out-of-date modules in the build dependencies graph and improves build times by avoiding re-building unnecessary modules.
+Read [cache guide](src/site/markdown/cache.md) for more details.
+
+Building
+--------
+The code currently relies on un-released modifications in the core Maven project.  Two submodules are included in this git repository to allow building the needed distributions and perform integration tests using those.
+
+In order to build those distributions, you first need to launch once the `build-maven.sh` script or the following command in the `maven/maven3` and `maven/maven4` directories:
+```
+mvn install -DskipTests -P versionlessMavenDist
+```
+This will build the custom distributions of maven.
 
 License
 -------

@@ -87,7 +87,7 @@ public class IntegrationTestExtension implements BeforeAllCallback, TestTemplate
         if ( !Files.exists( maven3Zip ) )
         {
             throw new IllegalStateException( "Unable to find " + maven3Zip + "\n"
-                    + "Please build the maven3 and maven4 distributions using the run-its.sh script" );
+                    + "Please build the maven3 and maven4 distributions using the build-maven.sh script" );
         }
         Path outMaven3 = Paths.get( "target/maven3" );
         deleteDir( outMaven3 );
@@ -101,7 +101,7 @@ public class IntegrationTestExtension implements BeforeAllCallback, TestTemplate
         if ( !Files.exists( maven4Zip ) )
         {
             throw new IllegalStateException( "Unable to find " + maven4Zip + "\n"
-                    + "Please build the maven3 and maven4 distributions using the run-its.sh script" );
+                    + "Please build the maven3 and maven4 distributions using the build-maven.sh script" );
         }
         Path outMaven4 = Paths.get( "target/maven4" );
         deleteDir( outMaven4 );
