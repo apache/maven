@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.caching.junit;
+package org.apache.maven.caching.its.junit;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -31,7 +31,6 @@ import java.util.stream.Stream;
 import org.apache.maven.caching.CacheUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -62,12 +61,12 @@ public class IntegrationTestExtension implements BeforeAllCallback, TestTemplate
     public boolean supportsTestTemplate( ExtensionContext context )
     {
         return context.getTestMethod()
-                .filter( m -> m.isAnnotationPresent( org.apache.maven.caching.junit.Test.class ) )
+                .filter( m -> m.isAnnotationPresent( Test.class ) )
                 .isPresent();
     }
 
     @Override
-    public java.util.stream.Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
+    public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
             ExtensionContext extensionContext )
     {
         Method m = extensionContext.getRequiredTestMethod();

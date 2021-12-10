@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.caching;
+package org.apache.maven.caching.its;
 
-import org.apache.maven.caching.junit.IntegrationTest;
-import org.apache.maven.caching.junit.Test;
+import org.apache.maven.caching.its.junit.IntegrationTest;
+import org.apache.maven.caching.its.junit.Test;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 

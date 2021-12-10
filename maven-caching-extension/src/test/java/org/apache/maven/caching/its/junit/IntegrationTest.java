@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.caching.junit;
+package org.apache.maven.caching.its.junit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

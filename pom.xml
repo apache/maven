@@ -69,7 +69,6 @@ under the License.
 
     <modules>
         <module>maven-caching-extension</module>
-        <module>maven-caching-its</module>
     </modules>
 
     <dependencyManagement>

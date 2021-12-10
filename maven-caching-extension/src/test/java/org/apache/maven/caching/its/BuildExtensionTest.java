@@ -16,20 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.caching.junit;
+package org.apache.maven.caching.its;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.apache.maven.caching.its.junit.IntegrationTest;
+import org.apache.maven.caching.its.junit.Test;
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
 
-@ExtendWith( IntegrationTestExtension.class )
-@TestTemplate
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.METHOD )
-public @interface Test
+@IntegrationTest( "src/test/projects/build-extension" )
+public class BuildExtensionTest
 {
+
+    @Test
+    void simple( Verifier verifier ) throws VerificationException
+    {
+        verifier.setAutoclean( false );
+
+        verifier.setLogFileName( "../log-1.txt" );
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
+
+        verifier.setLogFileName( "../log-2.txt" );
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
+        verifier.verifyTextInLog( "Found cached build, restoring from cache" );
+    }
 
 }
