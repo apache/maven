@@ -100,18 +100,18 @@ iteratively achieve working configuration.
 
 * Enable fail fast mode to fail build on the first discrepancy between
 * Provide reference to the CI build as a baseline for comparison between your local and remote builds. Go to the
-  reference CI build log and one of the final lines of the build should be a line about saving `cache-report.xml`
+  reference CI build log and one of the final lines of the build should be a line about saving `build-cache-report.xml`
 
 ```
-[INFO] [CACHE] Saved to remote cache https://your-cache-url/<...>/915296a3-4596-4eb5-bf37-f6e13ebe087e/cache-report.xml
+[INFO] [CACHE] Saved to remote cache https://your-cache-url/<...>/915296a3-4596-4eb5-bf37-f6e13ebe087e/build-cache-report.xml
 ```
 
-Copy the link to a `cache-report.xml` and provide it to your local build as a baseline for comparison.
+Copy the link to a `cbuild-ache-report.xml` and provide it to your local build as a baseline for comparison.
 
 * Run local build. Command line should look similar to this:
 
 ```bash
-mvn verify -Dremote.cache.failFast=true -Dremote.cache.baselineUrl=https://your-cache-url/<...>/915296a3-4596-4eb5-bf37-f6e13ebe087e/cache-report.xml
+mvn verify -Dremote.cache.failFast=true -Dremote.cache.baselineUrl=https://your-cache-url/<...>/915296a3-4596-4eb5-bf37-f6e13ebe087e/build-cache-report.xml
 ```
 
 Once discrepancy between remote and local builds detected cache will fail with diagnostic info in

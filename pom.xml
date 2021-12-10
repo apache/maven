@@ -260,10 +260,10 @@ under the License.
                 <artifactId>modello-maven-plugin</artifactId>
                 <configuration>
                     <models>
-                        <model>src/main/mdo/cache-config.mdo</model>
-                        <model>src/main/mdo/cache-build.mdo</model>
-                        <model>src/main/mdo/cache-diff.mdo</model>
-                        <model>src/main/mdo/cache-report.mdo</model>
+                        <model>src/main/mdo/build-cache-config.mdo</model>
+                        <model>src/main/mdo/build-cache-build.mdo</model>
+                        <model>src/main/mdo/build-cache-diff.mdo</model>
+                        <model>src/main/mdo/build-cache-report.mdo</model>
                     </models>
                     <version>1.0.0</version>
                 </configuration>
