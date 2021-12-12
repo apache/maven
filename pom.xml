@@ -31,11 +31,11 @@ under the License.
     </parent>
 
     <groupId>org.apache.maven.extensions</groupId>
-    <artifactId>maven-caching-extension</artifactId>
+    <artifactId>maven-build-cache-extension</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Apache Maven Caching Extension</name>
+    <name>Apache Maven Build Cache Extension</name>
     <inceptionYear>2021</inceptionYear>
 
     <properties>
@@ -66,6 +66,13 @@ under the License.
         <maven.site.path>ref/caching-LATEST</maven.site.path>
         <project.build.outputTimestamp>2021-04-05T08:12:18Z</project.build.outputTimestamp>
     </properties>
+
+    <distributionManagement>
+        <site>
+            <id>apache.website</id>
+            <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
+        </site>
+  </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -278,6 +285,14 @@ under the License.
                         <configuration>
                             <outputDirectory>${basedir}/target/generated-resources/modello</outputDirectory>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>modello-site-docs</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>xdoc</goal>
+                            <goal>xsd</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

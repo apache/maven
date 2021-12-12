@@ -19,5 +19,7 @@
 # under the License.
 #
 
+# git submodule update --init --recursive
+
 mvn package -DskipTests -P versionlessMavenDist -f "maven/maven3" || exit $?
 mvn package -DskipTests -P versionlessMavenDist -f "maven/maven4" || exit $?

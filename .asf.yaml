@@ -1,10 +1,9 @@
 # see https://s.apache.org/asfyaml
 github:
-  description: "Apache Maven core"
-  homepage: https://maven.apache.org/ref/current
+  description: "Apache Maven Build Cache Extension"
+  homepage: https://maven.apache.org/ref/caching
   labels:
     - java
     - build-management
     - apache-maven
     - maven
-    - hacktoberfest
