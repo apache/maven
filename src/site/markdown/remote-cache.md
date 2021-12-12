@@ -15,13 +15,13 @@
  limitations under the License.
 -->
 
-# Overview
+## Overview
 
 This document describes generic approach to remote cache setup. The process implies good knowledge of both Maven and the
 project. Due to Maven model limitation the process is semi-manual, but allows you to achieve sufficient control and
 transparency over caching logic.
 
-## Before you start
+### Before you start
 
 Before you start, please keep in mind basic principles:
 
@@ -36,21 +36,21 @@ Before you start, please keep in mind basic principles:
   tests ensure that critical surefire parameters are tracked (`skipTests` and similar) in config. The same applies for
   all over plugins.
 
-# Step-By-Step
+## Step-By-Step
 
-## Minimize number of moving parts
+### Minimize number of moving parts
 
 * Run build with single threaded builder to make sure logs from different modules do not interfere
 * Use the same branch which no-one else commits to
 * Designate single agent/node for CI builds
 * Preferably use the same OS between CI and local machine
 
-## Fork branch for cache setup purposes
+### Fork branch for cache setup purposes
 
 Fork stable code branch for cache setup purposes as you will need source code which doesn't change over time of setup.
 Also, you likely will need to do code changes as long as you go.
 
-## Setup http server to store artifacts
+### Setup http server to store artifacts
 
 In order to share build results cache needs a shared storage. The simplest option is to set up a http server which
 supports http PUT/GET/HEAD operations will suffice (Nginx, Apache or similar). Add the url to config and
@@ -73,13 +73,13 @@ Beside the http server, remote cache could be configured using any storage which
 by [Maven Wagon](https://maven.apache.org/wagon/). That includes a wide set of options, including SSH, FTP and many
 others. See Wagon documentation for a full list of options and other details.
 
-## Build selection
+### Build selection
 
 Build stored in cache ideally should be a build assembled in the most correct, comprehensive and complete way. Pull
 requests builds are good candidates to populate cache usually because this is there quality safeguards are applied
 normally.
 
-## CI Build setup to seed shared cache
+### CI Build setup to seed shared cache
 
 Allow writes in remote cache add jvm property to designated CI builds.
 
@@ -90,7 +90,7 @@ Allow writes in remote cache add jvm property to designated CI builds.
 Run the build, review log and ensure that artifacts are uploaded to remote cache. Now, rerun build and ensure that it
 completes almost instantly because it is fully cached.
 
-## Remote cache relocation to local builds
+### Remote cache relocation to local builds
 
 As practice shows, developers often don't realize that builds they run in local and CI environments are different. So
 straightforward attempt to reuse remote cache in local build usually results in cache misses because of difference in
@@ -127,15 +127,15 @@ Review `buildsdiff.xml` file and eliminate detected discrepancies. You can also 
 low level insights. See techniques to configure cache in [How-To](how-to.md) and troubleshooting of typical issues
 in the section below.
 
-# Common issues
+## Common issues
 
-## Issue 1: Local checkout is with different line endings
+### Issue 1: Local checkout is with different line endings
 
 Solution: normalise line endings. Current implementation doesn't have built-in line endings normalization, it has to be
 done externally. In git it is recommended to use `.gitattributes` file to establish consistent line endings across all
 envs for file types specific to this project
 
-## Issue 2: Effective poms mismatch because of plugins injection by profiles
+### Issue 2: Effective poms mismatch because of plugins injection by profiles
 
 Different profiles between remote and local builds likely result in different text of effective poms. As effective pom
 contributes hash value to the key that could lead to cache misses. Solution: instead of adding/removing specific plugins
@@ -191,7 +191,7 @@ Use:
 Hint: effective poms could be found in `buildinfo` files under `/build/projectsInputInfo/item[@type='pom']`
 xpath (`item type="pom"`).
 
-## Issue 3: Effective pom mismatch because of environment specific properties
+### Issue 3: Effective pom mismatch because of environment specific properties
 
 Potential reason: Sometimes it is not possible to avoid discrepancies in different environments - for example if plugin
 takes command line as parameter, it will be likely different on Win and linux. Such commands will appear in effective
@@ -211,7 +211,7 @@ filter out such properties from effective pom:
 </input>
 ```
 
-## Issue 4: Unexpected or transient files in cache key calculation
+### Issue 4: Unexpected or transient files in cache key calculation
 
 Potential reasons: plugins or tests emit temporary files (logs and similar) in non-standard locations. Solution: adjust
 global exclusions list to filter out the unexpected files:
@@ -224,7 +224,7 @@ global exclusions list to filter out the unexpected files:
 
 see sample config for exact syntax
 
-## Issue 5: Difference in tracked plugin properties
+### Issue 5: Difference in tracked plugin properties
 
 Tracked property in config means it is critical for determining is build up to date or not. Discrepancies could happen
 for any plugin for a number of reasons. Example: local build is using java target 1.6, remote: 1.8. `buildsdiff.xml`

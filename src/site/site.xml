@@ -25,26 +25,36 @@ under the License.
   <edit>${project.scm.url}</edit>
 
   <body>
+    <breadcrumbs>
+      <item name="Ref" href="../" />
+      <item name="Maven Build Cache Extension" href="./" />
+    </breadcrumbs>
+
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
       <item name="JavaDocs" href="apidocs/index.html"/>
       <item name="Source Xref" href="xref/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
-      <item name="maven-cache-config.xml" href="cache-config.html"/>
     </menu>
 
     <menu name="Documentation">
-      <item name="Overview" href="CACHE.html"/>
-      <item name="Howto" href="CACHE-HOWTO.html"/>
-      <item name="Parameters" href="CACHE-PARAMETERS.html"/>
-      <item name="Remote" href="CACHE-REMOTE.html"/>
+      <item name="Overview" href="cache.html"/>
+      <item name="Getting Started" href="getting-started.html"/>
+      <item name="Usage" href="usage.html"/>
+      <item name="Remote Cache Setup" href="remote-cache.html"/>
+      <item name="Howto" href="how-to.html"/>
+      <item name="Performance" href="performance.html"/>
+      <item name="Cache Parameters" href="parameters.html"/>
+    </menu>
+
+    <menu name="Reference">
+      <item name="maven-cache-config.xml" href="cache-config.html"/>
     </menu>
 
     <menu name="Cache Internals">
       <item name="buildinfo.xml" href="cache-build.html"/>
       <item name="diff-*.xml" href="cache-diff.html"/>
       <item name="cache-report.xml" href="cache-report.html"/>
-      <!--item name="FAQ" href="faq.html"/-->
     </menu>
 
     <menu ref="parent"/>

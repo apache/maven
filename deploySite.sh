@@ -19,5 +19,5 @@
 # under the License.
 #
 
-mvn -Preporting site site:stage "$@"
+mvn -Preporting site site:stage -Danimal.sniffer.skip "$@"
 mvn scm-publish:publish-scm "$@"

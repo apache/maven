@@ -15,7 +15,7 @@
  limitations under the License.
 -->
 
-### Overview
+## Overview
 
 Cache configuration provides you additional control over incremental Maven behavior. Follow it step by step to
 understand how it works and figure out your optimal config

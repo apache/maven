@@ -27,4 +27,4 @@ Maven Caching
 
  Maven Incremental Build and Cache (local and remote).
 
- Read {{{./CACHE.html} more documentation}}.
+ Read {{{./cache.html} more documentation}}.

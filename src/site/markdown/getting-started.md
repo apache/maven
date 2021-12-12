@@ -28,8 +28,8 @@ To on-board incremental Maven you need to complete several steps:
 
 ```xml
 <extension>
-    <groupId>org.apache.maven.caching</groupId>
-    <artifactId>maven-caching-extension</artifactId>
+    <groupId>org.apache.maven.extensions</groupId>
+    <artifactId>maven-build-cache-extension</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 </extension>
 ```

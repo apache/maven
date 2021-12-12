@@ -117,12 +117,12 @@ Such scheme allows to validate cache correctness by reconciling outcomes of cach
 
 ## See also
 
-* [Getting started](getting-started.md) - getting starting with cache and usage manual
-* [Usage](usage.md) - shared cache setup procedure
-* [Remote cache setup](remote-cache.md) - shared cache setup procedure
-* [How-To](how-to.md) - cookbook for typical scenarios
-* [Performance](performance.md) - performance tuning
-* [Cache Parameters](parameters.md) - description of supported parameters
+* [Getting started](getting-started.html) - getting starting with cache and usage manual
+* [Usage](usage.html) - shared cache setup procedure
+* [Remote cache setup](remote-cache.html) - shared cache setup procedure
+* [How-To](how-to.html) - cookbook for typical scenarios
+* [Performance](performance.html) - performance tuning
+* [Cache Parameters](parameters.html) - description of supported parameters
 * [Sample config file](maven-cache-config.xml)
 
 

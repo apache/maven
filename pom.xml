@@ -37,6 +37,7 @@ under the License.
 
     <name>Apache Maven Build Cache Extension</name>
     <inceptionYear>2021</inceptionYear>
+    <url>https://maven.apache.org/ref/caching/</url>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -72,7 +73,7 @@ under the License.
             <id>apache.website</id>
             <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
         </site>
-  </distributionManagement>
+    </distributionManagement>
 
     <dependencies>
         <dependency>

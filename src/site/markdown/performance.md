@@ -15,18 +15,18 @@
  limitations under the License.
 -->
 
-# Performance Tuning
+## Performance Tuning
 
 Various setup options which affect cache performance.
 
-## General notes
+### General notes
 
 Tuning of cache performance could reduce both resources consumption and build execution time but that is not guaranteed.
 In many scenarios build time of invalidated (changed) projects could be dominating in overall build time. Performance
 wins achieved by a faster cache engine might not correlate with final build times in straightforward way. As usual with
 performance, effect of performance optimizations should be carefully measured in relevant scenarios.
 
-## Hash algorithm selection
+### Hash algorithm selection
 
 By default, cache uses SHA-256 algorithm which is sufficiently fast and provides negligible probability of hash
 collisions. In projects with large codebase, performance of hash algorithms becomes more important and in such
@@ -43,7 +43,7 @@ or
 <hashAlgorithm>XXMM</hashAlgorithm>
 ```
 
-## Filter out unnecessary/huge artifacts
+### Filter out unnecessary/huge artifacts
 
 Price of uploading and downloading from cache of huge artifacts could be significant. In many scenarios assembling WAR,
 EAR or ZIP archive could be done more efficiently locally from cached JARs than storing bundles. In order to filter out
@@ -59,7 +59,7 @@ artifacts add configuration section:
 </cache>
 ```
 
-## Use lazy restore
+### Use lazy restore
 
 By default, cache tries to restore all artifacts for a project preemptively. Lazy restore could give a significant time
 and resources wins for remote cache by avoiding requesting and downloading unnecessary artifacts from cache. Use command
@@ -72,7 +72,7 @@ line flag:
 Note: In case of cache corruption lazy cache cannot fallback to normal execution, it will fail instead. To heal the
 corrupted cache need to force rewrite of the cache or remove corrupted cache entries manually
 
-## Disable project files restoration
+### Disable project files restoration
 
 By default, cache support partial restore of source code state from cached generated sources (and potentially more,
 depending on configuration). This could be helpful in local environment, but likely unnecessary and adds overhead in
@@ -82,7 +82,7 @@ continuous integration. To disable add command line flag
 -Dremote.cache.restoreGeneratedSources=false";
 ```
 
-## Disable post-processing of archives(JARs, WARs, etc) META-INF
+### Disable post-processing of archives(JARs, WARs, etc) META-INF
 
 Post-processing is disabled by default, but for some projects cache could be configured to auto-correct metadata (most
 notably [MANIFEST.MF `Implementation-Version`](https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Main_Attributes))
@@ -99,5 +99,3 @@ for the build (continuous integration, `verify` scenarios and similar) consider 
     ...
 </cache>
 ```
-
-

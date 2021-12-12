@@ -15,11 +15,11 @@
  limitations under the License.
 -->
 
-# Overview
+## Build Cache Parameters
 
 This documents contains various configuration parameters supported by cache engine
 
-## Command line flags
+### Command line flags
 
 | Parameter   | Description | Usage Scenario |
 | ----------- | ----------- | ----------- |
@@ -32,7 +32,7 @@ This documents contains various configuration parameters supported by cache engi
 | `-Dremote.cache.lazyRestore=(true/false)`             | Restore artifacts from remote cache lazily                    | Performance optimization |
 | `-Dremote.cache.restoreGeneratedSources=(true/false)` | Do not restore generated sources and directly attached files  | Performance optimization |
 
-## Project level properties
+### Project level properties
 
 Project level parameters allow overriding global parameters on project level Must be specified as project properties:
 
