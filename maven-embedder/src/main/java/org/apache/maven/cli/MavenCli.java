@@ -695,10 +695,10 @@ public class MavenCli
 
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom( coreRealm );
 
-        List<CoreExtension> extensionsDesc = loadCoreExtensionsDescriptors( cliRequest.multiModuleProjectDirectory );
+        List<CoreExtension> extensionsDesc = loadCoreExtensions( cliRequest.multiModuleProjectDirectory );
 
         List<CoreExtensionEntry> extensions =
-            loadCoreExtensions( cliRequest, extensionsDesc, coreRealm, coreEntry.getExportedArtifacts() );
+            loadCoreExtensionEntries( cliRequest, extensionsDesc, coreRealm, coreEntry.getExportedArtifacts() );
 
         ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
@@ -780,7 +780,7 @@ public class MavenCli
         };
     }
 
-    protected List<CoreExtension> loadCoreExtensionsDescriptors( File multiModuleProjectDirectory )
+    protected List<CoreExtension> loadCoreExtensions( File multiModuleProjectDirectory )
     {
         if ( multiModuleProjectDirectory == null )
         {
@@ -805,7 +805,7 @@ public class MavenCli
         return Collections.emptyList();
     }
 
-    protected List<CoreExtensionEntry> loadCoreExtensions(
+    protected List<CoreExtensionEntry> loadCoreExtensionEntries(
                 CliRequest cliRequest,
                 List<CoreExtension> extensions,
                 ClassRealm containerRealm,
