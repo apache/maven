@@ -40,12 +40,7 @@ public class Slf4jLoggerManager
 
     public Slf4jLoggerManager()
     {
-        this( LoggerFactory.getILoggerFactory() );
-    }
-
-    public Slf4jLoggerManager( ILoggerFactory loggerFactory )
-    {
-        this.loggerFactory = loggerFactory;
+        this.loggerFactory = LoggerFactory.getILoggerFactory();
     }
 
     public Logger getLoggerForComponent( String role )
