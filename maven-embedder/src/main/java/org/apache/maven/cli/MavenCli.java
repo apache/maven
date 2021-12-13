@@ -1839,7 +1839,7 @@ public class MavenCli
         System.setProperty( name, value );
     }
 
-    static class ExitException
+    protected static class ExitException
         extends Exception
     {
         int exitCode;
