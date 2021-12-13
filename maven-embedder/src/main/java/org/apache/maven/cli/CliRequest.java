@@ -116,8 +116,58 @@ public class CliRequest
         return request;
     }
 
+    public void setArgs( String[] args )
+    {
+        this.args = args;
+    }
+
+    public void setCommandLine( CommandLine commandLine )
+    {
+        this.commandLine = commandLine;
+    }
+
+    public void setClassWorld( ClassWorld classWorld )
+    {
+        this.classWorld = classWorld;
+    }
+
+    public void setWorkingDirectory( String workingDirectory )
+    {
+        this.workingDirectory = workingDirectory;
+    }
+
+    public void setMultiModuleProjectDirectory( File multiModuleProjectDirectory )
+    {
+        this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+    }
+
+    public void setVerbose( boolean verbose )
+    {
+        this.verbose = verbose;
+    }
+
+    public void setQuiet( boolean quiet )
+    {
+        this.quiet = quiet;
+    }
+
+    public void setShowErrors( boolean showErrors )
+    {
+        this.showErrors = showErrors;
+    }
+
     public void setUserProperties( Properties properties )
     {
         this.userProperties.putAll( properties );
+    }
+
+    public void setSystemProperties( Properties systemProperties )
+    {
+        this.systemProperties = systemProperties;
+    }
+
+    public void setRequest( MavenExecutionRequest request )
+    {
+        this.request = request;
     }
 }
