@@ -116,8 +116,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.util.Comparator.comparing;
 import static org.apache.maven.cli.CLIManager.COLOR;
@@ -151,10 +149,6 @@ public class MavenCli
     public static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
-
-    protected static final Pattern LAST_ANSI_SEQUENCE = Pattern.compile( "(\u001B\\[[;\\d]*[ -/]*[@-~])[^\u001B]*$" );
-
-    protected static final String ANSI_RESET = "\u001B\u005Bm";
 
     protected ClassWorld classWorld;
 
@@ -1235,41 +1229,20 @@ public class MavenCli
             }
         }
 
-        String[] lines = msg.split( "(\r\n)|(\r)|(\n)" );
-        String currentColor = "";
+        List<String> lines = org.apache.maven.cli.MessageUtils.splitLines( msg );
 
-        for ( int i = 0; i < lines.length; i++ )
+        for ( int i = 0; i < lines.size(); i++ )
         {
-            // add eventual current color inherited from previous line
-            String line = currentColor + lines[i];
-
-            // look for last ANSI escape sequence to check if nextColor
-            Matcher matcher = LAST_ANSI_SEQUENCE.matcher( line );
-            String nextColor = "";
-            if ( matcher.find() )
+            String line = lines.get( i );
+            if ( ( i == lines.size() - 1 ) && ( showErrors
+                    || ( summary.getException() instanceof InternalErrorException ) ) )
             {
-                nextColor = matcher.group( 1 );
-                if ( ANSI_RESET.equals( nextColor ) )
-                {
-                    // last ANSI escape code is reset: no next color
-                    nextColor = "";
-                }
-            }
-
-            // effective line, with indent and reset if end is colored
-            line = indent + line + ( "".equals( nextColor ) ? "" : ANSI_RESET );
-
-            if ( ( i == lines.length - 1 ) && ( showErrors
-                || ( summary.getException() instanceof InternalErrorException ) ) )
-            {
-                slf4jLogger.error( line, summary.getException() );
+                slf4jLogger.error( indent + line, summary.getException() );
             }
             else
             {
-                slf4jLogger.error( line );
+                slf4jLogger.error( indent + line );
             }
-
-            currentColor = nextColor;
         }
 
         indent += "  ";
