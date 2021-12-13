@@ -75,20 +75,4 @@ public class CLIManagerTest
         assertThat( properties[4], is( "2" ) );
         assertThat( properties, not( hasItemInArray( "test" ) ) );
     }
-
-    @Test
-    public void spacedOptions2()
-            throws Exception
-    {
-        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
-
-        assertTrue( cmdLine.hasOption( CLIManager.VERBOSE ) );
-
-        String[] properties = cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-        assertThat( properties[0], is( "x" ) );
-        assertThat( properties[1], is( "1" ) );
-        assertThat( properties[2], is( "y" ) );
-        assertThat( properties[3], is( "2" ) );
-        assertThat( properties, not( hasItemInArray( "test" ) ) );
-    }
 }
