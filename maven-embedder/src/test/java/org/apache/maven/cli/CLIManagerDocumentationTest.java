@@ -53,7 +53,7 @@ public class CLIManagerDocumentationTest
     private static class CLIManagerExtension
         extends CLIManager
     {
-        public Collection<Option> getOptions()
+        public List<Option> getOptionList()
         {
             List<Option> optList = new ArrayList<>( options.getOptions() );
             Collections.sort( optList, new OptionComparator() );
@@ -66,7 +66,7 @@ public class CLIManagerDocumentationTest
         StringBuilder sb = new StringBuilder( 512 );
         boolean a = true;
         sb.append( "<table border='1' class='zebra-striped'><tr class='a'><th><b>Options</b></th><th><b>Description</b></th></tr>" );
-        for ( Option option : new CLIManagerExtension().getOptions() )
+        for ( Option option : new CLIManagerExtension().getOptionList() )
         {
             a = !a;
             sb.append( "<tr class='" ).append( a ? 'a' : 'b' ).append( "'><td><code>-<a name='" );

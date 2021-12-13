@@ -115,7 +115,7 @@ public class CLIManager
     @Deprecated
     public static final String DEBUG = "debug";
 
-    protected Options options;
+    protected final Options options;
 
     @SuppressWarnings( "checkstyle:linelength" )
     public CLIManager()
@@ -161,6 +161,11 @@ public class CLIManager
 
         // Deprecated
         options.addOption( Option.builder().longOpt( DEBUG ).desc( "Produce execution verbose output (deprecated; only kept for backward compatibility)" ).build() );
+    }
+
+    public Options getOptions()
+    {
+        return options;
     }
 
     public CommandLine parse( String[] args )
