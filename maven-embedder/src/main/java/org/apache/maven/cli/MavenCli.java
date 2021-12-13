@@ -1844,7 +1844,7 @@ public class MavenCli
     {
         int exitCode;
 
-        ExitException( int exitCode )
+        public ExitException( int exitCode )
         {
             this.exitCode = exitCode;
         }
