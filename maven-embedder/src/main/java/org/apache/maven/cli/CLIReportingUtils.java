@@ -116,7 +116,7 @@ public final class CLIReportingUtils
         return ( s != null ? ( s.startsWith( "${" ) && s.endsWith( "}" ) ? null : s ) : null );
     }
 
-    static Properties getBuildProperties()
+    public static Properties getBuildProperties()
     {
         Properties properties = new Properties();
 
