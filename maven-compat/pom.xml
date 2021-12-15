@@ -33,6 +33,10 @@ under the License.
   <name>Maven Compat</name>
   <description>Maven2 classes maintained as compatibility layer.</description>
 
+  <properties>
+    <wagonVersion>3.5.1</wagonVersion>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -98,9 +102,22 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
     </dependency>
+
+    <!-- Wagon -->
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
+      <version>${wagonVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http</artifactId>
+      <version>${wagonVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+      <version>${wagonVersion}</version>
     </dependency>
 
     <dependency>
@@ -114,18 +131,18 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-file</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-connector-basic</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-wagon</artifactId>
+      <artifactId>maven-resolver-transport-file</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-http</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
