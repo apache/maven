@@ -122,16 +122,16 @@ public class ProjectBuilderTest
         assertEquals( 1, mavenProject.getArtifacts().size() );
 
         final MavenProject project = mavenProject;
-        final AtomicInteger artifactsResultInAnotherThead = new AtomicInteger();
+        final AtomicInteger artifactsResultInAnotherThread = new AtomicInteger();
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                artifactsResultInAnotherThead.set(project.getArtifacts().size());
+                artifactsResultInAnotherThread.set(project.getArtifacts().size());
             }
         });
         t.start();
         t.join();
-        assertEquals( project.getArtifacts().size(), artifactsResultInAnotherThead.get() );
+        assertEquals( project.getArtifacts().size(), artifactsResultInAnotherThread.get() );
     }
 
     public void testDontResolveDependencies()
