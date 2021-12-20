@@ -84,11 +84,11 @@ cd /d "%EXEC_DIR%"
 :endDetectBaseDir
 
 set "jvmConfig=\.mvn\jvm.config"
-if not exist "%MAVEN_PROJECTBASEDIR%%jvmConfig%" goto endReadAdditionalConfig
+if not exist "%MAVEN_PROJECTBASEDIR%%jvmConfig%" goto endReadJvmConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
 for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
 @endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
 
-:endReadAdditionalConfig
+:endReadJvmConfig
 
