@@ -1,5 +1,4 @@
 "%JAVACMD%" ^
-  %JVM_CONFIG_MAVEN_PROPS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
   -classpath %LAUNCHER_JAR% ^
