@@ -41,9 +41,9 @@ public class DefaultMojoExecutionConfigurator
     @Override
     public void configure( MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig )
     {
-        String g = mojoExecution.getGroupId();
+        String g = mojoExecution.getPlugin().getGroupId();
 
-        String a = mojoExecution.getArtifactId();
+        String a = mojoExecution.getPlugin().getArtifactId();
 
         Plugin plugin = findPlugin( g, a, project.getBuildPlugins() );
 
