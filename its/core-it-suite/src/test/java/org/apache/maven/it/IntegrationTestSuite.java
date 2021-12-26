@@ -148,7 +148,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6057CheckReactorOrderTest.class );
         suite.addTestSuite( MavenITmng5965ParallelBuildMultipliesWorkTest.class );
         suite.addTestSuite( MavenITmng5958LifecyclePhaseBinaryCompat.class );
-        suite.addTestSuite( MavenITmng5937MavenWrapper.class );
         suite.addTestSuite( MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest.class );
         suite.addTestSuite( MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest.class );
         suite.addTestSuite( MavenITmng5895CIFriendlyUsageWithPropertyTest.class );

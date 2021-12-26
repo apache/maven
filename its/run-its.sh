@@ -22,21 +22,7 @@
 # How I run the ITs from a clean slate. Though I do this with a primed Nexus instance. JvZ.
 # build maven core using -PversionlessMavenDist
 
-if [ -z "$MAVENCODEBASE" ] ; then
- echo Please export MAVENCODEBASE
-else
- case "$MAVENCODEBASE" in
-  /*) ;;
-  *) MAVENCODEBASE="$PWD/$MAVENCODEBASE" ;;
- esac
- mvn clean verify -P versionlessMavenDist -f "$MAVENCODEBASE" || exit $?
- if [ -f "$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar" ] ; then
-  mvn clean install -Prun-its,embedded -Dmaven.repo.local="`pwd`/repo" -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" -DwrapperDistroDir="$MAVENCODEBASE/apache-maven-wrapper/target" -DmavenWrapper="$MAVENCODEBASE/maven-wrapper/target/maven-wrapper.jar" || exit $?
- else
-  mvn clean install -Prun-its,embedded,!maven-wrapper -Dmaven.repo.local="`pwd`/repo" -DmavenDistro="$MAVENCODEBASE/apache-maven/target/apache-maven-bin.zip" || exit $?
- fi
-fi
-
+mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo
 
 # If behind a proxy try this
 

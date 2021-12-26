@@ -16,28 +16,10 @@
 @REM specific language governing permissions and limitations
 @REM under the License.
 @REM
-@ECHO OFF
-@IF  "%MAVENCODEBASE%"=="" (
- @ECHO Please SET MAVENCODEBASE / $env:MAVENCODEBASE
- @GOTO :eof
-)
 
-CALL :normalizePath %MAVENCODEBASE%
+@REM How JvZ runs the ITs from a clean slate if it would be on Windows
+
+mvn clean install -U -Prun-its,embedded -Dmaven.repo.local=%cd%\repo
 
 @REM If behind a proxy try this..
 @REM mvn clean install -Prun-its,embedded -Dmaven.repo.local=%cd%\repo -Dproxy.host=<host> -Dproxy.port=<port> -Dproxy.user= -Dproxy.pass= -Dproxy.nonProxyHosts=<hosts>
-
-:: ========== FUNCTIONS ==========
-
-CALL mvn clean verify -DdistributionFileName=${project.artifactId} -f "%_MAVENCODEBASE%" || exit /B
-
-if exist "%_MAVENCODEBASE%\maven-wrapper\target\maven-wrapper.jar" (
- CALL mvn clean install -Prun-its,embedded -Dmaven.repo.local="%cd%\repo" -DmavenDistro="%_MAVENCODEBASE%\apache-maven\target\apache-maven-bin.zip" -DwrapperDistroDir="%_MAVENCODEBASE%\apache-maven-wrapper\target" -DmavenWrapper="%_MAVENCODEBASE%\maven-wrapper\target\maven-wrapper.jar" || exit /B
-) else (
- CALL mvn clean install -Prun-its,embedded,!maven-wrapper -Dmaven.repo.local="%cd%\repo" -DmavenDistro="%_MAVENCODEBASE%\apache-maven\target\apache-maven-bin.zip" || exit /B
-)
-
-@GOTO :eof
-
-:normalizePath
- SET _MAVENCODEBASE=%~dpfn1
