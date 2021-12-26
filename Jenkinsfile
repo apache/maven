@@ -58,18 +58,10 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 invokerPublisher(disabled: true),
                 pipelineGraphPublisher(disabled: false)
             ], publisherStrategy: 'EXPLICIT') {
-                // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
-                sh "mvn clean"
-                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
+                sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist"
             }
             dir ('apache-maven/target') {
                 stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
-            }
-            dir ('apache-maven-wrapper/target') {
-                stash includes: 'apache-maven-wrapper-*.zip', name: 'maven-wrapper-dist'
-            }
-            dir ('maven-wrapper/target') {
-                stash includes: 'maven-wrapper.jar', name: 'wrapper-dist'
             }
         }
 
@@ -105,14 +97,12 @@ for (String os in runITsOses) {
                         }
                         dir('dists') {
                           unstash 'maven-dist'
-                          unstash 'maven-wrapper-dist'
-                          unstash 'wrapper-dist'
                         }
                         try {
                             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
                                 junitPublisher(ignoreAttachments: false)
                             ]) {
-                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore=true -DmavenWrapper=$WORK_DIR/dists/maven-wrapper.jar -DwrapperDistroDir=${WORK_DIR}/dists"
+                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore"
 
                                 if (isUnix()) {
                                     sh 'df -hT'
