@@ -59,8 +59,7 @@ under the License.
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuVersion>0.3.5</sisuVersion>
-    <wagonVersion>3.4.3</wagonVersion>
-    <jsoupVersion>1.12.1</jsoupVersion>
+    <wagonVersion>3.5.1</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
@@ -342,14 +341,6 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-      <!-- this is included in Wagon Http
-           we are just making the dependency explicit
-           in order to ease license attribution -->
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>${jsoupVersion}</version>
-    </dependency>
       <!--  Repository -->
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>

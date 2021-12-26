@@ -79,14 +79,6 @@ under the License.
         </exclusion>
       </exclusions>
     </dependency>
-    <!--  This is included in Wagon HTTP.
-          We are just making the dependency explicit
-          in order to ease license attribution -->
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
