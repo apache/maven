@@ -35,6 +35,7 @@ import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
 import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -233,6 +234,46 @@ class MetadataTest {
         Metadata source2 =
                 new Metadata(new MetadataStaxReader().read(new ByteArrayInputStream(baos.toByteArray()), true));
         assertNotNull(source2);
+    }
+
+    @Test
+    void testMergeWithEmptyMetadata() {
+        Metadata metadata = new Metadata();
+        Metadata newMetadata = new Metadata();
+        Assertions.assertFalse( metadata.merge( newMetadata ) );
+    }
+
+    @Test
+    void testMergeWithDifferentPrefixes() {
+        Metadata metadata = new Metadata();
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId( "myArtifactId" );
+        plugin.setName( "My Name" );
+        plugin.setPrefix( "myprefix" );
+        metadata.addPlugin( plugin );
+
+        Metadata newMetadata = new Metadata();
+        Plugin newPlugin = plugin.clone();
+        newPlugin.setArtifactId( "myNewArtifactId" );
+        plugin.setPrefix( "mynewprefix" );
+        newMetadata.addPlugin( newPlugin );
+        Assertions.assertTrue( metadata.merge( newMetadata ) );
+    }
+
+    @Test
+    void testMergeWithSamePrefixAndDifferentArtifactIds() {
+        Metadata metadata = new Metadata();
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId( "myArtifactId" );
+        plugin.setName( "My Name" );
+        plugin.setPrefix( "myprefix" );
+        metadata.addPlugin(plugin);
+
+        Metadata newMetadata = new Metadata();
+        Plugin newPlugin = plugin.clone();
+        newPlugin.setArtifactId( "myNewArtifactId" );
+        newMetadata.addPlugin( newPlugin );
+        Assertions.assertFalse( metadata.merge( newMetadata ) );
     }
 
     /*-- START helper methods to populate metadata objects ---*/
