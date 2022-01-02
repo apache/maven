@@ -30,6 +30,7 @@ under the License.
 
   <artifactId>maven-bom</artifactId>
   <version>4.0.0-alpha-1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
   <description>Bill Of Materials for Apache Maven dependencies</description>
