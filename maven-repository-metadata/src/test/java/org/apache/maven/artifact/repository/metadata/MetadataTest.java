@@ -240,40 +240,40 @@ class MetadataTest {
     void testMergeWithEmptyMetadata() {
         Metadata metadata = new Metadata();
         Metadata newMetadata = new Metadata();
-        Assertions.assertFalse( metadata.merge( newMetadata ) );
+        Assertions.assertFalse(metadata.merge(newMetadata));
     }
 
     @Test
     void testMergeWithDifferentPrefixes() {
         Metadata metadata = new Metadata();
         Plugin plugin = new Plugin();
-        plugin.setArtifactId( "myArtifactId" );
-        plugin.setName( "My Name" );
-        plugin.setPrefix( "myprefix" );
-        metadata.addPlugin( plugin );
+        plugin.setArtifactId("myArtifactId");
+        plugin.setName("My Name");
+        plugin.setPrefix("myprefix");
+        metadata.addPlugin(plugin);
 
         Metadata newMetadata = new Metadata();
         Plugin newPlugin = plugin.clone();
-        newPlugin.setArtifactId( "myNewArtifactId" );
-        plugin.setPrefix( "mynewprefix" );
-        newMetadata.addPlugin( newPlugin );
-        Assertions.assertTrue( metadata.merge( newMetadata ) );
+        newPlugin.setArtifactId("myNewArtifactId");
+        plugin.setPrefix("mynewprefix");
+        newMetadata.addPlugin(newPlugin);
+        Assertions.assertTrue(metadata.merge(newMetadata));
     }
 
     @Test
     void testMergeWithSamePrefixAndDifferentArtifactIds() {
         Metadata metadata = new Metadata();
         Plugin plugin = new Plugin();
-        plugin.setArtifactId( "myArtifactId" );
-        plugin.setName( "My Name" );
-        plugin.setPrefix( "myprefix" );
+        plugin.setArtifactId("myArtifactId");
+        plugin.setName("My Name");
+        plugin.setPrefix("myprefix");
         metadata.addPlugin(plugin);
 
         Metadata newMetadata = new Metadata();
         Plugin newPlugin = plugin.clone();
-        newPlugin.setArtifactId( "myNewArtifactId" );
-        newMetadata.addPlugin( newPlugin );
-        Assertions.assertFalse( metadata.merge( newMetadata ) );
+        newPlugin.setArtifactId("myNewArtifactId");
+        newMetadata.addPlugin(newPlugin);
+        Assertions.assertFalse(metadata.merge(newMetadata));
     }
 
     /*-- START helper methods to populate metadata objects ---*/

@@ -37,6 +37,8 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataStaxReader;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator.Level;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -77,15 +79,18 @@ public class DefaultVersionResolver implements VersionResolver {
     private static final String SNAPSHOT = "SNAPSHOT";
 
     private final MetadataResolver metadataResolver;
+    private final MetadataValidator metadataValidator;
     private final SyncContextFactory syncContextFactory;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
 
     @Inject
     public DefaultVersionResolver(
             MetadataResolver metadataResolver,
+            MetadataValidator metadataValidator,
             SyncContextFactory syncContextFactory,
             RepositoryEventDispatcher repositoryEventDispatcher) {
         this.metadataResolver = Objects.requireNonNull(metadataResolver, "metadataResolver cannot be null");
+        this.metadataValidator = Objects.requireNonNull(metadataValidator, "metadataValidator cannot be null");
         this.syncContextFactory = Objects.requireNonNull(syncContextFactory, "syncContextFactory cannot be null");
         this.repositoryEventDispatcher =
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
@@ -246,8 +251,16 @@ public class DefaultVersionResolver implements VersionResolver {
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
                         try (InputStream in =
                                 Files.newInputStream(metadata.getFile().toPath())) {
-                            versioning = new Versioning(
-                                    new MetadataStaxReader().read(in, false).getVersioning());
+                            org.apache.maven.artifact.repository.metadata.Metadata mavenMetadata =
+                                    new org.apache.maven.artifact.repository.metadata.Metadata(
+                                            new MetadataStaxReader().read(in, false));
+                            metadataValidator.validate(
+                                    mavenMetadata,
+                                    Level.ARTIFACT_ID,
+                                    null,
+                                    new RepositoryEventDispatcherMetadataProblemCollector(
+                                            session, repository, repositoryEventDispatcher, trace, metadata));
+                            versioning = mavenMetadata.getVersioning();
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata

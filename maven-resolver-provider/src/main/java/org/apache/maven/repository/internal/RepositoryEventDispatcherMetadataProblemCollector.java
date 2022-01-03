@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.repository.metadata.validator;
+package org.apache.maven.repository.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -37,28 +37,31 @@ package org.apache.maven.artifact.repository.metadata.validator;
  * under the License.
  */
 
-/**
- * Collects problems that are encountered during reading repository metadata.
- */
-public interface MetadataProblemCollector {
+import java.util.Objects;
 
-    /**
-     * The different severity levels for a problem, in decreasing order.
-     */
-    enum Severity {
-        FATAL, //
-        ERROR, //
-        WARNING //
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.repository.ArtifactRepository;
+
+public class RepositoryEventDispatcherMetadataProblemCollector extends RepositoryListenerMetadataProblemCollector {
+
+    private final RepositoryEventDispatcher repositoryEventDispatcher;
+
+    public RepositoryEventDispatcherMetadataProblemCollector(
+            RepositorySystemSession session,
+            ArtifactRepository repository,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            RequestTrace trace,
+            Metadata metadata) {
+        super(session, repository, trace, metadata);
+        this.repositoryEventDispatcher =
+                Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
     }
 
-    /**
-     * Adds the specified problem.
-     *
-     * @param severity The severity of the problem, must not be {@code null}.
-     * @param message The detail message of the problem, may be {@code null}.
-     * @param line The one-based index of the line containing the problem or {@code -1} if unknown.
-     * @param column The one-based index of the column containing the problem or {@code -1} if unknown.
-     * @param cause The cause of the problem, may be {@code null}.
-     */
-    void add(Severity severity, String message, int line, int column, Exception cause);
+    void dispatchEvent(RepositoryEvent event) {
+        repositoryEventDispatcher.dispatch(event);
+    }
 }

@@ -36,6 +36,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator.Level;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -45,6 +47,7 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
+import org.apache.maven.repository.internal.RepositoryListenerMetadataProblemCollector;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryListener;
@@ -78,6 +81,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
+    private final MetadataValidator metadataValidator;
     private final MavenPluginManager pluginManager;
     private final VersionScheme versionScheme;
 
@@ -85,10 +89,12 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     public DefaultPluginVersionResolver(
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
+            MetadataValidator metadataValidator,
             MavenPluginManager pluginManager,
             VersionScheme versionScheme) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
+        this.metadataValidator = metadataValidator;
         this.pluginManager = pluginManager;
         this.versionScheme = versionScheme;
     }
@@ -280,7 +286,11 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                 Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
 
                 Metadata repoMetadata = metadataReader.read(metadata.getFile(), options);
-
+                metadataValidator.validate(
+                        repoMetadata,
+                        Level.GROUP_ID,
+                        null,
+                        new RepositoryListenerMetadataProblemCollector(session, repository, trace, metadata));
                 mergeMetadata(versions, repoMetadata, repository);
             } catch (IOException e) {
                 invalidMetadata(session, trace, metadata, repository, e);

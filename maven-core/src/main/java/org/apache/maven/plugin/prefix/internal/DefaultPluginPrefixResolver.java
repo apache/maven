@@ -30,6 +30,8 @@ import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator;
+import org.apache.maven.artifact.repository.metadata.validator.MetadataValidator.Level;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -38,6 +40,7 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
+import org.apache.maven.repository.internal.RepositoryListenerMetadataProblemCollector;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -68,13 +71,18 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     private final BuildPluginManager pluginManager;
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
+    private final MetadataValidator metadataValidator;
 
     @Inject
     public DefaultPluginPrefixResolver(
-            BuildPluginManager pluginManager, RepositorySystem repositorySystem, MetadataReader metadataReader) {
+            BuildPluginManager pluginManager,
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader,
+            MetadataValidator metadataValidator) {
         this.pluginManager = pluginManager;
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
+        this.metadataValidator = metadataValidator;
     }
 
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
@@ -230,7 +238,12 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                 Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
 
                 Metadata pluginGroupMetadata = metadataReader.read(metadata.getFile(), options);
-
+                metadataValidator.validate(
+                        pluginGroupMetadata,
+                        Level.GROUP_ID,
+                        null,
+                        new RepositoryListenerMetadataProblemCollector(
+                                request.getRepositorySession(), repository, trace, metadata));
                 List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
 
                 if (plugins != null) {
