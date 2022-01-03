@@ -256,7 +256,7 @@ public class DefaultVersionResolver implements VersionResolver {
                                             new MetadataStaxReader().read(in, false));
                             metadataValidator.validate(
                                     mavenMetadata,
-                                    Level.ARTIFACT_ID,
+                                    Level.VERSION,
                                     null,
                                     new RepositoryEventDispatcherMetadataProblemCollector(
                                             session, repository, repositoryEventDispatcher, trace, metadata));
