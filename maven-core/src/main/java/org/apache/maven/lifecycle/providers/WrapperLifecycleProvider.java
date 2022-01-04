@@ -41,7 +41,7 @@ public final class WrapperLifecycleProvider
   public WrapperLifecycleProvider()
   {
     HashMap<String, LifecyclePhase> phases = new HashMap<>();
-    phases.put( "wrapper", new LifecyclePhase( "org.apache.maven.plugins:maven-wrapper-plugin:3.0.2:wrapper" ) );
+    phases.put( "wrapper", new LifecyclePhase( "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper" ) );
 
     this.lifecycle = new Lifecycle(
         "wrapper",
