@@ -19,17 +19,9 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**
  * {@code site} lifecycle provider.
@@ -37,36 +29,25 @@ import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 @Named( "site" )
 @Singleton
 public final class SiteLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private static final String LIFECYCLE_ID = "site";
+    private static final String LIFECYCLE_ID = "site";
 
-  private static final String[] PHASES = {
-      "pre-site",
-      "site",
-      "post-site",
-      "site-deploy"
-  };
+    private static final String[] PHASES = {
+        "pre-site",
+        "site",
+        "post-site",
+        "site-deploy"
+    };
 
-  private final Lifecycle lifecycle;
+    private static final String[] BINDINGS = {
+        "site", "org.apache.maven.plugins:maven-site-plugin:3.9.1:site",
+        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy"
+    };
 
-  @Inject
-  public SiteLifecycleProvider()
-  {
-    HashMap<String, LifecyclePhase> defaultBindings = new HashMap<>();
-    defaultBindings.put( "site", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ) );
-    defaultBindings.put( "site-deploy", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" ) );
-
-    this.lifecycle = new Lifecycle(
-        LIFECYCLE_ID,
-        Collections.unmodifiableList( Arrays.asList( PHASES ) ),
-        Collections.unmodifiableMap( defaultBindings )
-    );
-  }
-
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    @Inject
+    public SiteLifecycleProvider()
+    {
+        super( LIFECYCLE_ID, PHASES, BINDINGS );
+    }
 }
