@@ -29,44 +29,51 @@ import javax.inject.Singleton;
 
 import org.apache.maven.lifecycle.Lifecycle;
 
+/**
+ * {@code default} lifecycle provider.
+ */
 @Named( "default" )
 @Singleton
 public final class DefaultLifecycleProvider
     implements Provider<Lifecycle>
 {
+  private static final String LIFECYCLE_ID = "default";
+
+  private static final String[] PHASES = {
+      "validate",
+      "initialize",
+      "generate-sources",
+      "process-sources",
+      "generate-resources",
+      "process-resources",
+      "compile",
+      "process-classes",
+      "generate-test-sources",
+      "process-test-sources",
+      "generate-test-resources",
+      "process-test-resources",
+      "test-compile",
+      "process-test-classes",
+      "test",
+      "prepare-package",
+      "package",
+      "pre-integration-test",
+      "integration-test",
+      "post-integration-test",
+      "verify",
+      "install",
+      "deploy"
+  };
+
   private final Lifecycle lifecycle;
 
   @Inject
   public DefaultLifecycleProvider()
   {
     this.lifecycle = new Lifecycle(
-        "default",
-        Collections.unmodifiableList( Arrays.asList(
-                "validate",
-                "initialize",
-                "generate-sources",
-                "process-sources",
-                "generate-resources",
-                "process-resources",
-                "compile",
-                "process-classes",
-                "generate-test-sources",
-                "process-test-sources",
-                "generate-test-resources",
-                "process-test-resources",
-                "test-compile",
-                "process-test-classes",
-                "test",
-                "prepare-package",
-                "package",
-                "pre-integration-test",
-                "integration-test",
-                "post-integration-test",
-                "verify",
-                "install",
-                "deploy"
-        ) ),
-        null
+        LIFECYCLE_ID,
+        Collections.unmodifiableList( Arrays.asList( PHASES ) ),
+        null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate providers
     );
   }
 

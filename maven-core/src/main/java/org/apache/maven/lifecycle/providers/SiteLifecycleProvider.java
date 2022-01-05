@@ -31,29 +31,36 @@ import javax.inject.Singleton;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
+/**
+ * {@code site} lifecycle provider.
+ */
 @Named( "site" )
 @Singleton
 public final class SiteLifecycleProvider
     implements Provider<Lifecycle>
 {
+  private static final String LIFECYCLE_ID = "site";
+
+  private static final String[] PHASES = {
+      "pre-site",
+      "site",
+      "post-site",
+      "site-deploy"
+  };
+
   private final Lifecycle lifecycle;
 
   @Inject
   public SiteLifecycleProvider()
   {
-    HashMap<String, LifecyclePhase> phases = new HashMap<>();
-    phases.put( "site", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ) );
-    phases.put( "site-deploy", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" ) );
+    HashMap<String, LifecyclePhase> defaultBindings = new HashMap<>();
+    defaultBindings.put( "site", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ) );
+    defaultBindings.put( "site-deploy", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" ) );
 
     this.lifecycle = new Lifecycle(
-        "site",
-        Collections.unmodifiableList( Arrays.asList(
-                "pre-site",
-                "site",
-                "post-site",
-                "site-deploy"
-        ) ),
-        Collections.unmodifiableMap( phases )
+        LIFECYCLE_ID,
+        Collections.unmodifiableList( Arrays.asList( PHASES ) ),
+        Collections.unmodifiableMap( defaultBindings )
     );
   }
 
