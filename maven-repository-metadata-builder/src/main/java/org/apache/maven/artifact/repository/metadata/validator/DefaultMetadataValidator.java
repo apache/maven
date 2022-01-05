@@ -44,9 +44,7 @@ public class DefaultMetadataValidator implements MetadataValidator {
         final Level level;
         if (!metadata.getPlugins().isEmpty()) {
             level = Level.GROUP_ID;
-        }
-        else if ( metadata.getVersion() != null )
-        {
+        } else if (metadata.getVersion() != null) {
             level = Level.VERSION;
         } else {
             level = Level.ARTIFACT_ID;

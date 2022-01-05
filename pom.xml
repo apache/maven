@@ -113,6 +113,7 @@ under the License.
     <module>maven-artifact</module>
     <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
+    <module>maven-repository-metadata-builder</module>
     <module>maven-slf4j-provider</module>
     <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
