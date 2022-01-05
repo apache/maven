@@ -19,15 +19,9 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-
-import org.apache.maven.lifecycle.Lifecycle;
 
 /**
  * {@code default} lifecycle provider.
@@ -35,51 +29,41 @@ import org.apache.maven.lifecycle.Lifecycle;
 @Named( "default" )
 @Singleton
 public final class DefaultLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private static final String LIFECYCLE_ID = "default";
+    private static final String LIFECYCLE_ID = "default";
 
-  private static final String[] PHASES = {
-      "validate",
-      "initialize",
-      "generate-sources",
-      "process-sources",
-      "generate-resources",
-      "process-resources",
-      "compile",
-      "process-classes",
-      "generate-test-sources",
-      "process-test-sources",
-      "generate-test-resources",
-      "process-test-resources",
-      "test-compile",
-      "process-test-classes",
-      "test",
-      "prepare-package",
-      "package",
-      "pre-integration-test",
-      "integration-test",
-      "post-integration-test",
-      "verify",
-      "install",
-      "deploy"
-  };
+    private static final String[] PHASES = {
+        "validate",
+        "initialize",
+        "generate-sources",
+        "process-sources",
+        "generate-resources",
+        "process-resources",
+        "compile",
+        "process-classes",
+        "generate-test-sources",
+        "process-test-sources",
+        "generate-test-resources",
+        "process-test-resources",
+        "test-compile",
+        "process-test-classes",
+        "test",
+        "prepare-package",
+        "package",
+        "pre-integration-test",
+        "integration-test",
+        "post-integration-test",
+        "verify",
+        "install",
+        "deploy"
+    };
 
-  private final Lifecycle lifecycle;
-
-  @Inject
-  public DefaultLifecycleProvider()
-  {
-    this.lifecycle = new Lifecycle(
-        LIFECYCLE_ID,
-        Collections.unmodifiableList( Arrays.asList( PHASES ) ),
-        null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate providers
-    );
-  }
-
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    @Inject
+    public DefaultLifecycleProvider()
+    {
+      super( LIFECYCLE_ID, PHASES,
+          null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate providers
+      );
+    }
 }
