@@ -497,7 +497,8 @@ public class DefaultModelBuilder
 
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
                     "Failed to interpolate file location " + path + ": " + e.getMessage() ).setLocation(
-                    activationFile.getLocation( StringUtils.isNotEmpty( activationFile.getExists() ) ? "exists" : "missing"  ) )
+                    activationFile.getLocation( StringUtils.isNotEmpty( activationFile.getExists() )
+                                                                        ? "exists" : "missing"  ) )
                     .setException( e ) );
         }
     }
