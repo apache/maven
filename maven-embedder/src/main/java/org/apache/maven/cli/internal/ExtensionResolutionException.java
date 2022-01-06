@@ -34,7 +34,7 @@ public class ExtensionResolutionException
 
     public ExtensionResolutionException( CoreExtension extension, Throwable cause )
     {
-        super( "Extension " + getId( extension ) + " or one of its dependencies could not be resolved: "
+        super( "Extension " + extension.getId() + " or one of its dependencies could not be resolved: "
                         + cause.getMessage(), cause );
         this.extension = extension;
     }
@@ -44,16 +44,4 @@ public class ExtensionResolutionException
         return extension;
     }
 
-    public static String getId( CoreExtension extension )
-    {
-        StringBuilder id = new StringBuilder( 128 );
-
-        id.append( ( extension.getGroupId() == null ) ? "[unknown-group-id]" : extension.getGroupId() );
-        id.append( ":" );
-        id.append( ( extension.getArtifactId() == null ) ? "[unknown-artifact-id]" : extension.getArtifactId() );
-        id.append( ":" );
-        id.append( ( extension.getVersion() == null ) ? "[unknown-version]" : extension.getVersion() );
-
-        return id.toString();
-    }
 }
