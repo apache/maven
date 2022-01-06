@@ -29,6 +29,8 @@ import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Base lifecycle mapping provider, ie per-packaging plugin bindings for {@code default} lifecycle.
  */
@@ -39,11 +41,17 @@ public abstract class AbstractLifecycleMappingProvider
 
     protected AbstractLifecycleMappingProvider( String[] pluginBindings )
     {
-        HashMap<String, LifecyclePhase> lifecyclePhases = new HashMap<>();
-        int len = pluginBindings.length;
-        for ( int i = 0; i < len; i++ )
+        requireNonNull( pluginBindings );
+        final int len = pluginBindings.length;
+        if ( len < 1 || len % 2 != 0 )
         {
-            lifecyclePhases.put( pluginBindings[i++], new LifecyclePhase( pluginBindings[i] ) );
+            throw new IllegalArgumentException( "Plugin bindings must have more than 0, even count of elements" );
+        }
+
+        HashMap<String, LifecyclePhase> lifecyclePhases = new HashMap<>( len / 2 );
+        for ( int i = 0; i < len; i = i + 2 )
+        {
+            lifecyclePhases.put( pluginBindings[i], new LifecyclePhase( pluginBindings[i + 1] ) );
         }
 
         Lifecycle lifecycle = new Lifecycle();
