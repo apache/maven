@@ -41,11 +41,18 @@ public abstract class AbstractLifecycleProvider
         HashMap<String, LifecyclePhase> defaultBindings = null;
         if ( pluginBindings != null )
         {
-            int len = pluginBindings.length;
-            defaultBindings = new HashMap<>();
-            for ( int i = 0; i < len; i++ )
+            final int len = pluginBindings.length;
+
+            if ( len < 1 || len % 2 != 0 )
             {
-                defaultBindings.put( pluginBindings[i++], new LifecyclePhase( pluginBindings[i] ) );
+                throw new IllegalArgumentException( "Plugin bindings must have more than 0, even count of elements" );
+            }
+
+            defaultBindings = new HashMap<>( len / 2 );
+
+            for ( int i = 0; i < len; i += 2 )
+            {
+                defaultBindings.put( pluginBindings[i], new LifecyclePhase( pluginBindings[i + 1] ) );
             }
         }
 
