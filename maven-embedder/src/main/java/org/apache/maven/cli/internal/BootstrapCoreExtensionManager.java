@@ -132,6 +132,9 @@ public class BootstrapCoreExtensionManager
     {
         try
         {
+            // TODO: enhance the PluginDependenciesResolver to provide a
+            // TODO:    resolveCoreExtension method which uses a CoreExtension
+            // TODO:    object instead of a Plugin as this makes no sense
             Plugin plugin = new Plugin();
             plugin.setGroupId( extension.getGroupId() );
             plugin.setArtifactId( extension.getArtifactId() );
