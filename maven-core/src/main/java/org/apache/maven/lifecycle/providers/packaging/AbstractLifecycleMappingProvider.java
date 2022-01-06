@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.mapping.providers;
+package org.apache.maven.lifecycle.providers.packaging;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,50 +22,40 @@ package org.apache.maven.lifecycle.mapping.providers;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 import org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping;
 import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
-@Named( "pom" )
-@Singleton
-public final class PomLifecycleMappingProvider
+/**
+ * Base lifecycle mapping provider, ie per-packaging plugin bindings for {@code default} lifecycle.
+ */
+public abstract class AbstractLifecycleMappingProvider
     implements Provider<LifecycleMapping>
 {
-  private final LifecycleMapping lifecycleMapping;
+    private final LifecycleMapping lifecycleMapping;
 
-  @Inject
-  public PomLifecycleMappingProvider()
-  {
-    HashMap<String, LifecyclePhase> lifecyclePhases = new HashMap<>();
-    lifecyclePhases.put(
-        "install",
-        new LifecyclePhase( "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install" )
-    );
-    lifecyclePhases.put(
-        "deploy",
-        new LifecyclePhase( "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy" )
-    );
+    protected AbstractLifecycleMappingProvider( String[] pluginBindings )
+    {
+        HashMap<String, LifecyclePhase> lifecyclePhases = new HashMap<>();
+        int len = pluginBindings.length;
+        for ( int i = 0; i < len; i++ )
+        {
+            lifecyclePhases.put( pluginBindings[i++], new LifecyclePhase( pluginBindings[i] ) );
+        }
 
-    Lifecycle lifecycle = new Lifecycle();
-    lifecycle.setId( "default" );
-    lifecycle.setLifecyclePhases( Collections.unmodifiableMap( lifecyclePhases ) );
+        Lifecycle lifecycle = new Lifecycle();
+        lifecycle.setId( "default" );
+        lifecycle.setLifecyclePhases( Collections.unmodifiableMap( lifecyclePhases ) );
 
-    this.lifecycleMapping = new DefaultLifecycleMapping(
-        Collections.singletonList(
-            lifecycle
-        )
-    );
-  }
+        this.lifecycleMapping = new DefaultLifecycleMapping( Collections.singletonList( lifecycle ) );
+    }
 
-  @Override
-  public LifecycleMapping get()
-  {
-    return lifecycleMapping;
-  }
+    @Override
+    public LifecycleMapping get()
+    {
+        return lifecycleMapping;
+    }
 }
