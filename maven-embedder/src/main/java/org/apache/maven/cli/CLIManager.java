@@ -123,7 +123,7 @@ public class CLIManager
         options = new Options();
         options.addOption( Option.builder( Character.toString( HELP ) ).longOpt( "help" ).desc( "Display help information" ).build() );
         options.addOption( Option.builder( Character.toString( ALTERNATE_POM_FILE ) ).longOpt( "file" ).hasArg().desc( "Force the use of an alternate POM file (or directory with pom.xml)" ).build() );
-        options.addOption( Option.builder( Character.toString( SET_SYSTEM_PROPERTY ) ).hasArgs().valueSeparator( '=' ).desc( "Define a system property" ).build() );
+        options.addOption( Option.builder( Character.toString( SET_SYSTEM_PROPERTY ) ).numberOfArgs( 2 ).valueSeparator( '=' ).desc( "Define a system property" ).build() );
         options.addOption( Option.builder( Character.toString( OFFLINE ) ).longOpt( "offline" ).desc( "Work offline" ).build() );
         options.addOption( Option.builder( Character.toString( VERSION ) ).longOpt( "version" ).desc( "Display version information" ).build() );
         options.addOption( Option.builder( Character.toString( QUIET ) ).longOpt( "quiet" ).desc( "Quiet output - only show errors" ).build() );
