@@ -128,18 +128,29 @@ public class BootstrapCoreExtensionManager
 
     private List<Artifact> resolveExtension( CoreExtension extension, RepositorySystemSession repoSession,
                                              List<RemoteRepository> repositories, DependencyFilter dependencyFilter )
-        throws PluginResolutionException
+        throws ExtensionResolutionException
     {
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( extension.getGroupId() );
-        plugin.setArtifactId( extension.getArtifactId() );
-        plugin.setVersion( extension.getVersion() );
+        try
+        {
+            // TODO: enhance the PluginDependenciesResolver to provide a
+            // TODO:    resolveCoreExtension method which uses a CoreExtension
+            // TODO:    object instead of a Plugin as this makes no sense
+            Plugin plugin = new Plugin();
+            plugin.setGroupId( extension.getGroupId() );
+            plugin.setArtifactId( extension.getArtifactId() );
+            plugin.setVersion( extension.getVersion() );
 
-        DependencyNode root =
-            pluginDependenciesResolver.resolveCoreExtension( plugin, dependencyFilter, repositories, repoSession );
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept( nlg );
+            DependencyNode root = pluginDependenciesResolver
+                    .resolveCoreExtension( plugin, dependencyFilter, repositories, repoSession );
+            PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+            root.accept( nlg );
 
-        return nlg.getArtifacts( false );
+            return nlg.getArtifacts( false );
+        }
+        catch ( PluginResolutionException e )
+        {
+            throw new ExtensionResolutionException( extension, e.getCause() );
+        }
     }
+
 }
