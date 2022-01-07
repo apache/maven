@@ -83,6 +83,32 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * Gets the identifier of the extension.
+     *
+     * @return The extension id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     */
+    public String getId()
+    {
+        StringBuilder id = new StringBuilder( 128 );
+
+        id.append( ( getGroupId() == null ) ? "[unknown-group-id]" : getGroupId() );
+        id.append( ":" );
+        id.append( ( getArtifactId() == null ) ? "[unknown-artifact-id]" : getArtifactId() );
+        id.append( ":" );
+        id.append( ( getVersion() == null ) ? "[unknown-version]" : getVersion() );
+
+        return id.toString();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
   </classes>
 </model>
