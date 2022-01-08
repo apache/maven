@@ -48,15 +48,15 @@ public abstract class AbstractLifecycleMappingProvider
             throw new IllegalArgumentException( "Plugin bindings must have more than 0, even count of elements" );
         }
 
-        HashMap<String, LifecyclePhase> lifecyclePhases = new HashMap<>( len / 2 );
+        HashMap<String, LifecyclePhase> lifecyclePhaseBindings = new HashMap<>( len / 2 );
         for ( int i = 0; i < len; i = i + 2 )
         {
-            lifecyclePhases.put( pluginBindings[i], new LifecyclePhase( pluginBindings[i + 1] ) );
+            lifecyclePhaseBindings.put( pluginBindings[i], new LifecyclePhase( pluginBindings[i + 1] ) );
         }
 
         Lifecycle lifecycle = new Lifecycle();
         lifecycle.setId( "default" );
-        lifecycle.setLifecyclePhases( Collections.unmodifiableMap( lifecyclePhases ) );
+        lifecycle.setLifecyclePhases( Collections.unmodifiableMap( lifecyclePhaseBindings ) );
 
         this.lifecycleMapping = new DefaultLifecycleMapping( Collections.singletonList( lifecycle ) );
     }

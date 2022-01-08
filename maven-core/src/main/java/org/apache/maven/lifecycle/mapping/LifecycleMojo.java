@@ -25,7 +25,9 @@ import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * LifecycleMojo
+ * Mojo (plugin goal) binding to a lifecycle phase.
+ *
+ * @see LifecyclePhase
  */
 public class LifecycleMojo
 {
