@@ -26,12 +26,12 @@ import javax.inject.Singleton;
 /**
  * {@code default} lifecycle provider.
  */
-@Named( "default" )
+@Named( DefaultLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class DefaultLifecycleProvider
     extends AbstractLifecycleProvider
 {
-    private static final String LIFECYCLE_ID = "default";
+    protected static final String LIFECYCLE_ID = "default";
 
     private static final String[] PHASES = {
         "validate",

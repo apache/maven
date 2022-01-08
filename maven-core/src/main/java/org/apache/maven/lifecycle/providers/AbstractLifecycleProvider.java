@@ -43,7 +43,7 @@ public abstract class AbstractLifecycleProvider
         {
             final int len = pluginBindings.length;
 
-            if ( len < 1 || len % 2 != 0 )
+            if ( len < 2 || len % 2 != 0 )
             {
                 throw new IllegalArgumentException( "Plugin bindings must have more than 0, even count of elements" );
             }
