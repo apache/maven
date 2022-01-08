@@ -26,12 +26,12 @@ import javax.inject.Singleton;
 /**
  * {@code clean} lifecycle provider.
  */
-@Named( "clean" )
+@Named( CleanLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class CleanLifecycleProvider
     extends AbstractLifecycleProvider
 {
-    private static final String LIFECYCLE_ID = "clean";
+    protected static final String LIFECYCLE_ID = "clean";
 
     private static final String[] PHASES = {
         "pre-clean",
