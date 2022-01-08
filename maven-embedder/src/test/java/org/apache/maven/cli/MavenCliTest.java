@@ -493,10 +493,10 @@ public class MavenCliTest
     }
 
     @Test
-    public void populateProperties() throws Exception
+    public void populatePropertiesCanContainEqualsSign() throws Exception
     {
         // Arrange
-        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "-Dx=1", "-Dy", "-D", "z=2", "compile" }, null );
+        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "validate" }, null );
 
         // Act
         cli.cli( request );
@@ -504,9 +504,49 @@ public class MavenCliTest
 
         // Assert
         assertThat( request.getUserProperties().getProperty( "w" ), is( "x=y" ) );
+    }
+
+    @Test
+    public void populatePropertiesSpace() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-D", "z=2", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );
+    }
+
+    @Test
+    public void populatePropertiesShorthand() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "true" ) );
+    }
+
+    @Test
+    public void populatePropertiesMultiple() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx=1", "-Dy", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
         assertThat( request.getUserProperties().getProperty( "x" ), is( "1" ) );
         assertThat( request.getUserProperties().getProperty( "y" ), is( "true" ) );
-        assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );
     }
 
     @Test
