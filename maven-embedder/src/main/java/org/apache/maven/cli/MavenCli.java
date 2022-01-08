@@ -24,7 +24,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -1719,28 +1718,11 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        for ( final Option option : commandLine.getOptions() )
-        {
-            final String opt = option.getOpt();
-            // Some options do not have a "short" version (e.g. color, debug).
-            // We are specifically looking for the "-D" option.
-            if ( opt != null && CLIManager.SET_SYSTEM_PROPERTY == opt.charAt( 0 ) )
-            {
-                final String[] values = option.getValues();
-                final String key = values[0].trim();
-                String value;
-                if ( values.length == 1 )
-                {
-                    value = "true";
-                }
-                else
-                {
-                    // If the property value contains an '=', such as "-Dx=w=y", the values have to be concatenated
-                    value = String.join( "=", ArrayUtils.subarray( values, 1, values.length ) );
-                }
-                setCliProperty( key, value, userProperties );
-            }
-        }
+        final Properties userSpecifiedProperties = commandLine.getOptionProperties(
+                String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ) );
+        userSpecifiedProperties.forEach(
+                ( prop, value ) -> setCliProperty( (String) prop, (String) value, userProperties )
+        );
 
         SystemProperties.addSystemProperties( systemProperties );
 
