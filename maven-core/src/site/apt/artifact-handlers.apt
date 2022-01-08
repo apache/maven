@@ -30,7 +30,7 @@ Default Artifact Handlers Reference
   (classifier, extension, language) and how to manage it as dependency (add to classpath, include dependencies).
 
   Some artifact handlers
-  are configured by default in <<<META-INF/plexus/artifact-handlers.xml>>>:
+  are configured by default in {{{./apidocs/org/apache/maven/artifact/handler/providers/package-summary.html}<<<org.apache.maven.artifact.handler.providers>>>}} package:
 
 *--------------------+---------------+------------+------------+-----------+---------------------+-----------------------+
 || type              || classifier   || extension || packaging || language || added to classpath || includesDependencies ||

@@ -27,6 +27,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
+/**
+ * {@code maven-plugin} artifact handler provider.
+ */
 @Named( "maven-plugin" )
 @Singleton
 public class MavenPluginArtifactHandlerProvider

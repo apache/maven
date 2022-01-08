@@ -27,6 +27,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
+/**
+ * {@code test-jar} artifact handler provider.
+ */
 @Named( "test-jar" )
 @Singleton
 public class TestJarArtifactHandlerProvider
