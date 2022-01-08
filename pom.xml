@@ -488,6 +488,12 @@ under the License.
           </executions>
         </plugin>
         <plugin>
+            <!-- Remove when Apache Parent 25 is used -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.2</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
