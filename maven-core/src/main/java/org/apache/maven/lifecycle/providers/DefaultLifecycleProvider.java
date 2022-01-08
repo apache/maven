@@ -33,6 +33,7 @@ public final class DefaultLifecycleProvider
 {
     protected static final String LIFECYCLE_ID = "default";
 
+    // START SNIPPET: default
     private static final String[] PHASES = {
         "validate",
         "initialize",
@@ -58,6 +59,7 @@ public final class DefaultLifecycleProvider
         "install",
         "deploy"
     };
+    // END SNIPPET: default
 
     @Inject
     public DefaultLifecycleProvider()

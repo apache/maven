@@ -33,6 +33,7 @@ public final class SiteLifecycleProvider
 {
     protected static final String LIFECYCLE_ID = "site";
 
+    // START SNIPPET: site
     private static final String[] PHASES = {
         "pre-site",
         "site",
@@ -41,9 +42,10 @@ public final class SiteLifecycleProvider
     };
 
     private static final String[] BINDINGS = {
-        "site", "org.apache.maven.plugins:maven-site-plugin:3.9.1:site",
+        "site",        "org.apache.maven.plugins:maven-site-plugin:3.9.1:site",
         "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy"
     };
+    // END SNIPPET: site
 
     @Inject
     public SiteLifecycleProvider()

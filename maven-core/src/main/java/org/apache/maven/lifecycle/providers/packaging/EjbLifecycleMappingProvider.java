@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 public final class EjbLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
+    // START SNIPPET: ejb
     private static final String[] BINDINGS =
     {
         "process-resources",      "org.apache.maven.plugins:maven-resources-plugin:3.2.0:resources",
@@ -42,6 +43,7 @@ public final class EjbLifecycleMappingProvider
         "install",                "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install",
         "deploy",                 "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy"
     };
+    // END SNIPPET: ejb
     
     @Inject
     public EjbLifecycleMappingProvider()

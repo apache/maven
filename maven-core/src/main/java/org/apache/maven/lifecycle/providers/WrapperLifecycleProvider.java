@@ -33,6 +33,7 @@ public final class WrapperLifecycleProvider
 {
     protected static final String LIFECYCLE_ID = "wrapper";
 
+    // START SNIPPET: wrapper
     private static final String[] PHASES =
     {
         "wrapper"
@@ -41,6 +42,7 @@ public final class WrapperLifecycleProvider
     private static final String[] BINDINGS = {
         "wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper"
     };
+    // END SNIPPET: wrapper
 
     @Inject
     public WrapperLifecycleProvider()

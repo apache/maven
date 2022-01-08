@@ -16,45 +16,45 @@
 ~~ under the License.
 
  ---
- Plugin Bindings for Default Lifecycle Reference
+ Plugins Bindings for Default Lifecycle Reference
  ---
  Hervé Boutemy
  ---
  2013-08-02
  ---
 
-Plugin Bindings for <<<default>>> Lifecycle Reference
+Plugins Bindings for <<<default>>> Lifecycle Reference
 
-  The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugin bindings are defined separately
-  in <<<META-INF/plexus/default-bindings.xml>>> because they are specific for each packaging:
+  The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugins bindings are defined separately
+  in {{{./apidocs/org/apache/maven/lifecycle/providers/packaging/package-summary.html}<<<org.apache.maven.lifecycle.providers.packaging>>>}} package
+  because they are specific for each packaging:
 
 %{toc|fromDepth=2}
 
 * Plugin bindings for <<<pom>>> packaging
 
-%{snippet|id=pom-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=pom|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/PomLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<jar>>> packaging
 
-%{snippet|id=jar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=jar|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/JarLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<ejb>>> packaging
 
-%{snippet|id=ejb-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=ejb|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/EjbLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<maven-plugin>>> packaging
 
-%{snippet|id=maven-plugin-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=maven-plugin|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/MavenPluginLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<war>>> packaging
 
-%{snippet|id=war-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=war|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/WarLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<ear>>> packaging
 
-%{snippet|id=ear-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
+%{snippet|id=ear|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/EarLifecycleMappingProvider.java}
 
 * Plugin bindings for <<<rar>>> packaging
 
-%{snippet|id=rar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
-
+%{snippet|id=rar|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/RarLifecycleMappingProvider.java}

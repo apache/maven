@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 public final class EarLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
+    // START SNIPPET: ear
     private static final String[] BINDINGS =
     {
         "generate-resources", "org.apache.maven.plugins:maven-ear-plugin:3.1.2:generate-application-xml",
@@ -39,6 +40,7 @@ public final class EarLifecycleMappingProvider
         "install",            "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install",
         "deploy",             "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy"
     };
+    // END SNIPPET: ear
 
     @Inject
     public EarLifecycleMappingProvider()

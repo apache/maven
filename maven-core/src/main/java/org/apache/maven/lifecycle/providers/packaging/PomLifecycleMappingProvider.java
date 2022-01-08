@@ -31,11 +31,13 @@ import javax.inject.Singleton;
 public final class PomLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
+    // START SNIPPET: pom
     private static final String[] BINDINGS =
     {
         "install", "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install",
         "deploy",  "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy"
     };
+    // END SNIPPET: pom
     
     @Inject
     public PomLifecycleMappingProvider()

@@ -33,6 +33,7 @@ public final class CleanLifecycleProvider
 {
     protected static final String LIFECYCLE_ID = "clean";
 
+    // START SNIPPET: clean
     private static final String[] PHASES = {
         "pre-clean",
         "clean",
@@ -42,6 +43,7 @@ public final class CleanLifecycleProvider
     private static final String[] BINDINGS = {
         "clean", "org.apache.maven.plugins:maven-clean-plugin:3.1.0:clean"
     };
+    // END SNIPPET: clean
 
     @Inject
     public CleanLifecycleProvider()
