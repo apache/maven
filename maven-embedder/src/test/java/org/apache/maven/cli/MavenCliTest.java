@@ -509,6 +509,20 @@ public class MavenCliTest
         assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );
     }
 
+    @Test
+    public void populatePropertiesOverwrite() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx", "-Dx=false", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "false" ) );
+    }
+
     private MavenProject createMavenProject( String groupId, String artifactId )
     {
         MavenProject project = new MavenProject();
