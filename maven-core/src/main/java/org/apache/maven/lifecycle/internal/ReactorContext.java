@@ -20,7 +20,6 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.session.scope.internal.SessionScope;
 
 /**
  * Context that is fixed for the entire reactor build.
@@ -40,17 +39,13 @@ public class ReactorContext
 
     private final ReactorBuildStatus reactorBuildStatus;
 
-    private final SessionScope.Memento sessionScope;
-
     public ReactorContext( MavenExecutionResult result, ProjectIndex projectIndex,
-                           ClassLoader originalContextClassLoader, ReactorBuildStatus reactorBuildStatus,
-                           SessionScope.Memento sessionScope )
+                           ClassLoader originalContextClassLoader, ReactorBuildStatus reactorBuildStatus )
     {
         this.result = result;
         this.projectIndex = projectIndex;
         this.originalContextClassLoader = originalContextClassLoader;
         this.reactorBuildStatus = reactorBuildStatus;
-        this.sessionScope = sessionScope;
     }
 
     public ReactorBuildStatus getReactorBuildStatus()
@@ -73,11 +68,4 @@ public class ReactorContext
         return originalContextClassLoader;
     }
 
-    /**
-     * @since 3.3.0
-     */
-    public SessionScope.Memento getSessionScopeMemento()
-    {
-        return sessionScope;
-    }
 }
