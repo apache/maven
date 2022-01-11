@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -136,77 +138,83 @@ public class DefaultGraphBuilder
     private Result<ProjectDependencyGraph> reactorDependencyGraph( MavenSession session, List<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException, MavenExecutionException
     {
-        ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
-        List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
-        List<MavenProject> allSortedProjects = projectDependencyGraph.getSortedProjects();
-        activeProjects = trimProjectsToRequest( activeProjects, projectDependencyGraph, session.getRequest() );
-        activeProjects = trimSelectedProjects(
-                activeProjects, allSortedProjects, projectDependencyGraph, session.getRequest() );
-        activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
-        activeProjects = trimExcludedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
+        final ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
+        final List<MavenProject> allSortedProjects = projectDependencyGraph.getSortedProjects();
+        final MavenExecutionRequest request = session.getRequest();
 
-        if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
+        // Select projects into the reactor
+        final Set<MavenProject> projectsToActivate = new HashSet<>( allSortedProjects.size() );
+        final Set<MavenProject> projectsBySelection = getProjectsBySelection( allSortedProjects, request );
+        projectsToActivate.addAll( projectsBySelection );
+
+        // If no projects were selected deliberately by the user, fall back to all projects in this dir and below.
+        if ( projectsToActivate.isEmpty() )
         {
-            projectDependencyGraph = new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
+            final Set<MavenProject> projectsByDirectory = getProjectsByDirectory( allSortedProjects, request );
+            projectsToActivate.addAll( projectsByDirectory );
+        }
+
+        // Add all transitive dependencies
+        final Set<MavenProject> alsoMakeDependencies = getAlsoMakeDependencies( projectsToActivate, request,
+                projectDependencyGraph );
+        projectsToActivate.addAll( alsoMakeDependencies );
+
+        // Trim until resumed project
+        final Set<MavenProject> resumedProjects = getResumedProjects( projectsToActivate, allSortedProjects, request );
+        projectsToActivate.retainAll( resumedProjects );
+
+        // Add back all transitive dependencies after projects were trimmed
+        projectsToActivate.addAll( alsoMakeDependencies );
+
+        // Remove unwanted projects from the reactor
+        getExcludedProjects( projectsToActivate, allSortedProjects, request )
+                .forEach( projectsToActivate::remove );
+
+        if ( projectsToActivate.size() != allSortedProjects.size() )
+        {
+            // Sort all projects in build order
+            final List<MavenProject> activeProjects = new ArrayList<>( projectsToActivate );
+            activeProjects.sort( comparing( allSortedProjects::indexOf ) );
+
+            return Result.success( new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects ) );
         }
 
         return Result.success( projectDependencyGraph );
     }
 
-    private List<MavenProject> trimProjectsToRequest( List<MavenProject> activeProjects,
-                                                      ProjectDependencyGraph graph,
+    private Set<MavenProject> getProjectsByDirectory( List<MavenProject> allSortedProjects,
                                                       MavenExecutionRequest request )
             throws MavenExecutionException
     {
-        List<MavenProject> result = activeProjects;
-
-        if ( request.getPom() != null )
+        if ( request.getPom() == null )
         {
-            result = getProjectsInRequestScope( request, activeProjects );
-
-            List<MavenProject> sortedProjects = graph.getSortedProjects();
-            result.sort( comparing( sortedProjects::indexOf ) );
-
-            result = includeAlsoMakeTransitively( result, request, graph );
+            return new HashSet<>( allSortedProjects );
         }
 
-        return result;
+        return getProjectsInRequestScope( request, allSortedProjects );
     }
 
-    private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, List<MavenProject> allSortedProjects,
-                                                     ProjectDependencyGraph graph, MavenExecutionRequest request )
+    private Set<MavenProject> getProjectsBySelection( List<MavenProject> allSortedProjects,
+                                                      MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        List<MavenProject> result = projects;
-
         ProjectActivation projectActivation = request.getProjectActivation();
         Set<String> requiredSelectors = projectActivation.getRequiredActiveProjectSelectors();
         Set<String> optionalSelectors = projectActivation.getOptionalActiveProjectSelectors();
-        if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
+        if ( requiredSelectors.isEmpty() && optionalSelectors.isEmpty() )
         {
-            Set<MavenProject> selectedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
-            selectedProjects.addAll(
-                    getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
-            selectedProjects.addAll(
-                    getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
-
-            // it can be empty when an optional project is missing from the reactor, fallback to returning all projects
-            if ( !selectedProjects.isEmpty() )
-            {
-                result = new ArrayList<>( selectedProjects );
-
-                result = includeAlsoMakeTransitively( result, request, graph );
-
-                // Order the new list in the original order
-                List<MavenProject> sortedProjects = graph.getSortedProjects();
-                result.sort( comparing( sortedProjects::indexOf ) );
-            }
+            return Collections.emptySet();
         }
 
-        return result;
+        Set<MavenProject> selectedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
+        selectedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
+        selectedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
+
+        return selectedProjects;
     }
 
-    private Set<MavenProject> getProjectsBySelectors( MavenExecutionRequest request, List<MavenProject> projects,
+    private Set<MavenProject> getProjectsBySelectors( MavenExecutionRequest request,
+                                                      List<MavenProject> allSortedProjects,
                                                       Set<String> projectSelectors, boolean required )
             throws MavenExecutionException
     {
@@ -215,7 +223,7 @@ public class DefaultGraphBuilder
 
         for ( String selector : projectSelectors )
         {
-            Optional<MavenProject> optSelectedProject = projects.stream()
+            Optional<MavenProject> optSelectedProject = allSortedProjects.stream()
                     .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
                     .findFirst();
             if ( !optSelectedProject.isPresent() )
@@ -246,106 +254,86 @@ public class DefaultGraphBuilder
         return selectedProjects;
     }
 
-    private List<MavenProject> trimResumedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
-                                                    MavenExecutionRequest request )
+    private Set<MavenProject> getResumedProjects( Set<MavenProject> projectsToActivate,
+                                                  List<MavenProject> allSortedProjects, MavenExecutionRequest request )
             throws MavenExecutionException
     {
-        List<MavenProject> result = projects;
-
-        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+        if ( StringUtils.isEmpty( request.getResumeFrom() ) )
         {
-            File reactorDirectory = getReactorDirectory( request );
-
-            String selector = request.getResumeFrom();
-
-            MavenProject resumingFromProject = projects.stream()
-                    .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
-                    .findFirst()
-                    .orElseThrow( () -> new MavenExecutionException(
-                            "Could not find project to resume reactor build from: " + selector + " vs "
-                            + formatProjects( projects ), request.getPom() ) );
-            int resumeFromProjectIndex = projects.indexOf( resumingFromProject );
-            List<MavenProject> retainingProjects = result.subList( resumeFromProjectIndex, projects.size() );
-
-            result = includeAlsoMakeTransitively( retainingProjects, request, graph );
+            return projectsToActivate;
         }
 
-        return result;
+        File reactorDirectory = getReactorDirectory( request );
+        List<MavenProject> projectSelection = new ArrayList<>( projectsToActivate );
+        projectSelection.sort( comparing( allSortedProjects::indexOf ) );
+
+        String selector = request.getResumeFrom();
+        MavenProject resumingFromProject = projectsToActivate.stream()
+                .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                .findFirst()
+                .orElseThrow( () -> new MavenExecutionException(
+                        "Could not find project to resume reactor build from: " + selector + " vs "
+                        + formatProjects( projectSelection ), request.getPom() ) );
+
+        int resumeFromProjectIndex = projectSelection.indexOf( resumingFromProject );
+        return new HashSet<>( projectSelection.subList( resumeFromProjectIndex, projectSelection.size() ) );
     }
 
-    private List<MavenProject> trimExcludedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
-                                                     MavenExecutionRequest request )
+    private Set<MavenProject> getExcludedProjects( Set<MavenProject> projectsToActivate,
+                                                   List<MavenProject> allSortedProjects,
+                                                   MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        List<MavenProject> result = projects;
-
         ProjectActivation projectActivation = request.getProjectActivation();
         Set<String> requiredSelectors = projectActivation.getRequiredInactiveProjectSelectors();
         Set<String> optionalSelectors = projectActivation.getOptionalInactiveProjectSelectors();
-        if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
+        if ( requiredSelectors.isEmpty() && optionalSelectors.isEmpty() )
         {
-            Set<MavenProject> excludedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
-            List<MavenProject> allProjects = graph.getAllProjects();
-            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, requiredSelectors, true ) );
-            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, optionalSelectors, false ) );
-
-            result = new ArrayList<>( projects );
-            result.removeAll( excludedProjects );
-
-            if ( result.isEmpty() )
-            {
-                boolean isPlural = excludedProjects.size() > 1;
-                String message = String.format( "The project exclusion%s in --projects/-pl resulted in an "
-                        + "empty reactor, please correct %s.", isPlural ? "s" : "", isPlural ? "them" : "it" );
-                throw new MavenExecutionException( message, request.getPom() );
-            }
+            return Collections.emptySet();
         }
 
-        return result;
+        Set<MavenProject> excludedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
+        excludedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
+        excludedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
+
+        if ( excludedProjects.size() >= projectsToActivate.size() )
+        {
+            boolean isPlural = excludedProjects.size() > 1;
+            String message = String.format( "The project exclusion%s in --projects/-pl resulted in an "
+                    + "empty reactor, please correct %s.", isPlural ? "s" : "", isPlural ? "them" : "it" );
+            throw new MavenExecutionException( message, request.getPom() );
+        }
+
+        return excludedProjects;
     }
 
-    private List<MavenProject> includeAlsoMakeTransitively( List<MavenProject> projects, MavenExecutionRequest request,
-                                                            ProjectDependencyGraph graph )
+    private Set<MavenProject> getAlsoMakeDependencies( Set<MavenProject> projectsToActivate,
+                                                       MavenExecutionRequest request, ProjectDependencyGraph graph )
             throws MavenExecutionException
     {
-        List<MavenProject> result = projects;
-
         String makeBehavior = request.getMakeBehavior();
         boolean makeBoth = MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( makeBehavior );
 
         boolean makeUpstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( makeBehavior );
         boolean makeDownstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( makeBehavior );
 
-        if ( StringUtils.isNotEmpty( makeBehavior ) && !makeUpstream && !makeDownstream )
+        if ( !makeUpstream && !makeDownstream )
         {
-            throw new MavenExecutionException( "Invalid reactor make behavior: " + makeBehavior,
-                    request.getPom() );
-        }
-
-        if ( makeUpstream || makeDownstream )
-        {
-            Set<MavenProject> projectsSet = new HashSet<>( projects );
-
-            for ( MavenProject project : projects )
+            if ( StringUtils.isNotEmpty( makeBehavior ) )
             {
-                if ( makeUpstream )
-                {
-                    projectsSet.addAll( graph.getUpstreamProjects( project, true ) );
-                }
-                if ( makeDownstream )
-                {
-                    projectsSet.addAll( graph.getDownstreamProjects( project, true ) );
-                }
+                throw new MavenExecutionException( "Invalid reactor make behavior: " + makeBehavior, request.getPom() );
             }
 
-            result = new ArrayList<>( projectsSet );
-
-            // Order the new list in the original order
-            List<MavenProject> sortedProjects = graph.getSortedProjects();
-            result.sort( comparing( sortedProjects::indexOf ) );
+            return Collections.emptySet();
         }
 
-        return result;
+        List<MavenProject> emptyList = Collections.emptyList();
+        return projectsToActivate.stream()
+                .flatMap( project -> Stream.concat(
+                        ( makeUpstream ? graph.getUpstreamProjects( project, true ) : emptyList ).stream(),
+                        ( makeDownstream ? graph.getDownstreamProjects( project, true ) : emptyList ).stream()
+                ) )
+                .collect( Collectors.toSet() );
     }
 
     private void enrichRequestFromResumptionData( List<MavenProject> projects, MavenExecutionRequest request )
@@ -360,15 +348,16 @@ public class DefaultGraphBuilder
         }
     }
 
-    private List<MavenProject> getProjectsInRequestScope( MavenExecutionRequest request, List<MavenProject> projects )
+    private Set<MavenProject> getProjectsInRequestScope( MavenExecutionRequest request,
+                                                         List<MavenProject> allSortedProjects )
             throws MavenExecutionException
     {
         if ( request.getPom() == null )
         {
-            return projects;
+            return new HashSet<>( allSortedProjects );
         }
 
-        MavenProject requestPomProject = projects.stream()
+        MavenProject requestPomProject = allSortedProjects.stream()
                 .filter( project -> request.getPom().equals( project.getFile() ) )
                 .findFirst()
                 .orElseThrow( () -> new MavenExecutionException(
@@ -377,7 +366,7 @@ public class DefaultGraphBuilder
         List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
                 ? requestPomProject.getCollectedProjects() : Collections.emptyList();
 
-        List<MavenProject> result = new ArrayList<>( modules );
+        Set<MavenProject> result = new HashSet<>( modules );
         result.add( requestPomProject );
         return result;
     }
@@ -477,7 +466,7 @@ public class DefaultGraphBuilder
     {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope( request, projects );
+        Set<MavenProject> projectsInRequestScope = getProjectsInRequestScope( request, projects );
         for ( MavenProject p : projectsInRequestScope )
         {
             String projectKey = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
