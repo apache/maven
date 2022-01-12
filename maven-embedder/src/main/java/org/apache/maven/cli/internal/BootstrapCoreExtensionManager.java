@@ -61,6 +61,10 @@ import org.slf4j.LoggerFactory;
 @Named
 public class BootstrapCoreExtensionManager
 {
+    public static final String STRATEGY_PARENT_FIRST = "parent-first";
+    public static final String STRATEGY_PLUGIN = "plugin";
+    public static final String STRATEGY_SELF_FIRST = "self-first";
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
@@ -126,23 +130,27 @@ public class BootstrapCoreExtensionManager
     {
         String realmId =
             "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion();
-        ClassRealm realm;
+        final ClassRealm realm = classWorld.newRealm( realmId, null );
         Set<String> providedArtifacts = Collections.emptySet();
-        if ( "parent-first".equals( extension.getClassLoadingStrategy() ) )
+        String classLoadingStrategy = extension.getClassLoadingStrategy();
+        if ( STRATEGY_PARENT_FIRST.equals( classLoadingStrategy ) )
         {
-            realm = classWorld.newRealm( realmId, null );
             realm.importFrom( parentRealm, "" );
         }
-        else if ( "plugin".equals( extension.getClassLoadingStrategy() ) )
+        else if ( STRATEGY_PLUGIN.equals( classLoadingStrategy ) )
         {
-            realm = classWorld.newRealm( realmId, null );
             coreExports.getExportedPackages().forEach( ( p, cl ) -> realm.importFrom( cl, p ) );
             providedArtifacts = coreExports.getExportedArtifacts();
         }
+        else if ( STRATEGY_SELF_FIRST.equals( classLoadingStrategy ) )
+        {
+            realm.setParentRealm( parentRealm );
+        }
         else
         {
-            realm = classWorld.newRealm( realmId, null );
-            realm.setParentRealm( parentRealm );
+            throw new IllegalArgumentException( "Unsupported class-loading strategy '"
+                    + classLoadingStrategy + "'. Supported values are: " + STRATEGY_PARENT_FIRST
+                    + ", " + STRATEGY_PLUGIN + " and " + STRATEGY_SELF_FIRST );
         }
         log.debug( "Populating class realm {}", realm.getId() );
         for ( Artifact artifact : artifacts )
