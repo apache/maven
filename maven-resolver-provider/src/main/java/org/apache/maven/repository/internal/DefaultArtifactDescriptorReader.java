@@ -318,7 +318,7 @@ public class DefaultArtifactDescriptorReader
                 result.addRelocation( a );
                 a =
                     new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
-                                           relocation.getVersion() );
+                                           relocation.getVersion(), relocation.getMessage() );
                 result.setArtifact( a );
             }
             else

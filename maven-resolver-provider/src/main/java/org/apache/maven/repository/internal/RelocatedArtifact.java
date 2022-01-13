@@ -29,7 +29,7 @@ import org.eclipse.aether.artifact.Artifact;
 /**
  * @author Benjamin Bentmann
  */
-final class RelocatedArtifact
+public final class RelocatedArtifact
     extends AbstractArtifact
 {
 
@@ -41,13 +41,16 @@ final class RelocatedArtifact
 
     private final String version;
 
-    RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
+    private final String message;
+
+    RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version, String message )
     {
         this.artifact = Objects.requireNonNull( artifact, "artifact cannot be null" );
         // TODO Use StringUtils here
         this.groupId = ( groupId != null && groupId.length() > 0 ) ? groupId : null;
         this.artifactId = ( artifactId != null && artifactId.length() > 0 ) ? artifactId : null;
         this.version = ( version != null && version.length() > 0 ) ? version : null;
+        this.message = ( message != null && message.length() > 0 ) ? message : null;
     }
 
     public String getGroupId()
@@ -95,7 +98,7 @@ final class RelocatedArtifact
          {
              return this;
          }
-        return new RelocatedArtifact( artifact, groupId, artifactId, version );
+        return new RelocatedArtifact( artifact, groupId, artifactId, version, message );
     }
 
     @Override
@@ -106,7 +109,7 @@ final class RelocatedArtifact
         {
              return this;
         }
-        return new RelocatedArtifact( artifact.setFile( file ), groupId, artifactId, version );
+        return new RelocatedArtifact( artifact.setFile( file ), groupId, artifactId, version, message );
     }
 
     @Override
@@ -117,7 +120,7 @@ final class RelocatedArtifact
         {
              return this;
         }
-        return new RelocatedArtifact( artifact.setProperties( properties ), groupId, artifactId, version );
+        return new RelocatedArtifact( artifact.setProperties( properties ), groupId, artifactId, version, message );
     }
 
     public String getClassifier()
@@ -145,4 +148,8 @@ final class RelocatedArtifact
         return artifact.getProperties();
     }
 
+    public String getMessage()
+    {
+        return message;
+    }
 }
