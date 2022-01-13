@@ -192,8 +192,7 @@ public class DefaultProjectDependenciesResolver
                             ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) relocated ).getMessage()
                             : null;
                     logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
-                        + child.getDependency().getArtifact()
-                        + ( message != null ? ": " + message : "" ) );
+                        + relocated + ( message != null ? ": " + message : "" ) );
                 }
             }
         }
