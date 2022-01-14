@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // Tests that don't run stable and need to be fixed
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
+        suite.addTestSuite( MavenITmng7390SelectModuleOutsideCwdTest.class );
         suite.addTestSuite( MavenITmng7244IgnorePomPrefixInExpressions.class );
         suite.addTestSuite( MavenITmng7349RelocationWarningTest.class );
         suite.addTestSuite( MavenITmng6326CoreExtensionsNotFoundTest.class );
