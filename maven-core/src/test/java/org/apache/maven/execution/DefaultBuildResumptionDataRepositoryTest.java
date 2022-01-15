@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -46,7 +46,7 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getSelectedProjects(), is( asList( ":module-a" ) ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), is( singleton( ":module-a" ) ) );
     }
 
     @Test
@@ -74,7 +74,7 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getSelectedProjects(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getSelectedProjects(), is( empty() ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), is( empty() ) );
     }
 
     @Test
@@ -100,6 +100,6 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionData( request,  rootProject );
 
-        assertThat( request.getSelectedProjects(), containsInAnyOrder( "example:module-c" ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( "example:module-c" ) );
     }
 }
