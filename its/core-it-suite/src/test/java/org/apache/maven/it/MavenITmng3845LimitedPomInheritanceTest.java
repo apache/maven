@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3845LimitedPomInheritanceTest
 
     /**
      * Test that inheritance is all-or-nothing for certain sub-trees of the POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3845()
         throws Exception

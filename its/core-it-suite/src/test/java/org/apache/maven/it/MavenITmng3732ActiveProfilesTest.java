@@ -32,7 +32,6 @@ import java.util.Properties;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3732">MNG-3732</a>.
  *
  * @author Benjamin Bentmann
- *
  */
 public class MavenITmng3732ActiveProfilesTest
     extends AbstractMavenIntegrationTestCase
@@ -45,6 +44,8 @@ public class MavenITmng3732ActiveProfilesTest
 
     /**
      * Verify that MavenProject.getActiveProfiles() includes profiles from all sources.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3732()
         throws Exception

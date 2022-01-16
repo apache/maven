@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenIT0086PluginRealmTest
     /**
      * Verify that a plugin dependency class/resource can be loaded from both the plugin classloader and the
      * context classloader available to the plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0086()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest
      * Verify that profiles in a parent are only injected once during a reactor build that include the parent
      * itself. The parent being part of the reactor makes it subject to project caching and proper use of the
      * cache is crucial here.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4023()
         throws Exception

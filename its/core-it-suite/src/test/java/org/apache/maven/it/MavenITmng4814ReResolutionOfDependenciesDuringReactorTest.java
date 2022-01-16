@@ -43,6 +43,8 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
      * Verify that dependency resolution by an aggregator before the build has actually produced any artifacts
      * doesn't prevent later resolution of project artifacts from the reactor if the aggregator originally resolved
      * them from the remote repo.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

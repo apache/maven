@@ -41,6 +41,8 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest
     /**
      * Verify that plugin configurations are subject to the parameter expression evaluator, in particular composite
      * parameter types.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4317PluginVersionResolutionFromMultiReposTest
     /**
      * Verify that the g:a level metadata files from different repositories are properly merged when trying to resolve
      * a version for some plugin that was invoked with g:a:goal.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

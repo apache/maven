@@ -40,6 +40,8 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
 
     /**
      * Verify that POM errors indicate the line and column number in the input file.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

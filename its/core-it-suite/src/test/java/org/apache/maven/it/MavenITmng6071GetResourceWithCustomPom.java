@@ -19,6 +19,8 @@ public class MavenITmng6071GetResourceWithCustomPom
 
     /**
      * check when path to POM set by <code>-f ./pom.xml</code>
+     *
+     * @throws Exception in case of failure
      */
     @Test
     public void testRunCustomPomWithDot( )

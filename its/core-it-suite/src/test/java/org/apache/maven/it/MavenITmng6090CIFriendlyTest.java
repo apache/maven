@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -49,6 +48,8 @@ public class MavenITmng6090CIFriendlyTest
      * of defining the property via command line and
      * install the projects and afterwards just build
      * a part of the whole reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
         throws Exception

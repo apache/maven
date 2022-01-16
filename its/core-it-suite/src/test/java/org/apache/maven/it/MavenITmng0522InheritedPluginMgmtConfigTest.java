@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest
 
     /**
      * Test for injection of inherited plugin management into plugin configuration.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG522()
         throws Exception

@@ -131,6 +131,8 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
      * that it might require double submission of the data, first during an initial PUT without credentials and second
      * during a retried PUT with credentials in response to the auth challenge by the server. The checksum must
      * nevertheless only be calculated on the non-doubled data stream.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

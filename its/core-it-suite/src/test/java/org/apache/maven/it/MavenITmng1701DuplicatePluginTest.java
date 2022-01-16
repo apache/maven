@@ -40,6 +40,8 @@ public class MavenITmng1701DuplicatePluginTest
 
     /**
      * Verify that duplicate plugin declarations cause a warning.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

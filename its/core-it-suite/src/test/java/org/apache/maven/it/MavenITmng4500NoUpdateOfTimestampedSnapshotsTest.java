@@ -53,6 +53,8 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
     /**
      * Test that timestamped snapshots are treated as immutable, i.e. Maven should never check for updates of them
      * once downloaded from a remote repo regardless of the update policy.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

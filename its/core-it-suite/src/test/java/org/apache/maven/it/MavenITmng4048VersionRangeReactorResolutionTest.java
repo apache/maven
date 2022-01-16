@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
 
     /**
      * Verify that dependencies using version ranges can be resolved from the reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

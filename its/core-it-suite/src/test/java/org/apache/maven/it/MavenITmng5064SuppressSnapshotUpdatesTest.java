@@ -53,6 +53,8 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
     /**
      * Verify that snapshot updates can be completely suppressed via the CLI arg -nsu. The initial retrieval of a
      * missing snapshot should not be suppressed though.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

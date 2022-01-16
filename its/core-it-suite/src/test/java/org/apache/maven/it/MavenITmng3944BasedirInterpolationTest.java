@@ -41,6 +41,8 @@ public class MavenITmng3944BasedirInterpolationTest
 
     /**
      * Test that interpolation of ${basedir} works for a POM that is not named "pom.xml"
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3944()
         throws Exception

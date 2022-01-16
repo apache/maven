@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -47,6 +46,8 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest
      * hack to compensate for the historic slip of Maven core artifacts depending on wagon providers. Those old
      * wagon providers conflict with the usually newer wagons bundled with the core distro and cause grief under
      * a class loader hierarchy where wagons are loaded from the plugin realm (if available) like in Maven 3.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

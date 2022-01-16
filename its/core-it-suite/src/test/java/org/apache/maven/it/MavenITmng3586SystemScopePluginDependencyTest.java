@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3586SystemScopePluginDependencyTest
     /**
      * Test that plugin dependencies with scope system are part of the plugin class realm. This test checks
      * dependencies that are declared in the plugin POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromPlugin()
         throws Exception
@@ -68,6 +69,8 @@ public class MavenITmng3586SystemScopePluginDependencyTest
     /**
      * Test that plugin dependencies with scope system are part of the plugin class realm. This test checks
      * dependencies that are declared in the project POM that uses the plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromProject()
         throws Exception

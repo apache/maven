@@ -42,6 +42,8 @@ public class MavenITmng4479ProjectLevelPluginDepUsedForCliConfigTest
      * Verify that project-level plugin dependencies are used for direct invocations of the plugin and that they
      * can contribute classes required for the plugin configuration when the plugin is declared using properties
      * for its key.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -41,6 +41,8 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     /**
      * Tests that parallel downloads of artifacts from both the same and from different group ids don't corrupt
      * the local repo.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3379()
         throws Exception

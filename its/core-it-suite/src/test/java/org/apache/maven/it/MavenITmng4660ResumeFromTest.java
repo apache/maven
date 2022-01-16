@@ -40,6 +40,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      * without having them installed first.
      * This test case uses the target/classes directory of module-a, for the situation where
      * module-a has not been packaged.
+     *
+     * @throws Exception in case of failure
      */
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception
     {
@@ -77,6 +79,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      * Test that the --resume-from flag resolves dependencies inside the same Maven project
      * without having them installed first.
      * This test case uses the packaged artifact of module-a.
+     *
+     * @throws Exception in case of failure
      */
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception
     {

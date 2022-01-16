@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -37,6 +36,8 @@ public class MavenIT0010DependencyClosureResolutionTest
      * Since the artifact resolution does not use the project builder, we must
      * ensure that the full hierarchy of all dependencies is resolved. This
      * includes the dependencies of the parent-pom's of dependencies.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0010()
         throws Exception

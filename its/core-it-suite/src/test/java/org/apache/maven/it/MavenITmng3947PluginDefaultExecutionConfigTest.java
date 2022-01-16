@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3947PluginDefaultExecutionConfigTest
     /**
      * Test that the configuration for a plugin execution with the identifier "default" does not pollute the
      * configuration of standalone plugin executions from the CLI.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3947()
         throws Exception

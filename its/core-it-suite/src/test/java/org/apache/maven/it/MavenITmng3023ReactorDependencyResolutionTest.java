@@ -47,6 +47,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * has not been called, i.e. the output directory for the compiled classes has not been created yet, the
      * dependency project artifact should not have a file associated with it. Therefore, the dependency artifact
      * should fail to resolve, and the build should fail.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3023A() throws Exception
     {
@@ -82,6 +84,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * (a directory) associated with it, since the 'compile' phase has run. This location should be
      * present in the compile classpath output from the maven-it-plugin-dependency-resolution:compile
      * mojo execution.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3023B()
         throws Exception
@@ -116,6 +120,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * Afterwards, the projects are cleaned and a separate Maven call to the 'initialize' phase should succeed, since
      * the dependency artifact has been installed locally. This second execution should use the jar file
      * from the local repository in its classpath output.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3023C()
         throws Exception

@@ -37,8 +37,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
- *
- *
  */
 public class MavenITmng3415JunkRepositoryMetadataTest
     extends AbstractMavenIntegrationTestCase
@@ -56,9 +54,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     /**
      * This test simply verifies that when a metadata transfer fails (network error, etc.)
      * no metadata file is written to the local repository.
-     * <p/>
+     * <p>
      * Steps executed to verify this test:
-     * <p/>
+     * </p>
      * 0. Find the local repository directory:
      * a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
      * local repository in use by default. Read the output file to get this path.
@@ -75,6 +73,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * repository afterwards.
      * 3. Build the test project the second time
      * a. See (2.a) and (2.b) above; the same criteria applies here.
+     *
+     * @throws Exception in case of failure
      */
     public void testitTransferFailed()
         throws Exception
@@ -126,9 +126,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     /**
      * This test simply verifies that when metadata doesn't exist on the remote
      * repository, a basic metadata file is written to the local repository.
-     * <p/>
+     * <p>
      * Steps executed to verify this test:
-     * <p/>
+     * </p>
      * 0. Find the local repository directory:
      * a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
      * local repository in use by default. Read the output file to get this path.
@@ -145,6 +145,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * a. Verify that the remote repository is NOT checked for the metadata file again
      * b. Verify that the file used for updateInterval calculations was NOT changed from
      * the first build.
+     *
+     * @throws Exception in case of failure
      */
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException()
         throws Exception

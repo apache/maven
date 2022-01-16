@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0818WarDepsNotTransitiveTest
 
     /**
      * Test that depending on a WAR doesn't also get its dependencies transitively.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0818()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest
 
     /**
      * Test the use of a new type from a plugin
+     *
+     * @throws Exception in case of failure
      */
     public void testit0041()
         throws Exception

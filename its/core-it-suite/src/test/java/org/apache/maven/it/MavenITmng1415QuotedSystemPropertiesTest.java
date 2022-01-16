@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng1415QuotedSystemPropertiesTest
 
     /**
      * Test that quoted system properties are processed correctly. [MNG-1415]
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1415()
         throws Exception

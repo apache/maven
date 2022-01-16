@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenIT0038AlternatePomFileDifferentDirTest
 
     /**
      * Test building project from outside the project directory using '-f' option.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0038()
         throws Exception

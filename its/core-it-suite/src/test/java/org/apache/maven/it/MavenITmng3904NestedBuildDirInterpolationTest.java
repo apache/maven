@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3904NestedBuildDirInterpolationTest
     /**
      * Test that properties which refer to build directories which in turn refer to other build directories are
      * properly interpolated.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3904()
         throws Exception

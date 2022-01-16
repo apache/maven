@@ -40,6 +40,8 @@ public class MavenITmng2820PomCommentsTest
 
     /**
      * Verify that installed/deployed POMs retain any XML-comments like license headers.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

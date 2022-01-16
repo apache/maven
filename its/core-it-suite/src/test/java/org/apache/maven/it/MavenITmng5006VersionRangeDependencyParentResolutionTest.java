@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest
      * repository from which the specific dependency version was picked. Or put differently, the fact that a:0.1
      * was found in repo-1 does not mean parents/dependencies of a:0.1 are also located in that same repo, they
      * could be in any of the originally declared repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

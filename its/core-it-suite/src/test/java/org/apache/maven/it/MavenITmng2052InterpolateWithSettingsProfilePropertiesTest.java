@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
      * Test that properties defined in an active profile in the user's
      * settings are available for interpolation of systemPath in a dependency.
      * [MNG-2052]
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2052()
         throws Exception

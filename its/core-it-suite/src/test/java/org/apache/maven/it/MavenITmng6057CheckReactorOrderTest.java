@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -46,6 +45,8 @@ public class MavenITmng6057CheckReactorOrderTest
 
     /**
      * Verify that the result shows the reactor order as expected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitReactorShouldResultInExpectedOrder()
         throws Exception

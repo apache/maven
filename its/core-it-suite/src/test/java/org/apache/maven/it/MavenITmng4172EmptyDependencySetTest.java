@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4172EmptyDependencySetTest
 
     /**
      * Test that a project without dependencies is really constructed without dependency artifacts.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

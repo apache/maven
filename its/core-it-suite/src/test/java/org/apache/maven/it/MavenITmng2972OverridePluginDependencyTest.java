@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng2972OverridePluginDependencyTest
 
     /**
      * Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLifecycleInvocation()
         throws Exception
@@ -71,6 +72,8 @@ public class MavenITmng2972OverridePluginDependencyTest
      * another hash code for the dependency artifact and thereby changing its position in the HashSet's element order.
      * The two versions 0.2-mng-2972 and 9.9-MNG-2972 we use here have at least once proven (on Sun JDK 1.6.0_07) to
      * successfully break the correctness of the random ordering.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCommandLineInvocation()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
 
     /**
      * Test that inheritance of certain URLs automatically appends the child's artifact id.
+     *
+     * @throws Exception in case of failure
      */
     public void testitOneParent()
         throws Exception
@@ -73,6 +74,8 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
     /**
      * Test that inheritance of certain URLs automatically appends the child's artifact id. In a deeper inheritance
      * hierarchy, this should contribute the artifact id of each parent that does not override the URLs.
+     *
+     * @throws Exception in case of failure
      */
     public void testitTwoParents()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng3998PluginExecutionConfigTest
 
     /**
      * Test that multiple plugin executions do not lose their configuration when plugin management is used.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3998()
         throws Exception

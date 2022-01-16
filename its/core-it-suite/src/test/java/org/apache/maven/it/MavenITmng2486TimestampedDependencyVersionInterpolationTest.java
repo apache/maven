@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
      * Verify that the expression ${project.version} gets resolved to X-SNAPSHOT and not the actual timestamp
      * during transitive dependency resolution. In part, this depends on the deployed SNAPSHOT POMs to retain their
      * X-SNAPSHOT project version and not having it replaced with the timestamp version.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

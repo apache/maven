@@ -42,9 +42,11 @@ public class MavenITmng4415InheritedPluginOrderTest
 
     /**
      * Test that merging of plugins during inheritance follows these rules regarding ordering:
-     * parent: X ->      A -> B ->      D -> E
+     * {@code parent: X ->      A -> B ->      D -> E
      * child:       Y -> A ->      C -> D ->      F
-     * result: X -> Y -> A -> B -> C -> D -> E -> F
+     * result: X -> Y -> A -> B -> C -> D -> E -> F}
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

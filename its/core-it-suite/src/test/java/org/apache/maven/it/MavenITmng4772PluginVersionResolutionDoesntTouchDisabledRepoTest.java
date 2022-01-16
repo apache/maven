@@ -52,6 +52,8 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
     /**
      * Verify that repositories which have both releases and snapshots disabled aren't touched when looking for
      * the latest plugin version.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

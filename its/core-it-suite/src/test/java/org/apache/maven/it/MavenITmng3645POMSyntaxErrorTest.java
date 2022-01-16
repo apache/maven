@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +26,7 @@ import java.io.File;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3645">MNG-3645</a>.
  *
- * @todo Fill in a better description of what this test verifies!
+ * todo Fill in a better description of what this test verifies!
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
@@ -45,6 +43,8 @@ public class MavenITmng3645POMSyntaxErrorTest
 
     /**
      * Verify that POMs of reactor projects are parsed in strict mode.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -40,7 +40,9 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
 
     /**
      * Submodule2 depends on compiler output from submodule1, but dependency is in generate-resources phase in
-     * submodule2. This effectively tests the moddule-locking of the project artifact.
+     * submodule2. This effectively tests the module-locking of the project artifact.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

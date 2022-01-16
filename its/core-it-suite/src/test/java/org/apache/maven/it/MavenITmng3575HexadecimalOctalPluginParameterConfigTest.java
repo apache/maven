@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -39,6 +38,8 @@ public class MavenITmng3575HexadecimalOctalPluginParameterConfigTest
 
     /**
      * Verify that numeric plugin parameters can be configured using hexadecimal/octal notation.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

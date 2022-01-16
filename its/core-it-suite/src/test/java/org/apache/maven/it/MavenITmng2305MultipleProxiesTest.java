@@ -60,6 +60,8 @@ public class MavenITmng2305MultipleProxiesTest
     /**
      * Verify that proxies can be setup for multiple protocols, in this case HTTP and HTTPS. As a nice side effect,
      * this checks HTTPS tunneling over a web proxy.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

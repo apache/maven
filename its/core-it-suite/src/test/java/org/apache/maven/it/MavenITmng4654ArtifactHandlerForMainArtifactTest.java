@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest
     /**
      * Test that the artifact handler for the project main artifact is selected via the handler's type/roleHint
      * and not via the handler's packaging (the packaging only applies to the legacy repo layout).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

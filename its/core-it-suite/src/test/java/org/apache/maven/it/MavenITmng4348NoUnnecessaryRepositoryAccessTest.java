@@ -52,6 +52,8 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
     /**
      * Test that the (remote) repos are not accessed during execution of a mojo that does not require dependency
      * resolution. In detail, Maven should neither touch POMs, JARs nor metadata.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

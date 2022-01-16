@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng0731LegacyRepoLayoutTest
      * Verify that deployment of artifacts to a legacy-layout repository
      * results in a groupId directory of 'the.full.group.id' instead of
      * 'the/full/group/id'.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG731()
         throws Exception

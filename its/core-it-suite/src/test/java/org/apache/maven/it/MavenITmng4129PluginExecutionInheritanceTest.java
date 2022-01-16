@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -44,6 +43,8 @@ public class MavenITmng4129PluginExecutionInheritanceTest
 
     /**
      * Verify that plugin executions defined in the parent with inherited=false are not executed in child modules.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

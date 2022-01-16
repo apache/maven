@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng1999DefaultReportsInheritanceTest
 
     /**
      * Test that default reports can be suppressed via inheritance from the parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitInheritSuppression()
         throws Exception
@@ -63,6 +64,8 @@ public class MavenITmng1999DefaultReportsInheritanceTest
 
     /**
      * Verify that children can re-enable default reports if suppressed via inheritance from the parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitOverrideSuppression()
         throws Exception

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -41,6 +40,8 @@ public class MavenITmng3680InvalidDependencyPOMTest
 
     /**
      * Verify that dependencies with invalid POMs can still be used without failing the build.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3680 ()
         throws Exception

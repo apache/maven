@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4328PrimitiveMojoParameterConfigurationTest
      * Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
      * from expressions. In other words, the subtle difference between the runtime type of the expression value (which
      * will always be a primitive wrapper class due to reflection) and the actual parameter type should not matter.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

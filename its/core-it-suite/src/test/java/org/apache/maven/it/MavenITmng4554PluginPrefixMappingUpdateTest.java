@@ -55,6 +55,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
     /**
      * Test that the metadata holding the plugin prefix mapping is cached and not redownloaded upon each
      * Maven invocation.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCached()
         throws Exception
@@ -139,6 +141,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
     /**
      * Test that the local metadata holding the plugin prefix mapping can be forcefully updated via the command
      * line flag -U.
+     *
+     * @throws Exception in case of failure
      */
     public void testitForcedUpdate()
         throws Exception
@@ -224,6 +228,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
     /**
      * Test that the local metadata holding the plugin prefix mapping is automatically refetched from the remote
      * repositories if the local metadata fails to resolve a new/other plugin prefix.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRefetched()
         throws Exception

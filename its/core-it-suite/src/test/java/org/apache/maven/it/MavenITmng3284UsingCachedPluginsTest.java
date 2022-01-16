@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -40,6 +39,8 @@ public class MavenITmng3284UsingCachedPluginsTest
     /**
      * Verify that the effective plugin versions used for a project are not influenced by other instances of this
      * plugin in the reactor, i.e. each module gets exactly the plugin version it declares.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3284()
         throws Exception

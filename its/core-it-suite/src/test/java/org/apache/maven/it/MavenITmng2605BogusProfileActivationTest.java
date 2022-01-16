@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -43,6 +42,8 @@ public class MavenITmng2605BogusProfileActivationTest
     /**
      * Test that profiles are not accidentally activated when they have no activation element at all and
      * the user did not request their activation via id.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2605()
         throws Exception

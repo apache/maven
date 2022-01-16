@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.Os;
 

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
     /**
      * Verify that for a dependency being referenced in two different scopes, the scope given directly in the POM
      * always wins, even if weaker than the scope of the transitive dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testitDirectVsIndirect()
         throws Exception
@@ -81,6 +82,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in compile and in runtime scope, compile scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCompileVsRuntime()
         throws Exception
@@ -102,6 +105,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in compile and in test scope, compile scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCompileVsTest()
         throws Exception
@@ -123,6 +128,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in compile and in provided scope, compile scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCompileVsProvided()
         throws Exception
@@ -144,6 +151,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in runtime and in test scope, runtime scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRuntimeVsTest()
         throws Exception
@@ -165,6 +174,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in runtime and in provided scope, runtime scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRuntimeVsProvided()
         throws Exception
@@ -186,6 +197,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
 
     /**
      * Verify that for a dependency being referenced in provided and in test scope, provided scope wins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitProvidedVsTest()
         throws Exception

@@ -41,6 +41,8 @@ public class MavenITmng3808ReportInheritenceOrderingTest
 
     /**
      * Test that 3 executions are run in the correct order.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3808()
         throws Exception

@@ -45,6 +45,8 @@ public class MavenITmng3940EnvVarInterpolationTest
     /**
      * Test that interpolation of environment variables respects the casing rules of the underlying OS (especially
      * Windows).
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3940()
         throws Exception

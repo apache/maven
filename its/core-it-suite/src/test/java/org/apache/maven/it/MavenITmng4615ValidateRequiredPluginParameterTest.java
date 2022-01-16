@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
      * This scenario checks the case of all required parameters being set via plugin configuration.
+     *
+     * @throws Exception in case of failure
      */
     public void testitAllSet()
         throws Exception
@@ -63,6 +64,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
      * This scenario checks the case of a parameter missing its backing system property.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExprMissing()
         throws Exception
@@ -90,6 +93,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
      * This scenario checks the case of a parameter having its backing system property set.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExprSet()
         throws Exception
@@ -113,6 +118,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
      * This scenario checks the case of a parameter missing its backing POM value.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPomValMissing()
         throws Exception
@@ -142,6 +149,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
      * This scenario checks the case of a parameter having its backing POM value set.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPomValSet()
         throws Exception

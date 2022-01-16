@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng1088ReactorPluginResolutionTest
      * Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
      * (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
      * the plugin (i.e. a phase before "compile").
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1088()
         throws Exception

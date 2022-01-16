@@ -37,6 +37,8 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest
 
     /**
      * Verify that the legacy StringSearchModelInterpolator has its PathTranslator injected.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

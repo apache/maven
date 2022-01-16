@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenIT0024MultipleGoalExecutionsTest
     /**
      * Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;
      * that are directly inside the plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0024()
         throws Exception

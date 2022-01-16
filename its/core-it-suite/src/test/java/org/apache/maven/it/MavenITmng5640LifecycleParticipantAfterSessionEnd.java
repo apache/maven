@@ -37,6 +37,8 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
     /**
      * IT executing a Maven build that has UT failure.
+     *
+     * @throws Exception in case of failure
      */
     public void testBuildFailureUTFail()
         throws Exception
@@ -76,6 +78,8 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
     /**
      * IT executing a Maven build that has missing dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testBuildFailureMissingDependency()
         throws Exception
@@ -114,6 +118,8 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
     /**
      * IT executing a Maven build that has failing Maven plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testBuildError()
         throws Exception
@@ -159,6 +165,8 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
     /**
      * IT executing a Maven build that has failing Maven plugin throwing RuntimeException.
+     *
+     * @throws Exception in case of failure
      */
     public void testBuildErrorRt()
         throws Exception
@@ -200,4 +208,5 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
-    }}
+    }
+}

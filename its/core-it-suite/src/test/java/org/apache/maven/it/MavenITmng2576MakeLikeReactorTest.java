@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -50,6 +49,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that project list by itself only builds specified projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeOnlyList()
         throws Exception
@@ -75,6 +76,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that project list and all their upstream projects are built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeUpstream()
         throws Exception
@@ -101,6 +104,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that project list and all their downstream projects are built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeDownstream()
         throws Exception
@@ -127,6 +132,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that project list and all their upstream and downstream projects are built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeBoth()
         throws Exception
@@ -154,6 +161,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that using the mere basedir in the project list properly matches projects with non-default POM files.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByBasedir()
         throws Exception
@@ -180,6 +189,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that using the mere basedir in the project list properly matches projects with non-default POM files.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByBasedirPlus()
         throws Exception
@@ -208,6 +219,8 @@ public class MavenITmng2576MakeLikeReactorTest
     }
     /**
      * Verify that the project list can also specify project ids.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesById()
         throws Exception
@@ -233,6 +246,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that the project list can also specify artifact ids.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByArtifactId()
         throws Exception
@@ -261,6 +276,8 @@ public class MavenITmng2576MakeLikeReactorTest
 
     /**
      * Verify that reactor is resumed from specified project.
+     *
+     * @throws Exception in case of failure
      */
     public void testitResumeFrom()
         throws Exception

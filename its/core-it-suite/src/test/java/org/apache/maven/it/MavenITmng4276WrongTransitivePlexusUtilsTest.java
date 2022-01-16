@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest
     /**
      * Verify that plugins that have a *transitive* dependency on plexus-utils:x.y get that version and not a random
      * version injected by the core like 1.1.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

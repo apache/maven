@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenIT0040PackagingFromPluginExtensionTest
 
     /**
      * Test the use of a packaging from a plugin
+     *
+     * @throws Exception in case of failure
      */
     public void testit0040()
         throws Exception

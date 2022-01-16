@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest
     /**
      * Test that custom lifecycle mappings contributed by build extensions of one project do not leak into other
      * projects in the reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

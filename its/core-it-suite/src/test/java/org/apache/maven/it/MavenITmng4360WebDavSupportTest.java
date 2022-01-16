@@ -52,6 +52,8 @@ public class MavenITmng4360WebDavSupportTest
     /**
      * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
      * that the Jackrabbit based wagon can be properly loaded and doesn't die due to some class realm issue.
+     *
+     * @throws Exception in case of failure
      */
     public void testitJackrabbitBasedImpl()
         throws Exception
@@ -62,6 +64,8 @@ public class MavenITmng4360WebDavSupportTest
     /**
      * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
      * that the Slide based wagon can be properly loaded and doesn't die due to some class realm issue.
+     *
+     * @throws Exception in case of failure
      */
     public void testitSlideBasedImpl()
         throws Exception

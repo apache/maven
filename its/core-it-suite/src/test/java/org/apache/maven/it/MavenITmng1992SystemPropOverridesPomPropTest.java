@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng1992SystemPropOverridesPomPropTest
      * Test that system/execution properties take precedence over the POM's properties section when configuring a
      * plugin parameter that is annotated with @parameter expression="prop". Note that this issue is not about POM
      * interpolation but rather plugin parameter expression evaluation.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1992()
         throws Exception

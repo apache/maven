@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -41,6 +40,8 @@ public class MavenITmng2744checksumVerificationTest
 
     /**
      * Tests that hex digits of checksums are compared without regard to case.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2744()
         throws Exception

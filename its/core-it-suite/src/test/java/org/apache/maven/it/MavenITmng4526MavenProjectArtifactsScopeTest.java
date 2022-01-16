@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest
     /**
      * Test that MavenProject.getArtifacts() only holds artifacts matching the scope requested by a mojo. This
      * must also be the case when previously already artifacts from a wider scope were resolved.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

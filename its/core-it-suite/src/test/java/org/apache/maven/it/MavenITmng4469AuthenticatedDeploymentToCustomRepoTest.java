@@ -134,6 +134,8 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
 
     /**
      * Test that deployment to a custom repository (i.e. created by a plugin) that requires authentification works.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

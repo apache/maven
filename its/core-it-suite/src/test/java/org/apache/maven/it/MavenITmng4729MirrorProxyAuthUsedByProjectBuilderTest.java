@@ -56,6 +56,8 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
     /**
      * Test that the 2.x project builder obeys the network settings (mirror, proxy, auth) when building remote POMs
      * and discovering additional repositories.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

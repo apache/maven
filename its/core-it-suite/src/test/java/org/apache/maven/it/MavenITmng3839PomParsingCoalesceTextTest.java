@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3839PomParsingCoalesceTextTest
 
     /**
      * Test that POM parsing properly coalesces text data.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3839()
         throws Exception

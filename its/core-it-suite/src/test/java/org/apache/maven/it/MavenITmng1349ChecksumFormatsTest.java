@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -41,6 +40,8 @@ public class MavenITmng1349ChecksumFormatsTest
 
     /**
      * Tests that different checksum formats are supported.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1349()
         throws Exception

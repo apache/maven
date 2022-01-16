@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
     /**
      * Test that different projects in a reactor build can use different versions of the same extension.
      * This should still hold true if the two versions of the extension provide the same set of components.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

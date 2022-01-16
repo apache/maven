@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4412OfflineModeInPluginTest
     /**
      * Verify that plugins using the 2.x style artifact resolver directly are subject to the offline mode of the
      * current Maven session.
+     *
+     * @throws Exception in case of failure
      */
     public void testitResolver()
         throws Exception
@@ -76,6 +77,8 @@ public class MavenITmng4412OfflineModeInPluginTest
     /**
      * Verify that plugins using the 2.x style artifact collector directly are subject to the offline mode of the
      * current Maven session.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCollector()
         throws Exception

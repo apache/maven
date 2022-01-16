@@ -43,6 +43,8 @@ public class MavenITmng4180PerDependencyExclusionsTest
     /**
      * Test that dependency exclusions are not applied globally but are limited to the sub tree that is rooted at the
      * dependency they are declared on.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

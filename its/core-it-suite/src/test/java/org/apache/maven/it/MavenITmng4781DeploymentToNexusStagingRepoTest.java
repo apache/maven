@@ -121,6 +121,8 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
      * HTTP/WebDAV server is that those staging repos yield a HTTP 400 (and not 404) for every GET request until a
      * PUT request is made (which initializes the staging repo). The bottom line is that remote metadata must not be
      * requested before the first artifact is deployed.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

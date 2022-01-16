@@ -41,6 +41,8 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest
     /**
      * Verify that strict checksum verification applies to metadata as well and in particular fails the build
      * during deployment when the previous metadata is corrupt.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

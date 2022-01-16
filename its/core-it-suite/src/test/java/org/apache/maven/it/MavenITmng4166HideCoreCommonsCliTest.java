@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4166HideCoreCommonsCliTest
     /**
      * Verify that plugins can use their own version of commons-cli and are not bound to the version bundled in the
      * core.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4166()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng2318LocalParentResolutionTest
 
     /**
      * When a project has modules and its parent is not preinstalled [MNG-2318]
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2318()
         throws Exception

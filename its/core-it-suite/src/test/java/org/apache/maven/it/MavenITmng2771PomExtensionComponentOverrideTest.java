@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng2771PomExtensionComponentOverrideTest
 
     /**
      * Test that ensures the POM extensions can override default component implementations.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2771()
         throws Exception

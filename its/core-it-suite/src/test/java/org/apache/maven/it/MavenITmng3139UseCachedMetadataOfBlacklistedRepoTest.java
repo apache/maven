@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
     /**
      * Test that locally cached metadata of blacklisted repositories is consulted to resolve metaversions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3139()
         throws Exception

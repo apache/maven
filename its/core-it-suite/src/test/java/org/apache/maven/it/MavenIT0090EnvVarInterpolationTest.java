@@ -37,6 +37,8 @@ public class MavenIT0090EnvVarInterpolationTest
     /**
      * Test that ensures that envars are interpolated correctly into plugin
      * configurations.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0090()
         throws Exception

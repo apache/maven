@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng2749ExtensionAvailableToPluginTest
 
     /**
      * Verify that plugins can load classes/resources from a build extension.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2749()
         throws Exception

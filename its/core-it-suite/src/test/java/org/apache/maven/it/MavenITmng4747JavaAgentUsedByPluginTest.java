@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4747JavaAgentUsedByPluginTest
     /**
      * Verify that classes from JRE agents can be loaded from plugins. Agents are loaded into the system class loader
      * and hence plugins must have access to the system class loader.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

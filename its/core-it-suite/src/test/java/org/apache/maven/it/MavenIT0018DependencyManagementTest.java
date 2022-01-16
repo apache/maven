@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -36,6 +35,8 @@ public class MavenIT0018DependencyManagementTest
      * Ensure that managed dependencies for dependency POMs are calculated
      * correctly when resolved. Removes managed-dep-1.0.3 and checks it is
      * redownloaded upon resolution of direct-dep.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0018()
         throws Exception

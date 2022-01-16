@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -35,6 +34,8 @@ public class MavenIT0064MojoConfigViaSettersTest
     /**
      * Test the use of a mojo that uses setters instead of private fields
      * for the population of configuration values.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0064()
         throws Exception

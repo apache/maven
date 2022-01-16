@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0666IgnoreLegacyPomTest
     /**
      * Verify that maven-1 POMs will be ignored but not stop the resolution
      * process.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG666()
         throws Exception

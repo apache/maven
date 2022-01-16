@@ -22,8 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**

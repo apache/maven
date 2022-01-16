@@ -44,6 +44,8 @@ public class MavenITmng2790LastUpdatedMetadataTest
 
     /**
      * Verify that the field lastUpdated of existing local repo metadata is updated upon install of new a snapshot.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2790()
         throws Exception

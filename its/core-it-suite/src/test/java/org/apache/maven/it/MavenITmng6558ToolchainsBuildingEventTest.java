@@ -38,6 +38,8 @@ public class MavenITmng6558ToolchainsBuildingEventTest
 
     /**
      * Verify that <code>ToolchainsBuildingRequest</code> and <code>ToolchainsBuildingResult</code> events are sent to event spy.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

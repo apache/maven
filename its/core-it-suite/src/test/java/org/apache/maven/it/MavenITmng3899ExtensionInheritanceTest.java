@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3899ExtensionInheritanceTest
 
     /**
      * Test that build extensions are properly merged during inheritance.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3899()
         throws Exception

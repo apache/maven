@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2363BasedirAwareFileActivatorTest
     /**
      * Test that the file-based profile activator resolves relative paths against the current project's base directory
      * and also interpolates ${basedir} if explicitly given, just like usual for other parts of the POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

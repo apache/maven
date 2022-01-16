@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -44,6 +43,8 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest
     /**
      * Verify that dependency resolution gracefully ignores dependency POMs that have coordinates which don't
      * match the deployed artifact.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

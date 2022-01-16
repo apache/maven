@@ -53,7 +53,9 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
 
     /**
      * Verify that locally built/installed snapshot artifacts suppress remote update checks (as long as the local copy
-     * still satifies the update policy configured for the remote repository).
+     * still satisfies the update policy configured for the remote repository).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

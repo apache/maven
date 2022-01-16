@@ -41,6 +41,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
     /**
      * Verify that the artifact installer copies POMs to the local repo even if they have an older timestamp as the
      * copy in the local repo.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPomPackaging()
         throws Exception
@@ -89,6 +91,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
     /**
      * Verify that the artifact installer copies files to the local repo only if their timestamp differs from the copy
      * already in the local repo.
+     *
+     * @throws Exception in case of failure
      */
     public void testitJarPackaging()
         throws Exception

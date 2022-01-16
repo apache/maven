@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4355ExtensionAutomaticVersionResolutionTest
     /**
      * Test that extension declarations in the POM without an explicit version get resolved to the last release
      * version of the extension artifact.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

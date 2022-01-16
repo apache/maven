@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
     /**
      * Test aggregation of list configuration items for build plugins when using 'combine.children=append' attribute.
      * This variation of the test does not employ profiles.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNoProfile()
         throws Exception
@@ -53,6 +54,8 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
     /**
      * Test aggregation of list configuration items for build plugins when using 'combine.children=append' attribute.
      * This variation of the test employs active profiles which however are empty and should not change the result.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithProfile()
         throws Exception

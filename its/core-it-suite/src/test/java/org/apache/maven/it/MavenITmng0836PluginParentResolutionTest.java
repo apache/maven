@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +41,8 @@ public class MavenITmng0836PluginParentResolutionTest
      * Test that parent POMs referenced by a plugin POM can be resolved from ordinary repos, i.e. non-plugin repos.
      * As a motivation for this, imagine the plugin repository hosts only snapshots while the ordinary repository
      * hosts releases and a snapshot plugin might easily use a released parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG836()
         throws Exception

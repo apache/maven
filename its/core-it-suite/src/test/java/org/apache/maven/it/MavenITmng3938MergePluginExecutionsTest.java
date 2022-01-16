@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,7 +43,9 @@ public class MavenITmng3938MergePluginExecutionsTest
     /**
      * Test that plugin executions with the same id are merged during inheritance, especially executions using the
      * default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults, when
-     * no <pluginManagement> is involved.
+     * no {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginMngt()
         throws Exception
@@ -55,7 +56,9 @@ public class MavenITmng3938MergePluginExecutionsTest
     /**
      * Test that plugin executions with the same id are merged during inheritance, especially executions using the
      * default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults, when
-     * <pluginManagement> is involved.
+     * {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginMngt()
         throws Exception

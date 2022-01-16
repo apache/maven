@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest
     /**
      * Verify that plugin prefixes can be resolved from the POM's plugin management even if the POM
      * does not specify the plugin version.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

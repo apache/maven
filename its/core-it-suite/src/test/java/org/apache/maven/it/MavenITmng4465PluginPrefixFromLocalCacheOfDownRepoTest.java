@@ -41,6 +41,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
     /**
      * Verify that locally cached metadata of non-accessible remote repos is still considered when resolving
      * plugin prefixes.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

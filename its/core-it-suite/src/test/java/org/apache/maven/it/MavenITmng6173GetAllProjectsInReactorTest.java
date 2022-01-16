@@ -39,6 +39,8 @@ public class MavenITmng6173GetAllProjectsInReactorTest
     /**
      * Verifies that {@code MavenSession#getAllProjects()} returns all projects in the reactor
      * not only they ones being built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldReturnAllProjectsInReactor()
             throws Exception

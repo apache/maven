@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest
      * Verify that plugins that use magic parameter expressions like ${plugin} for ordinary system properties
      * get properly configured and don't crash due to Maven trying to inject a type-incompatible magic value
      * into the String-type mojo parameter.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

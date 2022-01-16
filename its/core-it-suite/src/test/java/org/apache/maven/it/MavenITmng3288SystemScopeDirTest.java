@@ -38,6 +38,8 @@ public class MavenITmng3288SystemScopeDirTest
 
     /**
      * Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3288()
         throws Exception

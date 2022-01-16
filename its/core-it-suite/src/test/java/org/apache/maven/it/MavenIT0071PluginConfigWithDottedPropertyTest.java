@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest
     /**
      * Verifies that dotted property references work within plugin
      * configurations.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0071()
         throws Exception

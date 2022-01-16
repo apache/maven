@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4381ExtensionSingletonComponentTest
     /**
      * Test that extension plugins can contribute non-core components that can be accessed by other plugins in the same
      * project and in projects with the same extension.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

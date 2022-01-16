@@ -33,7 +33,7 @@ import java.util.List;
  * <ul>
  *     <li>module-a</li>
  *     <li>module-b</li>
- *     <li>module-c</li> (depends on module-b)
+ *     <li>module-c (depends on module-b)</li>
  * </ul>
  *
  * @author Maarten Mulders
@@ -59,6 +59,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
     /**
      * Tests that the hint at the end of a failed build mentions <code>--resume</code> instead of <code>--resume-from</code>.
+     *
+     * @throws Exception in case of failure
      */
     public void testShouldSuggestToResumeWithoutArgs() throws Exception
     {

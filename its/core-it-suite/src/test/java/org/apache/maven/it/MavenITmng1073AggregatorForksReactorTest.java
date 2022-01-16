@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng1073AggregatorForksReactorTest
 
     /**
      * Verify that aggregator mojos invoked from the CLI that fork the lifecycle do so for the entire reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testitForkLifecycle()
         throws Exception
@@ -66,6 +67,8 @@ public class MavenITmng1073AggregatorForksReactorTest
 
     /**
      * Verify that aggregator mojos invoked from the CLI that fork a goal do so for the entire reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testitForkGoal()
         throws Exception

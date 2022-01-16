@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0479OverrideCentralRepoTest
 
     /**
      *  Verify that using the same repo id allows to override "central". This test checks the effective model.
+     *
+     * @throws Exception in case of failure
      */
     public void testitModel()
         throws Exception
@@ -115,6 +116,8 @@ public class MavenITmng0479OverrideCentralRepoTest
 
     /**
      *  Verify that using the same repo id allows to override "central". This test checks the actual repo access.
+     *
+     * @throws Exception in case of failure
      */
     public void testitResolution()
         throws Exception

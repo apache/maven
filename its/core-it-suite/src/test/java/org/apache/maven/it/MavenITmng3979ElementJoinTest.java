@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -42,6 +41,8 @@ public class MavenITmng3979ElementJoinTest
     /**
      * Test that during inheritance the merging/joining of sub trees with equal identifier doesn't crash if the parent
      * POM has a non-empty element and the child POM has an empty element to join.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3979()
         throws Exception

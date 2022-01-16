@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,8 +41,10 @@ public class MavenITmng3886ExecutionGoalsOrderTest
     }
 
     /**
-     * Test that the goals from a plugin execution are executed in the order given by the POM when no <pluginManagement>
+     * Test that the goals from a plugin execution are executed in the order given by the POM when no {@code <pluginManagement>}
      * is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginMngt()
         throws Exception
@@ -52,8 +53,10 @@ public class MavenITmng3886ExecutionGoalsOrderTest
     }
 
     /**
-     * Test that the goals from a plugin execution are executed in the order given by the POM when <pluginManagement>
+     * Test that the goals from a plugin execution are executed in the order given by the POM when {@code <pluginManagement>}
      * is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginMngt()
         throws Exception

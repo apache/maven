@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0496IgnoreUnknownPluginParametersTest
     /**
      * Test that unused configuration parameters from the POM don't cause the
      * mojo to fail...they will show up as warnings in the -X output instead.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG496()
         throws Exception

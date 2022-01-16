@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng5576CdFriendlyVersions
     /**
      * Verifies that property references with dotted notation work within
      * POM interpolation.
+     *
+     * @throws Exception in case of failure
      */
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer()
         throws Exception
@@ -70,6 +71,8 @@ public class MavenITmng5576CdFriendlyVersions
     /**
      * Verifies that property references with dotted notation work within
      * POM interpolation.
+     *
+     * @throws Exception in case of failure
      */
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer()
         throws Exception

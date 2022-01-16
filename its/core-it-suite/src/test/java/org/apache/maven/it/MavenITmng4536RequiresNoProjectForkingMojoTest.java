@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest
 
     /**
      * Test that forking mojos that require no project only fork the current project and not the entire reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

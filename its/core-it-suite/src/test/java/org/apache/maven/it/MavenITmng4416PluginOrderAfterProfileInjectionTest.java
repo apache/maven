@@ -42,9 +42,11 @@ public class MavenITmng4416PluginOrderAfterProfileInjectionTest
 
     /**
      * Test that merging of plugins during profile injection follows these rules regarding ordering:
-     * model:   X ->      A -> B ->      D -> E
+     * {@code model:   X ->      A -> B ->      D -> E
      * profile:      Y -> A ->      C -> D ->      F
-     * result:  X -> Y -> A -> B -> C -> D -> E -> F
+     * result:  X -> Y -> A -> B -> C -> D -> E -> F}
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

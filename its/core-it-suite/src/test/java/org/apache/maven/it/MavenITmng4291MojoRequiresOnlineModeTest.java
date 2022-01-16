@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
     /**
      * Test that the mojo annotation @requiresOnline is recognized. For a direct mojo invocation, this means to fail
      * when Maven is in offline mode but the mojo requires online model.
+     *
+     * @throws Exception in case of failure
      */
     public void testitDirectInvocation()
         throws Exception
@@ -71,6 +72,8 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
     /**
      * Test that the mojo annotation @requiresOnline is recognized. For a mojo invocation bound to a lifecycle phase,
      * this means to skip the mojo when Maven is in offline mode but the mojo requires online mode.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLifecycleInvocation()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
 
     /**
      * Verify that overriding a transitive compile time dependency as provided in a WAR ensures it is not included.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1233()
         throws Exception

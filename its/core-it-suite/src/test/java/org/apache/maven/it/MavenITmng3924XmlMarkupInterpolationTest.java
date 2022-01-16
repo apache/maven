@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3924XmlMarkupInterpolationTest
 
     /**
      * Test that interpolation of properties that resolve to XML markup doesn't crash the project builder.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3924()
         throws Exception

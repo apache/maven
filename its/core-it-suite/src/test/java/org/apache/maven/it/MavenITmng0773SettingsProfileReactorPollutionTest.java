@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng0773SettingsProfileReactorPollutionTest
 
     /**
      * Verify that profiles from settings.xml do not pollute module lists across projects in a reactorized build.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG773()
         throws Exception

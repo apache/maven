@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2006ChildPathAwareUrlInheritanceTest
     /**
      * Test that inheritance of those URLs which automatically append the child's artifact id take the child's
      * relative location to the parent into account.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2006()
         throws Exception

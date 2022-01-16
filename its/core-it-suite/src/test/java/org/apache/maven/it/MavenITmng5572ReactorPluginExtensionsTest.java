@@ -41,6 +41,8 @@ public class MavenITmng5572ReactorPluginExtensionsTest
 
     /**
      * Test that Maven warns when one reactor project contains a plugin, and another tries to use it with extensions
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

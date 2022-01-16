@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
     /**
      * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in the POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromPom()
         throws Exception
@@ -64,6 +65,8 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
     /**
      * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in profiles.xml.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromProfilesXml()
         throws Exception
@@ -88,6 +91,8 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
     /**
      * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in settings.xml.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromSettings()
         throws Exception

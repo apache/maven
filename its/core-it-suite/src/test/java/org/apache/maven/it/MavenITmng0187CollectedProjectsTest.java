@@ -45,6 +45,8 @@ public class MavenITmng0187CollectedProjectsTest
     /**
      * Verify that MavenProject.getCollectedProjects() provides access to the direct and indirect modules
      * of the current project.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

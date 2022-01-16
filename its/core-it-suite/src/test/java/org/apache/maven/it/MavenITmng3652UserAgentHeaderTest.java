@@ -34,8 +34,6 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3652">MNG-3652</a>.
- *
- *
  */
 public class MavenITmng3652UserAgentHeaderTest
     extends AbstractMavenIntegrationTestCase
@@ -105,6 +103,8 @@ public class MavenITmng3652UserAgentHeaderTest
 
     /**
      * Test that the user agent header is configured in the wagon manager.
+     *
+     * @throws Exception in case of failure
      */
     public void testmng3652_UnConfiguredHttp()
         throws Exception

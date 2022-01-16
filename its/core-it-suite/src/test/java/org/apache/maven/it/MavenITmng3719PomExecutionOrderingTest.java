@@ -43,6 +43,8 @@ public class MavenITmng3719PomExecutionOrderingTest
 
     /**
      * Test that 3 executions are run in the correct order.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3719()
         throws Exception

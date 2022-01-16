@@ -38,6 +38,8 @@ public class MavenITmng5011ConfigureCollectionArrayFromSystemPropTest
 
     /**
      * Verify that plugin parameters of type array/collection can be configured using system properties from the CLI.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4341PluginExecutionOrderTest
     /**
      * Test that plugins bound to the same phase get executed in POM order even if one of the plugins participates
      * in the default lifecycle bindings for the project's packaging.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

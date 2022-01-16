@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
      * problem is that the mere existence of a project output directory like target/classes is no sufficient indicator
      * that we can use that for artifact resolution. The project's output directory might just be a left over from a
      * previous build and could be in any state, e.g. incomplete.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

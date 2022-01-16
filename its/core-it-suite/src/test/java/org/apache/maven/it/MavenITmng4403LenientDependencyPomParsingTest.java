@@ -44,6 +44,8 @@ public class MavenITmng4403LenientDependencyPomParsingTest
      * Test that dependency POMs are only subject to minimal validation during metadata retrieval, i.e. Maven should
      * ignore most kinds of badness and make a best effort at getting the metadata. Of particular interest is also,
      * how Maven deals with duplicate dependency declarations.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -187,6 +187,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
     /**
      * Test that deployment (of a release) to a proxy that requires authentication works.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRelease()
         throws Exception
@@ -196,6 +198,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
     /**
      * Test that deployment (of a snapshot) to a proxy that requires authentication works.
+     *
+     * @throws Exception in case of failure
      */
     public void testitSnapshot()
         throws Exception

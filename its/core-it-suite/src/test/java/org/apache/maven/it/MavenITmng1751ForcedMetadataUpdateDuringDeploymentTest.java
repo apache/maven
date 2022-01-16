@@ -44,6 +44,8 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
     /**
      * Verify that deployment always updates the metadata even if its remote timestamp currently refers to
      * the future.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

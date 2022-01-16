@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng3475BaseAlignedDirTest
 
     /**
      * Verify that project directories are basedir aligned when queried by plugin parameter expressions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3475()
         throws Exception

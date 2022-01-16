@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      * Verify that missing plugin versions in the POM are resolved for all projects on which a forking aggregator mojo
      * will be run and not just the top-level project. This test checks the case of the mojo being invoked from a
      * lifecycle phase.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLifecycle()
         throws Exception
@@ -64,6 +65,8 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      * Verify that missing plugin versions in the POM are resolved for all projects on which a forking aggregator mojo
      * will be run and not just the top-level project. This test checks the case of the mojo being invoked from the
      * command line
+     *
+     * @throws Exception in case of failure
      */
     public void testitCmdLine()
         throws Exception

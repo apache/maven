@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
 
     /**
      * Verify that profiles are activated in relocated POMs.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

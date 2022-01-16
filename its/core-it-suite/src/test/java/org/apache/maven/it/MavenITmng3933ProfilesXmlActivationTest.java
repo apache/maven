@@ -45,6 +45,8 @@ public class MavenITmng3933ProfilesXmlActivationTest
     /**
      * Test that profiles from an external profiles.xml are properly activated. This is really a different story
      * than profiles in the settings.xml or the POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3933()
         throws Exception

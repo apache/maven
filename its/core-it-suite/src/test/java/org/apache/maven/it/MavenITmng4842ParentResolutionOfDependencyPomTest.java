@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
      * Verify that resolution of parent POMs for dependency POMs treats the remote repositories of the current
      * resolution request as dominant when merging with any repositories declared in the dependency POM. This
      * variant of the test checks dependency resolution by the core.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCore()
         throws Exception
@@ -70,6 +71,8 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
      * Verify that resolution of parent POMs for dependency POMs treats the remote repositories of the current
      * resolution request as dominant when merging with any repositories declared in the dependency POM. This
      * variant of the test checks manual dependency resolution by a plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPlugin()
         throws Exception

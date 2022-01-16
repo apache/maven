@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -49,6 +48,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that project list exclusion by itself is not built
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeWithExclude()
         throws Exception
@@ -75,6 +76,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that that exclusion happens on upstream projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeUpstreamExclude()
         throws Exception
@@ -101,6 +104,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that project list and all their downstream projects are built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeDownstreamExclude()
         throws Exception
@@ -127,6 +132,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify  project exclusion when also building upstream and downstream projects are built.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeBothExclude()
         throws Exception
@@ -154,6 +161,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that using the basedir for exclusion with an exclemation in the project list matches projects with non-default POM files.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByBasedirExclamationExclude()
         throws Exception
@@ -180,6 +189,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that using the basedir for exclusion with a minus in the project list matches projects with non-default POM files.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByBasedirMinusExclude()
         throws Exception
@@ -207,6 +218,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that the project list can also specify project ids for exclusion
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByIdExclude()
         throws Exception
@@ -232,6 +245,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     /**
      * Verify that the project list exclude can also specify artifact ids.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMatchesByArtifactIdExclude()
         throws Exception
@@ -257,6 +272,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
      /**
      * Verify that reactor is resumed from specified project with exclude
+     *
+     * @throws Exception in case of failure
      */
     public void testitResumeFromExclude()
         throws Exception

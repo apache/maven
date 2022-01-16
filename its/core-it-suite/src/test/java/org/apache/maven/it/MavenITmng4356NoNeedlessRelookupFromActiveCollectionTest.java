@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest
     /**
      * Test that read operations on active collections of components do not cause a re-lookup of the components from
      * the container which would prevent usage of stateful components that are usually instantiated per lookup.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

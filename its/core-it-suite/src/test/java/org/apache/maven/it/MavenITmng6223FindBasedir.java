@@ -34,6 +34,8 @@ public class MavenITmng6223FindBasedir
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>--file path/to/dir</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testMvnFileLongOptionToDir()
         throws Exception
@@ -43,6 +45,8 @@ public class MavenITmng6223FindBasedir
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>-f path/to/dir</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testMvnFileShortOptionToDir()
         throws Exception
@@ -52,6 +56,8 @@ public class MavenITmng6223FindBasedir
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>--file path/to/module</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testMvnFileLongOptionModuleToDir()
         throws Exception
@@ -61,6 +67,8 @@ public class MavenITmng6223FindBasedir
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>-f path/to/module</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testMvnFileShortOptionModuleToDir()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
     /**
      * Verify that encrypted passwords in the settings stay encrypted in the settings model visible to
      * plugins. In other words, the passwords should only be decrypted at the transport layer.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

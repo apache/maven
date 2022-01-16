@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
 
     /**
      * Test the update policy "always" for snapshot dependencies is respected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitAlways()
         throws Exception
@@ -78,6 +79,8 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
 
     /**
      * Test the update policy "never" for snapshot dependencies is respected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNever()
         throws Exception

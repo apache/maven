@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3831PomInterpolationTest
 
     /**
      * Test that expressions of the form ${*} resolve correctly to POM values (ugly but real).
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3831()
         throws Exception

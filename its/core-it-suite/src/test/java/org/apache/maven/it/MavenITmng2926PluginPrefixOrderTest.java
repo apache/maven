@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -42,6 +41,8 @@ public class MavenITmng2926PluginPrefixOrderTest
     /**
      * Verify that when resolving plugin prefixes the group org.apache.maven.plugins is searched before
      * org.codehaus.mojo and that custom groups from the settings are searched before these standard ones.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2926()
         throws Exception

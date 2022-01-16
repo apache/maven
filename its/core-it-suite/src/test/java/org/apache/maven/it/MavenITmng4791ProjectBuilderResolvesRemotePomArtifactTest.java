@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
     /**
      * Test that the project builder resolves the input artifact when building remote POMs if the input artifact
      * happens to be of type "pom".
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -39,6 +39,8 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest
     /**
      * Verifies that {@code MavenSession#getProjects()} returns the projects being built and that
      * {@code MavenSession#getDependencyGraph()} returns the dependency graph.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldReturnProjectsAndProjectDependencyGraph()
             throws Exception

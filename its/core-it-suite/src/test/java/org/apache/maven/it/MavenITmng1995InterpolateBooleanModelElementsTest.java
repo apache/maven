@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest
 
     /**
      * Verify that POM fields that are of type boolean can be interpolated with expressions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1995()
         throws Exception

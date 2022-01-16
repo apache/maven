@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -50,6 +49,8 @@ public class MavenITmng6391PrintVersionTest
      * as expected for the root module and last
      * module in build but not for the intermediate
      * modules.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldPrintVersionAtTopAndAtBottom()
         throws Exception
@@ -84,6 +85,8 @@ public class MavenITmng6391PrintVersionTest
      * Check that the resulting output is
      * as expected for all modules in case
      * for an aggregator build.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldPrintVersionInAllLines()
         throws Exception

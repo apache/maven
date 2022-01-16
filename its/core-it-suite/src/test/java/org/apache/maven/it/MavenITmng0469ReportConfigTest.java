@@ -42,7 +42,9 @@ public class MavenITmng0469ReportConfigTest
     }
 
     /**
-     * Test that <reporting> configuration also affects build plugins unless <build> configuration is also given.
+     * Test that {@code <reporting>} configuration also affects build plugins unless {@code <build>} configuration is also given.
+     *
+     * @throws Exception in case of failure
      */
     public void testitReportConfigOverridesBuildDefaults()
         throws Exception
@@ -63,7 +65,9 @@ public class MavenITmng0469ReportConfigTest
     }
 
     /**
-     * Test that <build> configuration dominates <reporting> configuration for build goals.
+     * Test that {@code <build>} configuration dominates {@code <reporting>} configuration for build goals.
+     *
+     * @throws Exception in case of failure
      */
     public void testitBuildConfigDominantDuringBuild()
         throws Exception
@@ -81,7 +85,9 @@ public class MavenITmng0469ReportConfigTest
     }
 
     /**
-     * Test that <build> configuration does not affect report goals.
+     * Test that {@code <build>} configuration does not affect report goals.
+     *
+     * @throws Exception in case of failure
      */
     public void testitBuildConfigIrrelevantForReports()
         throws Exception

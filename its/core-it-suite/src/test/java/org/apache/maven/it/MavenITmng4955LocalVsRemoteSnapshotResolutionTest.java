@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest
     /**
      * Verify that dependency resolution prefers newer local snapshots over outdated remote snapshots that use the new
      * metadata format.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

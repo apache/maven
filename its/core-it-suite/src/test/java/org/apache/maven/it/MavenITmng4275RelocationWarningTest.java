@@ -40,6 +40,8 @@ public class MavenITmng4275RelocationWarningTest
 
     /**
      * Verify that relocations are logged (at warning level).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,8 +26,6 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3477">MNG-3477</a>.
- *
- *
  */
 public class MavenITmng3477DependencyResolutionErrorMessageTest
     extends AbstractMavenIntegrationTestCase
@@ -41,6 +38,8 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
 
     /**
      * Tests that dependency resolution errors tell the underlying transport issue.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

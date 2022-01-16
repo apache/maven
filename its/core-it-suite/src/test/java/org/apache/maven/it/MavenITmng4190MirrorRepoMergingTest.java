@@ -45,6 +45,8 @@ public class MavenITmng4190MirrorRepoMergingTest
      * Test that artifact repositories are merged if they are mirrored by the same repo. If n repos map to one
      * mirror, there is no point in making n trips to the same mirror. However, the effective/merged repo needs
      * to account for possibly different policies of the original repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

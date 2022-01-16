@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4895PluginDepWithNonRelocatedMavenApiTest
     /**
      * Verify that the classes constituting the Maven API are always loaded from the Maven core realm even if the plugin
      * realm contains a 3rd party dependency that contains (non-relocated) duplicates of API classes.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

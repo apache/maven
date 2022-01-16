@@ -134,6 +134,8 @@ public class MavenITmng3953AuthenticatedDeploymentTest
 
     /**
      * Test that deployment (of a release) to a repository that requires authentification works.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRelease()
         throws Exception
@@ -143,6 +145,8 @@ public class MavenITmng3953AuthenticatedDeploymentTest
 
     /**
      * Test that deployment (of a snapshot) to a repository that requires authentification works.
+     *
+     * @throws Exception in case of failure
      */
     public void testitSnapshot()
         throws Exception

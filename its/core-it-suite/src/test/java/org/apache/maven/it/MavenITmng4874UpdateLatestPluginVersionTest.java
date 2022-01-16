@@ -40,6 +40,8 @@ public class MavenITmng4874UpdateLatestPluginVersionTest
 
     /**
      * Verify that deployment of a plugin updates the metadata's "latest" field.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4331DependencyCollectionTest
      * Test that @requiresDependencyCollection works for a goal that is bound into a very early lifecycle phase
      * like "validate" where none of the reactor projects have an artifact file. The Enforcer Plugin is the
      * real world example for this use case.
+     *
+     * @throws Exception in case of failure
      */
     public void testitEarlyLifecyclePhase()
         throws Exception
@@ -66,6 +67,8 @@ public class MavenITmng4331DependencyCollectionTest
     /**
      * Test that @requiresDependencyCollection works for an aggregator goal that is invoked from the command line.
      * The Release Plugin is the real world example for this use case.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCliAggregator()
         throws Exception

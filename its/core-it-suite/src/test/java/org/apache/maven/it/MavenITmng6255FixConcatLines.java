@@ -50,6 +50,8 @@ public class MavenITmng6255FixConcatLines
      * Check that <code>CR</code> line endings work.
      * <p>
      * Currently disabled.
+     *
+     * @throws Exception in case of failure
      */
     public void disabledJvmConfigFileCR()
         throws Exception
@@ -59,6 +61,8 @@ public class MavenITmng6255FixConcatLines
 
     /**
      * Check that <code>LF</code> line endings work.
+     *
+     * @throws Exception in case of failure
      */
     public void testJvmConfigFileLF()
         throws Exception
@@ -68,6 +72,8 @@ public class MavenITmng6255FixConcatLines
 
     /**
      * Check that <code>CRLF</code> line endings work.
+     *
+     * @throws Exception in case of failure
      */
     public void testJvmConfigFileCRLF()
         throws Exception

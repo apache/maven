@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4102InheritedPropertyInterpolationTest
      * Verify that the effective value of an inherited property reflects the values of any nested property
      * as defined by the child. This boils down to the order of inheritance and (parent) interpolation.
      * This variation of the test has no profiles.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNoProfiles()
         throws Exception
@@ -56,6 +57,8 @@ public class MavenITmng4102InheritedPropertyInterpolationTest
      * as defined by the child. This boils down to the order of inheritance and (parent) interpolation.
      * This variation of the test has active profiles in parent and child (which should make no difference
      * to the result).
+     *
+     * @throws Exception in case of failure
      */
     public void testitActiveProfiles()
         throws Exception

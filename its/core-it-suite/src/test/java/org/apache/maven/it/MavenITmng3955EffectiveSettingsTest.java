@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -43,6 +42,8 @@ public class MavenITmng3955EffectiveSettingsTest
     /**
      * Test that plugin parameter expressions referring to the settings reflect the actual core state, especially
      * if settings have been overridden by CLI parameters.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3955()
         throws Exception

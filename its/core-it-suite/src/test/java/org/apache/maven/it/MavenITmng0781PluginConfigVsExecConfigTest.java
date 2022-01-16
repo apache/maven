@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
     /**
      * Test that plugin-level configuration instances are not nullified by
      * execution-level configuration instances.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0781()
         throws Exception

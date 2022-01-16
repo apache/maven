@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -49,6 +48,8 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest
      * Test that the core properly handles goals with different requirements on dependency resolution. In particular
      * verify that the different dependency scopes are not erroneously collapsed/combined into just a single scope.
      * The problem is that scope "runtime" is not a superset of scope "compile".
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

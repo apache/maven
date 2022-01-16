@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest
      * Verify that exclusions on dependencies whose type implies a classifier are effective. For those dependencies,
      * the versionless management key of the dependency is different from the versionless id of the resulting artifact
      * which needs to be considered.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

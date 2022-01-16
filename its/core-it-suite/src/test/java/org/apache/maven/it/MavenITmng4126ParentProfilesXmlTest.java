@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -45,6 +44,8 @@ public class MavenITmng4126ParentProfilesXmlTest
      * Verify that effects of active profiles from the profiles.xml of a local parent are inherited by children when
      * parent and child are build together during a reactor invocation. This boils down to the reactor cache not
      * interfering with profile injection from profiles.xml by properly tracking the base directory of cached projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitReactorBuild()
         throws Exception
@@ -66,6 +67,8 @@ public class MavenITmng4126ParentProfilesXmlTest
      * Verify that effects of active profiles from the profiles.xml of a local parent are inherited by children when
      * parent and child are build together during a reactor invocation. This boils down to the reactor cache not
      * interfering with profile injection from profiles.xml by properly tracking the base directory of cached projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitChildOnlyBuild()
         throws Exception

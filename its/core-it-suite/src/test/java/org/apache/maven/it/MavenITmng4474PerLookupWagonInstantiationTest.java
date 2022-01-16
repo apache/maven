@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4474PerLookupWagonInstantiationTest
 
     /**
      * Verify that the wagon manager does not erroneously cache/reuse wagon instances that use per-lookup instantiation.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0947OptionalDependencyTest
     /**
      * Verify that direct optional dependencies are included in the project class paths while transitive optional
      * dependencies are excluded.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

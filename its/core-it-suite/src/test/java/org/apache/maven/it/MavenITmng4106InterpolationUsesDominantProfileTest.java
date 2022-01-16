@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -44,6 +43,8 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest
      * Test that interpolation uses the property values from the dominant (i.e. last) profile among a group
      * of active profiles that define the same properties. This boils down to the proper order of profile
      * injection and interpolation, i.e. interpolate after all profiles are injected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4106()
         throws Exception

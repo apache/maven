@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +39,8 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest
 
     /**
      * Verify that misplaced text inside the project element of a POM causes a parser error during reactor builds.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

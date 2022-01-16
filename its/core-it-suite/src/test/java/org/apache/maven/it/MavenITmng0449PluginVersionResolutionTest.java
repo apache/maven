@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0449PluginVersionResolutionTest
     /**
      * Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
      * then RELEASE in the repo metadata when the plugin is invoked from the lifecycle.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLifecycleInvocation()
         throws Exception
@@ -84,6 +85,8 @@ public class MavenITmng0449PluginVersionResolutionTest
     /**
      * Verify that versions for plugins are automatically resolved if not given in the POM by checking LATEST and
      * RELEASE in the repo metadata when the plugin is invoked directly from the command line.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCliInvocation()
         throws Exception

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -43,6 +42,7 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
      * The profiles should be activated even though only one of the activators
      * returns true.
      *
+     * @throws Exception in case of failure
      */
     public void testProfilesWithMultipleActivators()
         throws Exception

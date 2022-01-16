@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng2054PluginExecutionInheritanceTest
 
     /**
      * Test that plugin executions from &gt;1 step of inheritance don't run multiple times.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2054()
         throws Exception

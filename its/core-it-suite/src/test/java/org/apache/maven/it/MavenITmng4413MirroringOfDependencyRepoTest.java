@@ -56,6 +56,8 @@ public class MavenITmng4413MirroringOfDependencyRepoTest
     /**
      * Test that repositories contributed by dependency POMs during transitive dependency resolution are subject to
      * mirror and authentication configuration.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

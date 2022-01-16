@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng4405ValidPluginVersionTest
 
     /**
      * Test that non-interpolated plugin versions cause a validation error during building.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,7 +42,9 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
 
     /**
      * Test that multiple plugin executions bound to the same phase by child and parent are executed in the proper
-     * order when no <pluginManagement> is involved.
+     * order when no {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginMngt()
         throws Exception
@@ -53,7 +54,9 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
 
     /**
      * Test that multiple plugin executions bound to the same phase by child and parent are executed in the proper
-     * order when <pluginManagement> is involved.
+     * order when {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginMngt()
         throws Exception

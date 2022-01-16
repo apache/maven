@@ -177,6 +177,8 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
 
     /**
      * Test that HTTP proxy is used for HTTP and for WebDAV.
+     *
+     * @throws Exception in case of failure
      */
     public void testitUseHttpProxyForWebDAV()
         throws Exception

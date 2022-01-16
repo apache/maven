@@ -43,6 +43,8 @@ public class MavenITmng4761PluginLevelDependencyScopesTest
      * dependencies inappropriately, leading to unpredictable results.
      *
      * Plugin-dependency scope should be DISREGARDED, and runtime scope should be forced.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

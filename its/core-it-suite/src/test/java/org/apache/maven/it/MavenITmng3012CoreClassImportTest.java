@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3012CoreClassImportTest
     /**
      * Verify that classes shared with the Maven core realm are imported into the plugin realm such that instances of
      * these classes created by the core can be cast to classes loaded by the plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3012()
         throws Exception

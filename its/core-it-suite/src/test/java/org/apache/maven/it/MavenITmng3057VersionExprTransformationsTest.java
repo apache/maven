@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3057">MNG-3057</a>.
  *
- * @todo Fill in a better description of what this test verifies!
+ * todo Fill in a better description of what this test verifies!
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey

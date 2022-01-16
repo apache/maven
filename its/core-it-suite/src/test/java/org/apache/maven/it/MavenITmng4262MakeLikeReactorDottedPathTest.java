@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -47,6 +46,8 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
 
     /**
      * Verify that the project list can select the root project by its relative path ".".
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeRoot()
         throws Exception
@@ -68,7 +69,9 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
     }
 
     /**
-     * Verify that the project list can select a sub module by a relative path like "../<something>".
+     * Verify that the project list can select a sub module by a relative path like {@code "../<something>"}.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMakeModule()
         throws Exception

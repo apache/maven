@@ -43,6 +43,8 @@ public class MavenITmng1830ShowVersionTest
 
     /**
      * Test that the version format
+     *
+     * @throws Exception in case of failure
      */
     public void testVersion()
         throws Exception

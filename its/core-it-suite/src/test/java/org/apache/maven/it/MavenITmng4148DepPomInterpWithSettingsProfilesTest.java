@@ -42,6 +42,8 @@ public class MavenITmng4148DepPomInterpWithSettingsProfilesTest
      * Test that a property from the settings profile that used in the
      * version for a dependency is interpolated when the spec is a transitive dependency
      * (declared in the POM of a direct dependency of the current project).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng1052PluginMngtConfigTest
      * Test that configuration for a lifecycle-bound plugin is injected from
      * PluginManagement section even when it's not explicitly defined in the
      * plugins section.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1052()
         throws Exception

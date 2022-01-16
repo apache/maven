@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -39,8 +38,10 @@ public class MavenITmng4338OptionalMojosTest
     }
 
     /**
-     * Test that the <optional-mojos> element in custom lifecycle mappings is recognized and does not cause
+     * Test that the {@code <optional-mojos>} element in custom lifecycle mappings is recognized and does not cause
      * a configuration failure when loading the lifecycle.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

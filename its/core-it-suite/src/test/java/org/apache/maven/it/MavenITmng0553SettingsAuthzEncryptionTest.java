@@ -116,6 +116,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
     /**
      * Test that the encrypted auth infos given in the settings.xml are decrypted.
+     *
+     * @throws Exception in case of failure
      */
     public void testitBasic()
         throws Exception
@@ -143,6 +145,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     /**
      * Test that the encrypted auth infos given in the settings.xml are decrypted when the master password resides
      * in an external file.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRelocation()
         throws Exception
@@ -178,6 +182,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
     /**
      * Test that the CLI supports generation of encrypted (master) passwords.
+     *
+     * @throws Exception in case of failure
      */
     public void testitEncryption()
         throws Exception

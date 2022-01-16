@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * The test uses a multi-module project with two modules:
  * <ul>
- *     <li>app</li> (depends on lib)
+ *     <li>app (depends on lib)</li>
  *     <li>lib</li>
  * </ul>
  *
@@ -52,9 +52,11 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     }
 
     /**
-     * Performs a <code>cd app && mvn compile</code> invocation. Verifies that inter-module dependencies are resolved.
+     * Performs a {@code cd app && mvn compile} invocation. Verifies that inter-module dependencies are resolved.
+     *
+     * @throws Exception in case of failure
      */
-    public void testInSubModule() throws IOException, VerificationException
+    public void testInSubModule() throws Exception
     {
         // Compile the whole project first.
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -68,9 +70,11 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     }
 
     /**
-     * Performs a <code>mvn -f app/pom.xml compile</code> invocation. Verifies that inter-module dependencies are resolved.
+     * Performs a {@code mvn -f app/pom.xml compile} invocation. Verifies that inter-module dependencies are resolved.
+     *
+     * @throws Exception in case of failure
      */
-    public void testWithFile() throws IOException, VerificationException
+    public void testWithFile() throws Exception
     {
         // Compile the whole project first.
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -84,9 +88,11 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     }
 
     /**
-     * Performs a <code>mvn -f app/pom.xml -am compile</code> invocation. Verifies that dependent modules are also built.
+     * Performs a {@code mvn -f app/pom.xml -am compile} invocation. Verifies that dependent modules are also built.
+     *
+     * @throws Exception in case of failure
      */
-    public void testWithFileAndAlsoMake() throws IOException, VerificationException
+    public void testWithFileAndAlsoMake() throws Exception
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.addCliOption( "-am" );
@@ -97,9 +103,11 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     }
 
     /**
-     * Performs a <code>cd app && mvn compile -am</code> invocation. Verifies that dependent modules are also built.
+     * Performs a {@code cd app && mvn compile -am} invocation. Verifies that dependent modules are also built.
+     *
+     * @throws Exception in case of failure
      */
-    public void testInSubModuleWithAlsoMake() throws IOException, VerificationException
+    public void testInSubModuleWithAlsoMake() throws Exception
     {
         File submoduleDirectory = new File( testDir, "app" );
         Verifier verifier = newVerifier( submoduleDirectory.getAbsolutePath() );

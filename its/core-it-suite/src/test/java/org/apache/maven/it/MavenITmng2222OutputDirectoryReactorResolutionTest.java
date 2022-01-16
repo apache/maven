@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
      * Test that dependencies on reactor projects can be satisfied by their output directories even if those do not
      * exist (e.g. due to non-existing sources). This ensures consistent build results for "mvn compile" and
      * "mvn package".
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

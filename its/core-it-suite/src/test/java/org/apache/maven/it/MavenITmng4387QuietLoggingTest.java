@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4387QuietLoggingTest
 
     /**
      * Test that the CLI flag -q enables quiet logging, i.e. suppresses log levels below ERROR.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

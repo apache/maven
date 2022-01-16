@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -42,6 +41,8 @@ public class MavenITmng4116UndecodedUrlsTest
 
     /**
      * Test that the project builder does not decode URLs (which must be done by the transport layer instead).
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4116()
         throws Exception

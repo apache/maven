@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
     /**
      * Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
      * specified.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG761()
         throws Exception

@@ -39,6 +39,8 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest
 
     /**
      * Test that the file-based profile activator resolves project properties.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

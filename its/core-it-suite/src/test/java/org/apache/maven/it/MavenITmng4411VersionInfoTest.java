@@ -39,6 +39,8 @@ public class MavenITmng4411VersionInfoTest
 
     /**
      * Verify that "mvn --version" outputs the Maven version and stops the execution after that.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -41,6 +41,8 @@ public class MavenITmng2362DeployedPomEncodingTest
     /**
      * Verify that installed/deployed POMs retain their original file encoding and don't get messed up by some
      * transformation that erroneously uses the platform's default encoding for reading/writing them.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

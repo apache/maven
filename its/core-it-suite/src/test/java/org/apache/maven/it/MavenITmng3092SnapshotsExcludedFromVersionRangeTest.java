@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest
     /**
      * Verify that snapshots are not included in version ranges unless explicitly declared as the lower/upper bound
      * of the range.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

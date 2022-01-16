@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3805ExtensionClassPathOrderingTest
     /**
      * Verify that the extension manager respects the ordering of the extension's dependencies when setting up the
      * class realm.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3805()
         throws Exception

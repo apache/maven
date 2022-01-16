@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3043BestEffortReactorResolutionTest
      * Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
      * yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the
      * projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.
+     *
+     * @throws Exception in case of failure
      */
     public void testitTestPhase()
         throws Exception
@@ -97,6 +98,8 @@ public class MavenITmng3043BestEffortReactorResolutionTest
      * Test that dependency resolution still uses the actual artifact files once these have been
      * assembled/attached in the "package" phase. This ensures the class path is accurate and not locked to
      * the output directories of the best effort model from above.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPackagePhase()
         throws Exception

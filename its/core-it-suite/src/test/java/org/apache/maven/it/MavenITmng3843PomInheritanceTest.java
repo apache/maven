@@ -45,6 +45,8 @@ public class MavenITmng3843PomInheritanceTest
 
     /**
      * Test various inheritance scenarios.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3843()
         throws Exception

@@ -49,6 +49,8 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
 
     /**
      * Verify that resolution of the metaversion RELEASE respects offline mode.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

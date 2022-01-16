@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4960MakeLikeReactorResumeTest
     /**
      * Verify that the make-like reactor mode doesn't omit the selected projects when building their prerequisites
      * as well and resuming from one of them.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromUpstream()
         throws Exception
@@ -70,6 +71,8 @@ public class MavenITmng4960MakeLikeReactorResumeTest
     /**
      * Verify that the make-like reactor mode omits the selected project when building its dependents
      * as well and resuming from one of them.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFromDownstream()
         throws Exception

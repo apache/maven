@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -45,6 +44,8 @@ public class MavenITmng4034ManagedProfileDependencyTest
     /**
      * Verify that dependencies defined in profiles get their version injected from the dependency management of the
      * parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4034()
         throws Exception

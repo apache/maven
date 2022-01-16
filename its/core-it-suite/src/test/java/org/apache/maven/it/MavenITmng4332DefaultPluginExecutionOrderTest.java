@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4332DefaultPluginExecutionOrderTest
      * Verify that default plugin executions contributed by the packaging are executed before user-defined
      * executions from the POM's build section, regardless whether the executions are defined in the regular
      * plugins section or the plugin management section.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

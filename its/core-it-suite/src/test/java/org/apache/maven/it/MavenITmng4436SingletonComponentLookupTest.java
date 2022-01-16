@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4436SingletonComponentLookupTest
 
     /**
      * Test that lookup of a singleton component works reliably.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

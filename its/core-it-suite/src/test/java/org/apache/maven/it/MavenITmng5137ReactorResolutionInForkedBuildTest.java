@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
      * Verify that reactor resolution also works within a forked multi-module lifecycle, i.e. a lifecycle fork caused
      * by an aggregator mojo. Here, reactor resolution needs to search the forked project instances for build output,
      * not the project instances from the main build.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

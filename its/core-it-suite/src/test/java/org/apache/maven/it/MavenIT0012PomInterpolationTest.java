@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -34,6 +33,8 @@ public class MavenIT0012PomInterpolationTest
 
     /**
      * Test simple POM interpolation
+     *
+     * @throws Exception in case of failure
      */
     public void testit0012()
         throws Exception

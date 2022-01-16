@@ -41,6 +41,8 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
 
     /**
      * Test that expressions of the form ${pom.*} and {*} referring to the model cause build warnings.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

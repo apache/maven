@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest
     /**
      * Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
      * A depends on property B, and property B depends on property C and so on.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3833()
         throws Exception

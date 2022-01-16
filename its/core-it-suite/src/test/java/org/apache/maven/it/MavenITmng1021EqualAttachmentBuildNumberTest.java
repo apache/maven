@@ -40,6 +40,8 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
     /**
      * Test that source attachments have the same build number and timestamp as the main
      * artifact when deployed.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1021()
         throws Exception

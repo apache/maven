@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
 
     /**
      * Verify that a parent POM is downloaded from a default-style remote repo defined in the settings.
+     *
+     * @throws Exception in case of failure
      */
     public void testitDefaultLayout()
         throws Exception
@@ -61,6 +62,8 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
 
     /**
      * Verify that a parent POM is downloaded from a legacy-style remote repo defined in the settings.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLegacyLayout()
         throws Exception

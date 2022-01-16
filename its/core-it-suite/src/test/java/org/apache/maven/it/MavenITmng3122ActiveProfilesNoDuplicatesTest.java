@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3122ActiveProfilesNoDuplicatesTest
     /**
      * Verify that MavenProject.getActiveProfiles() reports profiles from the settings.xml with activeByDefault=true
      * only once.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3122()
         throws Exception

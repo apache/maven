@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4430DistributionManagementStatusTest
     /**
      * Test that presence of status field in distribution management of a local project POM causes a validation error,
      * this field is only allowed for POMs from the repo.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

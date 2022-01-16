@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
     /**
      * Verify that the make-like reactor mode considers actual project versions when calculating the inter-module
      * dependencies and the modules which need to be build. This variant checks calculation of upstream modules.
+     *
+     * @throws Exception in case of failure
      */
     public void testitAM()
         throws Exception
@@ -68,6 +69,8 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
     /**
      * Verify that the make-like reactor mode considers actual project versions when calculating the inter-module
      * dependencies and the modules which need to be build. This variant checks calculation of downstream modules.
+     *
+     * @throws Exception in case of failure
      */
     public void testitAMD()
         throws Exception

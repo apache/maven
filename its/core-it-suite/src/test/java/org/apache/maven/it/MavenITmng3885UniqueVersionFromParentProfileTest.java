@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     /**
      * Test that uniqueVersion=false defined by a parent profile is effective for child modules when building
      * from the parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNonUniqueVersionReactor()
         throws Exception
@@ -65,6 +66,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     /**
      * Test that uniqueVersion=false defined by a parent profile is effective for child modules when building
      * the child in isolation.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNonUniqueVersionStandalone()
         throws Exception
@@ -87,6 +90,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     /**
      * Test that uniqueVersion=true defined by a parent profile is effective for child modules when building
      * from the parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitUniqueVersionReactor()
         throws Exception
@@ -110,6 +115,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     /**
      * Test that uniqueVersion=true defined by a parent profile is effective for child modules when building
      * the child in isolation.
+     *
+     * @throws Exception in case of failure
      */
     public void testitUniqueVersionStandalone()
         throws Exception

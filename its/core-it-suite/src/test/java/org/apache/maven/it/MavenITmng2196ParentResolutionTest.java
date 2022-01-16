@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +39,8 @@ public class MavenITmng2196ParentResolutionTest
      * Verify that multimodule builds where one project references another as
      * a parent can build, even if that parent is not correctly referenced by
      * &lt;relativePath/&gt; and is not in the local repository. [MNG-2196]
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2196()
         throws Exception

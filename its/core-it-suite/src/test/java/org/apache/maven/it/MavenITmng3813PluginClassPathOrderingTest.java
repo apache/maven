@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3813PluginClassPathOrderingTest
 
     /**
      * Verify that the ordering of the plugin class path matches the ordering of the dependencies as given in the POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3813()
         throws Exception

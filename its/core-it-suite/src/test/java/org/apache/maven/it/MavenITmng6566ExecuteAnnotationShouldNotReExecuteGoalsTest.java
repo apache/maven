@@ -69,6 +69,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest
 
     /**
      * This test uses the <pre>require-compile-phase</pre> goal of the test plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testRunsCompileGoalOnceWithPhaseExecution()
             throws Exception

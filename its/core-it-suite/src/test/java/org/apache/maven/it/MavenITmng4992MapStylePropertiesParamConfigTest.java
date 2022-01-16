@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -39,6 +38,8 @@ public class MavenITmng4992MapStylePropertiesParamConfigTest
 
     /**
      * Verify that plugin parameters of type java.util.Properties can be configured like any other Map-style parameter.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

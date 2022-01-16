@@ -73,6 +73,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
 
     /**
      * Verify that the repositories are used in the reversed order of definition in settings.xml.
+     *
+     * @throws Exception in case of failure
      */
     public void testRepositoriesOrder()
         throws Exception
@@ -107,6 +109,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
 
     /**
      * Verify that the plugin repositories are used in the reversed order of definition in settings.xml.
+     *
+     * @throws Exception in case of failure
      */
     public void testPluginRepositoriesOrder()
         throws Exception

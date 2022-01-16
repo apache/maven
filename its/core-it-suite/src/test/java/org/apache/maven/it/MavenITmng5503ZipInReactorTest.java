@@ -40,6 +40,8 @@ public class MavenITmng5503ZipInReactorTest
     /**
      * Test that zip attached in the assembly plugin is found in the reactor. Simply running verify is sufficient to know that
      * it is found with this project setup.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

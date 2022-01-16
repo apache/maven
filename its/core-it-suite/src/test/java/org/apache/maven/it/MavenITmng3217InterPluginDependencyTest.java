@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3217InterPluginDependencyTest
     /**
      * Verify that the dependency of plugin A on some plugin B does not influence the build of another module in the
      * reactor that uses a different version of plugin B for normal build tasks.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3217()
         throws Exception

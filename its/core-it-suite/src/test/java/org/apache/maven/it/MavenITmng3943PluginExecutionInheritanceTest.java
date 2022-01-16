@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -45,6 +44,8 @@ public class MavenITmng3943PluginExecutionInheritanceTest
     /**
      * Test that plugin executions are properly merged during inheritance, even if the child uses a different
      * plugin version than the parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3943()
         throws Exception

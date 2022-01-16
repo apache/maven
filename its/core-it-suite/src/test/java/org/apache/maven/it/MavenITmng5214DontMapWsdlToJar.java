@@ -1,10 +1,5 @@
 package org.apache.maven.it;
 
-import org.apache.maven.it.util.ResourceExtractor;
-
-import java.io.File;
-import java.util.List;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,6 +19,10 @@ import java.util.List;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.List;
 
 public class MavenITmng5214DontMapWsdlToJar
     extends AbstractMavenIntegrationTestCase
@@ -36,6 +35,8 @@ public class MavenITmng5214DontMapWsdlToJar
     /**
      * Test that the code that allows test-jar and ejb-client dependencies to resolve to the
      * target/classes or target/test-class is *not* applies to other types, e.g. wsdl.
+     *
+     * @throws Exception in case of failure
      */
     public void testitTestPhase()
         throws Exception

@@ -117,6 +117,8 @@ public class MavenITmng4068AuthenticatedMirrorTest
     /**
      * Test that downloading of release/snapshot artifacts from an authenticated mirror works. This basically boils down
      * to using the proper id for the mirrored repository when looking up the credentials.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

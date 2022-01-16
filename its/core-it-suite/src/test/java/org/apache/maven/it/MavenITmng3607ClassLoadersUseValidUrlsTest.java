@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3607ClassLoadersUseValidUrlsTest
 
     /**
      * Test that class loaders created by Maven employ valid URLs, e.g. properly encode characters like spaces.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

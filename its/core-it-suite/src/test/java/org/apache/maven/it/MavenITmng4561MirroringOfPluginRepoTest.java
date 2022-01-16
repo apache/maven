@@ -56,6 +56,8 @@ public class MavenITmng4561MirroringOfPluginRepoTest
     /**
      * Test that repositories contributed by plugin POMs during transitive dependency resolution are subject to
      * mirror, proxy and authentication configuration.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest
 
     /**
      * Verify that dependency resolution considers dependency management also for relocated artifacts.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3769()
         throws Exception

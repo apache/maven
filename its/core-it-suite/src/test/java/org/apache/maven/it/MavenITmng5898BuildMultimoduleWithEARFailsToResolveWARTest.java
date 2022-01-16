@@ -39,6 +39,7 @@ public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest
 
     /**
      *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

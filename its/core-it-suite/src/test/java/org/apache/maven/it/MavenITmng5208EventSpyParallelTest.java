@@ -33,6 +33,8 @@ public class MavenITmng5208EventSpyParallelTest
 
     /**
      * Verify spy signals correct module for failure
+     *
+     * @throws Exception in case of failure
      */
     public void testCorrectModuleFails()
         throws Exception

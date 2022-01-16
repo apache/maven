@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -46,6 +45,8 @@ public class MavenITmng3853ProfileInjectedDistReposTest
      * this issue is not primarily about the effective model (which was correct for the original issue, i.e. reflected
      * the injected distributionManagement section) but whether the MavenProject wrapper around the model is in sync
      * with the model.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3853()
         throws Exception

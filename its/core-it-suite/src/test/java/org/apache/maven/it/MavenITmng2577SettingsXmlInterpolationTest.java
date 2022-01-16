@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2577SettingsXmlInterpolationTest
 
     /**
      * Verify that the settings.xml can be interpolated using environment variables.
+     *
+     * @throws Exception in case of failure
      */
     public void testitEnvVars()
         throws Exception
@@ -64,6 +65,8 @@ public class MavenITmng2577SettingsXmlInterpolationTest
 
     /**
      * Verify that the settings.xml can be interpolated using system properties.
+     *
+     * @throws Exception in case of failure
      */
     public void testitSystemProps()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -38,6 +37,8 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest
     /**
      * Test that parent-POMs cached during a build are available as parents
      * to other POMs in the multimodule build.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2130()
         throws Exception

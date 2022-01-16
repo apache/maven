@@ -41,6 +41,8 @@ public class MavenITmng2309ProfileInjectionOrderTest
 
     /**
      * Test that profiles are injected in declaration order, with the last profile being the most dominant.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2309()
         throws Exception

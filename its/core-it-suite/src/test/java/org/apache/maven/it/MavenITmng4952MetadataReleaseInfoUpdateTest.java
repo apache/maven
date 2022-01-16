@@ -41,6 +41,8 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest
 
     /**
      * Verify that the metadata's RELEASE field gets updated upon deployment of a new version.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

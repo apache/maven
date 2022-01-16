@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest
     /**
      * Test that relocation to an artifact with an invalid POM fails gracefully and still uses the relocated JAR
      * (instead of the JAR for the unrelocated artifact).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

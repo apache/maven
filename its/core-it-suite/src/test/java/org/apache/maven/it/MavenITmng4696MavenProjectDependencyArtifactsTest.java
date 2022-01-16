@@ -43,6 +43,8 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest
      * Verify that MavenProject.getDependencyArtifacts() returns all direct dependencies regardless of their scope.
      * In other words, getDependencyArtifacts() is in general not a subset of MavenProject.getArtifacts() as the
      * latter is subject to scope filtering as requested by plugins.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

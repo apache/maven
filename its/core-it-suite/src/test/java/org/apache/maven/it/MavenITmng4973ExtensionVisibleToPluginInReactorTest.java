@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest
      * Verify that a given plugin within a reactor build gets run with the proper class loader that is wired to
      * the extensions of the current module. More technically speaking, the plugin class realm cache must be keyed
      * by the current project and its build extensions as well.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

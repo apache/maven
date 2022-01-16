@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4342IndependentMojoParameterDefaultValuesTest
     /**
      * Test that multiple goals within a single execution get their default configuration properly injected. In
      * particular, the default values for one goal should not influence the default values of the other goal.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4274PluginRealmArtifactsTest
      * Verify that plugins with an undeclared dependency on plexus-utils that is brought in as a transitive dependency
      * of some Maven core artifact get the proper version of plexus-utils. For clarity, the proper version is the
      * version that the original core artifact specified as dependency, not the version shipped with the current core.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

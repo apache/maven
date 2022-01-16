@@ -42,6 +42,8 @@ public class MavenITmng3951AbsolutePathsTest
     /**
      * Test that the paths retrieved from the core are always absolute, in particular the drive-relative paths on
      * Windows must be properly resolved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3951()
         throws Exception

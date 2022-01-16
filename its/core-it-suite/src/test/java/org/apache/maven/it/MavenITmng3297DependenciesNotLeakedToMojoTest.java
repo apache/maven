@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest
     /**
      * Test that project dependencies resolved for one mojo are not exposed to another mojo if the latter
      * does not require dependency resolution.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

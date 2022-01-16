@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3822BasedirAlignedInterpolationTest
 
     /**
      * Verify that POM interpolation uses basedir-aligned build directories.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3822()
         throws Exception

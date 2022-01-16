@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
 
     /**
      * Verify that snapshot plugins which are scheduled for an update don't fail the build when in offline mode.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2695()
         throws Exception

@@ -52,6 +52,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
     /**
      * Test that Maven logs a warning when a packaged artifact is found that is older than the outputDirectory of the
      * same artifact.
+     *
+     * @throws Exception in case of failure
      */
     public void testShouldWarnWhenPackagedArtifactIsOutdated() throws Exception
     {

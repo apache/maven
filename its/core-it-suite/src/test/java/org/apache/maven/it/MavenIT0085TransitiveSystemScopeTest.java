@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -38,6 +37,8 @@ public class MavenIT0085TransitiveSystemScopeTest
      * when they are resolved transitively via another (non-system)
      * dependency. Inherited scope should not apply in the case of
      * system-scoped dependencies, no matter where they are.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0085()
         throws Exception

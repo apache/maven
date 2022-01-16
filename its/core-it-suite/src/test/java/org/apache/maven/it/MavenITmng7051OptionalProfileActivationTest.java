@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MavenITmng7051OptionalProfileActivationTest
         extends AbstractMavenIntegrationTestCase
@@ -36,8 +35,10 @@ public class MavenITmng7051OptionalProfileActivationTest
 
     /**
      * This test verifies that activating a non-existing profile breaks the build.
+     *
+     * @throws Exception in case of failure
      */
-    public void testActivatingNonExistingProfileBreaks() throws IOException, VerificationException
+    public void testActivatingNonExistingProfileBreaks() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
@@ -60,8 +61,10 @@ public class MavenITmng7051OptionalProfileActivationTest
 
     /**
      * This test verifies that activating a non-existing profile does not break the build when it is prefixed with <strong>?</strong>.
+     *
+     * @throws Exception in case of failure
      */
-    public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws IOException, VerificationException
+    public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
@@ -77,8 +80,10 @@ public class MavenITmng7051OptionalProfileActivationTest
 
     /**
      * This test verifies that activating both an existing and a non-existing profile does not break the build when it the latter is prefixed with <strong>?</strong>.
+     *
+     * @throws Exception in case of failure
      */
-    public void testActivatingExistingAndNonExistingProfiles() throws IOException, VerificationException
+    public void testActivatingExistingAndNonExistingProfiles() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
@@ -94,8 +99,10 @@ public class MavenITmng7051OptionalProfileActivationTest
 
     /**
      * This test verifies that deactivating a non-existing profile does not break the build when it is prefixed with <strong>?</strong>.
+     *
+     * @throws Exception in case of failure
      */
-    public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws IOException, VerificationException
+    public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
@@ -111,8 +118,10 @@ public class MavenITmng7051OptionalProfileActivationTest
 
     /**
      * This test verifies that deactivating both an existing and a non-existing profile does not break the build when it the latter is prefixed with <strong>?</strong>.
+     *
+     * @throws Exception in case of failure
      */
-    public void testDeactivatingExistingAndNonExistingProfiles() throws IOException, VerificationException
+    public void testDeactivatingExistingAndNonExistingProfiles() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );

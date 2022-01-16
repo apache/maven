@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0820ConflictResolutionTest
 
     /**
      * Verify that the collector selecting a particular version gets the correct subtree
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0820()
         throws Exception

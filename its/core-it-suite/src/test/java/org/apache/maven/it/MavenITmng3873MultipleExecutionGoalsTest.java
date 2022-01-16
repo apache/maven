@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,8 +40,10 @@ public class MavenITmng3873MultipleExecutionGoalsTest
     }
 
     /**
-     * Test that all goals from a plugin execution are actually executed and not only one when no <pluginManagement>
+     * Test that all goals from a plugin execution are actually executed and not only one when no {@code <pluginManagement>}
      * is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginMngt()
         throws Exception
@@ -51,8 +52,10 @@ public class MavenITmng3873MultipleExecutionGoalsTest
     }
 
     /**
-     * Test that all goals from a plugin execution are actually executed and not only one when <pluginManagement>
+     * Test that all goals from a plugin execution are actually executed and not only one when {@code <pluginManagement>}
      * is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginMngt()
         throws Exception

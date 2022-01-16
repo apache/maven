@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,7 +41,9 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest
     /**
      * Verify that URL normalization does not happen before interpolation which would result in invalid
      * inherited URLs for project layouts where the parent resides in a sibling directory of the child
-     * and expressions are used for the parent URLs ("${expression}/../foo" -> "foo").
+     * and expressions are used for the parent URLs ("${expression}/../foo" -&gt; "foo").
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -42,6 +42,8 @@ public class MavenITmng4203TransitiveDependencyExclusionTest
 
     /**
      * Test that exclusions defined on a dependency apply to its transitive dependencies as well.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

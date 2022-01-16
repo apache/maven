@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
      * Verify that plexus-utils:1.1 is present on plugin class path if plexus-utils is not explicitly declared in
      * plugin POM for backward-compat with Maven 2.0.5- (due to MNG-2892, plexus-utils is no longer part of the core
      * class realm in Maven 2.0.6+).
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3819()
         throws Exception

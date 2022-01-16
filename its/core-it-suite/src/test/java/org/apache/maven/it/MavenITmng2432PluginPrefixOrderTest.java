@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -42,6 +41,8 @@ public class MavenITmng2432PluginPrefixOrderTest
     /**
      * Verify that when resolving plugin prefixes the plugins from the POM are searched before the plugin groups
      * from the settings.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2432()
         throws Exception

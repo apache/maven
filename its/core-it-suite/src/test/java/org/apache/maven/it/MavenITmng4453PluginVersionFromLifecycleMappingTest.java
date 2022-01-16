@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest
     /**
      * Verify that plugin versions given by the lifecycle mapping are respected, even if those differ from the version
      * defined in the plugin management section inherited from the super POM.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

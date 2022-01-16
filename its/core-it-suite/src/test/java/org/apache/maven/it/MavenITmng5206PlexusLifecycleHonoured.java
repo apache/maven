@@ -39,6 +39,8 @@ public class MavenITmng5206PlexusLifecycleHonoured
 
     /**
      * Verify that plexus lifecycle phases are honoured: contextualize, configure, dispose
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

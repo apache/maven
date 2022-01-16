@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -36,6 +35,8 @@ public class MavenIT0009GoalConfigurationTest
     /**
      * Test plugin configuration and goal configuration that overrides what the
      * mojo has specified.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0009()
         throws Exception

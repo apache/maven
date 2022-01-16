@@ -41,6 +41,8 @@ public class MavenITmng4745PluginVersionUpdateTest
 
     /**
      * Verify that the update policy of a (plugin) repository affects the check for newer plugin versions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRepoPolicyAlways()
         throws Exception
@@ -74,6 +76,8 @@ public class MavenITmng4745PluginVersionUpdateTest
 
     /**
      * Verify that the update policy of a (plugin) repository affects the check for newer plugin versions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRepoPolicyNever()
         throws Exception
@@ -107,6 +111,8 @@ public class MavenITmng4745PluginVersionUpdateTest
 
     /**
      * Verify that the CLI's force update flag affects the check for newer plugin versions.
+     *
+     * @throws Exception in case of failure
      */
     public void testitForceUpdate()
         throws Exception

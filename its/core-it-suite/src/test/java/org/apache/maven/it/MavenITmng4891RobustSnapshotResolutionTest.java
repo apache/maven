@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4891RobustSnapshotResolutionTest
     /**
      * Verify that resolution of a local snapshot still succeeds even if the maven-metadata-local.xml has been
      * corrupted by a remote repository that misuses the same repo id, i.e. "local".
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

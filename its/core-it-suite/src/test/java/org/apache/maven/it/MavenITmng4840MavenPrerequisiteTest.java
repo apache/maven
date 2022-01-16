@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng4840MavenPrerequisiteTest
 
     /**
      * Verify that builds fail straight when the current Maven version doesn't match a plugin's prerequisite.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMojoExecution()
         throws Exception
@@ -72,6 +73,8 @@ public class MavenITmng4840MavenPrerequisiteTest
     /**
      * Verify that automatic plugin version resolution automatically skips plugin versions whose prerequisite on
      * the current Maven version isn't satisfied.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPluginVersionResolution()
         throws Exception

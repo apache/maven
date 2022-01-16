@@ -35,8 +35,10 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     }
 
     /**
-     * Verifies that a project with a dependency graph like A -> B -> C,
+     * Verifies that a project with a dependency graph like {@code A -> B -> C},
      * where C is in a non-Central repository should use B's {@literal <repositories>} to resolve C.
+     *
+     * @throws Exception in case of failure
      */
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -34,6 +33,8 @@ public class MavenIT0032MavenPrerequisiteTest
 
     /**
      * Tests that a specified Maven version requirement that is lower doesn't cause any problems
+     *
+     * @throws Exception in case of failure
      */
     public void testit0032()
         throws Exception

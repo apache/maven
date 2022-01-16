@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
 
     /**
      * Tests that plugin prefix metadata resolution errors tell the underlying transport issue.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPrefix()
         throws Exception
@@ -50,6 +51,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
 
     /**
      * Tests that plugin version metadata resolution errors tell the underlying transport issue.
+     *
+     * @throws Exception in case of failure
      */
     public void testitVersion()
         throws Exception

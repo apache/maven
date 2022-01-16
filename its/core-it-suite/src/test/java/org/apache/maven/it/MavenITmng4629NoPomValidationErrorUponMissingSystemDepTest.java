@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest
     /**
      * Verify that mere POM validation does not fail upon a system-scope dependency that refers to a non-existing
      * file (the error is deferred to actual dependency resolution).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng1908LegacySnapshotUpdateTest
 
     /**
      * Test that legacy repositories with legacy snapshots (i.e. without metadata) download correctly.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1908()
         throws Exception

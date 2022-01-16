@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
      * Test that profiles from settings.xml will be used to resolve import-scoped dependency POMs.
      * In this case, the settings profile enables snapshot resolution on the central repository, which
      * is required to resolve the import-scoped POM with a SNAPSHOT version.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

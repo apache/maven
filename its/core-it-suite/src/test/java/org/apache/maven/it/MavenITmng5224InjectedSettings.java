@@ -46,6 +46,7 @@ public class MavenITmng5224InjectedSettings
 
     /**
      *
+     * @throws Exception in case of failure
      */
     public void testmng5224_ReadSettings()
         throws Exception

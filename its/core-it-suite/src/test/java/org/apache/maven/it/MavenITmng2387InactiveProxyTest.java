@@ -112,6 +112,8 @@ public class MavenITmng2387InactiveProxyTest
 
     /**
      * Test that no proxy is used if none of the configured proxies is actually set as active.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

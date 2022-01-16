@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -48,6 +47,8 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
      * Check that the resulting run will not fail in case
      * of defining the property via command line which is
      * already defined inside the pom.
+     *
+     * @throws Exception in case of failure
      */
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
         throws Exception

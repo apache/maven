@@ -39,6 +39,8 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest
     /**
      * Verify that plugin parameters of type array/collection can be configured from expressions/defaults that
      * actually resolve to a collection/array.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

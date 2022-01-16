@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest
     /**
      * Test that &lt;activeByDefault/&gt; calculations for profile activation only
      * use profiles defined in the POM. [MNG-2136]
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2136()
         throws Exception

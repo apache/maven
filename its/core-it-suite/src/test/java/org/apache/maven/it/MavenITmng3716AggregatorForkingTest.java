@@ -21,13 +21,12 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3716">MNG-3716</a>.
  *
- * @todo Fill in a better description of what this test verifies!
+ * todo Fill in a better description of what this test verifies!
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
@@ -41,7 +40,7 @@ public class MavenITmng3716AggregatorForkingTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3716 ()
+    public void testitMNG3716()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3716" );

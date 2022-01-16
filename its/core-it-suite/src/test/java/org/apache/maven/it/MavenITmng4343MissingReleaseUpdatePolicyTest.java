@@ -140,6 +140,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
     /**
      * Verify that checking for *missing* release artifacts respects the update policy that is configured in the
      * release section for the respective repository, in this case "always".
+     *
+     * @throws Exception in case of failure
      */
     public void testitAlways()
         throws Exception
@@ -192,6 +194,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
     /**
      * Verify that checking for *missing* release artifacts respects the update policy that is configured in the
      * release section for the respective repository, in this case "never", unless overriden from the CLI via -U.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNever()
         throws Exception

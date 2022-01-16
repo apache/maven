@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,7 +42,9 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
 
     /**
      * Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
-     * ordered when no <pluginManagement> is involved.
+     * ordered when no {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginMngt()
         throws Exception
@@ -53,7 +54,9 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
 
     /**
      * Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
-     * ordered when <pluginManagement> is involved.
+     * ordered when {@code <pluginManagement>} is involved.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginMngt()
         throws Exception

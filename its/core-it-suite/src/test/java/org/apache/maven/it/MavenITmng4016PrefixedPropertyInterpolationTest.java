@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4016PrefixedPropertyInterpolationTest
     /**
      * Test that expressions with the special prefixes "project.", "pom." and "env." can be interpolated from
      * properties that include the prefix.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4016()
         throws Exception

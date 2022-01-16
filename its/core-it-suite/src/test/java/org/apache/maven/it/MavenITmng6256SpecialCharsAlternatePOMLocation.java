@@ -43,6 +43,8 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
 
     /**
      * check script is working when path to POM is set to <code>directory-with- -space</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testDirectoryWithSpace()
         throws Exception
@@ -53,6 +55,8 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
 
     /**
      * check script is working when path to POM is set to <code>directory-with-)-closing-bracket</code>
+     *
+     * @throws Exception in case of failure
      */
     public void testDirectoryWithClosingBracket()
         throws Exception

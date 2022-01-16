@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.Verifier;
 
 import java.io.File;
 

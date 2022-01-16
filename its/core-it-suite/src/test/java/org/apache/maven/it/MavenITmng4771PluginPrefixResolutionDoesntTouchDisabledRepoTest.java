@@ -51,6 +51,8 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest
     /**
      * Verify that repositories which have both releases and snapshots disabled aren't touched when looking for
      * plugin prefix mappings.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

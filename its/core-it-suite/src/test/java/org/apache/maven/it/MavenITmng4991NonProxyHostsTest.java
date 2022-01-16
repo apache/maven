@@ -48,6 +48,8 @@ public class MavenITmng4991NonProxyHostsTest
 
     /**
      * Verify that the nonProxyHosts settings is respected.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

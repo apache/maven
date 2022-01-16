@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest
 
     /**
      * Verify that user properties from the CLI do not override POM properties of transitive dependencies.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

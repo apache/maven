@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -35,6 +34,8 @@ public class MavenIT0063SystemScopeDependencyTest
 
     /**
      * Test the use of a system scoped dependency to a (fake) tools.jar.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0063()
         throws Exception

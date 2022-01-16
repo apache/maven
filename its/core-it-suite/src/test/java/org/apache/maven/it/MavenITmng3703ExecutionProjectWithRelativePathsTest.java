@@ -21,13 +21,13 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3703">MNG-3703</a>.
  *
- * @todo Fill in a better description of what this test verifies!
+ * todo Fill in a better description of what this test verifies!
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  */

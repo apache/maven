@@ -24,7 +24,6 @@ import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -61,7 +60,8 @@ public class MavenITmng6957BuildConsumer
      *   <li>resolved project versions (at least 2 levels deep) in parent and dependencies</li>
      *   <li>removal of modules in aggregators</li>
      * </ul>
-     * @throws Exception
+     *
+     * @throws Exception in case of failure
      */
     public void testPublishedPoms()
                     throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     /**
      * Test that duplicate dependencies cause a validation error during building.
+     *
+     * @throws Exception in case of failure
      */
     public void testitDependency()
         throws Exception
@@ -50,6 +51,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     /**
      * Test that duplicate managed dependencies cause a validation error during building.
+     *
+     * @throws Exception in case of failure
      */
     public void testitManagedDependency()
         throws Exception
@@ -59,6 +62,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     /**
      * Test that duplicate dependencies in profiles cause a validation error during building.
+     *
+     * @throws Exception in case of failure
      */
     public void testitProfileDependency()
         throws Exception
@@ -68,6 +73,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     /**
      * Test that duplicate managed dependencies in profiles cause a validation error during building.
+     *
+     * @throws Exception in case of failure
      */
     public void testitProfileManagedDependency()
         throws Exception

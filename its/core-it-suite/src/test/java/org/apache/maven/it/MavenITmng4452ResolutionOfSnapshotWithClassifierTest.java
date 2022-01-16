@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
      * snapshots) when the last deployment to that repo didn't include that particular classifier. In other words,
      * the metadata in the repository needs to properly keep track of all snapshots and not just the last deployed
      * one. The same goes for snapshots that differ only by file extension.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

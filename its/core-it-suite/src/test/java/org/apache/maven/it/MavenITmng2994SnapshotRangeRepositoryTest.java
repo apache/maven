@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2994SnapshotRangeRepositoryTest
 
     /**
      * Test that snapshot repositories are checked for ranges with snapshot boundaries.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

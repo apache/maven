@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest
      * Verify that plugins executed by other plugins (like reports executed by the maven-site-plugin) can successfully
      * lookup components via string-based roles from their plugin realm as denoted by the thread context class loader,
      * even if those components are also contained in the parent plugin realm.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

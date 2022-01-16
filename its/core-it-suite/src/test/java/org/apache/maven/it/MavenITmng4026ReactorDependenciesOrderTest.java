@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4026ReactorDependenciesOrderTest
     /**
      * Verify that the project class path is properly ordered during a reactor build, i.e. when dependencies are
      * resolved as active project artifacts from the reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4026()
         throws Exception

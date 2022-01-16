@@ -21,17 +21,16 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3729">MNG-3729</a>.
- * <br/><br/>
+ * <p>
  * Complicated use case, but say
  * you have an aggregator plugin that forks a lifecycle, and this aggregator is bound to the main lifecycle in a
  * multimodule build. Further, say you call another plugin directly from the command line for this multimodule build,
  * which forks a new lifecycle (like assembly:assembly).
- * <br/><br/>
+ * </p>
  * When the directly invoked aggregator forks, it will force the
  * forked lifecycle phase to be run for each project in the reactor, regardless of whether this causes the bound
  * aggregator mojo to run multiple times. When the bound aggregator executes for the first project (this will be in an

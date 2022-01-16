@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4963ParentResolutionFromMirrorTest
      * Verify that a released parent POM can be resolved when the settings define only a snapshot repository
      * which is subject to mirroring. Technically, this means to properly aggregate the built-in central repo
      * definition with the declared snapshot repo when both are mirrored.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

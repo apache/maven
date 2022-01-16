@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3974MirrorOrderingTest
     /**
      * Test that mirror definitions are properly evaluated. In particular, the first matching mirror definition
      * from the settings should win, i.e. ordering of mirror definitions matters.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFirstMatchWins()
         throws Exception

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -45,6 +44,8 @@ public class MavenITmng2068ReactorRelativeParentsTest
 
     /**
      * Test successful lineage construction when parent inherits groupId+version from grand-parent.
+     *
+     * @throws Exception in case of failure
      */
     public void testitInheritedIdFields()
         throws Exception
@@ -62,6 +63,8 @@ public class MavenITmng2068ReactorRelativeParentsTest
 
     /**
      * Test successful lineage construction when parent specifies groupId+version itself.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExplicitIdFields()
         throws Exception
@@ -79,6 +82,8 @@ public class MavenITmng2068ReactorRelativeParentsTest
 
     /**
      * Test that the implied relative path for the parent POM works, even two levels deep.
+     *
+     * @throws Exception in case of failure
      */
     public void testitComplex()
         throws Exception

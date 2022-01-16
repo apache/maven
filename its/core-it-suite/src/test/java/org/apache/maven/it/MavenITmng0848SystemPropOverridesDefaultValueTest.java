@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0848SystemPropOverridesDefaultValueTest
 
     /**
      * Test that execution/system properties take precedence over default value of plugin parameters.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG848()
         throws Exception

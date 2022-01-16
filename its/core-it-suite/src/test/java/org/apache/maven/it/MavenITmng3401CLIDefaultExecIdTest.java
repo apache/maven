@@ -42,6 +42,8 @@ public class MavenITmng3401CLIDefaultExecIdTest
     /**
      * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
      * invocations of a goal as well if the plugin is configured under build/plugins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithoutPluginManagement()
         throws Exception
@@ -52,6 +54,8 @@ public class MavenITmng3401CLIDefaultExecIdTest
     /**
      * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
      * invocations of a goal as well if the plugin is configured under build/pluginManagement/plugins.
+     *
+     * @throws Exception in case of failure
      */
     public void testitWithPluginManagement()
         throws Exception

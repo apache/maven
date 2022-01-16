@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng4400RepositoryOrderTest
 
     /**
      * Verify that repositories declared in the settings.xml are accessed in their declaration order.
+     *
+     * @throws Exception in case of failure
      */
     public void testitSettingsRepos()
         throws Exception
@@ -63,6 +64,8 @@ public class MavenITmng4400RepositoryOrderTest
 
     /**
      * Verify that repositories declared in the POM are accessed in their declaration order.
+     *
+     * @throws Exception in case of failure
      */
     public void testitPomRepos()
         throws Exception

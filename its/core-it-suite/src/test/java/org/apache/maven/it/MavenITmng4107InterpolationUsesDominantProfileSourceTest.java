@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -44,6 +43,8 @@ public class MavenITmng4107InterpolationUsesDominantProfileSourceTest
      * Test that POM interpolation uses the property values from the dominant profile source (POM vs. profiles.xml
      * vs. settings.xml). This boils down to the proper order of profile injection and interpolation, i.e.
      * interpolate after profiles from all sources are injected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG4107()
         throws Exception

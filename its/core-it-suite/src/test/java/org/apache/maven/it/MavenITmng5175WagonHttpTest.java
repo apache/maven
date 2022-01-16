@@ -105,6 +105,8 @@ public class MavenITmng5175WagonHttpTest
     /**
      * Test that the read time out from settings is used.
      * basically use a 1ms time out and wait a bit in the handler
+     *
+     * @throws Exception in case of failure
      */
     public void testmng5175_ReadTimeOutFromSettings()
         throws Exception

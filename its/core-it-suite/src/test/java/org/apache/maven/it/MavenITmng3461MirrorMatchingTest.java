@@ -50,6 +50,8 @@ public class MavenITmng3461MirrorMatchingTest
     /**
      * Test that mirror definitions are properly evaluated. In particular, an exact match by id should always
      * win over wildcard matches.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExactMatchDominatesWildcard()
         throws Exception
@@ -73,6 +75,8 @@ public class MavenITmng3461MirrorMatchingTest
     /**
      * Test that mirror definitions are properly evaluated. In particular, the wildcard external:* should not
      * match file:// and localhost repos but only external repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExternalWildcard()
         throws Exception
@@ -153,6 +157,8 @@ public class MavenITmng3461MirrorMatchingTest
     /**
      * Test that mirror definitions are properly evaluated. In particular, the wildcards within a single mirrorOf
      * spec should not be greedy.
+     *
+     * @throws Exception in case of failure
      */
     public void testitNonGreedyWildcard()
         throws Exception

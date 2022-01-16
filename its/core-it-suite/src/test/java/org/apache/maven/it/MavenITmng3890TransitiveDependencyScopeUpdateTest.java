@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest
     /**
      * Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer
      * remain in "provided" scope when depending on this consumer with scope "compile".
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3890()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2293CustomPluginParamImplTest
 
     /**
      * Verify that default implementation of an implementation for a complex object works as expected.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2293()
         throws Exception

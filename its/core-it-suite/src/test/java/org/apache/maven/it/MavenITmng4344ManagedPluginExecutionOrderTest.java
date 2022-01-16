@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng4344ManagedPluginExecutionOrderTest
      * Test that custom executions from managed plugins which are part of the default lifecycle bindings get
      * executed after executions from plugins that are defined in the regular build section and bound to the
      * same phase.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

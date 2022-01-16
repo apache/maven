@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest
      * with the newest metadata does not provide the selected version. In particular, the repository with the
      * newest metadata must not be the only repository used during artifact resolution, all repositories must
      * be considered.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

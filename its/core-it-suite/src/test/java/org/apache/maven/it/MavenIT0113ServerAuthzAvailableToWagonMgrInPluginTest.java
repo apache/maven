@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -36,6 +35,8 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     /**
      * Test that the auth infos given in the settings.xml are pushed into the wagon manager and are available
      * to other components/plugins.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0113()
         throws Exception

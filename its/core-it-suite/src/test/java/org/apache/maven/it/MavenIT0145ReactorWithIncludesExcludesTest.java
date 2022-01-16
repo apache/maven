@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
 
     /**
      * Test the old-style reactor mode with includes/excludes to locate projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitDefaultIncludesExcludes()
         throws Exception
@@ -64,6 +65,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
 
     /**
      * Test the old-style reactor mode with includes/excludes to locate projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCustomIncludes()
         throws Exception
@@ -89,6 +92,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
 
     /**
      * Test the old-style reactor mode with includes/excludes to locate projects.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCustomExcludes()
         throws Exception

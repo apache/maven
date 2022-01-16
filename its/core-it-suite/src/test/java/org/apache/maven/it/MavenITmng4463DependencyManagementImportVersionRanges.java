@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.maven.it.util.ResourceExtractor;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Integration tests for <a href="https://issues.apache.org/jira/browse/MNG-4463">MNG-4463</a>.

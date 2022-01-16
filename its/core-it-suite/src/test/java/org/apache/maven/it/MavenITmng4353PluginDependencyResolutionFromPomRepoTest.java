@@ -40,6 +40,8 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
 
     /**
      * Verify that repos given in a plugin's POM are considered while resolving the plugin dependencies.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

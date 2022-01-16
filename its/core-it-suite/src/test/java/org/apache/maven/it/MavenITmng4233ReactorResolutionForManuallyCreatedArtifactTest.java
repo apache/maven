@@ -43,6 +43,8 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest
      * from the reactor. This case is a subtle variation of MNG-2877, namely not using @requiresDependencyResolution
      * or artifact instances created by the Maven core. In short, reactor resolution should work for any artifact,
      * regardless whether created by the core or a plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

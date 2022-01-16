@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.io.IOException;
 
 public class MavenITmng7128BlockExternalHttpReactorTest
         extends AbstractMavenIntegrationTestCase
@@ -36,8 +35,10 @@ public class MavenITmng7128BlockExternalHttpReactorTest
 
     /**
      * This test verifies that defining a repository in pom.xml that uses HTTP is blocked.
+     *
+     * @throws Exception in case of failure
      */
-    public void testBlockedHttpRepositoryInPom() throws IOException, VerificationException
+    public void testBlockedHttpRepositoryInPom() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );

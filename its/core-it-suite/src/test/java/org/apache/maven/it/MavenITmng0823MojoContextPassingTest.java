@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0823MojoContextPassingTest
 
     /**
      * Tests context passing between mojos in the same plugin.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0823()
         throws Exception

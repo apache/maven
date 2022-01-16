@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0786ProfileAwareReactorTest
     /**
      * Verify that direct invocation of a mojo from the command line still
      * results in the processing of modules included via profiles.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0786()
         throws Exception

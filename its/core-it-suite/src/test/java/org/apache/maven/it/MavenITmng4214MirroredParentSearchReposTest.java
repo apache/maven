@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4214MirroredParentSearchReposTest
      * Test parent POMs can be resolved from repos with different enabled policies that are matched by a single mirror.
      * In other words, check that the one mirror is properly configured with a merged view of the potentially different
      * policies from the original repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

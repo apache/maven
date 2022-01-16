@@ -44,6 +44,8 @@ public class MavenITmng4666CoreRealmImportTest
      * Verify that API types from the Maven core realm are shared/imported into the plugin realm despite the plugin
      * declaring conflicting dependencies. For the core artifact filter, this boils down to the filter properly
      * recognizing such a conflicting dependency, i.e. knowing the relevant groupId:artifactId's.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

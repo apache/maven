@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
     /**
      * Test that reactor projects forked by an aggregator mojo bound to a lifecycle phase are subject to dependency
      * resolution as required by their respective build plugins.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

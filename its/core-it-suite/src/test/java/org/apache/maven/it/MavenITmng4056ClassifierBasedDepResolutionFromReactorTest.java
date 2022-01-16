@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
     /**
      * Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
      * in the consumer module does not use the proper artifact type but merely specifies the classifier.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

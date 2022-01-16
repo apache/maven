@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0461TolerateMissingDependencyPomTest
 
     /**
      * Verify that dependency resolution only warns in case of missing dependency POMs but does not fail.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

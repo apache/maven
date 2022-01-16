@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -47,6 +46,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
     /**
      * Test that the different scopes of transitive dependencies end up on the right class paths when mediated from
      * a compile-scope dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCompileScope()
         throws Exception
@@ -101,6 +102,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
     /**
      * Test that the different scopes of transitive dependencies end up on the right class paths when mediated from
      * a provided-scope dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testitProvidedScope()
         throws Exception
@@ -146,6 +149,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
     /**
      * Test that the different scopes of transitive dependencies end up on the right class paths when mediated from
      * a runtime-scope dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testitRuntimeScope()
         throws Exception
@@ -191,6 +196,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
     /**
      * Test that the different scopes of transitive dependencies end up on the right class paths when mediated from
      * a test-scope dependency.
+     *
+     * @throws Exception in case of failure
      */
     public void testitTestScope()
         throws Exception

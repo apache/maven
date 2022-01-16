@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
 
     /**
      * Verify that dependencies specified in plugins are also retrieved from ordinary/non-plugin repositories.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2539()
         throws Exception

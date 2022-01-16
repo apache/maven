@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,6 +43,8 @@ public class MavenITmng5000ChildPathAwareUrlInheritanceTest
     /**
      * Verify that child path aware URL adjustment still works when the child's artifactId doesn't match the name
      * of its base directory as given in the parent's module section.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

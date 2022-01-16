@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng2865MirrorWildcardTest
 
     /**
      * Test that the mirror wildcard * matches any repo, in particular file:// repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testitFileRepo()
         throws Exception
@@ -51,6 +52,8 @@ public class MavenITmng2865MirrorWildcardTest
 
     /**
      * Test that the mirror wildcard * matches any repo, in particular http://localhost repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testitLocalhostRepo()
         throws Exception
@@ -60,6 +63,8 @@ public class MavenITmng2865MirrorWildcardTest
 
     /**
      * Test that the mirror wildcard * matches any repo, in particular external repos.
+     *
+     * @throws Exception in case of failure
      */
     public void testitExternalRepo()
         throws Exception
@@ -69,6 +74,8 @@ public class MavenITmng2865MirrorWildcardTest
 
     /**
      * Test that the mirror wildcard * matches any repo, in particular central.
+     *
+     * @throws Exception in case of failure
      */
     public void testitCentralRepo()
         throws Exception

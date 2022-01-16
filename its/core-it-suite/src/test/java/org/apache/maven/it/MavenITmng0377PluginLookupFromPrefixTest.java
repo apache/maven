@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -41,6 +40,8 @@ public class MavenITmng0377PluginLookupFromPrefixTest
     /**
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
      * pluginGroups in the provided settings.xml.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG377()
         throws Exception

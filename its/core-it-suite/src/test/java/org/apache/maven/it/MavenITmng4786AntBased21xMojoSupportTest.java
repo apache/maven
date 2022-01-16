@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng4786AntBased21xMojoSupportTest
      * invoked. The essential bits here are that Ant-based mojos are instantiated via a custom component factory, yet
      * must undergo the same IoC as for regular Java components. And the 2.1.x Ant support actually requires injection
      * of a logger.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

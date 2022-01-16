@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
     /**
      * Verify that dependencies on not-yet-packaged sub artifacts in build phases prior to package can be satisfied
      * from a module's output directory, i.e. with the loose class files.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG2871()
         throws Exception

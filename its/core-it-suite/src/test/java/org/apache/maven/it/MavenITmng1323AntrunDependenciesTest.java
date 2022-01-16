@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -43,6 +42,8 @@ public class MavenITmng1323AntrunDependenciesTest
     /**
      * Verify that project-level plugin dependencies actually apply to the current project only and not the entire
      * reactor.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG1323()
         throws Exception

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng0985NonExecutedPluginMngtGoalsTest
      * Test that plugins in pluginManagement aren't included in the build
      * unless they are referenced by groupId/artifactId within the plugins
      * section of a pom.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG0985()
         throws Exception

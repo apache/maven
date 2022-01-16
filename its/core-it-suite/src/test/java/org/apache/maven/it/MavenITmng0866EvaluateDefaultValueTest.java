@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -43,6 +42,8 @@ public class MavenITmng0866EvaluateDefaultValueTest
 
     /**
      * Test that expressions inside the default value of plugin parameters are evaluated.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG866()
         throws Exception

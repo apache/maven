@@ -43,6 +43,8 @@ public class MavenITmng3892ReleaseDeploymentTest
     /**
      * Test that a bunch of release artifacts can be deployed without the deployer erroneously complaining about
      * already deployed artifacts.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG3892()
         throws Exception

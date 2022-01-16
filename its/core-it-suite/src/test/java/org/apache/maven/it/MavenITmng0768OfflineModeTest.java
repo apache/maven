@@ -53,6 +53,8 @@ public class MavenITmng0768OfflineModeTest
 
     /**
      * Test offline mode.
+     *
+     * @throws Exception in case of failure
      */
     public void testitMNG768()
         throws Exception

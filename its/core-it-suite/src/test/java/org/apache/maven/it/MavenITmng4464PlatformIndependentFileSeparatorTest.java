@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest
     /**
      * Test that Maven recognizes both the forward and the backward slash as file separators, regardless of the
      * underlying filesystem (i.e. even on Unix).
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

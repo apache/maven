@@ -41,6 +41,8 @@ public class MavenIT0144LifecycleExecutionOrderTest
 
     /**
      * Test that the lifecycle phases execute in proper order.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0144()
         throws Exception

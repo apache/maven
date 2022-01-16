@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -43,6 +42,8 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
      * Test that the execution project from a forked lifecycle does not leak into mojos that run after the mojo
      * that forked the lifecycle. While this is rather irrelevant for Maven's core itself, this enforces proper
      * mojo programming, i.e. a mojo should not access the execution project unless it forked the lifecycle.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

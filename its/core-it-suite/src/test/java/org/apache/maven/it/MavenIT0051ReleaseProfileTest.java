@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -35,6 +34,8 @@ public class MavenIT0051ReleaseProfileTest
 
     /**
      * Test source attachment when -DperformRelease=true is specified.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0051()
         throws Exception

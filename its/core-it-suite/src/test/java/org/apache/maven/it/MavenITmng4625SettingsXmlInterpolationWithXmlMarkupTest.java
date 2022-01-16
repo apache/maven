@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.codehaus.plexus.util.Os;
 
@@ -43,6 +42,8 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
     /**
      * Verify that interpolation of the settings.xml doesn't fail if an expression's value contains
      * XML special characters.
+     *
+     * @throws Exception in case of failure
      */
     public void testit()
         throws Exception

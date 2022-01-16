@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -42,6 +41,8 @@ public class MavenIT0039ReleasePomInReactorTest
      * Test reactor for projects that have release-pom.xml in addition to
      * pom.xml. The release-pom.xml file should be chosen above pom.xml for
      * these projects in the build.
+     *
+     * @throws Exception in case of failure
      */
     public void testit0039()
         throws Exception
