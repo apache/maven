@@ -24,7 +24,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -84,7 +83,7 @@ public class BuildRemotePomMojo
     /**
      * Runs this mojo.
      *
-     * @throws MojoFailureException If the artifact file has not been set.
+     * @throws MojoExecutionException If the artifact file has not been set.
      */
     public void execute()
         throws MojoExecutionException

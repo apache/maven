@@ -29,7 +29,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * Resolves an artifact and has an (unused) dependency on log4j.
@@ -86,7 +85,7 @@ public class ItMojo
      * Runs this mojo.
      *
      * @throws MojoExecutionException If the output file could not be created.
-     * @throws MojoFailureException If the output file has not been set.
+     * or if the output file has not been set.
      */
     public void execute()
         throws MojoExecutionException

@@ -21,7 +21,6 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,7 +74,7 @@ public class CheckThreadSafetyMojo
     /**
      * Runs this mojo.
      *
-     * @throws MojoFailureException If the output file could not be created.
+     * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
         throws MojoExecutionException

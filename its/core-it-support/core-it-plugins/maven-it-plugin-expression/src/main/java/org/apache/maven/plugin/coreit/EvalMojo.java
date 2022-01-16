@@ -36,7 +36,7 @@ import java.util.Properties;
  * value but can also be a collection/array or a bean-like object (from the Maven model). For example, the expression
  * "project/dependencies/0" would extract the first project dependency. In more detail, this example expression could
  * output the following keys to the properties file:
- * <p/>
+ *
  * <pre>
  * project.dependencies.0.groupId = org.apache.maven
  * project.dependencies.0.artifactId = maven-project
@@ -49,7 +49,7 @@ import java.util.Properties;
  * project.dependencies.0.exclusions.1.groupId = plexus
  * project.dependencies.0.exclusions.1.artifactId = plexus-container-default
  * </pre>
- * <p/>
+ *
  * Expressions that reference non-existing objects or use invalid collection/array indices silently resolve to
  * <code>null</code>. For collections and arrays, the special index "*" can be used to iterate all elements.
  *

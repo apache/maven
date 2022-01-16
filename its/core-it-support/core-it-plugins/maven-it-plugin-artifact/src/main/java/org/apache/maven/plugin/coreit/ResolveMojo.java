@@ -26,7 +26,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -94,7 +93,7 @@ public class ResolveMojo
     /**
      * Runs this mojo.
      *
-     * @throws MojoFailureException If the artifact could not be resolved
+     * @throws MojoExecutionException If the artifact could not be resolved
      */
     public void execute()
         throws MojoExecutionException

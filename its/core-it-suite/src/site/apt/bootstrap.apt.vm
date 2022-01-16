@@ -64,3 +64,27 @@ Maven Core Integration Tests Bootstrap
 * Group 7 Dependencies
 
 %{snippet|file=${project.build.directory}/test-classes/bootstrap/group-7/target/resolve.txt}
+
+* Group 8 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-8/target/resolve.txt}
+
+* Group 9 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-9/target/resolve.txt}
+
+* Group 10 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-10/target/resolve.txt}
+
+* Group 11 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-11/target/resolve.txt}
+
+* Group 12 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-12/target/resolve.txt}
+
+* Group 13 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-13/target/resolve.txt}
