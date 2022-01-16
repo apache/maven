@@ -79,7 +79,7 @@ mvn -Preporting site
 %{snippet|file=${project.build.directory}/info.txt}
 
 
-* Core ITs and dependencies
+* Core ITs Suite and Dependencies
 
  A good IT does not depend on external repos like Central, it uses dedicated test plugins and test repositories.
  The {{{https://github.com/apache/maven-integration-testing/blob/master/core-it-suite/src/test/resources-filtered/settings.xml}default <<<settings.xml>>>}}
