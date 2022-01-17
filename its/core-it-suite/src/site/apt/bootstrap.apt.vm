@@ -29,7 +29,7 @@
 Maven Core Integration Tests Bootstrap
 
   Core IT Bootstrapping downloads from Central repository every dependency (artifacts, plugins) required to let
-  Core ITs Suite run without downloading anything later (see {{{./index.html#Core_ITs_Suite_and_Dependencies}Core ITs Suite and dependencies}} rationale).
+  Core ITs Suite run without downloading anything later (see {{{./index.html#Core_ITs_Suite_and_Dependencies_.28incl._Plugins.29}Core ITs Suite and dependencies}} rationale).
   
   Content to download is defined in {{{https://github.com/apache/maven-integration-testing/tree/master/core-it-suite/src/test/resources/bootstrap}a series of bootstrap projects}}:
 
@@ -90,3 +90,7 @@ Maven Core Integration Tests Bootstrap
 * Group 13 Dependencies
 
 %{snippet|file=${project.build.directory}/test-classes/bootstrap/group-13/target/resolve.txt}
+
+* Group 14 Dependencies
+
+%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-14/target/resolve.txt}

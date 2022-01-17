@@ -44,7 +44,7 @@ mvn -Preporting site
 %{snippet|file=${project.build.directory}/info.txt}
 
 
-* Core ITs Suite and Dependencies
+* Core ITs Suite and Dependencies (incl. Plugins)
 
  A good IT does not depend on external repos like Central, it uses dedicated test plugins and test repositories.
  The {{{https://github.com/apache/maven-integration-testing/blob/master/core-it-suite/src/test/resources-filtered/settings.xml}default <<<settings.xml>>>}}
@@ -63,7 +63,14 @@ mvn -Preporting site
  what is populated during bootstrapping. When forgetting, typical failures (as seen in ASF CI) will give following traces in log:
 
 -------
-[INFO] Downloading from central: file:target/null/...
+[ERROR] testit(org.apache.maven.it.MavenITmng...)  Time elapsed: 0.145 s  <<< ERROR!
 ...
 [ERROR] Failed to execute goal ... (...) on project ...: ... Could not find artifact ... in central (file:target/null) -> [Help 1]
 -------
+
+** Using Local Repository Manager
+
+ If you are using a local repository manager, configured in your <<<~/.m2/settings.xml>>> as a mirror of <<<central>>>, it will invalidate previous setup:
+ working Core ITs Suite can work on your laptop but fail on ASF CI because of missing artifact.
+
+ Comment out your mirror configuration to enable the expected local failure, then be able to debug and fix the issue.
