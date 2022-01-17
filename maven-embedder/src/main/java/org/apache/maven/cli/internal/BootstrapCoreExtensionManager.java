@@ -163,7 +163,7 @@ public class BootstrapCoreExtensionManager
             else
             {
                 File file = artifact.getFile();
-                log.debug( "  Included {}", file );
+                log.debug( "  Included {} located at {}", id, file );
                 realm.addURL( file.toURI().toURL() );
             }
         }
