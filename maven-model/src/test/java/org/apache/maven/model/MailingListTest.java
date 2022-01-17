@@ -45,4 +45,13 @@ public class MailingListTest extends TestCase {
     public void testToStringNullSafe() {
         assertNotNull(new MailingList().toString());
     }
+
+    public void testToStringNotNonsense() {
+        MailingList list = new MailingList();
+        list.setName("modello-dev");
+
+        String s = list.toString();
+
+        assertEquals("MailingList {name=modello-dev, archive=null}", s);
+    }
 }

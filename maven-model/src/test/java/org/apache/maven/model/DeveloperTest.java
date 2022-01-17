@@ -45,4 +45,15 @@ public class DeveloperTest extends TestCase {
     public void testToStringNullSafe() {
         assertNotNull(new Developer().toString());
     }
+
+    public void testToStringNotNonsense() {
+        Developer dev = new Developer();
+        dev.setName("Maven Tester");
+        dev.setEmail("tester@acme.localdomain");
+        dev.setId("20220118");
+
+        String s = dev.toString();
+
+        assert "Developer {id=20220118, Contributor {name=Maven Tester, email=tester@acme.localdomain}}".equals(s) : s;
+    }
 }

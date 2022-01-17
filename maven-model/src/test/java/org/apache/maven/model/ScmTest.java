@@ -45,4 +45,13 @@ public class ScmTest extends TestCase {
     public void testToStringNullSafe() {
         assertNotNull(new Scm().toString());
     }
+
+    public void testToStringNotNonsense() {
+        Scm scm = new Scm();
+        scm.setConnection("scm:git:git://git.localdomain/model");
+
+        String s = scm.toString();
+
+        assertEquals("Scm {connection=scm:git:git://git.localdomain/model}", s);
+    }
 }

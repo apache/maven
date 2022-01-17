@@ -45,4 +45,32 @@ public class OrganizationTest extends TestCase {
     public void testToStringNullSafe() {
         assertNotNull(new Organization().toString());
     }
+
+    public void testToStringNotNonsense11() {
+        Organization org = new Organization();
+        org.setName("Testing Maven Unit");
+        org.setUrl("https://maven.localdomain");
+
+        assertEquals("Organization {name=Testing Maven Unit, url=https://maven.localdomain}", org.toString());
+    }
+
+    public void testToStringNotNonsense10() {
+        Organization org = new Organization();
+        org.setName("Testing Maven Unit");
+
+        assertEquals("Organization {name=Testing Maven Unit, url=null}", org.toString());
+    }
+
+    public void testToStringNotNonsense01() {
+        Organization org = new Organization();
+        org.setUrl("https://maven.localdomain");
+
+        assertEquals("Organization {name=null, url=https://maven.localdomain}", org.toString());
+    }
+
+    public void testToStringNotNonsense00() {
+        Organization org = new Organization();
+
+        assertEquals("Organization {name=null, url=null}", org.toString());
+    }
 }
