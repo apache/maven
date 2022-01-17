@@ -55,4 +55,4 @@ Maven Repository Metadata Model
 
    * a {{{./repository-metadata.html}Descriptor Reference}}.
  
- Notice: data about plugins in a directory representing a groupId is deprecated and will be removed in a future Maven version (perhaps 4)
+ Notice: data about plugins in a directory representing a groupId is deprecated and will be removed in a future Maven version.
