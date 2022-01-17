@@ -53,4 +53,14 @@ public class LicenseTest
         assertNotNull( new License().toString() );
     }
 
+    public void testToStringNotNonsense()
+    {
+        License license = new License();
+        license.setName( "Unlicense" );
+        license.setUrl( "http://lic.localdomain" );
+
+        String s = license.toString();
+
+        assert "License {name=Unlicense, url=http://lic.localdomain}".equals( s ) : s;
+    }
 }
