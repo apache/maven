@@ -45,4 +45,12 @@ public class BuildTest extends TestCase {
     public void testToStringNullSafe() {
         assertNotNull(new Build().toString());
     }
+
+    public void testToStringNotNonsense() {
+        Build build = new Build();
+
+        String s = build.toString();
+
+        assert "Build {BuildBase {PluginConfiguration {PluginContainer {}}}}".equals(s) : s;
+    }
 }
