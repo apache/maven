@@ -43,7 +43,7 @@ Maven Repository Metadata Model
  [[2]] in a "groupId/artifactId" directory: metadata describes <<<groupId>>>, <<<artifactId>>> and <<<versioning>>> element that
        gives data about available versions (<<<latest>>>, <<<release>>>, <<<versions>>> list and <<<lastUpdated>>>),
 
- [[3]] in a "groupId/artifactId/version" snapshot artifact directory: metadata describes <<<groupId>>>, <<<artifactId>>>, <<<version>>> (base version, ie ending in <<<-SNAPSHOT>>>) and
+ [[3]] in a "groupId/artifactId/version" snapshot artifact directory: metadata describes <<<groupId>>>, <<<artifactId>>>, <<<version>>> (base version, i.e. ending in <<<-SNAPSHOT>>>) and
        <<<versioning>>> element that gives data about snaphot (<<<snapshot>>>, <<<lastUpdated>>> and <<<snapshotVersions>>> list). Notice that a
        release artifact directory is not expected to provide metadata.
 
