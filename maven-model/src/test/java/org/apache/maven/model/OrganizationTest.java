@@ -53,4 +53,36 @@ public class OrganizationTest
         assertNotNull( new Organization().toString() );
     }
 
+
+    public void testToStringNotNonsense11()
+    {
+        Organization org = new Organization();
+        org.setName( "Testing Maven Unit" );
+        org.setUrl( "https://maven.localdomain" );
+
+        assertEquals( "name = 'Testing Maven Unit'\nurl = 'https://maven.localdomain'", org.toString() );
+    }
+
+    public void testToStringNotNonsense10()
+    {
+        Organization org = new Organization();
+        org.setName( "Testing Maven Unit" );
+
+        assertEquals( "name = 'Testing Maven Unit'\nurl = 'null'", org.toString() );
+    }
+
+    public void testToStringNotNonsense01()
+    {
+        Organization org = new Organization();
+        org.setUrl( "https://maven.localdomain" );
+
+        assertEquals( "name = 'null'\nurl = 'https://maven.localdomain'", org.toString() );
+    }
+
+    public void testToStringNotNonsense00()
+    {
+        Organization org = new Organization();
+
+        assertEquals( "name = 'null'\nurl = 'null'", org.toString() );
+    }
 }

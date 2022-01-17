@@ -43,8 +43,8 @@
   |   definition of these types
   |
 -->
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.8.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.8.0.xsd"
   xml.namespace="http://maven.apache.org/POM/${version}"
   xml.schemaLocation="https://maven.apache.org/xsd/maven-${version}.xsd">
   <id>maven</id>
@@ -1422,7 +1422,7 @@
         and maybe even a specific element for the user and scm mailing lists. Then leave the more
         lose structure for any other type of mailing list.</comment>
     </class>
-    <class java.clone="deep">
+    <class java.clone="deep" java.toString="true">
       <name>Organization</name>
       <description>Specifies the organization that produces this project.</description>
       <version>3.0.0+</version>
