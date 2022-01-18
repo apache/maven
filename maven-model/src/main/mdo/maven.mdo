@@ -971,6 +971,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "Contributor(name=%s, email=%s)", name, email );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>Dependency</name>
@@ -1179,6 +1193,20 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "Developer(super=%s, id=%s)", super.toString(), id );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>Exclusion</name>
