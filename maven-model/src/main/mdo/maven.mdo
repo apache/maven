@@ -1253,6 +1253,20 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "IssueManagement(system=%s, url=%s)", system, url );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>DistributionManagement</name>
