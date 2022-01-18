@@ -53,4 +53,19 @@ public class ScmTest
         assertNotNull( new Scm().toString() );
     }
 
+    public void testToStringNotNonsense()
+    {
+        Scm scm = new Scm();
+        scm.setConnection( "scm:git:git://git.localdomain/model" );
+
+        String s = scm.toString();
+
+        assertEquals( "connection = 'scm:git:git://git.localdomain/model'\n" +
+                      "developerConnection = 'null'\n" +
+                      "tag = 'HEAD'\n" +
+                      "url = 'null'\n" +
+                      "childScmConnectionInheritAppendPath = 'null'\n" +
+                      "childScmDeveloperConnectionInheritAppendPath = 'null'\n" +
+                      "childScmUrlInheritAppendPath = 'null'", s );
+    }
 }

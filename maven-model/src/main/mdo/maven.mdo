@@ -1652,7 +1652,7 @@
       </codeSegments>
 
     </class>
-    <class java.clone="deep">
+    <class java.clone="deep" java.toString="true">
       <name>Scm</name>
       <version>4.0.0+</version>
       <description>
