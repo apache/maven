@@ -53,4 +53,12 @@ public class BuildTest
         assertNotNull( new Build().toString() );
     }
 
+    public void testToStringNotNonsense()
+    {
+        Build build = new Build();
+
+        String s = build.toString();
+
+        assert "Build(super=BuildBase(super=PluginConfiguration(super=PluginContainer())))".equals( s ) : s;
+    }
 }

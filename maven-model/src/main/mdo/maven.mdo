@@ -618,6 +618,18 @@
             ]]>
           </code>
         </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "PluginContainer()" );
+     }
+            ]]>
+          </code>
+        </codeSegment>
       </codeSegments>
     </class>
     <class>
@@ -641,6 +653,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "PluginConfiguration(super=%s)", super.toString() );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>BuildBase</name>
@@ -715,6 +741,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "BuildBase(super=%s)", super.toString() );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Build</name>
@@ -792,6 +832,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return String.format( "Build(super=%s)", super.toString() );
+     }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>CiManagement</name>
