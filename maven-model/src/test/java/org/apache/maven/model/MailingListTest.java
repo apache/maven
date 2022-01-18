@@ -53,4 +53,18 @@ public class MailingListTest
         assertNotNull( new MailingList().toString() );
     }
 
+    public void testToStringNotNonsense()
+    {
+        MailingList list = new MailingList();
+        list.setName( "modello-dev" );
+
+        String s = list.toString();
+
+        assertEquals( "name = 'modello-dev'\n" +
+                      "subscribe = 'null'\n" +
+                      "unsubscribe = 'null'\n" +
+                      "post = 'null'\n" +
+                      "archive = 'null'\n" +
+                      "otherArchives = '[]'", s );
+    }
 }

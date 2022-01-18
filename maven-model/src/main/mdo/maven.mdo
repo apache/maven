@@ -1403,7 +1403,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class java.clone="deep">
+    <class java.clone="deep" java.toString="true">
       <name>MailingList</name>
       <version>3.0.0+</version>
       <description>This element describes all of the mailing lists associated with a project. The
