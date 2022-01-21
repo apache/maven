@@ -108,6 +108,18 @@ public class DefaultPluginDependenciesResolver
 
             pluginArtifact = result.getArtifact();
 
+            if ( logger.isWarnEnabled() )
+            {
+                if ( !result.getRelocations().isEmpty() )
+                {
+                    String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
+                            ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) pluginArtifact ).getMessage()
+                            : null;
+                    logger.warn( "The artifact " + result.getRelocations().get( 0 ) + " has been relocated to "
+                            + pluginArtifact + ( message != null ? ": " + message : "" ) );
+                }
+            }
+
             String requiredMavenVersion = (String) result.getProperties().get( "prerequisites.maven" );
             if ( requiredMavenVersion != null )
             {
@@ -204,22 +216,6 @@ public class DefaultPluginDependenciesResolver
             request.setTrace( RequestTrace.newChild( trace, depRequest ) );
 
             node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
-
-            if ( logger.isWarnEnabled() )
-            {
-                for ( DependencyNode child : node.getChildren() )
-                {
-                    if ( !child.getRelocations().isEmpty() )
-                    {
-                        org.eclipse.aether.artifact.Artifact relocated = child.getDependency().getArtifact();
-                        String message = relocated instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                                ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) relocated ).getMessage()
-                                : null;
-                        logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
-                                + relocated + ( message != null ? ": " + message : "" ) );
-                    }
-                }
-            }
 
             if ( logger.isDebugEnabled() )
             {
