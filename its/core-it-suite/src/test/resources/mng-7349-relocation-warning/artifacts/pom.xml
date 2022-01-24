@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng7349</groupId>
+  <artifactId>artifacts</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven-version>3.1.1</maven-version>
+  </properties>
+
+  <modules>
+    <module>new-dep</module>
+    <module>new-dep-dep</module>
+    <module>new-plugin</module>
+    <module>new-plugin-dep</module>
+    <module>old-dep-dep</module>
+    <module>old-dep</module>
+    <module>old-plugin-dep</module>
+    <module>old-plugin</module>
+  </modules>
+</project>
