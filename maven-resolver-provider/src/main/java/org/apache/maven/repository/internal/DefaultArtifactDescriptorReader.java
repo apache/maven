@@ -261,20 +261,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             if ( relocation != null )
             {
                 result.addRelocation( a );
-                Artifact relocatedArtifact =
+                a =
                     new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
-                                           relocation.getVersion() );
-                if ( LOGGER.isWarnEnabled() )
-                {
-                    String message = "The artifact " + a + " has been relocated to " + relocatedArtifact;
-                    if ( relocation.getMessage() != null )
-                    {
-                        message += ": " + relocation.getMessage();
-                    }
-                    LOGGER.warn( message );
-                }
-                result.setArtifact( relocatedArtifact );
-                a = relocatedArtifact;
+                                           relocation.getVersion(), relocation.getMessage() );
+                result.setArtifact( a );
             }
             else
             {
