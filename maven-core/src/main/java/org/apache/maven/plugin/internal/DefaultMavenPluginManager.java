@@ -148,6 +148,7 @@ public class DefaultMavenPluginManager
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultMavenPluginManager(
             PlexusContainer container,
             ClassRealmManager classRealmManager,

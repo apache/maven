@@ -100,6 +100,7 @@ import org.eclipse.sisu.Nullable;
  */
 @Named
 @Singleton
+@SuppressWarnings( {"checkstyle:JavaDocMethod", "checkstyle:HiddenField", "checkstyle:ParameterNumber" } )
 public class DefaultModelBuilder
     implements ModelBuilder
 {

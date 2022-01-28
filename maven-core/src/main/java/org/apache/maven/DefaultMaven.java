@@ -108,6 +108,7 @@ public class DefaultMaven
     private final SuperPomProvider superPomProvider;
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultMaven(
             ProjectBuilder projectBuilder,
             LifecycleStarter lifecycleStarter,

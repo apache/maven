@@ -1,3 +1,4 @@
+// CHECKSTYLE_OFF: RegexpHeader|FileLength|MethodName
 package org.apache.maven.model.merge;
 
 /*
@@ -94,7 +95,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author Benjamin Bentmann
  */
-@SuppressWarnings( { "checkstyle:methodname" } )
 public class ModelMerger
 {
 

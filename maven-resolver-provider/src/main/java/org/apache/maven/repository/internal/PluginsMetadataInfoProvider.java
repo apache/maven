@@ -39,6 +39,9 @@ public interface PluginsMetadataInfoProvider
 
     /**
      * Returns {@link PluginInfo} corresponding for passed in {@link Artifact}, or {@code null}.
+     *
+     * @param artifact the artifact
+     * @return the plugin info
      */
     PluginInfo getPluginInfo( Artifact artifact );
 }
