@@ -39,6 +39,11 @@ public class BuildListCalculatorTest
         assertEquals( "Stub data contains 6 items", 6, segments.size() );
         final ProjectSegment build = segments.get( 0 );
         assertNotNull( build );
+
+        for ( ProjectSegment segment : segments )
+        {
+            assertSame( session, segment.getSession() );
+        }
     }
 
     private static LifecycleTaskSegmentCalculator getTaskSegmentCalculator()
