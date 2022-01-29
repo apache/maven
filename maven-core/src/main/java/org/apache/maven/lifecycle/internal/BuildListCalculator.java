@@ -61,9 +61,16 @@ public class BuildListCalculator
             for ( MavenProject project : projects )
             {
                 BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
-                MavenSession copiedSession = session.clone();
-                copiedSession.setCurrentProject( project );
-                projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
+                MavenProject currentProject = session.getCurrentProject();
+                try
+                {
+                    session.setCurrentProject( project );
+                    projectBuilds.add( new ProjectSegment( project, taskSegment, session ) );
+                }
+                finally
+                {
+                    session.setCurrentProject( currentProject );
+                }
             }
         }
         return new ProjectBuildList( projectBuilds );
