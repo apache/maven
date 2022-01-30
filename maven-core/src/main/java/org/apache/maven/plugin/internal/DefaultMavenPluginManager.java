@@ -216,9 +216,10 @@ public class DefaultMavenPluginManager
 
                     if ( pluginDescriptorEntry != null )
                     {
-                        InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
-
-                        pluginDescriptor = parsePluginDescriptor( is, plugin, pluginFile.getAbsolutePath() );
+                        try ( InputStream is = pluginJar.getInputStream( pluginDescriptorEntry ) )
+                        {
+                            pluginDescriptor = parsePluginDescriptor( is, plugin, pluginFile.getAbsolutePath() );
+                        }
                     }
                 }
             }
@@ -267,9 +268,8 @@ public class DefaultMavenPluginManager
     private PluginDescriptor parsePluginDescriptor( InputStream is, Plugin plugin, String descriptorLocation )
         throws PluginDescriptorParsingException
     {
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( is ) )
         {
-            Reader reader = ReaderFactory.newXmlReader( is );
 
             return builder.build( reader, descriptorLocation );
         }
