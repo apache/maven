@@ -22,47 +22,49 @@ package org.apache.maven.settings.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
+import org.apache.maven.settings.building.SettingsProblemCollector;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mkleint
  */
 public class DefaultSettingsValidatorTest
-    extends TestCase
 {
 
     private DefaultSettingsValidator validator;
 
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         validator = new DefaultSettingsValidator();
     }
 
-    protected void tearDown()
+    @AfterEach
+    public void tearDown()
         throws Exception
     {
         validator = null;
-
-        super.tearDown();
     }
 
     private void assertContains( String msg, String substring )
     {
-        assertTrue( "\"" + substring + "\" was not found in: " + msg, msg.contains( substring ) );
+        assertTrue( msg.contains( substring ), "\"" + substring + "\" was not found in: " + msg );
     }
 
+    @Test
     public void testValidate()
     {
         Settings model = new Settings();
@@ -90,6 +92,7 @@ public class DefaultSettingsValidatorTest
         assertEquals( 0, problems.messages.size() );
     }
 
+    @Test
     public void testValidateMirror()
         throws Exception
     {
@@ -112,6 +115,7 @@ public class DefaultSettingsValidatorTest
         assertContains( problems.messages.get( 3 ), "'mirrors.mirror.id' must not contain any of these characters" );
     }
 
+    @Test
     public void testValidateRepository()
         throws Exception
     {
@@ -137,6 +141,7 @@ public class DefaultSettingsValidatorTest
                         "'profiles.profile[default].repositories.repository.id' must not contain any of these characters" );
     }
 
+    @Test
     public void testValidateUniqueServerId()
         throws Exception
     {
@@ -155,6 +160,7 @@ public class DefaultSettingsValidatorTest
                         "'servers.server.id' must be unique but found duplicate server with id test" );
     }
 
+    @Test
     public void testValidateUniqueProfileId()
         throws Exception
     {
@@ -173,6 +179,7 @@ public class DefaultSettingsValidatorTest
                         "'profiles.profile.id' must be unique but found duplicate profile with id test" );
     }
 
+    @Test
     public void testValidateUniqueRepositoryId()
         throws Exception
     {
@@ -196,6 +203,7 @@ public class DefaultSettingsValidatorTest
             + " but found duplicate repository with id test" );
     }
 
+    @Test
     public void testValidateUniqueProxyId()
         throws Exception
     {
@@ -215,6 +223,7 @@ public class DefaultSettingsValidatorTest
 
     }
 
+    @Test
     public void testValidateProxy()
         throws Exception
     {

@@ -102,6 +102,7 @@ public class DefaultModelBuildingRequest
         setModelResolver( request.getModelResolver() );
         setModelBuildingListener( request.getModelBuildingListener() );
         setModelCache( request.getModelCache() );
+        setWorkspaceModelResolver( request.getWorkspaceModelResolver() );
         setTransformerContextBuilder( request.getTransformerContextBuilder() );
     }
 

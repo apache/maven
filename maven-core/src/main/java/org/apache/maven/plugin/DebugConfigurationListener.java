@@ -22,7 +22,7 @@ package org.apache.maven.plugin;
 import java.lang.reflect.Array;
 
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * Log at debug level the mojo configuration.
@@ -33,7 +33,7 @@ import org.codehaus.plexus.logging.Logger;
 public class DebugConfigurationListener
     implements ConfigurationListener
 {
-    private Logger logger;
+    private final Logger logger;
 
     public DebugConfigurationListener( Logger logger )
     {

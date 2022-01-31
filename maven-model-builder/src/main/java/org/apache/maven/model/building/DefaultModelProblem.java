@@ -168,7 +168,12 @@ public class DefaultModelProblem
 
         buffer.append( '[' ).append( getSeverity() ).append( "] " );
         buffer.append( getMessage() );
-        buffer.append( " @ " ).append( ModelProblemUtils.formatLocation( this, null ) );
+        String location = ModelProblemUtils.formatLocation( this, null );
+        if ( !location.isEmpty() )
+        {
+            buffer.append( " @ " );
+            buffer.append( location );
+        }
 
         return buffer.toString();
     }

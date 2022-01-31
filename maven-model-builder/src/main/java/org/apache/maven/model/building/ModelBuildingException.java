@@ -170,8 +170,12 @@ public class ModelBuildingException
             writer.print( problem.getSeverity() );
             writer.print( "] " );
             writer.print( problem.getMessage() );
-            writer.print( " @ " );
-            writer.println( ModelProblemUtils.formatLocation( problem, modelId ) );
+            String location = ModelProblemUtils.formatLocation( problem, modelId );
+            if ( !location.isEmpty() )
+            {
+                writer.print( " @ " );
+                writer.println( location );
+            }
         }
 
         return buffer.toString();

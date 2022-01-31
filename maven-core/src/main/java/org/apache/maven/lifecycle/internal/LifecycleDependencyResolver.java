@@ -46,12 +46,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.ProjectArtifactsCache;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -66,30 +67,27 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 @Named
 public class LifecycleDependencyResolver
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
+    private final ProjectDependenciesResolver dependenciesResolver;
+
+    private final ProjectArtifactFactory artifactFactory;
+
+    private final EventSpyDispatcher eventSpyDispatcher;
+
+    private final ProjectArtifactsCache projectArtifactsCache;
 
     @Inject
-    private ProjectDependenciesResolver dependenciesResolver;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
-    private ProjectArtifactFactory artifactFactory;
-
-    @Inject
-    private EventSpyDispatcher eventSpyDispatcher;
-
-    @Inject
-    private ProjectArtifactsCache projectArtifactsCache;
-
-    public LifecycleDependencyResolver()
+    public LifecycleDependencyResolver(
+            ProjectDependenciesResolver dependenciesResolver,
+            ProjectArtifactFactory artifactFactory,
+            EventSpyDispatcher eventSpyDispatcher,
+            ProjectArtifactsCache projectArtifactsCache )
     {
-    }
-
-    public LifecycleDependencyResolver( ProjectDependenciesResolver projectDependenciesResolver, Logger logger )
-    {
-        this.dependenciesResolver = projectDependenciesResolver;
-        this.logger = logger;
+        this.dependenciesResolver = dependenciesResolver;
+        this.artifactFactory = artifactFactory;
+        this.eventSpyDispatcher = eventSpyDispatcher;
+        this.projectArtifactsCache = projectArtifactsCache;
     }
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )

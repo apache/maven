@@ -32,7 +32,7 @@ pipeline {
     stage("Build Maven Core") {
       steps {
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
-            sh "mvn -Drat.skip=true -T2 -B -V install -P versionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
+            sh "mvn -Drat.skip=true -T2 -B -V install -PversionlessMavenDist -Dmaven.repo.local=${env.WORKSPACE}/repo"
         }
       }
     }
@@ -41,7 +41,7 @@ pipeline {
         git url: "https://github.com/apache/maven-integration-testing.git", branch: "${ITS_BRANCH}"
         sh "ls -lrt ${env.WORKSPACE}/apache-maven/target/"
         withEnv(["JAVA_HOME=${ tool "JDK 1.8 (latest)" }", "PATH+MAVEN=${tool 'Maven 3.6.3'}/bin:${env.JAVA_HOME}/bin"]) {
-          sh "mvn clean install -V -B -Prun-its,embedded -Dmaven.test.failure.ignore=true -Dmaven.repo.local=${env.WORKSPACE}/repo  -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip -DwrapperDistroDir=${env.WORKSPACE}/apache-maven/target -DmavenWrapper=${env.WORKSPACE}/maven-wrapper/target/maven-wrapper.jar"
+          sh "mvn clean install -V -B -Prun-its,embedded -Dmaven.test.failure.ignore -Dmaven.repo.local=${env.WORKSPACE}/repo -DmavenDistro=${env.WORKSPACE}/apache-maven/target/apache-maven-bin.zip"
         }
       }
     }

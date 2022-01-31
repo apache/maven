@@ -22,35 +22,30 @@ package org.apache.maven.repository;
 import java.util.Arrays;
 import java.util.List;
 
+import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.settings.Mirror;
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import javax.inject.Inject;
+
+@PlexusTest
 public class MirrorProcessorTest
-    extends PlexusTestCase
 {
+    @Inject
     private DefaultMirrorSelector mirrorSelector;
+
+    @Inject
     private ArtifactRepositoryFactory repositorySystem;
 
-    protected void setUp()
-        throws Exception
-    {
-        mirrorSelector = (DefaultMirrorSelector) lookup( MirrorSelector.class );
-        repositorySystem = lookup( ArtifactRepositoryFactory.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        mirrorSelector = null;
-        repositorySystem = null;
-
-        super.tearDown();
-    }
-
+    @Test
     public void testExternalURL()
     {
         assertTrue( DefaultMirrorSelector.isExternalRepo( getRepo( "foo", "http://somehost" ) ) );
@@ -73,6 +68,7 @@ public class MirrorProcessorTest
         assertFalse( DefaultMirrorSelector.isExternalRepo( getRepo( "foo", "" ) ) );
     }
 
+    @Test
     public void testMirrorLookup()
     {
         Mirror mirrorA = newMirror( "a", "a", "http://a" );
@@ -87,6 +83,7 @@ public class MirrorProcessorTest
         assertNull( mirrorSelector.getMirror( getRepo( "c", "http://c.c" ), mirrors ) );
     }
 
+    @Test
     public void testMirrorWildcardLookup()
     {
         Mirror mirrorA = newMirror( "a", "a", "http://a" );
@@ -102,6 +99,7 @@ public class MirrorProcessorTest
         assertSame( mirrorC, mirrorSelector.getMirror( getRepo( "c", "http://c.c" ), mirrors ) );
     }
 
+    @Test
     public void testMirrorStopOnFirstMatch()
     {
         // exact matches win first
@@ -130,6 +128,7 @@ public class MirrorProcessorTest
         assertSame( mirrorC2, mirrorSelector.getMirror( getRepo( "f", "http://f" ), mirrors ) );
     }
 
+    @Test
     public void testPatterns()
     {
         assertTrue( DefaultMirrorSelector.matchPattern( getRepo( "a" ), "*" ) );
@@ -166,6 +165,7 @@ public class MirrorProcessorTest
         assertFalse( DefaultMirrorSelector.matchPattern( getRepo( "d" ), "!a,!c*" ) );
     }
 
+    @Test
     public void testPatternsWithExternal()
     {
         assertTrue( DefaultMirrorSelector.matchPattern( getRepo( "a", "http://localhost" ), "*" ) );
@@ -180,6 +180,7 @@ public class MirrorProcessorTest
         assertTrue( DefaultMirrorSelector.matchPattern( getRepo( "c", "http://somehost" ), "!a,external:*" ) );
     }
 
+    @Test
     public void testLayoutPattern()
     {
         assertTrue( DefaultMirrorSelector.matchesLayout( "default", null ) );
@@ -199,6 +200,7 @@ public class MirrorProcessorTest
         assertFalse( DefaultMirrorSelector.matchesLayout( "default", "!default,*" ) );
     }
 
+    @Test
     public void testMirrorLayoutConsideredForMatching()
     {
         ArtifactRepository repo = getRepo( "a" );

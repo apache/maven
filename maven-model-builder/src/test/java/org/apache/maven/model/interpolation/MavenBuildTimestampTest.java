@@ -22,17 +22,19 @@ package org.apache.maven.model.interpolation;
 import java.util.Date;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenBuildTimestampTest
-    extends TestCase
 {
+    @Test
     public void testMavenBuildTimestampUsesUTC()
     {
         Properties interpolationProperties = new Properties();
         interpolationProperties.setProperty( "maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'" );
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp( new Date(), interpolationProperties );
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertTrue( "We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith( "Z" ) );
+        assertTrue( formattedTimestamp.endsWith( "Z" ), "We expect the UTC marker at the end of the timestamp." );
     }
 }

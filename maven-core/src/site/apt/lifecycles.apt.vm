@@ -25,25 +25,31 @@
 
 Lifecycles Reference
 
-  Maven defines 3 lifecycles in <<<META-INF/plexus/components.xml>>>:
+  Maven defines 4 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
 
 %{toc|fromDepth=2}
 
 * <<<default>>> Lifecycle
 
-  <<<default>>> lifecycle is defined <<without>> any associated plugin.
-  Plugin bindings for this lifecycle are {{{./default-bindings.html}defined separately for every packaging}}:
+  <<<default>>> lifecycle is defined only with phases, <<without>> any associated plugin binding:
+  plugins bindings for this lifecycle are {{{./default-bindings.html}defined separately for each packaging}}:
 
-%{snippet|id=lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+%{snippet|id=default|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/DefaultLifecycleProvider.java}
 
 * <<<clean>>> Lifecycle
 
-  <<<clean>>> lifecycle is defined directly with its plugin bindings.
+  <<<clean>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=clean|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+%{snippet|id=clean|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/CleanLifecycleProvider.java}
 
 * <<<site>>> Lifecycle
 
-  <<<site>>> lifecycle is defined directly with its plugin bindings.
+  <<<site>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=site|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+%{snippet|id=site|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/SiteLifecycleProvider.java}
+
+* <<<wrapper>>> Lifecycle
+
+  <<<wrapper>>> lifecycle phases are defined with their plugins bindings:
+
+%{snippet|id=wrapper|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/WrapperLifecycleProvider.java}

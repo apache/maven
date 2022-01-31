@@ -24,8 +24,9 @@ import java.util.Collections;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * MNG-3131
@@ -34,11 +35,11 @@ import junit.framework.TestCase;
  *
  */
 public class PluginParameterExceptionTest
-    extends TestCase
 {
 
     private final String LS = System.lineSeparator();
 
+    @Test
     public void testMissingRequiredStringArrayTypeParameter()
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
@@ -69,6 +70,7 @@ public class PluginParameterExceptionTest
                 "</configuration>." + LS, exception.buildDiagnosticMessage() );
     }
 
+    @Test
     public void testMissingRequiredCollectionTypeParameter()
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
@@ -99,6 +101,7 @@ public class PluginParameterExceptionTest
                 "</configuration>." + LS, exception.buildDiagnosticMessage() );
     }
 
+    @Test
     public void testMissingRequiredMapTypeParameter()
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
@@ -129,6 +132,7 @@ public class PluginParameterExceptionTest
                 "</configuration>." + LS, exception.buildDiagnosticMessage() );
     }
 
+    @Test
     public void testMissingRequiredPropertiesTypeParameter()
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();

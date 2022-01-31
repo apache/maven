@@ -42,7 +42,7 @@ public class BuildPluginManagerStub
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
                                              RepositorySystemSession session )
     {
-        return MojoExecutorStub.createMojoDescriptor( plugin.getKey() );
+        return MojoExecutorStub.createMojoDescriptor( plugin );
     }
 
     public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )

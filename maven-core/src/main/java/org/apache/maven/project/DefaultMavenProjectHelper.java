@@ -54,11 +54,9 @@ public class DefaultMavenProjectHelper
     public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier,
                                 File artifactFile )
     {
-        String type = artifactType;
-
         ArtifactHandler handler = null;
 
-        if ( type != null )
+        if ( artifactType != null )
         {
             handler = artifactHandlerManager.getArtifactHandler( artifactType );
         }

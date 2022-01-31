@@ -22,12 +22,23 @@ package org.apache.maven.artifact.handler;
 import java.io.File;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.FileUtils;
+import javax.inject.Inject;
 
+import org.codehaus.plexus.testing.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@PlexusTest
 public class ArtifactHandlerTest
-    extends PlexusTestCase
 {
+    @Inject
+    PlexusContainer container;
+
+    @Test
     public void testAptConsistency()
         throws Exception
     {
@@ -47,7 +58,7 @@ public class ArtifactHandlerTest
                 int i = 0;
                 for ( String col : cols )
                 {
-                    assertEquals( "Wrong column header", expected[i++], col.trim() );
+                    assertEquals( expected[i++], col.trim(), "Wrong column header" );
                 }
             }
             else if ( line.startsWith( "|" ) )
@@ -62,13 +73,13 @@ public class ArtifactHandlerTest
                 String addedToClasspath = trimApt( cols[6] );
                 String includesDependencies = trimApt( cols[7] );
 
-                ArtifactHandler handler = lookup( ArtifactHandler.class, type );
-                assertEquals( type + " extension", handler.getExtension(), extension );
-                assertEquals( type + " packaging", handler.getPackaging(), packaging );
-                assertEquals( type + " classifier", handler.getClassifier(), classifier );
-                assertEquals( type + " language", handler.getLanguage(), language );
-                assertEquals( type + " addedToClasspath", handler.isAddedToClasspath() ? "true" : null, addedToClasspath );
-                assertEquals( type + " includesDependencies", handler.isIncludesDependencies() ? "true" : null, includesDependencies );
+                ArtifactHandler handler = container.lookup( ArtifactHandler.class, type );
+                assertEquals( handler.getExtension(), extension, type + " extension" );
+                assertEquals( handler.getPackaging(), packaging, type + " packaging" );
+                assertEquals( handler.getClassifier(), classifier, type + " classifier" );
+                assertEquals( handler.getLanguage(), language, type + " language" );
+                assertEquals( handler.isAddedToClasspath() ? "true" : null, addedToClasspath, type + " addedToClasspath" );
+                assertEquals( handler.isIncludesDependencies() ? "true" : null, includesDependencies, type + " includesDependencies" );
             }
         }
     }

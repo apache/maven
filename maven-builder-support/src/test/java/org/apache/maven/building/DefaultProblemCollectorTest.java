@@ -19,10 +19,12 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import static org.junit.Assert.*;
-
 import org.apache.maven.building.Problem.Severity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DefaultProblemCollectorTest
 {
@@ -46,7 +48,7 @@ public class DefaultProblemCollectorTest
         assertEquals( "MESSAGE1",p1.getMessage() );
         assertEquals( -1, p1.getLineNumber() );
         assertEquals( -1, p1.getColumnNumber() );
-        assertEquals( null, p1.getException() );
+        assertNull( p1.getException() );
 
         Problem p2 = collector.getProblems().get(1);
         assertEquals( Severity.WARNING, p2.getSeverity() );

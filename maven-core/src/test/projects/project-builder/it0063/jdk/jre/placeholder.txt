@@ -1,1 +1,1 @@
-need it so that empty folder does not get deleted
+need it so that empty directory does not get deleted

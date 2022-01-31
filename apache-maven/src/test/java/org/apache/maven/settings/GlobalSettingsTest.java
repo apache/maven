@@ -19,14 +19,16 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.
@@ -34,16 +36,16 @@ import java.nio.charset.StandardCharsets;
  * @author Benjamin Bentmann
  */
 public class GlobalSettingsTest
-    extends TestCase
 {
 
+    @Test
     public void testValidGlobalSettings()
         throws Exception
     {
         String basedir = System.getProperty( "basedir", System.getProperty( "user.dir" ) );
 
         File globalSettingsFile = new File( basedir, "src/assembly/maven/conf/settings.xml" );
-        assertTrue( globalSettingsFile.getAbsolutePath(), globalSettingsFile.isFile() );
+        assertTrue( globalSettingsFile.isFile(), globalSettingsFile.getAbsolutePath() );
 
         try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8) )
         {

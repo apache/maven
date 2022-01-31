@@ -79,14 +79,6 @@ under the License.
         </exclusion>
       </exclusions>
     </dependency>
-    <!--  This is included in Wagon HTTP.
-          We are just making the dependency explicit
-          in order to ease license attribution -->
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -113,10 +105,6 @@ under the License.
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-cipher</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -129,19 +117,15 @@ under the License.
           <configuration>
             <excludes combine.children="append">
               <exclude>src/assembly/maven/bin/m2.conf</exclude>
-              <!-- these are partial scripts, resulting in mvn/mwnw scripts -->
+              <!-- these are partial scripts, resulting in mvn scripts -->
               <exclude>src/assembly/shared/init</exclude>
               <exclude>src/assembly/shared/init.cmd</exclude>
               <exclude>src/assembly/shared/mvnlauncher</exclude>
               <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
               <exclude>src/assembly/shared/mvnvalidate</exclude>
               <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
-              <exclude>src/assembly/shared/mvnwlauncher</exclude>
-              <exclude>src/assembly/shared/mvnwlauncher.cmd</exclude>
               <exclude>src/assembly/shared/run</exclude>
               <exclude>src/assembly/shared/run.cmd</exclude>
-              <exclude>src/assembly/wrapper/*/download</exclude>
-              <exclude>src/assembly/wrapper/*/download.cmd</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -153,7 +137,7 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <includeArtifactIds>jansi</includeArtifactIds>
-          <includes>META-INF/native/**</includes>
+          <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
         </configuration>
         <executions>
           <execution>
@@ -208,7 +192,7 @@ under the License.
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assembly/maven/bin.xml</descriptor>
+                <descriptor>src/assembly/bin.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
@@ -276,7 +260,7 @@ under the License.
                   <attach>false</attach>
                   <outputDirectory>${distributionTargetDir}</outputDirectory>
                   <descriptors>
-                    <descriptor>src/assembly/maven/dir.xml</descriptor>
+                    <descriptor>src/assembly/dir.xml</descriptor>
                   </descriptors>
                 </configuration>
               </execution>
@@ -300,7 +284,7 @@ under the License.
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>src/assembly/maven/src.xml</descriptor>
+                    <descriptor>src/assembly/src.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>

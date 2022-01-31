@@ -17,12 +17,12 @@ package org.apache.maven.lifecycle.internal;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kristian Rosenvold

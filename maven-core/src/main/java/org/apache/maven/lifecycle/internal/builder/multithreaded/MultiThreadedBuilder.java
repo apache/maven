@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +46,8 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project).
@@ -64,15 +68,14 @@ import org.codehaus.plexus.logging.Logger;
 public class MultiThreadedBuilder
     implements Builder
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
+    private final LifecycleModuleBuilder lifecycleModuleBuilder;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private LifecycleModuleBuilder lifecycleModuleBuilder;
-
-    public MultiThreadedBuilder()
+    public MultiThreadedBuilder( LifecycleModuleBuilder lifecycleModuleBuilder )
     {
+        this.lifecycleModuleBuilder = lifecycleModuleBuilder;
     }
 
     @Override
@@ -129,6 +132,14 @@ public class MultiThreadedBuilder
                                                        Map<MavenProject, ProjectSegment> projectBuildList,
                                                        ThreadOutputMuxer muxer )
     {
+        // gather artifactIds which are not unique so that the respective thread names can be extended with the groupId
+        Set<String> duplicateArtifactIds = projectBuildList.keySet().stream()
+                .map( MavenProject::getArtifactId )
+                .collect( Collectors.groupingBy( Function.identity(), Collectors.counting() ) )
+                .entrySet().stream()
+                .filter( p -> p.getValue() > 1 )
+                .map( Map.Entry::getKey )
+                .collect( Collectors.toSet() );
 
         // schedule independent projects
         for ( MavenProject mavenProject : analyzer.getRootSchedulableBuilds() )
@@ -136,7 +147,8 @@ public class MultiThreadedBuilder
             ProjectSegment projectSegment = projectBuildList.get( mavenProject );
             logger.debug( "Scheduling: " + projectSegment.getProject() );
             Callable<ProjectSegment> cb =
-                createBuildCallable( rootSession, projectSegment, reactorContext, taskSegment, muxer );
+                createBuildCallable( rootSession, projectSegment, reactorContext, taskSegment, muxer,
+                                     duplicateArtifactIds );
             service.submit( cb );
         }
 
@@ -161,7 +173,8 @@ public class MultiThreadedBuilder
                         ProjectSegment scheduledDependent = projectBuildList.get( mavenProject );
                         logger.debug( "Scheduling: " + scheduledDependent );
                         Callable<ProjectSegment> cb =
-                            createBuildCallable( rootSession, scheduledDependent, reactorContext, taskSegment, muxer );
+                            createBuildCallable( rootSession, scheduledDependent, reactorContext, taskSegment, muxer,
+                                                 duplicateArtifactIds );
                         service.submit( cb );
                     }
                 }
@@ -183,16 +196,34 @@ public class MultiThreadedBuilder
     private Callable<ProjectSegment> createBuildCallable( final MavenSession rootSession,
                                                           final ProjectSegment projectBuild,
                                                           final ReactorContext reactorContext,
-                                                          final TaskSegment taskSegment, final ThreadOutputMuxer muxer )
+                                                          final TaskSegment taskSegment,
+                                                          final ThreadOutputMuxer muxer,
+                                                          final Set<String> duplicateArtifactIds )
     {
         return () ->
         {
-            // muxer.associateThreadWithProjectSegment( projectBuild );
-            lifecycleModuleBuilder.buildProject( projectBuild.getSession(), rootSession, reactorContext,
-                                                 projectBuild.getProject(), taskSegment );
-            // muxer.setThisModuleComplete( projectBuild );
+            final Thread currentThread = Thread.currentThread();
+            final String originalThreadName = currentThread.getName();
+            final MavenProject project = projectBuild.getProject();
 
-            return projectBuild;
+            final String threadNameSuffix = duplicateArtifactIds.contains( project.getArtifactId() )
+                    ? project.getGroupId() + ":" + project.getArtifactId()
+                    : project.getArtifactId();
+            currentThread.setName( "mvn-builder-" + threadNameSuffix );
+
+            try
+            {
+                // muxer.associateThreadWithProjectSegment( projectBuild );
+                lifecycleModuleBuilder.buildProject( projectBuild.getSession(), rootSession, reactorContext, project,
+                                                     taskSegment );
+                // muxer.setThisModuleComplete( projectBuild );
+
+                return projectBuild;
+            }
+            finally
+            {
+                 currentThread.setName( originalThreadName );
+            }
         };
     }
 }

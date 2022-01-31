@@ -19,16 +19,19 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.util.Properties;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Konstantin Perikov
  */
 public class ComplexActivationTest
-        extends TestCase
 {
 
     private File getPom( String name )
@@ -36,6 +39,7 @@ public class ComplexActivationTest
         return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
+    @Test
     public void testAndConditionInActivation()
             throws Exception
     {

@@ -23,6 +23,8 @@ import java.util.Properties;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link JdkVersionProfileActivator}.
@@ -33,12 +35,14 @@ public class JdkVersionProfileActivatorTest
     extends AbstractProfileActivatorTest<JdkVersionProfileActivator>
 {
 
-    public JdkVersionProfileActivatorTest()
+    @Override
+    @BeforeEach
+    void setUp() throws Exception
     {
-        super( JdkVersionProfileActivator.class );
+        activator = new JdkVersionProfileActivator();
     }
 
-    private Profile newProfile( String jdkVersion )
+    private Profile newProfile(String jdkVersion )
     {
         Activation a = new Activation();
         a.setJdk( jdkVersion );
@@ -56,6 +60,7 @@ public class JdkVersionProfileActivatorTest
         return props;
     }
 
+    @Test
     public void testNullSafe()
         throws Exception
     {
@@ -68,6 +73,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( false, p, newContext( null, null ) );
     }
 
+    @Test
     public void testPrefix()
         throws Exception
     {
@@ -83,6 +89,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "1.5" ) ) );
     }
 
+    @Test
     public void testPrefixNegated()
         throws Exception
     {
@@ -98,6 +105,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
     }
 
+    @Test
     public void testVersionRangeInclusiveBounds()
         throws Exception
     {
@@ -120,6 +128,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ) ) );
     }
 
+    @Test
     public void testVersionRangeExclusiveBounds()
         throws Exception
     {
@@ -143,6 +152,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "1.6" ) ) );
     }
 
+    @Test
     public void testVersionRangeInclusiveLowerBound()
         throws Exception
     {
@@ -165,6 +175,7 @@ public class JdkVersionProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ) ) );
     }
 
+    @Test
     public void testVersionRangeExclusiveUpperBound()
         throws Exception
     {

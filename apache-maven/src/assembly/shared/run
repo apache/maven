@@ -1,23 +1,21 @@
-# For Cygwin, switch paths to Windows format before running java
-if $cygwin ; then
-  [ -n "$MAVEN_HOME" ] &&
-    MAVEN_HOME=`cygpath --path --windows "$MAVEN_HOME"`
+# For Cygwin and MinGW, switch paths to Windows format before running java(1) command
+if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] &&
-    CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  [ -n "$LAUNCHER_JAR" ] &&
-    LAUNCHER_JAR=`cygpath --path --windows "$LAUNCHER_JAR"`
+    JAVA_HOME=`cygpath --windows "$JAVA_HOME"`
+  LAUNCHER_JAR=`cygpath --windows "$LAUNCHER_JAR"`
+  CLASSWORLDS_CONF=`cygpath --windows "$CLASSWORLDS_CONF"`
+  MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
+  MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
 fi
-
-# Provide a "standardized" way to retrieve the CLI args that will
-# work with both Windows and non-Windows executions.
-MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
-export MAVEN_CMD_LINE_ARGS
 
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
-  -classpath "${LAUNCHER_JAR}" \
-  $MAVENHOME_CONFIG "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
-  $MAVEN_LAUNCHER "$@"
+  -classpath "$LAUNCHER_JAR" \
+  "-Dclassworlds.conf=$CLASSWORLDS_CONF" \
+  "-Dmaven.home=$MAVEN_HOME" \
+  "-Dlibrary.jansi.path=${MAVEN_HOME}/lib/jansi-native" \
+  "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
+  $LAUNCHER_CLASS \
+  $MAVEN_ARGS \
+  "$@"

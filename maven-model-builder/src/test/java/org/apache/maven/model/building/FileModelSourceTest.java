@@ -18,13 +18,17 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import java.io.File;
 import java.io.IOException;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assume.assumeTrue;
-import org.junit.Test;
+
+import org.codehaus.plexus.util.Os;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 
 /**
  * Test that validate the solution of MNG-6261 issue
@@ -53,7 +57,7 @@ public class FileModelSourceTest
     public void testWindowsPaths()
             throws Exception
     {
-        assumeTrue( SystemUtils.IS_OS_WINDOWS );
+        assumeTrue( Os.isFamily( "Windows" ) );
 
         File upperCaseFile = createTempFile( "TESTE" );
         String absolutePath = upperCaseFile.getAbsolutePath();

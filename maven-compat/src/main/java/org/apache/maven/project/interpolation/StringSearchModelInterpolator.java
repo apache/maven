@@ -164,12 +164,7 @@ public class StringSearchModelInterpolator
             }
             else if ( isQualifiedForInterpolation( cls ) )
             {
-                Field[] fields = FIELDS_BY_CLASS.get( cls );
-                if ( fields == null )
-                {
-                    fields = cls.getDeclaredFields();
-                    FIELDS_BY_CLASS.put( cls, fields );
-                }
+                Field[] fields = FIELDS_BY_CLASS.computeIfAbsent( cls, k -> cls.getDeclaredFields() );
 
                 for ( Field field : fields )
                 {
@@ -368,12 +363,7 @@ public class StringSearchModelInterpolator
 //                return false;
 //            }
 
-            if ( "parent".equals( field.getName() ) )
-            {
-                return false;
-            }
-
-            return true;
+            return !"parent".equals( field.getName() );
         }
 
         private void evaluateArray( Object target )

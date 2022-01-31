@@ -44,13 +44,12 @@ public class DefaultModelPathTranslator
     implements ModelPathTranslator
 {
 
-    @Inject
-    private PathTranslator pathTranslator;
+    private final PathTranslator pathTranslator;
 
-    public DefaultModelPathTranslator setPathTranslator( PathTranslator pathTranslator )
+    @Inject
+    public DefaultModelPathTranslator( PathTranslator pathTranslator )
     {
         this.pathTranslator = pathTranslator;
-        return this;
     }
 
     @Override

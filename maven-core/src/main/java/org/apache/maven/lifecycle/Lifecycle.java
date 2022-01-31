@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**
- * Class Lifecycle.
+ * Lifecycle definition, with eventual plugin bindings (when they are not packaging-specific).
  */
 public class Lifecycle
 {

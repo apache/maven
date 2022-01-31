@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link PropertyProfileActivator}.
@@ -34,12 +36,14 @@ public class PropertyProfileActivatorTest
     extends AbstractProfileActivatorTest<PropertyProfileActivator>
 {
 
-    public PropertyProfileActivatorTest()
+    @BeforeEach
+    @Override
+    void setUp() throws Exception
     {
-        super( PropertyProfileActivator.class );
+        activator = new PropertyProfileActivator();
     }
 
-    private Profile newProfile( String key, String value )
+    private Profile newProfile(String key, String value )
     {
         ActivationProperty ap = new ActivationProperty();
         ap.setName( key );
@@ -61,6 +65,7 @@ public class PropertyProfileActivatorTest
         return props;
     }
 
+    @Test
     public void testNullSafe()
         throws Exception
     {
@@ -73,6 +78,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, p, newContext( null, null ) );
     }
 
+    @Test
     public void testWithNameOnly_UserProperty()
         throws Exception
     {
@@ -85,6 +91,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
+    @Test
     public void testWithNameOnly_SystemProperty()
         throws Exception
     {
@@ -97,6 +104,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
+    @Test
     public void testWithNegatedNameOnly_UserProperty()
         throws Exception
     {
@@ -109,6 +117,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
+    @Test
     public void testWithNegatedNameOnly_SystemProperty()
         throws Exception
     {
@@ -121,6 +130,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
+    @Test
     public void testWithValue_UserProperty()
         throws Exception
     {
@@ -133,6 +143,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
+    @Test
     public void testWithValue_SystemProperty()
         throws Exception
     {
@@ -145,6 +156,7 @@ public class PropertyProfileActivatorTest
         assertActivation( false, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
+    @Test
     public void testWithNegatedValue_UserProperty()
         throws Exception
     {
@@ -157,6 +169,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
+    @Test
     public void testWithNegatedValue_SystemProperty()
         throws Exception
     {
@@ -169,6 +182,7 @@ public class PropertyProfileActivatorTest
         assertActivation( true, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
+    @Test
     public void testWithValue_UserPropertyDominantOverSystemProperty()
         throws Exception
     {

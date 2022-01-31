@@ -19,6 +19,7 @@ package org.apache.maven.model.merge;
  * under the License.
  */
 
+import java.io.ObjectStreamException;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -2640,7 +2641,7 @@ public class ModelMerger
 
     /**
      * Use to compute keys for data structures
-     * @param <T>
+     * @param <T> the data structure type
      */
     @FunctionalInterface
     public interface KeyComputer<T> extends Function<T, Object>
@@ -2681,8 +2682,9 @@ public class ModelMerger
      * Merging list
      * @param <V>
      */
-    private static class MergingList<V> extends AbstractList<V>
+    private static class MergingList<V> extends AbstractList<V> implements java.io.Serializable
     {
+
         private final KeyComputer<V> keyComputer;
         private Map<Object, V> map;
         private List<V> list;
@@ -2691,6 +2693,11 @@ public class ModelMerger
         {
             this.map = new LinkedHashMap<>( initialCapacity );
             this.keyComputer = keyComputer;
+        }
+
+        Object writeReplace() throws ObjectStreamException
+        {
+            return new ArrayList<>( this );
         }
 
         @Override

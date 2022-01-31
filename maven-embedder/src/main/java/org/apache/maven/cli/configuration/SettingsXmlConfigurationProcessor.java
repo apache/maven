@@ -73,11 +73,17 @@ public class SettingsXmlConfigurationProcessor
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
 
-    @Inject
-    private SettingsBuilder settingsBuilder;
+    private final SettingsBuilder settingsBuilder;
+    private final SettingsDecrypter settingsDecrypter;
 
     @Inject
-    private SettingsDecrypter settingsDecrypter;
+    public SettingsXmlConfigurationProcessor(
+            SettingsBuilder settingsBuilder,
+            SettingsDecrypter settingsDecrypter )
+    {
+        this.settingsBuilder = settingsBuilder;
+        this.settingsDecrypter = settingsDecrypter;
+    }
 
     @Override
     public void process( CliRequest cliRequest )

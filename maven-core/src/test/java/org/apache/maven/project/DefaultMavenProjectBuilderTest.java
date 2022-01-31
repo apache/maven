@@ -18,63 +18,47 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
 {
+    @TempDir
+    File localRepoDir;
 
-    private List<File> filesToDelete = new ArrayList<>();
-
-    private File localRepoDir;
+    // only use by reread()
+    @TempDir
+    Path projectRoot;
 
     @Override
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
-        projectBuilder = lookup( ProjectBuilder.class );
-
-        localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
-        localRepoDir.mkdirs();
-
-        filesToDelete.add( localRepoDir );
-    }
-
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-
-        if ( !filesToDelete.isEmpty() )
-        {
-            for ( File file : filesToDelete )
-            {
-                if ( file.exists() )
-                {
-                    if ( file.isDirectory() )
-                    {
-                        FileUtils.deleteDirectory( file );
-                    }
-                    else
-                    {
-                        file.delete();
-                    }
-                }
-            }
-        }
+        projectBuilder = getContainer().lookup( ProjectBuilder.class );
     }
 
     protected MavenProject getProject( Artifact pom, boolean allowStub )
@@ -89,8 +73,10 @@ public class DefaultMavenProjectBuilderTest
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
-     * @throws Exception
+     *
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildFromMiddlePom() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/grandchild-check/child/pom.xml");
@@ -103,6 +89,8 @@ public class DefaultMavenProjectBuilderTest
         getProject( f2 );
     }
 
+    @Disabled( "Maven 4 does not allow duplicate plugin declarations" )
+    @Test
     public void testDuplicatePluginDefinitionsMerged()
         throws Exception
     {
@@ -114,22 +102,20 @@ public class DefaultMavenProjectBuilderTest
         assertEquals( "first", project.getBuildPlugins().get( 0 ).getExecutions().get( 0 ).getId() );
     }
 
+    @Test
     public void testFutureModelVersion()
         throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/future-model-version-pom.xml" );
 
-        try
-        {
-            getProject( f1 );
-            fail( "Expected to fail for future versions" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProject( f1 ),
+                "Expected to fail for future versions" );
+        assertThat(  e.getMessage(), containsString( "Building this project requires a newer version of Maven" ) );
     }
 
+    @Test
     public void testPastModelVersion()
         throws Exception
     {
@@ -137,43 +123,27 @@ public class DefaultMavenProjectBuilderTest
         // update the resource if we stop supporting modelVersion 4.0.0
         File f1 = getTestFile( "src/test/resources/projects/past-model-version-pom.xml" );
 
-        try
-        {
-            getProject( f1 );
-            fail( "Expected to fail for past versions" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            assertContains( "Building this project requires an older version of Maven", e.getMessage() );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProject( f1 ),
+                "Expected to fail for past versions" );
+        assertThat( e.getMessage(), containsString( "Building this project requires an older version of Maven" ) );
     }
 
+    @Test
     public void testFutureSchemaModelVersion()
         throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/future-schema-model-version-pom.xml" );
 
-        try
-        {
-            getProject( f1 );
-            fail( "Expected to fail for future versions" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            assertContains( "Building this project requires a newer version of Maven", e.getMessage() );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProject( f1 ),
+                "Expected to fail for future versions" );
+        assertThat( e.getMessage(), containsString( "Building this project requires a newer version of Maven" ) );
     }
 
-    private void assertContains( String expected, String actual )
-    {
-        if ( actual == null || !actual.contains( expected ) )
-        {
-            fail( "Expected: a string containing " + expected + "\nActual: " + ( actual == null
-                ? "null"
-                : "'" + actual + "'" ) );
-        }
-    }
-
+    @Test
     public void testBuildStubModelForMissingRemotePom()
         throws Exception
     {
@@ -201,48 +171,46 @@ public class DefaultMavenProjectBuilderTest
         return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
     }
 
-    public void xtestLoop()
-        throws Exception
-    {
-        while ( true )
-        {
-            File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
-            getProject( f1 );
-        }
-    }
-
+    @Test
     public void testPartialResultUponBadDependencyDeclaration()
         throws Exception
     {
         File pomFile = getTestFile( "src/test/resources/projects/bad-dependency.xml" );
 
-        try
-        {
-            ProjectBuildingRequest request = newBuildingRequest();
-            request.setProcessPlugins( false );
-            request.setResolveDependencies( true );
-            projectBuilder.build( pomFile, request );
-            fail( "Project building did not fail despite invalid POM" );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            List<ProjectBuildingResult> results = e.getResults();
-            assertNotNull( results );
-            assertEquals( 1, results.size() );
-            ProjectBuildingResult result = results.get( 0 );
-            assertNotNull( result );
-            assertNotNull( result.getProject() );
-            assertEquals( 1, result.getProblems().size() );
-            assertEquals( 1, result.getProject().getArtifacts().size() );
-            assertNotNull( result.getDependencyResolutionResult() );
-        }
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setProcessPlugins( false );
+        request.setResolveDependencies( true );
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> projectBuilder.build( pomFile, request ),
+                "Project building did not fail despite invalid POM" );
+        List<ProjectBuildingResult> results = e.getResults();
+        assertNotNull( results );
+        assertEquals( 1, results.size() );
+        ProjectBuildingResult result = results.get( 0 );
+        assertNotNull( result );
+        assertNotNull( result.getProject() );
+        assertEquals( 1, result.getProblems().size() );
+        assertEquals( 1, result.getProject().getArtifacts().size() );
+        assertNotNull( result.getDependencyResolutionResult() );
+    }
+
+    public void testImportScopePomResolvesFromPropertyBasedRepository()
+            throws Exception
+    {
+        File pomFile = getTestFile( "src/test/resources/projects/import-scope-pom-resolves-from-property-based-repository.xml" );
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setProcessPlugins( false );
+        request.setResolveDependencies( true );
+        projectBuilder.build( pomFile, request );
     }
 
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildValidParentVersionRangeLocally() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/parent-version-range-local-valid/child/pom.xml" );
@@ -260,46 +228,38 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception
     {
         File f1 =
             getTestFile( "src/test/resources/projects/parent-version-range-local-child-without-version/child/pom.xml" );
 
-        try
-        {
-            getProject( f1 );
-            fail( "Expected 'ProjectBuildingException' not thrown." );
-        }
-        catch ( final ProjectBuildingException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProject( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
+        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
 
     /**
      * Tests whether local version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildProjectVersionExpression() throws Exception
     {
         File f1 =
             getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-project-version-expression/child/pom.xml" );
 
-        try
-        {
-            getProject( f1 );
-            fail( "Expected 'ProjectBuildingException' not thrown." );
-        }
-        catch ( final ProjectBuildingException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProject( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
+        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
     
     /**
@@ -345,8 +305,9 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildParentVersionRangeExternally() throws Exception
     {
         File f1 = getTestFile( "src/test/resources/projects/parent-version-range-external-valid/pom.xml" );
@@ -364,47 +325,69 @@ public class DefaultMavenProjectBuilderTest
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception
     {
         File f1 =
             getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-without-version/pom.xml" );
 
-        try
-        {
-            this.getProjectFromRemoteRepository( f1 );
-            fail( "Expected 'ProjectBuildingException' not thrown." );
-        }
-        catch ( final ProjectBuildingException e )
-        {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
-        }
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProjectFromRemoteRepository( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
+        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
     }
 
     /**
      * Tests whether external version range parent references are build correctly.
      *
-     * @throws Exception
+     * @throws Exception in case of issue
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildProjectVersionExpression() throws Exception
     {
         File f1 =
             getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-project-version-expression/pom.xml" );
 
-        try
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getProjectFromRemoteRepository( f1 ),
+                "Expected 'ProjectBuildingException' not thrown." );
+        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+    }
+
+    /**
+     * Ensure that when re-reading a pom, it should not use the cached Model
+     *
+     * @throws Exception in case of issue
+     */
+    @Test
+    public void rereadPom_mng7063() throws Exception
+    {
+        final Path pom = projectRoot.resolve( "pom.xml" );
+        final ProjectBuildingRequest buildingRequest = newBuildingRequest();
+
+        try ( InputStream pomResource =
+            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom1.xml" ) )
         {
-            this.getProjectFromRemoteRepository( f1 );
-            fail( "Expected 'ProjectBuildingException' not thrown." );
+            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
         }
-        catch ( final ProjectBuildingException e )
+
+        MavenProject project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+        assertThat( project.getName(), is( "aid" ) ); // inherited from artifactId
+
+        try ( InputStream pomResource =
+            DefaultMavenProjectBuilderTest.class.getResourceAsStream( "/projects/reread/pom2.xml" ) )
         {
-            assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+            Files.copy( pomResource, pom, StandardCopyOption.REPLACE_EXISTING );
         }
+
+        project = projectBuilder.build( pom.toFile(), buildingRequest ).getProject();
+        assertThat( project.getName(), is( "PROJECT NAME" ) );
     }
     
     /**

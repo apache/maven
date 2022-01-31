@@ -29,6 +29,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MavenLifecycleParticipantTest
     extends AbstractCoreMavenComponentTestCase
@@ -98,17 +102,12 @@ public class MavenLifecycleParticipantTest
     }
 
     @Override
-    protected void setupContainer()
-    {
-        super.setupContainer();
-    }
-
-    @Override
     protected String getProjectsDirectory()
     {
         return "src/test/projects/lifecycle-listener";
     }
 
+    @Test
     public void testDependencyInjection()
         throws Exception
     {
@@ -126,7 +125,7 @@ public class MavenLifecycleParticipantTest
         request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
-        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
+        assertFalse( result.hasExceptions(), result.getExceptions().toString() );
 
         MavenProject project = result.getProject();
 
@@ -138,6 +137,7 @@ public class MavenLifecycleParticipantTest
         assertEquals( INJECTED_ARTIFACT_ID, artifacts.get( 0 ).getArtifactId() );
     }
 
+    @Test
     public void testReactorDependencyInjection()
         throws Exception
     {
@@ -161,7 +161,7 @@ public class MavenLifecycleParticipantTest
         request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
-        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
+        assertFalse( result.hasExceptions(), result.getExceptions().toString() );
 
         List<String> order = new ArrayList<>();
         for ( MavenProject project : result.getTopologicallySortedProjects() )

@@ -60,8 +60,9 @@ public class DefaultProjectsSelector implements ProjectsSelector
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(),
-                projectBuildingRequest );
+        boolean hasProjectSelection = !request.getProjectActivation().isEmpty();
+        boolean isRecursive = hasProjectSelection || request.isRecursive();
+        List<ProjectBuildingResult> results = projectBuilder.build( files, isRecursive, projectBuildingRequest );
 
         List<MavenProject> projects = new ArrayList<>( results.size() );
 

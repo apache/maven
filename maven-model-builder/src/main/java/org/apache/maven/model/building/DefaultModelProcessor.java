@@ -66,22 +66,14 @@ public class DefaultModelProcessor
     implements ModelProcessor
 {
 
-    @Inject
-    private ModelLocator locator;
+    private final ModelLocator locator;
+    private final ModelReader reader;
 
     @Inject
-    private ModelReader reader;
-
-    public DefaultModelProcessor setModelLocator( ModelLocator locator )
+    public DefaultModelProcessor( ModelLocator locator, ModelReader reader )
     {
         this.locator = locator;
-        return this;
-    }
-
-    public DefaultModelProcessor setModelReader( ModelReader reader )
-    {
         this.reader = reader;
-        return this;
     }
 
     @Override

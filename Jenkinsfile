@@ -23,14 +23,14 @@ def buildOs = 'linux'
 def buildJdk = '8'
 def buildMvn = '3.6.3'
 def runITsOses = ['linux', 'windows']
-def runITsJdks = ['8', '11']
+def runITsJdks = ['8', '11', '16', '17']
 def runITsMvn = '3.6.3'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
 try {
 
-def osNode = jenkinsEnv.labelForOS(buildOs) 
+def osNode = jenkinsEnv.labelForOS(buildOs)
 node(jenkinsEnv.nodeSelection(osNode)) {
     dir('build') {
         stage('Checkout') {
@@ -58,15 +58,10 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 invokerPublisher(disabled: true),
                 pipelineGraphPublisher(disabled: false)
             ], publisherStrategy: 'EXPLICIT') {
-                // For now: maven-wrapper contains 2 poms sharing the same outputDirectory, so separate clean
-                sh "mvn clean"
-                sh "mvn ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore=true -P versionlessMavenDist"
+                sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist"
             }
             dir ('apache-maven/target') {
-                stash includes: 'apache-maven-bin.zip,apache-maven-wrapper-*.zip', name: 'maven-dist'
-            }
-            dir ('maven-wrapper/target') {
-                stash includes: 'maven-wrapper.jar', name: 'wrapper-dist'
+                stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
             }
         }
 
@@ -102,13 +97,12 @@ for (String os in runITsOses) {
                         }
                         dir('dists') {
                           unstash 'maven-dist'
-                          unstash 'wrapper-dist'
                         }
                         try {
                             withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
                                 junitPublisher(ignoreAttachments: false)
                             ]) {
-                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore=true -DmavenWrapper=$WORK_DIR/dists/maven-wrapper.jar -DwrapperDistroDir=${WORK_DIR}/dists"
+                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore"
 
                                 if (isUnix()) {
                                     sh 'df -hT'
@@ -163,8 +157,8 @@ parallel(runITsTasks)
 } finally {
     // notify completion
     stage("Notifications") {
-        jenkinsNotify()      
-    }    
+        jenkinsNotify()
+    }
 }
 
 def archiveDirs(stageId, archives) {

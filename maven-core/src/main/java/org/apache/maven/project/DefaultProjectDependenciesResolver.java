@@ -34,7 +34,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -52,6 +51,8 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Benjamin Bentmann
@@ -61,15 +62,18 @@ import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final RepositorySystem repoSystem;
+    private final List<RepositorySessionDecorator> decorators;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private RepositorySystem repoSystem;
-
-    @Inject
-    private List<RepositorySessionDecorator> decorators;
+    public DefaultProjectDependenciesResolver(
+            RepositorySystem repoSystem,
+            List<RepositorySessionDecorator> decorators )
+    {
+        this.repoSystem = repoSystem;
+        this.decorators = decorators;
+    }
 
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )
         throws DependencyResolutionException
@@ -190,8 +194,12 @@ public class DefaultProjectDependenciesResolver
             {
                 if ( !child.getRelocations().isEmpty() )
                 {
+                    org.eclipse.aether.artifact.Artifact relocated = child.getDependency().getArtifact();
+                    String message = relocated instanceof org.apache.maven.repository.internal.RelocatedArtifact
+                            ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) relocated ).getMessage()
+                            : null;
                     logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
-                        + child.getDependency().getArtifact() );
+                        + relocated + ( message != null ? ": " + message : "" ) );
                 }
             }
         }

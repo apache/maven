@@ -28,7 +28,6 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.SyncContext;
 import org.eclipse.aether.impl.MetadataResolver;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
-import org.eclipse.aether.impl.SyncContextFactory;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.metadata.Metadata;
@@ -40,9 +39,7 @@ import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
-import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -67,64 +64,32 @@ import java.util.Objects;
 @Named
 @Singleton
 public class DefaultVersionRangeResolver
-    implements VersionRangeResolver, Service
+    implements VersionRangeResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
-    private MetadataResolver metadataResolver;
-
-    private SyncContextFactory syncContextFactory;
-
-    private RepositoryEventDispatcher repositoryEventDispatcher;
-
-    public DefaultVersionRangeResolver()
-    {
-        // enable default constructor
-    }
+    private final MetadataResolver metadataResolver;
+    private final SyncContextFactory syncContextFactory;
+    private final RepositoryEventDispatcher repositoryEventDispatcher;
+    private final VersionScheme versionScheme;
 
     @Inject
-    DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                                 RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        setMetadataResolver( metadataResolver );
-        setSyncContextFactory( syncContextFactory );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
-    }
-
-    public void initService( ServiceLocator locator )
-    {
-        setMetadataResolver( locator.getService( MetadataResolver.class ) );
-        setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-    }
-
-    public DefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )
+    public DefaultVersionRangeResolver( MetadataResolver metadataResolver,
+                                        SyncContextFactory syncContextFactory,
+                                        RepositoryEventDispatcher repositoryEventDispatcher,
+                                        VersionScheme versionScheme )
     {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionRangeResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
-    {
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
-        return this;
-    }
-
-    public DefaultVersionRangeResolver setRepositoryEventDispatcher(
-        RepositoryEventDispatcher repositoryEventDispatcher )
-    {
         this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
-        return this;
+                "repositoryEventDispatcher cannot be null" );
+        this.versionScheme = Objects.requireNonNull( versionScheme, "versionScheme cannot be null" );
     }
-
     public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         throws VersionRangeResolutionException
     {
         VersionRangeResult result = new VersionRangeResult( request );
-
-        VersionScheme versionScheme = new GenericVersionScheme();
 
         VersionConstraint versionConstraint;
         try

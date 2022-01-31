@@ -61,10 +61,11 @@ public class ProjectArtifact
         DependencyManagement depMngt = project.getDependencyManagement();
         return ( depMngt != null )
                    ? Collections.unmodifiableList( depMngt.getDependencies() )
-                   : Collections.<Dependency>emptyList();
+                   : Collections.emptyList();
 
     }
 
+    // TODO: this is duplicate of PomArtifactHandlerProvider provided one
     static class PomArtifactHandler
         implements ArtifactHandler
     {

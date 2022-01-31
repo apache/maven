@@ -51,9 +51,10 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
@@ -67,24 +68,27 @@ import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 public class DefaultProjectBuildingHelper
     implements ProjectBuildingHelper
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final PlexusContainer container; // TODO not used? Then remove
+    private final ClassRealmManager classRealmManager;
+    private final ProjectRealmCache projectRealmCache;
+    private final RepositorySystem repositorySystem;
+    private final MavenPluginManager pluginManager;
 
     @Inject
-    private Logger logger;
-
-    @Inject
-    private PlexusContainer container;
-
-    @Inject
-    private ClassRealmManager classRealmManager;
-
-    @Inject
-    private ProjectRealmCache projectRealmCache;
-
-    @Inject
-    private RepositorySystem repositorySystem;
-
-    @Inject
-    private MavenPluginManager pluginManager;
+    public DefaultProjectBuildingHelper(
+            PlexusContainer container,
+            ClassRealmManager classRealmManager,
+            ProjectRealmCache projectRealmCache,
+            RepositorySystem repositorySystem,
+            MavenPluginManager pluginManager )
+    {
+        this.container = container;
+        this.classRealmManager = classRealmManager;
+        this.projectRealmCache = projectRealmCache;
+        this.repositorySystem = repositorySystem;
+        this.pluginManager = pluginManager;
+    }
 
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                 List<ArtifactRepository> externalRepositories,

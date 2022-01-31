@@ -42,7 +42,7 @@ public class CliRequest
 
     File multiModuleProjectDirectory;
 
-    boolean debug;
+    boolean verbose;
 
     boolean quiet;
 
@@ -86,9 +86,9 @@ public class CliRequest
         return multiModuleProjectDirectory;
     }
 
-    public boolean isDebug()
+    public boolean isVerbose()
     {
-        return debug;
+        return verbose;
     }
 
     public boolean isQuiet()

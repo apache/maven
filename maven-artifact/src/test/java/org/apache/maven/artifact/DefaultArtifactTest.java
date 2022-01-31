@@ -19,13 +19,16 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultArtifactTest
-    extends TestCase
 {
 
     private DefaultArtifact artifact;
@@ -43,10 +46,10 @@ public class DefaultArtifactTest
 
     private ArtifactHandlerMock artifactHandler;
 
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
         artifactHandler = new ArtifactHandlerMock();
         versionRange = VersionRange.createFromVersion( version );
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler );
@@ -55,6 +58,7 @@ public class DefaultArtifactTest
         snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotVersionRange, scope, type, classifier, artifactHandler );
     }
 
+    @Test
     public void testGetVersionReturnsResolvedVersionOnSnapshot()
     {
         assertEquals( snapshotResolvedVersion, snapshotArtifact.getVersion() );
@@ -65,53 +69,62 @@ public class DefaultArtifactTest
         assertEquals( snapshotSpecVersion, snapshotArtifact.getBaseVersion() );
     }
 
+    @Test
     public void testGetDependencyConflictId()
     {
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId() );
     }
 
+    @Test
     public void testGetDependencyConflictIdNullGroupId()
     {
         artifact.setGroupId( null );
         assertEquals( null + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId() );
     }
 
+    @Test
     public void testGetDependencyConflictIdNullClassifier()
     {
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, null, artifactHandler );
         assertEquals( groupId + ":" + artifactId + ":" + type, artifact.getDependencyConflictId() );
     }
 
+    @Test
     public void testGetDependencyConflictIdNullScope()
     {
         artifact.setScope( null );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId() );
     }
 
+    @Test
     public void testToString()
     {
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope,
                       artifact.toString() );
     }
 
+    @Test
     public void testToStringNullGroupId()
     {
         artifact.setGroupId( null );
         assertEquals( artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope, artifact.toString() );
     }
 
+    @Test
     public void testToStringNullClassifier()
     {
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, null, artifactHandler );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact.toString() );
     }
 
+    @Test
     public void testToStringNullScope()
     {
         artifact.setScope( null );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version, artifact.toString() );
     }
 
+    @Test
     public void testComparisonByVersion()
     {
         Artifact artifact1 = new DefaultArtifact( groupId, artifactId, VersionRange.createFromVersion( "5.0" ), scope,
@@ -128,13 +141,14 @@ public class DefaultArtifactTest
         assertTrue( artifact1.compareTo( artifact ) == 0 );
     }
 
+    @Test
     public void testNonResolvedVersionRangeConsistentlyYieldsNullVersions()
         throws Exception
     {
         VersionRange vr = VersionRange.createFromVersionSpec( "[1.0,2.0)" );
         artifact = new DefaultArtifact( groupId, artifactId, vr, scope, type, null, artifactHandler );
-        assertEquals( null, artifact.getVersion() );
-        assertEquals( null, artifact.getBaseVersion() );
+        assertNull( artifact.getVersion() );
+        assertNull( artifact.getBaseVersion() );
     }
 
 }

@@ -27,65 +27,50 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
+
+import javax.inject.Inject;
 
 /**
  * @author Jason van Zyl
  */
+@PlexusTest
 public abstract class AbstractMavenProjectTestCase
-    extends PlexusTestCase
 {
     protected ProjectBuilder projectBuilder;
 
+    @Inject
     protected RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    @Inject
+    protected PlexusContainer container;
+
+    public PlexusContainer getContainer() {
+        return container;
     }
 
-    protected void setUp()
+    @BeforeEach
+    public void setUp()
         throws Exception
     {
-        super.setUp();
-
         if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
         {
-            projectBuilder = lookup( ProjectBuilder.class, "test" );
+            projectBuilder = getContainer().lookup( ProjectBuilder.class, "test" );
         }
         else
         {
             // default over to the main project builder...
-            projectBuilder = lookup( ProjectBuilder.class );
+            projectBuilder = getContainer().lookup( ProjectBuilder.class );
         }
-
-        repositorySystem = lookup( RepositorySystem.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     protected ProjectBuilder getProjectBuilder()
     {
         return projectBuilder;
-    }
-
-    @Override
-    protected String getCustomConfigurationName()
-    {
-        return AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
     }
 
     // ----------------------------------------------------------------------
@@ -186,6 +171,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         File localRepo = new File( request.getLocalRepository().getBasedir() );
         DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+        repoSession.setCache( new DefaultRepositoryCache() );
         repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
         request.setRepositorySession( repoSession );
     }

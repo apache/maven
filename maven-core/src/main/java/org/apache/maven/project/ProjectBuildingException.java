@@ -135,8 +135,12 @@ public class ProjectBuildingException
                     writer.print( problem.getSeverity() );
                     writer.print( "] " );
                     writer.print( problem.getMessage() );
-                    writer.print( " @ " );
-                    writer.println( ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
+                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
+                    if ( !location.isEmpty() )
+                    {
+                        writer.print( " @ " );
+                        writer.println( location );
+                    }
                 }
             }
         }

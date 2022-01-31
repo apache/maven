@@ -31,21 +31,31 @@ public class ArtifactMetadataRetrievalException
 {
     private Artifact artifact;
 
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    /**
+     * @param message a message
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     @Deprecated
     public ArtifactMetadataRetrievalException( String message )
     {
         this( message, null, null );
     }
 
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    /**
+     * @param cause a cause
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     @Deprecated
     public ArtifactMetadataRetrievalException( Throwable cause )
     {
         this( null, cause, null );
     }
 
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    /**
+     * @param message a message
+     * @param cause a cause
+     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
+     */
     @Deprecated
     public ArtifactMetadataRetrievalException( String message,
                                                Throwable cause )

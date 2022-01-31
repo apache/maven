@@ -82,26 +82,14 @@ public abstract class AbstractStringBasedModelInterpolator
         TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
     }
 
-    @Inject
-    private PathTranslator pathTranslator;
+    private final PathTranslator pathTranslator;
+    private final UrlNormalizer urlNormalizer;
 
     @Inject
-    private UrlNormalizer urlNormalizer;
-
-    public AbstractStringBasedModelInterpolator()
-    {
-    }
-
-    public AbstractStringBasedModelInterpolator setPathTranslator( PathTranslator pathTranslator )
+    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
     {
         this.pathTranslator = pathTranslator;
-        return this;
-    }
-
-    public AbstractStringBasedModelInterpolator setUrlNormalizer( UrlNormalizer urlNormalizer )
-    {
         this.urlNormalizer = urlNormalizer;
-        return this;
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,

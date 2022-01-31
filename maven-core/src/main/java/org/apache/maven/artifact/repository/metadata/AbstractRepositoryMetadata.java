@@ -149,7 +149,7 @@ public abstract class AbstractRepositoryMetadata
 
     public String toString()
     {
-        return "repository metadata for: \'" + getKey() + "\'";
+        return "repository metadata for: '" + getKey() + "'";
     }
 
     protected static Metadata createMetadata( Artifact artifact, Versioning versioning )

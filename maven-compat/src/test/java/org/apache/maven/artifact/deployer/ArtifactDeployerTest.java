@@ -24,7 +24,17 @@ import java.io.File;
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -32,36 +42,43 @@ import org.codehaus.plexus.util.FileUtils;
 public class ArtifactDeployerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactDeployer artifactDeployer;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactDeployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
-    }
+    @Inject
+    private SessionScope sessionScope;
 
     protected String component()
     {
         return "deployer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {
-        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
+        sessionScope.enter();
+        try
+        {
+            sessionScope.seed(MavenSession.class, mock(MavenSession.class));
 
-        Artifact artifact = createArtifact( "artifact", "1.0" );
+            String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
-        File file = new File( artifactBasedir, "artifact-1.0.jar" );
-        assertEquals( "dummy", FileUtils.fileRead( file, "UTF-8" ).trim() );
+            Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
+            File file = new File( artifactBasedir, "artifact-1.0.jar" );
+            assertEquals( "dummy", FileUtils.fileRead( file, "UTF-8" ).trim() );
 
-        ArtifactRepository remoteRepository = remoteRepository();
-        File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
-        assertTrue( deployedFile.exists() );
-        assertEquals( "dummy", FileUtils.fileRead( deployedFile, "UTF-8" ).trim() );
+            artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
+
+            ArtifactRepository remoteRepository = remoteRepository();
+            File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
+            assertTrue( deployedFile.exists() );
+            assertEquals( "dummy", FileUtils.fileRead( deployedFile, "UTF-8" ).trim() );
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
     }
 }

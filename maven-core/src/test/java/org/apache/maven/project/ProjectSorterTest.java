@@ -20,8 +20,9 @@ package org.apache.maven.project;
  */
 
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,9 +35,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test sorting projects by dependencies.
@@ -45,9 +44,6 @@ import org.junit.rules.ExpectedException;
  */
 public class ProjectSorterTest
 {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     private Parent createParent( MavenProject project )
     {
         return createParent( project.getGroupId(), project.getArtifactId(), project.getVersion() );
@@ -210,10 +206,10 @@ public class ProjectSorterTest
         MavenProject project2 = createProject( "groupId", "artifactId", "1.0" );
         projects.add( project2 );
 
-        expectedException.expect( DuplicateProjectException.class );
-        expectedException.reportMissingExceptionWithMessage( "Duplicate projects should fail" );
-
-        new ProjectSorter( projects ).getSortedProjects();
+        assertThrows(
+                DuplicateProjectException.class,
+                () -> new ProjectSorter( projects ).getSortedProjects(),
+                "Duplicate projects should fail" );
     }
 
     @Test

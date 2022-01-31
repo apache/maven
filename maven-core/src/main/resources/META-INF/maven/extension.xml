@@ -30,6 +30,7 @@ under the License.
     <exportedPackage>org.apache.maven.exception</exportedPackage>
     <exportedPackage>org.apache.maven.execution</exportedPackage>
     <exportedPackage>org.apache.maven.execution.scope</exportedPackage>
+    <exportedPackage>org.apache.maven.feature</exportedPackage>
     <exportedPackage>org.apache.maven.graph</exportedPackage>
     <exportedPackage>org.apache.maven.lifecycle</exportedPackage>
     <exportedPackage>org.apache.maven.model</exportedPackage>
@@ -39,7 +40,7 @@ under the License.
     <exportedPackage>org.apache.maven.project</exportedPackage>
     <exportedPackage>org.apache.maven.reporting</exportedPackage>
     <exportedPackage>org.apache.maven.repository</exportedPackage>
-    <exportedPackage>org.apache.maven.rtinfo</exportedPackage>
+    <exportedPackage>org.apache.maven.rtinfo.*</exportedPackage>
     <exportedPackage>org.apache.maven.settings</exportedPackage>
     <exportedPackage>org.apache.maven.toolchain</exportedPackage>
     <exportedPackage>org.apache.maven.usability</exportedPackage>
@@ -170,7 +171,7 @@ under the License.
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-impl</exportedArtifact>
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
-    <exportedArtifact>javax.annotation:jsr250-api</exportedArtifact>
+    <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 

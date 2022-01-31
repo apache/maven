@@ -32,5 +32,5 @@ public interface BuildResumptionAnalyzer
      * @param result Outcome of the current Maven build.
      * @return A {@link BuildResumptionData} instance or {@link Optional#empty()} if resuming the build is not possible.
      */
-    Optional<BuildResumptionData> determineBuildResumptionData( final MavenExecutionResult result );
+    Optional<BuildResumptionData> determineBuildResumptionData( MavenExecutionResult result );
 }

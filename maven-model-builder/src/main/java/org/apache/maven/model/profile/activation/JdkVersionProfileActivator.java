@@ -99,11 +99,7 @@ public class JdkVersionProfileActivator
 
         String jdk = activation.getJdk();
 
-        if ( jdk == null )
-        {
-            return false;
-        }
-        return true;
+        return jdk != null;
     }
 
     private static boolean isInRange( String value, List<RangeValue> range )

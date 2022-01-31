@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +46,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -51,15 +53,17 @@ import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.SessionData;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves a version for a plugin.
@@ -72,21 +76,30 @@ import org.eclipse.aether.version.VersionScheme;
 public class DefaultPluginVersionResolver
     implements PluginVersionResolver
 {
-
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Inject
-    private Logger logger;
+    private static final Object CACHE_KEY = new Object();
+
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final RepositorySystem repositorySystem;
+    private final MetadataReader metadataReader;
+    private final MavenPluginManager pluginManager;
+    private final VersionScheme versionScheme;
 
     @Inject
-    private RepositorySystem repositorySystem;
+    public DefaultPluginVersionResolver(
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader,
+            MavenPluginManager pluginManager,
+            VersionScheme versionScheme )
+    {
+        this.repositorySystem = repositorySystem;
+        this.metadataReader = metadataReader;
+        this.pluginManager = pluginManager;
+        this.versionScheme = versionScheme;
+    }
 
-    @Inject
-    private MetadataReader metadataReader;
-
-    @Inject
-    private MavenPluginManager pluginManager;
-
+    @Override
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
@@ -94,12 +107,26 @@ public class DefaultPluginVersionResolver
 
         if ( result == null )
         {
-            result = resolveFromRepository( request );
+            ConcurrentMap<Key, PluginVersionResult> cache = getCache( request.getRepositorySession().getData() );
+            Key key = getKey( request );
+            result = cache.get( key );
 
-            if ( logger.isDebugEnabled() )
+            if ( result == null )
             {
-                logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                    + " to " + result.getVersion() + " from repository " + result.getRepository() );
+                result = resolveFromRepository( request );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                        + " to " + result.getVersion() + " from repository " + result.getRepository() );
+                }
+
+                cache.putIfAbsent( key, result );
+            }
+            else if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Reusing cached resolved plugin version for " + request.getGroupId() + ":"
+                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom() );
             }
         }
         else if ( logger.isDebugEnabled() )
@@ -175,8 +202,6 @@ public class DefaultPluginVersionResolver
 
         if ( version == null )
         {
-            VersionScheme versionScheme = new GenericVersionScheme();
-
             TreeSet<Version> releases = new TreeSet<>( Collections.reverseOrder() );
             TreeSet<Version> snapshots = new TreeSet<>( Collections.reverseOrder() );
 
@@ -385,6 +410,67 @@ public class DefaultPluginVersionResolver
             }
         }
         return null;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private ConcurrentMap<Key, PluginVersionResult> getCache( SessionData data )
+    {
+        ConcurrentMap<Key, PluginVersionResult> cache =
+                ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+        while ( cache == null )
+        {
+            cache = new ConcurrentHashMap<>( 256 );
+            if ( data.set( CACHE_KEY, null, cache ) )
+            {
+                break;
+            }
+            cache = ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+        }
+        return cache;
+    }
+
+    private static Key getKey( PluginVersionRequest request )
+    {
+        return new Key( request.getGroupId(), request.getArtifactId(), request.getRepositories() );
+    }
+
+    static class Key
+    {
+        final String groupId;
+        final String artifactId;
+        final List<RemoteRepository> repositories;
+        final int hash;
+
+        Key( String groupId, String artifactId, List<RemoteRepository> repositories )
+        {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.repositories = repositories;
+            this.hash = Objects.hash( groupId, artifactId, repositories );
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+            Key key = ( Key ) o;
+            return groupId.equals( key.groupId )
+                    && artifactId.equals( key.artifactId )
+                    && repositories.equals( key.repositories );
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return hash;
+        }
     }
 
     static class Versions

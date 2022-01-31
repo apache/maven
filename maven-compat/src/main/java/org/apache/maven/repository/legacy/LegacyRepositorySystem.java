@@ -440,6 +440,8 @@ public class LegacyRepositorySystem
 
             effectiveRepository.setMirroredRepositories( mirroredRepos );
 
+            effectiveRepository.setBlocked( aliasedRepo.isBlocked() );
+
             effectiveRepositories.add( effectiveRepository );
         }
 
@@ -496,6 +498,7 @@ public class LegacyRepositorySystem
                     mirror.setId( repo.getId() );
                     mirror.setUrl( repo.getUrl() );
                     mirror.setLayout( repo.getContentType() );
+                    mirror.setBlocked( repo.isBlocked() );
                     return mirror;
                 }
             }
@@ -532,6 +535,8 @@ public class LegacyRepositorySystem
             {
                 repository.setLayout( getLayout( mirror.getLayout() ) );
             }
+
+            repository.setBlocked( mirror.isBlocked() );
         }
     }
 
@@ -828,12 +833,8 @@ public class LegacyRepositorySystem
         {
             repositoryLayout = layouts.get( "default" );
         }
-
-        ArtifactRepository artifactRepository =
-            artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots,
-                                                                releases );
-
-        return artifactRepository;
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots,
+                                                            releases );
     }
 
     private static String getMessage( Throwable error, String def )

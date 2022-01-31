@@ -19,9 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.assertThat;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,9 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.model.building.DefaultModelBuilder.FileToRawModelMerger;
 import org.apache.maven.model.merge.ModelMerger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 
 public class FileToRawModelMergerTest
 {

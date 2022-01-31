@@ -23,6 +23,14 @@ import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.session.scope.internal.SessionScope;
+import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -30,32 +38,39 @@ import org.apache.maven.artifact.Artifact;
 public class ArtifactInstallerTest
     extends AbstractArtifactComponentTestCase
 {
+    @Inject
     private ArtifactInstaller artifactInstaller;
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactInstaller = (ArtifactInstaller) lookup( ArtifactInstaller.ROLE );
-    }
+    @Inject
+    private SessionScope sessionScope;
 
     protected String component()
     {
         return "installer";
     }
 
+    @Test
     public void testArtifactInstallation()
         throws Exception
     {
-        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
+        sessionScope.enter();
+        try
+        {
+            sessionScope.seed(MavenSession.class, mock(MavenSession.class));
 
-        Artifact artifact = createArtifact( "artifact", "1.0" );
+            String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
-        File source = new File( artifactBasedir, "artifact-1.0.jar" );
+            Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        artifactInstaller.install( source, artifact, localRepository() );
+            File source = new File( artifactBasedir, "artifact-1.0.jar" );
 
-        assertLocalArtifactPresent( artifact );
+            artifactInstaller.install( source, artifact, localRepository() );
+
+            assertLocalArtifactPresent( artifact );
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
     }
 }

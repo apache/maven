@@ -23,13 +23,11 @@ package org.apache.maven.model.building;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.xml.sax.filter.BuildPomXMLFilterFactory;
-import org.apache.maven.xml.sax.filter.RelativeProject;
-import org.xml.sax.ext.LexicalHandler;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
+import org.apache.maven.model.transform.RelativeProject;
 
 /**
  * A BuildPomXMLFilterFactory which is context aware
@@ -37,35 +35,34 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultBuildPomXMLFilterFactory extends BuildPomXMLFilterFactory
+public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFactory
 {
     private final TransformerContext context;
 
     /**
      *
      * @param context a set of data to extract values from as required for the build pom
-     * @param lexicalHandlerConsumer the lexical handler consumer
      * @param consume {@code true} if this factory is being used for creating the consumer pom, otherwise {@code false}
      */
     public DefaultBuildPomXMLFilterFactory( TransformerContext context,
-                                            Consumer<LexicalHandler> lexicalHandlerConsumer,
                                             boolean consume )
     {
-        super( lexicalHandlerConsumer, consume );
+        super( consume );
         this.context = context;
     }
 
     @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
-        return p -> Optional.ofNullable( context.getRawModel( p ) ).map( m -> toRelativeProject( m ) );
+        return p -> Optional.ofNullable( context.getRawModel( p ) )
+                .map( DefaultBuildPomXMLFilterFactory::toRelativeProject );
     }
 
     @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
-        return (g, a) -> Optional.ofNullable( context.getRawModel( g, a ) )
-                            .map( m -> toVersion( m ) )
+        return ( g, a ) -> Optional.ofNullable( context.getRawModel( g, a ) )
+                            .map( DefaultBuildPomXMLFilterFactory::toVersion )
                             .orElse( null );
     }
 

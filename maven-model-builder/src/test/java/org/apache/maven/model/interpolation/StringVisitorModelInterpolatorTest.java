@@ -21,15 +21,8 @@ package org.apache.maven.model.interpolation;
 
 public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest
 {
-    @Override
-    public void setUp()
-    {
-        super.setUp();
-        interpolator = new StringVisitorModelInterpolator();
-    }
-
     protected ModelInterpolator createInterpolator()
     {
-        return this.interpolator;
+        return new StringVisitorModelInterpolator( null, null );
     }
 }

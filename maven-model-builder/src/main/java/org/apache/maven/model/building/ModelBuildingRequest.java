@@ -62,7 +62,7 @@ public interface ModelBuildingRequest
     /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_1;
 
     /**
      * Gets the file model to build (with profile activation).

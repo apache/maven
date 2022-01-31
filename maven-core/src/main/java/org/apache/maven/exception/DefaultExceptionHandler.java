@@ -149,7 +149,8 @@ public class DefaultExceptionHandler
         }
 
         String message = System.lineSeparator()
-            + "The project " + result.getProjectId() + " (" + result.getPomFile() + ") has "
+            + "The project " + ( result.getProjectId().isEmpty() ? "" : result.getProjectId() + " " )
+            + "(" + result.getPomFile() + ") has "
             + children.size() + " error" + ( children.size() == 1 ? "" : "s" );
 
         return new ExceptionSummary( null, message, null, children );
@@ -163,7 +164,7 @@ public class DefaultExceptionHandler
 
             String location = ModelProblemUtils.formatLocation( problem, projectId );
 
-            if ( StringUtils.isNotEmpty( location ) )
+            if ( !location.isEmpty() )
             {
                 message += " @ " + location;
             }
@@ -264,11 +265,10 @@ public class DefaultExceptionHandler
         {
             return false;
         }
-        else if ( exception.getClass().getName().startsWith( "java" ) )
+        else
         {
-            return false;
+            return !exception.getClass().getName().startsWith( "java" );
         }
-        return true;
     }
 
     private String getMessage( String message, Throwable exception )

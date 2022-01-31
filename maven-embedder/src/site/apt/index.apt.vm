@@ -27,6 +27,10 @@ ${project.name}
 
  ${project.description}
 
+* Useful entry points
+
+ * {{{./apidocs/org/apache/maven/cli/MavenCli.html}MavenCli.doMain(CliRequest)}} is the main method preparing runtime environment before running {{{../maven-core/}Maven.execute()}}
+
 * References
 
  * {{{./cli.html}CLI options}},

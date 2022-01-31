@@ -29,15 +29,13 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.codehaus.plexus.util.FileUtils;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
  * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
 public class CLIManagerDocumentationTest
-    extends TestCase
 {
     private final static String LS = System.lineSeparator();
 
@@ -46,7 +44,9 @@ public class CLIManagerDocumentationTest
     {
         public int compare( Option opt1, Option opt2 )
         {
-            return opt1.getOpt().compareToIgnoreCase( opt2.getOpt() );
+            String s1 = opt1.getOpt() != null ? opt1.getOpt() : opt1.getLongOpt();
+            String s2 = opt2.getOpt() != null ? opt2.getOpt() : opt2.getLongOpt();
+            return s1.compareToIgnoreCase( s2 );
         }
     }
 
@@ -98,6 +98,7 @@ public class CLIManagerDocumentationTest
         return sb.toString();
     }
 
+    @Test
     public void testOptionsAsHtml()
         throws IOException
     {

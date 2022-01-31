@@ -20,50 +20,51 @@ package org.apache.maven.cli;
  */
 
 import static java.util.Arrays.asList;
-import static org.apache.maven.cli.MavenCli.determineProfileActivation;
-import static org.apache.maven.cli.MavenCli.determineProjectActivation;
+import static org.apache.maven.cli.MavenCli.performProfileActivation;
+import static org.apache.maven.cli.MavenCli.performProjectActivation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.sisu.plexus.PlexusBeanModule;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
-
-import com.google.inject.Binder;
-import com.google.inject.Module;
 
 public class MavenCliTest
 {
@@ -71,14 +72,14 @@ public class MavenCliTest
 
     private String origBasedir;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         cli = new MavenCli();
         origBasedir = System.getProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
     }
 
-    @After
+    @AfterEach
     public void tearDown()
         throws Exception
     {
@@ -93,51 +94,55 @@ public class MavenCliTest
     }
 
     @Test
-    public void testDetermineProfileActivation() throws ParseException
+    public void testPerformProfileActivation() throws ParseException
     {
-        MavenCli.ProfileActivation result;
-        Options options = new Options();
+        final CommandLineParser parser = new DefaultParser();
+
+        final Options options = new Options();
         options.addOption( Option.builder( Character.toString( CLIManager.ACTIVATE_PROFILES ) ).hasArg().build() );
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "test1,+test2" } ) );
-        assertThat( result.activeProfiles.size(), is( 2 ) );
-        assertThat( result.activeProfiles, contains( "test1", "test2" ) );
+        ProfileActivation activation;
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "!test1,-test2" } ) );
-        assertThat( result.inactiveProfiles.size(), is( 2 ) );
-        assertThat( result.inactiveProfiles, contains( "test1", "test2" ) );
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "test1,+test2,?test3,+?test4" } ), activation );
+        assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalActiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
 
-        result = determineProfileActivation( new GnuParser().parse( options, new String[]{ "-P", "-test1,+test2" } ) );
-        assertThat( result.activeProfiles.size(), is( 1 ) );
-        assertThat( result.activeProfiles, contains( "test2" ) );
-        assertThat( result.inactiveProfiles.size(), is( 1 ) );
-        assertThat( result.inactiveProfiles, contains( "test1" ) );
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "!test1,-test2,-?test3,!?test4" } ), activation );
+        assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalInactiveProfileIds(), containsInAnyOrder( "test3", "test4" ) );
+
+        activation = new ProfileActivation();
+        performProfileActivation( parser.parse( options, new String[]{ "-P", "-test1,+test2" } ), activation );
+        assertThat( activation.getRequiredActiveProfileIds(), containsInAnyOrder( "test2" ) );
+        assertThat( activation.getRequiredInactiveProfileIds(), containsInAnyOrder( "test1" ) );
     }
 
     @Test
     public void testDetermineProjectActivation() throws ParseException
     {
-        MavenCli.ProjectActivation result;
-        Options options = new Options();
+        final CommandLineParser parser = new DefaultParser();
+
+        final Options options = new Options();
         options.addOption( Option.builder( CLIManager.PROJECT_LIST ).hasArg().build() );
 
-        result = determineProjectActivation( new GnuParser().parse( options, new String[0] ) );
-        assertThat( result.activeProjects, is( nullValue() ) );
-        assertThat( result.inactiveProjects, is( nullValue() ) );
+        ProjectActivation activation;
 
-        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl", "test1,+test2" } ) );
-        assertThat( result.activeProjects.size(), is( 2 ) );
-        assertThat( result.activeProjects, contains( "test1", "test2" ) );
+        activation = new ProjectActivation();
+        performProjectActivation( parser.parse( options, new String[]{ "-pl", "test1,+test2,?test3,+?test4" } ), activation );
+        assertThat( activation.getRequiredActiveProjectSelectors(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalActiveProjectSelectors(), containsInAnyOrder( "test3", "test4" ) );
 
-        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl", "!test1,-test2" } ) );
-        assertThat( result.inactiveProjects.size(), is( 2 ) );
-        assertThat( result.inactiveProjects, contains( "test1", "test2" ) );
+        activation = new ProjectActivation();
+        performProjectActivation( parser.parse( options, new String[]{ "-pl", "!test1,-test2,-?test3,!?test4" } ), activation );
+        assertThat( activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder( "test1", "test2" ) );
+        assertThat( activation.getOptionalInactiveProjectSelectors(), containsInAnyOrder( "test3", "test4" ) );
 
-        result = determineProjectActivation( new GnuParser().parse( options, new String[]{ "-pl" ,"-test1,+test2" } ) );
-        assertThat( result.activeProjects.size(), is( 1 ) );
-        assertThat( result.activeProjects, contains( "test2" ) );
-        assertThat( result.inactiveProjects.size(), is( 1 ) );
-        assertThat( result.inactiveProjects, contains( "test1" ) );
+        activation = new ProjectActivation();
+        performProjectActivation( parser.parse( options, new String[]{ "-pl", "-test1,+test2" } ), activation );
+        assertThat( activation.getRequiredActiveProjectSelectors(), containsInAnyOrder( "test2" ) );
+        assertThat( activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder( "test1" ) );
     }
 
     @Test
@@ -149,15 +154,10 @@ public class MavenCliTest
         // -TC2.2
         assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
 
-        try
-        {
-            cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" );
-            fail( "Should have failed with a NumberFormatException" );
-        }
-        catch ( NumberFormatException e )
-        {
-            // carry on
-        }
+        assertThrows(
+                NumberFormatException.class,
+                () -> cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" ),
+                "Should have failed with a NumberFormatException" );
     }
 
     @Test
@@ -189,22 +189,16 @@ public class MavenCliTest
         CliRequest request = new CliRequest( new String[0], null );
 
         cli.initialize( request );
-        try
-        {
-            cli.cli( request );
-            fail();
-        }
-        catch ( ParseException expected )
-        {
-
-        }
+        assertThrows( ParseException.class, () -> cli.cli( request ) );
     }
 
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -T 3} option can be overwritten via command line
      * argument.
@@ -229,8 +223,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
@@ -257,8 +253,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line
      * argument.
@@ -285,8 +283,10 @@ public class MavenCliTest
     /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
-     *   -T 3
+     *   -T
+     *   3
      *   -Drevision=1.3.0
+     *   "-Dlabel=Apache Maven"
      * </pre>
      * and check if the {@code -Drevision-1.3.0} option can be overwritten via command line argument when there are
      * funky arguments present.
@@ -308,11 +308,14 @@ public class MavenCliTest
         cli.cli( request );
         cli.properties( request );
 
+        assertEquals( "3", request.commandLine.getOptionValue( CLIManager.THREADS ) );
+
         String revision = System.getProperty( "revision" );
         assertEquals( "8.2.0", revision );
 
         assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
         assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
+        assertEquals( "Apache Maven", request.getSystemProperties().getProperty( "label" ) );
 
         assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
     }
@@ -321,7 +324,7 @@ public class MavenCliTest
     public void testStyleColors()
         throws Exception
     {
-        assumeTrue( "ANSI not supported", MessageUtils.isColorEnabled() );
+        assumeTrue( MessageUtils.isColorEnabled(), "ANSI not supported" );
         CliRequest request;
 
         MessageUtils.setColorEnabled( true );
@@ -333,6 +336,7 @@ public class MavenCliTest
 
         MessageUtils.setColorEnabled( true );
         request = new CliRequest( new String[] { "-l", "target/temp/mvn.log" }, null );
+        request.workingDirectory = "target/temp";
         cli.cli( request );
         cli.properties( request );
         cli.logging( request );
@@ -354,24 +358,21 @@ public class MavenCliTest
 
         MessageUtils.setColorEnabled( false );
         request = new CliRequest( new String[] { "-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log" }, null );
+        request.workingDirectory = "target/temp";
         cli.cli( request );
         cli.properties( request );
         cli.logging( request );
         assertTrue( MessageUtils.isColorEnabled() );
 
-        try
-        {
-            MessageUtils.setColorEnabled( false );
-            request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
-            cli.cli( request );
-            cli.properties( request );
-            cli.logging( request );
-            fail( "maybe is not a valid option" );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            // noop
-        }
+        MessageUtils.setColorEnabled( false );
+        CliRequest maybeColorRequest = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+        request.workingDirectory = "target/temp";
+        cli.cli( maybeColorRequest );
+        cli.properties( maybeColorRequest );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> cli.logging( maybeColorRequest ),
+                "maybe is not a valid option" );
     }
 
     /**
@@ -386,15 +387,8 @@ public class MavenCliTest
                 super.customizeContainer(container);
                 container.addComponent(mock(Maven.class), "org.apache.maven.Maven");
 
-                ((DefaultPlexusContainer)container).addPlexusInjector(Collections.<PlexusBeanModule>emptyList(),
-                        new Module()
-                        {
-                            public void configure( final Binder binder )
-                            {
-                                binder.bind( EventSpyDispatcher.class ).toInstance( eventSpyDispatcherMock );
-                            }
-                        }
-                    );
+                ( (DefaultPlexusContainer) container ).addPlexusInjector( Collections.emptyList(),
+                        binder -> binder.bind( EventSpyDispatcher.class ).toInstance( eventSpyDispatcherMock ) );
             }
         };
 
@@ -464,6 +458,109 @@ public class MavenCliTest
                 is( notNullValue() ) );
         assertThat( executionRequest.getLocalRepositoryPath().toString(),
                 is( "." + File.separatorChar + "custom2" ) );
+    }
+
+    /**
+     * MNG-7032: Disable colours for {@code --version} if {@code --batch-mode} is also given.
+     * @throws Exception cli invocation.
+     */
+    @Test
+    public void testVersionStringWithoutAnsi() throws Exception
+    {
+        // given
+        // - request with version and batch mode
+        CliRequest cliRequest = new CliRequest( new String[] {
+                "--version",
+                "--batch-mode"
+        }, null );
+        ByteArrayOutputStream systemOut = new ByteArrayOutputStream();
+        PrintStream oldOut = System.out;
+        System.setOut( new PrintStream( systemOut ) );
+
+        // when
+        try {
+            cli.cli( cliRequest );
+        } catch ( MavenCli.ExitException exitException ) {
+            // expected
+        } finally {
+            // restore sysout
+            System.setOut( oldOut );
+        }
+        String versionOut = new String( systemOut.toByteArray(), StandardCharsets.UTF_8 );
+
+        // then
+        assertEquals( MessageUtils.stripAnsiCodes( versionOut ), versionOut );
+    }
+
+    @Test
+    public void populatePropertiesCanContainEqualsSign() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dw=x=y", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "w" ), is( "x=y" ) );
+    }
+
+    @Test
+    public void populatePropertiesSpace() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-D", "z=2", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "z" ), is( "2" ) );
+    }
+
+    @Test
+    public void populatePropertiesShorthand() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "true" ) );
+    }
+
+    @Test
+    public void populatePropertiesMultiple() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx=1", "-Dy", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "1" ) );
+        assertThat( request.getUserProperties().getProperty( "y" ), is( "true" ) );
+    }
+
+    @Test
+    public void populatePropertiesOverwrite() throws Exception
+    {
+        // Arrange
+        CliRequest request = new CliRequest( new String[] { "-Dx", "-Dx=false", "validate" }, null );
+
+        // Act
+        cli.cli( request );
+        cli.properties( request );
+
+        // Assert
+        assertThat( request.getUserProperties().getProperty( "x" ), is( "false" ) );
     }
 
     private MavenProject createMavenProject( String groupId, String artifactId )

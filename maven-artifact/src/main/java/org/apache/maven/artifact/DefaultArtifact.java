@@ -349,14 +349,12 @@ public class DefaultArtifact
         {
             return false;
         }
-        else if ( a.getClassifier() == null ? classifier != null : !a.getClassifier().equals( classifier ) )
+        else
         {
-            return false;
+            return a.getClassifier() == null ? classifier == null : a.getClassifier().equals( classifier );
         }
 
         // We don't consider the version range in the comparison, just the resolved version
-
-        return true;
     }
 
     public String getBaseVersion()

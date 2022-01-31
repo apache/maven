@@ -45,7 +45,7 @@ Maven Core
 
  * <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
  with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}), to drive
- a full <<<MavenSession>>> execution ({{{./apidocs/org/apache/maven/execution/MavenSession.html}javadoc}}
+ a full Maven execution session
 
  * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
  with its <<<DefaultProjectBuilder>>> implementation

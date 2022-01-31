@@ -1,15 +1,5 @@
 package org.apache.maven.execution;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Settings;
-import org.eclipse.sisu.launch.InjectedTestCase;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,12 +19,26 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * under the License.
  */
 
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@PlexusTest
 public class DefaultMavenExecutionRequestPopulatorTest
-    extends InjectedTestCase
 {
     @Inject
     MavenExecutionRequestPopulator testee;
 
+    @Test
     public void testPluginRepositoryInjection()
         throws Exception
     {

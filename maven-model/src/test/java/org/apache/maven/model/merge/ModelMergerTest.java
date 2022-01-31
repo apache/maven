@@ -1,5 +1,6 @@
 package org.apache.maven.model.merge;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
@@ -22,14 +23,16 @@ import static org.hamcrest.Matchers.is;
  * under the License.
  */
 
-import static org.junit.Assert.assertThat;
-
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PatternSet;
@@ -37,7 +40,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Repository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * ModelMerger is based on same instances, subclasses should override KeyComputer per type
@@ -427,4 +430,21 @@ public class ModelMergerTest
         assertThat( target.getVersion(), is( "TARGET" ) );
     }
 
+    @Test
+    public void testMergedModelSerialization() throws Exception {
+        Model target = new Model();
+        Model source = new Model();
+        target.setLicenses(new ArrayList<License>());
+        License lic1 = new License();
+        License lic2 = new License();
+        target.getLicenses().add(lic1);
+        source.setLicenses(new ArrayList<License>());
+        source.getLicenses().add(lic2);
+
+        new ModelMerger().mergeModel(target, source, false, null);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(target);
+    }
 }

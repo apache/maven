@@ -49,6 +49,9 @@ public enum ArtifactScopeEnum
 
     /**
      * Helper method to simplify null processing
+     *
+     * @param scope a scope or {@code null}
+     * @return the provided scope or DEFAULT_SCOPE
      */
     public static ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
     {
@@ -99,7 +102,7 @@ public enum ArtifactScopeEnum
     /**
      * scope relationship function. Used by the graph conflict resolution policies
      *
-     * @param scope
+     * @param scope a scope
      * @return true is supplied scope is an inclusive sub-scope of current one.
      */
     public boolean encloses( ArtifactScopeEnum scope )

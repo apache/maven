@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,7 +57,8 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
@@ -70,27 +72,35 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 public class BuilderCommon
 {
-    @Inject
-    private LifecycleDebugLogger lifecycleDebugLogger;
+    private final Logger logger;
+    private final LifecycleDebugLogger lifecycleDebugLogger;
+    private final LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
+    private final ExecutionEventCatapult eventCatapult;
 
     @Inject
-    private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
-
-    @Inject
-    private ExecutionEventCatapult eventCatapult;
-
-    @Inject
-    private Logger logger;
-
-    public BuilderCommon()
+    public BuilderCommon(
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+            ExecutionEventCatapult eventCatapult )
     {
+        this.logger = LoggerFactory.getLogger( getClass() );
+        this.lifecycleDebugLogger = lifecycleDebugLogger;
+        this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
+        this.eventCatapult = eventCatapult;
     }
 
-    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator, Logger logger )
+    /**
+     * Ctor needed for UT.
+     */
+    BuilderCommon(
+            LifecycleDebugLogger lifecycleDebugLogger,
+            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+            ExecutionEventCatapult eventCatapult,
+            Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
+        this.eventCatapult = eventCatapult;
         this.logger = logger;
     }
 
@@ -109,10 +119,11 @@ public class BuilderCommon
         // With Maven 4's build/consumer the POM will always rewrite during distribution.
         // The maven-gpg-plugin uses the original POM, causing an invalid signature.
         // Fail as long as there's no solution available yet
-        if ( Features.buildConsumer().isActive() )
+        Properties userProperties = session.getUserProperties();
+        if ( Features.buildConsumer( userProperties ).isActive() )
         {
             Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
-                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() ) 
+                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() )
                                        && "org.apache.maven.plugins".equals( m.getGroupId() ) )
                             .findAny();
 
@@ -120,12 +131,12 @@ public class BuilderCommon
             {
                 throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
                     + " Verify if there is a compatible signing solution,"
-                    + " add -D" + Features.buildConsumer().propertyName() + "=false"
+                    + " add -D" + Features.buildConsumer( userProperties ).propertyName() + "=false"
                     + " or use Maven 3." );
             }
         }
 
-        if ( session.getRequest().getDegreeOfConcurrency() > 1 )
+        if ( session.getRequest().getDegreeOfConcurrency() > 1 && session.getProjects().size() > 1 )
         {
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if ( !unsafePlugins.isEmpty() )
@@ -155,7 +166,8 @@ public class BuilderCommon
                     {
                         logger.warn( unsafePlugin.getId() );
                     }
-                    logger.warn( "Enable debug to see more precisely which goals are not marked @threadSafe." );
+                    logger.warn( "Enable verbose output (-X) to see more precisely which goals are not marked"
+                            + " @threadSafe." );
                 }
                 logger.warn( "*****************************************************************" );
             }

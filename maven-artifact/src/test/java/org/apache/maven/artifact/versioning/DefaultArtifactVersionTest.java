@@ -19,7 +19,11 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test DefaultArtifactVersion.
@@ -27,7 +31,6 @@ import junit.framework.TestCase;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class DefaultArtifactVersionTest
-    extends TestCase
 {
     private ArtifactVersion newArtifactVersion( String version )
     {
@@ -42,14 +45,15 @@ public class DefaultArtifactVersionTest
             "'" + version + "' parsed as ('" + artifactVersion.getMajorVersion() + "', '"
                 + artifactVersion.getMinorVersion() + "', '" + artifactVersion.getIncrementalVersion() + "', '"
                 + artifactVersion.getBuildNumber() + "', '" + artifactVersion.getQualifier() + "'), ";
-        assertEquals( parsed + "check major version", major, artifactVersion.getMajorVersion() );
-        assertEquals( parsed + "check minor version", minor, artifactVersion.getMinorVersion() );
-        assertEquals( parsed + "check incremental version", incremental, artifactVersion.getIncrementalVersion() );
-        assertEquals( parsed + "check build number", buildnumber, artifactVersion.getBuildNumber() );
-        assertEquals( parsed + "check qualifier", qualifier, artifactVersion.getQualifier() );
-        assertEquals( "check " + version + " string value", version, artifactVersion.toString() );
+        assertEquals( major, artifactVersion.getMajorVersion(), parsed + "check major version" );
+        assertEquals( minor, artifactVersion.getMinorVersion(), parsed + "check minor version" );
+        assertEquals( incremental, artifactVersion.getIncrementalVersion(), parsed + "check incremental version" );
+        assertEquals( buildnumber, artifactVersion.getBuildNumber(), parsed + "check build number" );
+        assertEquals( qualifier, artifactVersion.getQualifier(), parsed + "check qualifier" );
+        assertEquals( version, artifactVersion.toString(), "check " + version + " string value" );
     }
 
+    @Test
     public void testVersionParsing()
     {
         checkVersionParsing( "1", 1, 0, 0, 0, null );
@@ -87,6 +91,7 @@ public class DefaultArtifactVersionTest
         checkVersionParsing( "1.2.3-200705301630", 1, 2, 3, 0, "200705301630" );
     }
 
+    @Test
     public void testVersionComparing()
     {
         assertVersionEqual( "1", "1" );
@@ -134,6 +139,7 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq", "2.0.0.v200706041906-7C78EK9E_EkMNfNOd2d8qq" );
     }
 
+    @Test
     public void testVersionSnapshotComparing()
     {
         assertVersionEqual( "1-SNAPSHOT", "1-SNAPSHOT" );
@@ -168,6 +174,7 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "2.0.1-xyz-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
     }
 
+    @Test
     public void testSnapshotVsReleases()
     {
         assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" );
@@ -175,49 +182,44 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.0-rc-1", "1.0-SNAPSHOT" );
     }
 
+    @Test
     public void testHashCode()
     {
         ArtifactVersion v1 = newArtifactVersion( "1" );
         ArtifactVersion v2 = newArtifactVersion( "1.0" );
-        assertEquals( true, v1.equals( v2 ) );
+        assertTrue( v1.equals( v2 ) );
         assertEquals( v1.hashCode(), v2.hashCode() );
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( newArtifactVersion( "1" ).equals( null ) );
     }
 
+    @Test
     public void testEqualsTypeSafe()
     {
         assertFalse( newArtifactVersion( "1" ).equals( "non-an-artifact-version-instance" ) );
     }
 
-    public void testNonNumericVersionRepresentationReturnsANumberFormatException()
-    {
-        try
-        {
-            new DefaultArtifactVersion( "..." );
-        }
-        catch ( Exception e )
-        {
-            assertTrue( "We expect a NumberFormatException to be thrown.", e instanceof NumberFormatException );
-        }
-    }
-
     private void assertVersionOlder( String left, String right )
     {
-        assertTrue( left + " should be older than " + right,
-                    newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) < 0 );
-        assertTrue( right + " should be newer than " + left,
-                    newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) > 0 );
+        assertTrue(
+                newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) < 0,
+                left + " should be older than " + right );
+        assertTrue(
+                newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) > 0,
+                right + " should be newer than " + left );
     }
 
     private void assertVersionEqual( String left, String right )
     {
-        assertTrue( left + " should be equal to " + right,
-                    newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) == 0 );
-        assertTrue( right + " should be equal to " + left,
-                    newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0 );
+        assertTrue(
+                newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) == 0,
+                left + " should be equal to " + right );
+        assertTrue(
+                newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0,
+                right + " should be equal to " + left );
     }
 }

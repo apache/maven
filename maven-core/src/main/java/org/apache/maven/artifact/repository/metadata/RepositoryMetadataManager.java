@@ -48,6 +48,7 @@ public interface RepositoryMetadataManager
      * @param metadata             the metadata to deploy
      * @param localRepository      the local repository to install to first
      * @param deploymentRepository the remote repository to deploy to
+     * @throws RepositoryMetadataDeploymentException in case of metadata deployment issue
      */
     void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
                  ArtifactRepository deploymentRepository )
@@ -58,6 +59,7 @@ public interface RepositoryMetadataManager
      *
      * @param metadata        the metadata
      * @param localRepository the local repository
+     * @throws RepositoryMetadataInstallationException in case of metadata installation issue
      */
     void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
         throws RepositoryMetadataInstallationException;

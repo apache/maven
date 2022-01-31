@@ -26,35 +26,34 @@ import static org.mockito.Mockito.when;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 
-public class ExecutionEventLoggerTest
+class ExecutionEventLoggerTest
 {
-    private ExecutionEventLogger executionEventLogger;
-
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         MessageUtils.setColorEnabled( false );
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown()
     {
         MessageUtils.setColorEnabled( true );
     }
 
     @Test
-    public void testProjectStarted()
+    void testProjectStarted()
     {
         // prepare
         Logger logger = mock( Logger.class );
         when( logger.isInfoEnabled() ).thenReturn( true );
-        executionEventLogger = new ExecutionEventLogger( logger );
+        ExecutionEventLogger executionEventLogger = new ExecutionEventLogger( logger );
 
         ExecutionEvent event = mock( ExecutionEvent.class );
         MavenProject project = mock( MavenProject.class );
@@ -77,12 +76,12 @@ public class ExecutionEventLoggerTest
     }
 
     @Test
-    public void testProjectStartedOverflow()
+    void testProjectStartedOverflow()
     {
         // prepare
         Logger logger = mock( Logger.class );
         when( logger.isInfoEnabled() ).thenReturn( true );
-        executionEventLogger = new ExecutionEventLogger( logger );
+        ExecutionEventLogger executionEventLogger = new ExecutionEventLogger( logger );
 
         ExecutionEvent event = mock( ExecutionEvent.class );
         MavenProject project = mock( MavenProject.class );
@@ -102,5 +101,42 @@ public class ExecutionEventLoggerTest
         inOrder.verify( logger ).info( "--< org.apache.maven.plugins.overflow:maven-project-info-reports-plugin >--" );
         inOrder.verify( logger ).info( "Building Apache Maven Project Info Reports Plugin 3.0.0-SNAPSHOT" );
         inOrder.verify( logger ).info( "----------------------------[ maven-plugin ]----------------------------" );
+    }
+
+    @Test
+    void testTerminalWidth()
+    {
+        // prepare
+        Logger logger = mock( Logger.class );
+        when( logger.isInfoEnabled() ).thenReturn( true );
+
+        ExecutionEvent event = mock( ExecutionEvent.class );
+        MavenProject project = mock( MavenProject.class );
+        when( project.getGroupId() ).thenReturn( "org.apache.maven.plugins.overflow" );
+        when( project.getArtifactId() ).thenReturn( "maven-project-info-reports-plugin" );
+        when( project.getPackaging() ).thenReturn( "maven-plugin" );
+        when( project.getName() ).thenReturn( "Apache Maven Project Info Reports Plugin" );
+        when( project.getVersion() ).thenReturn( "3.0.0-SNAPSHOT" );
+        when( event.getProject() ).thenReturn( project );
+
+        // default width
+        new ExecutionEventLogger( logger, -1 ).projectStarted( event );
+        Mockito.verify( logger ).info( "----------------------------[ maven-plugin ]----------------------------" );
+
+        // terminal width: 30
+        new ExecutionEventLogger( logger, 30 ).projectStarted( event );
+        Mockito.verify( logger ).info( "------------------[ maven-plugin ]------------------" );
+
+        // terminal width: 70
+        new ExecutionEventLogger( logger, 70 ).projectStarted( event );
+        Mockito.verify( logger ).info( "-----------------------[ maven-plugin ]-----------------------" );
+
+        // terminal width: 110
+        new ExecutionEventLogger( logger, 110 ).projectStarted( event );
+        Mockito.verify( logger ).info( "-------------------------------------------[ maven-plugin ]-------------------------------------------" );
+
+        // terminal width: 200
+        new ExecutionEventLogger( logger, 200 ).projectStarted( event );
+        Mockito.verify( logger ).info( "-----------------------------------------------------[ maven-plugin ]-----------------------------------------------------" );
     }
 }

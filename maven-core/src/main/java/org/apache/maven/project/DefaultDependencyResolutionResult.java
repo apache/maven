@@ -100,7 +100,7 @@ class DefaultDependencyResolutionResult
         List<Exception> errors = resolutionErrors.get( dependency );
         return ( errors != null )
                    ? Collections.unmodifiableList( errors )
-                   : Collections.<Exception>emptyList();
+                   : Collections.emptyList();
 
     }
 

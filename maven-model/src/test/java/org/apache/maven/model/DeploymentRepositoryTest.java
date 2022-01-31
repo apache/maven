@@ -19,7 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code DeploymentRepository}.
@@ -27,14 +31,15 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class DeploymentRepositoryTest
-    extends TestCase
 {
 
+    @Test
     public void testHashCodeNullSafe()
     {
         new DeploymentRepository().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe()
     {
         assertFalse( new DeploymentRepository().equals( null ) );
@@ -42,12 +47,14 @@ public class DeploymentRepositoryTest
         new DeploymentRepository().equals( new DeploymentRepository() );
     }
 
+    @Test
     public void testEqualsIdentity()
     {
         DeploymentRepository thing = new DeploymentRepository();
         assertTrue( thing.equals( thing ) );
     }
 
+    @Test
     public void testToStringNullSafe()
     {
         assertNotNull( new DeploymentRepository().toString() );

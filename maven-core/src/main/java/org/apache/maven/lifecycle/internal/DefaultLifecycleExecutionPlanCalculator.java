@@ -56,7 +56,6 @@ import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -75,46 +74,52 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultLifecycleExecutionPlanCalculator
     implements LifecycleExecutionPlanCalculator
 {
-    @Inject
-    private PluginVersionResolver pluginVersionResolver;
+
+    private final BuildPluginManager pluginManager;
+
+    private final DefaultLifecycles defaultLifecycles;
+
+    private final MojoDescriptorCreator mojoDescriptorCreator;
+
+    private final LifecyclePluginResolver lifecyclePluginResolver;
+
+    private final LifecycleMappingDelegate standardDelegate;
+
+    private final Map<String, LifecycleMappingDelegate> delegates;
+
+    private final Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
     @Inject
-    private BuildPluginManager pluginManager;
-
-    @Inject
-    private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private MojoDescriptorCreator mojoDescriptorCreator;
-
-    @Inject
-    private LifecyclePluginResolver lifecyclePluginResolver;
-
-    @Inject
-    @Named( DefaultLifecycleMappingDelegate.HINT )
-    private LifecycleMappingDelegate standardDelegate;
-
-    @Inject
-    private Map<String, LifecycleMappingDelegate> delegates;
-
-    @Inject
-    private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
-
-    @SuppressWarnings( { "UnusedDeclaration" } )
-    public DefaultLifecycleExecutionPlanCalculator()
+    public DefaultLifecycleExecutionPlanCalculator(
+            BuildPluginManager pluginManager,
+            DefaultLifecycles defaultLifecycles,
+            MojoDescriptorCreator mojoDescriptorCreator,
+            LifecyclePluginResolver lifecyclePluginResolver,
+            @Named( DefaultLifecycleMappingDelegate.HINT ) LifecycleMappingDelegate standardDelegate,
+            Map<String, LifecycleMappingDelegate> delegates,
+            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators )
     {
+        this.pluginManager = pluginManager;
+        this.defaultLifecycles = defaultLifecycles;
+        this.mojoDescriptorCreator = mojoDescriptorCreator;
+        this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.standardDelegate = standardDelegate;
+        this.delegates = delegates;
+        this.mojoExecutionConfigurators = mojoExecutionConfigurators;
     }
 
     // Only used for testing
     public DefaultLifecycleExecutionPlanCalculator( BuildPluginManager pluginManager,
-                                                    DefaultLifecycles defaultLifeCycles,
+                                                    DefaultLifecycles defaultLifecycles,
                                                     MojoDescriptorCreator mojoDescriptorCreator,
                                                     LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginManager = pluginManager;
-        this.defaultLifeCycles = defaultLifeCycles;
+        this.defaultLifecycles = defaultLifecycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.standardDelegate = null;
+        this.delegates = null;
         this.mojoExecutionConfigurators = Collections.singletonMap(
              "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
     }
@@ -137,7 +142,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         final List<ExecutionPlanItem> planItem = ExecutionPlanItem.createExecutionPlanItems( project, executions );
 
-        return new MavenExecutionPlan( planItem, defaultLifeCycles );
+        return new MavenExecutionPlan( planItem, defaultLifecycles );
     }
 
     @Override
@@ -271,14 +276,14 @@ public class DefaultLifecycleExecutionPlanCalculator
          * Determine the lifecycle that corresponds to the given phase.
          */
 
-        Lifecycle lifecycle = defaultLifeCycles.get( lifecyclePhase );
+        Lifecycle lifecycle = defaultLifecycles.get( lifecyclePhase );
 
         if ( lifecycle == null )
         {
             throw new LifecyclePhaseNotFoundException( "Unknown lifecycle phase \"" + lifecyclePhase
                 + "\". You must specify a valid lifecycle phase" + " or a goal in the format <plugin-prefix>:<goal> or"
                 + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
-                + defaultLifeCycles.getLifecyclePhaseList() + ".", lifecyclePhase );
+                + defaultLifecycles.getLifecyclePhaseList() + ".", lifecyclePhase );
         }
 
         LifecycleMappingDelegate delegate;

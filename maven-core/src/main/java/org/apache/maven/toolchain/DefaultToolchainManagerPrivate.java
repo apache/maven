@@ -23,13 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.slf4j.Logger;
 
 /**
+ * TODO: refactor this, component extending component is bad practice.
+ *
  * @author mkleint
  * @author Robert Scholte
  */
@@ -39,6 +43,19 @@ public class DefaultToolchainManagerPrivate
     extends DefaultToolchainManager
     implements ToolchainManagerPrivate
 {
+    @Inject
+    public DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories )
+    {
+        super( factories );
+    }
+
+    /**
+     * Ctor needed for UT.
+     */
+    DefaultToolchainManagerPrivate( Map<String, ToolchainFactory> factories, Logger logger )
+    {
+        super( factories, logger );
+    }
 
     @Override
     public ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )

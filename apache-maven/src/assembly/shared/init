@@ -1,63 +1,31 @@
-# For Cygwin, ensure paths are in Unix format before anything is touched
-if $cygwin ; then
-  [ -n "$MAVEN_HOME" ] &&
-    MAVEN_HOME=`cygpath --unix "$MAVEN_HOME"`
+CLASSWORLDS_CONF="$MAVEN_HOME/bin/m2.conf"
+
+# For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
+if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] &&
-    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
-# For Mingw, ensure paths are in Unix format before anything is touched
-if $mingw ; then
-  [ -n "$MAVEN_HOME" ] &&
-    MAVEN_HOME=`(cd "$MAVEN_HOME"; pwd)`
-  [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`(cd "$JAVA_HOME"; pwd)`
-fi
-
-if [ -z "$JAVA_HOME" ]; then
-  javaExecutable="`which javac`"
-  if [ -n "$javaExecutable" ] && ! [ "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
-    # readlink(1) is not available as standard on Solaris 10.
-    readLink=`which readlink`
-    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
-      if $darwin ; then
-        javaHome="`dirname \"$javaExecutable\"`"
-        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
-      else
-        javaExecutable="`readlink -f \"$javaExecutable\"`"
-      fi
-      javaHome="`dirname \"$javaExecutable\"`"
-      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
-      JAVA_HOME="$javaHome"
-      export JAVA_HOME
-    fi
-  fi
-fi
-
-if [ -z "$JAVACMD" ] ; then
-  if [ -n "$JAVA_HOME"  ] ; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-      # IBM's JDK on AIX uses strange locations for the executables
-      JAVACMD="$JAVA_HOME/jre/sh/java"
-    else
-      JAVACMD="$JAVA_HOME/bin/java"
-    fi
+if [ -n "$JAVA_HOME" ] ; then
+  if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+    # IBM's JDK on AIX uses strange locations for the executables
+    JAVACMD="$JAVA_HOME/jre/sh/java"
   else
-    JAVACMD="`which java`"
+    JAVACMD="$JAVA_HOME/bin/java"
+
+    if [ ! -x "$JAVACMD" ] ; then
+      echo "The JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started." >&2
+      echo "JAVA_HOME is set to \"$JAVA_HOME\", but \"\$JAVA_HOME/bin/java\" does not exist." >&2
+      exit 1
+    fi
   fi
-fi
+else
+  JAVACMD="`\\unset -f command; \\command -v java`"
 
-if [ ! -x "$JAVACMD" ] ; then
-  echo "The JAVA_HOME environment variable is not defined correctly" >&2
-  echo "This environment variable is needed to run this program" >&2
-  echo "NB: JAVA_HOME should point to a JDK not a JRE" >&2
-  exit 1
-fi
-
-if [ -z "$JAVA_HOME" ] ; then
-  echo "Warning: JAVA_HOME environment variable is not set."
+  if [ ! -x "$JAVACMD" ] ; then
+    echo "The java(1) command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started." >&2
+    exit 1
+  fi
 fi
 
 # traverses directory structure from process work directory to filesystem root
@@ -114,15 +82,5 @@ concat_lines() {
   fi
 }
 
-MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir "$@"`}"
+MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"
-
-# For Cygwin, switch project base directory path to Windows format before
-# executing Maven otherwise this will cause Maven not to consider it.
-if $cygwin ; then
-  [ -n "$MAVEN_PROJECTBASEDIR" ] &&
-  MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
-fi
-
-export MAVEN_PROJECTBASEDIR
-

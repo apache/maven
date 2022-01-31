@@ -31,7 +31,7 @@ public class PluginVersionNotFoundException
 
     public PluginVersionNotFoundException( String groupId, String artifactId )
     {
-        super( "The plugin \'" + groupId + ":" + artifactId + "\' does not exist or no valid version could be found" );
+        super( "The plugin '" + groupId + ":" + artifactId + "' does not exist or no valid version could be found" );
 
         this.groupId = groupId;
         this.artifactId = artifactId;

@@ -44,9 +44,9 @@ public final class ArtifactUtils
             {
                 return true;
             }
-            else if ( Artifact.VERSION_FILE_PATTERN.matcher( version ).matches() )
+            else
             {
-                return true;
+                return Artifact.VERSION_FILE_PATTERN.matcher( version ).matches();
             }
         }
         return false;
@@ -173,7 +173,14 @@ public final class ArtifactUtils
         return clone;
     }
 
-    /** Returns <code>to</code> collection */
+    /**
+     * Copy artifact to a collection.
+     *
+     * @param <T> the target collection type
+     * @param from an artifact collection
+     * @param to the target artifact collection
+     * @return <code>to</code> collection
+     */
     public static <T extends Collection<Artifact>> T copyArtifacts( Collection<Artifact> from, T to )
     {
         for ( Artifact artifact : from )

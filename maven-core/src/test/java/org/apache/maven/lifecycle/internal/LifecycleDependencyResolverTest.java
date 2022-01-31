@@ -30,26 +30,23 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.junit.Test;
+
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
 {
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver resolver;
 
     @Override
     protected String getProjectsDirectory()
     {
         return null;
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        resolver = lookup( LifecycleDependencyResolver.class );
     }
 
     @Test
@@ -71,7 +68,7 @@ public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentT
         MavenProject lib = session.getProjects().get( 1 );
         MavenProject war = session.getProjects().get( 2 );
 
-        assertEquals( null , war.getArtifactMap().get("org.apache.maven.its.mng6300:mng6300-lib").getFile() );
+        assertNull( war.getArtifactMap().get( "org.apache.maven.its.mng6300:mng6300-lib" ).getFile() );
 
         lib.getArtifact().setFile( new File( "lib.jar" ) );
 

@@ -29,8 +29,8 @@ under the License.
 
   <name>Maven Integration Test :: MNG-4107</name>
   <description>
-    Test that POM interpolation uses the property values from the dominant profile source (POM vs. profiles.xml
-    vs. settings.xml). This boils down to the proper order of profile injection and interpolation, i.e.
+    Test that POM interpolation uses the property values from the dominant profile source (POM vs. settings.xml).
+    This boils down to the proper order of profile injection and interpolation, i.e.
     interpolate after profiles from all sources are injected.
   </description>
 

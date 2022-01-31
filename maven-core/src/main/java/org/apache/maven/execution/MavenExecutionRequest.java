@@ -154,21 +154,33 @@ public interface MavenExecutionRequest
 
     String getReactorFailureBehavior();
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProjectActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest setSelectedProjects( List<String> projects );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProjectActivation()}.
+     */
+    @Deprecated
     List<String> getSelectedProjects();
 
     /**
      * @param projects the projects to exclude
      * @return this MavenExecutionRequest
      * @since 3.2
+     * @deprecated Since Maven 4: use {@link #getProjectActivation()}.
      */
+    @Deprecated
     MavenExecutionRequest setExcludedProjects( List<String> projects );
 
     /**
      * @return the excluded projects, never {@code null}
      * @since 3.2
+     * @deprecated Since Maven 4: use {@link #getProjectActivation()}.
      */
+    @Deprecated
     List<String> getExcludedProjects();
 
     /**
@@ -277,21 +289,67 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setProfiles( List<Profile> profiles );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest addActiveProfile( String profile );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest setActiveProfiles( List<String> profiles );
 
+    /**
+     * @return The list of profiles that the user wants to activate.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     List<String> getActiveProfiles();
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest addInactiveProfile( String profile );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
 
+    /**
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     MavenExecutionRequest setInactiveProfiles( List<String> profiles );
 
+    /**
+     * @return The list of profiles that the user wants to de-activate.
+     * @deprecated Since Maven 4: use {@link #getProfileActivation()}.
+     */
+    @Deprecated
     List<String> getInactiveProfiles();
+
+    /**
+     * Return the requested activation(s) of project(s) in this execution.
+     * @return requested (de-)activation(s) of project(s) in this execution. Never {@code null}.
+     */
+    ProjectActivation getProjectActivation();
+
+    /**
+     * Return the requested activation(s) of profile(s) in this execution.
+     * @return requested (de-)activation(s) of profile(s) in this execution. Never {@code null}.
+     */
+    ProfileActivation getProfileActivation();
 
     // Proxies
     List<Proxy> getProxies();

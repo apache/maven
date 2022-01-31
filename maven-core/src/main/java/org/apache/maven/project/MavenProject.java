@@ -1154,15 +1154,10 @@ public class MavenProject
         sb.append( getArtifactId() );
         sb.append( ':' );
         sb.append( getVersion() );
-        sb.append( " @ " );
-
-        try
+        if ( getFile() != null )
         {
+            sb.append( " @ " );
             sb.append( getFile().getPath() );
-        }
-        catch ( NullPointerException e )
-        {
-            // don't log it.
         }
 
         return sb.toString();

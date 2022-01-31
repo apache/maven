@@ -43,8 +43,12 @@ public class LifecycleTaskSegmentCalculatorStub
 
     public static final String install = "install";
 
+    public LifecycleTaskSegmentCalculatorStub()
+    {
+        super( null, null );
+    }
 
-    public List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
+    public List<TaskSegment> calculateTaskSegments(MavenSession session, List<String> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginVersionResolutionException
