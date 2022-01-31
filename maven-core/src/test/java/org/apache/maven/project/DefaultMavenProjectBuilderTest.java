@@ -420,7 +420,53 @@ public class DefaultMavenProjectBuilderTest
             assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
         }
     }
-    
+
+    /**
+     * Tests whether external version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeExternallyWithChildPomVersionExpression() throws Exception
+    {
+        File f1 =
+                getTestFile(
+                        "src/test/resources/projects/parent-version-range-external-child-pom-version-expression/pom.xml" );
+
+        try
+        {
+            this.getProjectFromRemoteRepository( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        }
+    }
+
+    /**
+     * Tests whether external version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeExternallyWithChildPomParentVersionExpression() throws Exception
+    {
+        File f1 =
+                getTestFile(
+                        "src/test/resources/projects/parent-version-range-external-child-pom-parent-version-expression/pom.xml" );
+
+        try
+        {
+            this.getProjectFromRemoteRepository( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        }
+    }
+
     /**
      * Tests whether external version range parent references are build correctly.
      *

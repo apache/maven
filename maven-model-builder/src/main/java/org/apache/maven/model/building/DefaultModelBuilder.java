@@ -1103,7 +1103,9 @@ public class DefaultModelBuilder
 
     private boolean rawChildVersionReferencesParent( String rawChildModelVersion )
     {
-        return rawChildModelVersion.equals( "${project.version}" ) 
+        return rawChildModelVersion.equals( "${pom.version}" )
+                || rawChildModelVersion.equals( "${project.version}" )
+                || rawChildModelVersion.equals( "${pom.parent.version}" )
                 || rawChildModelVersion.equals( "${project.parent.version}" );
     }
 
