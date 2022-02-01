@@ -104,7 +104,7 @@ public abstract class AbstractStringBasedModelInterpolator
         {
             projectPrefixValueSource =
                     new ProblemDetectingValueSource( projectPrefixValueSource, "pom.", "project.", problems,
-                            ModelProblem.Severity.FATAL );
+                            ModelProblem.Severity.ERROR );
         }
 
         ValueSource prefixlessObjectBasedValueSource = new ObjectBasedValueSource( model );

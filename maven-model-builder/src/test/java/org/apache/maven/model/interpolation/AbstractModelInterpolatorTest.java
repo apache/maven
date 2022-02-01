@@ -529,7 +529,7 @@ public abstract class AbstractModelInterpolatorTest
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ),
                 collector );
 
-        assertCollectorState( 1, 0, 0, collector );
+        assertCollectorState( 0, 1, 0, collector );
         assertEquals( out.getName(), model.getName() );
     }
 
