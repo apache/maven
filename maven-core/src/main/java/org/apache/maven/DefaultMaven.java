@@ -678,11 +678,11 @@ public class DefaultMaven
         {
             if ( problem.getSeverity() == ModelProblem.Severity.WARNING )
             {
-                logger.warn( problem.toString() );
+                logger.warn( problem.getMessage() );
             }
             else
             {
-                logger.error( problem.toString() );
+                logger.error( problem.getMessage() );
             }
         }
 
