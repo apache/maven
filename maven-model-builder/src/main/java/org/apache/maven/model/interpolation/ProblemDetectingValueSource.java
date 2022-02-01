@@ -46,6 +46,8 @@ class ProblemDetectingValueSource
 
     private final ModelProblemCollector problems;
 
+    private final String status;
+
     ProblemDetectingValueSource( ValueSource valueSource, String bannedPrefix, String newPrefix,
                                  ModelProblemCollector problems, ModelProblem.Severity severity )
     {
@@ -54,6 +56,9 @@ class ProblemDetectingValueSource
         this.newPrefix = newPrefix;
         this.problems = problems;
         this.severity = severity;
+        this.status = ModelProblem.Severity.ERROR.equals( severity )
+                ? "no longer supported"
+                : "deprecated";
     }
 
     @Override
@@ -63,7 +68,7 @@ class ProblemDetectingValueSource
 
         if ( value != null && expression.startsWith( bannedPrefix ) )
         {
-            String msg = "The expression ${" + expression + "} is deprecated.";
+            String msg = "The expression ${" + expression + "} is " + status + ".";
             if ( newPrefix != null && newPrefix.length() > 0 )
             {
                 msg += " Please use ${" + newPrefix + expression.substring( bannedPrefix.length() ) + "} instead.";
