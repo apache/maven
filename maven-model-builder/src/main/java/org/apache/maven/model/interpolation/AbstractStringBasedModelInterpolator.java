@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
@@ -98,16 +99,20 @@ public abstract class AbstractStringBasedModelInterpolator
     {
         Properties modelProperties = model.getProperties();
 
-        ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
         if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            modelValueSource1 = new ProblemDetectingValueSource( modelValueSource1, "pom.", "project.", problems );
+            projectPrefixValueSource =
+                    new ProblemDetectingValueSource( projectPrefixValueSource, "pom.", "project.", problems,
+                            ModelProblem.Severity.FATAL );
         }
 
-        ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
+        ValueSource prefixlessObjectBasedValueSource = new ObjectBasedValueSource( model );
         if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            modelValueSource2 = new ProblemDetectingValueSource( modelValueSource2, "", "project.", problems );
+            prefixlessObjectBasedValueSource =
+                    new ProblemDetectingValueSource( prefixlessObjectBasedValueSource, "", "project.", problems,
+                            ModelProblem.Severity.WARNING );
         }
 
         // NOTE: Order counts here!
@@ -145,7 +150,7 @@ public abstract class AbstractStringBasedModelInterpolator
             valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), modelProperties ) );
         }
 
-        valueSources.add( modelValueSource1 );
+        valueSources.add( projectPrefixValueSource );
 
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
 
@@ -176,7 +181,7 @@ public abstract class AbstractStringBasedModelInterpolator
             }
         } );
 
-        valueSources.add( modelValueSource2 );
+        valueSources.add( prefixlessObjectBasedValueSource );
 
         return valueSources;
     }
@@ -189,7 +194,7 @@ public abstract class AbstractStringBasedModelInterpolator
         if ( projectDir != null )
         {
             processors.add( new PathTranslatingPostProcessor( PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
-                                                              projectDir, pathTranslator ) );
+                    projectDir, pathTranslator ) );
         }
         processors.add( new UrlNormalizingPostProcessor( urlNormalizer ) );
         return processors;

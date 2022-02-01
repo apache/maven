@@ -21,9 +21,9 @@ package org.apache.maven.model.interpolation;
 
 import java.util.List;
 
-import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.interpolation.ValueSource;
 
@@ -42,15 +42,18 @@ class ProblemDetectingValueSource
 
     private final String newPrefix;
 
+    private final ModelProblem.Severity severity;
+
     private final ModelProblemCollector problems;
 
     ProblemDetectingValueSource( ValueSource valueSource, String bannedPrefix, String newPrefix,
-                                        ModelProblemCollector problems )
+                                 ModelProblemCollector problems, ModelProblem.Severity severity )
     {
         this.valueSource = valueSource;
         this.bannedPrefix = bannedPrefix;
         this.newPrefix = newPrefix;
         this.problems = problems;
+        this.severity = severity;
     }
 
     @Override
@@ -65,7 +68,7 @@ class ProblemDetectingValueSource
             {
                 msg += " Please use ${" + newPrefix + expression.substring( bannedPrefix.length() ) + "} instead.";
             }
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 ).setMessage( msg ) );
+            problems.add( new ModelProblemCollectorRequest( severity, Version.V20 ).setMessage( msg ) );
         }
 
         return value;
