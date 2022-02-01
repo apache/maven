@@ -6,7 +6,7 @@
     <version>[1,10]</version>
   </parent>
   <artifactId>child</artifactId>
-  <!-- Must not use expressions from parent due to version range. -->
-  <version>${some.property}</version>
+  <!-- Must not use ${project.version} due to version range. -->
+  <version>${project.version}</version>
   <packaging>pom</packaging>
 </project>
