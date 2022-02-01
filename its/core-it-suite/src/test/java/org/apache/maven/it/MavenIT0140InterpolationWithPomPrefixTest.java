@@ -25,16 +25,18 @@ import java.io.File;
 import java.util.Properties;
 
 /**
+ * <a href="https://issues.apache.org/jira/browse/MNG-7244">MNG-7244</a> removes the deprecation of
+ * <code>pom.X</code>.
+ * See {@link MavenITmng7244IgnorePomPrefixInExpressions}.
  *
  * @author Benjamin Bentmann
- *
  */
 public class MavenIT0140InterpolationWithPomPrefixTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenIT0140InterpolationWithPomPrefixTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0,4.0.0-alpha-1)" );
     }
 
     /**

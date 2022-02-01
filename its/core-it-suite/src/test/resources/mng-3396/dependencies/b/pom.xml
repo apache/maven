@@ -12,7 +12,7 @@
   <version>1.0</version>
   <dependencies>
     <dependency>
-      <groupId>${pom.groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>A</artifactId>
       <version>[1.0,2.0)</version>
     </dependency>

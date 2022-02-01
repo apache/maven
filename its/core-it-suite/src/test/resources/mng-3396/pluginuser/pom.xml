@@ -10,7 +10,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>${pom.groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>plugin</artifactId>
         <version>1.0</version>
         <executions>

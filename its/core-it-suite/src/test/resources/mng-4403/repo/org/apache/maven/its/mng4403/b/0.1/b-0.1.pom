@@ -80,8 +80,7 @@ under the License.
       <!-- duplicate dependency with different version (MNG-4005), last declaration wins -->
       <groupId>org.apache.maven.its.mng4403</groupId>
       <artifactId>a</artifactId>
-      <!-- deprecated expression prefix (MNG-4421) -->
-      <version>${pom.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <!-- dependency managed by duplicate declarations -->

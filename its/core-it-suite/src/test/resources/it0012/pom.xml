@@ -32,19 +32,16 @@ under the License.
 
   <properties>
     <test>
-POM content (available with 3 prefixes):
+POM content (available with 2 prefixes):
   project.version: ${project.version}
-  pom.version: ${pom.version}
   version: ${version}
 
 basedir (available with 2 prefixes):
   basedir: ${basedir}
   project.basedir: ${project.basedir}
-  pom.basedir: ${pom.basedir}
 
 baseUri (available with 2 prefixes):
   project.baseUri: ${project.baseUri}
-  pom.baseUri: ${pom.baseUri}
 
 build.timestamp (only if build start time defined):
   build.timestamp: ${build.timestamp}

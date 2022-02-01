@@ -19,7 +19,7 @@
       <version>2.0.4</version>
     </dependency>
     <dependency>
-      <groupId>${pom.groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>B</artifactId>
       <version>1.0</version>
     </dependency>
@@ -27,7 +27,7 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>${pom.groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>A</artifactId>
         <version>3.0</version>
       </dependency>

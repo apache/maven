@@ -28,6 +28,10 @@ import java.util.Properties;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4421">MNG-4421</a>.
  *
+ * But <a href="https://issues.apache.org/jira/browse/MNG-7244">MNG-7244</a> removes the deprecation of
+ * <code>pom.X</code>.
+ * See {@link MavenITmng7244IgnorePomPrefixInExpressions}.
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
@@ -36,7 +40,7 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
 
     public MavenITmng4421DeprecatedPomInterpolationExpressionsTest()
     {
-        super( "[3.0-alpha-3,)" );
+        super( "[3.0-alpha-3,4.0.0-alpha-1)" );
     }
 
     /**
