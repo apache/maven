@@ -21,8 +21,8 @@ package org.apache.maven.model.interpolation;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -52,7 +52,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
+    private static final List<String> PROJECT_PREFIXES = Collections.singletonList( "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
@@ -95,16 +95,12 @@ public abstract class AbstractStringBasedModelInterpolator
     {
         Properties modelProperties = model.getProperties();
 
-        ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource prefixlessObjectBasedValueSource = new ObjectBasedValueSource( model );
         if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            modelValueSource1 = new ProblemDetectingValueSource( modelValueSource1, "pom.", "project.", problems );
-        }
-
-        ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
-        if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
-        {
-            modelValueSource2 = new ProblemDetectingValueSource( modelValueSource2, "", "project.", problems );
+            prefixlessObjectBasedValueSource =
+                    new ProblemDetectingValueSource( prefixlessObjectBasedValueSource, "", "project.", problems );
         }
 
         // NOTE: Order counts here!
@@ -142,7 +138,7 @@ public abstract class AbstractStringBasedModelInterpolator
             valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), modelProperties ) );
         }
 
-        valueSources.add( modelValueSource1 );
+        valueSources.add( projectPrefixValueSource );
 
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
 
@@ -163,7 +159,7 @@ public abstract class AbstractStringBasedModelInterpolator
             }
         } );
 
-        valueSources.add( modelValueSource2 );
+        valueSources.add( prefixlessObjectBasedValueSource );
 
         return valueSources;
     }

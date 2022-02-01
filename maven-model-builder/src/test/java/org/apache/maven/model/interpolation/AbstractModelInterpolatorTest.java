@@ -176,7 +176,7 @@ public abstract class AbstractModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertCollectorState(  0, 1, 0, collector );
+        assertCollectorState( 0, 1, 0, collector );
     }
 
     @Test
@@ -208,7 +208,7 @@ public abstract class AbstractModelInterpolatorTest
         String orgName = "MyCo";
 
         Model model = new Model();
-        model.setName( "${pom.organization.name} Tools" );
+        model.setName( "${project.organization.name} Tools" );
 
         Organization org = new Organization();
         org.setName( orgName );
@@ -427,14 +427,9 @@ public abstract class AbstractModelInterpolatorTest
         build.addResource( res );
 
         Resource res2 = new Resource();
-        res2.setDirectory( "${pom.build.sourceDirectory}" );
+        res2.setDirectory( "${build.sourceDirectory}" );
 
         build.addResource( res2 );
-
-        Resource res3 = new Resource();
-        res3.setDirectory( "${build.sourceDirectory}" );
-
-        build.addResource( res3 );
 
         model.setBuild( build );
 
@@ -442,13 +437,12 @@ public abstract class AbstractModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertCollectorState( 0, 0, 2, collector );
+        assertCollectorState( 0, 0, 1, collector );
 
 
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
         assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
         assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
     }
@@ -515,6 +509,29 @@ public abstract class AbstractModelInterpolatorTest
         assertEquals(
                 "Resolving expression: '${basedir}': Detected the following recursive expression cycle in 'basedir': [basedir]",
                 collector.getErrors().get( 0 ) );
+    }
+
+    @Test
+    public void shouldIgnorePropertiesWithPomPrefix() throws Exception
+    {
+        final String orgName = "MyCo";
+        final String expectedName = "${pom.organization.name} Tools";
+
+        Model model = new Model();
+        model.setName( expectedName );
+
+        Organization org = new Organization();
+        org.setName( orgName );
+
+        model.setOrganization( org );
+
+        ModelInterpolator interpolator = createInterpolator();
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ),
+                collector );
+
+        assertCollectorState( 0, 0, 0, collector );
+        assertEquals( out.getName(), expectedName );
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;
