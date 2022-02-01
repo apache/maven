@@ -19,12 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblemUtils;
-
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -72,7 +67,7 @@ public class ProjectBuildingException
 
     public ProjectBuildingException( List<ProjectBuildingResult> results )
     {
-        super( createMessage( results ) );
+        super( "Some problems were encountered while processing the POMs" );
         this.projectId = "";
         this.results = results;
     }
@@ -115,38 +110,6 @@ public class ProjectBuildingException
         if ( pomFile != null )
         {
             buffer.append( " at " ).append( pomFile.getAbsolutePath() );
-        }
-        return buffer.toString();
-    }
-
-    private static String createMessage( List<ProjectBuildingResult> results )
-    {
-        StringWriter buffer = new StringWriter( 1024 );
-        PrintWriter writer = new PrintWriter( buffer );
-        writer.println( "Some problems were encountered while processing the POMs:" );
-        try
-        {
-
-            for ( ProjectBuildingResult result : results )
-            {
-                for ( ModelProblem problem : result.getProblems() )
-                {
-                    writer.print( "[" );
-                    writer.print( problem.getSeverity() );
-                    writer.print( "] " );
-                    writer.print( problem.getMessage() );
-                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    if ( !location.isEmpty() )
-                    {
-                        writer.print( " @ " );
-                        writer.println( location );
-                    }
-                }
-            }
-        }
-        finally
-        {
-            writer.close();
         }
         return buffer.toString();
     }

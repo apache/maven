@@ -19,8 +19,10 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -241,7 +243,7 @@ public class DefaultMavenProjectBuilderTest
                 ProjectBuildingException.class,
                 () -> getProject( f1 ),
                 "Expected 'ProjectBuildingException' not thrown." );
-        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage( "Version must be a constant" ) ) );
     }
 
     /**
@@ -260,7 +262,7 @@ public class DefaultMavenProjectBuilderTest
                 ProjectBuildingException.class,
                 () -> getProject( f1 ),
                 "Expected 'ProjectBuildingException' not thrown." );
-        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage( "Version must be a constant" ) ) );
     }
     
     /**
@@ -339,7 +341,7 @@ public class DefaultMavenProjectBuilderTest
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository( f1 ),
                 "Expected 'ProjectBuildingException' not thrown." );
-        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage( "Version must be a constant" ) ) );
     }
 
     /**
@@ -358,7 +360,7 @@ public class DefaultMavenProjectBuilderTest
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository( f1 ),
                 "Expected 'ProjectBuildingException' not thrown." );
-        assertThat( e.getMessage(), containsString( "Version must be a constant" ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage( "Version must be a constant") ) );
     }
 
     /**
