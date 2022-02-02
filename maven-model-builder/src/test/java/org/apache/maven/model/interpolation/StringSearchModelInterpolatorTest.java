@@ -54,7 +54,8 @@ public class StringSearchModelInterpolatorTest
         throws Exception
     {
         super.setUp();
-        interpolator = new StringSearchModelInterpolator();
+        interpolator =
+            new StringSearchModelInterpolator().setVersionPropertiesProcessor( new DefaultModelVersionProcessor() );
     }
 
 
@@ -580,6 +581,7 @@ public class StringSearchModelInterpolatorTest
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
+        interpolator.setVersionPropertiesProcessor( new DefaultModelVersionProcessor() );
         interpolator.interpolateObject( new ClassWithFinalField(), new Model(), null, request, problems );
 
         assertProblemFree(  problems );
@@ -605,6 +607,7 @@ public class StringSearchModelInterpolatorTest
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
+        interpolator.setVersionPropertiesProcessor( new DefaultModelVersionProcessor() );
         interpolator.interpolateObject( model, model, null, request, problems );
 
         assertProblemFree( problems );
