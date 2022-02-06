@@ -68,14 +68,10 @@ public class StringSearchModelInterpolator
     }
 
     @Inject
-    public StringSearchModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
+    public StringSearchModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer,
+                                          ModelVersionProcessor processor )
     {
-        super( pathTranslator, urlNormalizer );
-    }
-
-    StringSearchModelInterpolator()
-    {
-        super( null, null );
+        super( pathTranslator, urlNormalizer, processor );
     }
 
     @Override

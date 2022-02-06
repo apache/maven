@@ -26,6 +26,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,7 +104,7 @@ public class DefaultModelValidatorTest
     public void setUp()
         throws Exception
     {
-        validator = new DefaultModelValidator();
+        validator = new DefaultModelValidator( new DefaultModelVersionProcessor() );
     }
 
     @AfterEach
@@ -876,7 +877,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 0, 1 );
         assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
     }
-    
+
     @Test
     public void repositoryWithExpression() throws Exception
     {
@@ -884,7 +885,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 1, 0 );
         assertEquals( "'repositories.repository.[repo].url' contains an expression but should be a constant.", result.getErrors().get( 0 ) );
     }
-    
+
     @Test
     public void repositoryWithBasedirExpression() throws Exception
     {

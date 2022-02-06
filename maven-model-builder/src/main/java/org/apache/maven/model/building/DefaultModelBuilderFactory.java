@@ -26,7 +26,9 @@ import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.interpolation.ModelInterpolator;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.interpolation.StringVisitorModelInterpolator;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.ModelReader;
@@ -259,12 +261,19 @@ public class DefaultModelBuilderFactory
     {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringVisitorModelInterpolator( pathTranslator, normalizer );
+        ModelVersionProcessor versionProcessor = newModelVersionPropertiesProcessor();
+        return new StringVisitorModelInterpolator( pathTranslator, normalizer, versionProcessor );
+    }
+
+    protected ModelVersionProcessor newModelVersionPropertiesProcessor()
+    {
+        return new DefaultModelVersionProcessor();
     }
 
     protected ModelValidator newModelValidator()
     {
-        return new DefaultModelValidator();
+        ModelVersionProcessor processor = newModelVersionPropertiesProcessor();
+        return new DefaultModelValidator( processor );
     }
 
     protected ModelNormalizer newModelNormalizer()
