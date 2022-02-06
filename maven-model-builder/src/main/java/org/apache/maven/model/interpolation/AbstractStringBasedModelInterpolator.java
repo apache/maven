@@ -52,12 +52,6 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
-    public static final String SHA1_PROPERTY = "sha1";
-
-    public static final String CHANGELIST_PROPERTY = "changelist";
-
-    public static final String REVISION_PROPERTY = "revision";
-
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
@@ -82,14 +76,17 @@ public abstract class AbstractStringBasedModelInterpolator
         TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
     }
 
+    private final ModelVersionProcessor versionProcessor;
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
 
     @Inject
-    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
+    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer,
+                                                 ModelVersionProcessor processor )
     {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
+        this.versionProcessor = processor;
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
@@ -151,18 +148,8 @@ public abstract class AbstractStringBasedModelInterpolator
 
         // Overwrite existing values in model properties. Otherwise it's not possible
         // to define the version via command line: mvn -Drevision=6.5.7 ...
-        if ( config.getSystemProperties().containsKey( REVISION_PROPERTY ) )
-        {
-            modelProperties.put( REVISION_PROPERTY, config.getSystemProperties().get( REVISION_PROPERTY ) );
-        }
-        if ( config.getSystemProperties().containsKey( CHANGELIST_PROPERTY ) )
-        {
-            modelProperties.put( CHANGELIST_PROPERTY, config.getSystemProperties().get( CHANGELIST_PROPERTY ) );
-        }
-        if ( config.getSystemProperties().containsKey( SHA1_PROPERTY ) )
-        {
-            modelProperties.put( SHA1_PROPERTY, config.getSystemProperties().get( SHA1_PROPERTY ) );
-        }
+        versionProcessor.overwriteModelProperties( modelProperties, config );
+
         valueSources.add( new MapBasedValueSource( modelProperties ) );
 
         valueSources.add( new MapBasedValueSource( config.getSystemProperties() ) );

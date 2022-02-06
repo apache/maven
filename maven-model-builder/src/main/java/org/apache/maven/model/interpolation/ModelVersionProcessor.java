@@ -9,7 +9,7 @@ package org.apache.maven.model.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,10 +19,29 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
-public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest
+import java.util.Properties;
+
+import org.apache.maven.model.building.ModelBuildingRequest;
+
+/**
+ * Allows a fixed set of properties that are valid inside a version and that could be overwritten for example on the
+ * commandline
+ */
+public interface ModelVersionProcessor
 {
-    protected ModelInterpolator createInterpolator()
-    {
-        return new StringVisitorModelInterpolator( null, null, new DefaultModelVersionProcessor() );
-    }
+
+    /**
+     * @param property the property to check
+     * @return <code>true</code> if this is a valid property for this processor
+     */
+    boolean isValidProperty( String property );
+
+    /**
+     * This method is responsible for examining the request and possibly overwrite of the valid properties in the model
+     * 
+     * @param modelProperties
+     * @param request
+     */
+    void overwriteModelProperties( Properties modelProperties, ModelBuildingRequest request );
+
 }

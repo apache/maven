@@ -26,6 +26,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,7 +104,8 @@ public class DefaultModelValidatorTest
     public void setUp()
         throws Exception
     {
-        validator = new DefaultModelValidator();
+        validator =
+            new DefaultModelValidator( new DefaultModelVersionProcessor() );
     }
 
     @AfterEach

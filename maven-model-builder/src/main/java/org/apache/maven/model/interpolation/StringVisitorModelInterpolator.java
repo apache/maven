@@ -92,9 +92,10 @@ public class StringVisitorModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
     @Inject
-    public StringVisitorModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
+    public StringVisitorModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer,
+                                           ModelVersionProcessor processor )
     {
-        super( pathTranslator, urlNormalizer );
+        super( pathTranslator, urlNormalizer, processor );
     }
 
     interface InnerInterpolator
