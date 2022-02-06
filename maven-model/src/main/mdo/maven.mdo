@@ -2834,7 +2834,12 @@
         <field>
           <name>version</name>
           <version>4.0.0+</version>
-          <description>The version of the reporting plugin to be used.</description>
+          <description>
+            <![CDATA[
+            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitely,
+            version is searched in <code>build/plugins</code> then in <code>build/pluginManagement</code>.
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
