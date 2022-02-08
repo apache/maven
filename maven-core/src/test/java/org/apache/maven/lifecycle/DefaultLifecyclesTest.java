@@ -93,8 +93,8 @@ public class DefaultLifecyclesTest
         DefaultLifecycles dl = new DefaultLifecycles( myLifecycles.stream()
                                                             .collect( Collectors.toMap( l -> l.getId(), l -> l ) ) );
 
-        assertThat( dl.getLifeCycles().get( 0 ).getId(), is( "default" ) );
-        assertThat( dl.getLifeCycles().get( 1 ).getId(), is( "clean" ) );
+        assertThat( dl.getLifeCycles().get( 0 ).getId(), is( "clean" ) );
+        assertThat( dl.getLifeCycles().get( 1 ).getId(), is( "default" ) );
         assertThat( dl.getLifeCycles().get( 2 ).getId(), is( "site" ) );
         assertThat( dl.getLifeCycles().get( 3 ).getId(), is( "wrapper" ) );
         assertThat( dl.getLifeCycles().get( 4 ).getId(), is( "etl" ) );

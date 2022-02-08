@@ -163,17 +163,6 @@ public class DefaultLifecyclePluginAnalyzer
         }
     }
 
-    private List<Lifecycle> getOrderedLifecycles()
-    {
-        // NOTE: The lifecycle order can affect implied execution ids so we better be deterministic.
-
-        List<Lifecycle> lifecycles = new ArrayList<>( defaultLifeCycles.getLifeCycles() );
-
-        lifecycles.sort( Comparator.comparing( Lifecycle::getId ) );
-
-        return lifecycles;
-    }
-
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
     {
         InputSource inputSource = new InputSource();
