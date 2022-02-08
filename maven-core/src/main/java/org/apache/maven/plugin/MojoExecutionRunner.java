@@ -22,7 +22,7 @@ package org.apache.maven.plugin;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 
 /**
- * Provides context for mojo execution. Invocation of #run will result in actual execution
+ * Provides context for mojo execution. Invocation of {@link #run(MojoExecution)} will result in actual execution
  */
 public interface MojoExecutionRunner
 {
