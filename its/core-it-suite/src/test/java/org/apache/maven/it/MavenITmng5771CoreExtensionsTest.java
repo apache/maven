@@ -98,4 +98,52 @@ public class MavenITmng5771CoreExtensionsTest
 
         server.stop();
     }
+
+    //
+    // https://issues.apache.org/jira/browse/MNG-7395: Support properties in extensions.xml
+    //
+    public void testCoreExtensionWithProperties()
+        throws Exception
+    {
+        requiresMavenVersion( "[3.8.5,)" );
+
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+
+        verifier = newVerifier( new File( testDir, "client-properties" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( "-Dtest-extension-version=0.1" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    //
+    // https://issues.apache.org/jira/browse/MNG-7395: Support properties in extensions.xml
+    //
+    public void testCoreExtensionWithConfig()
+        throws Exception
+    {
+        requiresMavenVersion( "[3.8.5,)" );
+
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+
+        verifier = newVerifier( new File( testDir, "client-config" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
 }
