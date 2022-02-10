@@ -55,7 +55,7 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     @Override
     public void describeTo( Description description )
     {
-        description.appendText("a ProjectBuildingResult with location ")
+        description.appendText( "a ProjectBuildingResult with location " )
                 .appendText( formatLocation( columnNumber, lineNumber ) );
     }
 

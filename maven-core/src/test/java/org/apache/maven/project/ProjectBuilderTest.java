@@ -108,7 +108,7 @@ public class ProjectBuilderTest
                       () -> getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
         assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage(
                 "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing" ) ) );
-        assertThat( e.getResults(), contains( projectBuildingResultWithLocation( 17, 9) ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithLocation( 17, 9 ) ) );
     }
 
     @Test

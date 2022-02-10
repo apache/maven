@@ -53,7 +53,7 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
     @Override
     public void describeTo( Description description )
     {
-        description.appendText("a ProjectBuildingResult with message ")
+        description.appendText( "a ProjectBuildingResult with message " )
                 .appendValue(problemMessage);
     }
 
