@@ -210,12 +210,6 @@ public class DefaultGraphBuilder
         selectedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
         selectedProjects.addAll( getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
 
-        // it can be empty when an optional project is missing from the reactor
-        if ( selectedProjects.isEmpty() )
-        {
-            return Collections.emptySet();
-        }
-
         return selectedProjects;
     }
 
