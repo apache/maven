@@ -43,8 +43,8 @@
   |   definition of these types
   |
 -->
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/POM/${version}"
   xml.schemaLocation="https://maven.apache.org/xsd/maven-${version}.xsd">
   <id>maven</id>
@@ -642,11 +642,11 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class xdoc.anchorName="profile_build">
       <name>BuildBase</name>
       <version>3.0.0+</version>
       <superClass>PluginConfiguration</superClass>
-      <description>Generic informations for a build.</description>
+      <description>Build configuration in a profile.</description>
       <fields>
         <field>
           <name>defaultGoal</name>
@@ -1937,12 +1937,12 @@
       </fields>
     </class>
 
-    <class>
+    <class xdoc.anchorName="deployment_repository">
       <name>DeploymentRepository</name>
       <superClass>Repository</superClass>
       <version>4.0.0+</version>
-      <description>Repository contains the information needed for deploying to the remote
-        repository.</description>
+      <description>Deployment repository contains the information needed for deploying to the remote
+        repository, which adds uniqueVersion property to usual repositories for download.</description>
       <fields>
         <field>
           <name>uniqueVersion</name>
@@ -2807,13 +2807,13 @@
     </class>
     -->
     <!-- /BuildProfile support -->
-    <class xml.tagName="plugin" java.clone="deep">
+    <class xml.tagName="plugin" xdoc.anchorName="report_plugin" java.clone="deep">
       <name>ReportPlugin</name>
       <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
-        The <code>&lt;plugin&gt;</code> element contains informations required for a report plugin.
+        The <code>&lt;plugin&gt;</code> element in <code>&lt;reporting&gt;&lt;plugins&gt;</code> contains informations required for a report plugin.
         ]]>
       </description>
       <fields>
