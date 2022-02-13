@@ -138,8 +138,10 @@ public class DefaultGraphBuilder
     {
         ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
+        List<MavenProject> allSortedProjects = projectDependencyGraph.getSortedProjects();
         activeProjects = trimProjectsToRequest( activeProjects, projectDependencyGraph, session.getRequest() );
-        activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
+        activeProjects = trimSelectedProjects(
+                activeProjects, allSortedProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimResumedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
         activeProjects = trimExcludedProjects( activeProjects, projectDependencyGraph, session.getRequest() );
 
@@ -171,8 +173,8 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
-                                                     MavenExecutionRequest request )
+    private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, List<MavenProject> allSortedProjects,
+                                                     ProjectDependencyGraph graph, MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List<MavenProject> result = projects;
@@ -183,8 +185,10 @@ public class DefaultGraphBuilder
         if ( !requiredSelectors.isEmpty() || !optionalSelectors.isEmpty() )
         {
             Set<MavenProject> selectedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
-            selectedProjects.addAll( getProjectsBySelectors( request, projects, requiredSelectors, true ) );
-            selectedProjects.addAll( getProjectsBySelectors( request, projects, optionalSelectors, false ) );
+            selectedProjects.addAll(
+                    getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
+            selectedProjects.addAll(
+                    getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
 
             // it can be empty when an optional project is missing from the reactor, fallback to returning all projects
             if ( !selectedProjects.isEmpty() )
