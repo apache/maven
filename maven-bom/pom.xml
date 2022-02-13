@@ -96,6 +96,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
         <version>${project.version}</version>
       </dependency>

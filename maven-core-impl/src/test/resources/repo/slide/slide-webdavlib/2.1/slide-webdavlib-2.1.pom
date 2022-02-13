@@ -1,0 +1,23 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>slide</groupId>
+  <artifactId>slide-webdavlib</artifactId>
+  <version>2.1</version>
+  <dependencies> 
+    <dependency> 
+      <groupId>commons-httpclient</groupId> 
+      <artifactId>commons-httpclient</artifactId> 
+      <version>2.0.2</version> 
+    </dependency> 
+    <dependency> 
+      <groupId>jdom</groupId> 
+      <artifactId>jdom</artifactId> 
+      <version>1.0</version> 
+    </dependency> 
+    <dependency> 
+      <groupId>de.zeigermann.xml</groupId> 
+      <artifactId>xml-im-exporter</artifactId> 
+      <version>1.1</version> 
+    </dependency> 
+  </dependencies> 
+</project>

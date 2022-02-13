@@ -1,0 +1,40 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>jdom</groupId>
+  <artifactId>jdom</artifactId>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.6.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.0.b2</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- should be replaced jaxen-jdom provided with jdom -->
+    <dependency>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.0-FCS</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>saxpath</groupId>
+      <artifactId>saxpath</artifactId>
+      <version>1.0-FCS</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- should be replaced by xalan.jar from jdom, their version was 2.5.D1 -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.5.0</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+</project>

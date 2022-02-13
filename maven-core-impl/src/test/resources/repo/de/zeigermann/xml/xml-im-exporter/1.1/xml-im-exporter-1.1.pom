@@ -1,0 +1,8 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.zeigermann.xml</groupId>
+  <artifactId>xml-im-exporter</artifactId>
+  <name>XML Im-/Exporter</name>
+  <version>1.1</version>
+  <url>http://xml-im-exporter.sourceforge.net</url>
+</project>
