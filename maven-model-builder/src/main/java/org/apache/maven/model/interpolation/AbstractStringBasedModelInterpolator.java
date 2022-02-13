@@ -151,15 +151,16 @@ public abstract class AbstractStringBasedModelInterpolator
 
         // Overwrite existing values in model properties. Otherwise it's not possible
         // to define the version via command line: mvn -Drevision=6.5.7 ...
-        if ( config.getSystemProperties().containsKey( REVISION_PROPERTY ) )
+        // I think this overwrite is conditional and only overwrite current projects
+        if ( config.getSystemProperties().containsKey( REVISION_PROPERTY ) && projectDir!=null )
         {
             modelProperties.put( REVISION_PROPERTY, config.getSystemProperties().get( REVISION_PROPERTY ) );
         }
-        if ( config.getSystemProperties().containsKey( CHANGELIST_PROPERTY ) )
+        if ( config.getSystemProperties().containsKey( CHANGELIST_PROPERTY ) && projectDir!=null )
         {
             modelProperties.put( CHANGELIST_PROPERTY, config.getSystemProperties().get( CHANGELIST_PROPERTY ) );
         }
-        if ( config.getSystemProperties().containsKey( SHA1_PROPERTY ) )
+        if ( config.getSystemProperties().containsKey( SHA1_PROPERTY ) && projectDir!=null )
         {
             modelProperties.put( SHA1_PROPERTY, config.getSystemProperties().get( SHA1_PROPERTY ) );
         }
