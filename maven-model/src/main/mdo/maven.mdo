@@ -1941,7 +1941,7 @@
       <name>DeploymentRepository</name>
       <superClass>Repository</superClass>
       <version>4.0.0+</version>
-      <description>Deployment Repository contains the information needed for deploying to the remote
+      <description>Deployment repository contains the information needed for deploying to the remote
         repository, which adds uniqueVersion property to usual repositories for download.</description>
       <fields>
         <field>
