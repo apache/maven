@@ -18,10 +18,11 @@
  */
 package org.apache.maven.plugin.descriptor;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.plugin.Mojo;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -51,9 +52,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
 
     private static final String DEFAULT_LANGUAGE = "java";
 
-    private List<Parameter> parameters;
-
-    private Map<String, Parameter> parameterMap;
+    private final ArrayList<Parameter> parameters;
 
     /** By default, the execution strategy is "once-per-session" */
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
@@ -91,7 +90,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     private String deprecated;
 
     /**
-     * Flags this Mojo to run it in a multi module way, i.e. aggregate the build with the set of projects listed as
+     * Flags this Mojo to run it in a multi-module way, i.e. aggregate the build with the set of projects listed as
      * modules. By default, no need to aggregate the Maven project and its child modules
      */
     private boolean aggregator = false;
@@ -140,6 +139,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
      * Default constructor.
      */
     public MojoDescriptor() {
+        this.parameters = new ArrayList<>();
         setInstantiationStrategy(DEFAULT_INSTANTIATION_STRATEGY);
         setComponentFactory(DEFAULT_LANGUAGE);
     }
@@ -177,10 +177,11 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /**
-     * @return the list of parameters
+     * @return the list of parameters copy. Any change to returned list is NOT reflected on this instance. To add
+     * parameters, use {@link #addParameter(Parameter)} method.
      */
     public List<Parameter> getParameters() {
-        return parameters;
+        return new ArrayList<>(parameters);
     }
 
     /**
@@ -188,6 +189,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
      * @throws DuplicateParameterException if any
      */
     public void setParameters(List<Parameter> parameters) throws DuplicateParameterException {
+        this.parameters.clear();
         for (Parameter parameter : parameters) {
             addParameter(parameter);
         }
@@ -198,31 +200,25 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
      * @throws DuplicateParameterException if any
      */
     public void addParameter(Parameter parameter) throws DuplicateParameterException {
-        if (parameters != null && parameters.contains(parameter)) {
+        if (parameters.contains(parameter)) {
             throw new DuplicateParameterException(parameter.getName()
                     + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
                     + getImplementation() + ")");
-        }
-
-        if (parameters == null) {
-            parameters = new LinkedList<>();
         }
 
         parameters.add(parameter);
     }
 
     /**
-     * @return the list parameters as a Map
+     * @return the list parameters as a Map (keyed by {@link Parameter#getName()}) that is built from
+     * {@link #parameters} list on each call. In other words, the map returned is built on fly and is a copy.
+     * Any change to this map is NOT reflected on list and other way around!
      */
     public Map<String, Parameter> getParameterMap() {
-        if (parameterMap == null) {
-            parameterMap = new HashMap<>();
+        LinkedHashMap<String, Parameter> parameterMap = new LinkedHashMap<>();
 
-            if (parameters != null) {
-                for (Parameter pd : parameters) {
-                    parameterMap.put(pd.getName(), pd);
-                }
-            }
+        for (Parameter pd : parameters) {
+            parameterMap.put(pd.getName(), pd);
         }
 
         return parameterMap;
@@ -321,14 +317,14 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /**
-     * @return the binded phase name of the Mojo
+     * @return the bound phase name of the Mojo
      */
     public String getPhase() {
         return phase;
     }
 
     /**
-     * @param phase the new binded phase name of the Mojo
+     * @param phase the new bound phase name of the Mojo
      */
     public void setPhase(String phase) {
         this.phase = phase;
@@ -482,45 +478,16 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
         if (object instanceof MojoDescriptor) {
             MojoDescriptor other = (MojoDescriptor) object;
 
-            if (!compareObjects(getPluginDescriptor(), other.getPluginDescriptor())) {
-                return false;
-            }
-
-            return compareObjects(getGoal(), other.getGoal());
+            return Objects.equals(getPluginDescriptor(), other.getPluginDescriptor())
+                    && Objects.equals(getGoal(), other.getGoal());
         }
 
         return false;
     }
 
-    private boolean compareObjects(Object first, Object second) {
-        if (first == second) {
-            return true;
-        }
-
-        if (first == null || second == null) {
-            return false;
-        }
-
-        return first.equals(second);
-    }
-
     /** {@inheritDoc} */
     public int hashCode() {
-        int result = 1;
-
-        String goal = getGoal();
-
-        if (goal != null) {
-            result += goal.hashCode();
-        }
-
-        PluginDescriptor pd = getPluginDescriptor();
-
-        if (pd != null) {
-            result -= pd.hashCode();
-        }
-
-        return result;
+        return Objects.hash(getGoal(), getPluginDescriptor());
     }
 
     /**
