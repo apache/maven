@@ -40,10 +40,16 @@ public interface ArtifactManager extends Service
     @Nonnull
     Optional<Path> getPath( Artifact artifact );
 
+    void setPath( Artifact artifact, Path path );
+
     @Nonnull
     Collection<Metadata> getAttachedMetadatas( Artifact artifact );
 
     void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 
-    void setPath( Artifact artifact, Path path );
+    /**
+     * Checks whether a given artifact version is considered a <code>SNAPSHOT</code> or not.
+     */
+    boolean isSnapshot( String version );
+
 }

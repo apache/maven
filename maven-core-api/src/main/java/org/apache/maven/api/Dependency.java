@@ -31,6 +31,7 @@ public interface Dependency
     @Nonnull
     Artifact getArtifact();
 
+    // TODO: make that en enum ?
     String getScope();
 
     @Nullable

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.model.Repository;
 
 public interface RepositoryFactory extends Service
 {
@@ -30,5 +31,7 @@ public interface RepositoryFactory extends Service
     LocalRepository createLocal( Path path );
 
     RemoteRepository createRemote( String id, String url );
+
+    RemoteRepository createRemote( Repository repository );
 
 }

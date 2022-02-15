@@ -23,10 +23,13 @@ import javax.annotation.Nonnull;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.RemoteRepository;
 
 /**
  * Interface to manage the project during its lifecycle
@@ -49,4 +52,26 @@ public interface ProjectManager extends Service
 
     void attachArtifact( Project project, String trim, String trim1, Path path );
 
+    List<String> getCompileSourceRoots( Project project );
+
+    void addCompileSourceRoot( Project project, String sourceRoot );
+
+    List<String> getTestCompileSourceRoots( Project project );
+
+    void addTestCompileSourceRoot( Project project, String sourceRoot );
+
+    List<RemoteRepository> getRepositories( Project project );
+
+    List<Artifact> getResolvedDependencies( Project project, ResolutionScope scope );
+
+    Node getCollectedDependencies( Project project, ResolutionScope scope );
+
+    enum ResolutionScope
+    {
+        Compile,
+        CompileRuntime,
+        Runtime,
+        RuntimeSystem,
+        Test
+    }
 }

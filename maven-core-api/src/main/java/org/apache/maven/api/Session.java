@@ -24,6 +24,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -44,6 +45,7 @@ import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Service;
 import org.apache.maven.settings.Settings;
@@ -98,6 +100,28 @@ public interface Session
      */
     @Nonnull
     Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories );
+
+    /**
+     * Register the given listener which will receive all events.
+     *
+     * @param listener the listener to register
+     */
+    void registerListener( @Nonnull Listener listener );
+
+    /**
+     * Unregisters a previously registered listener.
+     *
+     * @param listener the listener to unregister
+     */
+    void unregisterListener( @Nonnull Listener listener );
+
+    /**
+     * Returns the list of registered listeners.
+     *
+     * @return an immutable collection of listeners
+     */
+    @Nonnull
+    Collection<Listener> getListeners();
 
     /**
      * Shortcut for <code>getService(RepositoryFactory.class).createLocal(...)</code>
@@ -205,6 +229,30 @@ public interface Session
     {
         return getService( DependencyResolver.class )
                 .resolve( this, dependency, null );
+    }
+
+    default Path getPathForLocalArtifact( Artifact artifact )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForLocalArtifact( this, getLocalRepository(), artifact );
+    }
+
+    default Path getPathForLocalMetadata( Metadata metadata )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForLocalMetadata( this, getLocalRepository(), metadata );
+    }
+
+    default Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForRemoteArtifact( this, getLocalRepository(), remote, artifact );
+    }
+
+    default Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForRemoteMetadata( this, getLocalRepository(), remote, metadata );
     }
 
 }

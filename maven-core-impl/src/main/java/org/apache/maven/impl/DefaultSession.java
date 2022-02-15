@@ -31,9 +31,11 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.Listener;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.RepositoryFactory;
@@ -77,6 +79,7 @@ public class DefaultSession implements Session
     private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
     private LocalRepositoryProvider localRepositoryProvider;
+    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
 
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes
             = Collections.synchronizedMap( new WeakHashMap<>() );
@@ -260,7 +263,7 @@ public class DefaultSession implements Session
         }
         else if ( clazz == RepositoryFactory.class )
         {
-            return (T) new DefaultRepositoryFactory();
+            return (T) new DefaultRepositoryFactory( repositorySystem );
         }
         throw new NoSuchElementException( clazz.getName() );
     }
@@ -457,4 +460,22 @@ public class DefaultSession implements Session
         throw new UnsupportedOperationException( "Not implemented yet" );
     }
 
+    @Override
+    public void registerListener( @Nonnull Listener listener )
+    {
+        listeners.add( listener );
+    }
+
+    @Override
+    public void unregisterListener( @Nonnull Listener listener )
+    {
+        listeners.remove( listener );
+    }
+
+    @Nonnull
+    @Override
+    public Collection<Listener> getListeners()
+    {
+        return Collections.unmodifiableCollection( listeners );
+    }
 }

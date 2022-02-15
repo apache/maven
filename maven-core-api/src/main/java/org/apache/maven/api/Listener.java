@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -21,13 +21,11 @@ package org.apache.maven.api;
 
 import javax.annotation.Nonnull;
 
-public interface RemoteRepository extends Repository
+/**
+ * A listener for session events.
+ */
+@FunctionalInterface
+public interface Listener
 {
-
-    @Nonnull
-    String getUrl();
-
-    @Nonnull
-    String getProtocol();
-
+    void onEvent( @Nonnull Event event );
 }

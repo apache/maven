@@ -50,4 +50,18 @@ public class DefaultRemoteRepository implements RemoteRepository
     {
         return repository.getContentType();
     }
+
+    @Nonnull
+    @Override
+    public String getUrl()
+    {
+        return repository.getUrl();
+    }
+
+    @Nonnull
+    @Override
+    public String getProtocol()
+    {
+        return repository.getProtocol();
+    }
 }
