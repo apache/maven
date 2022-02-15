@@ -20,7 +20,7 @@ package org.apache.maven.api.services;
  */
 
 public class ArtifactFactoryException
-    extends RuntimeException
+    extends MavenException
 {
 
     public ArtifactFactoryException( String message )

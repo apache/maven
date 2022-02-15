@@ -24,7 +24,7 @@ package org.apache.maven.api.services;
  * dependency graph.
  */
 public class DependencyCollectorException
-    extends Exception
+    extends MavenException
 {
     /**
      *

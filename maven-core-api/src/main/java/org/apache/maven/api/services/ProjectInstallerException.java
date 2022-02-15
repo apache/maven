@@ -23,7 +23,7 @@ package org.apache.maven.api.services;
  * The Exception class in case a resolving does not work.
  */
 public class ProjectInstallerException
-    extends Exception
+    extends MavenException
 {
     /**
      * @param message The message to give.

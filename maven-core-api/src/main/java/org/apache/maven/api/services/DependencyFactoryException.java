@@ -20,7 +20,7 @@ package org.apache.maven.api.services;
  */
 
 public class DependencyFactoryException
-    extends RuntimeException
+    extends MavenException
 {
 
     public DependencyFactoryException( String message )

@@ -23,7 +23,7 @@ package org.apache.maven.api.services;
  * 
  */
 public class ArtifactInstallerException
-    extends Exception
+    extends MavenException
 {
 
     /**

@@ -24,7 +24,7 @@ package org.apache.maven.api.services;
  * 
  */
 public class ArtifactDeployerException
-    extends Exception
+    extends MavenException
 {
 
     /**

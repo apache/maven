@@ -23,7 +23,7 @@ package org.apache.maven.api.services;
  * 
  */
 public class ArtifactResolverException
-    extends Exception
+    extends MavenException
 {
 
     private static final long serialVersionUID = 7252294837746943917L;

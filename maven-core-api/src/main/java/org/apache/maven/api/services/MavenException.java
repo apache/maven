@@ -19,19 +19,29 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-/**
- * The Exception class in case a resolving does not work.
- */
-public class ProjectBuilderException
-    extends MavenException
+public class MavenException extends RuntimeException
 {
-    /**
-     * @param message The message to give.
-     * @param e The {@link Exception}.
-     */
-    public ProjectBuilderException( String message, Exception e )
+    public MavenException()
     {
-        super( message, e );
     }
 
+    public MavenException( String message )
+    {
+        super( message );
+    }
+
+    public MavenException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public MavenException( Throwable cause )
+    {
+        super( cause );
+    }
+
+    public MavenException( String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace )
+    {
+        super( message, cause, enableSuppression, writableStackTrace );
+    }
 }

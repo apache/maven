@@ -23,7 +23,7 @@ package org.apache.maven.api.services;
  * The Exception class in case a resolving does not work.
  */
 public class DependencyResolverException
-    extends Exception
+    extends MavenException
 {
     private static final long serialVersionUID = 5320065249974323888L;
 
