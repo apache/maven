@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,34 +19,23 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Project;
+import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.Metadata;
+import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Session;
 
-/**
- * Interface to manage the project during its lifecycle
- */
-public interface ProjectManager extends Service
+public interface LocalRepositoryManager extends Service
 {
-    /**
-     * Returns the path to the resolved file in the local repository
-     * if the artifact has been resolved.
-     *
-     * @return the path of the resolved artifact
-     */
-    @Nonnull
-    Optional<Path> getPath( Project project );
 
-    @Nonnull
-    Collection<Artifact> getAttachedArtifacts( Project project );
+    Path getPathForLocalArtifact( Session session, LocalRepository local, Artifact artifact );
 
-    void attachArtifact( Project project, String type, Path path );
+    Path getPathForLocalMetadata( Session session, LocalRepository local, Metadata metadata );
 
-    void attachArtifact( Project project, String trim, String trim1, Path path );
+    Path getPathForRemoteArtifact( Session session, LocalRepository local, RemoteRepository remote, Artifact artifact );
+
+    Path getPathForRemoteMetadata( Session session, LocalRepository local, RemoteRepository remote, Metadata metadata );
 
 }

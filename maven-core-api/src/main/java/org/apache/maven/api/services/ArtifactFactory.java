@@ -33,4 +33,11 @@ public interface ArtifactFactory extends Service
     {
         return create( ArtifactFactoryRequest.build( session, groupId, artifactId, version, type ) );
     }
+
+    default Artifact create( Session session, String groupId, String artifactId,
+                             String classifier, String version, String type )
+            throws ArtifactFactoryException, IllegalArgumentException
+    {
+        return create( ArtifactFactoryRequest.build( session, groupId, artifactId, classifier, version, type ) );
+    }
 }

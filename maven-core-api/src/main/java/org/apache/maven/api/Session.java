@@ -22,9 +22,11 @@ package org.apache.maven.api;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
@@ -42,7 +44,9 @@ import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Service;
+import org.apache.maven.settings.Settings;
 
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
@@ -52,10 +56,22 @@ public interface Session
 {
 
     @Nonnull
+    Settings getSettings();
+
+    @Nonnull
     LocalRepository getLocalRepository();
 
     @Nonnull
     List<RemoteRepository> getRemoteRepositories();
+
+    @Nonnull
+    SessionData getData();
+
+    @Nonnull
+    Properties getUserProperties();
+
+    @Nonnull
+    Properties getSystemProperties();
 
     /**
      * Retrieves the service for the interface
@@ -84,6 +100,15 @@ public interface Session
     Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories );
 
     /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createLocal(...)</code>
+     */
+    default LocalRepository createLocalRepository( Path path )
+            throws ArtifactFactoryException, IllegalArgumentException
+    {
+        return getService( RepositoryFactory.class ).createLocal( path );
+    }
+
+    /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      */
     default Artifact createArtifact( String groupId, String artifactId, String version, String type )
@@ -91,6 +116,16 @@ public interface Session
     {
         return getService( ArtifactFactory.class )
                 .create( this, groupId, artifactId, version, type );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     */
+    default Artifact createArtifact( String groupId, String artifactId, String classifier, String version, String type )
+            throws ArtifactFactoryException, IllegalArgumentException
+    {
+        return getService( ArtifactFactory.class )
+                .create( this, groupId, artifactId, classifier, version, type );
     }
 
     /**

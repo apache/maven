@@ -20,6 +20,7 @@ package org.apache.maven.impl;
  */
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -28,13 +29,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactMetadata;
+import org.apache.maven.api.Metadata;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
@@ -53,12 +59,13 @@ import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectDeployer;
 import org.apache.maven.api.services.ProjectInstaller;
+import org.apache.maven.settings.Settings;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
+import org.eclipse.aether.impl.LocalRepositoryProvider;
 
 public class DefaultSession implements Session
 {
@@ -69,6 +76,7 @@ public class DefaultSession implements Session
     private final List<RemoteRepository> repositories;
     private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
+    private LocalRepositoryProvider localRepositoryProvider;
 
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes
             = Collections.synchronizedMap( new WeakHashMap<>() );
@@ -112,6 +120,59 @@ public class DefaultSession implements Session
 
     @Nonnull
     @Override
+    public Settings getSettings()
+    {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public Properties getUserProperties()
+    {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public Properties getSystemProperties()
+    {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public SessionData getData()
+    {
+        org.eclipse.aether.SessionData data = session.getData();
+        return new SessionData()
+        {
+            @Override
+            public void set( @Nonnull Object key, @Nullable Object value )
+            {
+                data.set( key, value );
+            }
+            @Override
+            public boolean set( @Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue )
+            {
+                return data.set( key, oldValue, newValue );
+            }
+            @Nullable
+            @Override
+            public Object get( @Nonnull Object key )
+            {
+                return data.get( key );
+            }
+            @Nullable
+            @Override
+            public Object computeIfAbsent( @Nonnull Object key, @Nonnull Supplier<Object> supplier )
+            {
+                return data.computeIfAbsent( key, supplier );
+            }
+        };
+    }
+
+    @Nonnull
+    @Override
     public Session withLocalRepository( @Nonnull LocalRepository localRepository )
     {
         Objects.requireNonNull( localRepository, "localRepository" );
@@ -124,7 +185,7 @@ public class DefaultSession implements Session
         try
         {
             org.eclipse.aether.repository.LocalRepository repository = toRepository( localRepository );
-            LocalRepositoryManager localRepositoryManager
+            org.eclipse.aether.repository.LocalRepositoryManager localRepositoryManager
                     = localRepositoryManagerFactory.newInstance( session, repository );
 
             RepositorySystemSession newSession = new DefaultRepositorySystemSession( session )
@@ -193,12 +254,25 @@ public class DefaultSession implements Session
         {
             return (T) new DefaultProjectInstaller( repositorySystem );
         }
+        else if ( clazz == LocalRepositoryManager.class )
+        {
+            return (T) new DefaultLocalRepositoryManager();
+        }
+        else if ( clazz == RepositoryFactory.class )
+        {
+            return (T) new DefaultRepositoryFactory();
+        }
         throw new NoSuchElementException( clazz.getName() );
     }
 
     public RepositorySystemSession getSession()
     {
         return session;
+    }
+
+    public LocalRepositoryProvider getLocalRepositoryProvider()
+    {
+        return localRepositoryProvider;
     }
 
     public RemoteRepository getRemoteRepository( org.eclipse.aether.repository.RemoteRepository repository )
@@ -356,7 +430,7 @@ public class DefaultSession implements Session
         }
     }
 
-    public org.eclipse.aether.metadata.Metadata toMetadata( ArtifactMetadata metadata )
+    public org.eclipse.aether.metadata.Metadata toMetadata( Metadata metadata )
     {
         /*
         if ( metadata instanceof ProjectArtifactMetadata )

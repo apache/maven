@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactMetadata;
+import org.apache.maven.api.Metadata;
 
 public interface ArtifactManager extends Service
 {
@@ -41,6 +41,9 @@ public interface ArtifactManager extends Service
     Optional<Path> getPath( Artifact artifact );
 
     @Nonnull
-    Collection<ArtifactMetadata> getAttachedMetadatas( Artifact artifact );
+    Collection<Metadata> getAttachedMetadatas( Artifact artifact );
 
+    void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
+
+    void setPath( Artifact artifact, Path path );
 }

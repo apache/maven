@@ -53,6 +53,19 @@ public interface ArtifactFactoryRequest
                 .build();
     }
 
+    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
+                                         String classifier, String version, String type )
+    {
+        return ArtifactFactoryRequest.builder()
+                .session( session )
+                .groupId( groupId )
+                .artifactId( artifactId )
+                .classifier( classifier )
+                .version( version )
+                .type( type )
+                .build();
+    }
+
     static ArtifactFactoryRequestBuilder builder()
     {
         return new ArtifactFactoryRequestBuilder();

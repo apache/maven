@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,49 +19,23 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
-import java.nio.file.Path;
-import java.util.List;
-
-import org.apache.maven.model.Model;
-
 /**
- * Interface representing a Maven project.
+ * Toolchain interface.
  */
-public interface Project
+public interface Toolchain
 {
+    /**
+     * get the type of toolchain.
+     *
+     * @return the toolchain type
+     */
+    String getType();
 
-    @Nonnull
-    String getGroupId();
-
-    @Nonnull
-    String getArtifactId();
-
-    @Nonnull
-    String getVersion();
-
-    @Nonnull
-    String getPackaging();
-
-    @Nonnull
-    Artifact getArtifact();
-
-    @Nonnull
-    Model getModel();
-
-    @Nonnull
-    Path getPomPath();
-
-    default Path getBasedir()
-    {
-        return getPomPath().getParent();
-    }
-
-    @Nonnull
-    List<Dependency> getDependencies();
-
-    @Nonnull
-    List<Dependency> getManagedDependencies();
-
+    /**
+     * Gets the platform tool executable.
+     *
+     * @param toolName the tool platform independent tool name.
+     * @return file representing the tool executable, or null if the tool can not be found
+     */
+    String findTool( String toolName );
 }

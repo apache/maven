@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.api.services;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,49 +19,15 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
-import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.Toolchain;
 
-/**
- * Interface representing a Maven project.
- */
-public interface Project
+public interface ToolchainManager extends Service
 {
+    List<Toolchain> getToolchains( Session session, String jdk, Map<String, String> jdkToolchain );
 
-    @Nonnull
-    String getGroupId();
-
-    @Nonnull
-    String getArtifactId();
-
-    @Nonnull
-    String getVersion();
-
-    @Nonnull
-    String getPackaging();
-
-    @Nonnull
-    Artifact getArtifact();
-
-    @Nonnull
-    Model getModel();
-
-    @Nonnull
-    Path getPomPath();
-
-    default Path getBasedir()
-    {
-        return getPomPath().getParent();
-    }
-
-    @Nonnull
-    List<Dependency> getDependencies();
-
-    @Nonnull
-    List<Dependency> getManagedDependencies();
-
+    Toolchain getToolchainFromBuildContext( Session session, String jdk );
 }

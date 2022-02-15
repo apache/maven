@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,34 +19,16 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Optional;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Project;
+import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.RemoteRepository;
 
-/**
- * Interface to manage the project during its lifecycle
- */
-public interface ProjectManager extends Service
+public interface RepositoryFactory extends Service
 {
-    /**
-     * Returns the path to the resolved file in the local repository
-     * if the artifact has been resolved.
-     *
-     * @return the path of the resolved artifact
-     */
-    @Nonnull
-    Optional<Path> getPath( Project project );
 
-    @Nonnull
-    Collection<Artifact> getAttachedArtifacts( Project project );
+    LocalRepository createLocal( Path path );
 
-    void attachArtifact( Project project, String type, Path path );
-
-    void attachArtifact( Project project, String trim, String trim1, Path path );
+    RemoteRepository createRemote( String id, String url );
 
 }

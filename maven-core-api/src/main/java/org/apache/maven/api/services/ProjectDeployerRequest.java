@@ -38,20 +38,12 @@ public interface ProjectDeployerRequest
 
     int getRetryFailedDeploymentCount();
 
-//    @Nonnull
-//    Optional<String> getAltDeploymentRepository();
-
-//    @Nonnull
-//    Optional<String> getAltSnapshotDeploymentRepository();
-
-//    @Nonnull
-//    Optional<String> getAltReleaseDeploymentRepository();
-
-    static ProjectDeployerRequest build( Session session, Project project )
+    static ProjectDeployerRequest build( Session session, Project project, RemoteRepository repository )
     {
         return builder()
                 .session( session )
                 .project( project )
+                .repository( repository )
                 .build();
     }
 

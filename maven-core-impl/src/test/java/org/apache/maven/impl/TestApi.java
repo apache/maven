@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 
 import javax.inject.Inject;
 
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.apache.maven.api.Project;
@@ -29,6 +30,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -75,6 +77,7 @@ public class TestApi
                 new RemoteRepository.Builder( "mirror", "default",
                         "file:target/test-classes/repo" ).build() );
         this.session = session
+                .withLocalRepository( session.getService( RepositoryFactory.class ).createLocal( Paths.get( "target/repo" ) ) )
                 .withLocalRepository( localRepository )
                 .withRemoteRepositories( Collections.singletonList( remoteRepository ) );
     }

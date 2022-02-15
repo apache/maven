@@ -19,6 +19,6 @@ package org.apache.maven.api;
  * under the License.
  */
 
-public interface RepositoryMetadata extends ArtifactMetadata
+public interface RepositoryMetadata extends Metadata
 {
 }

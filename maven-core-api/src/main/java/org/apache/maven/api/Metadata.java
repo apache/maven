@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,49 +19,20 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
-import java.nio.file.Path;
-import java.util.List;
-
-import org.apache.maven.model.Model;
-
-/**
- * Interface representing a Maven project.
- */
-public interface Project
+public interface Metadata
 {
 
-    @Nonnull
     String getGroupId();
 
-    @Nonnull
     String getArtifactId();
 
-    @Nonnull
     String getVersion();
 
-    @Nonnull
-    String getPackaging();
-
-    @Nonnull
-    Artifact getArtifact();
-
-    @Nonnull
-    Model getModel();
-
-    @Nonnull
-    Path getPomPath();
-
-    default Path getBasedir()
+    enum Storage
     {
-        return getPomPath().getParent();
+        Group, Artifact, Version
     }
 
-    @Nonnull
-    List<Dependency> getDependencies();
-
-    @Nonnull
-    List<Dependency> getManagedDependencies();
+    Storage getStorage();
 
 }

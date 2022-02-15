@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,6 +19,26 @@ package org.apache.maven.api;
  * under the License.
  */
 
-public interface ArtifactMetadata
+import java.nio.file.Path;
+
+import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.services.RepositoryFactory;
+
+public class DefaultRepositoryFactory implements RepositoryFactory
 {
+
+    @Override
+    public LocalRepository createLocal( Path path )
+    {
+        return new DefaultLocalRepository( new org.eclipse.aether.repository.LocalRepository( "target/repo" ) );
+    }
+
+    @Override
+    public RemoteRepository createRemote( String id, String url )
+    {
+        return new DefaultRemoteRepository(
+                new org.eclipse.aether.repository.RemoteRepository.Builder( id, "", url )
+                        .build() );
+    }
 }

@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Project;
 
@@ -60,9 +61,9 @@ public interface ProjectDeployer extends Service
     void deploy( ProjectDeployerRequest request )
         throws ProjectDeployerException, IllegalArgumentException;
 
-    default void deploy( Session session, Project project )
+    default void deploy( Session session, Project project, RemoteRepository repository )
             throws ProjectDeployerException, IllegalArgumentException
     {
-        deploy( ProjectDeployerRequest.build( session, project ) );
+        deploy( ProjectDeployerRequest.build( session, project, repository ) );
     }
 }
