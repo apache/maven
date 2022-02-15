@@ -19,6 +19,10 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import javax.annotation.Nonnull;
+
+import java.util.Optional;
+
 /**
  * Event
  */
@@ -54,6 +58,7 @@ public interface Event
      *
      * @return The type of the event, never {@code null}.
      */
+    @Nonnull
     Type getType();
 
     /**
@@ -61,28 +66,30 @@ public interface Event
      *
      * @return The current session, never {@code null}.
      */
+    @Nonnull
     Session getSession();
 
     /**
      * Gets the current project (if any).
      *
-     * @return The current project or {@code null} if not applicable.
+     * @return The current project or {@code empty()} if not applicable.
      */
-    Project getProject();
+    @Nonnull
+    Optional<Project> getProject();
 
     /**
      * Gets the current mojo execution (if any).
      *
-     * @return The current mojo execution or {@code null} if not applicable.
-     * TODO: return MojoExecution
+     * @return The current mojo execution or {@code empty()} if not applicable.
      */
-    Object getMojoExecution();
+    @Nonnull
+    Optional<MojoExecution> getMojoExecution();
 
     /**
      * Gets the exception that caused the event (if any).
      *
-     * @return The exception or {@code null} if none.
+     * @return The exception or {@code empty()} if none.
      */
-    Exception getException();
+    Optional<Exception> getException();
 
 }

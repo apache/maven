@@ -20,7 +20,6 @@ package org.apache.maven.impl;
  */
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
@@ -37,14 +36,16 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager
     public Path getPathForLocalArtifact( Session session, LocalRepository local, Artifact artifact )
     {
         DefaultSession s = (DefaultSession) session;
-        return Paths.get( getManager( s, local ).getPathForLocalArtifact( s.toArtifact( artifact ) ) );
+        String path = getManager( s, local ).getPathForLocalArtifact( s.toArtifact( artifact ) );
+        return local.getPath().resolve( path );
     }
 
     @Override
     public Path getPathForLocalMetadata( Session session, LocalRepository local, Metadata metadata )
     {
         DefaultSession s = (DefaultSession) session;
-        return Paths.get( getManager( s, local ).getPathForLocalMetadata( s.toMetadata( metadata ) ) );
+        String path = getManager( s, local ).getPathForLocalMetadata( s.toMetadata( metadata ) );
+        return local.getPath().resolve( path );
     }
 
     @Override
@@ -52,8 +53,9 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager
                                           RemoteRepository remote, Artifact artifact )
     {
         DefaultSession s = (DefaultSession) session;
-        return Paths.get( getManager( s, local ).getPathForRemoteArtifact(
-                s.toArtifact( artifact ), s.toRepository( remote ), null ) );
+        String path = getManager( s, local ).getPathForRemoteArtifact(
+                s.toArtifact( artifact ), s.toRepository( remote ), null );
+        return local.getPath().resolve( path );
     }
 
     @Override
@@ -61,8 +63,9 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager
                                           RemoteRepository remote, Metadata metadata )
     {
         DefaultSession s = (DefaultSession) session;
-        return Paths.get( getManager( s, local ).getPathForRemoteMetadata(
-                s.toMetadata( metadata ), s.toRepository( remote ), null ) );
+        String path = getManager( s, local ).getPathForRemoteMetadata(
+                s.toMetadata( metadata ), s.toRepository( remote ), null );
+        return local.getPath().resolve( path );
     }
 
     private org.eclipse.aether.repository.LocalRepositoryManager getManager(

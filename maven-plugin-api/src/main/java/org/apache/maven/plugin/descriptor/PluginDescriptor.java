@@ -19,7 +19,8 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
@@ -29,19 +30,18 @@ import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Jason van Zyl
@@ -259,8 +259,7 @@ public class PluginDescriptor
     {
         if ( artifactMap == null )
         {
-            artifactMap = getArtifacts().stream()
-                    .collect( Collectors.toMap(  a -> a.getGroupId() + ":" + a.getArtifactId(), a -> a ) );
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
 
         return artifactMap;
@@ -398,17 +397,17 @@ public class PluginDescriptor
     private InputStream getDescriptorStream( String descriptor )
         throws IOException
     {
-        Path pluginFile = ( pluginArtifact != null ) ? pluginArtifact.getPath().orElse( null ) : null;
+        File pluginFile = ( pluginArtifact != null ) ? pluginArtifact.getFile() : null;
         if ( pluginFile == null )
         {
             throw new IllegalStateException( "plugin main artifact has not been resolved for " + getId() );
         }
 
-        if ( Files.isRegularFile( pluginFile ) )
+        if ( pluginFile.isFile() )
         {
             try
             {
-                return new URL( "jar:" + pluginFile.toUri() + "!/" + descriptor ).openStream();
+                return new URL( "jar:" + pluginFile.toURI() + "!/" + descriptor ).openStream();
             }
             catch ( MalformedURLException e )
             {
@@ -417,7 +416,7 @@ public class PluginDescriptor
         }
         else
         {
-            return Files.newInputStream( pluginFile.resolve( descriptor ) );
+            return new FileInputStream( new File( pluginFile, descriptor ) );
         }
     }
 
