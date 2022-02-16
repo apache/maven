@@ -601,14 +601,15 @@ public class LegacyRepositorySystem
                 if ( auth != null )
                 {
                     repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
-                    AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
-                    Authentication result =
-                        new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
-                                            authCtx.get( AuthenticationContext.PASSWORD ) );
-                    result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
-                    result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
-                    authCtx.close();
+                    try ( AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo ) )
+                    {
+                        Authentication result =
+                                new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
+                                        authCtx.get( AuthenticationContext.PASSWORD ) );
+                        result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
+                        result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
                     return result;
+                    }
                 }
             }
         }
@@ -717,12 +718,13 @@ public class LegacyRepositorySystem
                     if ( proxy.getAuthentication() != null )
                     {
                         repo = new RemoteRepository.Builder( repo ).setProxy( proxy ).build();
-                        AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
-                        p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
-                        p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
-                        p.setNtlmDomain( authCtx.get( AuthenticationContext.NTLM_DOMAIN ) );
-                        p.setNtlmHost( authCtx.get( AuthenticationContext.NTLM_WORKSTATION ) );
-                        authCtx.close();
+                        try ( AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo ) )
+                        {
+                            p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
+                            p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
+                            p.setNtlmDomain( authCtx.get( AuthenticationContext.NTLM_DOMAIN ) );
+                            p.setNtlmHost( authCtx.get( AuthenticationContext.NTLM_WORKSTATION ) );
+                        }
                     }
                     return p;
                 }
