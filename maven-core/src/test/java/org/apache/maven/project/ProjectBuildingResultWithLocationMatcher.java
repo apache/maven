@@ -34,7 +34,8 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     private final int columnNumber;
     private final int lineNumber;
 
-    ProjectBuildingResultWithLocationMatcher( int columnNumber, int lineNumber ) {
+    ProjectBuildingResultWithLocationMatcher( int columnNumber, int lineNumber )
+    {
         this.columnNumber = columnNumber;
         this.lineNumber = lineNumber;
     }
@@ -42,7 +43,8 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     @Override
     public boolean matches( Object o )
     {
-        if ( !( o instanceof ProjectBuildingResult ) ) {
+        if ( !( o instanceof ProjectBuildingResult ) )
+        {
             return false;
         }
 
@@ -67,7 +69,8 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     @Override
     public void describeMismatch(final Object o, final Description description)
     {
-        if ( !( o instanceof ProjectBuildingResult ) ) {
+        if ( !( o instanceof ProjectBuildingResult ) )
+        {
             super.describeMismatch( o, description );
         }
         else
@@ -81,7 +84,8 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
         }
     }
 
-    static Matcher<ProjectBuildingResult> projectBuildingResultWithLocation( int columnNumber, int lineNumber ) {
+    static Matcher<ProjectBuildingResult> projectBuildingResultWithLocation( int columnNumber, int lineNumber )
+    {
         return new ProjectBuildingResultWithLocationMatcher( columnNumber, lineNumber );
     }
 }

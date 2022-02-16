@@ -40,7 +40,8 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
     @Override
     public boolean matches( Object o )
     {
-        if ( !( o instanceof ProjectBuildingResult ) ) {
+        if ( !( o instanceof ProjectBuildingResult ) )
+        {
             return false;
         }
 
@@ -60,7 +61,8 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
     @Override
     public void describeMismatch(final Object o, final Description description)
     {
-        if ( !( o instanceof ProjectBuildingResult ) ) {
+        if ( !( o instanceof ProjectBuildingResult ) )
+        {
             super.describeMismatch( o, description );
         }
         else
@@ -75,7 +77,8 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
         }
     }
 
-    static Matcher<ProjectBuildingResult> projectBuildingResultWithProblemMessage( String message ) {
+    static Matcher<ProjectBuildingResult> projectBuildingResultWithProblemMessage( String message )
+    {
         return new ProjectBuildingResultWithProblemMessageMatcher( message );
     }
 }
