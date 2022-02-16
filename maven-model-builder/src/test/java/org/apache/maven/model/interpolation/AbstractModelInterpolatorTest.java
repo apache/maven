@@ -512,12 +512,13 @@ public abstract class AbstractModelInterpolatorTest
     }
 
     @Test
-    public void shouldFailWhenPomPrefixIsUsed() throws Exception
+    public void shouldIgnorePropertiesWithPomPrefix() throws Exception
     {
-        String orgName = "MyCo";
+        final String orgName = "MyCo";
+        final String expectedName = "${pom.organization.name} Tools";
 
         Model model = new Model();
-        model.setName( "${pom.organization.name} Tools" );
+        model.setName( expectedName );
 
         Organization org = new Organization();
         org.setName( orgName );
@@ -529,8 +530,8 @@ public abstract class AbstractModelInterpolatorTest
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ),
                 collector );
 
-        assertCollectorState( 0, 1, 0, collector );
-        assertEquals( out.getName(), model.getName() );
+        assertCollectorState( 0, 0, 0, collector );
+        assertEquals( out.getName(), expectedName );
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

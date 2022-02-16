@@ -21,8 +21,8 @@ package org.apache.maven.model.interpolation;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -59,7 +59,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
     public static final String REVISION_PROPERTY = "revision";
 
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
+    private static final List<String> PROJECT_PREFIXES = Collections.singletonList( "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
@@ -100,13 +100,6 @@ public abstract class AbstractStringBasedModelInterpolator
         Properties modelProperties = model.getProperties();
 
         ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
-        if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
-        {
-            projectPrefixValueSource =
-                    new ProblemDetectingValueSource( projectPrefixValueSource, "pom.", "project.", problems,
-                            ModelProblem.Severity.ERROR );
-        }
-
         ValueSource prefixlessObjectBasedValueSource = new ObjectBasedValueSource( model );
         if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
