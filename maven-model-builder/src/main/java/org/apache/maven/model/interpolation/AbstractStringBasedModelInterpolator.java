@@ -31,7 +31,6 @@ import javax.inject.Inject;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
@@ -104,8 +103,7 @@ public abstract class AbstractStringBasedModelInterpolator
         if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
             prefixlessObjectBasedValueSource =
-                    new ProblemDetectingValueSource( prefixlessObjectBasedValueSource, "", "project.", problems,
-                            ModelProblem.Severity.WARNING );
+                    new ProblemDetectingValueSource( prefixlessObjectBasedValueSource, "", "project.", problems );
         }
 
         // NOTE: Order counts here!
@@ -187,7 +185,7 @@ public abstract class AbstractStringBasedModelInterpolator
         if ( projectDir != null )
         {
             processors.add( new PathTranslatingPostProcessor( PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
-                    projectDir, pathTranslator ) );
+                                                              projectDir, pathTranslator ) );
         }
         processors.add( new UrlNormalizingPostProcessor( urlNormalizer ) );
         return processors;
