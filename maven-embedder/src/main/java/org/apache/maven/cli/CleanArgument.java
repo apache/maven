@@ -54,8 +54,6 @@ public class CleanArgument
             // this has to be a separate "if" statement, to capture the case of: "-Dfoo=bar"
             if ( addedToBuffer && arg.endsWith( "\"" ) )
             {
-                String cleanArgPart = arg.substring( 0, arg.length() - 1 );
-
                 // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
                 currentArg.setLength( currentArg.length() - 1 );
 
