@@ -15,13 +15,13 @@
   </properties>
 
   <modules>
-    <module>new-dep</module>
     <module>new-dep-dep</module>
-    <module>new-plugin</module>
-    <module>new-plugin-dep</module>
+    <module>new-dep</module>
     <module>old-dep-dep</module>
-    <module>old-dep</module>
     <module>old-plugin-dep</module>
+    <module>new-plugin-dep</module>
+    <module>new-plugin</module>
+    <module>old-dep</module>
     <module>old-plugin</module>
   </modules>
 </project>
