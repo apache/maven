@@ -141,6 +141,14 @@ under the License.
                 }
             }
 
+            for ( SnapshotVersion version : versioning.getSnapshotVersions() )
+            {
+                if ( !v.getSnapshotVersions().contains( version ) )
+                {
+                    changed = true;
+                    v.getSnapshotVersions().add( version );
+                }
+            }
             if ( "null".equals( versioning.getLastUpdated() ) )
             {
                 versioning.setLastUpdated( null );
