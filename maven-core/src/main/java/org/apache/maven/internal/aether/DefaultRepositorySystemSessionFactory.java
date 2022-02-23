@@ -19,10 +19,12 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -48,6 +50,7 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.ConfigurationProperties;
@@ -61,8 +64,9 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
-import org.eclipse.aether.transform.FileTransformer;
+import org.eclipse.aether.transform.ArtifactTransformer;
 import org.eclipse.aether.transform.TransformException;
+import org.eclipse.aether.transform.TransformedArtifact;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
@@ -291,39 +295,53 @@ public class DefaultRepositorySystemSessionFactory
         return props.getProperty( "version", "unknown-version" );
     }
 
-    private Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact,
-                                                                    final SessionData sessionData )
+    private Collection<ArtifactTransformer> getTransformersForArtifact( final Artifact artifact,
+                                                                        final SessionData sessionData )
     {
         TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
-        Collection<FileTransformer> transformers = new ArrayList<>();
 
         // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle.
         if ( "pom".equals( artifact.getExtension() ) && context != null )
         {
-            transformers.add( new FileTransformer()
+            return Collections.singletonList( new ArtifactTransformer()
             {
                 @Override
-                public InputStream transformData( File pomFile )
-                    throws IOException, TransformException
+                public TransformedArtifact transformArtifact( Artifact artifact ) throws TransformException, IOException
                 {
                     try
                     {
-                        return new ConsumerModelSourceTransformer().transform( pomFile.toPath(), context );
+                        File target = Files.createTempFile( "transformer", "pom" ).toFile();
+                        try ( InputStream inputStream = new ConsumerModelSourceTransformer()
+                                .transform( artifact.getFile().toPath(), context );
+                              OutputStream outputStream = new BufferedOutputStream(
+                                      Files.newOutputStream( target.toPath() ) ) )
+                        {
+                            IOUtil.copy( inputStream, outputStream );
+                        }
+                        Artifact transformed = artifact.setFile( target );
+                        return new TransformedArtifact()
+                        {
+                            @Override
+                            public Artifact getArtifact()
+                            {
+                                return transformed;
+                            }
+
+                            @Override
+                            public void close() throws IOException
+                            {
+                                Files.deleteIfExists( target.toPath() );
+                            }
+                        };
                     }
                     catch ( XmlPullParserException e )
                     {
                         throw new TransformException( e );
                     }
                 }
-
-                @Override
-                public Artifact transformArtifact( Artifact artifact )
-                {
-                    return artifact;
-                }
             } );
         }
-        return Collections.unmodifiableCollection( transformers );
+        return Collections.emptyList();
     }
 
 }
