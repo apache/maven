@@ -49,8 +49,8 @@ import org.junit.runners.model.Statement;
 
 /**
  * {@link TestRule} for usage with Junit-4.10ff. This is just a wrapper for an embedded 
- * {@link AbstractMojoTestCase}, so all <tt>protected</tt> methods of the TestCase are 
- * exhibited as <tt>public</tt> in the rule. You may annotate single tests methods with 
+ * {@link AbstractMojoTestCase}, so all <code>protected</code> methods of the TestCase are
+ * exhibited as <code>public</code> in the rule. You may annotate single tests methods with
  * {@link WithoutMojo} to prevent the rule from firing.
  *
  * @author Mirko Friedenhagen

@@ -72,7 +72,7 @@ public class TestResources
     /**
      * Creates new clean copy of test project directory structure. The copy is named after both the test being executed
      * and test project name, which allows the same test project can be used by multiple tests and by different
-     * instances of the same parametrized tests.<br/>
+     * instances of the same parametrized tests.<br>
      * TODO Provide alternative working directory naming for Windows, which still limits path names to ~250 charecters
      */
     public File getBasedir( String project )

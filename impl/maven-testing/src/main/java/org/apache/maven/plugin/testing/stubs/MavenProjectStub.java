@@ -1356,8 +1356,6 @@ public class MavenProjectStub
 
     /**
      * By default, do nothing.
-     *
-     * @see org.apache.maven.project.MavenProject#addPlugin(org.apache.maven.model.Plugin)
      */
     public void addPlugin( Plugin plugin )
     {
