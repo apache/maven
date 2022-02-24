@@ -19,6 +19,8 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import java.util.Map;
+
 /**
  * Toolchain interface.
  */
@@ -38,4 +40,12 @@ public interface Toolchain
      * @return file representing the tool executable, or null if the tool can not be found
      */
     String findTool( String toolName );
+
+    /**
+     * Let the toolchain decide if it matches requirements defined
+     * in the toolchain plugin configuration.
+     * @param requirements Map&lt;String, String&gt; key value pair, may not be {@code null}
+     * @return {@code true} if the requirements match, otherwise {@code false}
+     */
+    boolean matchesRequirements( Map<String, String> requirements );
 }

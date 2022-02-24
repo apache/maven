@@ -22,6 +22,7 @@ package org.apache.maven.toolchain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,13 +78,17 @@ public class DefaultToolchainManagerPrivate
             {
                 for ( ToolchainModel toolchainModel : availableToolchains )
                 {
-                    toRet.add( fact.createToolchain( toolchainModel ) );
+                    ToolchainPrivate tool = fact.createToolchain( toolchainModel );
+                    if ( tool != null && Objects.equals( type, tool.getType() ) )
+                    {
+                        toRet.add( tool );
+                    }
                 }
             }
 
             // add default toolchain
             ToolchainPrivate tool = fact.createDefaultToolchain();
-            if ( tool != null )
+            if ( tool != null && Objects.equals( type, tool.getType() ) )
             {
                 toRet.add( tool );
             }

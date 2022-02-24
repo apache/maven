@@ -26,7 +26,7 @@
     <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-core-api-impl</artifactId>
+  <artifactId>maven-core-impl</artifactId>
   <name>Apache Maven Core API Implementation</name>
 
   <dependencies>

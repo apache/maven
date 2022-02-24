@@ -64,4 +64,8 @@ public interface Project
     @Nonnull
     List<Dependency> getManagedDependencies();
 
+    default String getId()
+    {
+        return getModel().getId();
+    }
 }

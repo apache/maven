@@ -25,6 +25,9 @@ import javax.annotation.concurrent.Immutable;
 import java.nio.file.Path;
 import java.util.Optional;
 
+/**
+ * TODO: split between Coordinates / AttachedArtifact / ResolvedArtifact
+ */
 @Immutable
 public interface Artifact
 {
@@ -46,6 +49,14 @@ public interface Artifact
     String getArtifactId();
 
     /**
+     * The classifier of the artifact.
+     *
+     * @return The classifier or an empty string if none, never {@code null}.
+     */
+    @Nonnull
+    String getClassifier();
+
+    /**
      * The version of the artifact.
      *
      * @return The version.
@@ -54,7 +65,7 @@ public interface Artifact
     String getVersion();
 
     /**
-     * The file-extension of the artifact.
+     * The file extension of the artifact.
      *
      * @return The extension.
      */
@@ -62,16 +73,8 @@ public interface Artifact
     String getExtension();
 
     /**
-     * The classifier of the artifact.
-     *
-     * @return The classifier.
-     */
-    @Nonnull
-    String getClassifier();
-
-    /**
      * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the {@link #getVersion()}, the
-     * base version will always refer to the unresolved meta version.
+     * base version will always refer to the unresolved version.
      *
      * @return The base version, never {@code null}.
      */
@@ -93,5 +96,17 @@ public interface Artifact
      */
     @Nonnull
     Optional<Path> getPath();
+
+    /**
+     * Unique id identifying this artifact
+     */
+    default String getId()
+    {
+        return getGroupId()
+                + ":" + getArtifactId()
+                + ":" + getExtension()
+                + ( getClassifier().isEmpty() ? "" : ":" + getClassifier() )
+                + ":" + getBaseVersion();
+    }
 
 }

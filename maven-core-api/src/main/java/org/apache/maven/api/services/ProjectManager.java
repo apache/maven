@@ -48,9 +48,12 @@ public interface ProjectManager extends Service
     @Nonnull
     Collection<Artifact> getAttachedArtifacts( Project project );
 
-    void attachArtifact( Project project, String type, Path path );
+    default void attachArtifact( Project project, String type, Path path )
+    {
+        attachArtifact( project, type, "", path );
+    }
 
-    void attachArtifact( Project project, String trim, String trim1, Path path );
+    void attachArtifact( Project project, String type, String classifier, Path path );
 
     List<String> getCompileSourceRoots( Project project );
 

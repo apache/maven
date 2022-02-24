@@ -129,6 +129,7 @@ public class DefaultProject implements Project
                         dependency.getVersion(), dependency.getType() );
             }
 
+            @Nonnull
             @Override
             public String getScope()
             {

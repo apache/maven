@@ -27,4 +27,10 @@ public interface MojoExecution
 {
     @Nonnull
     Plugin getPlugin();
+
+    @Nonnull
+    String getExecutionId();
+
+    @Nonnull
+    String getGoal();
 }

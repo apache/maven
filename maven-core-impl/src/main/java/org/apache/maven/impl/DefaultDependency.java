@@ -53,6 +53,7 @@ public class DefaultDependency implements Dependency
         return session.getArtifact( dependency.getArtifact() );
     }
 
+    @Nonnull
     @Override
     public String getScope()
     {

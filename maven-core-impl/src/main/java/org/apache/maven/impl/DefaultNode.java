@@ -20,12 +20,14 @@ package org.apache.maven.impl;
  */
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Repository;
 
 public class DefaultNode implements Node
@@ -66,15 +68,10 @@ public class DefaultNode implements Node
     }
 
     @Override
-    public Boolean getOptional()
+    public Optional<RemoteRepository> getRepository()
     {
-        return node.getDependency().getOptional();
-    }
-
-    @Override
-    public String getScope()
-    {
-        return node.getDependency().getScope();
+        // TODO
+        throw new UnsupportedOperationException( "Not implemented yet" );
     }
 
     @Override

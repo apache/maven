@@ -33,6 +33,7 @@ import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -65,12 +66,16 @@ public class TestApi
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
 
+    @Inject
+    DefaultToolchainManagerPrivate toolchainManagerPrivate;
+
     @BeforeEach
     void setup()
     {
         RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
         DefaultSession session = new DefaultSession( rss, repositorySystem, localRepositoryManagerFactory,
-                                                     Collections.emptyList(), projectBuilder, mavenRepositorySystem );
+                                                     Collections.emptyList(), projectBuilder, mavenRepositorySystem,
+                                                     toolchainManagerPrivate );
         DefaultLocalRepository localRepository = new DefaultLocalRepository(
                 new LocalRepository( "target/repo" ) );
         org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(

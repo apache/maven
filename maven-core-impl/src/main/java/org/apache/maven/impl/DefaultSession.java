@@ -48,8 +48,10 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -62,6 +64,7 @@ import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectDeployer;
 import org.apache.maven.api.services.ProjectInstaller;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -78,6 +81,7 @@ public class DefaultSession implements Session
     private final List<RemoteRepository> repositories;
     private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
+    private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private LocalRepositoryProvider localRepositoryProvider;
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -97,7 +101,8 @@ public class DefaultSession implements Session
                            @Nonnull LocalRepositoryManagerFactory localRepositoryManagerFactory,
                            @Nonnull List<RemoteRepository> repositories,
                            @Nonnull org.apache.maven.project.ProjectBuilder projectBuilder,
-                           @Nonnull MavenRepositorySystem mavenRepositorySystem )
+                           @Nonnull MavenRepositorySystem mavenRepositorySystem,
+                           @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate )
     {
         this.session = Objects.requireNonNull( session );
         this.repositorySystem = Objects.requireNonNull( repositorySystem );
@@ -105,6 +110,12 @@ public class DefaultSession implements Session
         this.repositories = Objects.requireNonNull( repositories );
         this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
+        this.toolchainManagerPrivate = toolchainManagerPrivate;
+    }
+
+    MavenSession getMavenSession()
+    {
+        return null;
     }
 
     @Nonnull
@@ -195,7 +206,7 @@ public class DefaultSession implements Session
                     .setLocalRepositoryManager( localRepositoryManager );
 
             return new DefaultSession( newSession, repositorySystem, localRepositoryManagerFactory,
-                                       repositories, projectBuilder, mavenRepositorySystem );
+                                       repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
         }
         catch ( NoLocalRepositoryManagerException e )
         {
@@ -209,7 +220,7 @@ public class DefaultSession implements Session
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
         return new DefaultSession( session, repositorySystem, localRepositoryManagerFactory,
-                                   repositories, projectBuilder, mavenRepositorySystem );
+                                   repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
     }
 
     @Nonnull
@@ -264,6 +275,10 @@ public class DefaultSession implements Session
         else if ( clazz == RepositoryFactory.class )
         {
             return (T) new DefaultRepositoryFactory( repositorySystem );
+        }
+        else if ( clazz == ToolchainManager.class )
+        {
+            return (T) new DefaultToolchainManager( toolchainManagerPrivate );
         }
         throw new NoSuchElementException( clazz.getName() );
     }
@@ -478,4 +493,5 @@ public class DefaultSession implements Session
     {
         return Collections.unmodifiableCollection( listeners );
     }
+
 }

@@ -42,6 +42,8 @@ public interface ArtifactDeployerRequest
     @Nonnull
     Collection<Artifact> getArtifacts();
 
+    int getRetryFailedDeploymentCount();
+
     @Nonnull
     static ArtifactDeployerRequestBuilder builder()
     {
@@ -63,6 +65,7 @@ public interface ArtifactDeployerRequest
         Session session;
         RemoteRepository repository;
         Collection<Artifact> artifacts;
+        int retryFailedDeploymentCount;
 
         @Nonnull
         public ArtifactDeployerRequestBuilder session( Session session )
@@ -84,10 +87,16 @@ public interface ArtifactDeployerRequest
             return this;
         }
 
+        public ArtifactDeployerRequestBuilder retryFailedDeploymentCount( int retryFailedDeploymentCount )
+        {
+            this.retryFailedDeploymentCount = retryFailedDeploymentCount;
+            return this;
+        }
+
         @Nonnull
         public ArtifactDeployerRequest build()
         {
-            return new DefaultArtifactDeployerRequest( session, repository, artifacts );
+            return new DefaultArtifactDeployerRequest( session, repository, artifacts, retryFailedDeploymentCount );
         }
 
         private static class DefaultArtifactDeployerRequest extends BaseRequest
@@ -96,14 +105,17 @@ public interface ArtifactDeployerRequest
 
             private final RemoteRepository repository;
             private final Collection<Artifact> artifacts;
+            private final int retryFailedDeploymentCount;
 
             DefaultArtifactDeployerRequest( @Nonnull Session session,
                                             @Nonnull RemoteRepository repository,
-                                            @Nonnull Collection<Artifact> artifacts )
+                                            @Nonnull Collection<Artifact> artifacts,
+                                            int retryFailedDeploymentCount )
             {
                 super( session );
                 this.repository = requireNonNull( repository, "repository" );
                 this.artifacts = unmodifiable( artifacts, "artifacts" );
+                this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 
             @Nonnull
@@ -118,6 +130,12 @@ public interface ArtifactDeployerRequest
             public Collection<Artifact> getArtifacts()
             {
                 return artifacts;
+            }
+
+            @Override
+            public int getRetryFailedDeploymentCount()
+            {
+                return retryFailedDeploymentCount;
             }
         }
 

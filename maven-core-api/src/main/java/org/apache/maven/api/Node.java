@@ -22,14 +22,12 @@ package org.apache.maven.api;
 import javax.annotation.concurrent.Immutable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
  * Represents a dependency node within a Maven project's dependency collector.
- *
- * @author Pim Moerenhout
- * @since 0.12
  */
 @Immutable
 public interface Node
@@ -57,14 +55,9 @@ public interface Node
     List<Repository> getRemoteRepositories();
 
     /**
-     * @return true for an optional dependency.
+     * The repository where this artifact has been downloaded from.
      */
-    Boolean getOptional();
-
-    /**
-     * @return The scope on the dependency.
-     */
-    String getScope();
+    Optional<RemoteRepository> getRepository();
 
     /**
      * Traverses this node and potentially its children using the specified visitor.

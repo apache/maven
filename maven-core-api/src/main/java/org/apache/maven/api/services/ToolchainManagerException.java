@@ -19,23 +19,19 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.maven.api.Session;
-import org.apache.maven.api.Toolchain;
-
-public interface ToolchainManager extends Service
+/**
+ * The Exception class in case a resolving does not work.
+ */
+public class ToolchainManagerException
+    extends MavenException
 {
-    List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements )
-            throws ToolchainManagerException;
+    /**
+     * @param message The message to give.
+     * @param e The {@link Exception}.
+     */
+    public ToolchainManagerException( String message, Exception e )
+    {
+        super( message, e );
+    }
 
-    Toolchain getToolchainFromBuildContext( Session session, String type )
-            throws ToolchainManagerException;
-
-    List<Toolchain> getToolchainsForType( Session session, String type )
-            throws ToolchainManagerException;
-
-    void storeToolchainToBuildContext( Session session, Toolchain toolchain )
-            throws ToolchainManagerException;
 }

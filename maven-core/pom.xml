@@ -219,7 +219,7 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <version>1.1.0</version>
+          <version>2.0.0</version>
           <!-- This is a required attribute and is intentionally left empty -->
           <models></models>
         </configuration>
