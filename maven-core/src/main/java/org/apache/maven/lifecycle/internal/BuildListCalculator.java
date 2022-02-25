@@ -57,10 +57,18 @@ public class BuildListCalculator
             }
             for ( MavenProject project : projects )
             {
-                BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
-                MavenSession copiedSession = session.clone();
-                copiedSession.setCurrentProject( project );
-                projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
+                ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                try
+                {
+                    BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
+                    MavenSession copiedSession = session.clone();
+                    copiedSession.setCurrentProject( project );
+                    projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
+                }
+                finally
+                {
+                    Thread.currentThread().setContextClassLoader( ccl );
+                }
             }
         }
         return new ProjectBuildList( projectBuilds );
