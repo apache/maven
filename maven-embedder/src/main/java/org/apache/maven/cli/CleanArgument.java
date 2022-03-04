@@ -54,32 +54,12 @@ public class CleanArgument
             // this has to be a separate "if" statement, to capture the case of: "-Dfoo=bar"
             if ( addedToBuffer && arg.endsWith( "\"" ) )
             {
-                String cleanArgPart = arg.substring( 0, arg.length() - 1 );
+                // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
+                currentArg.setLength( currentArg.length() - 1 );
 
-                // if we're building an argument, keep doing so.
-                if ( currentArg != null )
-                {
-                    // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
-                    if ( addedToBuffer )
-                    {
-                        currentArg.setLength( currentArg.length() - 1 );
-                    }
-                    // otherwise, we trim the trailing " and append to the buffer.
-                    else
-                    {
-                        // TODO introducing a space here...not sure what else to do but collapse whitespace
-                        currentArg.append( ' ' ).append( cleanArgPart );
-                    }
-
-                    cleaned.add( currentArg.toString() );
-                }
-                else
-                {
-                    cleaned.add( cleanArgPart );
-                }
+                cleaned.add( currentArg.toString() );
 
                 currentArg = null;
-                addedToBuffer = false;
                 continue;
             }
 

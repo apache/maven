@@ -47,10 +47,7 @@ public class SettingsBuildingException
         super( toMessage( problems ) );
 
         this.problems = new ArrayList<>();
-        if ( problems != null )
-        {
-            this.problems.addAll( problems );
-        }
+        this.problems.addAll( problems );
     }
 
     /**
