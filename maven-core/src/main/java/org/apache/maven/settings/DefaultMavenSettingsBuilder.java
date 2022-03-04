@@ -147,12 +147,8 @@ public class DefaultMavenSettingsBuilder
             // ---------------------------------------------------------------------------------
             // path = path.replaceAll( "//", "/" );
 
-            return new File( path ).getAbsoluteFile();
         }
-        else
-        {
-            return new File( path ).getAbsoluteFile();
-        }
+        return new File( path ).getAbsoluteFile();
     }
 
 }
