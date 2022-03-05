@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.8.5</version>
+  <version>3.8.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -76,7 +76,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
-    <project.build.outputTimestamp>2022-03-05T11:30:01Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-03-05T11:41:15Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
