@@ -24,7 +24,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
     <relativePath />
   </parent>
 
