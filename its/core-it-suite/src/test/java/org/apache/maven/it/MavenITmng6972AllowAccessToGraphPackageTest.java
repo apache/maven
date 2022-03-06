@@ -32,7 +32,7 @@ public class MavenITmng6972AllowAccessToGraphPackageTest
 
     public MavenITmng6972AllowAccessToGraphPackageTest()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.9.0,)" );
     }
 
     public void testit()
