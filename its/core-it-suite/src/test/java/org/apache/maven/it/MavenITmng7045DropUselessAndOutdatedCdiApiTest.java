@@ -31,7 +31,7 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest
 
     public MavenITmng7045DropUselessAndOutdatedCdiApiTest()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.8.3,)" );
     }
 
     @Test
