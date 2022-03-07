@@ -200,7 +200,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "session".equals( expression ) )
         {
-            value = session;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = session.getSession();
+            }
+            else
+            {
+                value = session;
+            }
         }
         else if ( expression.startsWith( "session" ) )
         {

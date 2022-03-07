@@ -79,8 +79,10 @@ public class DefaultToolchainManagerPrivateTest
         when( session.getRequest() ).thenReturn( req );
 
         ToolchainPrivate basicToolchain = mock( ToolchainPrivate.class );
+        when( basicToolchain.getType() ).thenReturn( "basic" );
         when( toolchainFactory_basicType.createDefaultToolchain() ).thenReturn( basicToolchain );
         ToolchainPrivate rareToolchain = mock( ToolchainPrivate.class );
+        when( rareToolchain.getType() ).thenReturn( "rare" );
         when( toolchainFactory_rareType.createDefaultToolchain() ).thenReturn( rareToolchain );
 
         // execute
@@ -101,8 +103,10 @@ public class DefaultToolchainManagerPrivateTest
         when( session.getRequest() ).thenReturn( req );
 
         ToolchainPrivate basicToolchain = mock( ToolchainPrivate.class );
+        when( basicToolchain.getType() ).thenReturn( "basic" );
         when( toolchainFactory_basicType.createDefaultToolchain() ).thenReturn( basicToolchain );
         ToolchainPrivate rareToolchain = mock( ToolchainPrivate.class );
+        when( rareToolchain.getType() ).thenReturn( "rare" );
         when( toolchainFactory_rareType.createDefaultToolchain() ).thenReturn( rareToolchain );
 
         // execute
@@ -124,18 +128,25 @@ public class DefaultToolchainManagerPrivateTest
         Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<>();
         req.setToolchains( groupedToolchains );
 
+        ToolchainPrivate basicToolchain = mock( ToolchainPrivate.class );
+        when( basicToolchain.getType() ).thenReturn( "basic" );
+        ToolchainPrivate rareToolchain = mock( ToolchainPrivate.class );
+        when( rareToolchain.getType() ).thenReturn( "rare" );
+
         List<ToolchainModel> basicToolchains = new ArrayList<>();
         ToolchainModel basicToolchainModel = new ToolchainModel();
         basicToolchainModel.setType( "basic" );
         basicToolchains.add( basicToolchainModel );
         basicToolchains.add( basicToolchainModel );
         groupedToolchains.put( "basic", basicToolchains );
+        when( toolchainFactory_basicType.createToolchain( basicToolchainModel ) ).thenReturn( basicToolchain );
 
         List<ToolchainModel> rareToolchains = new ArrayList<>();
         ToolchainModel rareToolchainModel = new ToolchainModel();
         rareToolchainModel.setType( "rare" );
         rareToolchains.add( rareToolchainModel );
         groupedToolchains.put( "rare", rareToolchains );
+        when( toolchainFactory_rareType.createToolchain( rareToolchainModel ) ).thenReturn( rareToolchain );
 
         // execute
         ToolchainPrivate[] toolchains = toolchainManager.getToolchainsForType( "basic", session );

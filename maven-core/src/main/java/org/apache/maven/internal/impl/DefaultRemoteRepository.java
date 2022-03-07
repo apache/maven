@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.internal.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -21,53 +21,47 @@ package org.apache.maven.api;
 
 import javax.annotation.Nonnull;
 
-import java.nio.file.Path;
-import java.util.List;
+import org.apache.maven.api.RemoteRepository;
 
-import org.apache.maven.model.Model;
-
-/**
- * Interface representing a Maven project.
- */
-public interface Project
+public class DefaultRemoteRepository implements RemoteRepository
 {
+    private final org.eclipse.aether.repository.RemoteRepository repository;
 
-    @Nonnull
-    String getGroupId();
-
-    @Nonnull
-    String getArtifactId();
-
-    @Nonnull
-    String getVersion();
-
-    @Nonnull
-    String getPackaging();
-
-    @Nonnull
-    Artifact getArtifact();
-
-    @Nonnull
-    Model getModel();
-
-    @Nonnull
-    Path getPomPath();
-
-    default Path getBasedir()
+    public DefaultRemoteRepository( org.eclipse.aether.repository.RemoteRepository repository )
     {
-        return getPomPath().getParent();
+        this.repository = repository;
+    }
+
+    public org.eclipse.aether.repository.RemoteRepository getRepository()
+    {
+        return repository;
     }
 
     @Nonnull
-    List<Dependency> getDependencies();
-
-    @Nonnull
-    List<Dependency> getManagedDependencies();
-
-    default String getId()
+    @Override
+    public String getId()
     {
-        return getModel().getId();
+        return repository.getId();
     }
 
-    boolean isExecutionRoot();
+    @Nonnull
+    @Override
+    public String getType()
+    {
+        return repository.getContentType();
+    }
+
+    @Nonnull
+    @Override
+    public String getUrl()
+    {
+        return repository.getUrl();
+    }
+
+    @Nonnull
+    @Override
+    public String getProtocol()
+    {
+        return repository.getProtocol();
+    }
 }

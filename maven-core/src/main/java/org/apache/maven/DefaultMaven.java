@@ -19,6 +19,7 @@ package org.apache.maven;
  * under the License.
  */
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -32,6 +33,7 @@ import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -107,6 +109,8 @@ public class DefaultMaven
 
     private final SuperPomProvider superPomProvider;
 
+    private final DefaultSessionFactory defaultSessionFactory;
+
     @Inject
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultMaven(
@@ -120,7 +124,8 @@ public class DefaultMaven
             @Named( GraphBuilder.HINT ) GraphBuilder graphBuilder,
             BuildResumptionAnalyzer buildResumptionAnalyzer,
             BuildResumptionDataRepository buildResumptionDataRepository,
-            SuperPomProvider superPomProvider )
+            SuperPomProvider superPomProvider,
+            DefaultSessionFactory defaultSessionFactory )
     {
         this.projectBuilder = projectBuilder;
         this.lifecycleStarter = lifecycleStarter;
@@ -133,6 +138,7 @@ public class DefaultMaven
         this.buildResumptionAnalyzer = buildResumptionAnalyzer;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
+        this.defaultSessionFactory = defaultSessionFactory;
     }
 
     @Override
@@ -224,8 +230,10 @@ public class DefaultMaven
             DefaultRepositorySystemSession repoSession =
                 (DefaultRepositorySystemSession) newRepositorySession( request );
             MavenSession session = new MavenSession( container, repoSession, request, result );
+            session.setSession( defaultSessionFactory.getSession( session ) );
 
             sessionScope.seed( MavenSession.class, session );
+            sessionScope.seed( Session.class, session.getSession() );
 
             legacySupport.setSession( session );
 

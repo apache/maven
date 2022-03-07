@@ -30,6 +30,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Session;
 
 /**
  * Interface to manage the project during its lifecycle
@@ -48,12 +49,19 @@ public interface ProjectManager extends Service
     @Nonnull
     Collection<Artifact> getAttachedArtifacts( Project project );
 
-    default void attachArtifact( Project project, String type, Path path )
+    default void attachArtifact( Session session, Project project, String type, Path path )
     {
-        attachArtifact( project, type, "", path );
+        attachArtifact( session, project, type, "", path );
     }
 
-    void attachArtifact( Project project, String type, String classifier, Path path );
+    default void attachArtifact( Session session, Project project, String type, String classifier, Path path )
+    {
+        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    classifier, project.getVersion(), type );
+        attachArtifact( project, artifact, path );
+    }
+
+    void attachArtifact( Project project, Artifact artifact, Path path );
 
     List<String> getCompileSourceRoots( Project project );
 

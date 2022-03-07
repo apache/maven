@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -42,17 +41,17 @@ public class MojoExecutionEvent
 
     private final MojoExecution mojoExecution;
 
-    private final Mojo mojo;
+    private final Object mojo;
 
     private final Throwable cause;
 
-    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo )
+    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution, Object mojo )
     {
         this( session, project, mojoExecution, mojo, null );
     }
 
-    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo,
-                               Throwable cause )
+    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution,
+                               Object mojo, Throwable cause )
     {
         this.session = session;
         this.project = project;
@@ -76,7 +75,7 @@ public class MojoExecutionEvent
         return mojoExecution;
     }
 
-    public Mojo getMojo()
+    public Object getMojo()
     {
         return mojo;
     }

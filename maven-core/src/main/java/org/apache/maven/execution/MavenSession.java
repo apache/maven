@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -297,6 +298,8 @@ public class MavenSession
 
     private final Settings settings;
 
+    private Session session;
+
     @Deprecated
     /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap()
@@ -439,5 +442,14 @@ public class MavenSession
         return container.lookupMap( role );
     }
 
+    public Session getSession()
+    {
+        return session;
+    }
+
+    public void setSession( Session session )
+    {
+        this.session = session;
+    }
     /*end[MAVEN4]*/
 }

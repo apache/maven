@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -94,6 +95,7 @@ public class LifecycleModuleBuilder
         {
             sessionScope.enter();
             sessionScope.seed( MavenSession.class, session );
+            sessionScope.seed( Session.class, session.getSession() );
         }
         try
         {

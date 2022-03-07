@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.internal.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,55 +19,30 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-
-import java.nio.file.Path;
+import java.util.AbstractList;
 import java.util.List;
+import java.util.function.Function;
 
-import org.apache.maven.model.Model;
-
-/**
- * Interface representing a Maven project.
- */
-public interface Project
+public  class MappedList<U, V> extends AbstractList<U>
 {
+    private final List<V> list;
+    private final Function<V, U> mapper;
 
-    @Nonnull
-    String getGroupId();
-
-    @Nonnull
-    String getArtifactId();
-
-    @Nonnull
-    String getVersion();
-
-    @Nonnull
-    String getPackaging();
-
-    @Nonnull
-    Artifact getArtifact();
-
-    @Nonnull
-    Model getModel();
-
-    @Nonnull
-    Path getPomPath();
-
-    default Path getBasedir()
+    public MappedList( List<V> list, Function<V, U> mapper )
     {
-        return getPomPath().getParent();
+        this.list = list;
+        this.mapper = mapper;
     }
 
-    @Nonnull
-    List<Dependency> getDependencies();
-
-    @Nonnull
-    List<Dependency> getManagedDependencies();
-
-    default String getId()
+    @Override
+    public U get( int index )
     {
-        return getModel().getId();
+        return mapper.apply( list.get( index ) );
     }
 
-    boolean isExecutionRoot();
+    @Override
+    public int size()
+    {
+        return list.size();
+    }
 }

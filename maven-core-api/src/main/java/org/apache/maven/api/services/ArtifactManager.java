@@ -32,18 +32,19 @@ public interface ArtifactManager extends Service
 {
 
     /**
-     * Returns the path to the resolved file in the local repository
-     * if the artifact has been resolved.
-     *
-     * @return the path of the resolved artifact
+     * Returns the path of the file previously associated to this artifact
+     * or <code>Optional.empty()</code> if no path has been associated.
      */
     @Nonnull
-    Optional<Path> getPath( Artifact artifact );
+    Optional<Path> getPath( @Nonnull Artifact artifact );
 
-    void setPath( Artifact artifact, Path path );
+    /**
+     * Associates the given file path to the artifact.
+     */
+    void setPath( @Nonnull Artifact artifact, Path path );
 
     @Nonnull
-    Collection<Metadata> getAttachedMetadatas( Artifact artifact );
+    Collection<Metadata> getAttachedMetadatas( @Nonnull Artifact artifact );
 
     void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 

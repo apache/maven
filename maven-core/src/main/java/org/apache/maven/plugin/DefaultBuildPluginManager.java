@@ -97,7 +97,7 @@ public class DefaultBuildPluginManager
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        Mojo mojo = null;
+        Object mojo = null;
 
         ClassRealm pluginRealm;
         try
@@ -121,7 +121,15 @@ public class DefaultBuildPluginManager
             scope.seed( MavenProject.class, project );
             scope.seed( MojoExecution.class, mojoExecution );
 
-            mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
+            if ( mojoDescriptor.isV4Api() )
+            {
+                mojo = mavenPluginManager.getConfiguredMojo(
+                        org.apache.maven.api.plugin.Mojo.class, session, mojoExecution );
+            }
+            else
+            {
+                mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
+            }
 
             legacySupport.setSession( session );
 
@@ -134,7 +142,14 @@ public class DefaultBuildPluginManager
 
                 mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
 
-                mojo.execute();
+                if ( mojoDescriptor.isV4Api() )
+                {
+                    ( ( org.apache.maven.api.plugin.Mojo ) mojo ).execute();
+                }
+                else
+                {
+                    ( ( Mojo ) mojo ).execute();
+                }
 
                 mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
             }
@@ -150,15 +165,15 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
 
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -172,8 +187,8 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -187,8 +202,8 @@ public class DefaultBuildPluginManager
         }
         catch ( ClassCastException e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
