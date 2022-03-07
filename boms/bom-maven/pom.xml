@@ -22,52 +22,22 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-parent</artifactId>
-    <version>35</version>
-    <relativePath />
+    <groupId>org.apache.maven.boms</groupId>
+    <artifactId>boms</artifactId>
+    <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-1-SNAPSHOT</version>
+  <artifactId>bom-maven</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Dependencies BOM</name>
-  <description>Bill Of Materials for Apache Maven dependencies</description>
-  <url>https://maven.apache.org/ref/${project.version}/${project.artifactId}</url>
-
-  <properties>
-    <maven.site.path>ref/4-LATEST/${project.artifactId}</maven.site.path>
-  </properties>
-
-  <scm>
-    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://github.com/apache/maven/tree/${project.scm.tag}/${project.artifactId}</url>
-    <tag>master</tag>
-  </scm>
-  <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MNG</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
-  </ciManagement>
-  <distributionManagement>
-    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
-    <site>
-      <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
-    </site>
-  </distributionManagement>
+  <name>Maven BOM</name>
+  <description>Bill Of Materials for Maven itself</description>
 
   <dependencyManagement>
     <!-- Not included:
          - apache-maven, as it delivers the binaries
          - maven-compat, only used by apache-maven distributions to support older releases
-         - maven-slf4j-provider, only used by apache-maven distributions
-         - maven-wrapper, only used by apache-maven-wrapper distributions -->
+         - maven-slf4j-provider, only used by apache-maven distributions -->
     <dependencies>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -146,15 +116,4 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <topSiteURL>${project.distributionManagement.site.url}/..</topSiteURL>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

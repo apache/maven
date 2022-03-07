@@ -21,41 +21,40 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven.boms</groupId>
+    <artifactId>boms</artifactId>
     <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-builder-support</artifactId>
+  <artifactId>bom-wagon</artifactId>
+  <packaging>pom</packaging>
 
-  <name>Maven Builder Support</name>
-  <description>Support for descriptor builders (model, setting, toolchains)</description>
+  <name>Maven Wagon BOM</name>
+  <description>Bill Of Materials for Wagon</description>
+
+  <properties>
+    <wagonVersion>3.5.1</wagonVersion>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.apache.maven.boms</groupId>
-        <artifactId>bom-all</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-file</artifactId>
+        <version>${wagonVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-http</artifactId>
+        <version>${wagonVersion}</version>
+        <classifier>shaded</classifier>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
 </project>

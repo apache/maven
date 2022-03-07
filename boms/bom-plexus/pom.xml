@@ -21,41 +21,52 @@ under the License.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven.boms</groupId>
+    <artifactId>boms</artifactId>
     <version>4.0.0-alpha-1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-builder-support</artifactId>
+  <artifactId>bom-plexus</artifactId>
+  <packaging>pom</packaging>
 
-  <name>Maven Builder Support</name>
-  <description>Support for descriptor builders (model, setting, toolchains)</description>
+  <name>Maven Plexus BOM</name>
+  <description>Bill Of Materials for Plexus</description>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.apache.maven.boms</groupId>
-        <artifactId>bom-all</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-shared-utils</artifactId>
+        <version>3.3.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-interpolation</artifactId>
+        <version>1.26</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-sec-dispatcher</artifactId>
+        <version>2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-cipher</artifactId>
+        <version>2.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-testing</artifactId>
+        <version>1.0.0</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
 </project>
