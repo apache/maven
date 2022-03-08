@@ -51,7 +51,8 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public Optional<Path> getPath( @Nonnull Artifact artifact )
     {
-        return Optional.ofNullable( paths.get( artifact ) );
+        Path path = paths.get( artifact );
+        return path != null ? Optional.of( path ) : artifact.getPath();
     }
 
     @Override

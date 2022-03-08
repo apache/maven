@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -243,7 +244,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "project".equals( expression ) )
         {
-            value = project;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( (DefaultSession) session.getSession() ).getProject( project );
+            }
+            else
+            {
+                value = project;
+            }
         }
         else if ( "executedProject".equals( expression ) )
         {

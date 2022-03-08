@@ -22,6 +22,7 @@ package org.apache.maven.internal.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -82,7 +83,7 @@ public class DefaultSession implements Session
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final ArtifactManager artifactManager = new DefaultArtifactManager();
-    private final ProjectManager projectManager = new DefaultProjectManager();
+    private final ProjectManager projectManager = new DefaultProjectManager( artifactManager );
 
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes
             = Collections.synchronizedMap( new WeakHashMap<>() );
@@ -424,22 +425,24 @@ public class DefaultSession implements Session
 
     public org.eclipse.aether.artifact.Artifact toArtifact( Artifact artifact )
     {
+        File file = getService( ArtifactManager.class ).getPath( artifact ).map( Path::toFile ).orElse( null );
         if ( artifact instanceof DefaultArtifact )
         {
-            return ( ( DefaultArtifact ) artifact ).getArtifact();
+            org.eclipse.aether.artifact.Artifact a = ( (DefaultArtifact) artifact ).getArtifact();
+            if ( Objects.equals( file, a.getFile() ) )
+            {
+                return a;
+            }
         }
-        else
-        {
-            return new org.eclipse.aether.artifact.DefaultArtifact(
-                    artifact.getGroupId(),
-                    artifact.getArtifactId(),
-                    artifact.getClassifier(),
-                    artifact.getExtension(),
-                    artifact.getVersion(),
-                    null,
-                    getService( ArtifactManager.class ).getPath( artifact ).map( Path::toFile ).orElse( null )
-            );
-        }
+        return new org.eclipse.aether.artifact.DefaultArtifact(
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getClassifier(),
+                artifact.getExtension(),
+                artifact.getVersion(),
+                null,
+                file
+        );
     }
 
     public org.eclipse.aether.metadata.Metadata toMetadata( Metadata metadata )

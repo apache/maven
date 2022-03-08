@@ -70,8 +70,12 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager
     private org.eclipse.aether.repository.LocalRepositoryManager getManager(
             DefaultSession session, LocalRepository local )
     {
-        return session.getRepositorySystem()
-                .newLocalRepositoryManager( session.getSession(), session.toRepository( local ) );
+        org.eclipse.aether.repository.LocalRepository repository = session.toRepository( local );
+        if ( "enhanced".equals( repository.getContentType() ) )
+        {
+            repository = new org.eclipse.aether.repository.LocalRepository( repository.getBasedir(), "" );
+        }
+        return session.getRepositorySystem().newLocalRepositoryManager( session.getSession(), repository );
     }
 
 }

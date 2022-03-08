@@ -43,9 +43,15 @@ public interface ArtifactManager extends Service
      */
     void setPath( @Nonnull Artifact artifact, Path path );
 
+    /**
+     * TODO: investigate removing the Metadata api completely
+     */
     @Nonnull
     Collection<Metadata> getAttachedMetadatas( @Nonnull Artifact artifact );
 
+    /**
+     * TODO: investigate removing the Metadata api completely
+     */
     void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 
     /**

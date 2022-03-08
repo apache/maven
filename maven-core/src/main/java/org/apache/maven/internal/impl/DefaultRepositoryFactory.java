@@ -26,6 +26,7 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.model.Repository;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.RepositoryPolicy;
 
 public class DefaultRepositoryFactory implements RepositoryFactory
 {
@@ -47,7 +48,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory
     public RemoteRepository createRemote( String id, String url )
     {
         return new DefaultRemoteRepository(
-                new org.eclipse.aether.repository.RemoteRepository.Builder( id, "", url )
+                new org.eclipse.aether.repository.RemoteRepository.Builder( id, "default", url )
                         .build() );
     }
 
@@ -67,8 +68,8 @@ public class DefaultRepositoryFactory implements RepositoryFactory
             org.apache.maven.model.RepositoryPolicy policy )
     {
         boolean enabled = true;
-        String updatePolicy = null;
-        String checksumPolicy = null;
+        String updatePolicy = RepositoryPolicy.UPDATE_POLICY_DAILY;
+        String checksumPolicy = RepositoryPolicy.CHECKSUM_POLICY_FAIL;
         if ( policy != null )
         {
             enabled = policy.isEnabled();
@@ -81,6 +82,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory
                 checksumPolicy = policy.getChecksumPolicy();
             }
         }
-        return new org.eclipse.aether.repository.RepositoryPolicy( enabled, updatePolicy, checksumPolicy );
+        return new org.eclipse.aether.repository.RepositoryPolicy(
+                enabled, updatePolicy, checksumPolicy );
     }
 }

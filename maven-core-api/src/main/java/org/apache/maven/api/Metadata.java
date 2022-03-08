@@ -19,6 +19,9 @@ package org.apache.maven.api;
  * under the License.
  */
 
+/**
+ * TODO: investigate removing the Metadata api completely
+ */
 public interface Metadata
 {
 
