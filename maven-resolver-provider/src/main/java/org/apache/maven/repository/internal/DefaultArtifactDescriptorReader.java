@@ -83,6 +83,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final ArtifactResolver artifactResolver;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
+    private final ModelCacheFactory modelCacheFactory;
 
     @Inject
     public DefaultArtifactDescriptorReader(
@@ -91,7 +92,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             VersionRangeResolver versionRangeResolver,
             ArtifactResolver artifactResolver,
             ModelBuilder modelBuilder,
-            RepositoryEventDispatcher repositoryEventDispatcher )
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            ModelCacheFactory modelCacheFactory )
     {
         this.remoteRepositoryManager = Objects.requireNonNull( remoteRepositoryManager,
                 "remoteRepositoryManager cannot be null" );
@@ -102,6 +104,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         this.modelBuilder = Objects.requireNonNull( modelBuilder, "modelBuilder cannot be null" );
         this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
                 "repositoryEventDispatcher cannot be null" );
+        this.modelCacheFactory = Objects.requireNonNull( modelCacheFactory,
+                "modelCacheFactory cannot be null" );
     }
 
     public ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session,
@@ -218,7 +222,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 modelRequest.setTwoPhaseBuilding( false );
                 modelRequest.setSystemProperties( toProperties( session.getSystemProperties() ) );
                 modelRequest.setUserProperties( toProperties( session.getUserProperties() ) );
-                modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
+                modelRequest.setModelCache( modelCacheFactory.createCache( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
                                                                          request.getRequestContext(), artifactResolver,
                                                                          versionRangeResolver, remoteRepositoryManager,
