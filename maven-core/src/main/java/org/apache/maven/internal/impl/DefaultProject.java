@@ -22,6 +22,7 @@ package org.apache.maven.internal.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +47,16 @@ public class DefaultProject implements Project
     {
         this.session = session;
         this.project = project;
+    }
+
+    public DefaultSession getSession()
+    {
+        return session;
+    }
+
+    public MavenProject getProject()
+    {
+        return project;
     }
 
     @Nonnull
@@ -94,7 +105,8 @@ public class DefaultProject implements Project
     @Override
     public Path getPomPath()
     {
-        return project.getFile().toPath();
+        File file = project.getFile();
+        return file != null ? file.toPath() : null;
     }
 
     @Nonnull

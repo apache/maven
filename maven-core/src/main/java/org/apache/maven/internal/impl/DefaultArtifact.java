@@ -98,4 +98,31 @@ public class DefaultArtifact implements Artifact
     {
         return Optional.ofNullable( artifact.getFile() ).map( File::toPath );
     }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+        DefaultArtifact that = (DefaultArtifact) o;
+        return artifact.equals( that.artifact );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash( artifact );
+    }
+
+    @Override
+    public String toString()
+    {
+        return artifact.toString();
+    }
 }

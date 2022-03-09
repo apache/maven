@@ -50,12 +50,19 @@ public interface Project
     @Nonnull
     Model getModel();
 
-    @Nonnull
+    /**
+     * Returns the path to the pom file for this project.
+     * A project is usually read from the file system and this will point to
+     * the file.  In some cases, a transient project can be created which
+     * will not point to an actual pom file.
+     * @return the path of the pom
+     */
     Path getPomPath();
 
     default Path getBasedir()
     {
-        return getPomPath().getParent();
+        Path pomPath = getPomPath();
+        return pomPath != null ? pomPath.getParent() : null;
     }
 
     @Nonnull

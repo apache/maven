@@ -25,11 +25,10 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
@@ -40,10 +39,6 @@ import org.apache.maven.api.services.ProjectManager;
 public class DefaultProjectManager implements ProjectManager
 {
 
-    private final Map<Project, Path> paths = new ConcurrentHashMap<>();
-    private final Map<Project, Collection<Artifact>> attachedArtifacts = new ConcurrentHashMap<>();
-    private final Map<Project, List<String>> compileSourceRoots = new ConcurrentHashMap<>();
-    private final Map<Project, List<String>> testCompileSourceRoots = new ConcurrentHashMap<>();
     private final ArtifactManager artifactManager;
 
     public DefaultProjectManager( ArtifactManager artifactManager )
@@ -55,51 +50,55 @@ public class DefaultProjectManager implements ProjectManager
     @Override
     public Optional<Path> getPath( Project project )
     {
-        return Optional.ofNullable( paths.get( project ) );
+        throw new UnsupportedOperationException();
     }
 
     @Nonnull
     @Override
     public Collection<Artifact> getAttachedArtifacts( Project project )
     {
-        Collection<Artifact> attached = attachedArtifacts.get( project );
-        return attached != null ? Collections.unmodifiableCollection( attached ) : Collections.emptyList();
+        DefaultSession session = ( (DefaultProject ) project ).getSession();
+        Collection<Artifact> attached = ( ( DefaultProject ) project ).getProject().getAttachedArtifacts().stream()
+                .map( RepositoryUtils::toArtifact )
+                .map( session::getArtifact )
+                .collect( Collectors.toList() );
+        return Collections.unmodifiableCollection( attached );
     }
 
     @Override
     public void attachArtifact( Project project, Artifact artifact, Path path )
     {
-        attachedArtifacts.computeIfAbsent( project, p -> new CopyOnWriteArrayList<>() )
-                .add( artifact );
+        ( ( DefaultProject ) project ).getProject().addAttachedArtifact(
+                RepositoryUtils.toArtifact( ( ( DefaultProject ) project ).getSession().toArtifact( artifact ) ) );
         artifactManager.setPath( artifact, path );
     }
 
     @Override
     public List<String> getCompileSourceRoots( Project project )
     {
-        List<String> roots = compileSourceRoots.get( project );
-        return roots != null ? Collections.unmodifiableList( roots ) : Collections.emptyList();
+        List<String> roots = ( ( DefaultProject ) project ).getProject().getCompileSourceRoots();
+        return Collections.unmodifiableList( roots );
     }
 
     @Override
     public void addCompileSourceRoot( Project project, String sourceRoot )
     {
-        compileSourceRoots.computeIfAbsent( project, p -> new CopyOnWriteArrayList<>() )
-                .add( sourceRoot );
+        List<String> roots = ( ( DefaultProject ) project ).getProject().getCompileSourceRoots();
+        roots.add( sourceRoot );
     }
 
     @Override
     public List<String> getTestCompileSourceRoots( Project project )
     {
-        List<String> roots = testCompileSourceRoots.get( project );
-        return roots != null ? Collections.unmodifiableList( roots ) : Collections.emptyList();
+        List<String> roots = ( ( DefaultProject ) project ).getProject().getTestCompileSourceRoots();
+        return Collections.unmodifiableList( roots );
     }
 
     @Override
     public void addTestCompileSourceRoot( Project project, String sourceRoot )
     {
-        testCompileSourceRoots.computeIfAbsent( project, p -> new CopyOnWriteArrayList<>() )
-                .add( sourceRoot );
+        List<String> roots = ( ( DefaultProject ) project ).getProject().getTestCompileSourceRoots();
+        roots.add( sourceRoot );
     }
 
     @Override

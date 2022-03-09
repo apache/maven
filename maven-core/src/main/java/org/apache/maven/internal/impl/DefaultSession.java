@@ -91,7 +91,7 @@ public class DefaultSession implements Session
             = Collections.synchronizedMap( new WeakHashMap<>() );
     private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories
             = Collections.synchronizedMap( new WeakHashMap<>() );
-    private final Map<MavenProject, Project> allProjects
+    private final Map<String, Project> allProjects
             = Collections.synchronizedMap( new WeakHashMap<>() );
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies
             = Collections.synchronizedMap( new WeakHashMap<>() );
@@ -310,7 +310,7 @@ public class DefaultSession implements Session
 
     public Project getProject( MavenProject project )
     {
-        return allProjects.computeIfAbsent( project, p -> new DefaultProject( this, p ) );
+        return allProjects.computeIfAbsent( project.getId(), id -> new DefaultProject( this, project ) );
     }
 
     public List<org.eclipse.aether.repository.RemoteRepository> toRepositories( List<RemoteRepository> repositories )
