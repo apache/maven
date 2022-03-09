@@ -128,7 +128,8 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
-            .setSystemProperties( executionProperties );
+            .setSystemProperties( executionProperties )
+            .setUserProperties( new Properties() );
 
         List<MavenProject> projects = new ArrayList<>();
 

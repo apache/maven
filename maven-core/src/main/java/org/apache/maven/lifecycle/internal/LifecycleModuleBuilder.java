@@ -89,8 +89,12 @@ public class LifecycleModuleBuilder
 
         // session may be different from rootSession seeded in DefaultMaven
         // explicitly seed the right session here to make sure it is used by Guice
-        sessionScope.enter( reactorContext.getSessionScopeMemento() );
-        sessionScope.seed( MavenSession.class, session );
+        final boolean scoped = session != rootSession;
+        if ( scoped )
+        {
+            sessionScope.enter();
+            sessionScope.seed( MavenSession.class, session );
+        }
         try
         {
 
@@ -144,7 +148,10 @@ public class LifecycleModuleBuilder
         }
         finally
         {
-            sessionScope.exit();
+            if ( scoped )
+            {
+                sessionScope.exit();
+            }
 
             session.setCurrentProject( null );
 

@@ -27,6 +27,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
+/**
+ * {@code rar} artifact handler provider.
+ */
 @Named( "rar" )
 @Singleton
 public class RarArtifactHandlerProvider

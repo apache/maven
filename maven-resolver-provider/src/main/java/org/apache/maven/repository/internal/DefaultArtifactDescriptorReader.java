@@ -220,8 +220,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 modelRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                 modelRequest.setProcessPlugins( false );
                 modelRequest.setTwoPhaseBuilding( false );
-                modelRequest.setSystemProperties( toProperties( session.getUserProperties(),
-                                                                session.getSystemProperties() ) );
+                modelRequest.setSystemProperties( toProperties( session.getSystemProperties() ) );
+                modelRequest.setUserProperties( toProperties( session.getUserProperties() ) );
                 modelRequest.setModelCache( modelCacheFactory.createCache( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
                                                                          request.getRequestContext(), artifactResolver,
@@ -265,20 +265,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             if ( relocation != null )
             {
                 result.addRelocation( a );
-                Artifact relocatedArtifact =
+                a =
                     new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
-                                           relocation.getVersion() );
-                if ( LOGGER.isWarnEnabled() )
-                {
-                    String message = "The artifact " + a + " has been relocated to " + relocatedArtifact;
-                    if ( relocation.getMessage() != null )
-                    {
-                        message += ": " + relocation.getMessage();
-                    }
-                    LOGGER.warn( message );
-                }
-                result.setArtifact( relocatedArtifact );
-                a = relocatedArtifact;
+                                           relocation.getVersion(), relocation.getMessage() );
+                result.setArtifact( a );
             }
             else
             {
@@ -287,17 +277,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         }
     }
 
-    private Properties toProperties( Map<String, String> dominant, Map<String, String> recessive )
+    private Properties toProperties( Map<String, String> map )
     {
         Properties props = new Properties();
-        if ( recessive != null )
-        {
-            props.putAll( recessive );
-        }
-        if ( dominant != null )
-        {
-            props.putAll( dominant );
-        }
+        props.putAll( map );
         return props;
     }
 

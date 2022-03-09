@@ -19,8 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -110,7 +108,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
 
-        for ( Lifecycle lifecycle : getOrderedLifecycles() )
+        for ( Lifecycle lifecycle : defaultLifeCycles.getLifeCycles() )
         {
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
@@ -161,17 +159,6 @@ public class DefaultLifecyclePluginAnalyzer
             }
             throw new RuntimeException( e );
         }
-    }
-
-    private List<Lifecycle> getOrderedLifecycles()
-    {
-        // NOTE: The lifecycle order can affect implied execution ids so we better be deterministic.
-
-        List<Lifecycle> lifecycles = new ArrayList<>( defaultLifeCycles.getLifeCycles() );
-
-        lifecycles.sort( Comparator.comparing( Lifecycle::getId ) );
-
-        return lifecycles;
     }
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )

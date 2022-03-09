@@ -113,7 +113,7 @@ public class OperatingSystemProfileActivator
 
         boolean result = Os.isVersion( test );
 
-        return reverse ? !result : result;
+        return reverse != result;
     }
 
     private boolean determineArchMatch( String arch )
@@ -129,7 +129,7 @@ public class OperatingSystemProfileActivator
 
         boolean result = Os.isArch( test );
 
-        return reverse ? !result : result;
+        return reverse != result;
     }
 
     private boolean determineNameMatch( String name )
@@ -145,7 +145,7 @@ public class OperatingSystemProfileActivator
 
         boolean result = Os.isName( test );
 
-        return reverse ? !result : result;
+        return reverse != result;
     }
 
     private boolean determineFamilyMatch( String family )
@@ -161,7 +161,7 @@ public class OperatingSystemProfileActivator
 
         boolean result = Os.isFamily( test );
 
-        return reverse ? !result : result;
+        return reverse != result;
     }
 
 }

@@ -24,10 +24,10 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
 
 /**
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO merge with artifactmetadatasource
  * TODO retrieval exception not appropriate for store
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public interface ArtifactMetadata
 {
@@ -70,19 +70,19 @@ public interface ArtifactMetadata
 
     /**
      * Merge a new metadata set into this piece of metadata.
+     * TODO this should only be needed on the repository metadata {@link org.apache.maven.artifact.metadata.ArtifactMetadata}
      *
      * @param metadata the new metadata
-     * TODO this should only be needed on the repository metadata
      */
     void merge( ArtifactMetadata metadata );
 
     /**
      * Store the metadata in the local repository.
+     * TODO this should only be needed on the repository metadata {@link org.apache.maven.artifact.metadata.ArtifactMetadata}
      *
      * @param localRepository  the local repository
      * @param remoteRepository the remote repository it came from
      * @throws RepositoryMetadataStoreException in case of issue
-     * TODO this should only be needed on the repository metadata
      */
     void storeInLocalRepository( ArtifactRepository localRepository,
                                  ArtifactRepository remoteRepository )

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
@@ -37,7 +38,10 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.project.ProjectBuildingResultWithLocationMatcher.projectBuildingResultWithLocation;
+import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
@@ -102,9 +106,9 @@ public class ProjectBuilderTest
 
         ProjectBuildingException e = assertThrows( ProjectBuildingException.class,
                       () -> getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
-        assertThat( e.getMessage(),
-                    containsString( "[ERROR] 'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing. "
-                        + "@ line 9, column 17" ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage(
+                "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing" ) ) );
+        assertThat( e.getResults(), contains( projectBuildingResultWithLocation( 17, 9 ) ) );
     }
 
     @Test
@@ -127,6 +131,18 @@ public class ProjectBuilderTest
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 1, mavenProject.getArtifacts().size() );
+
+        final MavenProject project = mavenProject;
+        final AtomicInteger artifactsResultInAnotherThread = new AtomicInteger();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                artifactsResultInAnotherThread.set(project.getArtifacts().size());
+            }
+        });
+        t.start();
+        t.join();
+        assertEquals( project.getArtifacts().size(), artifactsResultInAnotherThread.get() );
     }
 
     @Test
@@ -238,7 +254,7 @@ public class ProjectBuilderTest
         assertEquals( 1, pex.getResults().size() );
         assertNotNull( pex.getResults().get( 0 ).getPomFile() );
         assertThat( pex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
-        assertThat( pex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
+        assertThat( pex.getResults(), contains( projectBuildingResultWithProblemMessage( "expected START_TAG or END_TAG not TEXT" ) ) );
     }
 
     @Test

@@ -1,5 +1,4 @@
 "%JAVACMD%" ^
-  %JVM_CONFIG_MAVEN_PROPS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
   -classpath %LAUNCHER_JAR% ^
@@ -7,7 +6,9 @@
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  %LAUNCHER_CLASS% %*
+  %LAUNCHER_CLASS% ^
+  %MAVEN_ARGS% ^
+  %*
 if ERRORLEVEL 1 goto error
 goto end
 

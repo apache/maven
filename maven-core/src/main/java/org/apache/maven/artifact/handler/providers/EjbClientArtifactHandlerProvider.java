@@ -27,6 +27,9 @@ import javax.inject.Singleton;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 
+/**
+ * {@code ejb-client} artifact handler provider.
+ */
 @Named( "ejb-client" )
 @Singleton
 public class EjbClientArtifactHandlerProvider

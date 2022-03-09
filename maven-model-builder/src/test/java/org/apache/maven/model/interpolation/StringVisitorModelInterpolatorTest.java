@@ -23,6 +23,6 @@ public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolato
 {
     protected ModelInterpolator createInterpolator()
     {
-        return new StringVisitorModelInterpolator( null, null );
+        return new StringVisitorModelInterpolator( null, null, new DefaultModelVersionProcessor() );
     }
 }

@@ -29,7 +29,7 @@ import org.eclipse.aether.artifact.Artifact;
 /**
  * @author Benjamin Bentmann
  */
-final class RelocatedArtifact
+public final class RelocatedArtifact
     extends AbstractArtifact
 {
 
@@ -41,13 +41,16 @@ final class RelocatedArtifact
 
     private final String version;
 
-    RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
+    private final String message;
+
+    RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version, String message )
     {
         this.artifact = Objects.requireNonNull( artifact, "artifact cannot be null" );
         // TODO Use StringUtils here
         this.groupId = ( groupId != null && groupId.length() > 0 ) ? groupId : null;
         this.artifactId = ( artifactId != null && artifactId.length() > 0 ) ? artifactId : null;
         this.version = ( version != null && version.length() > 0 ) ? version : null;
+        this.message = ( message != null && message.length() > 0 ) ? message : null;
     }
 
     public String getGroupId()
@@ -86,6 +89,40 @@ final class RelocatedArtifact
         }
     }
 
+    // Revise these three methods when MRESOLVER-233 is delivered
+    @Override
+    public Artifact setVersion( String version )
+    {
+         String current = getVersion();
+         if ( current.equals( version ) || ( version == null && current.length() <= 0 ) )
+         {
+             return this;
+         }
+        return new RelocatedArtifact( artifact, groupId, artifactId, version, message );
+    }
+
+    @Override
+    public Artifact setFile( File file )
+    {
+        File current = getFile();
+        if ( Objects.equals( current, file ) )
+        {
+             return this;
+        }
+        return new RelocatedArtifact( artifact.setFile( file ), groupId, artifactId, version, message );
+    }
+
+    @Override
+    public Artifact setProperties( Map<String, String> properties )
+    {
+        Map<String, String> current = getProperties();
+        if ( current.equals( properties ) || ( properties == null && current.isEmpty() ) )
+        {
+             return this;
+        }
+        return new RelocatedArtifact( artifact.setProperties( properties ), groupId, artifactId, version, message );
+    }
+
     public String getClassifier()
     {
         return artifact.getClassifier();
@@ -111,4 +148,8 @@ final class RelocatedArtifact
         return artifact.getProperties();
     }
 
+    public String getMessage()
+    {
+        return message;
+    }
 }

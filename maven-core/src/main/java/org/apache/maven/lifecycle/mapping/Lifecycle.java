@@ -23,9 +23,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 /**
- * Class Lifecycle.
+ * Lifecycle definition for a packaging (multiple packagings share the same lifecycle id = usually "default").
  */
 public class Lifecycle
 {

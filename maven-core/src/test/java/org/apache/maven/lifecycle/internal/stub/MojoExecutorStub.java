@@ -21,13 +21,15 @@ import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.PhaseRecorder;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,33 +48,34 @@ public class MojoExecutorStub
             BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
-            ExecutionEventCatapult eventCatapult )
+            ExecutionEventCatapult eventCatapult,
+            MojosExecutionStrategy mojosExecutionStrategy )
     {
-        super( pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult );
-    }
-
-    @Override
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
-        throws LifecycleExecutionException
-    {
-        executions.add( mojoExecution );
+        super( pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult, mojosExecutionStrategy );
     }
 
     @Override
     public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
-        executions.addAll(mojoExecutions);
+        executions.addAll( mojoExecutions );
+    }
+
+    @Override
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session, ProjectIndex projectIndex ) throws LifecycleExecutionException
+    {
+        return null;
     }
 
 
-    public static MojoDescriptor createMojoDescriptor( String mojoDescription )
+    public static MojoDescriptor createMojoDescriptor( Plugin plugin )
     {
         final PluginDescriptor descriptor = new PluginDescriptor();
-        descriptor.setArtifactId( mojoDescription );
+        descriptor.setGroupId( plugin.getGroupId() );
+        descriptor.setArtifactId( plugin.getArtifactId() );
+        descriptor.setPlugin( plugin );
+        descriptor.setVersion( plugin.getVersion() );
         final MojoDescriptor mojoDescriptor = new MojoDescriptor();
-        mojoDescriptor.setDescription( mojoDescription );
         mojoDescriptor.setPluginDescriptor( descriptor );
         return mojoDescriptor;
     }

@@ -28,7 +28,9 @@ import java.util.Map;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * LifecyclePhase
+ * Mojo (goals) bindings to a lifecycle phase.
+ *
+ * @see LifecycleMojo
  */
 public class LifecyclePhase
 {

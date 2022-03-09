@@ -95,15 +95,11 @@ public class PropertyProfileActivator
             }
 
             // we have a value, so it has to match the system value...
-            boolean result = propValue.equals( sysValue );
-
-            return reverseValue ? !result : result;
+            return reverseValue != propValue.equals( sysValue );
         }
         else
         {
-            boolean result = StringUtils.isNotEmpty( sysValue );
-
-            return reverseName ? !result : result;
+            return reverseName != StringUtils.isNotEmpty( sysValue );
         }
     }
 

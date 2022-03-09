@@ -19,47 +19,37 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
-
-@Named( "site" )
+/**
+ * {@code site} lifecycle provider.
+ */
+@Named( SiteLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class SiteLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private final Lifecycle lifecycle;
+    protected static final String LIFECYCLE_ID = "site";
 
-  @Inject
-  public SiteLifecycleProvider()
-  {
-    HashMap<String, LifecyclePhase> phases = new HashMap<>();
-    phases.put( "site", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:site" ) );
-    phases.put( "site-deploy", new LifecyclePhase( "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy" ) );
-
-    this.lifecycle = new Lifecycle(
+    // START SNIPPET: site
+    private static final String[] PHASES = {
+        "pre-site",
         "site",
-        Collections.unmodifiableList( Arrays.asList(
-                "pre-site",
-                "site",
-                "post-site",
-                "site-deploy"
-        ) ),
-        Collections.unmodifiableMap( phases )
-    );
-  }
+        "post-site",
+        "site-deploy"
+    };
 
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    private static final String[] BINDINGS = {
+        "site",        "org.apache.maven.plugins:maven-site-plugin:3.9.1:site",
+        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy"
+    };
+    // END SNIPPET: site
+
+    @Inject
+    public SiteLifecycleProvider()
+    {
+        super( LIFECYCLE_ID, PHASES, BINDINGS );
+    }
 }

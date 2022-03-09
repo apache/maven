@@ -19,60 +19,53 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.lifecycle.Lifecycle;
-
-@Named( "default" )
+/**
+ * {@code default} lifecycle provider.
+ */
+@Named( DefaultLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class DefaultLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private final Lifecycle lifecycle;
+    protected static final String LIFECYCLE_ID = "default";
 
-  @Inject
-  public DefaultLifecycleProvider()
-  {
-    this.lifecycle = new Lifecycle(
-        "default",
-        Collections.unmodifiableList( Arrays.asList(
-                "validate",
-                "initialize",
-                "generate-sources",
-                "process-sources",
-                "generate-resources",
-                "process-resources",
-                "compile",
-                "process-classes",
-                "generate-test-sources",
-                "process-test-sources",
-                "generate-test-resources",
-                "process-test-resources",
-                "test-compile",
-                "process-test-classes",
-                "test",
-                "prepare-package",
-                "package",
-                "pre-integration-test",
-                "integration-test",
-                "post-integration-test",
-                "verify",
-                "install",
-                "deploy"
-        ) ),
-        null
-    );
-  }
+    // START SNIPPET: default
+    private static final String[] PHASES = {
+        "validate",
+        "initialize",
+        "generate-sources",
+        "process-sources",
+        "generate-resources",
+        "process-resources",
+        "compile",
+        "process-classes",
+        "generate-test-sources",
+        "process-test-sources",
+        "generate-test-resources",
+        "process-test-resources",
+        "test-compile",
+        "process-test-classes",
+        "test",
+        "prepare-package",
+        "package",
+        "pre-integration-test",
+        "integration-test",
+        "post-integration-test",
+        "verify",
+        "install",
+        "deploy"
+    };
+    // END SNIPPET: default
 
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    @Inject
+    public DefaultLifecycleProvider()
+    {
+      super( LIFECYCLE_ID, PHASES,
+          null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate providers
+      );
+    }
 }

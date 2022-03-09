@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,6 +39,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -94,6 +94,8 @@ public class DefaultRepositorySystemSessionFactory
 
     private final MavenRepositorySystem mavenRepositorySystem;
 
+    private final RuntimeInformation runtimeInformation;
+
     @Inject
     public DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
@@ -102,7 +104,8 @@ public class DefaultRepositorySystemSessionFactory
             @Nullable @Named( "ide" ) WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
-            MavenRepositorySystem mavenRepositorySystem )
+            MavenRepositorySystem mavenRepositorySystem,
+            RuntimeInformation runtimeInformation )
     {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
@@ -111,6 +114,7 @@ public class DefaultRepositorySystemSessionFactory
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
+        this.runtimeInformation = runtimeInformation;
     }
 
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
@@ -267,28 +271,10 @@ public class DefaultRepositorySystemSessionFactory
 
     private String getUserAgent()
     {
-        return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "
+        String version = runtimeInformation.getMavenVersion();
+        version = version.isEmpty() ? version : "/" + version;
+        return "Apache-Maven" + version + " (Java " + System.getProperty( "java.version" ) + "; "
             + System.getProperty( "os.name" ) + " " + System.getProperty( "os.version" ) + ")";
-    }
-
-    private String getMavenVersion()
-    {
-        Properties props = new Properties();
-
-        try ( InputStream is = getClass().getResourceAsStream(
-            "/META-INF/maven/org.apache.maven/maven-core/pom.properties" ) )
-        {
-            if ( is != null )
-            {
-                props.load( is );
-            }
-        }
-        catch ( IOException e )
-        {
-            logger.debug( "Failed to read Maven version", e );
-        }
-
-        return props.getProperty( "version", "unknown-version" );
     }
 
     private Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact,

@@ -266,28 +266,15 @@ public class DefaultMaven
             return addExceptionToResult( result, e );
         }
 
-        WorkspaceReader reactorWorkspace;
         try
         {
-            reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
+            setupWorkspaceReader( session, repoSession );
         }
         catch ( ComponentLookupException e )
         {
             return addExceptionToResult( result, e );
         }
-
-        //
-        // Desired order of precedence for local artifact repositories
-        //
-        // Reactor
-        // Workspace
-        // User Local Repository
-        //
-        repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorWorkspace,
-                                                                            repoSession.getWorkspaceReader() ) );
-
         repoSession.setReadOnly();
-
         try
         {
             afterProjectsRead( session );
@@ -367,11 +354,40 @@ public class DefaultMaven
         return result;
     }
 
+    private void setupWorkspaceReader( MavenSession session, DefaultRepositorySystemSession repoSession )
+        throws ComponentLookupException
+    {
+        // Desired order of precedence for workspace readers before querying the local artifact repositories
+        List<WorkspaceReader> workspaceReaders = new ArrayList<WorkspaceReader>();
+        // 1) Reactor workspace reader
+        workspaceReaders.add( container.lookup( WorkspaceReader.class, ReactorReader.HINT ) );
+        // 2) Repository system session-scoped workspace reader
+        WorkspaceReader repoWorkspaceReader = repoSession.getWorkspaceReader();
+        if ( repoWorkspaceReader != null )
+        {
+            workspaceReaders.add( repoWorkspaceReader );
+        }
+        // 3) .. n) Project-scoped workspace readers
+        for ( WorkspaceReader workspaceReader : getProjectScopedExtensionComponents( session.getProjects(),
+                                                                                     WorkspaceReader.class ) )
+        {
+            if ( workspaceReaders.contains( workspaceReader ) )
+            {
+                continue;
+            }
+            workspaceReaders.add( workspaceReader );
+        }
+        WorkspaceReader[] readers = workspaceReaders.toArray( new WorkspaceReader[0] );
+        repoSession.setWorkspaceReader( new ChainedWorkspaceReader( readers ) );
+
+    }
+
     private void afterSessionStart( MavenSession session )
         throws MavenExecutionException
     {
         // CHECKSTYLE_OFF: LineLength
-        for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.emptyList() ) )
+        for ( AbstractMavenLifecycleParticipant listener : getExtensionComponents( Collections.emptyList(),
+                                                                                   AbstractMavenLifecycleParticipant.class ) )
         // CHECKSTYLE_ON: LineLength
         {
             listener.afterSessionStart( session );
@@ -384,7 +400,10 @@ public class DefaultMaven
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            // CHECKSTYLE_OFF: LineLength
+            for ( AbstractMavenLifecycleParticipant listener : getExtensionComponents( session.getProjects(),
+                                                                                       AbstractMavenLifecycleParticipant.class ) )
+            // CHECKSTYLE_ON: LineLength
             {
                 Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
 
@@ -403,7 +422,10 @@ public class DefaultMaven
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
+            // CHECKSTYLE_OFF: LineLength
+            for ( AbstractMavenLifecycleParticipant listener : getExtensionComponents( projects,
+                                                                                       AbstractMavenLifecycleParticipant.class ) )
+            // CHECKSTYLE_ON: LineLength
             {
                 Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
 
@@ -463,51 +485,60 @@ public class DefaultMaven
         }
     }
 
-    private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
+    private <T> Collection<T> getExtensionComponents( Collection<MavenProject> projects, Class<T> role )
     {
-        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners = new LinkedHashSet<>();
+        Collection<T> foundComponents = new LinkedHashSet<>();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            try
-            {
-                lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // this is just silly, lookupList should return an empty list!
-                logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
-            }
+            foundComponents.addAll( container.lookupList( role ) );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // this is just silly, lookupList should return an empty list!
+            logger.warn( "Failed to lookup " + role + ": " + e.getMessage() );
+        }
 
-            Collection<ClassLoader> scannedRealms = new HashSet<>();
+        foundComponents.addAll( getProjectScopedExtensionComponents( projects, role ) );
 
+        return foundComponents;
+    }
+
+    protected <T> Collection<T> getProjectScopedExtensionComponents( Collection<MavenProject> projects, Class<T> role )
+    {
+
+        Collection<T> foundComponents = new LinkedHashSet<>();
+        Collection<ClassLoader> scannedRealms = new HashSet<>();
+
+        Thread currentThread = Thread.currentThread();
+        ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
+        try
+        {
             for ( MavenProject project : projects )
             {
                 ClassLoader projectRealm = project.getClassRealm();
 
                 if ( projectRealm != null && scannedRealms.add( projectRealm ) )
                 {
-                    Thread.currentThread().setContextClassLoader( projectRealm );
+                    currentThread.setContextClassLoader( projectRealm );
 
                     try
                     {
-                        lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
+                        foundComponents.addAll( container.lookupList( role ) );
                     }
                     catch ( ComponentLookupException e )
                     {
                         // this is just silly, lookupList should return an empty list!
-                        logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
+                        logger.warn( "Failed to lookup " + role + ": " + e.getMessage() );
                     }
                 }
             }
+            return foundComponents;
         }
         finally
         {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
+            currentThread.setContextClassLoader( originalContextClassLoader );
         }
-
-        return lifecycleListeners;
     }
 
     private MavenExecutionResult addExceptionToResult( MavenExecutionResult result, Throwable e )
@@ -678,11 +709,11 @@ public class DefaultMaven
         {
             if ( problem.getSeverity() == ModelProblem.Severity.WARNING )
             {
-                logger.warn( problem.toString() );
+                logger.warn( problem.getMessage() );
             }
             else
             {
-                logger.error( problem.toString() );
+                logger.error( problem.getMessage() );
             }
         }
 

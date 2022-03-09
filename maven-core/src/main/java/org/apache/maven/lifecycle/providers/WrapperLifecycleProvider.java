@@ -19,40 +19,34 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Collections;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
-
-@Named( "wrapper" )
+/**
+ * {@code wrapper} lifecycle provider.
+ */
+@Named( WrapperLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class WrapperLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private final Lifecycle lifecycle;
+    protected static final String LIFECYCLE_ID = "wrapper";
 
-  @Inject
-  public WrapperLifecycleProvider()
-  {
-    HashMap<String, LifecyclePhase> phases = new HashMap<>();
-    phases.put( "wrapper", new LifecyclePhase( "org.apache.maven.plugins:maven-wrapper-plugin:3.0.2:wrapper" ) );
+    // START SNIPPET: wrapper
+    private static final String[] PHASES =
+    {
+        "wrapper"
+    };
 
-    this.lifecycle = new Lifecycle(
-        "wrapper",
-        Collections.singletonList( "wrapper" ),
-        Collections.unmodifiableMap( phases )
-    );
-  }
+    private static final String[] BINDINGS = {
+        "wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper"
+    };
+    // END SNIPPET: wrapper
 
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    @Inject
+    public WrapperLifecycleProvider()
+    {
+        super( LIFECYCLE_ID, PHASES, BINDINGS );
+    }
 }

@@ -24,12 +24,13 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
     <relativePath />
   </parent>
 
   <artifactId>maven-bom</artifactId>
   <version>4.0.0-alpha-1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
   <description>Bill Of Materials for Apache Maven dependencies</description>
@@ -148,18 +149,6 @@ under the License.
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.4</version>
-          </dependency>
-        </dependencies>
-      </plugin>
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
         <configuration>

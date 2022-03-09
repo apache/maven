@@ -743,6 +743,7 @@ public class MavenCli
 
     private List<CoreExtensionEntry> loadCoreExtensions( CliRequest cliRequest, ClassRealm containerRealm,
                                                          Set<String> providedArtifacts )
+            throws Exception
     {
         if ( cliRequest.multiModuleProjectDirectory == null )
         {
@@ -755,75 +756,62 @@ public class MavenCli
             return Collections.emptyList();
         }
 
+        List<CoreExtension> extensions = readCoreExtensionsDescriptor( extensionsFile );
+        if ( extensions.isEmpty() )
+        {
+            return Collections.emptyList();
+        }
+
+        ContainerConfiguration cc = new DefaultContainerConfiguration() //
+            .setClassWorld( cliRequest.classWorld ) //
+            .setRealm( containerRealm ) //
+            .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
+            .setAutoWiring( true ) //
+            .setJSR250Lifecycle( true ) //
+            .setName( "maven" );
+
+        DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
+        {
+            @Override
+            protected void configure()
+            {
+                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+            }
+        } );
+
         try
         {
-            List<CoreExtension> extensions = readCoreExtensionsDescriptor( extensionsFile );
-            if ( extensions.isEmpty() )
-            {
-                return Collections.emptyList();
-            }
+            container.setLookupRealm( null );
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration() //
-                .setClassWorld( cliRequest.classWorld ) //
-                .setRealm( containerRealm ) //
-                .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
-                .setAutoWiring( true ) //
-                .setJSR250Lifecycle( true ) //
-                .setName( "maven" );
+            container.setLoggerManager( plexusLoggerManager );
 
-            DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
-            {
-                @Override
-                protected void configure()
-                {
-                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                }
-            } );
+            container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
-            try
-            {
-                container.setLookupRealm( null );
+            Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
-                container.setLoggerManager( plexusLoggerManager );
+            executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
 
-                container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+            configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
 
-                Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
+            configure( cliRequest );
 
-                executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
+            MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
 
-                configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
+            populateRequest( cliRequest, request );
 
-                configure( cliRequest );
+            request = executionRequestPopulator.populateDefaults( request );
 
-                MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
+            BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
 
-                populateRequest( cliRequest, request );
+            return Collections.unmodifiableList( resolver.loadCoreExtensions( request, providedArtifacts,
+                                                                              extensions ) );
 
-                request = executionRequestPopulator.populateDefaults( request );
-
-                BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
-
-                return Collections.unmodifiableList( resolver.loadCoreExtensions( request, providedArtifacts,
-                                                                                  extensions ) );
-
-            }
-            finally
-            {
-                executionRequestPopulator = null;
-                container.dispose();
-            }
         }
-        catch ( RuntimeException e )
+        finally
         {
-            // runtime exceptions are most likely bugs in maven, let them bubble up to the user
-            throw e;
+            executionRequestPopulator = null;
+            container.dispose();
         }
-        catch ( Exception e )
-        {
-            slf4jLogger.warn( "Failed to read extensions descriptor from '{}'", extensionsFile, e );
-        }
-        return Collections.emptyList();
     }
 
     private List<CoreExtension> readCoreExtensionsDescriptor( File extensionsFile )
@@ -1730,18 +1718,11 @@ public class MavenCli
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
-        {
-            String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
-
-            if ( defStrs != null )
-            {
-                for ( String defStr : defStrs )
-                {
-                    setCliProperty( defStr, userProperties );
-                }
-            }
-        }
+        final Properties userSpecifiedProperties = commandLine.getOptionProperties(
+                String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ) );
+        userSpecifiedProperties.forEach(
+                ( prop, value ) -> setCliProperty( (String) prop, (String) value, userProperties )
+        );
 
         SystemProperties.addSystemProperties( systemProperties );
 
@@ -1759,27 +1740,8 @@ public class MavenCli
         systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
-    private static void setCliProperty( String property, Properties properties )
+    private static void setCliProperty( String name, String value, Properties properties )
     {
-        String name;
-
-        String value;
-
-        int i = property.indexOf( '=' );
-
-        if ( i <= 0 )
-        {
-            name = property.trim();
-
-            value = "true";
-        }
-        else
-        {
-            name = property.substring( 0, i ).trim();
-
-            value = property.substring( i + 1 );
-        }
-
         properties.setProperty( name, value );
 
         // ----------------------------------------------------------------------

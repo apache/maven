@@ -19,45 +19,35 @@ package org.apache.maven.lifecycle.providers;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
-
-@Named( "clean" )
+/**
+ * {@code clean} lifecycle provider.
+ */
+@Named( CleanLifecycleProvider.LIFECYCLE_ID )
 @Singleton
 public final class CleanLifecycleProvider
-    implements Provider<Lifecycle>
+    extends AbstractLifecycleProvider
 {
-  private final Lifecycle lifecycle;
+    protected static final String LIFECYCLE_ID = "clean";
 
-  @Inject
-  public CleanLifecycleProvider()
-  {
-    HashMap<String, LifecyclePhase> phases = new HashMap<>();
-    phases.put( "clean", new LifecyclePhase( "org.apache.maven.plugins:maven-clean-plugin:3.1.0:clean" ) );
-
-    this.lifecycle = new Lifecycle(
+    // START SNIPPET: clean
+    private static final String[] PHASES = {
+        "pre-clean",
         "clean",
-        Collections.unmodifiableList( Arrays.asList(
-                "pre-clean",
-                "clean",
-                "post-clean"
-        ) ),
-        Collections.unmodifiableMap( phases )
-    );
-  }
+        "post-clean"
+    };
 
-  @Override
-  public Lifecycle get()
-  {
-    return lifecycle;
-  }
+    private static final String[] BINDINGS = {
+        "clean", "org.apache.maven.plugins:maven-clean-plugin:3.1.0:clean"
+    };
+    // END SNIPPET: clean
+
+    @Inject
+    public CleanLifecycleProvider()
+    {
+        super( LIFECYCLE_ID, PHASES, BINDINGS );
+    }
 }

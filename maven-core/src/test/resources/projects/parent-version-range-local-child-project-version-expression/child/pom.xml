@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>parent-version-range-local</groupId>
+    <artifactId>parent</artifactId>
+    <version>[1,10]</version>
+  </parent>
+  <artifactId>child</artifactId>
+  <!-- Must not use ${project.version} due to version range. -->
+  <version>${project.version}</version>
+  <packaging>pom</packaging>
+</project>

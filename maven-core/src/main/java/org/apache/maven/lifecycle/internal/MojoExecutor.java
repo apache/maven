@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +48,8 @@ import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoExecutionRunner;
+import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginIncompatibleException;
@@ -50,6 +57,7 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.SessionData;
 
 /**
  * <p>
@@ -72,17 +80,23 @@ public class MojoExecutor
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
     private final ExecutionEventCatapult eventCatapult;
 
+    private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
+
+    private final MojosExecutionStrategy mojosExecutionStrategy;
+
     @Inject
     public MojoExecutor(
             BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
-            ExecutionEventCatapult eventCatapult )
+            ExecutionEventCatapult eventCatapult,
+            MojosExecutionStrategy mojosExecutionStrategy )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
         this.lifeCycleDependencyResolver = lifeCycleDependencyResolver;
         this.eventCatapult = eventCatapult;
+        this.mojosExecutionStrategy = mojosExecutionStrategy;
     }
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
@@ -140,21 +154,27 @@ public class MojoExecutor
         return Collections.unmodifiableCollection( scopes );
     }
 
-    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
+    public void execute( final MavenSession session,
+                         final List<MojoExecution> mojoExecutions,
+                         final ProjectIndex projectIndex )
         throws LifecycleExecutionException
 
     {
-        DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
+        final DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
 
-        PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
+        final PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        for ( MojoExecution mojoExecution : mojoExecutions )
+        mojosExecutionStrategy.execute( mojoExecutions, session, new MojoExecutionRunner()
         {
-            execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
-        }
+            @Override
+            public void run( MojoExecution mojoExecution ) throws LifecycleExecutionException
+            {
+                MojoExecutor.this.execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
+            }
+        } );
     }
 
-    public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                          DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
         throws LifecycleExecutionException
     {
@@ -201,6 +221,81 @@ public class MojoExecutor
                 return;
             }
         }
+
+        try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor, aggregatorLock ) )
+        {
+            doExecute( session, mojoExecution, projectIndex, dependencyContext );
+        }
+    }
+
+    /**
+     * Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use
+     * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
+     * all other executions until finished.
+     * We also lock on a given project to forbid a forked lifecycle to be executed concurrently with the project.
+     * TODO: ideally, the builder should take care of the ordering in a smarter way
+     * TODO: and concurrency issues fixed with MNG-7157
+     */
+    private static class ProjectLock implements AutoCloseable
+    {
+        final Lock acquiredAggregatorLock;
+        final Lock acquiredProjectLock;
+
+        ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor, ReadWriteLock aggregatorLock )
+        {
+            if ( session.getRequest().getDegreeOfConcurrency() > 1 )
+            {
+                boolean aggregator = mojoDescriptor.isAggregator();
+                acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
+                acquiredProjectLock = getProjectLock( session );
+                acquiredAggregatorLock.lock();
+                acquiredProjectLock.lock();
+            }
+            else
+            {
+                acquiredAggregatorLock = null;
+                acquiredProjectLock = null;
+            }
+        }
+
+        @Override
+        public void close()
+        {
+            // release the lock in the reverse order of the acquisition
+            if ( acquiredProjectLock != null )
+            {
+                acquiredProjectLock.unlock();
+            }
+            if ( acquiredAggregatorLock != null )
+            {
+                acquiredAggregatorLock.unlock();
+            }
+        }
+
+        @SuppressWarnings( { "unchecked", "rawtypes" } )
+        private Lock getProjectLock( MavenSession session )
+        {
+            SessionData data = session.getRepositorySession().getData();
+            // TODO: when resolver 1.7.3 is released, the code below should be changed to
+            // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
+            // TODO:         ProjectLock.class, l -> new ConcurrentHashMap<>() );
+            Map<MavenProject, Lock> locks = ( Map ) data.get( ProjectLock.class );
+            // initialize the value if not already done (in case of a concurrent access) to the method
+            if ( locks == null )
+            {
+                // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
+                data.set( ProjectLock.class, null, new ConcurrentHashMap<>() );
+                locks = ( Map ) data.get( ProjectLock.class );
+            }
+            return locks.computeIfAbsent( session.getCurrentProject(), p -> new ReentrantLock() );
+        }
+    }
+
+    private void doExecute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+                            DependencyContext dependencyContext )
+            throws LifecycleExecutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
 

@@ -58,7 +58,7 @@ public class StringSearchModelInterpolatorTest
 {
     protected ModelInterpolator createInterpolator()
     {
-        return new StringSearchModelInterpolator();
+        return new StringSearchModelInterpolator( null, null, new DefaultModelVersionProcessor() );
     }
 
     @Test
@@ -579,7 +579,8 @@ public class StringSearchModelInterpolatorTest
         request.setUserProperties( props );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
+        StringSearchModelInterpolator interpolator =
+            new StringSearchModelInterpolator( null, null, new DefaultModelVersionProcessor() );
         interpolator.interpolateObject( new ClassWithFinalField(), new Model(), null, request, problems );
 
         assertProblemFree( problems );
@@ -605,7 +606,8 @@ public class StringSearchModelInterpolatorTest
         model.setLocation( "", new InputLocation( 1, 1, source ) );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
+        StringSearchModelInterpolator interpolator =
+            new StringSearchModelInterpolator( null, null, new DefaultModelVersionProcessor() );
         interpolator.interpolateObject( model, model, null, request, problems );
 
         assertProblemFree( problems );
