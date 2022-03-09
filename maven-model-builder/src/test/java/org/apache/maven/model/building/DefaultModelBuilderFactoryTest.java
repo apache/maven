@@ -20,10 +20,16 @@ package org.apache.maven.model.building;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Paths;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 /**
  * @author Benjamin Bentmann
@@ -32,9 +38,11 @@ public class DefaultModelBuilderFactoryTest
     extends TestCase
 {
 
+    private static final String BASE_DIR = Paths.get( "src", "test", "resources", "poms", "factory" ).toString();
+
     private File getPom( String name )
     {
-        return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
+        return new File( Paths.get( BASE_DIR, name + ".xml"  ).toString() ).getAbsoluteFile();
     }
 
     public void testCompleteWiring()
@@ -56,4 +64,30 @@ public class DefaultModelBuilderFactoryTest
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }
 
+    @Test
+    public void testPomChanges() throws Exception
+    {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull( builder );
+        File pom = getPom( "simple" );
+
+        String originalExists = readPom( pom ).getProfiles().get( 1 ).getActivation().getFile().getExists();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setProcessPlugins( true );
+        request.setPomFile( pom );
+        ModelBuildingResult result = builder.build( request );
+        String resultExists = result.getRawModel().getProfiles().get( 1 ).getActivation().getFile().getExists();
+
+        assertEquals( originalExists, resultExists );
+        assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists()
+                .contains( BASE_DIR ) );
+    }
+
+    private static Model readPom( File file ) throws Exception
+    {
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+
+        return reader.read( new FileInputStream( file ) );
+    }
 }

@@ -511,7 +511,6 @@ public class DefaultArtifactResolver
         if ( result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations()
             || result.hasCircularDependencyExceptions() )
         {
-            logger.info( "Failure detected." );
             return result;
         }
 

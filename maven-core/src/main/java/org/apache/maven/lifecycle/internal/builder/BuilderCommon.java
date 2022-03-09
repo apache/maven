@@ -98,7 +98,7 @@ public class BuilderCommon
 
         lifecycleDebugLogger.debugProjectPlan( project, executionPlan );
 
-        if ( session.getRequest().getDegreeOfConcurrency() > 1 )
+        if ( session.getRequest().getDegreeOfConcurrency() > 1 && session.getProjects().size() > 1 )
         {
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if ( !unsafePlugins.isEmpty() )

@@ -24,7 +24,9 @@ import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.interpolation.ModelInterpolator;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.interpolation.StringVisitorModelInterpolator;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.ModelReader;
@@ -43,6 +45,7 @@ import org.apache.maven.model.path.DefaultUrlNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
 import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.apache.maven.model.plugin.DefaultPluginConfigurationExpander;
 import org.apache.maven.model.plugin.DefaultReportConfigurationExpander;
@@ -109,7 +112,13 @@ public class DefaultModelBuilderFactory
     protected ProfileActivator[] newProfileActivators()
     {
         return new ProfileActivator[] { new JdkVersionProfileActivator(), new OperatingSystemProfileActivator(),
-            new PropertyProfileActivator(), new FileProfileActivator().setPathTranslator( newPathTranslator() ) };
+            new PropertyProfileActivator(), new FileProfileActivator()
+                        .setProfileActivationFilePathInterpolator( newProfileActivationFilePathInterpolator() ) };
+    }
+
+    protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator()
+    {
+        return new ProfileActivationFilePathInterpolator().setPathTranslator( newPathTranslator() );
     }
 
     protected UrlNormalizer newUrlNormalizer()
@@ -126,12 +135,18 @@ public class DefaultModelBuilderFactory
     {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringVisitorModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( normalizer );
+        return new StringVisitorModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( normalizer )
+                        .setVersionPropertiesProcessor( newModelVersionPropertiesProcessor() );
+    }
+
+    protected ModelVersionProcessor newModelVersionPropertiesProcessor()
+    {
+        return new DefaultModelVersionProcessor();
     }
 
     protected ModelValidator newModelValidator()
     {
-        return new DefaultModelValidator();
+        return new DefaultModelValidator( newModelVersionPropertiesProcessor() );
     }
 
     protected ModelNormalizer newModelNormalizer()
@@ -225,6 +240,7 @@ public class DefaultModelBuilderFactory
         modelBuilder.setPluginConfigurationExpander( newPluginConfigurationExpander() );
         modelBuilder.setReportConfigurationExpander( newReportConfigurationExpander() );
         modelBuilder.setReportingConverter( newReportingConverter() );
+        modelBuilder.setProfileActivationFilePathInterpolator( newProfileActivationFilePathInterpolator() );
 
         return modelBuilder;
     }

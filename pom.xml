@@ -25,12 +25,12 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>34</version>
+    <version>35</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.8.5-SNAPSHOT</version>
+  <version>3.8.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -59,8 +59,7 @@ under the License.
     <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuVersion>0.3.5</sisuVersion>
-    <wagonVersion>3.4.3</wagonVersion>
-    <jsoupVersion>1.12.1</jsoupVersion>
+    <wagonVersion>3.5.1</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
@@ -77,7 +76,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
-    <project.build.outputTimestamp>2021-11-14T09:14:52Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-03-05T11:41:15Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
@@ -101,7 +100,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>maven-3.8.3</tag>
+    <tag>maven-3.8.5</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -342,14 +341,6 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-      <!-- this is included in Wagon Http
-           we are just making the dependency explicit
-           in order to ease license attribution -->
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>${jsoupVersion}</version>
-    </dependency>
       <!--  Repository -->
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>

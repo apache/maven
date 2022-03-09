@@ -39,6 +39,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.SessionData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * <p>
@@ -75,6 +82,8 @@ public class MojoExecutor
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
     public MojoExecutor()
     {
@@ -196,6 +205,88 @@ public class MojoExecutor
                 return;
             }
         }
+
+        try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor, aggregatorLock ) )
+        {
+            doExecute( session, mojoExecution, projectIndex, dependencyContext );
+        }
+    }
+
+    /**
+     * Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use
+     * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
+     * all other executions until finished.
+     * We also lock on a given project to forbid a forked lifecycle to be executed concurrently with the project.
+     * TODO: ideally, the builder should take care of the ordering in a smarter way
+     * TODO: and concurrency issues fixed with MNG-7157
+     */
+    private static class ProjectLock implements AutoCloseable
+    {
+        final Lock acquiredAggregatorLock;
+        final Lock acquiredProjectLock;
+
+        ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor, ReadWriteLock aggregatorLock )
+        {
+            if ( session.getRequest().getDegreeOfConcurrency() > 1 )
+            {
+                boolean aggregator = mojoDescriptor.isAggregator();
+                acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
+                acquiredProjectLock = getProjectLock( session );
+                acquiredAggregatorLock.lock();
+                acquiredProjectLock.lock();
+            }
+            else
+            {
+                acquiredAggregatorLock = null;
+                acquiredProjectLock = null;
+            }
+        }
+
+        @Override
+        public void close()
+        {
+            // release the lock in the reverse order of the acquisition
+            if ( acquiredProjectLock != null )
+            {
+                acquiredProjectLock.unlock();
+            }
+            if ( acquiredAggregatorLock != null )
+            {
+                acquiredAggregatorLock.unlock();
+            }
+        }
+
+        @SuppressWarnings( { "unchecked", "rawtypes" } )
+        private Lock getProjectLock( MavenSession session )
+        {
+            SessionData data = session.getRepositorySession().getData();
+            ConcurrentMap<MavenProject, Lock> locks = ( ConcurrentMap ) data.get( ProjectLock.class );
+            // initialize the value if not already done (in case of a concurrent access) to the method
+            if ( locks == null )
+            {
+                // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
+                data.set( ProjectLock.class, null, new ConcurrentHashMap<>() );
+                locks = ( ConcurrentMap ) data.get( ProjectLock.class );
+            }
+            Lock acquiredProjectLock = locks.get( session.getCurrentProject() );
+            if ( acquiredProjectLock == null )
+            {
+                acquiredProjectLock = new ReentrantLock();
+                Lock prev = locks.putIfAbsent( session.getCurrentProject(), acquiredProjectLock );
+                if ( prev != null )
+                {
+                    acquiredProjectLock = prev;
+                }
+            }
+            return acquiredProjectLock;
+        }
+    }
+
+    private void doExecute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+                            DependencyContext dependencyContext )
+            throws LifecycleExecutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
 

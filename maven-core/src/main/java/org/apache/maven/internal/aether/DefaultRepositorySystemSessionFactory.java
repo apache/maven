@@ -25,6 +25,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -53,11 +54,8 @@ import org.eclipse.sisu.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @since 3.3.0
@@ -92,6 +90,9 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
+
+    @Inject
+    private RuntimeInformation runtimeInformation;
 
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
@@ -244,28 +245,10 @@ public class DefaultRepositorySystemSessionFactory
 
     private String getUserAgent()
     {
-        return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "
+        String version = runtimeInformation.getMavenVersion();
+        version = version.isEmpty() ? version : "/" + version;
+        return "Apache-Maven" + version + " (Java " + System.getProperty( "java.version" ) + "; "
             + System.getProperty( "os.name" ) + " " + System.getProperty( "os.version" ) + ")";
-    }
-
-    private String getMavenVersion()
-    {
-        Properties props = new Properties();
-
-        try ( InputStream is = getClass().getResourceAsStream(
-            "/META-INF/maven/org.apache.maven/maven-core/pom.properties" ) )
-        {
-            if ( is != null )
-            {
-                props.load( is );
-            }
-        }
-        catch ( IOException e )
-        {
-            logger.debug( "Failed to read Maven version", e );
-        }
-
-        return props.getProperty( "version", "unknown-version" );
     }
 
 }

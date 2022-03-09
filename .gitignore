@@ -15,3 +15,4 @@ out/
 .java-version
 .factorypath
 .checkstyle
+.vscode/

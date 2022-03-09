@@ -254,7 +254,7 @@ public class PomConstructionTest
     public void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "unique-dependency-key/deps", true, null );
+        PomTestWrapper pom = buildPom( "unique-dependency-key/deps", true, null, null );
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals( "0.2", pom.getValue( "dependencies[1]/version" ) );
     }
@@ -1437,7 +1437,7 @@ public class PomConstructionTest
         Properties props = new Properties();
         props.put( "java.version", "1.5.0_15" );
 
-        PomTestWrapper pom = buildPom( "jdk-activation", props );
+        PomTestWrapper pom = buildPom( "jdk-activation", props, null );
         assertEquals( 3, pom.getMavenProject().getActiveProfiles().size() );
         assertEquals( "PASSED", pom.getValue( "properties/jdkProperty3" ) );
         assertEquals( "PASSED", pom.getValue( "properties/jdkProperty2" ) );
@@ -1534,7 +1534,7 @@ public class PomConstructionTest
     {
         Properties sysProps = new Properties();
         sysProps.setProperty( "system.property", "PASSED" );
-        PomTestWrapper pom = buildPom( "system-property-interpolation", sysProps );
+        PomTestWrapper pom = buildPom( "system-property-interpolation", sysProps, null );
         assertEquals( "PASSED", pom.getValue( "name" ) );
     }
 
@@ -1681,7 +1681,7 @@ public class PomConstructionTest
     {
         Properties props = new Properties();
         props.setProperty( "testProperty", "PASSED" );
-        PomTestWrapper pom = buildPom( "interpolation-cli-wins", props );
+        PomTestWrapper pom = buildPom( "interpolation-cli-wins", null, props );
 
         assertEquals( "PASSED", pom.getValue( "properties/interpolatedProperty" ) );
     }
@@ -1838,17 +1838,17 @@ public class PomConstructionTest
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
         throws Exception
     {
-        return buildPom( pomPath, null, profileIds );
+        return buildPom( pomPath, null, null, profileIds );
     }
 
-    private PomTestWrapper buildPom( String pomPath, Properties executionProperties, String... profileIds )
+    private PomTestWrapper buildPom( String pomPath, Properties systemProperties, Properties userProperties, String... profileIds )
         throws Exception
     {
-        return buildPom( pomPath, false, executionProperties, profileIds );
+        return buildPom( pomPath, false, systemProperties, userProperties, profileIds );
     }
 
-    private PomTestWrapper buildPom( String pomPath, boolean lenientValidation, Properties executionProperties,
-                                     String... profileIds )
+    private PomTestWrapper buildPom( String pomPath, boolean lenientValidation, Properties systemProperties,
+                                     Properties userProperties, String... profileIds )
         throws Exception
     {
         File pomFile = new File( testDirectory, pomPath );
@@ -1864,8 +1864,8 @@ public class PomConstructionTest
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
-        config.setSystemProperties( executionProperties );
-        config.setUserProperties( executionProperties );
+        config.setSystemProperties( systemProperties );
+        config.setUserProperties( userProperties );
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 

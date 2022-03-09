@@ -26,6 +26,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import junit.framework.TestCase;
@@ -95,7 +96,7 @@ public class DefaultModelValidatorTest
     {
         super.setUp();
 
-        validator = new DefaultModelValidator();
+        validator = new DefaultModelValidator(new DefaultModelVersionProcessor() );
     }
 
     @Override

@@ -27,16 +27,6 @@ Maven Repository Metadata Model
 
  This is strictly the model for Maven Repository Metadata, so really just plain objects.
 
- Maven Repository Metadata is available in directories representing:
-
- [[1]] an un-versioned artifact: it gives informations about available versions of the artifact,
-
- [[2]] a snapshot artifact: it gives precise information on the snapshot,
-
- [[3]] a group containing Maven plugins artifacts: it gives informations on plugins available in this group.
-
- []
-
  The metadata file name is:
 
  * <<<maven-metadata.xml>>> in a remote repository,
@@ -45,8 +35,30 @@ Maven Repository Metadata Model
 
  []
 
+ Depending on what the directory represents ("groupId", "groupId/artifactId" or "groupId/artifactId/version"),
+ the Maven Repository Metadata file contains 3 different sets of metadata:
+
+ [[1]] in a "groupId" directory: a "groupId" directory may contain Maven plugins artifacts, which are described in metadata's <<<plugins>>> element,
+
+ [[2]] in a "groupId/artifactId" directory: metadata describes <<<groupId>>>, <<<artifactId>>> and <<<versioning>>> element that
+       gives data about available versions (<<<latest>>>, <<<release>>>, <<<versions>>> list and <<<lastUpdated>>>),
+
+ [[3]] in a "groupId/artifactId/version" snapshot artifact directory: metadata describes <<<groupId>>>, <<<artifactId>>>, <<<version>>> (base version, i.e. ending in <<<-SNAPSHOT>>>) and
+       <<<versioning>>> element that gives data about snaphot (<<<snapshot>>>, <<<lastUpdated>>> and <<<snapshotVersions>>> list). Notice that a
+       release artifact directory is not expected to provide metadata.
+
+ []
+
  The following are generated from this model:
 
-   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files
+   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files,
 
-   * A {{{./repository-metadata.html}Descriptor Reference}}
+   * a {{{./repository-metadata.html}Descriptor Reference}}.
+ 
+ Notice: data about plugins in a directory representing a groupId is deprecated and will be removed in a future Maven version.
+~~ logic behind this:
+~~ 1. MNG-7266: maven-compat will be removed from future Maven version
+~~ 2. this will remove the code that updates plugins data: see MNG-7375/MPLUGIN-384 https://maven.apache.org/ref/3.8.4/maven-compat/apidocs/org/apache/maven/artifact/repository/metadata/GroupRepositoryMetadata.html
+~~ 3. this will lead to inconsistent data: removing it will be safer/more clear
+~~ but this logic still remains to be confirmed by clear consensus of the whole team
+ 
