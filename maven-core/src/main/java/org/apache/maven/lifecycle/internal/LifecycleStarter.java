@@ -29,6 +29,7 @@ import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.component.annotations.Component;
@@ -77,8 +78,11 @@ public class LifecycleStarter
         ProjectBuildList projectBuilds = null;
         MavenExecutionResult result = session.getResult();
 
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try
         {
+            BuilderCommon.attachToThread( session.getTopLevelProject() );
+
             if ( buildExecutionRequiresProject( session ) && projectIsNotPresent( session ) )
             {
                 throw new MissingProjectException( "The goal you specified requires a project to execute"
@@ -134,6 +138,7 @@ public class LifecycleStarter
         finally
         {
             eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
+            Thread.currentThread().setContextClassLoader( tccl );
         }
     }
 
