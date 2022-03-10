@@ -97,6 +97,7 @@ public class DefaultRepositorySystemSessionFactory
     private final RuntimeInformation runtimeInformation;
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,

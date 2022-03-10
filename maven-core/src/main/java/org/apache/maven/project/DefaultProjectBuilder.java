@@ -105,6 +105,7 @@ public class DefaultProjectBuilder
     private final ModelCacheFactory modelCacheFactory;
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultProjectBuilder(
             ModelBuilder modelBuilder,
             ModelProcessor modelProcessor,
