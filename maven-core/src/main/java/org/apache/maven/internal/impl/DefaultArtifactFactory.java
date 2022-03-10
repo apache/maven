@@ -27,6 +27,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryException;
 import org.apache.maven.api.services.ArtifactFactoryRequest;
+import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.aether.artifact.ArtifactType;
 
 @Named
@@ -41,13 +42,18 @@ public class DefaultArtifactFactory implements ArtifactFactory
         {
             type = session.getSession().getArtifactTypeRegistry().get( request.getType() );
         }
+        String classifier = StringUtils.isNotEmpty( request.getClassifier() )
+                                ? request.getClassifier()
+                                : type != null ? type.getClassifier() : null;
+        String extension = StringUtils.isNotEmpty( request.getExtension() )
+                                ? request.getExtension() : type != null ? type.getExtension() : null;
         return new DefaultArtifact(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(
                     request.getGroupId(),
                     request.getArtifactId(),
-                    request.getClassifier(),
-                    request.getExtension(),
+                    classifier,
+                    extension,
                     request.getVersion(),
                     type ) );
     }

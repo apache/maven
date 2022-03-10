@@ -20,8 +20,6 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,13 +36,11 @@ import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.metadata.Metadata;
 
-@Named
 public class DefaultArtifactInstaller implements ArtifactInstaller
 {
 
     private final RepositorySystem repositorySystem;
 
-    @Inject
     DefaultArtifactInstaller( @Nonnull RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );

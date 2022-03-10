@@ -49,15 +49,20 @@ public interface ProjectManager extends Service
     @Nonnull
     Collection<Artifact> getAttachedArtifacts( Project project );
 
-    default void attachArtifact( Session session, Project project, String type, Path path )
+    default void attachArtifact( Session session, Project project, Path path )
     {
-        attachArtifact( session, project, type, "", path );
+        String name = path.getFileName().toString();
+        int dot = name.lastIndexOf( '.' );
+        String ext = dot >= 1 ? name.substring( dot + 1 ) : "";
+        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
+                project.getVersion(), ext );
+        attachArtifact( project, artifact, path );
     }
 
-    default void attachArtifact( Session session, Project project, String type, String classifier, Path path )
+    default void attachArtifact( Session session, Project project, String type, Path path )
     {
         Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                    classifier, project.getVersion(), type );
+                                                    project.getVersion(), null, null, type );
         attachArtifact( project, artifact, path );
     }
 

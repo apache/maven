@@ -236,7 +236,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "reactorProjects".equals( expression ) )
         {
-            value = session.getProjects();
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( ( DefaultSession ) session.getSession() ).getProjects( session.getProjects() );
+            }
+            else
+            {
+                value = session.getProjects();
+            }
         }
         else if ( "mojoExecution".equals( expression ) )
         {
@@ -255,7 +262,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "executedProject".equals( expression ) )
         {
-            value = project.getExecutionProject();
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( (DefaultSession) session.getSession() ).getProject( project.getExecutionProject() );
+            }
+            else
+            {
+                value = project.getExecutionProject();
+            }
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
         {

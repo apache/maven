@@ -41,7 +41,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory
     @Override
     public LocalRepository createLocal( Path path )
     {
-        return new DefaultLocalRepository( new org.eclipse.aether.repository.LocalRepository( "target/repo" ) );
+        return new DefaultLocalRepository( new org.eclipse.aether.repository.LocalRepository( path.toFile() ) );
     }
 
     @Override

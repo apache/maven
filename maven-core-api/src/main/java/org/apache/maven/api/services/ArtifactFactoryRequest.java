@@ -35,33 +35,34 @@ public interface ArtifactFactoryRequest
 
     String getVersion();
 
-    String getType();
+    String getClassifier();
 
     String getExtension();
 
-    String getClassifier();
+    String getType();
 
     static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String version, String type )
+                                         String version, String extension )
     {
         return ArtifactFactoryRequest.builder()
                 .session( session )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
-                .type( type )
+                .extension( extension )
                 .build();
     }
 
     static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String classifier, String version, String type )
+                                         String version, String classifier, String extension, String type )
     {
         return ArtifactFactoryRequest.builder()
                 .session( session )
                 .groupId( groupId )
                 .artifactId( artifactId )
-                .classifier( classifier )
                 .version( version )
+                .classifier( classifier )
+                .extension( extension )
                 .type( type )
                 .build();
     }
@@ -77,9 +78,9 @@ public interface ArtifactFactoryRequest
         private String groupId;
         private String artifactId;
         private String version;
-        private String type;
-        private String extension;
         private String classifier;
+        private String extension;
+        private String type;
 
         public ArtifactFactoryRequestBuilder session( Session session )
         {
@@ -105,9 +106,9 @@ public interface ArtifactFactoryRequest
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder type( String type )
+        public ArtifactFactoryRequestBuilder classifier( String classifier )
         {
-            this.type = type;
+            this.classifier = classifier;
             return this;
         }
 
@@ -117,16 +118,16 @@ public interface ArtifactFactoryRequest
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder classifier( String classifier )
+        public ArtifactFactoryRequestBuilder type( String type )
         {
-            this.classifier = classifier;
+            this.type = type;
             return this;
         }
 
         public ArtifactFactoryRequest build()
         {
-            return new DefaultArtifactFactoryRequest( session, groupId, artifactId,
-                                                      version, type, extension, classifier );
+            return new DefaultArtifactFactoryRequest( session, groupId, artifactId, version,
+                                                      classifier, extension, type );
         }
 
         private static class DefaultArtifactFactoryRequest extends BaseRequest implements ArtifactFactoryRequest
@@ -134,25 +135,25 @@ public interface ArtifactFactoryRequest
             private final String groupId;
             private final String artifactId;
             private final String version;
-            private final String type;
-            private final String extension;
             private final String classifier;
+            private final String extension;
+            private final String type;
 
             DefaultArtifactFactoryRequest( @Nonnull Session session,
                                            String groupId,
                                            String artifactId,
                                            String version,
-                                           String type,
+                                           String classifier,
                                            String extension,
-                                           String classifier )
+                                           String type )
             {
                 super( session );
                 this.groupId = groupId;
                 this.artifactId = artifactId;
                 this.version = version;
-                this.type = type;
-                this.extension = extension;
                 this.classifier = classifier;
+                this.extension = extension;
+                this.type = type;
             }
 
             @Override
@@ -174,9 +175,9 @@ public interface ArtifactFactoryRequest
             }
 
             @Override
-            public String getType()
+            public String getClassifier()
             {
-                return type;
+                return classifier;
             }
 
             @Override
@@ -186,9 +187,9 @@ public interface ArtifactFactoryRequest
             }
 
             @Override
-            public String getClassifier()
+            public String getType()
             {
-                return classifier;
+                return type;
             }
         }
     }

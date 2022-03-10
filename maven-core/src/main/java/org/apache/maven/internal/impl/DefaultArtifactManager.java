@@ -20,7 +20,6 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.annotation.Nonnull;
-import javax.inject.Named;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -31,13 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
-import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Metadata;
 import org.apache.maven.api.services.ArtifactManager;
 
-@Named
-@SessionScoped
 public class DefaultArtifactManager implements ArtifactManager
 {
     private static final String SNAPSHOT = "SNAPSHOT";

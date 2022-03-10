@@ -28,16 +28,17 @@ public interface ArtifactFactory extends Service
     Artifact create( ArtifactFactoryRequest request )
             throws ArtifactFactoryException, IllegalArgumentException;
 
-    default Artifact create( Session session, String groupId, String artifactId, String version, String type )
+    default Artifact create( Session session, String groupId, String artifactId, String version, String extension )
             throws ArtifactFactoryException, IllegalArgumentException
     {
-        return create( ArtifactFactoryRequest.build( session, groupId, artifactId, version, type ) );
+        return create( ArtifactFactoryRequest.build( session, groupId, artifactId, version, extension ) );
     }
 
-    default Artifact create( Session session, String groupId, String artifactId,
-                             String classifier, String version, String type )
+    default Artifact create( Session session, String groupId, String artifactId, String version,
+                             String classifier, String extension, String type )
             throws ArtifactFactoryException, IllegalArgumentException
     {
-        return create( ArtifactFactoryRequest.build( session, groupId, artifactId, classifier, version, type ) );
+        return create( ArtifactFactoryRequest.build( session, groupId, artifactId,
+                                                     version, classifier, extension, type ) );
     }
 }

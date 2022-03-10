@@ -308,6 +308,13 @@ public class DefaultSession implements Session
         return allDependencies.computeIfAbsent( dependency, d -> new DefaultDependency( this, d ) );
     }
 
+    public List<Project> getProjects( List<MavenProject> projects )
+    {
+        return projects == null ? null : projects.stream()
+                .map( this::getProject )
+                .collect( Collectors.toList() );
+    }
+
     public Project getProject( MavenProject project )
     {
         return allProjects.computeIfAbsent( project.getId(), id -> new DefaultProject( this, project ) );

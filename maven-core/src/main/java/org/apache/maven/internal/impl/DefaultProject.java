@@ -143,7 +143,7 @@ public class DefaultProject implements Project
             public Artifact getArtifact()
             {
                 return session.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                        dependency.getVersion(), dependency.getType() );
+                        dependency.getVersion(), null, null, dependency.getType() );
             }
 
             @Nonnull

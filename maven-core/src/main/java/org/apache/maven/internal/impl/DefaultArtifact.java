@@ -111,13 +111,17 @@ public class DefaultArtifact implements Artifact
             return false;
         }
         DefaultArtifact that = (DefaultArtifact) o;
-        return artifact.equals( that.artifact );
+        return Objects.equals( this.getGroupId(), that.getGroupId() )
+                && Objects.equals( this.getArtifactId(), that.getArtifactId() )
+                && Objects.equals( this.getVersion(), that.getVersion() )
+                && Objects.equals( this.getClassifier(), that.getClassifier() )
+                && Objects.equals( this.getExtension(), that.getExtension() );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( artifact );
+        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier(), getExtension() );
     }
 
     @Override

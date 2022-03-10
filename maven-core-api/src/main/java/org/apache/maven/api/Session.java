@@ -135,21 +135,22 @@ public interface Session
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      */
-    default Artifact createArtifact( String groupId, String artifactId, String version, String type )
+    default Artifact createArtifact( String groupId, String artifactId, String version, String extension )
             throws ArtifactFactoryException, IllegalArgumentException
     {
         return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, version, type );
+                .create( this, groupId, artifactId, version, extension );
     }
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      */
-    default Artifact createArtifact( String groupId, String artifactId, String classifier, String version, String type )
+    default Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
+                                     String extension, String type )
             throws ArtifactFactoryException, IllegalArgumentException
     {
         return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, classifier, version, type );
+                .create( this, groupId, artifactId, version, classifier, extension, type );
     }
 
     /**
