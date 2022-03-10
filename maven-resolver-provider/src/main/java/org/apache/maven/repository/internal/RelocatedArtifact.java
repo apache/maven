@@ -153,9 +153,4 @@ public final class RelocatedArtifact
         return message;
     }
 
-    @Override
-    protected Artifact newInstance( String version, Map<String, String> properties, File file )
-    {
-        throw new IllegalStateException();
-    }
 }
