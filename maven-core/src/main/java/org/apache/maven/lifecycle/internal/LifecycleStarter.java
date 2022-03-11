@@ -108,10 +108,8 @@ public class LifecycleStarter
                 lifecycleDebugLogger.debugReactorPlan( projectBuilds );
             }
 
-            ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus( session.getProjectDependencyGraph() );
-            reactorContext =
-                new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus );
+            reactorContext = new ReactorContext( result, projectIndex, reactorBuildStatus );
 
             String builderId = session.getRequest().getBuilderId();
             Builder builder = builders.get( builderId );

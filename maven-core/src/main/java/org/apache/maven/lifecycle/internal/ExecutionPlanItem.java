@@ -19,7 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -49,8 +48,6 @@ public class ExecutionPlanItem
     public static List<ExecutionPlanItem> createExecutionPlanItems( MavenProject mavenProject,
                                                                     List<MojoExecution> executions )
     {
-        BuilderCommon.attachToThread( mavenProject );
-
         List<ExecutionPlanItem> result = new ArrayList<>();
         for ( MojoExecution mojoExecution : executions )
         {

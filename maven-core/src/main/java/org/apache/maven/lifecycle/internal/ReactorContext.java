@@ -35,16 +35,13 @@ public class ReactorContext
 
     private final ProjectIndex projectIndex;
 
-    private final ClassLoader originalContextClassLoader;
-
     private final ReactorBuildStatus reactorBuildStatus;
 
     public ReactorContext( MavenExecutionResult result, ProjectIndex projectIndex,
-                           ClassLoader originalContextClassLoader, ReactorBuildStatus reactorBuildStatus )
+                           ReactorBuildStatus reactorBuildStatus )
     {
         this.result = result;
         this.projectIndex = projectIndex;
-        this.originalContextClassLoader = originalContextClassLoader;
         this.reactorBuildStatus = reactorBuildStatus;
     }
 
@@ -61,11 +58,6 @@ public class ReactorContext
     public ProjectIndex getProjectIndex()
     {
         return projectIndex;
-    }
-
-    public ClassLoader getOriginalContextClassLoader()
-    {
-        return originalContextClassLoader;
     }
 
 }

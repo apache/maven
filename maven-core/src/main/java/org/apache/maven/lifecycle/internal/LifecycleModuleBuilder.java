@@ -84,6 +84,21 @@ public class LifecycleModuleBuilder
     public void buildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
                               MavenProject currentProject, TaskSegment taskSegment )
     {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            BuilderCommon.attachToThread( currentProject );
+            doBuildProject( session, rootSession, reactorContext, currentProject, taskSegment );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( tccl );
+        }
+    }
+
+    private void doBuildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
+                                   MavenProject currentProject, TaskSegment taskSegment )
+    {
         session.setCurrentProject( currentProject );
 
         long buildStartTime = System.currentTimeMillis();
@@ -104,8 +119,6 @@ public class LifecycleModuleBuilder
                 eventCatapult.fire( ExecutionEvent.Type.ProjectSkipped, session, null );
                 return;
             }
-
-            BuilderCommon.attachToThread( currentProject );
 
             projectExecutionListener.beforeProjectExecution( new ProjectExecutionEvent( session, currentProject ) );
 
@@ -155,8 +168,6 @@ public class LifecycleModuleBuilder
             }
 
             session.setCurrentProject( null );
-
-            Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
         }
     }
 }

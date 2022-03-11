@@ -20,7 +20,6 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -57,7 +56,6 @@ public class BuildListCalculator
             }
             for ( MavenProject project : projects )
             {
-                BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
                 MavenSession copiedSession = session.clone();
                 copiedSession.setCurrentProject( project );
                 projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
