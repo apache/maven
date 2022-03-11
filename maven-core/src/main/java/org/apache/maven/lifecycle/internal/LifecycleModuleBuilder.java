@@ -84,21 +84,6 @@ public class LifecycleModuleBuilder
     public void buildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
                               MavenProject currentProject, TaskSegment taskSegment )
     {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            BuilderCommon.attachToThread( currentProject );
-            doBuildProject( session, rootSession, reactorContext, currentProject, taskSegment );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( tccl );
-        }
-    }
-
-    private void doBuildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
-                                   MavenProject currentProject, TaskSegment taskSegment )
-    {
         session.setCurrentProject( currentProject );
 
         long buildStartTime = System.currentTimeMillis();

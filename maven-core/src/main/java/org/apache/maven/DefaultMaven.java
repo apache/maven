@@ -23,9 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -51,6 +49,8 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -202,12 +202,7 @@ public class DefaultMaven
     {
         try
         {
-            // CHECKSTYLE_OFF: LineLength
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
-            {
-                listener.afterSessionStart( session );
-            }
-            // CHECKSTYLE_ON: LineLength
+            callListeners( session, AbstractMavenLifecycleParticipant::afterSessionStart );
         }
         catch ( MavenExecutionException e )
         {
@@ -232,6 +227,32 @@ public class DefaultMaven
             return addExceptionToResult( result, e );
         }
 
+
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            ClassRealm lookupRealm = setupBuildExtensions( session );
+            Thread.currentThread().setContextClassLoader( lookupRealm );
+            container.setLookupRealm( lookupRealm );
+
+            return doExecute2( request, result, session, repoSession );
+        }
+        catch ( DuplicateRealmException e )
+        {
+            return addExceptionToResult( result, e );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( tccl );
+        }
+    }
+
+    private MavenExecutionResult doExecute2( MavenExecutionRequest request,
+                                             MavenExecutionResult result,
+                                             MavenSession session,
+                                             DefaultRepositorySystemSession repoSession )
+    {
+        Result<? extends ProjectDependencyGraph> graphResult;
         try
         {
             setupWorkspaceReader( session, repoSession );
@@ -243,23 +264,13 @@ public class DefaultMaven
 
         repoSession.setReadOnly();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterProjectsRead( session );
-            }
+            callListeners( session, AbstractMavenLifecycleParticipant::afterProjectsRead );
         }
         catch ( MavenExecutionException e )
         {
             return addExceptionToResult( result, e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
         //
@@ -313,8 +324,57 @@ public class DefaultMaven
                 return addExceptionToResult( result, e );
             }
         }
-
         return result;
+    }
+
+    @FunctionalInterface
+    interface ListenerMethod
+    {
+        void run( AbstractMavenLifecycleParticipant listener, MavenSession session ) throws MavenExecutionException;
+    }
+
+    private void callListeners( MavenSession session, ListenerMethod method ) throws MavenExecutionException
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( session.getProjects() ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                method.run( listener, session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
+    }
+
+    private ClassRealm setupBuildExtensions( MavenSession session ) throws DuplicateRealmException
+    {
+        List<ClassRealm> buildExtensionsRealms = new ArrayList<>();
+        for ( MavenProject project : session.getProjects() )
+        {
+            ClassRealm realm = project.getClassRealm();
+            if ( realm != null )
+            {
+                buildExtensionsRealms.add( realm );
+            }
+        }
+        if ( !buildExtensionsRealms.isEmpty() )
+        {
+            ClassRealm extRealm = container.createChildRealm( "session.ext" );
+            for ( ClassRealm realm : buildExtensionsRealms )
+            {
+                extRealm.importFrom( realm, realm.getId() );
+            }
+            return extRealm;
+        }
+        else
+        {
+            return container.getContainerRealm();
+        }
     }
 
     private void setupWorkspaceReader( MavenSession session, DefaultRepositorySystemSession repoSession )
@@ -331,8 +391,7 @@ public class DefaultMaven
             workspaceReaders.add( repoWorkspaceReader );
         }
         // 3) .. n) Project-scoped workspace readers
-        for ( WorkspaceReader workspaceReader : getProjectScopedExtensionComponents( session.getProjects(),
-                                                                                     WorkspaceReader.class ) )
+        for ( WorkspaceReader workspaceReader : container.lookupList( WorkspaceReader.class ) )
         {
             if ( workspaceReaders.contains( workspaceReader ) )
             {
@@ -342,26 +401,12 @@ public class DefaultMaven
         }
         WorkspaceReader[] readers = workspaceReaders.toArray( new WorkspaceReader[0] );
         repoSession.setWorkspaceReader( new ChainedWorkspaceReader( readers ) );
-
     }
 
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
         throws MavenExecutionException
     {
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterSessionEnd( session );
-            }
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
+        callListeners( session, AbstractMavenLifecycleParticipant::afterSessionEnd );
     }
 
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
@@ -398,47 +443,7 @@ public class DefaultMaven
             logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
         }
 
-        lifecycleListeners.addAll( getProjectScopedExtensionComponents( projects,
-                                                                        AbstractMavenLifecycleParticipant.class ) );
-
         return lifecycleListeners;
-    }
-
-    protected <T> Collection<T> getProjectScopedExtensionComponents( Collection<MavenProject> projects, Class<T> role )
-    {
-
-        Collection<T> foundComponents = new LinkedHashSet<>();
-        Collection<ClassLoader> scannedRealms = new HashSet<>();
-
-        Thread currentThread = Thread.currentThread();
-        ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
-        try
-        {
-            for ( MavenProject project : projects )
-            {
-                ClassLoader projectRealm = project.getClassRealm();
-
-                if ( projectRealm != null && scannedRealms.add( projectRealm ) )
-                {
-                    currentThread.setContextClassLoader( projectRealm );
-
-                    try
-                    {
-                        foundComponents.addAll( container.lookupList( role ) );
-                    }
-                    catch ( ComponentLookupException e )
-                    {
-                        // this is just silly, lookupList should return an empty list!
-                        logger.warn( "Failed to lookup " + role + ": " + e.getMessage() );
-                    }
-                }
-            }
-            return foundComponents;
-        }
-        finally
-        {
-            currentThread.setContextClassLoader( originalContextClassLoader );
-        }
     }
 
     private MavenExecutionResult addExceptionToResult( MavenExecutionResult result, Throwable e )
