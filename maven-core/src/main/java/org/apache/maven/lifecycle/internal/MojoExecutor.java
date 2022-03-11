@@ -19,6 +19,11 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -38,8 +43,6 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
 
@@ -69,26 +72,27 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Kristian Rosenvold
  * @since 3.0
  */
-@Component( role = MojoExecutor.class )
+@Named
+@Singleton
 public class MojoExecutor
 {
 
-    @Requirement
+    @Inject
     private BuildPluginManager pluginManager;
 
-    @Requirement
+    @Inject
     private MavenPluginManager mavenPluginManager;
 
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
     private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
-    @Requirement
-    private MojosExecutionStrategy mojosExecutionStrategy;
+    @Inject
+    private Provider<MojosExecutionStrategy> mojosExecutionStrategy;
 
     public MojoExecutor()
     {
@@ -159,7 +163,9 @@ public class MojoExecutor
 
         final PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        mojosExecutionStrategy.execute( mojoExecutions, session, new MojoExecutionRunner()
+        final MojosExecutionStrategy strategy = mojosExecutionStrategy.get();
+
+        strategy.execute( mojoExecutions, session, new MojoExecutionRunner()
         {
             @Override
             public void run( MojoExecution mojoExecution ) throws LifecycleExecutionException
