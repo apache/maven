@@ -33,6 +33,15 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2022-03-05</created>
+        <revision>3.8.5</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.5/source/apache-maven-3.8.5-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.5/source/apache-maven-3.8.5-src.tar.gz</file-release>
+      </Version>
+      <Version>
+        <name>Apache Maven 3.8.4</name>
         <created>2021-11-14</created>
         <revision>3.8.4</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.zip</file-release>
