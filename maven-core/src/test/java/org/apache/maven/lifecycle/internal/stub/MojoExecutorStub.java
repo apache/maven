@@ -15,6 +15,8 @@
 
 package org.apache.maven.lifecycle.internal.stub;
 
+import javax.inject.Provider;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.DependencyContext;
@@ -49,7 +51,7 @@ public class MojoExecutorStub
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
             ExecutionEventCatapult eventCatapult,
-            MojosExecutionStrategy mojosExecutionStrategy )
+            Provider<MojosExecutionStrategy> mojosExecutionStrategy )
     {
         super( pluginManager, mavenPluginManager, lifeCycleDependencyResolver, eventCatapult, mojosExecutionStrategy );
     }
