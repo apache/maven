@@ -62,7 +62,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -385,17 +384,28 @@ public class DefaultMaven
     private void afterSessionStart( MavenSession session )
         throws MavenExecutionException
     {
-        // CHECKSTYLE_OFF: LineLength
-        for ( AbstractMavenLifecycleParticipant listener : getExtensionComponents( Collections.emptyList(),
-                                                                                   AbstractMavenLifecycleParticipant.class ) )
-        // CHECKSTYLE_ON: LineLength
-        {
-            listener.afterSessionStart( session );
-        }
+        callListeners( session, AbstractMavenLifecycleParticipant::afterSessionStart );
     }
 
     private void afterProjectsRead( MavenSession session )
         throws MavenExecutionException
+    {
+        callListeners( session, AbstractMavenLifecycleParticipant::afterProjectsRead );
+    }
+
+    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
+        throws MavenExecutionException
+    {
+        callListeners( session, AbstractMavenLifecycleParticipant::afterSessionEnd );
+    }
+
+    @FunctionalInterface
+    interface ListenerMethod
+    {
+        void run( AbstractMavenLifecycleParticipant listener, MavenSession session ) throws MavenExecutionException;
+    }
+
+    private void callListeners( MavenSession session, ListenerMethod method ) throws MavenExecutionException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
@@ -407,29 +417,7 @@ public class DefaultMaven
             {
                 Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
 
-                listener.afterProjectsRead( session );
-            }
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( originalClassLoader );
-        }
-    }
-
-    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
-        throws MavenExecutionException
-    {
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            // CHECKSTYLE_OFF: LineLength
-            for ( AbstractMavenLifecycleParticipant listener : getExtensionComponents( projects,
-                                                                                       AbstractMavenLifecycleParticipant.class ) )
-            // CHECKSTYLE_ON: LineLength
-            {
-                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
-
-                listener.afterSessionEnd( session );
+                method.run( listener, session );
             }
         }
         finally
