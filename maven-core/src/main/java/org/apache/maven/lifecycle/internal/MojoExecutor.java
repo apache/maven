@@ -38,8 +38,10 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
 
@@ -88,7 +90,7 @@ public class MojoExecutor
     private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
     @Requirement
-    private MojosExecutionStrategy mojosExecutionStrategy;
+    private PlexusContainer container;
 
     public MojoExecutor()
     {
@@ -159,7 +161,16 @@ public class MojoExecutor
 
         final PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        mojosExecutionStrategy.execute( mojoExecutions, session, new MojoExecutionRunner()
+        MojosExecutionStrategy strategy;
+        try
+        {
+            strategy = container.lookup( MojosExecutionStrategy.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Unable to lookup MojosExecutionStrategy", e );
+        }
+        strategy.execute( mojoExecutions, session, new MojoExecutionRunner()
         {
             @Override
             public void run( MojoExecution mojoExecution ) throws LifecycleExecutionException
