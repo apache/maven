@@ -35,6 +35,7 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingHelper;
 import org.apache.maven.session.scope.internal.SessionScope;
 
 /**
@@ -58,6 +59,7 @@ public class LifecycleModuleBuilder
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
     private final SessionScope sessionScope;
+    private final ProjectBuildingHelper projectBuildingHelper;
 
     @Inject
     public LifecycleModuleBuilder(
@@ -65,13 +67,15 @@ public class LifecycleModuleBuilder
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            SessionScope sessionScope )
+            SessionScope sessionScope,
+            ProjectBuildingHelper projectBuildingHelper )
     {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener( listeners );
         this.sessionScope = sessionScope;
+        this.projectBuildingHelper = projectBuildingHelper;
     }
 
     public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,
@@ -104,7 +108,7 @@ public class LifecycleModuleBuilder
                 return;
             }
 
-            BuilderCommon.attachToThread( currentProject );
+            projectBuildingHelper.selectProjectRealm( currentProject );
 
             projectExecutionListener.beforeProjectExecution( new ProjectExecutionEvent( session, currentProject ) );
 
