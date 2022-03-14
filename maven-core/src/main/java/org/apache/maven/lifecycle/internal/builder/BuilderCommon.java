@@ -56,7 +56,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,15 +231,6 @@ public class BuilderCommon
         {
             logger.error( "invalid reactor failure behavior " + rootSession.getReactorFailureBehavior() );
             buildContext.getReactorBuildStatus().halt();
-        }
-    }
-
-    public static void attachToThread( MavenProject currentProject )
-    {
-        ClassRealm projectRealm = currentProject.getClassRealm();
-        if ( projectRealm != null )
-        {
-            Thread.currentThread().setContextClassLoader( projectRealm );
         }
     }
 

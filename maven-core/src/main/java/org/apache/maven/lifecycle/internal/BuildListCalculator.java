@@ -27,7 +27,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -60,18 +59,9 @@ public class BuildListCalculator
             }
             for ( MavenProject project : projects )
             {
-                ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-                try
-                {
-                    BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
-                    MavenSession copiedSession = session.clone();
-                    copiedSession.setCurrentProject( project );
-                    projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
-                }
-                finally
-                {
-                    Thread.currentThread().setContextClassLoader( tccl );
-                }
+                MavenSession copiedSession = session.clone();
+                copiedSession.setCurrentProject( project );
+                projectBuilds.add( new ProjectSegment( project, taskSegment, copiedSession ) );
             }
         }
         return new ProjectBuildList( projectBuilds );
