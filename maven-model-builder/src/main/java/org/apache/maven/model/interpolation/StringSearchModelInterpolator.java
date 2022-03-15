@@ -85,7 +85,7 @@ public class StringSearchModelInterpolator
     void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
                             ModelProblemCollector problems )
     {
-        List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
+        List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config );
         List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
