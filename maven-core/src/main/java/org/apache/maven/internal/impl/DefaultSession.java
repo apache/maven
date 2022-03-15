@@ -53,6 +53,9 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.ToolchainManager;
+import org.apache.maven.api.services.xml.ModelXmlFactory;
+import org.apache.maven.api.services.xml.SettingsXmlFactory;
+import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
@@ -274,6 +277,18 @@ public class DefaultSession implements Session
         else if ( clazz == ToolchainManager.class )
         {
             return (T) new DefaultToolchainManager( toolchainManagerPrivate );
+        }
+        else if ( clazz == ModelXmlFactory.class )
+        {
+            return (T) new DefaultModelXmlFactory();
+        }
+        else if ( clazz == SettingsXmlFactory.class )
+        {
+            return (T) new DefaultSettingsXmlFactory();
+        }
+        else if ( clazz == ToolchainsXmlFactory.class )
+        {
+            return (T) new DefaultToolchainsXmlFactory();
         }
         throw new NoSuchElementException( clazz.getName() );
     }
