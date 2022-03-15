@@ -27,7 +27,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
@@ -35,6 +37,7 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryException;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
+import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverResult;
@@ -48,6 +51,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Service;
+import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -125,6 +129,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(RepositoryFactory.class).createLocal(...)</code>
+     * @see RepositoryFactory#createLocal(Path)
      */
     default LocalRepository createLocalRepository( Path path )
             throws ArtifactFactoryException, IllegalArgumentException
@@ -133,7 +138,30 @@ public interface Session
     }
 
     /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
+     * @see RepositoryFactory#createRemote(String, String)
+     */
+    @Nonnull
+    default RemoteRepository createRemoteRepository( @Nonnull String id, @Nonnull String url )
+    {
+        return getService( RepositoryFactory.class )
+                .createRemote( id, url );
+    }
+
+    /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
+     * @see RepositoryFactory#createRemote(Repository)
+     */
+    @Nonnull
+    default RemoteRepository createRemoteRepository( @Nonnull Repository repository )
+    {
+        return getService( RepositoryFactory.class )
+                .createRemote( repository );
+    }
+
+    /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     * @see ArtifactFactory#create(Session, String, String, String, String)
      */
     default Artifact createArtifact( String groupId, String artifactId, String version, String extension )
             throws ArtifactFactoryException, IllegalArgumentException
@@ -144,6 +172,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     * @see ArtifactFactory#create(Session, String, String, String, String, String, String)
      */
     default Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
                                      String extension, String type )
@@ -155,6 +184,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     * @see ArtifactResolver#resolve(Session, Artifact)
      */
     default ArtifactResolverResult resolveArtifact( Artifact artifact )
             throws ArtifactResolverException, IllegalArgumentException
@@ -164,17 +194,29 @@ public interface Session
     }
 
     /**
-     * Shortcut for <code>getService(ArtifactResolver.class).install(...)</code>
+     * Shortcut for <code>getService(ArtifactInstaller.class).install(...)</code>
+     * @see ArtifactInstaller#install(Session, Collection)
      */
-    default void installArtifact( Artifact... artifacts )
-        throws ArtifactInstallerException, IllegalArgumentException
+    default void installArtifacts( Artifact... artifacts )
+            throws ArtifactInstallerException, IllegalArgumentException
     {
-        getService( ArtifactInstaller.class )
-                .install( this, Arrays.asList( artifacts ) );
+        installArtifacts( Arrays.asList( artifacts ) );
     }
 
     /**
-     * Shortcut for <code>getService(ArtifactResolver.class).deploy(...)</code>
+     * Shortcut for <code>getService(ArtifactInstaller.class).install(...)</code>
+     * @see ArtifactInstaller#install(Session, Collection)
+     */
+    default void installArtifacts( Collection<Artifact> artifacts )
+            throws ArtifactInstallerException, IllegalArgumentException
+    {
+        getService( ArtifactInstaller.class )
+                .install( this, artifacts );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactDeployer.class).deploy(...)</code>
+     * @see ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
      */
     default void deployArtifact( RemoteRepository repository, Artifact... artifacts )
         throws ArtifactDeployerException, IllegalArgumentException
@@ -184,7 +226,39 @@ public interface Session
     }
 
     /**
+     * Shortcut for <code>getService(ArtifactManager.class).setPath(...)</code>
+     * @see ArtifactManager#setPath(Artifact, Path)
+     */
+    default void setArtifactPath( @Nonnull Artifact artifact, Path path )
+    {
+        getService( ArtifactManager.class )
+                .setPath( artifact, path );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactManager.class).getPath(...)</code>
+     * @see ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    default Optional<Path> getArtifactPath( @Nonnull Artifact artifact )
+    {
+        return getService( ArtifactManager.class )
+                .getPath( artifact );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactManager.class).isSnapshot(...)</code>
+     * @see ArtifactManager#isSnapshot(String)
+     */
+    default boolean isVersionSnapshot( @Nonnull String version )
+    {
+        return getService( ArtifactManager.class )
+                .isSnapshot( version );
+    }
+
+    /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * @see DependencyFactory#create(Session, Artifact)
      */
     default Dependency createDependency( Artifact artifact )
     {
@@ -194,6 +268,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * @see DependencyCollector#collect(Session, Artifact)
      */
     default DependencyCollectorResult collectDependencies( Artifact artifact )
             throws DependencyCollectorException, IllegalArgumentException
@@ -204,6 +279,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * @see DependencyCollector#collect(Session, Project)
      */
     default DependencyCollectorResult collectDependencies( Project project )
             throws DependencyCollectorException, IllegalArgumentException
@@ -214,6 +290,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     * @see DependencyCollector#collect(Session, Dependency)
      */
     default DependencyCollectorResult collectDependencies( Dependency dependency )
             throws DependencyCollectorException, IllegalArgumentException
@@ -224,6 +301,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
+     * @see DependencyResolver#resolve(Session, Dependency, Predicate)
      */
     default DependencyResolverResult resolveDependencies( Dependency dependency )
             throws DependencyResolverException, IllegalArgumentException
