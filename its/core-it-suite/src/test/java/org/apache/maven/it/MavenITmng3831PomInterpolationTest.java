@@ -36,7 +36,7 @@ public class MavenITmng3831PomInterpolationTest
 
     public MavenITmng3831PomInterpolationTest()
     {
-        super( "(,2.0.2),(2.0.2,)" );
+        super( "(,2.0.2),(2.0.2,4.0.0-alpha-1)" );
     }
 
     /**

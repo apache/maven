@@ -32,7 +32,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>child</name>
-  <description>${project.parent.artifactId}, ${project.artifactId}, ${parent.artifactId}, ${project.artifactId}</description>
+  <description>${project.parent.artifactId}, ${project.artifactId}</description>
 
   <build>
     <plugins>

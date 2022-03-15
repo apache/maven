@@ -54,7 +54,7 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/parent.properties" );
-        assertEquals( "parent, child, parent, child", props.getProperty( "project.description" ) );
+        assertEquals( "parent, child", props.getProperty( "project.description" ) );
     }
 
 }

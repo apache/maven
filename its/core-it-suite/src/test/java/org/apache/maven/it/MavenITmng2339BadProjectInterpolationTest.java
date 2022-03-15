@@ -25,8 +25,6 @@ import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2339">MNG-2339</a>.
- *
- *
  */
 public class MavenITmng2339BadProjectInterpolationTest
     extends AbstractMavenIntegrationTestCase
@@ -57,6 +55,7 @@ public class MavenITmng2339BadProjectInterpolationTest
     public void testitMNG2339b()
         throws Exception
     {
+        requiresMavenVersion( "(2.0.8,4.0.0-alpha-1)" );
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2339/b" );
 
         Verifier verifier;
