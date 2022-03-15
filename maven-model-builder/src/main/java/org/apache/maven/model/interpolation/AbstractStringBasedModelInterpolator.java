@@ -31,7 +31,6 @@ import javax.inject.Inject;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -89,8 +88,7 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
-                                                    final ModelBuildingRequest config,
-                                                    final ModelProblemCollector problems )
+                                                    final ModelBuildingRequest config )
     {
         Properties modelProperties = model.getProperties();
 
