@@ -230,7 +230,7 @@ public abstract class AbstractModelInterpolatorTest
         model.setVersion( "3.8.1" );
 
         Dependency dep = new Dependency();
-        dep.setVersion( "${version}" );
+        dep.setVersion( "${project.version}" );
 
         model.addDependency( dep );
 
@@ -239,7 +239,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
                 collector );
-        assertCollectorState( 0, 0, 1, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -288,7 +288,7 @@ public abstract class AbstractModelInterpolatorTest
         model.setArtifactId( "foo" );
 
         Dependency dep = new Dependency();
-        dep.setVersion( "${artifactId}-${version}" );
+        dep.setVersion( "${project.artifactId}-${project.version}" );
 
         model.addDependency( dep );
 
@@ -297,7 +297,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
                 collector );
-        assertCollectorState( 0, 0, 2, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -426,24 +426,18 @@ public abstract class AbstractModelInterpolatorTest
 
         build.addResource( res );
 
-        Resource res2 = new Resource();
-        res2.setDirectory( "${build.sourceDirectory}" );
-
-        build.addResource( res2 );
-
         model.setBuild( build );
 
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertCollectorState( 0, 0, 1, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
 
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
         assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
     }
 
