@@ -20,6 +20,8 @@ package org.apache.maven.api;
  */
 
 
+import org.apache.maven.api.annotations.Nonnull;
+
 /**
  * Defines a hierarchical visitor for collecting dependency node trees.
  * 
@@ -35,7 +37,7 @@ public interface NodeVisitor
      * @return <code>true</code> to visit the specified dependency node's children, <code>false</code> to skip the
      *         specified dependency node's children and proceed to its next sibling
      */
-    boolean enter( Node node );
+    boolean enter( @Nonnull Node node );
 
     /**
      * Ends the visit to the specified dependency node.
@@ -44,5 +46,5 @@ public interface NodeVisitor
      * @return <code>true</code> to visit the specified dependency node's next sibling, <code>false</code> to skip the
      *         specified dependency node's next siblings and proceed to its parent
      */
-    boolean leave( Node node );
+    boolean leave( @Nonnull Node node );
 }

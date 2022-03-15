@@ -19,7 +19,7 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
+import org.apache.maven.api.annotations.Nonnull;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -19,7 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import javax.annotation.concurrent.ThreadSafe;
+import org.apache.maven.api.annotations.ThreadSafe;
 
 @ThreadSafe
 public interface Service

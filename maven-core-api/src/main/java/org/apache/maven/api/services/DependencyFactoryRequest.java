@@ -19,7 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
+import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Collection;

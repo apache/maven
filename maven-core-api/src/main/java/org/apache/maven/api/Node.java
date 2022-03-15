@@ -19,7 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.concurrent.Immutable;
+import org.apache.maven.api.annotations.Immutable;
 
 import java.util.List;
 import java.util.Optional;

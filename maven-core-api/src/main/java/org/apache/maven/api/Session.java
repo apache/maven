@@ -19,8 +19,8 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.ThreadSafe;
 
 import java.nio.file.Path;
 import java.util.Arrays;

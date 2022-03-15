@@ -19,8 +19,8 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Immutable;
 
 import java.nio.file.Path;
 import java.util.Optional;
