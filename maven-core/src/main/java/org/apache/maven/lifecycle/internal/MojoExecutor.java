@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
@@ -82,7 +83,7 @@ public class MojoExecutor
 
     private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
-    private final MojosExecutionStrategy mojosExecutionStrategy;
+    private final Provider<MojosExecutionStrategy> mojosExecutionStrategy;
 
     @Inject
     public MojoExecutor(
@@ -90,7 +91,7 @@ public class MojoExecutor
             MavenPluginManager mavenPluginManager,
             LifecycleDependencyResolver lifeCycleDependencyResolver,
             ExecutionEventCatapult eventCatapult,
-            MojosExecutionStrategy mojosExecutionStrategy )
+            Provider<MojosExecutionStrategy> mojosExecutionStrategy )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
@@ -164,7 +165,7 @@ public class MojoExecutor
 
         final PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
 
-        mojosExecutionStrategy.execute( mojoExecutions, session, new MojoExecutionRunner()
+        mojosExecutionStrategy.get().execute( mojoExecutions, session, new MojoExecutionRunner()
         {
             @Override
             public void run( MojoExecution mojoExecution ) throws LifecycleExecutionException
