@@ -103,6 +103,36 @@ import org.eclipse.sisu.Nullable;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
+    /**
+     * The tag used for the file model without profile activation
+     * @since 4.0.0
+     */
+    private static final ModelCacheTag<InterpolatedModel> INTERPOLATED = new ModelCacheTag<InterpolatedModel>()
+    {
+        @Override
+        public String getName()
+        {
+            return "interpolated";
+        }
+
+        @Override
+        public Class<InterpolatedModel> getType()
+        {
+            return InterpolatedModel.class;
+        }
+
+        @Override
+        public InterpolatedModel intoCache( InterpolatedModel data )
+        {
+            return data;
+        }
+
+        @Override
+        public InterpolatedModel fromCache( InterpolatedModel data )
+        {
+            return data;
+        }
+    };
     private final ModelMerger modelMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
@@ -517,13 +547,11 @@ public class DefaultModelBuilder
                           DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        Model inputModel =
-            readRawModel( request, problems );
+        Model inputModel = readRawModel( request, problems );
 
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
-        ModelData superData = new ModelData( null, getSuperModel() );
 
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
@@ -545,90 +573,10 @@ public class DefaultModelBuilder
 
         List<Model> lineage = new ArrayList<>();
 
-        for ( ModelData currentData = resultData; ; )
-        {
-            String modelId = currentData.getId();
-            result.addModelId( modelId );
-
-            Model rawModel = currentData.getModel();
-            result.setRawModel( modelId, rawModel );
-
-            profileActivationContext.setProjectProperties( rawModel.getProperties() );
-            problems.setSource( rawModel );
-            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
-                                                                                 profileActivationContext, problems );
-            result.setActivePomProfiles( modelId, activePomProfiles );
-
-            Model tmpModel = rawModel.clone();
-
-            problems.setSource( tmpModel );
-
-            // model normalization
-            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
-
-            profileActivationContext.setProjectProperties( tmpModel.getProperties() );
-
-            Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
-                                                                                          profileActivationContext,
-                                                                                          problems );
-            injectProfileActivations( tmpModel, interpolatedActivations );
-
-            // profile injection
-            for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
-            {
-                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
-            }
-
-            if ( currentData == resultData )
-            {
-                for ( Profile activeProfile : activeExternalProfiles )
-                {
-                    profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
-                }
-                result.setEffectiveModel( tmpModel );
-            }
-
-            lineage.add( tmpModel );
-
-            if ( currentData == superData )
-            {
-                break;
-            }
-
-            configureResolver( request.getModelResolver(), tmpModel, problems );
-
-            ModelData parentData =
-                readParent( currentData.getModel(), currentData.getSource(), request, result, problems );
-
-            if ( parentData == null )
-            {
-                currentData = superData;
-            }
-            else if ( !parentIds.add( parentData.getId() ) )
-            {
-                StringBuilder message = new StringBuilder( "The parents form a cycle: " );
-                for ( String parentId : parentIds )
-                {
-                    message.append( parentId ).append( " -> " );
-                }
-                message.append( parentData.getId() );
-
-                problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE )
-                    .setMessage( message.toString() ) );
-
-                throw problems.newModelBuildingException();
-            }
-            else
-            {
-                currentData = parentData;
-            }
-        }
+        getModelData( request, result, problems, profileActivationContext,
+                activeExternalProfiles, parentIds, lineage, resultData );
 
         problems.setSource( result.getRawModel() );
-        checkPluginVersions( lineage, request, problems );
-
-        // inheritance assembly
-        assembleInheritance( lineage, request, problems );
 
         Model resultModel = lineage.get( 0 );
 
@@ -649,6 +597,142 @@ public class DefaultModelBuilder
         configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         return resultModel;
+    }
+
+    private void getModelData( ModelBuildingRequest request,
+                               DefaultModelBuildingResult result,
+                               DefaultModelProblemCollector problems,
+                               DefaultProfileActivationContext profileActivationContext,
+                               List<Profile> activeExternalProfiles,
+                               Collection<String> parentIds,
+                               List<Model> lineage,
+                               ModelData currentData ) throws ModelBuildingException
+    {
+        ModelCache cache = request.getModelCache();
+        if ( cache != null )
+        {
+            InterpolatedModel interpolated =
+                    cache.get( currentData.getSource(), INTERPOLATED );
+            if ( interpolated != null )
+            {
+                Model model = interpolated.getModel();
+                if ( activeExternalProfiles != null )
+                {
+                    result.setEffectiveModel( model );
+                }
+                lineage.add( model );
+                for ( InterpolatedModel m = interpolated; m != null; m = m.getParent() )
+                {
+                    result.addModelId( m.getModelId() );
+                    result.setRawModel( m.getModelId(), m.getModel() );
+                    result.setActivePomProfiles( m.getModelId(), m.getProfiles() );
+                }
+                return;
+            }
+        }
+
+        String modelId = currentData.getId();
+        result.addModelId( modelId );
+
+        Model rawModel = currentData.getModel();
+        result.setRawModel( modelId, rawModel );
+
+        profileActivationContext.setProjectProperties( rawModel.getProperties() );
+        problems.setSource( rawModel );
+        List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
+                profileActivationContext, problems );
+        result.setActivePomProfiles( modelId, activePomProfiles );
+
+        Model tmpModel = rawModel.clone();
+
+        problems.setSource( tmpModel );
+
+        // model normalization
+        modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+
+        profileActivationContext.setProjectProperties( tmpModel.getProperties() );
+
+        Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
+                profileActivationContext,
+                problems );
+        injectProfileActivations( tmpModel, interpolatedActivations );
+
+        // profile injection
+        for ( Profile activeProfile : activePomProfiles )
+        {
+            profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+        }
+
+        if ( activeExternalProfiles != null )
+        {
+            for ( Profile activeProfile : activeExternalProfiles )
+            {
+                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+            }
+            result.setEffectiveModel( tmpModel );
+        }
+
+        List<Model> tmpLineage = new ArrayList<>();
+
+        tmpLineage.add( tmpModel );
+
+        InterpolatedModel parentInterpolatedModel = null;
+        if ( currentData.getSource() != null )
+        {
+            configureResolver( request.getModelResolver(), tmpModel, problems );
+
+            ModelData parentData =
+                    readParent( currentData.getModel(), currentData.getSource(), request, result, problems );
+
+            if ( parentData == null )
+            {
+                parentData = new ModelData( null, getSuperModel() );
+            }
+            if ( !parentIds.add( parentData.getId() ) )
+            {
+                throw newCycleException( problems, parentIds, parentData );
+            }
+            else
+            {
+                getModelData( request, result, problems, profileActivationContext,
+                        null, parentIds, tmpLineage, parentData );
+                if ( cache != null )
+                {
+                    parentInterpolatedModel = cache.get( parentData.getSource(), INTERPOLATED );
+                }
+            }
+        }
+
+        checkPluginVersions( tmpLineage, request, problems );
+
+        // inheritance assembly
+        assembleInheritance( tmpLineage, request, problems );
+
+        Model interpolated = tmpLineage.get( 0 );
+        lineage.add( interpolated );
+        if ( cache != null )
+        {
+            cache.put( currentData.getSource(), INTERPOLATED,
+                    new InterpolatedModel( modelId, interpolated,
+                            activePomProfiles, parentInterpolatedModel ) );
+        }
+    }
+
+    private ModelBuildingException newCycleException( DefaultModelProblemCollector problems,
+                                                      Collection<String> parentIds,
+                                                      ModelData parentData )
+    {
+        StringBuilder message = new StringBuilder( "The parents form a cycle: " );
+        for ( String parentId : parentIds )
+        {
+            message.append( parentId ).append( " -> " );
+        }
+        message.append( parentData.getId() );
+
+        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
+                .setMessage( message.toString() ) );
+
+        return problems.newModelBuildingException();
     }
 
     private Map<String, Activation> getInterpolatedActivations( Model rawModel,
@@ -1772,6 +1856,43 @@ public class DefaultModelBuilder
             // the default execution path only knows the DefaultModelProblemCollector,
             // only reason it's not in signature is because it's package private
             throw new IllegalStateException();
+        }
+    }
+
+    private static class InterpolatedModel
+    {
+        private final String modelId;
+        private final Model model;
+        private final List<Profile> profiles;
+        private final InterpolatedModel parent;
+
+        InterpolatedModel( String modelId, Model model, List<Profile> profiles,
+                                  InterpolatedModel parent )
+        {
+            this.modelId = modelId;
+            this.model = model;
+            this.profiles = profiles;
+            this.parent = parent;
+        }
+
+        public String getModelId()
+        {
+            return modelId;
+        }
+
+        public Model getModel()
+        {
+            return model;
+        }
+
+        public List<Profile> getProfiles()
+        {
+            return profiles;
+        }
+
+        public InterpolatedModel getParent()
+        {
+            return parent;
         }
     }
 
