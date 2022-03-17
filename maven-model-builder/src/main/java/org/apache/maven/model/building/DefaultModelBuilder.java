@@ -586,7 +586,7 @@ public class DefaultModelBuilder
         problems.setRootModel( resultModel );
 
         // model interpolation
-        resultModel = interpolateModel( resultModel, request, problems );
+        resultModel = interpolateModel( resultModel.clone(), request, problems );
 
         // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
