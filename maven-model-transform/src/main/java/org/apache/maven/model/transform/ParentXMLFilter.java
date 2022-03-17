@@ -22,6 +22,7 @@ package org.apache.maven.model.transform;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,12 +54,21 @@ class ParentXMLFilter
     /**
      * @param relativePathMapper
      */
-    ParentXMLFilter( XmlPullParser parser,
-                     Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath )
+    ParentXMLFilter( XmlPullParser xmlPullParser,
+                     Function<Path, Optional<RelativeProject>> relativePathMapper,
+                     Path projectPath )
     {
-        super( parser, "parent" );
+        super( xmlPullParser );
         this.relativePathMapper = relativePathMapper;
         this.projectPath = projectPath;
+    }
+
+    @Override
+    protected boolean shouldBuffer( ArrayList<String> stack )
+    {
+        return stack.size() >= 2
+                && "project".equals( stack.get( 0 ) )
+                && "parent".equals( stack.get( 1 ) );
     }
 
     protected void process( List<Event> buffer )

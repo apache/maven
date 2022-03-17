@@ -19,6 +19,7 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
@@ -36,7 +37,15 @@ public class RelativePathXMLFilter extends NodeBufferingParser
 
     public RelativePathXMLFilter( XmlPullParser xmlPullParser )
     {
-        super( xmlPullParser, "parent" );
+        super( xmlPullParser );
+    }
+
+    @Override
+    protected boolean shouldBuffer( ArrayList<String> stack )
+    {
+        return stack.size() >= 2
+                && "project".equals( stack.get( 0 ) )
+                && "parent".equals( stack.get( 1 ) );
     }
 
     protected void process( List<Event> buffer )

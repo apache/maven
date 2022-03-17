@@ -22,7 +22,6 @@ package org.apache.maven.model.transform.pull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -38,43 +37,53 @@ public abstract class NodeBufferingParser extends BufferingParser
 
     private final List<Event> buffer = new ArrayList<>();
 
-    private final String nodeName;
+    private final ArrayList<String> stack = new ArrayList<>();
 
     private boolean buffering;
 
-    public NodeBufferingParser( XmlPullParser xmlPullParser, String nodeName )
+    public NodeBufferingParser( XmlPullParser xmlPullParser )
     {
         super( xmlPullParser );
-        this.nodeName = Objects.requireNonNull( nodeName );
     }
 
     @Override
     protected boolean accept() throws XmlPullParserException, IOException
     {
-        if ( nodeName.equals( xmlPullParser.getName() ) )
+        int event = xmlPullParser.getEventType();
+        if ( event == START_TAG )
         {
-            if ( xmlPullParser.getEventType() == START_TAG && !buffering )
+            String name = xmlPullParser.getName();
+            stack.add( name );
+            if ( !buffering )
             {
-                buffer.add( bufferEvent() );
-                buffering = true;
-                return false;
-            }
-            if ( xmlPullParser.getEventType() == END_TAG && buffering )
-            {
-                buffer.add( bufferEvent() );
-                process( buffer );
-                buffering = false;
-                buffer.clear();
-                return false;
+                buffering = shouldBuffer( stack );
             }
         }
-        else if ( buffering )
+        else if ( event == END_TAG )
+        {
+            stack.remove( stack.size() - 1 );
+            if ( buffering )
+            {
+                buffering = shouldBuffer( stack );
+                if ( !buffering )
+                {
+                    buffer.add( bufferEvent() );
+                    process( buffer );
+                    buffering = false;
+                    buffer.clear();
+                    return false;
+                }
+            }
+        }
+        if ( buffering )
         {
             buffer.add( bufferEvent() );
             return false;
         }
         return true;
     }
+
+    protected abstract boolean shouldBuffer( ArrayList<String> stack );
 
     protected abstract void process( List<Event> buffer );
 

@@ -19,6 +19,7 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
@@ -36,7 +37,15 @@ class ModulesXMLFilter
 {
     ModulesXMLFilter( XmlPullParser xmlPullParser )
     {
-        super( xmlPullParser, "modules" );
+        super( xmlPullParser );
+    }
+
+    @Override
+    protected boolean shouldBuffer( ArrayList<String> stack )
+    {
+        return stack.size() >= 2
+                && "project".equals( stack.get( 0 ) )
+                && "modules".equals( stack.get( 1 ) );
     }
 
     protected void process( List<Event> buffer )
