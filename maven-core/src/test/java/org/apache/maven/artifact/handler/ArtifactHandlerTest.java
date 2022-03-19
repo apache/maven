@@ -50,28 +50,28 @@ public class ArtifactHandlerTest
         {
             if ( line.startsWith( "||" ) )
             {
-                String[] cols = line.split( "\\|\\|" );
+                String[] columns = line.split( "\\|\\|" );
                 String[] expected =
                     new String[] { "", "type", "classifier", "extension", "packaging", "language", "added to classpath",
                         "includesDependencies", "" };
 
                 int i = 0;
-                for ( String col : cols )
+                for ( String col : columns )
                 {
                     assertEquals( expected[i++], col.trim(), "Wrong column header" );
                 }
             }
             else if ( line.startsWith( "|" ) )
             {
-                String[] cols = line.split( "\\|" );
+                String[] columns = line.split( "\\|" );
 
-                String type = trimApt( cols[1] );
-                String classifier = trimApt( cols[2] );
-                String extension = trimApt( cols[3], type );
-                String packaging = trimApt( cols[4], type );
-                String language = trimApt( cols[5] );
-                String addedToClasspath = trimApt( cols[6] );
-                String includesDependencies = trimApt( cols[7] );
+                String type = trimApt( columns[1] );
+                String classifier = trimApt( columns[2] );
+                String extension = trimApt( columns[3], type );
+                String packaging = trimApt( columns[4], type );
+                String language = trimApt( columns[5] );
+                String addedToClasspath = trimApt( columns[6] );
+                String includesDependencies = trimApt( columns[7] );
 
                 ArtifactHandler handler = container.lookup( ArtifactHandler.class, type );
                 assertEquals( handler.getExtension(), extension, type + " extension" );
