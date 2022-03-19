@@ -695,6 +695,35 @@ public class DefaultProjectBuilder
             project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         }
 
+        initialProfiles( project, result );
+
+        //
+        // All the parts that were taken out of MavenProject for Maven 4.0.0
+        //
+
+        project.setProjectBuildingRequest( projectBuildingRequest );
+
+        configPluginArtifacts( project );
+
+        
+        Set<Artifact> reportArtifacts = reportArtifacts( project );
+        project.setReportArtifacts( reportArtifacts );
+
+       
+        Set<Artifact> extensionArtifacts = initialExtensionArtifacts( project );
+        project.setExtensionArtifacts( extensionArtifacts );
+
+       
+        Map<String, Artifact> map = initialVersionMap( project );
+        project.setManagedVersionMap( map );
+
+        releaseArtifactRepository( project, projectBuildingRequest );
+
+        initSnapShotArtifactRepository( project, projectBuildingRequest );
+    }
+
+    private void initialProfiles( MavenProject project, ModelBuildingResult result ) 
+    {
         List<Profile> activeProfiles = new ArrayList<>();
         activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
         activeProfiles.addAll( result.getActiveExternalProfiles() );
@@ -705,27 +734,11 @@ public class DefaultProjectBuilder
         {
             project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
         }
+    }
 
-        //
-        // All the parts that were taken out of MavenProject for Maven 4.0.0
-        //
-
-        project.setProjectBuildingRequest( projectBuildingRequest );
-
-        // pluginArtifacts
-        Set<Artifact> pluginArtifacts = new HashSet<>();
-        for ( Plugin plugin : project.getBuildPlugins() )
-        {
-            Artifact artifact = repositorySystem.createPluginArtifact( plugin );
-
-            if ( artifact != null )
-            {
-                pluginArtifacts.add( artifact );
-            }
-        }
-        project.setPluginArtifacts( pluginArtifacts );
-
-        // reportArtifacts
+    // reportArtifacts
+    private Set<Artifact> reportArtifacts( MavenProject project ) 
+    {
         Set<Artifact> reportArtifacts = new HashSet<>();
         for ( ReportPlugin report : project.getReportPlugins() )
         {
@@ -741,9 +754,12 @@ public class DefaultProjectBuilder
                 reportArtifacts.add( artifact );
             }
         }
-        project.setReportArtifacts( reportArtifacts );
+        return reportArtifacts;
+    }
 
-        // extensionArtifacts
+    // extensionArtifacts
+    private Set<Artifact> initialExtensionArtifacts( MavenProject project ) 
+    {
         Set<Artifact> extensionArtifacts = new HashSet<>();
         List<Extension> extensions = project.getBuildExtensions();
         if ( extensions != null )
@@ -769,9 +785,12 @@ public class DefaultProjectBuilder
                 }
             }
         }
-        project.setExtensionArtifacts( extensionArtifacts );
+        return extensionArtifacts;
+    }
 
-        // managedVersionMap
+    // managedVersionMap
+    private Map<String, Artifact> initialVersionMap( MavenProject project ) 
+    {
         Map<String, Artifact> map = null;
         if ( repositorySystem != null )
         {
@@ -779,74 +798,85 @@ public class DefaultProjectBuilder
             if ( ( dependencyManagement != null ) && ( ( dependencyManagement.getDependencies() ) != null )
                 && ( dependencyManagement.getDependencies().size() > 0 ) )
             {
-                map = new AbstractMap<String, Artifact>()
-                {
-                    HashMap<String, Artifact> delegate;
-
-                    @Override
-                    public Set<Entry<String, Artifact>> entrySet()
-                    {
-                        return Collections.unmodifiableSet( compute().entrySet() );
-                    }
-
-                    @Override
-                    public Set<String> keySet()
-                    {
-                        return Collections.unmodifiableSet( compute().keySet() );
-                    }
-
-                    @Override
-                    public Collection<Artifact> values()
-                    {
-                        return Collections.unmodifiableCollection( compute().values() );
-                    }
-
-                    @Override
-                    public boolean containsValue( Object value )
-                    {
-                        return compute().containsValue( value );
-                    }
-
-                    @Override
-                    public boolean containsKey( Object key )
-                    {
-                        return compute().containsKey( key );
-                    }
-
-                    @Override
-                    public Artifact get( Object key )
-                    {
-                        return compute().get( key );
-                    }
-
-                    HashMap<String, Artifact> compute()
-                    {
-                        if ( delegate == null )
-                        {
-                            delegate = new HashMap<>();
-                            for ( Dependency d : dependencyManagement.getDependencies() )
-                            {
-                                Artifact artifact = repositorySystem.createDependencyArtifact( d );
-
-                                if ( artifact != null )
-                                {
-                                    delegate.put( d.getManagementKey(), artifact );
-                                }
-                            }
-                        }
-
-                        return delegate;
-                    }
-                };
+                map = createVersionMap( dependencyManagement );
             }
             else
             {
                 map = Collections.emptyMap();
             }
         }
-        project.setManagedVersionMap( map );
+        return map;
+    }
+    //create managedVersionMap  
+    private Map<String, Artifact> createVersionMap( final DependencyManagement dependencyManagement )
+    {
+        Map<String, Artifact> map;
+        map = new AbstractMap<String, Artifact>()
+        {
+            HashMap<String, Artifact> delegate;
 
-        // release artifact repository
+            @Override
+            public Set<Entry<String, Artifact>> entrySet()
+            {
+                return Collections.unmodifiableSet( compute().entrySet() );
+            }
+
+            @Override
+            public Set<String> keySet()
+            {
+                return Collections.unmodifiableSet( compute().keySet() );
+            }
+
+            @Override
+            public Collection<Artifact> values()
+            {
+                return Collections.unmodifiableCollection( compute().values() );
+            }
+
+            @Override
+            public boolean containsValue( Object value )
+            {
+                return compute().containsValue( value );
+            }
+
+            @Override
+            public boolean containsKey( Object key )
+            {
+                return compute().containsKey( key );
+            }
+
+            @Override
+            public Artifact get( Object key )
+            {
+                return compute().get( key );
+            }
+
+            HashMap<String, Artifact> compute()
+            {
+                if ( delegate == null )
+                {
+                    delegate = new HashMap<>();
+                    for ( Dependency d : dependencyManagement.getDependencies() )
+                    {
+                        Artifact artifact = repositorySystem.createDependencyArtifact( d );
+
+                        if ( artifact != null )
+                        {
+                            delegate.put( d.getManagementKey(), artifact );
+                        }
+                    }
+                }
+
+                return delegate;
+            }
+        };
+        return map;
+    }
+
+    // release artifact repository
+    private void releaseArtifactRepository( MavenProject project, ProjectBuildingRequest projectBuildingRequest ) 
+    {
+       
         if ( project.getDistributionManagement() != null
                         && project.getDistributionManagement().getRepository() != null )
         {
@@ -869,8 +899,12 @@ public class DefaultProjectBuilder
                     + project.getId(), e );
             }
         }
-
-        // snapshot artifact repository
+    }
+    
+    // snapshot artifact repository
+    private void initSnapShotArtifactRepository( MavenProject project, ProjectBuildingRequest projectBuildingRequest ) 
+    {
+       
         if ( project.getDistributionManagement() != null
             && project.getDistributionManagement().getSnapshotRepository() != null )
         {
@@ -893,6 +927,23 @@ public class DefaultProjectBuilder
                     + project.getId(), e );
             }
         }
+    }
+
+    // pluginArtifacts
+    private void configPluginArtifacts( MavenProject project ) 
+    {
+       
+        Set<Artifact> pluginArtifacts = new HashSet<>();
+        for ( Plugin plugin : project.getBuildPlugins() )
+        {
+            Artifact artifact = repositorySystem.createPluginArtifact( plugin );
+
+            if ( artifact != null )
+            {
+                pluginArtifacts.add( artifact );
+            }
+        }
+        project.setPluginArtifacts( pluginArtifacts );
     }
 
     private void initParent( MavenProject project, Map<File, MavenProject> projects, boolean buildParentIfNotExisting,
