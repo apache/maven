@@ -145,8 +145,8 @@ public class LifecycleExecutionPlanCalculatorStub
         }
         // The remaining are basically "for future expansion"
         List<MojoExecution> me = new ArrayList<>();
-        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
+        me.add( new MojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( new MojoExecution( "compile", "default-compile", COMPILE ) );
         return createExecutionPlan( project, me );
     }
 
@@ -171,14 +171,14 @@ public class LifecycleExecutionPlanCalculatorStub
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         List<MojoExecution> me = new ArrayList<>();
-        me.add( createMojoExecution( "initialize", "default-initialize", INITIALIZE ) );
-        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
-        me.add( createMojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
-        me.add( createMojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
-        me.add( createMojoExecution( "test", "default-test", TEST ) );
-        me.add( createMojoExecution( "war", "default-war", PACKAGE ) );
-        me.add( createMojoExecution( "install", "default-install", INSTALL ) );
+        me.add( new MojoExecution( "initialize", "default-initialize", INITIALIZE ) );
+        me.add( new MojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( new MojoExecution( "compile", "default-compile", COMPILE ) );
+        me.add( new MojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
+        me.add( new MojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
+        me.add( new MojoExecution( "test", "default-test", TEST ) );
+        me.add( new MojoExecution( "war", "default-war", PACKAGE ) );
+        me.add( new MojoExecution( "install", "default-install", INSTALL ) );
         return createExecutionPlan( ProjectDependencyGraphStub.A.getExecutionProject(), me );
     }
 
@@ -188,12 +188,12 @@ public class LifecycleExecutionPlanCalculatorStub
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         List<MojoExecution> me = new ArrayList<>();
-        me.add( createMojoExecution( "enforce", "enforce-versions", VALIDATE ) );
-        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
-        me.add( createMojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
-        me.add( createMojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
-        me.add( createMojoExecution( "test", "default-test", TEST ) );
+        me.add( new MojoExecution( "enforce", "enforce-versions", VALIDATE ) );
+        me.add( new MojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( new MojoExecution( "compile", "default-compile", COMPILE ) );
+        me.add( new MojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
+        me.add( new MojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
+        me.add( new MojoExecution( "test", "default-test", TEST ) );
         return createExecutionPlan( ProjectDependencyGraphStub.B.getExecutionProject(), me );
     }
 
@@ -208,21 +208,7 @@ public class LifecycleExecutionPlanCalculatorStub
         return new MavenExecutionPlan( planItemList, DefaultLifecyclesStub.createDefaultLifecycles() );
     }
 
-    private static MojoExecution createMojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor )
-    {
-        InputSource defaultBindings = new InputSource();
-        defaultBindings.setModelId( DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID );
-
-        final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
-        plugin.setLocation( "version", new InputLocation( 12, 34, defaultBindings ) );
-        MojoExecution result = new MojoExecution( plugin, goal, executionId );
-        result.setConfiguration( new Xpp3Dom( executionId + "-" + goal ) );
-        result.setMojoDescriptor( mojoDescriptor );
-        result.setLifecyclePhase( mojoDescriptor.getPhase() );
-
-        return result;
-
-    }
+   
 
     public static MojoDescriptor createMojoDescriptor( String phaseName )
     {

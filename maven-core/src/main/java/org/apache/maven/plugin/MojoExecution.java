@@ -23,6 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -108,6 +111,23 @@ public class MojoExecution
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = configuration;
         this.executionId = null;
+    }
+    
+    public MojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor ) 
+    {
+        InputSource defaultBindings = new InputSource();
+        defaultBindings.setModelId( DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID );
+
+        final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
+        int columnNumber = new Integer( "34" );
+        plugin.setLocation( "version", new InputLocation( 12, columnNumber, defaultBindings ) );
+        this.plugin = plugin;
+        this.goal = goal;
+        this.executionId = executionId;
+        this.setConfiguration( new Xpp3Dom( executionId + "-" + goal ) );
+        this.setMojoDescriptor( mojoDescriptor );
+        this.setLifecyclePhase( mojoDescriptor.getPhase() );
+        
     }
 
     /**
