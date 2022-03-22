@@ -23,6 +23,19 @@ package org.apache.maven.repository;
 import java.io.File;
 import java.util.EventObject;
 
+import org.apache.maven.repository.Event.Initiated;
+import org.apache.maven.repository.Event.Started;
+import org.apache.maven.repository.Event.Completed;      
+import org.apache.maven.repository.Event.Error;
+import org.apache.maven.repository.Event.Progress;
+import org.apache.maven.repository.Event.Get;
+import org.apache.maven.repository.Event.Put;
+
+
+
+
+
+
 /**
  * TransferEvent is used to notify TransferListeners about progress
  * in transfer of resources form/to the repository
@@ -67,9 +80,11 @@ public class ArtifactTransferEvent
      */
     public static final int REQUEST_PUT = 6;
 
-    private int eventType;
+    // private int eventType;
 
-    private int requestType;
+    // private int requestType;
+    private Event event;
+    private Event request;
 
     private Exception exception;
 
@@ -84,15 +99,44 @@ public class ArtifactTransferEvent
     private int dataOffset;
 
     private int dataLength;
+   
 
     public ArtifactTransferEvent( String wagon, final int eventType, final int requestType,
                                   ArtifactTransferResource artifact )
     {
         super( wagon );
-
-        setEventType( eventType );
-
-        setRequestType( requestType );
+       
+         switch ( eventType )
+        {
+            case TRANSFER_INITIATED:
+                this.event = event.new Initiated(); 
+                break;
+            case TRANSFER_STARTED:
+                this.event = event.new Started();
+                break;
+            case TRANSFER_COMPLETED:
+                this.event = event.new Completed();
+                break;
+            case TRANSFER_PROGRESS:
+                this.event = event.new Progress();
+                break;
+            case TRANSFER_ERROR:
+                this.event = event.new Error();
+                break;
+            default :
+                throw new IllegalArgumentException( "Illegal event type: " + eventType );
+        }
+        switch ( requestType )
+        {
+            case REQUEST_GET:
+                this.request = request.new Get();
+                break;
+            case REQUEST_PUT:
+                this.request = request.new Put();
+                break;
+            default :
+                throw new IllegalArgumentException( "Illegal request type: " + requestType );
+        }
 
         this.artifact = artifact;
     }
@@ -110,79 +154,7 @@ public class ArtifactTransferEvent
         return artifact;
     }
 
-    /**
-     * @return Returns the exception.
-     */
-    public Exception getException()
-    {
-        return exception;
-    }
-
-    /**
-     * Returns the request type.
-     *
-     * @return Returns the request type. The Request type is one of
-     *         <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>
-     */
-    public int getRequestType()
-    {
-        return requestType;
-    }
-
-    /**
-     * Sets the request type
-     *
-     * @param requestType The requestType to set.
-     *                    The Request type value should be either
-     *                    <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>.
-     * @throws IllegalArgumentException when
-     */
-    public void setRequestType( final int requestType )
-    {
-        switch ( requestType )
-        {
-            case REQUEST_PUT:
-                break;
-            case REQUEST_GET:
-                break;
-            default :
-                throw new IllegalArgumentException( "Illegal request type: " + requestType );
-        }
-
-        this.requestType = requestType;
-    }
-
-    /**
-     * @return Returns the eventType.
-     */
-    public int getEventType()
-    {
-        return eventType;
-    }
-
-    /**
-     * @param eventType The eventType to set.
-     */
-    public void setEventType( final int eventType )
-    {
-        switch ( eventType )
-        {
-            case TRANSFER_INITIATED:
-                break;
-            case TRANSFER_STARTED:
-                break;
-            case TRANSFER_COMPLETED:
-                break;
-            case TRANSFER_PROGRESS:
-                break;
-            case TRANSFER_ERROR:
-                break;
-            default :
-                throw new IllegalArgumentException( "Illegal event type: " + eventType );
-        }
-
-        this.eventType = eventType;
-    }
+   
 
     /**
      * @return Returns the local file.
@@ -245,41 +217,16 @@ public class ArtifactTransferEvent
         StringBuilder sb = new StringBuilder( 64 );
 
         sb.append( "TransferEvent[" );
-
-        switch ( this.getRequestType() )
+        if ( request != null )
         {
-            case REQUEST_GET:
-                sb.append( "GET" );
-                break;
-            case REQUEST_PUT:
-                sb.append( "PUT" );
-                break;
-            default:
-                sb.append( this.getRequestType() );
-                break;
-        }
+           request.toStringHelper( sb );   
+        } 
+        
 
         sb.append( '|' );
-        switch ( this.getEventType() )
+        if ( event != null )
         {
-            case TRANSFER_COMPLETED:
-                sb.append( "COMPLETED" );
-                break;
-            case TRANSFER_ERROR:
-                sb.append( "ERROR" );
-                break;
-            case TRANSFER_INITIATED:
-                sb.append( "INITIATED" );
-                break;
-            case TRANSFER_PROGRESS:
-                sb.append( "PROGRESS" );
-                break;
-            case TRANSFER_STARTED:
-                sb.append( "STARTED" );
-                break;
-            default:
-                sb.append( this.getEventType() );
-                break;
+           event.toStringHelper( sb );   
         }
 
         sb.append( '|' );
@@ -293,10 +240,10 @@ public class ArtifactTransferEvent
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + eventType;
+        result = prime * result + event.getCode();
         result = prime * result + ( ( exception == null ) ? 0 : exception.hashCode() );
         result = prime * result + ( ( localFile == null ) ? 0 : localFile.hashCode() );
-        result = prime * result + requestType;
+        result = prime * result + request.getCode();
         return result;
     }
 
@@ -311,7 +258,7 @@ public class ArtifactTransferEvent
             return false;
         }
         final ArtifactTransferEvent other = (ArtifactTransferEvent) obj;
-        if ( eventType != other.eventType )
+        if ( event.getCode() != other.event.getCode() )
         {
             return false;
         }
@@ -326,7 +273,7 @@ public class ArtifactTransferEvent
         {
             return false;
         }
-        if ( requestType != other.requestType )
+        if ( this.request.getCode() != other.request.getCode() )
         {
             return false;
         }
