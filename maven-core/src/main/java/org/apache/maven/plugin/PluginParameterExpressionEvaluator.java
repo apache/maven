@@ -194,6 +194,73 @@ public class PluginParameterExpressionEvaluator
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
+        value = getValue(value, expression, mojoDescriptor);
+
+        /*
+         * MNG-4312: We neither have reserved all of the above magic expressions nor is their set fixed/well-known (it
+         * gets occasionally extended by newer Maven versions). This imposes the risk for existing plugins to
+         * unintentionally use such a magic expression for an ordinary system property. So here we check whether we
+         * ended up with a magic value that is not compatible with the type of the configured mojo parameter (a string
+         * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
+         * expression from properties only.
+         */
+        value = processingValue(type, value, expression);
+
+        return value;
+    }
+
+    private Object processingValue(Class<?> type, Object value, String expression) throws ExpressionEvaluationException {
+        if ( value != null && type != null && !( value instanceof String ) && !isTypeCompatible( type, value ) )
+        {
+            value = null;
+        }
+
+        if ( value == null )
+        {
+            // The CLI should win for defining properties
+
+            if ( properties != null )
+            {
+                // We will attempt to get nab a system property as a way to specify a
+                // parameter to a plugins. My particular case here is allowing the surefire
+                // plugin to run a single test so I want to specify that class on the cli
+                // as a parameter.
+
+                value = properties.getProperty( expression );
+            }
+
+            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
+            {
+                value = project.getProperties().getProperty( expression );
+            }
+
+        }
+
+        if ( value instanceof String )
+        {
+            // TODO without #, this could just be an evaluate call...
+
+            String val = (String) value;
+
+            int exprStartDelimiter = val.indexOf( "${" );
+
+            if ( exprStartDelimiter >= 0 )
+            {
+                if ( exprStartDelimiter > 0 )
+                {
+                    value = val.substring( 0, exprStartDelimiter ) + evaluate( val.substring( exprStartDelimiter ) );
+                }
+                else
+                {
+                    value = evaluate( val.substring( exprStartDelimiter ) );
+                }
+            }
+        }
+        return value;
+    }
+
+    private Object getValue(Object value, String expression, MojoDescriptor mojoDescriptor)
+            throws ExpressionEvaluationException {
         if ( "localRepository".equals( expression ) )
         {
             value = session.getLocalRepository();
@@ -368,62 +435,6 @@ public class PluginParameterExpressionEvaluator
                 value = basedir + expression.substring( pathSeparator );
             }
         }
-
-        /*
-         * MNG-4312: We neither have reserved all of the above magic expressions nor is their set fixed/well-known (it
-         * gets occasionally extended by newer Maven versions). This imposes the risk for existing plugins to
-         * unintentionally use such a magic expression for an ordinary system property. So here we check whether we
-         * ended up with a magic value that is not compatible with the type of the configured mojo parameter (a string
-         * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
-         * expression from properties only.
-         */
-        if ( value != null && type != null && !( value instanceof String ) && !isTypeCompatible( type, value ) )
-        {
-            value = null;
-        }
-
-        if ( value == null )
-        {
-            // The CLI should win for defining properties
-
-            if ( properties != null )
-            {
-                // We will attempt to get nab a system property as a way to specify a
-                // parameter to a plugins. My particular case here is allowing the surefire
-                // plugin to run a single test so I want to specify that class on the cli
-                // as a parameter.
-
-                value = properties.getProperty( expression );
-            }
-
-            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
-            {
-                value = project.getProperties().getProperty( expression );
-            }
-
-        }
-
-        if ( value instanceof String )
-        {
-            // TODO without #, this could just be an evaluate call...
-
-            String val = (String) value;
-
-            int exprStartDelimiter = val.indexOf( "${" );
-
-            if ( exprStartDelimiter >= 0 )
-            {
-                if ( exprStartDelimiter > 0 )
-                {
-                    value = val.substring( 0, exprStartDelimiter ) + evaluate( val.substring( exprStartDelimiter ) );
-                }
-                else
-                {
-                    value = evaluate( val.substring( exprStartDelimiter ) );
-                }
-            }
-        }
-
         return value;
     }
 

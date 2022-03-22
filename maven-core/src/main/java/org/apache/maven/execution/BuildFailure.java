@@ -29,7 +29,7 @@ import org.apache.maven.project.MavenProject;
 public class BuildFailure
     extends BuildSummary
 {
-
+    
     /**
      * The cause of the build failure.
      */
@@ -47,6 +47,8 @@ public class BuildFailure
         super( project, time );
         this.cause = cause;
     }
+
+    
 
     /**
      * Gets the cause of the build failure.
