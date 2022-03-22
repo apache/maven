@@ -194,7 +194,7 @@ public class PluginParameterExpressionEvaluator
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        value = getValue(value, expression, mojoDescriptor);
+        value = getValue( value, expression, mojoDescriptor );
 
         /*
          * MNG-4312: We neither have reserved all of the above magic expressions nor is their set fixed/well-known (it
@@ -204,12 +204,13 @@ public class PluginParameterExpressionEvaluator
          * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
          * expression from properties only.
          */
-        value = processingValue(type, value, expression);
+        value = processValue( type, value, expression );
 
         return value;
     }
 
-    private Object processingValue(Class<?> type, Object value, String expression) throws ExpressionEvaluationException {
+    private Object processValue( Class<?> type, Object value, String expression ) throws ExpressionEvaluationException 
+    {
         if ( value != null && type != null && !( value instanceof String ) && !isTypeCompatible( type, value ) )
         {
             value = null;
@@ -259,8 +260,9 @@ public class PluginParameterExpressionEvaluator
         return value;
     }
 
-    private Object getValue(Object value, String expression, MojoDescriptor mojoDescriptor)
-            throws ExpressionEvaluationException {
+    private Object getValue( Object value, String expression, MojoDescriptor mojoDescriptor )
+            throws ExpressionEvaluationException 
+    {
         if ( "localRepository".equals( expression ) )
         {
             value = session.getLocalRepository();

@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
@@ -42,6 +41,8 @@ public interface Builder
     // Be nice to whittle this down to Session, maybe add task segments to the session. The session really is the
     // the place to store reactor related information.
     //
+
+       
     void build( MavenSession session, ReactorContext reactorContext, ProjectBuildList projectBuilds,
                 List<TaskSegment> taskSegments, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException;
