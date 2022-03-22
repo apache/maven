@@ -668,6 +668,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
+        suite.addTestSuite( MavenITmng0828PluginConfigValuesInDebugTest.class );
         suite.addTestSuite( MavenITmng0823MojoContextPassingTest.class );
         suite.addTestSuite( MavenITmng0820ConflictResolutionTest.class );
         suite.addTestSuite( MavenITmng0818WarDepsNotTransitiveTest.class );
