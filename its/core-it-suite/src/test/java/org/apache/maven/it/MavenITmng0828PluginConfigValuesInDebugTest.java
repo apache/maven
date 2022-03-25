@@ -20,6 +20,8 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
@@ -68,7 +70,10 @@ public class MavenITmng0828PluginConfigValuesInDebugTest
         checkLog( log, "(f) byteParam = 42" );
         checkLog( log, "(f) byteParam = 42" );
         checkLog( log, "(f) characterParam = X" );
-        checkLog( log, "(f) dateParam = Sun Nov 09 11:59:03 CET 2008" );
+
+        Date date = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.S a" ).parse( "2008-11-09 11:59:03.0 AM" );
+        checkLog( log, "(f) dateParam = " + date );
+
         checkLog( log, "(f) defaultParam = maven-core-it" );
         checkLog( log, "(f) defaultParamWithExpression = org.apache.maven.its.mng0828:test1:1.0-SNAPSHOT" );
         checkLog( log, "(f) domParam = <domParam><echo>one</echo>" + NL
