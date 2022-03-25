@@ -62,49 +62,55 @@ public class MavenITmng0828PluginConfigValuesInDebugTest
 
         String log = FileUtils.fileRead( new File( verifier.getBasedir(), verifier.getLogFileName() ) );
 
-        checkLog( log, "(f) aliasDefaultExpressionParam = test" );
-        checkLog( log, "(f) basedir = " + testDir.getCanonicalPath() );
+        checkLog( log, "[DEBUG]   (f) aliasDefaultExpressionParam = test" );
+        checkLog( log, "[DEBUG]   (f) basedir = " + testDir.getCanonicalPath() );
         checkLog( log,
-                  "(f) beanParam = org.apache.maven.plugin.coreit.Bean[fieldParam=field, setterParam=setter, setterCalled=true]" );
-        checkLog( log, "(f) booleanParam = true" );
-        checkLog( log, "(f) byteParam = 42" );
-        checkLog( log, "(f) byteParam = 42" );
-        checkLog( log, "(f) characterParam = X" );
+                  "[DEBUG]   (f) beanParam = org.apache.maven.plugin.coreit.Bean[fieldParam=field, setterParam=setter, setterCalled=true]" );
+        checkLog( log, "[DEBUG]   (f) booleanParam = true" );
+        checkLog( log, "[DEBUG]   (f) byteParam = 42" );
+        checkLog( log, "[DEBUG]   (f) byteParam = 42" );
+        checkLog( log, "[DEBUG]   (f) characterParam = X" );
 
         Date date = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.S a" ).parse( "2008-11-09 11:59:03.0 AM" );
-        checkLog( log, "(f) dateParam = " + date );
+        checkLog( log, "[DEBUG]   (f) dateParam = " + date );
 
-        checkLog( log, "(f) defaultParam = maven-core-it" );
-        checkLog( log, "(f) defaultParamWithExpression = org.apache.maven.its.mng0828:test1:1.0-SNAPSHOT" );
-        checkLog( log, "(f) domParam = <domParam><echo>one</echo>" + NL
-            + "<echo>two</echo>" + NL
-            + "<echo>three</echo>" + NL
-            + "<echo>four</echo>" + NL
-            + "</domParam>" );
-        checkLog( log, "(f) doubleParam = -1.5" );
-        checkLog( log, "(f) fieldParam = field" );
-        checkLog( log, "(f) fileParam = " + new File( testDir, "pom.xml" ).getCanonicalPath() );
-        checkLog( log, "(f) floatParam = 0.0" );
-        checkLog( log, "(f) integerParam = 0" );
-        checkLog( log, "(f) listParam = [one, two, three, four]" );
-        checkLog( log, "(f) longParam = 9876543210" );
-        checkLog( log, "(f) mapParam = {key1=value1, key2=value2}" );
-        checkLog( log, "(f) propertiesFile = " + new File( testDir,
-                                                           "target/plugin-config.properties" ).getCanonicalPath() );
-        checkLog( log, "(f) propertiesParam = {key2=value2, key1=value1}" );
-        checkLog( log, "(f) setParam = [item]" );
-        checkLog( log, "(f) shortParam = -12345" );
-        checkLog( log, "(f) stringParam = Hello World!" );
-        checkLog( log, "(f) stringParams = [one, two, three, four]" );
-        checkLog( log, "(f) urlParam = http://maven.apache.org/" );
-        checkLog( log, "(s) setterParam = setter" );
+        checkLog( log, "[DEBUG]   (f) defaultParam = maven-core-it" );
+        checkLog( log, "[DEBUG]   (f) defaultParamWithExpression = org.apache.maven.its.mng0828:test1:1.0-SNAPSHOT" );
+
+        // new line of dumping dom is not guaranteed, but all items should be present
+        checkLog( log, "[DEBUG]   (f) domParam = <domParam><echo>one</echo>" );
+        checkLog( log, "<echo>two</echo>" );
+        checkLog( log, "<echo>three</echo>" );
+        checkLog( log, "<echo>four</echo>" );
+        checkLog( log, "</domParam>" );
+
+        checkLog( log, "[DEBUG]   (f) doubleParam = -1.5" );
+        checkLog( log, "[DEBUG]   (f) fieldParam = field" );
+        checkLog( log, "[DEBUG]   (f) fileParam = " + new File( testDir, "pom.xml" ).getCanonicalPath() );
+        checkLog( log, "[DEBUG]   (f) floatParam = 0.0" );
+        checkLog( log, "[DEBUG]   (f) integerParam = 0" );
+        checkLog( log, "[DEBUG]   (f) listParam = [one, two, three, four]" );
+        checkLog( log, "[DEBUG]   (f) longParam = 9876543210" );
+
+        // Map items order is not guaranteed, so only check begin of params ...
+        checkLog( log, "[DEBUG]   (f) mapParam = {key" );
+        checkLog( log, "[DEBUG]   (f) propertiesFile = "
+            + new File( testDir, "target/plugin-config.properties" ).getCanonicalPath() );
+
+        // Properties item order is not guaranteed, so only check begin of params ...
+        checkLog( log, "[DEBUG]   (f) propertiesParam = {key" );
+        checkLog( log, "[DEBUG]   (f) setParam = [item]" );
+        checkLog( log, "[DEBUG]   (f) shortParam = -12345" );
+        checkLog( log, "[DEBUG]   (f) stringParam = Hello World!" );
+        checkLog( log, "[DEBUG]   (f) stringParams = [one, two, three, four]" );
+        checkLog( log, "[DEBUG]   (f) urlParam = http://maven.apache.org/" );
+        checkLog( log, "[DEBUG]   (s) setterParam = setter" );
     }
 
     private void checkLog( String log, String expected )
     {
-        String toSearch = "[DEBUG]   " + expected + NL;
-        assertTrue( NL + ">>>" + NL + log + "<<<" + NL + NL + "does not contains: " + NL + toSearch,
-                    log.contains( toSearch ) );
+        assertTrue( NL + ">>>" + NL + log + "<<<" + NL + NL + "does not contains: " + NL + expected + NL,
+                    log.contains( expected ) );
     }
 
 }
