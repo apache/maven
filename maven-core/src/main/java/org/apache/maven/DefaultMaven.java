@@ -19,6 +19,7 @@ package org.apache.maven;
  * under the License.
  */
 
+import com.google.common.collect.Sets;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -29,8 +30,10 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
+import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
@@ -107,6 +110,8 @@ public class DefaultMaven
 
     private final SuperPomProvider superPomProvider;
 
+    private final ProjectSelector projectSelector;
+
     @Inject
     public DefaultMaven(
             ProjectBuilder projectBuilder,
@@ -132,6 +137,7 @@ public class DefaultMaven
         this.buildResumptionAnalyzer = buildResumptionAnalyzer;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
+        this.projectSelector = new ProjectSelector();
     }
 
     @Override
@@ -323,6 +329,7 @@ public class DefaultMaven
 
             lifecycleStarter.execute( session );
 
+            validateOptionalProjects( request, session );
             validateOptionalProfiles( session, request.getProfileActivation() );
 
             if ( session.getResult().hasExceptions() )
@@ -629,6 +636,19 @@ public class DefaultMaven
             );
             addExceptionToResult( session.getResult(), new MissingProfilesException( message ) );
         }
+    }
+
+    /**
+     * Check whether any of the requested optional projects were not activated or deactivated.
+     * @param request the {@link MavenExecutionRequest}.
+     * @param session the {@link MavenSession}.
+     */
+    private void validateOptionalProjects( MavenExecutionRequest request, MavenSession session )
+    {
+        final ProjectActivation projectActivation = request.getProjectActivation();
+        final Set<String> allOptionalSelectors = Sets.union( projectActivation.getOptionalActiveProjectSelectors(),
+                projectActivation.getOptionalInactiveProjectSelectors() );
+        projectSelector.getOptionalProjectsBySelectors( request, session.getAllProjects(), allOptionalSelectors );
     }
 
     /**
