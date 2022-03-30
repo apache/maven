@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 
 import java.util.Objects;
 
-import org.apache.maven.model.InputLocation;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 

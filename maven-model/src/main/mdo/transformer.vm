@@ -1,0 +1,154 @@
+#*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+*#
+#set ( $basePackage = "org.apache.maven.api.model" )
+#set ( $package = "org.apache.maven.model.v4" )
+#set ( $className = "ModelTransformer" )
+#
+#MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
+package ${package};
+
+import java.io.ObjectStreamException;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Objects;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.maven.api.annotations.Generated;
+#foreach ( $class in $model.allClasses )
+import ${basePackage}.${class.name};
+#end
+
+@Generated
+public class ${className}
+{
+
+    private final Function<String, String> transformer;
+
+    public ${className}( Function<String, String> transformer )
+    {
+        this.transformer = transformer;
+    }
+
+    /**
+     * Transforms the given model
+     */
+    public Model visit( Model target )
+    {
+        Objects.requireNonNull( target, "target cannot be null" );
+        return transformModel( target );
+    }
+
+    /**
+     * The transformation function.
+     */
+    protected String transform( String value )
+    {
+        return transformer.apply( value );
+    }
+
+#foreach ( $class in $model.allClasses )
+  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
+    #set ( $ancestors = $Helper.ancestors( $class ) )
+    #set ( $allFields = [] )
+    #foreach ( $cl in $ancestors )
+      #set ( $dummy = $allFields.addAll( $cl.allFields ) )
+    #end
+    protected ${class.name} transform${class.name}( ${class.name} target )
+    {
+        if ( target == null )
+        {
+            return null;
+        }
+        ${class.name}.Builder builder = ${class.name}.newBuilder( target );
+    #foreach ( $field in $allFields )
+        transform${field.modelClass.name}_${Helper.capitalise($field.name)}( builder, target );
+    #end
+        return builder.build();
+    }
+
+    #foreach ( $field in $allFields )
+      #set ( $capField = ${Helper.capitalise($field.name)} )
+    protected void transform${class.name}_${capField}( ${class.name}.Builder builder, ${class.name} target )
+    {
+      #if ( $field.type == "String" )
+        String newVal = transform( target.get${capField}() );
+        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
+        builder.${field.name}( transform( target.get${capField}(), this::transform ) );
+      #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
+        Properties props = target.get${capField}();
+        Properties newProps = null;
+        for ( Map.Entry<Object, Object> entry : props.entrySet() )
+        {
+            if ( entry.getKey() instanceof String && entry.getValue() instanceof String )
+            {
+                String newVal = transform( ( String ) entry.getValue() );
+                if ( newVal != null && newVal != entry.getValue() )
+                {
+                    if ( newProps == null )
+                    {
+                        newProps = new Properties();
+                        newProps.putAll( props );
+                        builder.${field.name}( newProps );
+                    }
+                    newProps.put( ( String ) entry.getKey(), newVal );
+                }
+            }
+        }
+      #elseif ( $field.to && $field.multiplicity == "1" )
+        ${field.to} newVal = transform${field.to}( target.get${capField}() );
+        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+      #elseif ( $field.to && $field.multiplicity == "*" )
+        builder.${field.name}( transform( target.get${capField}(), this::transform${field.to} ) );
+      #else
+        // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+      #end
+    }
+    #end
+
+  #end
+#end
+    protected <T> List<T> transform( List<T> list, Function<T, T> transformer )
+    {
+        List<T> newList = null;
+        for ( int i = 0; i < list.size(); i++ )
+        {
+            T newVal = transformer.apply( list.get( i ) );
+            if ( newVal != list.get( i ) )
+            {
+                if ( newList == null )
+                {
+                    newList = new ArrayList<>( list );
+                }
+                newList.set( i, newVal );
+            }
+        }
+        return newList;
+    }
+
+}

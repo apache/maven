@@ -4,8 +4,9 @@ package org.apache.maven.model.building;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
+  import java.util.concurrent.atomic.AtomicReference;
 
-/*
+  /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -24,10 +25,10 @@ import java.io.File;
  * under the License.
  */
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
@@ -98,7 +99,7 @@ public class DefaultModelBuilderTest
     static class CycleInImportsResolver extends BaseModelResolver
     {
         @Override
-        public ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException
+        public ModelSource resolveModel(Dependency dependency, AtomicReference<Dependency> modified ) throws UnresolvableModelException
         {
             switch ( dependency.getManagementKey() )
             {
@@ -119,13 +120,13 @@ public class DefaultModelBuilderTest
         }
 
         @Override
-        public ModelSource resolveModel( Parent parent ) throws UnresolvableModelException
+        public ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified ) throws UnresolvableModelException
         {
             return null;
         }
 
         @Override
-        public ModelSource resolveModel( Dependency dependency ) throws UnresolvableModelException
+        public ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified ) throws UnresolvableModelException
         {
             return null;
         }

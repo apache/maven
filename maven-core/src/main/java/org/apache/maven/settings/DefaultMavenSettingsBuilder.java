@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;

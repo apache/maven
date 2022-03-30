@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 
 /**
  * Handles serialization of a model into some kind of textual format like XML.

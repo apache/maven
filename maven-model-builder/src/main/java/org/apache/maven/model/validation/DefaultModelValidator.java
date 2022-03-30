@@ -19,33 +19,9 @@ package org.apache.maven.model.validation;
  * under the License.
  */
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputLocationTracker;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.Resource;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.apache.maven.model.interpolation.ModelVersionProcessor;
-import org.codehaus.plexus.util.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
@@ -58,9 +34,33 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.BuildBase;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputLocationTracker;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.Reporting;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.Resource;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>

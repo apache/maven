@@ -21,8 +21,8 @@ package org.apache.maven.lifecycle.mapping;
 
 import java.util.List;
 
+import org.apache.maven.api.xml.Dom;
 import org.apache.maven.model.Dependency;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Mojo (plugin goal) binding to a lifecycle phase.
@@ -33,7 +33,7 @@ public class LifecycleMojo
 {
 
     private String goal;
-    private Xpp3Dom configuration;
+    private Dom configuration;
     private List<Dependency> dependencies;
 
     public String getGoal()
@@ -41,7 +41,7 @@ public class LifecycleMojo
         return goal;
     }
 
-    public Xpp3Dom getConfiguration()
+    public Dom getConfiguration()
     {
         return configuration;
     }
@@ -56,7 +56,7 @@ public class LifecycleMojo
         this.goal = goal;
     }
 
-    public void setConfiguration( Xpp3Dom configuration )
+    public void setConfiguration( Dom configuration )
     {
         this.configuration = configuration;
     }

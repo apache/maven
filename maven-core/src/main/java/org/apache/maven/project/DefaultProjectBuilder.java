@@ -21,6 +21,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,6 +105,7 @@ public class DefaultProjectBuilder
     private final ProjectDependenciesResolver dependencyResolver;
     private final ModelCacheFactory modelCacheFactory;
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
     public DefaultProjectBuilder(
             ModelBuilder modelBuilder,
@@ -260,9 +262,9 @@ public class DefaultProjectBuilder
         return resolutionResult;
     }
 
-    private List<String> getProfileIds( List<Profile> profiles )
+    private List<String> getProfileIds( List<org.apache.maven.api.model.Profile> profiles )
     {
-        return profiles.stream().map( Profile::getId ).collect( Collectors.toList() );
+        return profiles.stream().map( org.apache.maven.api.model.Profile::getId ).collect( Collectors.toList() );
     }
 
     private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
@@ -279,7 +281,9 @@ public class DefaultProjectBuilder
 
         request.setValidationLevel( configuration.getValidationLevel() );
         request.setProcessPlugins( configuration.isProcessPlugins() );
-        request.setProfiles( configuration.getProfiles() );
+        request.setProfiles( configuration.getProfiles() != null
+                ? configuration.getProfiles().stream().map( Profile::getDelegate ).collect( Collectors.toList() )
+                : null );
         request.setActiveProfileIds( configuration.getActiveProfileIds() );
         request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
         request.setSystemProperties( configuration.getSystemProperties() );
@@ -484,7 +488,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = result.getFileModel().clone();
+        Model model = new Model( result.getFileModel() );
 
         poolBuilder.put( model.getPomFile().toPath(),  model );
 
@@ -515,8 +519,8 @@ public class DefaultProjectBuilder
                 {
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
-                                                 -1, null );
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE,
+                                model.getDelegate(), -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -553,7 +557,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                 ModelProblem.Version.BASE, model, -1, -1, null );
+                                ModelProblem.Version.BASE, model.getDelegate(), -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -657,7 +661,7 @@ public class DefaultProjectBuilder
                 }
                 else
                 {
-                    project.setModel( interimResult.result.getEffectiveModel() );
+                    project.setModel( new Model( interimResult.result.getEffectiveModel() ) );
 
                     result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
                 }
@@ -675,10 +679,8 @@ public class DefaultProjectBuilder
                               boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
-        Model model = result.getEffectiveModel();
-
-        project.setModel( model );
-        project.setOriginalModel( result.getFileModel() );
+        project.setModel( new Model( result.getEffectiveModel() ) );
+        project.setOriginalModel( new Model( result.getFileModel() ) );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
 
@@ -696,8 +698,8 @@ public class DefaultProjectBuilder
         }
 
         List<Profile> activeProfiles = new ArrayList<>();
-        activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
-        activeProfiles.addAll( result.getActiveExternalProfiles() );
+        activeProfiles.addAll( Profile.profileToApiV3( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) ) );
+        activeProfiles.addAll( Profile.profileToApiV3( result.getActiveExternalProfiles() ) );
         project.setActiveProfiles( activeProfiles );
 
         project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
@@ -899,7 +901,7 @@ public class DefaultProjectBuilder
                              ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
     {
         Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
-                                ? result.getRawModel( result.getModelIds().get( 1 ) )
+                                ? new Model( result.getRawModel( result.getModelIds().get( 1 ) ) )
                                 : null;
 
         if ( parentModel != null )
@@ -913,7 +915,8 @@ public class DefaultProjectBuilder
 
             // org.apache.maven.its.mng4834:parent:0.1
             String parentModelId = result.getModelIds().get( 1 );
-            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
+            Path parentPomPath = result.getRawModel( parentModelId ).getPomFile();
+            File parentPomFile = parentPomPath != null ? parentPomPath.toFile() : null;
             MavenProject parent = projects.get( parentPomFile );
             if ( parent == null && buildParentIfNotExisting )
             {
@@ -983,7 +986,7 @@ public class DefaultProjectBuilder
 
         if ( !modelId.isEmpty() )
         {
-            final Model model = result.getRawModel( modelId );
+            final Model model = new Model( result.getRawModel( modelId ) );
             groupId = model.getGroupId() != null
                           ? model.getGroupId()
                           : inheritedGroupId( result, modelIndex + 1 );
@@ -1000,11 +1003,11 @@ public class DefaultProjectBuilder
 
         if ( !modelId.isEmpty() )
         {
-            final Model model = result.getRawModel( modelId );
-            version = model.getVersion() != null
-                          ? model.getVersion()
-                          : inheritedVersion( result, modelIndex + 1 );
-
+            version = result.getRawModel( modelId ).getVersion();
+            if ( version == null )
+            {
+                version = inheritedVersion( result, modelIndex + 1 );
+            }
         }
 
         return version;

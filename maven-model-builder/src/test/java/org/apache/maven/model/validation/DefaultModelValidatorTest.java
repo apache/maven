@@ -22,12 +22,12 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

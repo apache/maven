@@ -19,13 +19,14 @@ package org.apache.maven.toolchain.merge;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  *
@@ -35,19 +36,20 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class MavenToolchainMerger
 {
 
-    public void merge( PersistedToolchains dominant, PersistedToolchains recessive, String recessiveSourceLevel )
+    public PersistedToolchains merge( PersistedToolchains dominant, PersistedToolchains recessive,
+                                      String recessiveSourceLevel )
     {
         if ( dominant == null || recessive == null )
         {
-            return;
+            return dominant;
         }
 
         recessive.setSourceLevel( recessiveSourceLevel );
 
-        shallowMerge( dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel );
+        return shallowMerge( dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel );
     }
 
-    private void shallowMerge( List<ToolchainModel> dominant, List<ToolchainModel> recessive,
+    private PersistedToolchains shallowMerge( List<ToolchainModel> dominant, List<ToolchainModel> recessive,
                                String recessiveSourceLevel )
     {
         Map<Object, ToolchainModel> merged = new LinkedHashMap<>();
@@ -67,32 +69,25 @@ public class MavenToolchainMerger
             if ( dominantModel == null )
             {
                 recessiveModel.setSourceLevel( recessiveSourceLevel );
-                dominant.add( recessiveModel );
+                merged.put( key, recessiveModel );
             }
             else
             {
-                mergeToolchainModelConfiguration( dominantModel, recessiveModel );
+                merged.put( key, mergeToolchainModelConfiguration( dominantModel, recessiveModel ) );
             }
         }
+        return PersistedToolchains.newBuilder()
+                .toolchains( new ArrayList<>( merged.values() ) )
+                .build();
     }
 
-    protected void mergeToolchainModelConfiguration( ToolchainModel target,
-                                                    ToolchainModel source )
+    protected ToolchainModel mergeToolchainModelConfiguration( ToolchainModel target,
+                                                               ToolchainModel source )
     {
-        Xpp3Dom src = (Xpp3Dom) source.getConfiguration();
-        if ( src != null )
-        {
-            Xpp3Dom tgt = (Xpp3Dom) target.getConfiguration();
-            if ( tgt == null )
-            {
-                tgt = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( src ), tgt );
-            }
-            else
-            {
-                tgt = Xpp3Dom.mergeXpp3Dom( tgt, src );
-            }
-            target.setConfiguration( tgt );
-        }
+        Dom src = source.getConfiguration();
+        Dom tgt = target.getConfiguration();
+        Dom merged = Dom.merge( tgt, src );
+        return target.withConfiguration( merged );
     }
 
     protected Object getToolchainModelKey( ToolchainModel model )

@@ -26,10 +26,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
+import java.util.Properties;
 
+import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
-import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -73,7 +74,7 @@ public class DefaultToolchainTest
     @Test
     public void testGetModel()
     {
-        ToolchainModel model = new ToolchainModel();
+        ToolchainModel model = ToolchainModel.newInstance();
         DefaultToolchain toolchain = newDefaultToolchain( model );
         assertEquals( model, toolchain.getModel() );
     }
@@ -81,11 +82,11 @@ public class DefaultToolchainTest
     @Test
     public void testGetType()
     {
-        ToolchainModel model = new ToolchainModel();
+        ToolchainModel model = ToolchainModel.newInstance();
         DefaultToolchain toolchain = newDefaultToolchain( model, "TYPE" );
         assertEquals( "TYPE", toolchain.getType() );
 
-        model.setType( "MODEL_TYPE" );
+        model = model.withType( "MODEL_TYPE" );
         toolchain = newDefaultToolchain( model );
         assertEquals( "MODEL_TYPE", toolchain.getType() );
     }
@@ -93,7 +94,7 @@ public class DefaultToolchainTest
     @Test
     public void testGetLogger()
     {
-        ToolchainModel model = new ToolchainModel();
+        ToolchainModel model = ToolchainModel.newInstance();
         DefaultToolchain toolchain = newDefaultToolchain( model );
         assertEquals( logger, toolchain.getLog() );
     }
@@ -101,8 +102,8 @@ public class DefaultToolchainTest
     @Test
     public void testMissingRequirementProperty()
     {
-        ToolchainModel model = new ToolchainModel();
-        model.setType( "TYPE" );
+        ToolchainModel model = ToolchainModel.newInstance();
+        model = model.withType( "TYPE" );
         DefaultToolchain toolchain = newDefaultToolchain( model );
 
         assertFalse( toolchain.matchesRequirements( Collections.singletonMap( "name", "John Doe" ) ) );
@@ -113,8 +114,8 @@ public class DefaultToolchainTest
     @Test
     public void testNonMatchingRequirementProperty()
     {
-        ToolchainModel model = new ToolchainModel();
-        model.setType( "TYPE" );
+        ToolchainModel model = ToolchainModel.newInstance();
+        model = model.withType( "TYPE" );
         DefaultToolchain toolchain = newDefaultToolchain( model );
         toolchain.addProvideToken( "name", RequirementMatcherFactory.createExactMatcher( "Jane Doe" ) );
 
@@ -126,25 +127,27 @@ public class DefaultToolchainTest
     @Test
     public void testEquals()
     {
-        ToolchainModel tm1 = new ToolchainModel();
-        tm1.setType( "jdk" );
-        tm1.addProvide( "version", "1.5" );
-        tm1.addProvide( "vendor", "sun" );
-        Xpp3Dom configuration1 = new Xpp3Dom("configuration");
-        Xpp3Dom jdkHome1 = new Xpp3Dom( "jdkHome" );
-        jdkHome1.setValue("${env.JAVA_HOME}");
-        configuration1.addChild( jdkHome1 );
-        tm1.setConfiguration( configuration1 );
+        Properties props1 = new Properties();
+        props1.put( "version", "1.5" );
+        props1.put( "vendor", "sun" );
+        Xpp3Dom jdkHome1 = new Xpp3Dom( "jdkHome", "${env.JAVA_HOME}", null, null, null );
+        Xpp3Dom configuration1 = new Xpp3Dom("configuration", null, null, Collections.singletonList( jdkHome1 ), null );
+        ToolchainModel tm1 = ToolchainModel.newBuilder()
+                .type( "jdk" )
+                .provides( props1 )
+                .configuration( configuration1 )
+                .build();
 
-        ToolchainModel tm2 = new ToolchainModel();
-        tm1.setType( "jdk" );
-        tm1.addProvide( "version", "1.4" );
-        tm1.addProvide( "vendor", "sun" );
-        Xpp3Dom configuration2 = new Xpp3Dom("configuration");
-        Xpp3Dom jdkHome2 = new Xpp3Dom( "jdkHome" );
-        jdkHome2.setValue("${env.JAVA_HOME}");
-        configuration2.addChild( jdkHome2 );
-        tm2.setConfiguration( configuration2 );
+        Properties props2 = new Properties();
+        props2.put( "version", "1.4" );
+        props2.put( "vendor", "sun" );
+        Xpp3Dom jdkHome2 = new Xpp3Dom( "jdkHome", "${env.JAVA_HOME}", null, null, null );
+        Xpp3Dom configuration2 = new Xpp3Dom("configuration", null, null, Collections.singletonList( jdkHome2 ), null );
+        ToolchainModel tm2 = ToolchainModel.newBuilder()
+                .type( "jdk" )
+                .provides( props2 )
+                .configuration( configuration2 )
+                .build();
 
         DefaultToolchain tc1 = new DefaultJavaToolChain( tm1, null );
         DefaultToolchain tc2 = new DefaultJavaToolChain( tm2, null );

@@ -22,13 +22,16 @@ package org.apache.maven.model.plugin;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.ReportSet;
+import org.apache.maven.api.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
@@ -42,27 +45,33 @@ public class DefaultReportConfigurationExpander
 {
 
     @Override
-    public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public Model expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Reporting reporting = model.getReporting();
 
         if ( reporting != null )
         {
+            List<ReportPlugin> reportPlugins = new ArrayList<>();
             for ( ReportPlugin reportPlugin : reporting.getPlugins() )
             {
-                Xpp3Dom parentDom = (Xpp3Dom) reportPlugin.getConfiguration();
-
+                Dom parentDom = reportPlugin.getConfiguration();
                 if ( parentDom != null )
                 {
-                    for ( ReportSet execution : reportPlugin.getReportSets() )
+                    List<ReportSet> reportSets = new ArrayList<>();
+                    for ( ReportSet reportSet : reportPlugin.getReportSets() )
                     {
-                        Xpp3Dom childDom = (Xpp3Dom) execution.getConfiguration();
-                        childDom = Xpp3Dom.mergeXpp3Dom( childDom, new Xpp3Dom( parentDom ) );
-                        execution.setConfiguration( childDom );
+                        Dom childDom = reportSet.getConfiguration();
+                        Dom newDom = childDom != null ? childDom.merge( parentDom ) : parentDom;
+                        reportSets.add( reportSet.withConfiguration( newDom ) );
                     }
+                    reportPlugin = reportPlugin.withReportSets( reportSets );
                 }
+                reportPlugins.add( reportPlugin );
             }
+            return model.withReporting( reporting.withPlugins( reportPlugins ) );
         }
+
+        return model;
     }
 
 }

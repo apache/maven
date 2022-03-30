@@ -1,0 +1,304 @@
+#*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+*#
+#set ( $basePackage = "org.apache.maven.api.model" )
+#set ( $package = "org.apache.maven.model.v4" )
+#set ( $className = "MavenXpp3Writer" )
+#
+#MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
+package ${package};
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import org.apache.maven.api.annotations.Generated;
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.internal.xml.DomBuilder;
+#foreach ( $class in $model.allClasses )
+import ${basePackage}.${class.name};
+#end
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
+import org.codehaus.plexus.util.xml.pull.MXParser;
+import org.codehaus.plexus.util.xml.pull.MXSerializer;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+
+@Generated
+public class ${className}
+{
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
+
+    /**
+     * Field NAMESPACE.
+     */
+    private static final String NAMESPACE = null;
+
+    /**
+     * Field fileComment.
+     */
+    private String fileComment = null;
+
+
+      //-----------/
+     //- Methods -/
+    //-----------/
+
+    /**
+     * Method setFileComment.
+     *
+     * @param fileComment a fileComment object.
+     */
+    public void setFileComment( String fileComment )
+    {
+        this.fileComment = fileComment;
+    } //-- void setFileComment( String )
+
+    /**
+     * Method write.
+     *
+     * @param writer a writer object.
+     * @param model a model object.
+     * @throws java.io.IOException java.io.IOException if any.
+     */
+    public void write( Writer writer, Model model )
+        throws java.io.IOException
+    {
+        XmlSerializer serializer = new MXSerializer();
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+        serializer.setOutput( writer );
+        serializer.startDocument( model.getModelEncoding(), null );
+        writeModel( "project", model, serializer );
+        serializer.endDocument();
+    } //-- void write( Writer, Model )
+
+    /**
+     * Method write.
+     *
+     * @param stream a stream object.
+     * @param model a model object.
+     * @throws java.io.IOException java.io.IOException if any.
+     */
+    public void write( OutputStream stream, Model model )
+        throws java.io.IOException
+    {
+        XmlSerializer serializer = new MXSerializer();
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+        serializer.setOutput( stream, model.getModelEncoding() );
+        serializer.startDocument( model.getModelEncoding(), null );
+        writeModel( "project", model, serializer );
+        serializer.endDocument();
+    } //-- void write( OutputStream, Model )
+
+    /**
+     * Method writeDomToSerializer.
+     *
+     * @param dom a dom object.
+     * @param serializer a serializer object.
+     * @throws java.io.IOException java.io.IOException if any.
+     */
+    protected void writeDomToSerializer( org.apache.maven.api.xml.Dom dom, XmlSerializer serializer )
+        throws java.io.IOException
+    {
+        serializer.startTag( NAMESPACE, dom.getName() );
+
+        for ( Map.Entry<String, String> attribute : dom.getAttributes().entrySet() )
+        {
+            serializer.attribute( NAMESPACE, attribute.getKey(), attribute.getValue() );
+        }
+        for ( Dom aChild : dom.getChildren() )
+        {
+            writeDomToSerializer( aChild, serializer );
+        }
+
+        String value = dom.getValue();
+        if ( value != null )
+        {
+            serializer.text( value );
+        }
+
+        serializer.endTag( NAMESPACE, dom.getName() );
+
+    } //-- void writeDomToSerializer( org.apache.maven.api.xml.Dom, XmlSerializer )
+
+
+#foreach ( $class in $model.allClasses )
+ #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
+  #set ( $classUcapName = $Helper.capitalise( $class.name ) )
+  #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
+  #set ( $allFields = $Helper.xmlFields( $class ) )
+    private void write${classUcapName}( String tagName, ${classUcapName} ${classLcapName}, XmlSerializer serializer )
+        throws IOException
+    {
+        if ( ${classLcapName} != null )
+        {
+  #if ( $class == $root )
+            if ( this.fileComment != null )
+            {
+                serializer.comment(this.fileComment);
+            }
+            serializer.setPrefix( "", "http://maven.apache.org/POM/4.0.0" );
+            serializer.setPrefix( "xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+            serializer.startTag( NAMESPACE, tagName );
+            serializer.attribute( "", "xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" );
+  #else
+            serializer.startTag( NAMESPACE, tagName );
+  #end
+  #foreach ( $field in $allFields )
+    #if ( $Helper.xmlFieldMetadata( $field ).attribute )
+      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
+      #if ( $field.type == "String" )
+            writeAttr( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+      #else
+        // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+      #end
+    #end
+  #end
+  #foreach ( $field in $allFields )
+    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient )
+      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
+      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
+      #if ( $field.type == "String" )
+            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.get${fieldCapName}(), serializer );
+      #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
+        #if ( ${field.defaultValue} == "true" )
+            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
+        #else
+            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
+        #end
+      #elseif ( $field.type == "int" )
+            // TODO: name=${field.name} type=${field.type}
+      #elseif ( $field.type == "DOM" )
+            writeDom( ${classLcapName}.get${fieldCapName}(), serializer );
+      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
+        #set( $singularField = ${Helper.singular($fieldTagName)} )
+            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, t -> writeTag( "$singularField", "${field.defaultValue}", t, serializer ) );
+      #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
+            writeProperties( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+      #elseif ( $field.to && $field.multiplicity == "1" )
+            write${field.to}( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+      #elseif ( $field.to && $field.multiplicity == "*" )
+        #set( $singularField = ${Helper.singular($fieldTagName)} )
+            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, t -> write${field.to}( "$singularField", t, serializer ) );
+      #else
+            // TODO: name=${field.name} type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+      #end
+    #end
+  #end
+            serializer.endTag( NAMESPACE, tagName );
+        }
+    }
+
+ #end
+#end
+    @FunctionalInterface
+    private interface ElementWriter<T>
+    {
+        public void write( T t ) throws IOException;
+    }
+
+    private <T> void writeList( String tagName, List<T> list, XmlSerializer serializer, ElementWriter<T> writer )
+        throws IOException
+    {
+        if ( list != null && !list.isEmpty() )
+        {
+            serializer.startTag( NAMESPACE, tagName );
+            for ( T t : list )
+            {
+                writer.write( t );
+            }
+            serializer.endTag( NAMESPACE, tagName );
+        }
+    }
+
+    private <T> void writeProperties( String tagName, Properties props, XmlSerializer serializer )
+            throws IOException
+    {
+        if ( props != null && !props.isEmpty() )
+        {
+            serializer.startTag( NAMESPACE, tagName );
+            for ( Map.Entry<Object, Object> entry : props.entrySet() )
+            {
+                writeTag( entry.getKey().toString(), null, entry.getValue().toString(), serializer );
+            }
+            serializer.endTag( NAMESPACE, tagName );
+        }
+    }
+
+    private void writeDom( Dom dom, XmlSerializer serializer )
+            throws IOException
+    {
+        if ( dom != null )
+        {
+            serializer.startTag( NAMESPACE, dom.getName() );
+            for ( Map.Entry<String, String> attr : dom.getAttributes().entrySet() )
+            {
+                serializer.attribute( NAMESPACE, attr.getKey(), attr.getValue() );
+            }
+            for ( Dom child : dom.getChildren() )
+            {
+                writeDom( child, serializer );
+            }
+            String value = dom.getValue();
+            if ( value != null )
+            {
+                serializer.text( value );
+            }
+            serializer.endTag( NAMESPACE, dom.getName() );
+        }
+    }
+
+    private void writeTag( String tagName, String defaultValue, String value, XmlSerializer serializer )
+        throws IOException
+    {
+        if ( value != null && !Objects.equals( defaultValue, value ) )
+        {
+            serializer.startTag( NAMESPACE, tagName ).text( value ).endTag( NAMESPACE, tagName );
+        }
+    }
+
+    private void writeAttr( String attrName, String value, XmlSerializer serializer )
+        throws IOException
+    {
+        if ( value != null )
+        {
+            serializer.attribute( NAMESPACE, attrName, value );
+        }
+    }
+
+}

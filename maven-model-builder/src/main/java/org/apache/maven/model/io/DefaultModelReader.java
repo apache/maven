@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -33,12 +31,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.InputSource;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.building.TransformerContext;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
+import org.apache.maven.model.v4.MavenXpp3Reader;
+import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
@@ -58,10 +56,6 @@ public class DefaultModelReader
 {
     private final ModelSourceTransformer transformer;
 
-    private Method readMethod;
-
-    private Method readMethodEx;
-
     @Inject
     public DefaultModelReader( ModelSourceTransformer transformer )
     {
@@ -78,9 +72,7 @@ public class DefaultModelReader
         {
             Model model = read( in, input.toPath(), options );
 
-            model.setPomFile( input );
-
-            return model;
+            return model.withPomFile( input.toPath() );
         }
     }
 
@@ -140,25 +132,13 @@ public class DefaultModelReader
 
             InputSource source = getSource( options );
             boolean strict = isStrict( options );
-            try
+            if ( source != null )
             {
-                if ( source != null )
-                {
-                    return readModelEx( transformingParser, source, strict );
-                }
-                else
-                {
-                    return readModel( transformingParser, strict );
-                }
+                return readModelEx( transformingParser, source, strict );
             }
-            catch ( InvocationTargetException e )
+            else
             {
-                Throwable cause = e.getCause();
-                if ( cause instanceof Exception )
-                {
-                    throw ( Exception ) cause;
-                }
-                throw e;
+                return readModel( transformingParser, strict );
             }
         }
         catch ( XmlPullParserException e )
@@ -176,30 +156,17 @@ public class DefaultModelReader
     }
 
     private Model readModel( XmlPullParser parser, boolean strict )
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+            throws XmlPullParserException, IOException
     {
-        if ( readMethod == null )
-        {
-            readMethod = MavenXpp3Reader.class.getDeclaredMethod( "read", XmlPullParser.class, boolean.class );
-            readMethod.setAccessible( true );
-        }
         MavenXpp3Reader mr = new MavenXpp3Reader();
-        Object model = readMethod.invoke( mr, parser, strict );
-        return ( Model ) model;
+        return mr.read( parser, strict );
     }
 
     private Model readModelEx( XmlPullParser parser, InputSource source, boolean strict )
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+            throws XmlPullParserException, IOException
     {
-        if ( readMethodEx == null )
-        {
-            readMethodEx = MavenXpp3ReaderEx.class.getDeclaredMethod( "read",
-                    XmlPullParser.class, boolean.class, InputSource.class );
-            readMethodEx.setAccessible( true );
-        }
         MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
-        Object model = readMethodEx.invoke( mr, parser, strict, source );
-        return ( Model ) model;
+        return mr.read( parser, strict, source );
     }
 
 }

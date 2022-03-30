@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,7 +45,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.ModelReader;
@@ -249,7 +250,7 @@ public class TestRepositorySystem
                 {
                     Model model = modelReader.read( pomFile, null );
 
-                    dependencies = model.getDependencies();
+                    dependencies = model.getDependencies().stream().map( Dependency::new ).collect( Collectors.toList() );
                 }
                 catch ( IOException e )
                 {

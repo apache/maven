@@ -177,9 +177,9 @@ public class BuilderCommon
 
         List<String> unversionedPlugins = executionPlan.getMojoExecutions().stream()
                          .map( MojoExecution::getPlugin )
-                         .filter( p -> p.getLocation( "version" ) != null ) // versionless cli goal (?)
-                         .filter( p -> p.getLocation( "version" ).getSource() != null ) // versionless in pom (?)
-                         .filter( p -> defaulModelId.equals( p.getLocation( "version" ).getSource().getModelId() ) )
+                         .filter( p -> p.getLocation( "version" ) != null
+                                 && p.getLocation( "version" ).getSource() != null
+                                 && p.getLocation( "version" ).getSource().getModelId().equals( defaulModelId ) )
                          .distinct()
                          .map( Plugin::getArtifactId ) // managed by us, groupId is always o.a.m.plugins
                          .collect( Collectors.toList() );

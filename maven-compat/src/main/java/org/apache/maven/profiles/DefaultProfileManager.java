@@ -32,10 +32,12 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * DefaultProfileManager
@@ -185,7 +187,10 @@ public class DefaultProfileManager
 
         final List<ProfileActivationException> errors = new ArrayList<>();
 
-        List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req ->
+        Collection<Profile> values = profilesById.values();
+        List<org.apache.maven.api.model.Profile> list =
+                values.stream().map( Profile::getDelegate ).collect( Collectors.toList() );
+        List<org.apache.maven.api.model.Profile> profiles = profileSelector.getActiveProfiles( list, context, req ->
         {
             if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
             {
@@ -198,7 +203,7 @@ public class DefaultProfileManager
             throw errors.get( 0 );
         }
 
-        return profiles;
+        return Profile.profileToApiV3( profiles );
     }
 
     /* (non-Javadoc)

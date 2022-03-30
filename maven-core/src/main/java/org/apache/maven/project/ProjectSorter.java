@@ -26,11 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.model.Build;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Extension;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Plugin;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Extension;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Plugin;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
@@ -107,13 +108,13 @@ public class ProjectSorter
 
             MavenProject project = projectMap.get( projectId );
 
-            for ( Dependency dependency : project.getDependencies() )
+            for ( Dependency dependency : project.getModel().getDelegate().getDependencies() )
             {
                 addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
                          dependency.getArtifactId(), dependency.getVersion(), false, false );
             }
 
-            Parent parent = project.getModel().getParent();
+            Parent parent = project.getModel().getDelegate().getParent();
 
             if ( parent != null )
             {
@@ -123,22 +124,26 @@ public class ProjectSorter
                          parent.getVersion(), true, false );
             }
 
-            for ( Plugin plugin : project.getBuildPlugins() )
+            Build build = project.getModel().getDelegate().getBuild();
+            if ( build != null )
             {
-                addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
-                         plugin.getArtifactId(), plugin.getVersion(), false, true );
-
-                for ( Dependency dependency : plugin.getDependencies() )
+                for ( Plugin plugin : build.getPlugins() )
                 {
-                    addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
-                             dependency.getArtifactId(), dependency.getVersion(), false, true );
-                }
-            }
+                    addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
+                             plugin.getArtifactId(), plugin.getVersion(), false, true );
 
-            for ( Extension extension : project.getBuildExtensions() )
-            {
-                addEdge( projectMap, vertexMap, project, projectVertex, extension.getGroupId(),
-                         extension.getArtifactId(), extension.getVersion(), false, true );
+                    for ( Dependency dependency : plugin.getDependencies() )
+                    {
+                        addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
+                                 dependency.getArtifactId(), dependency.getVersion(), false, true );
+                    }
+                }
+
+                for ( Extension extension : build.getExtensions() )
+                {
+                    addEdge( projectMap, vertexMap, project, projectVertex, extension.getGroupId(),
+                             extension.getArtifactId(), extension.getVersion(), false, true );
+                }
             }
         }
 

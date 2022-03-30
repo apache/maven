@@ -139,6 +139,8 @@ public class MojoDescriptor
      */
     private boolean threadSafe = false;
 
+    private boolean v4Api = false;
+
     /**
      * Default constructor.
      */
@@ -455,7 +457,7 @@ public class MojoDescriptor
     /** {@inheritDoc} */
     public String getRole()
     {
-        return Mojo.ROLE;
+        return isV4Api() ? "org.apache.maven.api.plugin.Mojo" : Mojo.ROLE;
     }
 
     /** {@inheritDoc} */
@@ -654,6 +656,16 @@ public class MojoDescriptor
     {
         return ( getExecuteGoal() != null && getExecuteGoal().length() > 0 )
             || ( getExecutePhase() != null && getExecutePhase().length() > 0 );
+    }
+
+    public boolean isV4Api()
+    {
+        return v4Api;
+    }
+
+    public void setV4Api( boolean v4Api )
+    {
+        this.v4Api = v4Api;
     }
 
     /**

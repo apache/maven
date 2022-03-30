@@ -145,7 +145,7 @@ public class ProfilesConversionUtils
     private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy profileXmlRepo )
     {
         org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
-        policy.setEnabled( profileXmlRepo.isEnabled() );
+        policy.setEnabled( Boolean.toString( profileXmlRepo.isEnabled() ) );
         policy.setUpdatePolicy( profileXmlRepo.getUpdatePolicy() );
         policy.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );
         return policy;

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 
 /**
  * Collects the output of the model builder.

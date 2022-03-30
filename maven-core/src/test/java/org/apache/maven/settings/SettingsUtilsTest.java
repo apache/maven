@@ -20,10 +20,18 @@ package org.apache.maven.settings;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import org.apache.maven.api.settings.Activation;
+import org.apache.maven.api.settings.ActivationFile;
+import org.apache.maven.api.settings.ActivationOS;
+import org.apache.maven.api.settings.ActivationProperty;
+import org.apache.maven.api.settings.Profile;
+import org.apache.maven.api.settings.Repository;
+import org.apache.maven.api.settings.Settings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,16 +43,17 @@ public class SettingsUtilsTest
     @Test
     public void testShouldAppendRecessivePluginGroupIds()
     {
-        Settings dominant = new Settings();
-        dominant.addPluginGroup( "org.apache.maven.plugins" );
-        dominant.addPluginGroup( "org.codehaus.modello" );
+        Settings dominant = Settings.newBuilder()
+                .pluginGroups( Arrays.asList( "org.apache.maven.plugins", "org.codehaus.modello" ) )
+                .build();
 
-        Settings recessive = new Settings();
-        recessive.addPluginGroup( "org.codehaus.plexus" );
+        Settings recessive = Settings.newBuilder()
+                .pluginGroups( Arrays.asList( "org.codehaus.plexus" ) )
+                .build();
 
-        SettingsUtils.merge( dominant, recessive, Settings.GLOBAL_LEVEL );
+        Settings merged = SettingsUtils.merge( dominant, recessive, Settings.GLOBAL_LEVEL );
 
-        List<String> pluginGroups = dominant.getPluginGroups();
+        List<String> pluginGroups = merged.getPluginGroups();
 
         assertNotNull( pluginGroups );
         assertEquals( 3, pluginGroups.size() );
@@ -57,56 +66,63 @@ public class SettingsUtilsTest
     public void testRoundTripProfiles()
     {
         Random entropy = new Random();
-        Profile p = new Profile();
-        p.setId( "id" + Long.toHexString( entropy.nextLong() ) );
-        Activation a = new Activation();
-        a.setActiveByDefault( entropy.nextBoolean() );
-        a.setJdk( "jdk" + Long.toHexString( entropy.nextLong() ) );
-        ActivationFile af = new ActivationFile();
-        af.setExists( "exists" + Long.toHexString( entropy.nextLong() ) );
-        af.setMissing( "missing" + Long.toHexString( entropy.nextLong() ) );
-        a.setFile( af );
-        ActivationProperty ap = new ActivationProperty();
-        ap.setName( "name" + Long.toHexString( entropy.nextLong() ) );
-        ap.setValue( "value" + Long.toHexString( entropy.nextLong() ) );
-        a.setProperty( ap );
-        ActivationOS ao = new ActivationOS();
-        ao.setArch( "arch" + Long.toHexString( entropy.nextLong() ) );
-        ao.setFamily( "family" + Long.toHexString( entropy.nextLong() ) );
-        ao.setName( "name" + Long.toHexString( entropy.nextLong() ) );
-        ao.setVersion( "version" + Long.toHexString( entropy.nextLong() ) );
-        a.setOs( ao );
-        p.setActivation( a );
+        ActivationFile af = ActivationFile.newBuilder()
+                .exists( "exists" + Long.toHexString( entropy.nextLong() ) )
+                .missing( "missing" + Long.toHexString( entropy.nextLong() ) )
+                .build();
+        ActivationProperty ap = ActivationProperty.newBuilder()
+                .name( "name" + Long.toHexString( entropy.nextLong() ) )
+                .value( "value" + Long.toHexString( entropy.nextLong() ) )
+                .build();
+        ActivationOS ao = ActivationOS.newBuilder()
+                .arch( "arch" + Long.toHexString( entropy.nextLong() ) )
+                .family( "family" + Long.toHexString( entropy.nextLong() ) )
+                .name( "name" + Long.toHexString( entropy.nextLong() ) )
+                .version( "version" + Long.toHexString( entropy.nextLong() ) )
+                .build();
+        Activation a = Activation.newBuilder()
+                .activeByDefault( entropy.nextBoolean() )
+                .jdk( "jdk" + Long.toHexString( entropy.nextLong() ) )
+                .file( af )
+                .property( ap )
+                .os( ao )
+                .build();
         Properties props = new Properties();
         int count = entropy.nextInt( 10 );
         for ( int i = 0; i < count; i++ )
         {
             props.setProperty( "name" + Long.toHexString( entropy.nextLong() ),
-                               "value" + Long.toHexString( entropy.nextLong() ) );
+                    "value" + Long.toHexString( entropy.nextLong() ) );
         }
-        p.setProperties( props );
         count = entropy.nextInt( 3 );
         List<Repository> repos = new ArrayList<>();
         for ( int i = 0; i < count; i++ )
         {
-            Repository r = new Repository();
-            r.setId( "id" + Long.toHexString( entropy.nextLong() ) );
-            r.setName( "name" + Long.toHexString( entropy.nextLong() ) );
-            r.setUrl( "url" + Long.toHexString( entropy.nextLong() ) );
+            Repository r = Repository.newBuilder()
+                    .id( "id" + Long.toHexString( entropy.nextLong() ) )
+                    .name( "name" + Long.toHexString( entropy.nextLong() ) )
+                    .url(  "url" + Long.toHexString( entropy.nextLong() ) )
+                    .build();
             repos.add( r );
         }
-        p.setRepositories( repos );
         count = entropy.nextInt( 3 );
-        repos = new ArrayList<>();
+        List<Repository> pluginRepos = new ArrayList<>();
         for ( int i = 0; i < count; i++ )
         {
-            Repository r = new Repository();
-            r.setId( "id" + Long.toHexString( entropy.nextLong() ) );
-            r.setName( "name" + Long.toHexString( entropy.nextLong() ) );
-            r.setUrl( "url" + Long.toHexString( entropy.nextLong() ) );
-            repos.add( r );
+            Repository r = Repository.newBuilder()
+                    .id( "id" + Long.toHexString( entropy.nextLong() ) )
+                    .name( "name" + Long.toHexString( entropy.nextLong() ) )
+                    .url(  "url" + Long.toHexString( entropy.nextLong() ) )
+                    .build();
+            pluginRepos.add( r );
         }
-        p.setPluginRepositories( repos );
+        Profile p = Profile.newBuilder()
+                .id( "id" + Long.toHexString( entropy.nextLong() ) )
+                .activation( a )
+                .properties( props )
+                .repositories( repos )
+                .pluginRepositories( pluginRepos )
+                .build();
 
         Profile clone = SettingsUtils.convertToSettingsProfile( SettingsUtils.convertFromSettingsProfile( p ) );
 

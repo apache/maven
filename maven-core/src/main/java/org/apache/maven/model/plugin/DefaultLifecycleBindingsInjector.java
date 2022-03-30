@@ -25,18 +25,19 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
@@ -65,11 +66,12 @@ public class DefaultLifecycleBindingsInjector
         this.lifecycle = lifecycle;
     }
 
-    public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public Model injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         String packaging = model.getPackaging();
 
-        Collection<Plugin> defaultPlugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
+        Collection<org.apache.maven.model.Plugin> defaultPlugins =
+                lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
 
         if ( defaultPlugins == null )
         {
@@ -79,12 +81,15 @@ public class DefaultLifecycleBindingsInjector
         }
         else if ( !defaultPlugins.isEmpty() )
         {
-            Model lifecycleModel = new Model();
-            lifecycleModel.setBuild( new Build() );
-            lifecycleModel.getBuild().getPlugins().addAll( defaultPlugins );
-
-            merger.merge( model, lifecycleModel );
+            List<Plugin> plugins = defaultPlugins.stream()
+                    .map( org.apache.maven.model.Plugin::getDelegate )
+                    .collect( Collectors.toList() );
+            Model lifecycleModel = Model.newBuilder()
+                            .build( Build.newBuilder().plugins( plugins ).build() )
+                            .build();
+            model = merger.merge( model, lifecycleModel );
         }
+        return model;
     }
 
     /**
@@ -96,22 +101,27 @@ public class DefaultLifecycleBindingsInjector
 
         private static final String PLUGIN_MANAGEMENT = "plugin-management";
 
-        public void merge( Model target, Model source )
+        public Model merge( Model target, Model source )
         {
-            if ( target.getBuild() == null )
+            Build targetBuild = target.getBuild();
+            if ( targetBuild == null )
             {
-                target.setBuild( new Build() );
+                targetBuild = Build.newInstance();
             }
 
             Map<Object, Object> context =
                 Collections.singletonMap( PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement() );
 
-            mergePluginContainer_Plugins( target.getBuild(), source.getBuild(), false, context );
+            Build.Builder builder = Build.newBuilder( target.getBuild() );
+            mergePluginContainer_Plugins( builder, targetBuild, source.getBuild(), false, context );
+
+            return target.withBuild( builder.build() );
         }
 
         @SuppressWarnings( { "checkstyle:methodname" } )
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
+        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
+                                                     PluginContainer target, PluginContainer source,
                                                      boolean sourceDominant, Map<Object, Object> context )
         {
             List<Plugin> src = source.getPlugins();
@@ -135,13 +145,13 @@ public class DefaultLifecycleBindingsInjector
                     Plugin existing = merged.get( key );
                     if ( existing != null )
                     {
-                        mergePlugin( existing, element, sourceDominant, context );
+                        element = mergePlugin( existing, element, sourceDominant, context );
                     }
                     else
                     {
-                        merged.put( key, element );
                         added.put( key, element );
                     }
+                    merged.put( key, element );
                 }
 
                 if ( !added.isEmpty() )
@@ -155,8 +165,8 @@ public class DefaultLifecycleBindingsInjector
                             Plugin addedPlugin = added.get( key );
                             if ( addedPlugin != null )
                             {
-                                Plugin plugin = managedPlugin.clone();
-                                mergePlugin( plugin, addedPlugin, sourceDominant, Collections.emptyMap() );
+                                Plugin plugin = mergePlugin( managedPlugin, addedPlugin,
+                                        sourceDominant, Collections.emptyMap() );
                                 merged.put( key, plugin );
                             }
                         }
@@ -165,18 +175,22 @@ public class DefaultLifecycleBindingsInjector
 
                 List<Plugin> result = new ArrayList<>( merged.values() );
 
-                target.setPlugins( result );
+                builder.plugins( result );
             }
         }
 
         @Override
-        protected void mergePluginExecution( PluginExecution target, PluginExecution source, boolean sourceDominant,
-                                             Map<Object, Object> context )
+        protected void mergePluginExecution_Priority( PluginExecution.Builder builder, PluginExecution target,
+                                                      PluginExecution source, boolean sourceDominant,
+                                                      Map<Object, Object> context )
         {
-            super.mergePluginExecution( target, source, sourceDominant, context );
-
-            target.setPriority( Math.min( target.getPriority(), source.getPriority() ) );
+            if ( target.getPriority() > source.getPriority() )
+            {
+                builder.priority( source.getPriority() );
+                builder.location( "priority", source.getLocation( "priority" ) );
+            }
         }
+        //mergePluginExecution_Priority( builder, target, source, sourceDominant, context );
 
     }
 

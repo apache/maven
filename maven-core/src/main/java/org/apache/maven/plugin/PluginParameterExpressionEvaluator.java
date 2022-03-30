@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -200,7 +201,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "session".equals( expression ) )
         {
-            value = session;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = session.getSession();
+            }
+            else
+            {
+                value = session;
+            }
         }
         else if ( expression.startsWith( "session" ) )
         {
@@ -228,7 +236,14 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "reactorProjects".equals( expression ) )
         {
-            value = session.getProjects();
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( ( DefaultSession ) session.getSession() ).getProjects( session.getProjects() );
+            }
+            else
+            {
+                value = session.getProjects();
+            }
         }
         else if ( "mojoExecution".equals( expression ) )
         {
@@ -236,11 +251,25 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "project".equals( expression ) )
         {
-            value = project;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( (DefaultSession) session.getSession() ).getProject( project );
+            }
+            else
+            {
+                value = project;
+            }
         }
         else if ( "executedProject".equals( expression ) )
         {
-            value = project.getExecutionProject();
+            if ( mojoDescriptor.isV4Api() )
+            {
+                value = ( (DefaultSession) session.getSession() ).getProject( project.getExecutionProject() );
+            }
+            else
+            {
+                value = project.getExecutionProject();
+            }
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
         {

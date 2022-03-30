@@ -84,7 +84,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 @Component( role = RepositorySystem.class, hint = "default" )
 public class LegacyRepositorySystem
-    implements RepositorySystem
+        implements RepositorySystem
 {
 
     @Requirement
@@ -146,13 +146,13 @@ public class LegacyRepositorySystem
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format( "Invalid version specification '%s' creating dependency artifact '%s'.",
-                                              d.getVersion(), d ), e );
+                    d.getVersion(), d ), e );
             return null;
         }
 
         Artifact artifact =
-            artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
-                                                      d.getClassifier(), d.getScope(), d.isOptional() );
+                artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
+                        d.getClassifier(), d.getScope(), d.isOptional() );
 
         if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && d.getSystemPath() != null )
         {
@@ -185,8 +185,8 @@ public class LegacyRepositorySystem
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format(
-                "Invalid version specification '%s' creating extension artifact '%s:%s:%s'.",
-                version, groupId, artifactId, version ), e );
+                    "Invalid version specification '%s' creating extension artifact '%s:%s:%s'.",
+                    version, groupId, artifactId, version ), e );
 
             return null;
         }
@@ -216,8 +216,8 @@ public class LegacyRepositorySystem
         {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error( String.format(
-                "Invalid version specification '%s' creating plugin artifact '%s'.",
-                version, plugin ), e );
+                    "Invalid version specification '%s' creating plugin artifact '%s'.",
+                    version, plugin ), e );
 
             return null;
         }
@@ -251,41 +251,41 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactRepository createDefaultLocalRepository()
-        throws InvalidRepositoryException
+            throws InvalidRepositoryException
     {
         return createLocalRepository( RepositorySystem.defaultUserLocalRepository );
     }
 
     public ArtifactRepository createLocalRepository( File localRepository )
-        throws InvalidRepositoryException
+            throws InvalidRepositoryException
     {
         return createRepository( "file://" + localRepository.toURI().getRawPath(),
-                                 RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
+                ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
     public ArtifactRepository createDefaultRemoteRepository()
-        throws InvalidRepositoryException
+            throws InvalidRepositoryException
     {
         return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
-                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
+                ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
-        throws IOException
+            throws IOException
     {
         return createRepository( canonicalFileUrl( url ), repositoryId, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
     private String canonicalFileUrl( String url )
-        throws IOException
+            throws IOException
     {
         if ( !url.startsWith( "file:" ) )
         {
@@ -322,12 +322,12 @@ public class LegacyRepositorySystem
         try
         {
             LocalArtifactRepository ideWorkspace =
-                plexus.lookup( LocalArtifactRepository.class, LocalArtifactRepository.IDE_WORKSPACE );
+                    plexus.lookup( LocalArtifactRepository.class, LocalArtifactRepository.IDE_WORKSPACE );
 
             if ( request.getLocalRepository() instanceof DelegatingLocalArtifactRepository )
             {
                 DelegatingLocalArtifactRepository delegatingLocalRepository =
-                    (DelegatingLocalArtifactRepository) request.getLocalRepository();
+                        (DelegatingLocalArtifactRepository) request.getLocalRepository();
 
                 LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorkspace();
 
@@ -346,7 +346,7 @@ public class LegacyRepositorySystem
             {
                 ArtifactRepository localRepository = request.getLocalRepository();
                 DelegatingLocalArtifactRepository delegatingLocalRepository =
-                    new DelegatingLocalArtifactRepository( localRepository );
+                        new DelegatingLocalArtifactRepository( localRepository );
                 delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
                 request.setLocalRepository( delegatingLocalRepository );
                 try
@@ -367,21 +367,21 @@ public class LegacyRepositorySystem
         return artifactResolver.resolve( request );
     }
 
-//    public void addProxy( String protocol, String host, int port, String username, String password,
-//                          String nonProxyHosts )
-//    {
-//        ProxyInfo proxyInfo = new ProxyInfo();
-//        proxyInfo.setHost( host );
-//        proxyInfo.setType( protocol );
-//        proxyInfo.setPort( port );
-//        proxyInfo.setNonProxyHosts( nonProxyHosts );
-//        proxyInfo.setUserName( username );
-//        proxyInfo.setPassword( password );
-//
-//        proxies.put( protocol, proxyInfo );
-//
-//        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
-//    }
+    //    public void addProxy( String protocol, String host, int port, String username, String password,
+    //                          String nonProxyHosts )
+    //    {
+    //        ProxyInfo proxyInfo = new ProxyInfo();
+    //        proxyInfo.setHost( host );
+    //        proxyInfo.setType( protocol );
+    //        proxyInfo.setPort( port );
+    //        proxyInfo.setNonProxyHosts( nonProxyHosts );
+    //        proxyInfo.setUserName( username );
+    //        proxyInfo.setPassword( password );
+    //
+    //        proxies.put( protocol, proxyInfo );
+    //
+    //        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
+    //    }
 
     public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )
     {
@@ -408,7 +408,7 @@ public class LegacyRepositorySystem
             List<ArtifactRepository> mirroredRepos = new ArrayList<>();
 
             List<ArtifactRepositoryPolicy> releasePolicies =
-                new ArrayList<>( aliasedRepos.size() );
+                    new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -419,7 +419,7 @@ public class LegacyRepositorySystem
             ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
 
             List<ArtifactRepositoryPolicy> snapshotPolicies =
-                new ArrayList<>( aliasedRepos.size() );
+                    new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -431,8 +431,8 @@ public class LegacyRepositorySystem
             ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
 
             ArtifactRepository effectiveRepository =
-                createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(),
-                                          snapshotPolicy, releasePolicy );
+                    createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(),
+                            snapshotPolicy, releasePolicy );
 
             effectiveRepository.setAuthentication( aliasedRepo.getAuthentication() );
 
@@ -523,8 +523,8 @@ public class LegacyRepositorySystem
         if ( mirror != null )
         {
             ArtifactRepository original =
-                createArtifactRepository( repository.getId(), repository.getUrl(), repository.getLayout(),
-                                          repository.getSnapshots(), repository.getReleases() );
+                    createArtifactRepository( repository.getId(), repository.getUrl(), repository.getLayout(),
+                            repository.getSnapshots(), repository.getReleases() );
 
             repository.setMirroredRepositories( Collections.singletonList( original ) );
 
@@ -563,9 +563,9 @@ public class LegacyRepositorySystem
 
                 if ( server != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server );
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server.getDelegate() );
                     SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
-                    server = result.getServer();
+                    server = new Server( result.getServer() );
 
                     if ( logger.isDebugEnabled() )
                     {
@@ -603,8 +603,8 @@ public class LegacyRepositorySystem
                     repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
                     AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
                     Authentication result =
-                        new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
-                                            authCtx.get( AuthenticationContext.PASSWORD ) );
+                            new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
+                                    authCtx.get( AuthenticationContext.PASSWORD ) );
                     result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
                     result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
                     authCtx.close();
@@ -641,7 +641,8 @@ public class LegacyRepositorySystem
                         pi.setNonProxyHosts( proxy.getNonProxyHosts() );
 
                         org.apache.maven.wagon.repository.Repository repo =
-                            new org.apache.maven.wagon.repository.Repository( repository.getId(), repository.getUrl() );
+                                new org.apache.maven.wagon.repository.Repository(
+                                        repository.getId(), repository.getUrl() );
 
                         if ( !ProxyUtils.validateNonProxyHosts( pi, repo.getHost() ) )
                         {
@@ -669,9 +670,9 @@ public class LegacyRepositorySystem
 
                 if ( proxy != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy );
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy.getDelegate() );
                     SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
-                    proxy = result.getProxy();
+                    proxy = new org.apache.maven.settings.Proxy( result.getProxy() );
 
                     if ( logger.isDebugEnabled() )
                     {
@@ -744,13 +745,13 @@ public class LegacyRepositorySystem
 
     public void retrieve( ArtifactRepository repository, File destination, String remotePath,
                           ArtifactTransferListener transferListener )
-        throws ArtifactTransferFailedException, ArtifactDoesNotExistException
+            throws ArtifactTransferFailedException, ArtifactDoesNotExistException
     {
         try
         {
             wagonManager.getRemoteFile( repository, destination, remotePath,
-                                        TransferListenerAdapter.newAdapter( transferListener ),
-                                        ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
+                    TransferListenerAdapter.newAdapter( transferListener ),
+                    ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
@@ -764,12 +765,12 @@ public class LegacyRepositorySystem
 
     public void publish( ArtifactRepository repository, File source, String remotePath,
                          ArtifactTransferListener transferListener )
-        throws ArtifactTransferFailedException
+            throws ArtifactTransferFailedException
     {
         try
         {
             wagonManager.putRemoteFile( repository, source, remotePath,
-                                        TransferListenerAdapter.newAdapter( transferListener ) );
+                    TransferListenerAdapter.newAdapter( transferListener ) );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
@@ -781,7 +782,7 @@ public class LegacyRepositorySystem
     // Artifact Repository Creation
     //
     public ArtifactRepository buildArtifactRepository( Repository repo )
-        throws InvalidRepositoryException
+            throws InvalidRepositoryException
     {
         if ( repo != null )
         {
@@ -816,10 +817,10 @@ public class LegacyRepositorySystem
                                                  String checksumPolicy )
     {
         ArtifactRepositoryPolicy snapshotsPolicy =
-            new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
+                new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
 
         ArtifactRepositoryPolicy releasesPolicy =
-            new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
+                new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
 
         return createArtifactRepository( repositoryId, url, null, snapshotsPolicy, releasesPolicy );
     }
@@ -834,7 +835,7 @@ public class LegacyRepositorySystem
             repositoryLayout = layouts.get( "default" );
         }
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots,
-                                                            releases );
+                releases );
     }
 
     private static String getMessage( Throwable error, String def )
@@ -870,7 +871,7 @@ public class LegacyRepositorySystem
      * described.
      */
     static class UnknownRepositoryLayout
-        implements ArtifactRepositoryLayout
+            implements ArtifactRepositoryLayout
     {
 
         private final String id;

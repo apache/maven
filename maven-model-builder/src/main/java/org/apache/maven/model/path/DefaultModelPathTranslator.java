@@ -22,15 +22,17 @@ package org.apache.maven.model.path;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Resource;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Reporting;
+import org.apache.maven.api.model.Resource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
@@ -53,61 +55,87 @@ public class DefaultModelPathTranslator
     }
 
     @Override
-    public void alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
+    public Model alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
     {
         if ( model == null || basedir == null )
         {
-            return;
+            return model;
         }
 
         Build build = model.getBuild();
-
+        Build newBuild = null;
         if ( build != null )
         {
-            build.setDirectory( alignToBaseDirectory( build.getDirectory(), basedir ) );
-
-            build.setSourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) );
-
-            build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
-
-            build.setScriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) );
-
-            for ( Resource resource : build.getResources() )
-            {
-                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
-            }
-
-            for ( Resource resource : build.getTestResources() )
-            {
-                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
-            }
-
-            if ( build.getFilters() != null )
-            {
-                List<String> filters = new ArrayList<>( build.getFilters().size() );
-                for ( String filter : build.getFilters() )
-                {
-                    filters.add( alignToBaseDirectory( filter, basedir ) );
-                }
-                build.setFilters( filters );
-            }
-
-            build.setOutputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) );
-
-            build.setTestOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) );
+            newBuild = Build.newBuilder( build )
+                    .directory( alignToBaseDirectory( build.getDirectory(), basedir ) )
+                    .sourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) )
+                    .testSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) )
+                    .scriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) )
+                    .resources( map( build.getResources(), r -> alignToBaseDirectory( r, basedir ) ) )
+                    .testResources( map( build.getTestResources(), r -> alignToBaseDirectory( r, basedir ) ) )
+                    .filters( map( build.getFilters(), s -> alignToBaseDirectory( s, basedir ) ) )
+                    .outputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) )
+                    .testOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) )
+                    .build();
         }
 
         Reporting reporting = model.getReporting();
-
+        Reporting newReporting = null;
         if ( reporting != null )
         {
-            reporting.setOutputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) );
+            newReporting = Reporting.newBuilder( reporting )
+                    .outputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) )
+                    .build();
         }
+        if ( newBuild != build || newReporting != reporting )
+        {
+            return Model.newBuilder( model )
+                    .build( newBuild )
+                    .reporting( newReporting )
+                    .build();
+        }
+        return model;
+    }
+
+    private <T> List<T> map( List<T> resources, Function<T, T> mapper )
+    {
+        List<T> newResources = null;
+        if ( resources != null )
+        {
+            for ( int i = 0; i < resources.size(); i++ )
+            {
+                T resource = resources.get( i );
+                T newResource = mapper.apply( resource );
+                if ( newResource != null )
+                {
+                    if ( newResources == null )
+                    {
+                        newResources = new ArrayList<>( resources );
+                    }
+                    newResources.set( i, newResource );
+                }
+            }
+        }
+        return newResources;
+    }
+
+    private Resource alignToBaseDirectory( Resource resource, File basedir )
+    {
+        if ( resource != null )
+        {
+            String newDir = alignToBaseDirectory( resource.getDirectory(), basedir );
+            if ( newDir != null )
+            {
+                return resource.withDirectory( newDir );
+            }
+        }
+        return resource;
     }
 
     private String alignToBaseDirectory( String path, File basedir )
     {
-        return pathTranslator.alignToBaseDirectory( path, basedir );
+        String newPath = pathTranslator.alignToBaseDirectory( path, basedir );
+        return Objects.equals( path, newPath ) ? null : newPath;
     }
 
 }

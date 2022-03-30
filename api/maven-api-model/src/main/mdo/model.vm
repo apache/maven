@@ -1,0 +1,403 @@
+#*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+*#
+#set ( $basePackage = "org.apache.maven.api.model" )
+#set ( $package = "${basePackage}" )
+#
+#foreach ( $class in $model.allClasses )
+  #set ( $ancestors = $Helper.ancestors( $class ) )
+  #set ( $allFields = [] )
+  #set ( $inheritedFields = [] )
+  #foreach ( $cl in $ancestors )
+    #if ( $cl != $class )
+      #set ( $dummy = $inheritedFields.addAll( $cl.allFields ) )
+    #end
+    #set ( $dummy = $allFields.addAll( $cl.allFields ) )
+  #end
+  #set ( $className = "${class.name}" )
+#MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
+  #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
+    #foreach ( $class in $model.allClasses )
+      #if ( $class.getMetadata("org.codehaus.modello.plugin.model.ModelClassMetadata").rootElement )
+        #set ( $root = $class )
+      #end
+    #end
+    #set ( $types = { "DOM": "org.apache.maven.api.xml.Dom" } )
+    #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
+    #set ( $dummy = $imports.add( "java.io.Serializable" ) )
+    #set ( $dummy = $imports.add( "java.util.Collections" ) )
+    #set ( $dummy = $imports.add( "java.util.HashMap" ) )
+    #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
+    #foreach ( $field in $allFields )
+      #if ( $field.type == "java.util.List" )
+          #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
+          #set ( $dummy = $imports.add( "java.util.List" ) )
+          #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
+      #else
+        #set ( $fieldType = ${types.getOrDefault($field.type,$field.type)} )
+        #set ( $idx = $fieldType.lastIndexOf('.') )
+        #if ( $idx > 0 )
+          #set ( $dummy = $imports.add( $fieldType ) )
+          #set ( $dummy = $types.put( $fieldType, $fieldType.substring( $idx + 1 ) ) )
+        #end
+      #end
+    #end
+    #set ( $eq = "" )
+    #set ( $hc = "" )
+    #foreach ( $field in $allFields )
+      #if ( $field.identifier )
+        #set ( $dummy = $imports.add( "java.util.Objects" ) )
+        #set ( $dummy = $identifiers.add( $field ) )
+        #if ( $eq == "" )
+          #set ( $eq = "Objects.equals( this.${field.name}, that.${field.name} )" )
+        #else
+          #set ( $eq = "$eq && Objects.equals( this.${field.name}, that.${field.name} )" )
+        #end
+        #if ( $hc == "" )
+          #set ( $hc = "${field.name}" )
+        #else
+          #set ( $hc = "$hc, this.${field.name}" )
+        #end
+      #end
+    #end
+package ${package};
+
+  #foreach ( $imp in $imports )
+import $imp;
+  #end
+
+@Generated
+public class ${class.name}
+    #if ( $class.superClass )
+    extends ${class.superClass}
+    #end
+    implements Serializable, InputLocationTracker
+{
+    #if ( $class == $root )
+    final String modelEncoding;
+    #end
+    #foreach ( $field in $class.allFields )
+    final ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name;
+    #end
+    #if ( ! $class.superClass )
+    final Map<Object, InputLocation> locations;
+    final InputLocation location;
+    #end
+    #foreach ( $field in $class.allFields )
+    final InputLocation ${field.name}Location;
+    #end
+
+    ${class.name}(
+    #if ( $class == $root )
+        String modelEncoding,
+    #end
+    #foreach ( $field in $allFields )
+        ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name,
+    #end
+        Map<Object, InputLocation> locations,
+        InputLocation location,
+    #foreach ( $field in $allFields )
+      #if ( $field == ${allFields[${allFields.size()} - 1]} )
+        #set ( $sep = "" )
+      #else
+        #set ( $sep = "," )
+      #end
+        InputLocation ${field.name}Location${sep}
+    #end
+    )
+    {
+    #if ( $class.superClass )
+        super(
+      #foreach ( $field in $inheritedFields )
+            ${field.name},
+      #end
+            locations,
+            location,
+      #foreach ( $field in $inheritedFields )
+        #if ( $field == ${inheritedFields[${inheritedFields.size()} - 1]} )
+          #set ( $sep = "" )
+        #else
+          #set ( $sep = "," )
+        #end
+            ${field.name}Location${sep}
+      #end
+        );
+    #end
+    #if ( $class == $root )
+        this.modelEncoding = modelEncoding;
+    #end
+    #foreach ( $field in $class.allFields )
+        this.${field.name} = ${field.name};
+    #end
+    #if ( ! $class.superClass )
+        this.locations = locations;
+        this.location = location;
+    #end
+    #foreach ( $field in $class.allFields )
+        this.${field.name}Location = ${field.name}Location;
+    #end
+    }
+
+    #if ( ! $eq.empty )
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || !( o instanceof ${class.name} ) )
+        {
+            return false;
+        }
+        ${class.name} that = ( ${class.name} ) o;
+        return ${eq};
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash( ${hc} );
+    }
+
+    #end
+    #if ( $class == $root )
+    public String getModelEncoding()
+    {
+        return modelEncoding;
+    }
+
+    #end
+    #foreach ( $field in $class.allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type == "boolean" || $type == "Boolean" )
+        #set ( $pfx = "is" )
+      #else
+        #set ( $pfx = "get" )
+      #end
+      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
+    @Nonnull
+      #end
+    public ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${pfx}${cap}()
+    {
+        return this.${field.name};
+    }
+
+    #end
+    public InputLocation getLocation( Object key )
+    {
+        if ( key instanceof String )
+        {
+            switch ( ( String ) key )
+            {
+    #if ( ! $class.superClass )
+                case "":
+                    return location;
+    #end
+    #foreach ( $field in $class.allFields )
+                case "${field.name}":
+                    return ${field.name}Location;
+    #end
+            }
+        }
+    #if ( $class.superClass )
+        return super.getLocation( key );
+    #else
+        return locations != null ? locations.get( key ) : null;
+    #end
+    }
+
+    #foreach ( $field in $allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+    public ${class.name} with${cap}( $type $field.name )
+    {
+        return newBuilder( this ).${field.name}( $field.name ).build();
+    }
+    #end
+
+    public static ${class.name} newInstance()
+    {
+        return newInstance( true );
+    }
+
+    public static ${class.name} newInstance( boolean withDefaults )
+    {
+        return newBuilder( withDefaults ).build();
+    }
+
+    public static Builder newBuilder()
+    {
+        return newBuilder( true );
+    }
+
+    public static Builder newBuilder( boolean withDefaults )
+    {
+        return new Builder( withDefaults );
+    }
+
+    public static Builder newBuilder( ${class.name} from )
+    {
+        return newBuilder( from, false );
+    }
+
+    public static Builder newBuilder( ${class.name} from, boolean forceCopy )
+    {
+        return new Builder( from, forceCopy );
+    }
+
+    public static class Builder
+    #if ( $class.superClass )
+        extends ${class.superClass}.Builder
+    #end
+    {
+        ${class.name} base;
+    #if ( $class == $root )
+        String modelEncoding;
+    #end
+    #foreach ( $field in $class.allFields )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type == 'boolean' )
+        Boolean ${field.name};
+      #elseif ( $type == 'int' )
+        Integer ${field.name};
+      #else
+        ${type} ${field.name};
+    #end
+    #end
+    #if ( ! $class.superClass )
+        Map<Object, InputLocation> locations;
+    #end
+
+        Builder( boolean withDefaults )
+        {
+    #if ( $class.superClass )
+            super( withDefaults );
+    #end
+            if ( withDefaults )
+            {
+    #foreach ( $field in $class.allFields )
+      #if ( $field.defaultValue )
+        #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+        #if ( $field.type == "String" )
+                this.${field.name} = "${field.defaultValue}";
+        #elseif ( $field.type != "java.util.List" && $field.type != "java.util.Properties" )
+                this.${field.name} = ${field.defaultValue};
+        #end
+      #end
+    #end
+            }
+        }
+
+        Builder( ${class.name} base, boolean forceCopy )
+        {
+    #if ( $class.superClass )
+            super( base, forceCopy );
+    #end
+            if ( forceCopy )
+            {
+    #foreach ( $field in $class.allFields )
+                this.${field.name} = base.${field.name};
+    #end
+            }
+            else
+            {
+                this.base = base;
+            }
+        }
+
+    #if ( $class == $root )
+        public Builder modelEncoding( String modelEncoding )
+        {
+            this.modelEncoding = modelEncoding;
+            return this;
+        }
+
+    #end
+    #foreach ( $field in $allFields )
+        public Builder ${field.name}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
+        {
+            this.${field.name} = ${field.name};
+            return this;
+        }
+
+    #end
+
+        public Builder location( Object key, InputLocation location )
+        {
+            if ( this.locations == null )
+            {
+                this.locations = new HashMap<>();
+            }
+            this.locations.put( key, location );
+            return this;
+        }
+
+        public ${class.name} build()
+        {
+            if ( base != null
+    #foreach ( $field in $allFields )
+                    && ( ${field.name} == null || ${field.name} == base.${field.name} )
+    #end
+            )
+            {
+                return base;
+            }
+            Map<Object, InputLocation> locations = new HashMap<>( this.locations != null ? this.locations : ( base != null ? base.locations : Collections.emptyMap() ) );
+            InputLocation location = locations.remove( "" );
+    #foreach ( $field in $allFields )
+            InputLocation ${field.name}Location = locations.remove( "${field.name}" );
+    #end
+            return new ${class.name}(
+    #if ( $class == $root )
+                modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : null ),
+    #end
+    #foreach ( $field in $allFields )
+      #if ( $field.type == "java.util.List" )
+                ${field.name} != null ? Collections.unmodifiableList( new ArrayList<>( ${field.name} ) ) : ( base != null ? base.${field.name} : Collections.emptyList() ),
+      #elseif ( $field.type == "java.util.Properties" )
+                new ROProperties( ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null ) ),
+      #elseif ( $field.type == "boolean" || $field.type == "int" )
+                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : ${field.defaultValue} ),
+      #else
+                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null ),
+      #end
+    #end
+                Collections.unmodifiableMap( locations ),
+                location != null ? location : ( base != null ? base.location : null ),
+    #foreach ( $field in $allFields )
+      #if ( $field == ${allFields[${allFields.size()} - 1]} )
+        #set ( $sep = "" )
+      #else
+        #set ( $sep = "," )
+      #end
+                ${field.name}Location != null ? ${field.name}Location : ( base != null ? base.${field.name}Location : null )${sep}
+    #end
+            );
+        }
+    }
+
+    #foreach ( $cs in $class.getCodeSegments($version) )
+$cs.code
+    #end
+}
+  #end
+#end

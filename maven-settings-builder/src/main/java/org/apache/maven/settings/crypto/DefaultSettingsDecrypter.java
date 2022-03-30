@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
@@ -61,13 +61,9 @@ public class DefaultSettingsDecrypter
 
         for ( Server server : request.getServers() )
         {
-            server = server.clone();
-
-            servers.add( server );
-
             try
             {
-                server.setPassword( decrypt( server.getPassword() ) );
+                server = server.withPassword( decrypt( server.getPassword() ) );
             }
             catch ( SecDispatcherException e )
             {
@@ -77,32 +73,32 @@ public class DefaultSettingsDecrypter
 
             try
             {
-                server.setPassphrase( decrypt( server.getPassphrase() ) );
+                server = server.withPassphrase( decrypt( server.getPassphrase() ) );
             }
             catch ( SecDispatcherException e )
             {
                 problems.add( new DefaultSettingsProblem( "Failed to decrypt passphrase for server " + server.getId()
                     + ": " + e.getMessage(), Severity.ERROR, "server: " + server.getId(), -1, -1, e ) );
             }
+
+            servers.add( server );
         }
 
         List<Proxy> proxies = new ArrayList<>();
 
         for ( Proxy proxy : request.getProxies() )
         {
-            proxy = proxy.clone();
-
-            proxies.add( proxy );
-
             try
             {
-                proxy.setPassword( decrypt( proxy.getPassword() ) );
+                proxy = proxy.withPassword( decrypt( proxy.getPassword() ) );
             }
             catch ( SecDispatcherException e )
             {
                 problems.add( new DefaultSettingsProblem( "Failed to decrypt password for proxy " + proxy.getId()
                     + ": " + e.getMessage(), Severity.ERROR, "proxy: " + proxy.getId(), -1, -1, e ) );
             }
+
+            proxies.add( proxy );
         }
 
         return new DefaultSettingsDecryptionResult( servers, proxies, problems );

@@ -33,8 +33,8 @@ import javax.inject.Singleton;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.TrackableBase;
+import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
@@ -106,7 +106,7 @@ public class DefaultSettingsBuilder
             getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
         Settings userSettings = readSettings( userSettingsSource, request, problems );
 
-        settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        userSettings = settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         problems.setSource( "" );
 
@@ -119,7 +119,7 @@ public class DefaultSettingsBuilder
             File file = new File( localRepository );
             if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
             {
-                userSettings.setLocalRepository( file.getAbsolutePath() );
+                userSettings = userSettings.withLocalRepository( file.getAbsolutePath() );
             }
         }
 
@@ -165,7 +165,7 @@ public class DefaultSettingsBuilder
     {
         if ( settingsSource == null )
         {
-            return new Settings();
+            return Settings.newInstance();
         }
 
         problems.setSource( settingsSource.getLocation() );
@@ -194,13 +194,13 @@ public class DefaultSettingsBuilder
         {
             problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsSource.getLocation()
                 + ": " + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
-            return new Settings();
+            return Settings.newInstance();
         }
         catch ( IOException e )
         {
             problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation()
                 + ": " + e.getMessage(), -1, -1, e );
-            return new Settings();
+            return Settings.newInstance();
         }
 
         settingsValidator.validate( settings, problems );

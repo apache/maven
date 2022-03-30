@@ -84,6 +84,8 @@ under the License.
     <module>maven-model</module>
     <module>maven-model-builder</module>
     <module>maven-model-transform</module>
+    <module>api</module>
+    <module>maven-xml-impl</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -660,7 +662,8 @@ under the License.
         <version>3.1.2</version>
         <configuration>
           <violationSeverity>info</violationSeverity>
-          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>
+          <violationIgnore>JavadocVariable,JavadocMethod,HiddenField</violationIgnore>
+<!--          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
         </configuration>
         <dependencies>
           <dependency>

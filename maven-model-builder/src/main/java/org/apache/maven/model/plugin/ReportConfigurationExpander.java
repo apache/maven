@@ -19,7 +19,7 @@ package org.apache.maven.model.plugin;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -38,6 +38,6 @@ public interface ReportConfigurationExpander
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
+    Model expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

@@ -25,10 +25,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
@@ -133,7 +134,8 @@ class DefaultModelResolver
         }
 
         List<RemoteRepository> newRepositories =
-            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository(
+                    new org.apache.maven.model.Repository( repository ) ) );
 
         this.repositories =
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
@@ -179,7 +181,7 @@ class DefaultModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( final Parent parent )
+    public ModelSource resolveModel( final Parent parent, final AtomicReference<Parent> modified )
         throws UnresolvableModelException
     {
         try
@@ -214,9 +216,13 @@ class DefaultModelResolver
 
             }
 
-            parent.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if ( !parent.getVersion().equals( newVersion ) )
+            {
+                modified.set( parent.withVersion( newVersion ) );
+            }
 
-            return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+            return resolveModel( parent.getGroupId(), parent.getArtifactId(), newVersion );
         }
         catch ( final VersionRangeResolutionException e )
         {
@@ -227,7 +233,7 @@ class DefaultModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( final Dependency dependency )
+    public ModelSource resolveModel( final Dependency dependency, AtomicReference<Dependency> modified )
         throws UnresolvableModelException
     {
         try
@@ -262,9 +268,13 @@ class DefaultModelResolver
 
             }
 
-            dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if ( !dependency.getVersion().equals( newVersion ) )
+            {
+                modified.set( dependency.withVersion( newVersion ) );
+            }
 
-            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), newVersion );
         }
         catch ( VersionRangeResolutionException e )
         {

@@ -193,6 +193,11 @@ public class MavenProject
         setModel( model );
     }
 
+    public MavenProject( org.apache.maven.api.model.Model model )
+    {
+        this( new Model( model ) );
+    }
+
     public MavenProject( Model model )
     {
         setModel( model );
@@ -969,11 +974,14 @@ public class MavenProject
 
                     if ( executionId != null )
                     {
-                        PluginExecution execution = plugin.getExecutionsAsMap().get( executionId );
-                        if ( execution != null )
+                        for ( PluginExecution execution : plugin.getExecutions() )
                         {
-                            // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
-                            dom = (Xpp3Dom) execution.getConfiguration();
+                            if ( executionId.equals( execution.getId() ) )
+                            {
+                                // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
+                                dom = (Xpp3Dom) execution.getConfiguration();
+                                break;
+                            }
                         }
                     }
                     break;
@@ -1549,7 +1557,8 @@ public class MavenProject
                                           ArtifactFilter filter )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, filter, this );
+        return MavenMetadataSource.createArtifacts( artifactFactory, getModel().getDependencies(),
+                inheritedScope, filter, this );
     }
 
     @Deprecated

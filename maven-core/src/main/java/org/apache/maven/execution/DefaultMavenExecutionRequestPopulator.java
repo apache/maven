@@ -283,7 +283,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
         {
-            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
+            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile.getDelegate() ) );
 
             if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
             {
@@ -292,7 +292,8 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     try
                     {
-                        request.addRemoteRepository( repositorySystem.buildArtifactRepository( remoteRepository ) );
+                        request.addRemoteRepository(
+                                MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -305,7 +306,8 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     try
                     {
-                        request.addPluginArtifactRepository( repositorySystem.buildArtifactRepository( pluginRepo ) );
+                        request.addPluginArtifactRepository(
+                                MavenRepositorySystem.buildArtifactRepository( pluginRepo ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {

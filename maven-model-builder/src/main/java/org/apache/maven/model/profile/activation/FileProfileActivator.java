@@ -25,9 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
-import org.apache.maven.model.Profile;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;

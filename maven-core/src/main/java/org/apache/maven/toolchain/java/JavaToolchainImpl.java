@@ -22,7 +22,7 @@ package org.apache.maven.toolchain.java;
 import java.io.File;
 
 import org.apache.maven.toolchain.DefaultToolchain;
-import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;

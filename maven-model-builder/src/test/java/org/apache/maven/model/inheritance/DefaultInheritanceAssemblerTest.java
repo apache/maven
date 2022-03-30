@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.AbstractModelSourceTransformer;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.building.TransformerContext;
@@ -211,18 +211,18 @@ public class DefaultInheritanceAssemblerTest
         {
             // when model is read from repo, a stream is used, then pomFile == null
             // (has consequences in inheritance algorithm since getProjectDirectory() returns null)
-            parent.setPomFile( null );
-            child.setPomFile( null );
+            parent = Model.newBuilder( parent, true ).pomFile( null ).build();
+            child = Model.newBuilder( child, true ).pomFile( null ).build();
         }
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assembler.assembleModelInheritance( child, parent, null, problems );
+        Model assembled = assembler.assembleModelInheritance( child, parent, null, problems );
 
         // write baseName + "-actual"
         File actual = new File( "target/test-classes/poms/inheritance/" + baseName
             + ( fromRepo ? "-build" : "-repo" ) + "-actual.xml" );
-        writer.write( actual, null, child );
+        writer.write( actual, null, assembled );
 
         // check with getPom( baseName + "-expected" )
         File expected = getPom( baseName + "-expected" );
@@ -240,11 +240,11 @@ public class DefaultInheritanceAssemblerTest
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assembler.assembleModelInheritance( child, parent, null, problems );
+        Model model = assembler.assembleModelInheritance( child, parent, null, problems );
 
         File actual = new File( "target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml" );
 
-        writer.write( actual, null, child );
+        writer.write( actual, null, model );
 
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom( "module-path-not-artifactId-expected" );

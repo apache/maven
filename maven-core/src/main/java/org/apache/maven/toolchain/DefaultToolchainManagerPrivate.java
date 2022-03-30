@@ -28,7 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.slf4j.Logger;
 
 /**
@@ -58,7 +58,7 @@ public class DefaultToolchainManagerPrivate
     }
 
     @Override
-    public ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
+    public ToolchainPrivate[] getToolchainsForType( String type, MavenSession session )
         throws MisconfiguredToolchainException
     {
         List<ToolchainPrivate> toRet = new ArrayList<>();
@@ -71,7 +71,9 @@ public class DefaultToolchainManagerPrivate
         }
         else
         {
-            List<ToolchainModel> availableToolchains = context.getRequest().getToolchains().get( type );
+            List<ToolchainModel> availableToolchains =
+                    org.apache.maven.toolchain.model.ToolchainModel.toolchainModelToApiV4(
+                            session.getRequest().getToolchains().get( type ) );
 
             if ( availableToolchains != null )
             {

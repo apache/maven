@@ -28,6 +28,7 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
+import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -44,29 +45,29 @@ class Xpp3DomNodeIterator
 
     private NodeTest test;
 
-    private Xpp3Dom node;
+    private Dom node;
 
-    private Xpp3Dom[] children;
+    private List<Dom> children;
 
-    private List<Xpp3Dom> filteredChildren = new ArrayList<>();
+    private List<Dom> filteredChildren = new ArrayList<>();
 
     private int filteredIndex;
 
-    private Xpp3Dom child;
+    private Dom child;
 
     private int position;
 
     public Xpp3DomNodeIterator( NodePointer parent, NodeTest test, boolean reverse, NodePointer startWith )
     {
         this.parent = parent;
-        this.node = (Xpp3Dom) parent.getNode();
+        this.node = (Dom) parent.getNode();
         this.children = this.node.getChildren();
         if ( startWith != null )
         {
             Xpp3Dom startWithNode = (Xpp3Dom) startWith.getNode();
-            for ( ; filteredIndex < children.length; filteredIndex++ )
+            for ( ; filteredIndex < children.size(); filteredIndex++ )
             {
-                if ( startWithNode.equals( children[filteredIndex] ) )
+                if ( startWithNode.equals( children.get(filteredIndex) ) )
                 {
                     filteredIndex++;
                     break;
@@ -104,9 +105,9 @@ class Xpp3DomNodeIterator
 
     private void filterChildren( int position )
     {
-        for ( ; position > filteredChildren.size() && filteredIndex < children.length; filteredIndex++ )
+        for ( ; position > filteredChildren.size() && filteredIndex < children.size(); filteredIndex++ )
         {
-            Xpp3Dom child = children[filteredIndex];
+            Dom child = children.get(filteredIndex);
             if ( testNode( child ) )
             {
                 filteredChildren.add( child );
@@ -114,7 +115,7 @@ class Xpp3DomNodeIterator
         }
     }
 
-    private boolean testNode( Xpp3Dom node )
+    private boolean testNode( Dom node )
     {
         if ( test == null )
         {

@@ -19,7 +19,7 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 
 /**
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown

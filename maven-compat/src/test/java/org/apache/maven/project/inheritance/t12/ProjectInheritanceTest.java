@@ -21,8 +21,10 @@ package org.apache.maven.project.inheritance.t12;
 
 import java.io.File;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;

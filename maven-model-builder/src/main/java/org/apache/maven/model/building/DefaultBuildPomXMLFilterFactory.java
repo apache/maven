@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
 import org.apache.maven.model.transform.RelativeProject;
 

@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 
 /**
  * A simple model problem collector for testing the model building components.

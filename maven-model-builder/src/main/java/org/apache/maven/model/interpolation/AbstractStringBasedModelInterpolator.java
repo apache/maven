@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;

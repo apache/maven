@@ -19,9 +19,9 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.File;
+import java.nio.file.Path;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 
 /**
  * Assists in the handling of model problems.
@@ -48,7 +48,7 @@ public class ModelProblemUtils
 
         buffer.append( toId( model ) );
 
-        File pomFile = model.getPomFile();
+        Path pomFile = model.getPomFile();
         if ( pomFile != null )
         {
             buffer.append( " (" ).append( pomFile ).append( ')' );
@@ -63,11 +63,11 @@ public class ModelProblemUtils
 
         if ( model != null )
         {
-            File pomFile = model.getPomFile();
+            Path pomFile = model.getPomFile();
 
             if ( pomFile != null )
             {
-                path = pomFile.getAbsolutePath();
+                path = pomFile.toAbsolutePath().toString();
             }
         }
 

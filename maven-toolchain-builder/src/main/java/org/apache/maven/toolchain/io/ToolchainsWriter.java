@@ -19,7 +19,7 @@ package org.apache.maven.toolchain.io;
  * under the License.
  */
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 
 import java.io.IOException;
 import java.io.Writer;

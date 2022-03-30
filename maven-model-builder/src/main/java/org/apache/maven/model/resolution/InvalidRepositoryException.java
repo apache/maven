@@ -19,7 +19,7 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
-import org.apache.maven.model.Repository;
+import org.apache.maven.api.model.Repository;
 
 /**
  * Signals an error when adding a repository to the model resolver.

@@ -57,6 +57,7 @@ public class ArtifactDescriptorUtils
         return builder.build();
     }
 
+
     public static RepositoryPolicy toRepositoryPolicy( org.apache.maven.model.RepositoryPolicy policy )
     {
         boolean enabled = true;

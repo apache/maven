@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 
 import java.util.Arrays;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
@@ -381,8 +381,11 @@ public class DefaultModelBuilderFactory
     {
 
         @Override
-        public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+        public Model injectLifecycleBindings( Model model,
+                                              ModelBuildingRequest request,
+                                              ModelProblemCollector problems )
         {
+            return model;
         }
 
     }

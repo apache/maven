@@ -26,12 +26,12 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.Profile;
+import org.apache.maven.api.settings.Repository;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Server;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.codehaus.plexus.util.StringUtils;

@@ -21,7 +21,7 @@ package org.apache.maven.toolchain;
 
 import java.util.Map;
 
-import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * a private contract between the toolchains plugin and the components.

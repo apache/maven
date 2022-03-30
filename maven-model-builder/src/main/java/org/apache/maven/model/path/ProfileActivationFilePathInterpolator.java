@@ -19,7 +19,7 @@ package org.apache.maven.model.path;
  * under the License.
  */
 
-import org.apache.maven.model.ActivationFile;
+import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;

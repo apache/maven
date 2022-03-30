@@ -27,8 +27,8 @@ import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.io.ToolchainsReader;
 import org.apache.maven.toolchain.io.ToolchainsWriter;
 import org.apache.maven.toolchain.merge.MavenToolchainMerger;
-import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.TrackableBase;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.api.toolchain.TrackableBase;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
@@ -76,11 +76,12 @@ public class DefaultToolchainsBuilder
 
         PersistedToolchains userToolchains = readToolchains( request.getUserToolchainsSource(), request, problems );
 
-        toolchainsMerger.merge( userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL );
+        PersistedToolchains merged = toolchainsMerger.merge(
+                userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL );
 
         problems.setSource( "" );
 
-        userToolchains = interpolate( userToolchains, problems );
+        merged = interpolate( merged, problems );
 
         if ( hasErrors( problems.getProblems() ) )
         {
@@ -88,7 +89,7 @@ public class DefaultToolchainsBuilder
         }
 
 
-        return new DefaultToolchainsBuildingResult( userToolchains, problems.getProblems() );
+        return new DefaultToolchainsBuildingResult( merged, problems.getProblems() );
     }
 
     private PersistedToolchains interpolate( PersistedToolchains toolchains, ProblemCollector problems )
@@ -160,7 +161,7 @@ public class DefaultToolchainsBuilder
     {
         if ( toolchainsSource == null )
         {
-            return new PersistedToolchains();
+            return PersistedToolchains.newInstance();
         }
 
         PersistedToolchains toolchains;
@@ -187,13 +188,13 @@ public class DefaultToolchainsBuilder
         {
             problems.add( Problem.Severity.FATAL, "Non-parseable toolchains " + toolchainsSource.getLocation()
                 + ": " + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
-            return new PersistedToolchains();
+            return PersistedToolchains.newInstance();
         }
         catch ( IOException e )
         {
             problems.add( Problem.Severity.FATAL, "Non-readable toolchains " + toolchainsSource.getLocation()
                 + ": " + e.getMessage(), -1, -1, e );
-            return new PersistedToolchains();
+            return PersistedToolchains.newInstance();
         }
 
         return toolchains;

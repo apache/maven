@@ -231,9 +231,9 @@ public class MavenMetadataSource
             }
             else
             {
-                dependencies = rel.project.getDependencies();
+                dependencies = rel.project.getModel().getDependencies();
 
-                DependencyManagement depMgmt = rel.project.getDependencyManagement();
+                DependencyManagement depMgmt = rel.project.getModel().getDependencyManagement();
                 managedDependencies = ( depMgmt != null ) ? depMgmt.getDependencies() : null;
 
                 pomRepositories = rel.project.getRemoteArtifactRepositories();
@@ -618,7 +618,7 @@ public class MavenMetadataSource
                 {
                     Relocation relocation = null;
 
-                    DistributionManagement distMgmt = project.getDistributionManagement();
+                    DistributionManagement distMgmt = project.getModel().getDistributionManagement();
                     if ( distMgmt != null )
                     {
                         relocation = distMgmt.getRelocation();

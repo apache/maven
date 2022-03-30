@@ -22,7 +22,7 @@ package org.apache.maven.toolchain.building;
 import java.util.List;
 
 import org.apache.maven.building.Problem;
-import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 
 /**
  * Collects the output of the toolchains builder.

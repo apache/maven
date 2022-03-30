@@ -24,7 +24,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 
 /**
  * Signals one ore more errors during model building. The model builder tries to collect as many problems as possible

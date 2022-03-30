@@ -19,6 +19,7 @@ package org.apache.maven.model.management;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +28,10 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
@@ -50,9 +51,9 @@ public class DefaultDependencyManagementInjector
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
-    public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public Model injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        merger.mergeManagedDependencies( model );
+        return merger.mergeManagedDependencies( model );
     }
 
     /**
@@ -62,7 +63,7 @@ public class DefaultDependencyManagementInjector
         extends MavenModelMerger
     {
 
-        public void mergeManagedDependencies( Model model )
+        public Model mergeManagedDependencies( Model model )
         {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if ( dependencyManagement != null )
@@ -76,39 +77,55 @@ public class DefaultDependencyManagementInjector
                     dependencies.put( key, dependency );
                 }
 
+                boolean modified = false;
                 for ( Dependency managedDependency : dependencyManagement.getDependencies() )
                 {
                     Object key = getDependencyKey().apply( managedDependency );
                     Dependency dependency = dependencies.get( key );
                     if ( dependency != null )
                     {
-                        mergeDependency( dependency, managedDependency, false, context );
+                        Dependency merged = mergeDependency( dependency, managedDependency, false, context );
+                        if ( merged != dependency )
+                        {
+                            dependencies.put( key, merged );
+                            modified = true;
+                        }
                     }
                 }
+
+                if ( modified )
+                {
+                    List<Dependency> newDeps = new ArrayList<>( dependencies.size() );
+                    for ( Dependency dep : model.getDependencies() )
+                    {
+                        Object key = getDependencyKey().apply( dep );
+                        Dependency dependency = dependencies.get( key );
+                        newDeps.add( dependency );
+                    }
+                    return Model.newBuilder( model ).dependencies( newDeps ).build();
+                }
             }
+            return model;
         }
 
         @Override
-        protected void mergeDependency_Optional( Dependency target, Dependency source, boolean sourceDominant,
+        protected void mergeDependency_Optional( Dependency.Builder builder,
+                                                 Dependency target, Dependency source, boolean sourceDominant,
                                                  Map<Object, Object> context )
         {
             // optional flag is not managed
         }
 
         @Override
-        protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
+        protected void mergeDependency_Exclusions( Dependency.Builder builder,
+                                                   Dependency target, Dependency source, boolean sourceDominant,
                                                    Map<Object, Object> context )
         {
             List<Exclusion> tgt = target.getExclusions();
             if ( tgt.isEmpty() )
             {
                 List<Exclusion> src = source.getExclusions();
-
-                for ( Exclusion element : src )
-                {
-                    Exclusion clone = element.clone();
-                    target.addExclusion( clone );
-                }
+                builder.exclusions( src );
             }
         }
 
