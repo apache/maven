@@ -18,6 +18,11 @@
 *#
 #set ( $basePackage = "org.apache.maven.api.model" )
 #set ( $package = "${basePackage}" )
+#foreach ( $field in $model.getClass("Model", $version).allFields )
+  #if ( $field.name == "pomFile" )
+    #set ( $dummy = $field.setType("java.nio.file.Path") )
+  #end
+#end
 #
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )

@@ -20,17 +20,17 @@ package org.codehaus.modello.plugin.velocity;
  */
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.modello.maven.AbstractModelloGeneratorMojo;
-import org.codehaus.modello.model.ModelField;
 
 /**
  * Creates an XML schema from the model.
@@ -50,6 +50,9 @@ public class ModelloVelocityMojo
     @Parameter
     private List<String> templates;
 
+    @Parameter
+    private List<String> params;
+
     protected String getGeneratorType()
     {
         return "velocity";
@@ -57,40 +60,15 @@ public class ModelloVelocityMojo
 
     protected void customizeParameters( Properties parameters )
     {
-        try
-        {
-            Field field = ModelField.class.getDeclaredField( "PRIMITIVE_TYPES" );
-            field.setAccessible( true );
-            unsetFinal( field );
-            field.set( null, new String[] { "boolean", "Boolean", "char", "Character", "byte",
-                    "Byte", "short", "Short", "int", "Integer", "long", "Long", "float", "Float",
-                    "double", "Double", "String", "Date", "DOM", "java.nio.file.Path" } );
-
-            super.customizeParameters( parameters );
-            parameters.put( "basedir", Objects.requireNonNull( getBasedir(), "basedir is null" ) );
-            parameters.put( VelocityGenerator.VELOCITY_TEMPLATES, String.join( ",", templates ) );
-        }
-        catch ( Throwable e )
-        {
-            throw new RuntimeException( e );
-        }
-    }
-
-    private void unsetFinal( Field field ) throws IllegalAccessException, NoSuchFieldException
-    {
-// TODO: on jdk >= 12, accessing Field.modifiers fail, need to check with VarHandle or adds an open module
-//        try
-//        {
-            Field modifiersField = Field.class.getDeclaredField( "modifiers" );
-            modifiersField.setAccessible( true );
-            modifiersField.setInt( field, field.getModifiers() & ~Modifier.FINAL );
-//        }
-//        catch ( Throwable t )
-//        {
-//            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
-//            VarHandle modifiers = lookup.findVarHandle( Field.class, "modifiers", int.class );
-//            modifiers.set( field, field.getModifiers() & ~Modifier.FINAL );
-//        }
+        super.customizeParameters( parameters );
+        Map<String, String> params = this.params != null ? this.params.stream().collect( Collectors.toMap(
+                s -> s.substring( 0, s.indexOf( '=' ) ), s -> s.substring( s.indexOf( '=' ) + 1 )
+        ) ) : Collections.emptyMap();
+        getLog().warn( "templates: " + templates );
+        getLog().warn( "params: " + params );
+        parameters.put( "basedir", Objects.requireNonNull( getBasedir(), "basedir is null" ) );
+        parameters.put( VelocityGenerator.VELOCITY_TEMPLATES, String.join( ",", templates ) );
+        parameters.put( VelocityGenerator.VELOCITY_PARAMETERS, params );
     }
 
     protected boolean producesCompilableResult()

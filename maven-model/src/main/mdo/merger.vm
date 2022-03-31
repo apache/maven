@@ -19,6 +19,11 @@
 #set ( $basePackage = "org.apache.maven.api.model" )
 #set ( $package = "org.apache.maven.model.v4" )
 #set ( $className = "ModelMerger" )
+#foreach ( $field in $model.getClass("Model", $version).allFields )
+  #if ( $field.name == "pomFile" )
+    #set ( $dummy = $field.setType("java.nio.file.Path") )
+  #end
+#end
 #
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
 package ${package};

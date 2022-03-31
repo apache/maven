@@ -83,7 +83,7 @@
           <version>5.0.0+</version>
           <required>false</required>
           <description>Originating POM file</description>
-          <type>java.nio.file.Path</type>
+          <type>DOM</type> <!-- This is transformed to a File/Path in the template -->
         </field>
 
         <!-- ====================================================================== -->
