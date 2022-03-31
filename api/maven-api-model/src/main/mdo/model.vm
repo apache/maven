@@ -230,12 +230,16 @@ public class ${class.name}
     #end
     }
 
+    public Builder with()
+    {
+        return newBuilder( this );
+    }
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
     public ${class.name} with${cap}( $type $field.name )
     {
-        return newBuilder( this ).${field.name}( $field.name ).build();
+        return with().${field.name}( $field.name ).build();
     }
     #end
 
