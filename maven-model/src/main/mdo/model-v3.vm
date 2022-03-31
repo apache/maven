@@ -45,6 +45,7 @@
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.List" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Objects" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Collectors" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
@@ -189,14 +190,17 @@ public class ${class.name}
 
     public void set${cap}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
     {
+        if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
+        {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        delegate = getDelegate().with${cap}(
-                ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
+            delegate = getDelegate().with${cap}(
+                    ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
       #elseif ( $field.to && $field.to != "String" )
-        delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
+            delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
       #else
-        delegate = getDelegate().with${cap}( ${field.name} );
+            delegate = getDelegate().with${cap}( ${field.name} );
       #end
+        }
     }
 
       #if ( $field.type == "java.util.List" && $field.multiplicity == "*" )
