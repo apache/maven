@@ -1,0 +1,95 @@
+mavenCentral() 
+ implementation 'com.facebook.android:facebook-login:latest.release'
+
+<string name="facebook_app_id">1234</string>
+<string name="fb_login_protocol_scheme">fb1234</string>
+<string name="facebook_client_token">56789</string>
+
+
+<application android:label="@string/app_name" ...>
+    ...
+   	<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+   	<meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+    ...
+</application>
+
+    <activity android:name="com.facebook.FacebookActivity"
+        android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        android:label="@string/app_name" />
+    <activity
+        android:name="com.facebook.CustomTabActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="@string/fb_login_protocol_scheme" />
+        </intent-filter>
+    </activity>
+
+<uses-permission android:name="android.permission.INTERNET"/>
+
+
+<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+        
+      
+keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore | openssl sha1 -binary | openssl base64
+
+      
+keytool -exportcert -alias androiddebugkey -keystore "C:\Users\USERNAME\.android\debug.keystore" | "PATH_TO_OPENSSL_LIBRARY\bin\openssl" sha1 -binary | "PATH_TO_OPENSSL_LIBRARY\bin\openssl" base64
+      
+
+      
+keytool -exportcert -alias YOUR_RELEASE_KEY_ALIAS -keystore YOUR_RELEASE_KEY_PATH | openssl sha1 -binary | openssl base64
+
+<com.facebook.login.widget.LoginButton
+    android:id="@+id/login_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="30dp"
+    android:layout_marginBottom="30dp" /> 
+callbackManager = CallbackManager.Factory.create();
+
+      
+    private static final String EMAIL = "email";
+      
+    loginButton = (LoginButton) findViewById(R.id.login_button);
+    loginButton.setReadPermissions(Arrays.asList(EMAIL));
+    // If you are using in a fragment, call loginButton.setFragment(this);    
+
+    // Callback registration
+    loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            // App code
+        }
+
+        @Override
+        public void onCancel() {
+            // App code
+        }
+
+        @Override
+        public void onError(FacebookException exception) {
+            // App code
+        }
+    });
+
+      @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+AccessToken accessToken = AccessToken.getCurrentAccessToken();
+boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+  
+
+      
+LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+  
+<queries> <package android:name="com.facebook.katana" /> </queries>   
+
+LoginManager.getInstance().retrieveLoginStatus(this, new LoginStatusCallback() { @Override public void onCompleted(AccessToken accessToken) { // User was previously logged in, can log them in directly here. // If this callback is called, a popup notification appears that says // "Logged in as <User Name>" } @Override public void onFailure() { // No access token could be retrieved for the user } @Override public void onError(Exception exception) { // An error occurred } });   
