@@ -31,8 +31,8 @@ under the License.
 
     <artifactId>maven-api-toolchain</artifactId>
 
-    <name>Maven Toolchain Model</name>
-    <description>Maven Toolchain model.</description>
+    <name>Maven API Toolchain</name>
+    <description>Maven API Toolchain model.</description>
 
     <dependencies>
         <dependency>

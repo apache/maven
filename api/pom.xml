@@ -27,7 +27,7 @@
   </parent>
 
   <artifactId>maven-api</artifactId>
-  <name>Apache Maven API</name>
+  <name>Maven API</name>
   <packaging>pom</packaging>
 
   <modules>

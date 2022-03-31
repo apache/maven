@@ -30,8 +30,8 @@ under the License.
 
   <artifactId>maven-api-model</artifactId>
 
-  <name>Maven Model</name>
-  <description>Model for Maven POM (Project Object Model)</description>
+  <name>Maven API Model</name>
+  <description>Maven API Model for Maven POM (Project Object Model)</description>
 
   <dependencies>
     <dependency>

@@ -30,8 +30,8 @@ under the License.
 
   <artifactId>maven-api-settings</artifactId>
 
-  <name>Maven Settings</name>
-  <description>Maven Settings model.</description>
+  <name>Maven API Settings</name>
+  <description>Maven API Settings model.</description>
 
   <dependencies>
     <dependency>

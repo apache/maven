@@ -27,7 +27,7 @@
   </parent>
 
   <artifactId>maven-api-xml</artifactId>
-  <name>Apache Maven API XML</name>
+  <name>Maven API XML</name>
 
   <dependencies>
     <dependency>

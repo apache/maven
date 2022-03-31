@@ -27,6 +27,6 @@
   </parent>
 
   <artifactId>maven-api-meta</artifactId>
-  <name>Apache Maven API Meta annotations</name>
+  <name>Maven API Meta annotations</name>
 
 </project>
