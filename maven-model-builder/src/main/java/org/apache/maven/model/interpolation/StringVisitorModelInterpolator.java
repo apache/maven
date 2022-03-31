@@ -55,10 +55,9 @@ public class StringVisitorModelInterpolator
 {
     @Inject
     public StringVisitorModelInterpolator( PathTranslator pathTranslator,
-                                           UrlNormalizer urlNormalizer,
-                                           ModelVersionProcessor processor )
+                                           UrlNormalizer urlNormalizer )
     {
-        super( pathTranslator, urlNormalizer, processor );
+        super( pathTranslator, urlNormalizer );
     }
 
     interface InnerInterpolator

@@ -78,15 +78,12 @@ public abstract class AbstractStringBasedModelInterpolator
 
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
-    private final ModelVersionProcessor versionProcessor;
 
     @Inject
-    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer,
-                                                 ModelVersionProcessor processor )
+    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
     {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
-        this.versionProcessor = processor;
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
@@ -141,10 +138,6 @@ public abstract class AbstractStringBasedModelInterpolator
         valueSources.add( projectPrefixValueSource );
 
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
-
-        // Overwrite existing values in model properties. Otherwise it's not possible
-        // to define the version via command line: mvn -Drevision=6.5.7 ...
-        versionProcessor.overwriteModelProperties( modelProperties, config );
 
         valueSources.add( new MapBasedValueSource( modelProperties ) );
 

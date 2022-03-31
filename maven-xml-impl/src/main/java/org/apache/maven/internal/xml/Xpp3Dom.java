@@ -388,7 +388,8 @@ public class Xpp3Dom
                 {
                     children = dominant.getChildren();
                 }
-                return new Xpp3Dom( dominant.getName(), value, attrs, children, location );
+                return new Xpp3Dom( dominant.getName(), value != null ? value : dominant.getValue(),
+                                    attrs, children, location );
             }
         }
         return dominant;

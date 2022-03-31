@@ -83,14 +83,6 @@ public class DefaultPluginConfigurationExpander
                 for ( PluginExecution execution : plugin.getExecutions() )
                 {
                     Dom childDom = execution.getConfiguration();
-                    if ( childDom != null )
-                    {
-                        childDom.merge( parentDom );
-                    }
-                    else
-                    {
-                        childDom = parentDom.clone();
-                    }
                     executions.add( execution.withConfiguration(
                             childDom != null ? childDom.merge( parentDom ) : parentDom ) );
                 }

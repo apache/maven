@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +65,7 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.DependencyManagementInjector;
@@ -126,6 +126,7 @@ public class DefaultModelBuilder
     private final ReportConfigurationExpander reportConfigurationExpander;
     private final ReportingConverter reportingConverter;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+    private final ModelVersionProcessor versionProcessor;
 
     @Inject
     public DefaultModelBuilder(
@@ -146,7 +147,8 @@ public class DefaultModelBuilder
             PluginConfigurationExpander pluginConfigurationExpander,
             ReportConfigurationExpander reportConfigurationExpander,
             ReportingConverter reportingConverter,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
+            ModelVersionProcessor versionProcessor )
     {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
@@ -166,6 +168,7 @@ public class DefaultModelBuilder
         this.reportConfigurationExpander = reportConfigurationExpander;
         this.reportingConverter = reportingConverter;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        this.versionProcessor = versionProcessor;
     }
 
     /**
@@ -179,7 +182,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -193,7 +196,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -207,7 +210,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -221,7 +224,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -235,7 +238,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -249,7 +252,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -263,7 +266,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -277,7 +280,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -291,7 +294,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -305,7 +308,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -319,7 +322,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -334,7 +337,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -349,7 +352,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -363,7 +366,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -377,7 +380,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -391,7 +394,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -405,7 +408,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -420,7 +423,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     @Override
@@ -1200,6 +1203,16 @@ public class DefaultModelBuilder
         // save profile activations before interpolation, since they are evaluated with limited scope
         Map<String, Activation> originalActivations = getProfileActivations( model );
 
+        // Overwrite existing values in model properties. Otherwise it's not possible
+        // to define the version via command line: mvn -Drevision=6.5.7 ...
+        Properties props = new Properties();
+        props.putAll( model.getProperties() );
+        versionProcessor.overwriteModelProperties( props, request );
+        if ( !props.equals( model.getProperties() ) )
+        {
+            model = model.withProperties( props );
+        }
+
         Path projectDir = model.getProjectDirectory();
         Model interpolatedModel = modelInterpolator.interpolateModel(
                 model, projectDir != null ? projectDir.toFile() : null, request, problems );
@@ -1545,10 +1558,8 @@ public class DefaultModelBuilder
 
         List<Dependency> newDependencies = null;
 
-        for ( Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); )
+        for ( Dependency dependency : depMgmt.getDependencies() )
         {
-            Dependency dependency = it.next();
-
             if ( !"pom".equals( dependency.getType() ) || !"import".equals( dependency.getScope() ) )
             {
                 continue;
@@ -1560,8 +1571,17 @@ public class DefaultModelBuilder
             }
             newDependencies.remove( dependency );
 
+            AtomicReference<Dependency> resolvedDependency = new AtomicReference<>();
+
             DependencyManagement importMgmt = loadDependencyManagement( model, request, problems,
-                                                                        dependency, importIds );
+                    dependency, importIds, resolvedDependency );
+
+            if ( resolvedDependency.get() != null )
+            {
+                // TODO: The dependency for the BOM has been resolved, but we are actually getting rid of it...
+                //       Before the introduction of the immutable model, the dependency was updated.
+                Dependency resolvedDep = resolvedDependency.get();
+            }
 
             if ( importMgmt != null )
             {
@@ -1587,7 +1607,8 @@ public class DefaultModelBuilder
     private DependencyManagement loadDependencyManagement( Model model, ModelBuildingRequest request,
                                                            DefaultModelProblemCollector problems,
                                                            Dependency dependency,
-                                                           Collection<String> importIds )
+                                                           Collection<String> importIds,
+                                                           AtomicReference<Dependency> resolvedDependency )
     {
         String groupId = dependency.getGroupId();
         String artifactId = dependency.getArtifactId();
@@ -1640,7 +1661,7 @@ public class DefaultModelBuilder
         if ( importMgmt == null )
         {
             importMgmt = doLoadDependencyManagement( model, request, problems, dependency,
-                                                     groupId, artifactId, version, importIds );
+                                                     groupId, artifactId, version, importIds, resolvedDependency );
             if ( importMgmt != null )
             {
                 intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
@@ -1657,7 +1678,8 @@ public class DefaultModelBuilder
                                                              String groupId,
                                                              String artifactId,
                                                              String version,
-                                                             Collection<String> importIds )
+                                                             Collection<String> importIds,
+                                                             AtomicReference<Dependency> resolvedDependency )
     {
         DependencyManagement importMgmt;
         final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
@@ -1689,10 +1711,9 @@ public class DefaultModelBuilder
         if ( importModel == null )
         {
             final ModelSource importSource;
-            final AtomicReference<Dependency> modified = new AtomicReference<>();
             try
             {
-                importSource = modelResolver.resolveModel( dependency, modified );
+                importSource = modelResolver.resolveModel( dependency, resolvedDependency );
             }
             catch ( UnresolvableModelException e )
             {
@@ -1708,11 +1729,6 @@ public class DefaultModelBuilder
                     .setMessage( buffer.toString() ).setLocation( dependency.getLocation( "" ) )
                     .setException( e ) );
                 return null;
-            }
-
-            if ( modified.get() != null )
-            {
-                throw new UnsupportedOperationException( "NEED TO UPDATE DEPENDENCY" );
             }
 
             final ModelBuildingResult importResult;

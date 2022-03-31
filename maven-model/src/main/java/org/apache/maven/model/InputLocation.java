@@ -74,7 +74,8 @@ public final class InputLocation
         this.source = location.getSource() != null ? new InputSource( location.getSource() ) : null;
         this.locations = location.getLocations().isEmpty() ? null
                 : location.getLocations().entrySet().stream().collect(
-                        Collectors.toMap( e -> e.getKey(), e -> new InputLocation( e.getValue() ) ) );
+                        Collectors.toMap( e -> e.getKey(),
+                                          e -> e.getValue() == location ? this : new InputLocation( e.getValue() ) ) );
     }
 
     public InputLocation( int lineNumber, int columnNumber)
