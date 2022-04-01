@@ -43,10 +43,11 @@ public final class ProjectSelector
             throws MavenExecutionException
     {
         Set<MavenProject> selectedProjects = new LinkedHashSet<>();
+        File baseDirectory = !isNullOrEmpty( request.getBaseDirectory() )
+                ? new File( request.getBaseDirectory() ) : null;
         for ( String selector : projectSelectors )
         {
-            Optional<MavenProject> optSelectedProject
-                    = findOptionalProject( projects, getBaseDirectory( request ), selector );
+            Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
             if ( !optSelectedProject.isPresent() )
             {
                 String message = "Could not find the selected project in the reactor: " + selector;
@@ -72,10 +73,11 @@ public final class ProjectSelector
     {
         Set<MavenProject> resolvedOptionalProjects = new LinkedHashSet<>();
         Set<String> unresolvedOptionalSelectors = new HashSet<>();
+        File baseDirectory = !isNullOrEmpty( request.getBaseDirectory() )
+                ? new File( request.getBaseDirectory() ) : null;
         for ( String selector : projectSelectors )
         {
-            Optional<MavenProject> optSelectedProject =
-                    findOptionalProject( projects, getBaseDirectory( request ), selector );
+            Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
             if ( optSelectedProject.isPresent() )
             {
                 resolvedOptionalProjects.add( optSelectedProject.get() );
@@ -102,11 +104,6 @@ public final class ProjectSelector
         return projects.stream()
                 .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
                 .findFirst();
-    }
-
-    File getBaseDirectory( MavenExecutionRequest request )
-    {
-        return !isNullOrEmpty( request.getBaseDirectory() ) ? new File( request.getBaseDirectory() ) : null;
     }
 
     boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
