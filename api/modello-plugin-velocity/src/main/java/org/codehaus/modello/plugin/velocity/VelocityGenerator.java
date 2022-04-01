@@ -76,11 +76,6 @@ public class VelocityGenerator
             context.put( "model", model );
             context.put( "Helper", new Helper( version ) );
 
-            for ( String key : context.getKeys() )
-            {
-                getLogger().warn( "context: " + key + " -> " + context.get( key ) );
-            }
-
             for ( String templatePath : templates.split( "," ) )
             {
                 Template template = velocity.getTemplate( templatePath );

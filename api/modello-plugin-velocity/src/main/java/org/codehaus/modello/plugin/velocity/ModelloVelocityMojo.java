@@ -64,8 +64,6 @@ public class ModelloVelocityMojo
         Map<String, String> params = this.params != null ? this.params.stream().collect( Collectors.toMap(
                 s -> s.substring( 0, s.indexOf( '=' ) ), s -> s.substring( s.indexOf( '=' ) + 1 )
         ) ) : Collections.emptyMap();
-        getLog().warn( "templates: " + templates );
-        getLog().warn( "params: " + params );
         parameters.put( "basedir", Objects.requireNonNull( getBasedir(), "basedir is null" ) );
         parameters.put( VelocityGenerator.VELOCITY_TEMPLATES, String.join( ",", templates ) );
         parameters.put( VelocityGenerator.VELOCITY_PARAMETERS, params );
