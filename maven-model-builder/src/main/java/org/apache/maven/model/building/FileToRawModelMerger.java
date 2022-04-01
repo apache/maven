@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
@@ -85,8 +86,9 @@ class FileToRawModelMerger extends ModelMerger
                                                            boolean sourceDominant, Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
-                                                                         context ) );
+        builder.dependencies( target.getDependencies().stream()
+                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
+                .collect( Collectors.toList() ) );
     }
 
     @Override
@@ -135,8 +137,9 @@ class FileToRawModelMerger extends ModelMerger
                                         Map<Object, Object> context )
     {
         Iterator<Profile> sourceIterator = source.getProfiles().iterator();
-        target.getProfiles().forEach( t -> mergeProfile( t, sourceIterator.next(), sourceDominant,
-                                                                  context ) );
+        builder.profiles( target.getProfiles().stream()
+                .map( d -> mergeProfile( d, sourceIterator.next(), sourceDominant, context ) )
+                .collect( Collectors.toList() ) );
     }
 
     @Override
@@ -145,8 +148,9 @@ class FileToRawModelMerger extends ModelMerger
                                                 Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
-                                                                         context ) );
+        builder.dependencies( target.getDependencies().stream()
+                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
+                .collect( Collectors.toList() ) );
     }
 
     @Override
@@ -171,8 +175,9 @@ class FileToRawModelMerger extends ModelMerger
                                              Map<Object, Object> context )
     {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        target.getDependencies().forEach( t -> mergeDependency( t, sourceIterator.next(), sourceDominant,
-                                                                         context ) );
+        builder.dependencies( target.getDependencies().stream()
+                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
+                .collect( Collectors.toList() ) );
     }
 
     @Override
