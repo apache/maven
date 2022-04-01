@@ -42,6 +42,10 @@ public class Xpp3DomPointerFactory
 
     public NodePointer createNodePointer( QName name, Object object, Locale locale )
     {
+        if ( object instanceof org.codehaus.plexus.util.xml.Xpp3Dom )
+        {
+            object = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) object ).getDom();
+        }
         if ( object instanceof Dom )
         {
             return new Xpp3DomNodePointer( (Dom) object );
@@ -51,6 +55,10 @@ public class Xpp3DomPointerFactory
 
     public NodePointer createNodePointer( NodePointer parent, QName name, Object object )
     {
+        if ( object instanceof org.codehaus.plexus.util.xml.Xpp3Dom )
+        {
+            object = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) object ).getDom();
+        }
         if ( object instanceof Dom )
         {
             return new Xpp3DomNodePointer( parent, (Dom) object );

@@ -37,7 +37,7 @@
         #set ( $root = $class )
       #end
     #end
-    #set ( $types = { "DOM": "org.apache.maven.api.xml.Dom" } )
+    #set ( $types = { "DOM": "Object" } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )
     #set ( $dummy = $imports.add( "java.util.AbstractList" ) )
@@ -183,6 +183,8 @@ public class ${class.name}
         return new WrapperList<String, ${field.to}>( getDelegate()::get${cap}, this::set${cap}, s -> s, s -> s );
       #elseif ( $field.to )
         return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}() ) : null;
+      #elseif ( $field.type == "DOM" )
+        return getDelegate().${pfx}${cap}() != null ? new org.codehaus.plexus.util.xml.Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
       #else
         return getDelegate().${pfx}${cap}();
       #end
@@ -190,17 +192,25 @@ public class ${class.name}
 
     public void set${cap}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
     {
+      #if ( $field.type == "DOM" )
+        org.codehaus.plexus.util.xml.Xpp3Dom dom = ( org.codehaus.plexus.util.xml.Xpp3Dom ) ${field.name};
+        if ( ! Objects.equals( dom != null ? dom.getDom() : null, getDelegate().${pfx}${cap}() ) )
+        {
+            delegate = getDelegate().with${cap}( dom.getDom() );
+        }
+      #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
         {
-      #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
+        #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
             delegate = getDelegate().with${cap}(
                     ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
-      #elseif ( $field.to && $field.to != "String" )
+        #elseif ( $field.to && $field.to != "String" )
             delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
-      #else
+        #else
             delegate = getDelegate().with${cap}( ${field.name} );
-      #end
+        #end
         }
+      #end
     }
 
       #if ( $field.type == "java.util.List" && $field.multiplicity == "*" )

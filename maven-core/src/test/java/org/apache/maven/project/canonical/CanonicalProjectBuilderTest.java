@@ -77,7 +77,7 @@ public class CanonicalProjectBuilderTest
 
         assertEquals( "1.0", plugin.getVersion() );
 
-        Dom configuration = plugin.getConfiguration();
+        Dom configuration = plugin.getDelegate().getConfiguration();
 
         assertEquals( "src/conf/plexus.conf", configuration.getChild( "plexusConfiguration" ).getValue() );
 
@@ -98,7 +98,7 @@ public class CanonicalProjectBuilderTest
 
         assertEquals( "plexus:runtime", g0 );
 
-        configuration = execution.getConfiguration();
+        configuration = execution.getDelegate().getConfiguration();
 
         assertEquals( "ContinuumPro", configuration.getChild( "plexusApplicationName" ).getValue() );
 

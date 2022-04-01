@@ -65,11 +65,11 @@ public class DefaultMojoExecutionConfigurator
 
             if ( pluginExecution != null )
             {
-                pomConfiguration = pluginExecution.getConfiguration();
+                pomConfiguration = pluginExecution.getDelegate().getConfiguration();
             }
             else if ( allowPluginLevelConfig )
             {
-                pomConfiguration = plugin.getConfiguration();
+                pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
             Dom mojoConfiguration = Xpp3Dom.merge( mojoExecution.getConfiguration(), pomConfiguration );
