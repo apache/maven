@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -20,17 +20,29 @@ package org.apache.maven.api;
  */
 
 /**
- * TODO: investigate removing the Metadata api completely
+ * The possible types of execution events.
+ *
+ * TODO: those values are lower cased, while other events are upper-case
+ *       we need to align on one strategy
+ *       see also {@link MetadataStorage} and {@link org.apache.maven.api.services.ResolutionScope}
  */
-public interface Metadata
+public enum EventType
 {
-
-    String getGroupId();
-
-    String getArtifactId();
-
-    String getVersion();
-
-    MetadataStorage getStorage();
-
+    ProjectDiscoveryStarted,
+    SessionStarted,
+    SessionEnded,
+    ProjectSkipped,
+    ProjectStarted,
+    ProjectSucceeded,
+    ProjectFailed,
+    MojoSkipped,
+    MojoStarted,
+    MojoSucceeded,
+    MojoFailed,
+    ForkStarted,
+    ForkSucceeded,
+    ForkFailed,
+    ForkedProjectStarted,
+    ForkedProjectSucceeded,
+    ForkedProjectFailed,
 }

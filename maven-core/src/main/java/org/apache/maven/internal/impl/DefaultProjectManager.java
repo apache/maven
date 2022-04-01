@@ -35,6 +35,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.api.services.ResolutionScope;
 
 public class DefaultProjectManager implements ProjectManager
 {

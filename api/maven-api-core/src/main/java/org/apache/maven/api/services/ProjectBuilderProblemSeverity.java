@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.api.services;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -20,17 +20,13 @@ package org.apache.maven.api;
  */
 
 /**
- * TODO: investigate removing the Metadata api completely
+ * The different severity levels for a problem, in decreasing order.
  */
-public interface Metadata
+public enum ProjectBuilderProblemSeverity
 {
 
-    String getGroupId();
-
-    String getArtifactId();
-
-    String getVersion();
-
-    MetadataStorage getStorage();
+    FATAL, //
+    ERROR, //
+    WARNING //
 
 }

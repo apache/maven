@@ -82,12 +82,4 @@ public interface ProjectManager extends Service
 
     Node getCollectedDependencies( Project project, ResolutionScope scope );
 
-    enum ResolutionScope
-    {
-        Compile,
-        CompileRuntime,
-        Runtime,
-        RuntimeSystem,
-        Test
-    }
 }

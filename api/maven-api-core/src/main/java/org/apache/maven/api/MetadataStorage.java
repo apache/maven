@@ -9,7 +9,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -20,17 +20,9 @@ package org.apache.maven.api;
  */
 
 /**
- * TODO: investigate removing the Metadata api completely
+ * Storage location for metadata
  */
-public interface Metadata
+public enum MetadataStorage
 {
-
-    String getGroupId();
-
-    String getArtifactId();
-
-    String getVersion();
-
-    MetadataStorage getStorage();
-
+    Group, Artifact, Version
 }

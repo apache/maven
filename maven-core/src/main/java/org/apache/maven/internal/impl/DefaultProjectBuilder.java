@@ -35,6 +35,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.services.ProjectBuilderProblemSeverity;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
@@ -215,9 +216,9 @@ public class DefaultProjectBuilder implements ProjectBuilder
                         }
 
                         @Override
-                        public Severity getSeverity()
+                        public ProjectBuilderProblemSeverity getSeverity()
                         {
-                            return Severity.valueOf( problem.getSeverity().name() );
+                            return ProjectBuilderProblemSeverity.valueOf( problem.getSeverity().name() );
                         }
                     };
                 }

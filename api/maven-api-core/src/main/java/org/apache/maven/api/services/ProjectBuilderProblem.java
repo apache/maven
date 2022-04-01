@@ -31,18 +31,6 @@ public interface ProjectBuilderProblem
 {
 
     /**
-     * The different severity levels for a problem, in decreasing order.
-     */
-    enum Severity
-    {
-
-        FATAL, //
-        ERROR, //
-        WARNING //
-
-    }
-
-    /**
      * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
      * creator of the problem, the general expectation is that the hint provides sufficient information to the user to
      * track the problem back to its origin. A concrete example for such a source hint can be the file path or URL from
@@ -96,6 +84,6 @@ public interface ProjectBuilderProblem
      *
      * @return The severity level of this problem, never {@code null}.
      */
-    Severity getSeverity();
+    ProjectBuilderProblemSeverity getSeverity();
 
 }
