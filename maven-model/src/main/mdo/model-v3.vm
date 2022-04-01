@@ -193,10 +193,14 @@ public class ${class.name}
     public void set${cap}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
     {
       #if ( $field.type == "DOM" )
-        org.codehaus.plexus.util.xml.Xpp3Dom dom = ( org.codehaus.plexus.util.xml.Xpp3Dom ) ${field.name};
-        if ( ! Objects.equals( dom != null ? dom.getDom() : null, getDelegate().${pfx}${cap}() ) )
+        if ( ${field.name} instanceof org.codehaus.plexus.util.xml.Xpp3Dom )
         {
-            delegate = getDelegate().with${cap}( dom.getDom() );
+            ${field.name} = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) ${field.name} ).getDom();
+        }
+        org.apache.maven.api.xml.Dom dom = ( org.apache.maven.api.xml.Dom ) ${field.name};
+        if ( ! Objects.equals( dom, getDelegate().${pfx}${cap}() ) )
+        {
+            delegate = getDelegate().with${cap}( dom );
         }
       #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )

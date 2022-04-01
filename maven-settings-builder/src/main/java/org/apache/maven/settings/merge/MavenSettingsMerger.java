@@ -20,11 +20,13 @@ package org.apache.maven.settings.merge;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.settings.IdentifiableBase;
 import org.apache.maven.api.settings.Settings;
@@ -59,36 +61,18 @@ public class MavenSettingsMerger
 
         List<String> dominantActiveProfiles = dominant.getActiveProfiles();
         List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
-        List<String> mergedActiveProfiles = new ArrayList<>();
-        if ( recessiveActiveProfiles != null )
-        {
-            for ( String profileId : recessiveActiveProfiles )
-            {
-                if ( dominantActiveProfiles == null || !dominantActiveProfiles.contains( profileId ) )
-                {
-                    mergedActiveProfiles.add( profileId );
-                }
-            }
-        }
+        List<String> mergedActiveProfiles = Stream.of( dominantActiveProfiles, recessiveActiveProfiles )
+                    .flatMap( Collection::stream )
+                    .distinct()
+                    .collect( Collectors.toList() );
         merged.activeProfiles( mergedActiveProfiles );
 
         List<String> dominantPluginGroupIds = dominant.getPluginGroups();
         List<String> recessivePluginGroupIds = recessive.getPluginGroups();
-        List<String> mergedPluginGroupIds = new ArrayList<>();
-        if ( recessivePluginGroupIds != null )
-        {
-            if ( dominantPluginGroupIds != null )
-            {
-                mergedPluginGroupIds.addAll( dominantPluginGroupIds );
-            }
-            for ( String pluginGroupId : recessivePluginGroupIds )
-            {
-                if ( dominantPluginGroupIds == null || !dominantPluginGroupIds.contains( pluginGroupId ) )
-                {
-                    mergedPluginGroupIds.add( pluginGroupId );
-                }
-            }
-        }
+        List<String> mergedPluginGroupIds = Stream.of( dominantPluginGroupIds, recessivePluginGroupIds )
+                .flatMap( Collection::stream )
+                .distinct()
+                .collect( Collectors.toList() );
         merged.pluginGroups( mergedPluginGroupIds );
 
         String localRepository = StringUtils.isEmpty( dominant.getLocalRepository() )
