@@ -109,8 +109,12 @@ public class VelocityGenerator
         {
             for ( int i = 0; i < len; i++ )
             {
-                if ( cbuf[ off + i] == '\n' )
+                if ( cbuf[ off + i ] == '\n' )
                 {
+                    if ( sb.length() > 0 && sb.charAt( sb.length() - 1 ) == '\r' )
+                    {
+                        sb.setLength( sb.length() - 1 );
+                    }
                     writeLine( sb.toString() );
                     sb.setLength( 0 );
                 }
