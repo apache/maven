@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng5222</groupId>
+  <artifactId>maven-it-mng5222</artifactId>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: mng5222</name>
+  <description>
+    Test that ensures that warning about deprecated mojo params are generated.
+  </description>
+
+  <url>https://www.test.org</url>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>deprecated-config</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>config-values</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.its.plugins</groupId>
+              <artifactId>maven-it-plugin-configuration</artifactId>
+              <configuration>
+                <deprecatedParam>value1</deprecatedParam>
+                <deprecatedParam2>value2</deprecatedParam2>
+                <deprecatedParamWithDefaultConstant>value3</deprecatedParamWithDefaultConstant>
+                <deprecatedParamWithDefaultEvaluate>value4</deprecatedParamWithDefaultEvaluate>
+                <deprecatedArray>
+                  <item>a1</item>
+                  <item>a2</item>
+                </deprecatedArray>
+                <deprecatedArrayWithDefaults>
+                  <item>b1</item>
+                  <item>b2</item>
+                </deprecatedArrayWithDefaults>
+                <deprecatedList>
+                  <item>c1</item>
+                  <item>c2</item>
+                </deprecatedList>
+                <deprecatedListWithDefaults>
+                  <item>d1</item>
+                  <item>d2</item>
+                </deprecatedListWithDefaults>
+                <deprecatedProperties>
+                  <property>
+                    <name>propertyName1</name>
+                    <value>propertyValue1</value>
+                  </property>
+                  <property>
+                    <name>propertyName2</name>
+                    <value>propertyValue2</value>
+                  </property>
+                </deprecatedProperties>
+                <deprecatedMap>
+                  <key1>value1</key1>
+                  <key2>value2</key2>
+                </deprecatedMap>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
