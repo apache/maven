@@ -26,17 +26,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.xml.Dom;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
+import org.apache.maven.internal.xml.XmlPlexusConfiguration;
+import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
@@ -47,8 +52,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -227,17 +231,12 @@ public class DefaultRepositorySystemSessionFactory
 
             if ( server.getConfiguration() != null )
             {
-                Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
-                for ( int i = dom.getChildCount() - 1; i >= 0; i-- )
-                {
-                    Xpp3Dom child = dom.getChild( i );
-                    if ( "wagonProvider".equals( child.getName() ) )
-                    {
-                        dom.removeChild( i );
-                    }
-                }
-
-                XmlPlexusConfiguration config = new XmlPlexusConfiguration( dom );
+                Dom dom = server.getConfiguration();
+                List<Dom> children = dom.getChildren().stream()
+                        .filter( c -> !"wagonProvider".equals( c.getName() ) )
+                        .collect( Collectors.toList() );
+                dom = new Xpp3Dom( dom.getName(), null, null, children, null );
+                PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration( dom );
                 configProps.put( "aether.connector.wagon.config." + server.getId(), config );
             }
 

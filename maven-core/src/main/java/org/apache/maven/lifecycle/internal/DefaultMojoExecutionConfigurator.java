@@ -72,9 +72,12 @@ public class DefaultMojoExecutionConfigurator
                 pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
-            Dom mojoConfiguration = Xpp3Dom.merge( mojoExecution.getConfiguration(), pomConfiguration );
+            Dom mojoConfiguration = mojoExecution.getConfiguration() != null
+                    ? mojoExecution.getConfiguration().getDom() : null;
 
-            mojoExecution.setConfiguration( mojoConfiguration );
+            Dom mergedConfiguration = Xpp3Dom.merge( mojoConfiguration, pomConfiguration );
+
+            mojoExecution.setConfiguration( mergedConfiguration );
         }
     }
 

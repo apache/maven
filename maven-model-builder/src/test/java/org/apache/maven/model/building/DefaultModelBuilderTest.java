@@ -146,6 +146,32 @@ public class DefaultModelBuilderTest
         {
             return this;
         }
+
+        @Override
+        public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+        {
+            return null;
+        }
+
+        @Override
+        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
+                throws UnresolvableModelException
+        {
+            return null;
+        }
+
+        @Override
+        public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+        {
+
+        }
+
+        @Override
+        public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
+                throws InvalidRepositoryException
+        {
+
+        }
     }
 
     @Test

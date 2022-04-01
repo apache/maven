@@ -590,7 +590,7 @@ public class DefaultMavenPluginManager
                 ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
-            Dom dom = mojoExecution.getConfiguration();
+            Dom dom = mojoExecution.getConfiguration().getDom();
 
             PlexusConfiguration pomConfiguration;
 

@@ -66,7 +66,7 @@ public interface ModelResolver
      *
      * @see Parent#clone()
      */
-    ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified )
+    ModelSource resolveModel( org.apache.maven.model.Parent parent )
         throws UnresolvableModelException;
 
     /**
@@ -87,7 +87,7 @@ public interface ModelResolver
      *
      * @see Dependency#clone()
      */
-    ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified )
+    ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
         throws UnresolvableModelException;
 
     /**
@@ -98,7 +98,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository )
+    void addRepository( org.apache.maven.model.Repository repository )
         throws InvalidRepositoryException;
 
     /**
@@ -112,7 +112,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository, boolean replace )
+    void addRepository( org.apache.maven.model.Repository repository, boolean replace )
             throws InvalidRepositoryException;
 
     /**
@@ -124,4 +124,15 @@ public interface ModelResolver
      */
     ModelResolver newCopy();
 
+    ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified )
+            throws UnresolvableModelException;
+
+    ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified )
+            throws UnresolvableModelException;
+
+    void addRepository( Repository repository )
+            throws InvalidRepositoryException;
+
+    void addRepository( Repository repository, boolean replace )
+            throws InvalidRepositoryException;
 }

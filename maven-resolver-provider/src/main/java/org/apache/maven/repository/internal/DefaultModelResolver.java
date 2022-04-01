@@ -283,4 +283,41 @@ class DefaultModelResolver
 
         }
     }
+
+    @Override
+    public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+    {
+        AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
+        ModelSource result = resolveModel( parent.getDelegate(), resolvedParent );
+        if ( resolvedParent.get() != null )
+        {
+            parent.setVersion( resolvedParent.get().getVersion() );
+        }
+        return result;
+    }
+
+    @Override
+    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
+    {
+        AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
+        ModelSource result = resolveModel( dependency.getDelegate(), resolvedDependency );
+        if ( resolvedDependency.get() != null )
+        {
+            dependency.setVersion( resolvedDependency.get().getVersion() );
+        }
+        return result;
+    }
+
+    @Override
+    public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+    {
+        addRepository( repository.getDelegate() );
+    }
+
+    @Override
+    public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
+            throws InvalidRepositoryException
+    {
+        addRepository( repository.getDelegate(), replace );
+    }
 }
