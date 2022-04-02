@@ -185,6 +185,12 @@ under the License.
       <artifactId>plexus-testing</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-test-util</artifactId>
+      <version>${resolverVersion}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
