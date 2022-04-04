@@ -19,7 +19,9 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
 import java.util.Collection;
@@ -31,6 +33,7 @@ import org.apache.maven.api.Artifact;
 /**
  * A request for installing one or more artifacts in the local repository.
  */
+@Immutable
 public interface ArtifactInstallerRequest
 {
 
@@ -40,11 +43,13 @@ public interface ArtifactInstallerRequest
     @Nonnull
     Collection<Artifact> getArtifacts();
 
+    @Nonnull
     static ArtifactInstallerRequestBuilder builder()
     {
         return new ArtifactInstallerRequestBuilder();
     }
 
+    @Nonnull
     static ArtifactInstallerRequest build( Session session, Collection<Artifact> artifacts )
     {
         return builder()
@@ -53,6 +58,7 @@ public interface ArtifactInstallerRequest
                 .build();
     }
 
+    @NotThreadSafe
     class ArtifactInstallerRequestBuilder
     {
         Session session;
@@ -88,7 +94,7 @@ public interface ArtifactInstallerRequest
                                              @Nonnull Collection<Artifact> artifacts )
             {
                 super( session );
-                this.artifacts = unmodifiable( artifacts, "artifacts" );
+                this.artifacts = nonNull( artifacts, "artifacts can not be null" );
             }
 
             @Nonnull

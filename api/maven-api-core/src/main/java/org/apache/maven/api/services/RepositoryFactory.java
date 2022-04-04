@@ -23,15 +23,19 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
 
 public interface RepositoryFactory extends Service
 {
 
-    LocalRepository createLocal( Path path );
+    @Nonnull
+    LocalRepository createLocal( @Nonnull Path path );
 
-    RemoteRepository createRemote( String id, String url );
+    @Nonnull
+    RemoteRepository createRemote( @Nonnull String id, @Nonnull String url );
 
-    RemoteRepository createRemote( Repository repository );
+    @Nonnull
+    RemoteRepository createRemote( @Nonnull Repository repository );
 
 }

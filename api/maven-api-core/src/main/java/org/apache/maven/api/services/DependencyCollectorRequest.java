@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.ArrayList;
@@ -31,6 +32,10 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request to collect the transitive dependencies and to build a dependency graph from them. There are three ways to
@@ -41,6 +46,7 @@ import org.apache.maven.api.Artifact;
  *
  * @see DependencyCollector#collect(DependencyCollectorRequest)
  */
+@Immutable
 public interface DependencyCollectorRequest
 {
 
@@ -59,26 +65,29 @@ public interface DependencyCollectorRequest
     @Nonnull
     Collection<Dependency> getManagedDependencies();
 
-    static DependencyCollectorRequest build( Session session, Artifact root )
+    @Nonnull
+    static DependencyCollectorRequest build( @Nonnull Session session, Artifact root )
     {
-        BaseRequest.requireNonNull( session, "session" );
         return builder()
-                .session( session )
-                .root( session.createDependency( root ) )
+                .session( nonNull( session, "session can not be null" ) )
+                .root( session.createDependency( nonNull( root, "root can not be null" ) ) )
                 .build();
     }
 
-    static DependencyCollectorRequest build( Session session, Dependency root )
+    @Nonnull
+    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Dependency root )
     {
         return builder()
-                .session( session )
-                .root( root )
+                .session( nonNull( session, "session can not be null" ) )
+                .root( nonNull( root, "root can not be null" ) )
                 .build();
     }
 
-    static DependencyCollectorRequest build( Session session, Project project )
+    @Nonnull
+    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Project project )
     {
-        BaseRequest.requireNonNull( session, "session" );
+        nonNull( session, "session can not be null" );
+        nonNull( project, "project can not be null" );
         return builder()
                 .session( session )
                 .root( session.createDependency( project.getArtifact() ) )
@@ -87,11 +96,13 @@ public interface DependencyCollectorRequest
                 .build();
     }
 
+    @Nonnull
     static DependencyCollectorRequestBuilder builder()
     {
         return new DependencyCollectorRequestBuilder();
     }
 
+    @NotThreadSafe
     class DependencyCollectorRequestBuilder
     {
 
@@ -120,7 +131,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder rootArtifact( Artifact rootArtifact )
+        public DependencyCollectorRequestBuilder rootArtifact( @Nullable Artifact rootArtifact )
         {
             this.rootArtifact = rootArtifact;
             return this;
@@ -146,7 +157,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependencies( List<Dependency> dependencies )
+        public DependencyCollectorRequestBuilder dependencies( @Nullable List<Dependency> dependencies )
         {
             this.dependencies = ( dependencies != null ) ? dependencies : Collections.emptyList();
             return this;
@@ -158,7 +169,8 @@ public interface DependencyCollectorRequest
          * @param dependency The dependency to add, may be {@code null}.
          * @return This request for chaining, never {@code null}.
          */
-        public DependencyCollectorRequestBuilder dependency( Dependency dependency )
+        @Nonnull
+        public DependencyCollectorRequestBuilder dependency( @Nullable Dependency dependency )
         {
             if ( dependency != null )
             {
@@ -180,7 +192,8 @@ public interface DependencyCollectorRequest
          * @param managedDependencies The dependency management, may be {@code null}.
          * @return This request for chaining, never {@code null}.
          */
-        public DependencyCollectorRequestBuilder managedDependencies( List<Dependency> managedDependencies )
+        @Nonnull
+        public DependencyCollectorRequestBuilder managedDependencies( @Nullable List<Dependency> managedDependencies )
         {
             this.managedDependencies = ( managedDependencies != null ) ? managedDependencies : Collections.emptyList();
             return this;
@@ -189,10 +202,12 @@ public interface DependencyCollectorRequest
         /**
          * Adds the specified managed dependency.
          *
-         * @param managedDependency The managed dependency to add, may be {@code null}.
+         * @param managedDependency The managed dependency to add, may be {@code null} in which case the call
+         *                          will have no effect.
          * @return This request for chaining, never {@code null}.
          */
-        public DependencyCollectorRequestBuilder managedDependency( Dependency managedDependency )
+        @Nonnull
+        public DependencyCollectorRequestBuilder managedDependency( @Nullable Dependency managedDependency )
         {
             if ( managedDependency != null )
             {
@@ -205,6 +220,7 @@ public interface DependencyCollectorRequest
             return this;
         }
 
+        @Nonnull
         public DependencyCollectorRequest build()
         {
             return new DefaultDependencyCollectorRequest(
@@ -232,19 +248,17 @@ public interface DependencyCollectorRequest
              *                     null}.
              */
             DefaultDependencyCollectorRequest(
-                    Session session,
-                    Artifact rootArtifact,
-                    Dependency root,
-                    Collection<Dependency> dependencies,
-                    Collection<Dependency> managedDependencies )
+                    @Nonnull Session session,
+                    @Nullable Artifact rootArtifact,
+                    @Nullable Dependency root,
+                    @Nonnull Collection<Dependency> dependencies,
+                    @Nonnull Collection<Dependency> managedDependencies )
             {
                 super( session );
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = dependencies != null && !dependencies.isEmpty()
-                        ? unmodifiable( dependencies, "dependencies" ) : Collections.emptyList();
-                this.managedDependencies = managedDependencies != null && !managedDependencies.isEmpty()
-                        ? unmodifiable( managedDependencies, "managedDependencies" ) : Collections.emptyList();
+                this.dependencies = unmodifiable( dependencies );
+                this.managedDependencies = unmodifiable( managedDependencies );
 
             }
 
@@ -276,6 +290,7 @@ public interface DependencyCollectorRequest
                 return managedDependencies;
             }
 
+            @Nonnull
             @Override
             public String toString()
             {

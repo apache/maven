@@ -28,15 +28,20 @@ import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
+/**
+ * A wrapper class around a maven resolver artifact.
+ */
 public class DefaultArtifact implements Artifact
 {
-    private final DefaultSession session;
-    private final org.eclipse.aether.artifact.Artifact artifact;
+    private final @Nonnull DefaultSession session;
+    private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
 
     public DefaultArtifact( @Nonnull DefaultSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact )
     {
-        this.session = Objects.requireNonNull( session );
-        this.artifact = Objects.requireNonNull( artifact );
+        this.session = nonNull( session, "session can not be null" );
+        this.artifact = nonNull( artifact, "artifact can not be null" );
     }
 
     public org.eclipse.aether.artifact.Artifact getArtifact()

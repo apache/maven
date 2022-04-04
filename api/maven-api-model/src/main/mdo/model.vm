@@ -49,7 +49,10 @@
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.NotThreadSafe" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
           #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
@@ -88,7 +91,7 @@ package ${package};
 import $imp;
   #end
 
-@Generated
+@Generated @ThreadSafe @Immutable
 public class ${class.name}
     #if ( $class.superClass )
     extends ${class.superClass}
@@ -230,6 +233,7 @@ public class ${class.name}
     #end
     }
 
+    @Nonnull
     public Builder with()
     {
         return newBuilder( this );
@@ -237,42 +241,50 @@ public class ${class.name}
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+    @Nonnull
     public ${class.name} with${cap}( $type $field.name )
     {
         return with().${field.name}( $field.name ).build();
     }
     #end
 
+    @Nonnull
     public static ${class.name} newInstance()
     {
         return newInstance( true );
     }
 
+    @Nonnull
     public static ${class.name} newInstance( boolean withDefaults )
     {
         return newBuilder( withDefaults ).build();
     }
 
+    @Nonnull
     public static Builder newBuilder()
     {
         return newBuilder( true );
     }
 
+    @Nonnull
     public static Builder newBuilder( boolean withDefaults )
     {
         return new Builder( withDefaults );
     }
 
+    @Nonnull
     public static Builder newBuilder( ${class.name} from )
     {
         return newBuilder( from, false );
     }
 
+    @Nonnull
     public static Builder newBuilder( ${class.name} from, boolean forceCopy )
     {
         return new Builder( from, forceCopy );
     }
 
+    @NotThreadSafe
     public static class Builder
     #if ( $class.superClass )
         extends ${class.superClass}.Builder
@@ -334,6 +346,7 @@ public class ${class.name}
         }
 
     #if ( $class == $root )
+        @Nonnull
         public Builder modelEncoding( String modelEncoding )
         {
             this.modelEncoding = modelEncoding;
@@ -342,6 +355,7 @@ public class ${class.name}
 
     #end
     #foreach ( $field in $allFields )
+        @Nonnull
         public Builder ${field.name}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
         {
             this.${field.name} = ${field.name};
@@ -350,6 +364,7 @@ public class ${class.name}
 
     #end
 
+        @Nonnull
         public Builder location( Object key, InputLocation location )
         {
             if ( this.locations == null )
@@ -360,6 +375,7 @@ public class ${class.name}
             return this;
         }
 
+        @Nonnull
         public ${class.name} build()
         {
             if ( base != null

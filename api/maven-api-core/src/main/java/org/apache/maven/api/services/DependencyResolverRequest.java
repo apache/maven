@@ -19,7 +19,9 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -35,9 +37,12 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * A request to collect and resolve a dependency graph.
  */
+@Immutable
 public interface DependencyResolverRequest extends DependencyCollectorRequest
 {
 
@@ -57,8 +62,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                                             @Nullable Predicate<Node> filter )
     {
         return builder()
-                .session( session )
-                .rootArtifact( root )
+                .session( nonNull( session, "session can not be null" ) )
+                .rootArtifact( nonNull( root, "root can not be null" ) )
                 .filter( filter )
                 .build();
     }
@@ -76,8 +81,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                                             @Nullable Predicate<Node> filter )
     {
         return builder()
-                .session( session )
-                .root( root )
+                .session( nonNull( session, "session can not be null" ) )
+                .root( nonNull( root, "root can not be null" ) )
                 .filter( filter )
                 .build();
     }
@@ -94,7 +99,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                                             @Nonnull Project project,
                                             @Nullable Predicate<Node> filter )
     {
-        BaseRequest.requireNonNull( session, "session" );
+        nonNull( session, "session can not be null" );
+        nonNull( project, "project can not be null" );
         return builder()
                 .session( session )
                 .root( session.createDependency( project.getArtifact() ) )
@@ -110,6 +116,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         return new DependencyResolverRequestBuilder();
     }
 
+    @NotThreadSafe
     class DependencyResolverRequestBuilder 
     {
         Session session;
@@ -147,7 +154,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         /**
          *
          * @param root The root dependency
-         * @return
+         * @return This request for chaining, never {@code null}.
          */
         @Nonnull
         public DependencyResolverRequestBuilder root( @Nonnull Dependency root )
@@ -178,7 +185,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyResolverRequestBuilder dependency( Dependency dependency )
+        public DependencyResolverRequestBuilder dependency( @Nullable Dependency dependency )
         {
             if ( dependency != null )
             {
@@ -214,7 +221,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyResolverRequestBuilder managedDependency( Dependency managedDependency )
+        public DependencyResolverRequestBuilder managedDependency( @Nullable Dependency managedDependency )
         {
             if ( managedDependency != null )
             {
@@ -228,7 +235,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         }
 
         @Nonnull
-        public DependencyResolverRequestBuilder filter( Predicate<Node> filter )
+        public DependencyResolverRequestBuilder filter( @Nullable Predicate<Node> filter )
         {
             this.filter = filter;
             return this;
@@ -274,10 +281,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                 super( session );
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = dependencies != null && !dependencies.isEmpty()
-                        ? unmodifiable( dependencies, "dependencies" ) : Collections.emptyList();
-                this.managedDependencies = managedDependencies != null && !managedDependencies.isEmpty()
-                        ? unmodifiable( managedDependencies, "managedDependencies" ) : Collections.emptyList();
+                this.dependencies = unmodifiable( dependencies );
+                this.managedDependencies = unmodifiable( managedDependencies );
                 this.filter = filter;
             }
 

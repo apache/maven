@@ -23,11 +23,12 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Objects;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Exclusion;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency
 {
@@ -36,8 +37,8 @@ public class DefaultDependency implements Dependency
 
     public DefaultDependency( @Nonnull DefaultSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency )
     {
-        this.session = Objects.requireNonNull( session, "session" );
-        this.dependency = Objects.requireNonNull( dependency, "dependency" );
+        this.session = nonNull( session, "session" );
+        this.dependency = nonNull( dependency, "dependency" );
     }
 
     @Nonnull

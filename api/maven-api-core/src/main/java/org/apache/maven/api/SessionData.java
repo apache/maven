@@ -21,6 +21,7 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.annotations.Provider;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 import java.util.function.Supplier;
@@ -35,10 +36,8 @@ import java.util.function.Supplier;
  * <strong>Note:</strong> Actual implementations must be thread-safe.
  * 
  * @see Session#getData()
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
  */
-@ThreadSafe
+@ThreadSafe @Provider
 public interface SessionData
 {
 

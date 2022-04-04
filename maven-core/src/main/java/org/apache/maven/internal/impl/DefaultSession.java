@@ -74,6 +74,8 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 public class DefaultSession implements Session
 {
 
@@ -106,9 +108,9 @@ public class DefaultSession implements Session
                            @Nonnull MavenRepositorySystem mavenRepositorySystem,
                            @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate )
     {
-        this.mavenSession = Objects.requireNonNull( session );
+        this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
-        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.repositorySystem = nonNull( repositorySystem );
         this.repositories = repositories != null
                 ? repositories
                 : mavenSession.getRequest().getRemoteRepositories().stream()
@@ -203,7 +205,7 @@ public class DefaultSession implements Session
     @Override
     public Session withLocalRepository( @Nonnull LocalRepository localRepository )
     {
-        Objects.requireNonNull( localRepository, "localRepository" );
+        nonNull( localRepository, "localRepository" );
         if ( session.getLocalRepository() != null
                 && Objects.equals( session.getLocalRepository().getBasedir().toPath(),
                              localRepository.getPath() ) )
@@ -302,11 +304,13 @@ public class DefaultSession implements Session
         throw new NoSuchElementException( clazz.getName() );
     }
 
+    @Nonnull
     public RepositorySystemSession getSession()
     {
         return session;
     }
 
+    @Nonnull
     public RepositorySystem getRepositorySystem()
     {
         return repositorySystem;
@@ -322,12 +326,14 @@ public class DefaultSession implements Session
         return allNodes.computeIfAbsent( node, n -> new DefaultNode( this, n ) );
     }
 
-    public Artifact getArtifact( org.eclipse.aether.artifact.Artifact artifact )
+    @Nonnull
+    public Artifact getArtifact( @Nonnull org.eclipse.aether.artifact.Artifact artifact )
     {
         return allArtifacts.computeIfAbsent( artifact, a -> new DefaultArtifact( this, a ) );
     }
 
-    public Dependency getDependency( org.eclipse.aether.graph.Dependency dependency )
+    @Nonnull
+    public Dependency getDependency( @Nonnull org.eclipse.aether.graph.Dependency dependency )
     {
         return allDependencies.computeIfAbsent( dependency, d -> new DefaultDependency( this, d ) );
     }
@@ -506,13 +512,13 @@ public class DefaultSession implements Session
     @Override
     public void registerListener( @Nonnull Listener listener )
     {
-        listeners.add( listener );
+        listeners.add( nonNull( listener ) );
     }
 
     @Override
     public void unregisterListener( @Nonnull Listener listener )
     {
-        listeners.remove( listener );
+        listeners.remove( nonNull( listener ) );
     }
 
     @Nonnull

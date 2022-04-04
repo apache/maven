@@ -1,4 +1,4 @@
-package org.apache.maven.api.services;
+package org.apache.maven.internal.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,18 +19,33 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-public class ArtifactFactoryException
-    extends MavenException
+class Utils
 {
-
-    public ArtifactFactoryException( String message )
+    static <T> T nonNull( T t )
     {
-        super( message );
+        if ( t == null )
+        {
+            throw new IllegalArgumentException();
+        }
+        return t;
     }
 
-    public ArtifactFactoryException( String message, Throwable cause )
+    static <T> T nonNull( T t, String message )
     {
-        super( message, cause );
+        if ( t == null )
+        {
+            throw new IllegalArgumentException( message );
+        }
+        return t;
+    }
+
+    static <T> T cast( Class<T> clazz, Object o, String message )
+    {
+        if ( ! clazz.isInstance( o ) )
+        {
+            throw new IllegalArgumentException( message );
+        }
+        return clazz.cast( o );
     }
 
 }

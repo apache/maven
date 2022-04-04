@@ -19,16 +19,17 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-
-import java.util.Objects;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.NotThreadSafe;
 
 /**
  * A request for resolving an artifact.
  */
+@Immutable
 public interface ArtifactResolverRequest
 {
     @Nonnull
@@ -52,6 +53,7 @@ public interface ArtifactResolverRequest
                 .build();
     }
 
+    @NotThreadSafe
     class ArtifactResolverRequestBuilder
     {
         Session session;
@@ -86,7 +88,7 @@ public interface ArtifactResolverRequest
                                             @Nonnull Artifact artifact )
             {
                 super( session );
-                this.artifact = Objects.requireNonNull( artifact );
+                this.artifact = nonNull( artifact, "artifact can not be null" );
             }
 
             @Nonnull

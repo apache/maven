@@ -19,13 +19,14 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -38,32 +39,42 @@ import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.metadata.Metadata;
 
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
+/**
+ * Implementation of {@link ArtifactDeployer} service.
+ */
 @Named
 public class DefaultArtifactDeployer implements ArtifactDeployer
 {
-    private final RepositorySystem repositorySystem;
+    private final @Nonnull RepositorySystem repositorySystem;
 
     @Inject
     DefaultArtifactDeployer( @Nonnull RepositorySystem repositorySystem )
     {
-        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.repositorySystem = nonNull( repositorySystem, "repositorySystem can not be null" );
     }
 
     @Override
-    public void deploy( ArtifactDeployerRequest request ) throws ArtifactDeployerException, IllegalArgumentException
+    public void deploy( @Nonnull ArtifactDeployerRequest request )
     {
-        DefaultSession session = ( DefaultSession ) request.getSession();
+        nonNull( request, "request can not be null" );
+        DefaultSession session = cast( DefaultSession.class, request.getSession(),
+                "request.session should be a " + DefaultSession.class );
+        Collection<Artifact> artifacts = nonNull( request.getArtifacts(), "request.artifacts can not be null" );
+        RemoteRepository repository = nonNull( request.getRepository(), "request.repository can not be null" );
         try
         {
             ArtifactManager artifactManager = session.getService( ArtifactManager.class );
-            List<Metadata> metadatas = request.getArtifacts().stream()
+            List<Metadata> metadatas = artifacts.stream()
                     .map( artifactManager::getAttachedMetadatas )
                     .flatMap( Collection::stream )
                     .map( session::toMetadata )
                     .collect( Collectors.toList() );
             DeployRequest deployRequest = new DeployRequest()
-                    .setRepository( session.toRepository( request.getRepository() ) )
-                    .setArtifacts( session.toArtifacts( request.getArtifacts() ) )
+                    .setRepository( session.toRepository( repository ) )
+                    .setArtifacts( session.toArtifacts( artifacts ) )
                     .setMetadata( metadatas );
 
             DeployResult result = repositorySystem.deploy( session.getSession(), deployRequest );

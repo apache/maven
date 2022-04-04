@@ -34,7 +34,6 @@ import java.util.function.Predicate;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactFactoryException;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactManager;
@@ -85,13 +84,14 @@ public interface Session
      * @throws NoSuchElementException if the service could not be found
      */
     @Nonnull
-    <T extends Service> T getService( Class<T> clazz ) throws NoSuchElementException;
+    <T extends Service> T getService( Class<T> clazz );
 
     /**
      * Creates a derived session using the given local repository.
      *
      * @param localRepository the new local repository
      * @return the derived session
+     * @throws NullPointerException if {@code localRepository} is null
      */
     @Nonnull
     Session withLocalRepository( @Nonnull LocalRepository localRepository );
@@ -101,6 +101,7 @@ public interface Session
      *
      * @param repositories the new list of remote repositories
      * @return the derived session
+     * @throws NullPointerException if {@code repositories} is null
      */
     @Nonnull
     Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories );
@@ -109,6 +110,7 @@ public interface Session
      * Register the given listener which will receive all events.
      *
      * @param listener the listener to register
+     * @throws NullPointerException if {@code listener} is null
      */
     void registerListener( @Nonnull Listener listener );
 
@@ -116,13 +118,14 @@ public interface Session
      * Unregisters a previously registered listener.
      *
      * @param listener the listener to unregister
+     * @throws NullPointerException if {@code listener} is null
      */
     void unregisterListener( @Nonnull Listener listener );
 
     /**
      * Returns the list of registered listeners.
      *
-     * @return an immutable collection of listeners
+     * @return an immutable collection of listeners, never {@code null}
      */
     @Nonnull
     Collection<Listener> getListeners();
@@ -132,7 +135,6 @@ public interface Session
      * @see RepositoryFactory#createLocal(Path)
      */
     default LocalRepository createLocalRepository( Path path )
-            throws ArtifactFactoryException, IllegalArgumentException
     {
         return getService( RepositoryFactory.class ).createLocal( path );
     }
@@ -164,7 +166,6 @@ public interface Session
      * @see ArtifactFactory#create(Session, String, String, String, String)
      */
     default Artifact createArtifact( String groupId, String artifactId, String version, String extension )
-            throws ArtifactFactoryException, IllegalArgumentException
     {
         return getService( ArtifactFactory.class )
                 .create( this, groupId, artifactId, version, extension );
@@ -176,7 +177,6 @@ public interface Session
      */
     default Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
                                      String extension, String type )
-            throws ArtifactFactoryException, IllegalArgumentException
     {
         return getService( ArtifactFactory.class )
                 .create( this, groupId, artifactId, version, classifier, extension, type );
@@ -185,30 +185,33 @@ public interface Session
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
      * @see ArtifactResolver#resolve(Session, Artifact)
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
      */
     default ArtifactResolverResult resolveArtifact( Artifact artifact )
-            throws ArtifactResolverException, IllegalArgumentException
     {
         return getService( ArtifactResolver.class )
                 .resolve( this, artifact );
     }
 
     /**
-     * Shortcut for <code>getService(ArtifactInstaller.class).install(...)</code>
+     * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
      * @see ArtifactInstaller#install(Session, Collection)
+     *
+     * @throws ArtifactInstallerException if the artifacts installation failed
      */
     default void installArtifacts( Artifact... artifacts )
-            throws ArtifactInstallerException, IllegalArgumentException
     {
         installArtifacts( Arrays.asList( artifacts ) );
     }
 
     /**
-     * Shortcut for <code>getService(ArtifactInstaller.class).install(...)</code>
+     * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
      * @see ArtifactInstaller#install(Session, Collection)
+     *
+     * @throws ArtifactInstallerException if the artifacts installation failed
      */
     default void installArtifacts( Collection<Artifact> artifacts )
-            throws ArtifactInstallerException, IllegalArgumentException
     {
         getService( ArtifactInstaller.class )
                 .install( this, artifacts );
@@ -217,9 +220,10 @@ public interface Session
     /**
      * Shortcut for <code>getService(ArtifactDeployer.class).deploy(...)</code>
      * @see ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
+     *
+     * @throws ArtifactDeployerException if the artifacts deployment failed
      */
     default void deployArtifact( RemoteRepository repository, Artifact... artifacts )
-        throws ArtifactDeployerException, IllegalArgumentException
     {
         getService( ArtifactDeployer.class )
                 .deploy( this, repository, Arrays.asList( artifacts ) );
@@ -229,7 +233,7 @@ public interface Session
      * Shortcut for <code>getService(ArtifactManager.class).setPath(...)</code>
      * @see ArtifactManager#setPath(Artifact, Path)
      */
-    default void setArtifactPath( @Nonnull Artifact artifact, Path path )
+    default void setArtifactPath( @Nonnull Artifact artifact, @Nonnull Path path )
     {
         getService( ArtifactManager.class )
                 .setPath( artifact, path );
@@ -260,7 +264,8 @@ public interface Session
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
      * @see DependencyFactory#create(Session, Artifact)
      */
-    default Dependency createDependency( Artifact artifact )
+    @Nonnull
+    default Dependency createDependency( @Nonnull Artifact artifact )
     {
         return getService( DependencyFactory.class )
                 .create( this, artifact );
@@ -269,9 +274,11 @@ public interface Session
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
      * @see DependencyCollector#collect(Session, Artifact)
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
      */
-    default DependencyCollectorResult collectDependencies( Artifact artifact )
-            throws DependencyCollectorException, IllegalArgumentException
+    @Nonnull
+    default DependencyCollectorResult collectDependencies( @Nonnull Artifact artifact )
     {
         return getService( DependencyCollector.class )
                 .collect( this, artifact );
@@ -280,9 +287,11 @@ public interface Session
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
      * @see DependencyCollector#collect(Session, Project)
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
      */
-    default DependencyCollectorResult collectDependencies( Project project )
-            throws DependencyCollectorException, IllegalArgumentException
+    @Nonnull
+    default DependencyCollectorResult collectDependencies( @Nonnull Project project )
     {
         return getService( DependencyCollector.class )
                 .collect( this, project );
@@ -291,9 +300,11 @@ public interface Session
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
      * @see DependencyCollector#collect(Session, Dependency)
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
      */
-    default DependencyCollectorResult collectDependencies( Dependency dependency )
-            throws DependencyCollectorException, IllegalArgumentException
+    @Nonnull
+    default DependencyCollectorResult collectDependencies( @Nonnull Dependency dependency )
     {
         return getService( DependencyCollector.class )
                 .collect( this, dependency );
@@ -302,15 +313,17 @@ public interface Session
     /**
      * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
      * @see DependencyResolver#resolve(Session, Dependency, Predicate)
+     *
+     * @throws DependencyResolverException if the dependency resolution failed
      */
-    default DependencyResolverResult resolveDependencies( Dependency dependency )
-            throws DependencyResolverException, IllegalArgumentException
+    @Nonnull
+    default DependencyResolverResult resolveDependencies( @Nonnull Dependency dependency )
     {
         return getService( DependencyResolver.class )
                 .resolve( this, dependency, null );
     }
 
-    default Path getPathForLocalArtifact( Artifact artifact )
+    default Path getPathForLocalArtifact( @Nonnull Artifact artifact )
     {
         return getService( LocalRepositoryManager.class )
                 .getPathForLocalArtifact( this, getLocalRepository(), artifact );

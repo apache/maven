@@ -22,15 +22,25 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
+import org.apache.maven.api.annotations.Nonnull;
 
 public interface DependencyFactory extends Service
 {
 
-    Dependency create( DependencyFactoryRequest request )
-        throws DependencyFactoryException, IllegalArgumentException;
+    /**
+     * Creates a new {@link Dependency} object from the request.
+     *
+     * @param request the request containing the various data
+     * @return a new {@link Dependency} object.
+     *
+     * @throws IllegalArgumentException if {@code request} is null or
+     *         if {@code request.getSession()} is null or invalid
+     */
+    @Nonnull
+    Dependency create( @Nonnull DependencyFactoryRequest request );
 
-    default Dependency create( Session session, Artifact artifact )
-        throws DependencyFactoryException, IllegalArgumentException
+    @Nonnull
+    default Dependency create( @Nonnull Session session, @Nonnull Artifact artifact )
     {
         return create( DependencyFactoryRequest.build( session, artifact ) );
     }

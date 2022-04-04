@@ -29,15 +29,16 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Repository;
+import org.apache.maven.api.annotations.Nonnull;
 
 public class DefaultNode implements Node
 {
 
-    private final DefaultSession session;
-    private final org.eclipse.aether.graph.DependencyNode node;
+    private final @Nonnull DefaultSession session;
+    private final @Nonnull org.eclipse.aether.graph.DependencyNode node;
 
-    public DefaultNode( DefaultSession session,
-                        org.eclipse.aether.graph.DependencyNode node )
+    public DefaultNode( @Nonnull DefaultSession session,
+                        @Nonnull org.eclipse.aether.graph.DependencyNode node )
     {
         this.session = session;
         this.node = node;

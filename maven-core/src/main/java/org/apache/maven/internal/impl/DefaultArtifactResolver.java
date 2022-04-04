@@ -22,8 +22,6 @@ package org.apache.maven.internal.impl;
 import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
-import java.util.Objects;
-
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
@@ -34,6 +32,9 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 public class DefaultArtifactResolver implements ArtifactResolver
 {
     private final RepositorySystem repositorySystem;
@@ -41,14 +42,16 @@ public class DefaultArtifactResolver implements ArtifactResolver
     @Inject
     DefaultArtifactResolver( @Nonnull RepositorySystem repositorySystem )
     {
-        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.repositorySystem = nonNull( repositorySystem, "repositorySystem can not be null" );
     }
 
     @Override
     public ArtifactResolverResult resolve( ArtifactResolverRequest request )
             throws ArtifactResolverException, IllegalArgumentException
     {
-        DefaultSession session = ( DefaultSession ) request.getSession();
+        nonNull( request, "request can not be null" );
+        DefaultSession session = cast( DefaultSession.class, request.getSession(),
+                "request.session should be a " + DefaultSession.class );
         try
         {
             ArtifactRequest req = new ArtifactRequest()

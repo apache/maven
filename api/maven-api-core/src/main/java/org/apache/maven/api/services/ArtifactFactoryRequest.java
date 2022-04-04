@@ -19,10 +19,13 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.NotThreadSafe;
 
+@Immutable
 public interface ArtifactFactoryRequest
 {
 
@@ -72,6 +75,7 @@ public interface ArtifactFactoryRequest
         return new ArtifactFactoryRequestBuilder();
     }
 
+    @NotThreadSafe
     class ArtifactFactoryRequestBuilder
     {
         private Session session;

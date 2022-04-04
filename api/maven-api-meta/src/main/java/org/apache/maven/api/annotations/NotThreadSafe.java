@@ -1,4 +1,4 @@
-package org.apache.maven.api.services;
+package org.apache.maven.api.annotations;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,18 +19,12 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-public class DependencyFactoryException
-    extends MavenException
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Documented
+@Retention( RetentionPolicy.CLASS )
+public @interface NotThreadSafe
 {
-
-    public DependencyFactoryException( String message )
-    {
-        super( message );
-    }
-
-    public DependencyFactoryException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-
 }

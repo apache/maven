@@ -19,7 +19,9 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -28,6 +30,9 @@ import java.util.Optional;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
+@Immutable
 public interface ProjectBuilderRequest
 {
 
@@ -55,8 +60,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
     {
         return builder()
-                .session( session )
-                .source( source )
+                .session( nonNull( session, "session can not be null" ) )
+                .source( nonNull( source, "source can not be null" ) )
                 .build();
     }
 
@@ -64,8 +69,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Path path )
     {
         return builder()
-                .session( session )
-                .path( path )
+                .session( nonNull( session, "session can not be null" ) )
+                .path( nonNull( path, "path can not be null" ) )
                 .build();
     }
 
@@ -73,8 +78,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Artifact artifact )
     {
         return builder()
-                .session( session )
-                .artifact( artifact )
+                .session( nonNull( session, "session can not be null" ) )
+                .artifact( nonNull( artifact, "artifact can not be null" ) )
                 .build();
     }
 
@@ -84,6 +89,7 @@ public interface ProjectBuilderRequest
         return new ProjectBuilderRequestBuilder();
     }
 
+    @NotThreadSafe
     class ProjectBuilderRequestBuilder
     {
         Session session;

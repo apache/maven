@@ -23,21 +23,23 @@ import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.apache.maven.api.LocalRepository;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultLocalRepository implements LocalRepository
 {
 
-    private final org.eclipse.aether.repository.LocalRepository repository;
+    private final @Nonnull org.eclipse.aether.repository.LocalRepository repository;
 
     @Inject
     public DefaultLocalRepository( @Nonnull org.eclipse.aether.repository.LocalRepository repository )
     {
-        this.repository = Objects.requireNonNull( repository, "repository" );
+        this.repository = nonNull( repository, "repository can not be null" );
     }
 
+    @Nonnull
     public org.eclipse.aether.repository.LocalRepository getRepository()
     {
         return repository;

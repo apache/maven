@@ -46,14 +46,14 @@ public interface DependencyCollector extends Service
      * @param request The dependency collection request, must not be {@code null}.
      * @return The collection result, never {@code null}.
      * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @throws IllegalArgumentException if an argument is null or invalid
      *
      * @see DependencyCollector#collect(Session, Project)
      * @see DependencyCollector#collect(Session, Dependency)
      * @see DependencyCollector#collect(Session, Artifact)
      */
     @Nonnull
-    DependencyCollectorResult collect( @Nonnull DependencyCollectorRequest request )
-            throws DependencyCollectorException, IllegalArgumentException;
+    DependencyCollectorResult collect( @Nonnull DependencyCollectorRequest request );
 
     /**
      * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
@@ -64,12 +64,12 @@ public interface DependencyCollector extends Service
      * @param root The Maven Dependency, must not be {@code null}.
      * @return The collection result, never {@code null}.
      * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
     default DependencyCollectorResult collect( @Nonnull Session session,
                                                @Nonnull Dependency root )
-        throws DependencyCollectorException
     {
         return collect( DependencyCollectorRequest.build( session, root ) );
     }
@@ -83,12 +83,12 @@ public interface DependencyCollector extends Service
      * @param project The {@link Project}, must not be {@code null}.
      * @return The collection result, never {@code null}.
      * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
     default DependencyCollectorResult collect( @Nonnull Session session,
                                                @Nonnull Project project )
-        throws DependencyCollectorException
     {
         return collect( DependencyCollectorRequest.build( session, project ) );
     }
@@ -102,12 +102,12 @@ public interface DependencyCollector extends Service
      * @param artifact The {@link Artifact}, must not be {@code null}.
      * @return The collection result, never {@code null}.
      * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
     default DependencyCollectorResult collect( @Nonnull Session session,
                                                @Nonnull Artifact artifact )
-        throws DependencyCollectorException
     {
         return collect( DependencyCollectorRequest.build( session, artifact ) );
     }

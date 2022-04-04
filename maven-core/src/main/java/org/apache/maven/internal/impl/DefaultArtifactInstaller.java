@@ -23,7 +23,6 @@ import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.services.ArtifactInstaller;
@@ -36,6 +35,9 @@ import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.metadata.Metadata;
 
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 public class DefaultArtifactInstaller implements ArtifactInstaller
 {
 
@@ -43,48 +45,15 @@ public class DefaultArtifactInstaller implements ArtifactInstaller
 
     DefaultArtifactInstaller( @Nonnull RepositorySystem repositorySystem )
     {
-        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.repositorySystem = nonNull( repositorySystem );
     }
 
     @Override
     public void install( ArtifactInstallerRequest request ) throws ArtifactInstallerException, IllegalArgumentException
     {
-
-        /*
-        // prepare installRequest
-        InstallRequest request = new InstallRequest();
-
-        // transform artifacts
-        for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
-        {
-            Artifact mainArtifact = RepositoryUtils.toArtifact( mavenArtifact );
-            request.addArtifact( mainArtifact );
-
-            for ( ArtifactMetadata metadata : mavenArtifact.getMetadataList() )
-            {
-                if ( metadata instanceof ProjectArtifactMetadata )
-                {
-                    Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
-                    pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
-                    request.addArtifact( pomArtifact );
-                }
-                else if ( // metadata instanceof SnapshotArtifactRepositoryMetadata ||
-                        metadata instanceof ArtifactRepositoryMetadata )
-                {
-                    // eaten, handled by repo system
-                }
-                else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
-                {
-                    org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMetadata =
-                            (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
-
-                    request.addMetadata( new Maven31MetadataBridge( metadata ).setFile( transferMetadata.getFile() ) );
-                }
-            }
-        }
-        */
-
-        DefaultSession session = ( DefaultSession ) request.getSession();
+        nonNull( request, "request can not be null" );
+        DefaultSession session = cast( DefaultSession.class, request.getSession(),
+                "request.session should be a " + DefaultSession.class );
         try
         {
             ArtifactManager artifactManager = session.getService( ArtifactManager.class );

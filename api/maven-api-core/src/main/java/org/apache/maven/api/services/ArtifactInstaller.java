@@ -33,21 +33,19 @@ public interface ArtifactInstaller extends Service
     /**
      * @param request {@link ArtifactInstallerRequest}
      * @throws ArtifactInstallerException in case of an error.
-     * @throws IllegalArgumentException in case <code>request</code> is <code>null</code>.
+     * @throws IllegalArgumentException in case {@code request} is {@code null}.
      */
-    void install( ArtifactInstallerRequest request )
-        throws ArtifactInstallerException, IllegalArgumentException;
+    void install( ArtifactInstallerRequest request );
 
     /**
      * @param session the repository session
      * @param artifact the {@link Artifact} to install
      * @throws ArtifactInstallerException In case of an error which can be the a given artifact can not be found or the
      *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter <code>session</code> is <code>null</code> or
-     *          <code>artifact</code> is <code>null</code>.
+     * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or
+     *          {@code artifact} is {@code null}.
      */
     default void install( Session session, Artifact artifact )
-            throws ArtifactInstallerException, IllegalArgumentException
     {
         install( session, Collections.singletonList( artifact ) );
     }
@@ -57,13 +55,12 @@ public interface ArtifactInstaller extends Service
      * @param artifacts Collection of {@link Artifact MavenArtifacts}
      * @throws ArtifactInstallerException In case of an error which can be the a given artifact can not be found or the
      *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter <code>request</code> is <code>null</code> or parameter
-     *             <code>localRepository</code> is <code>null</code> or <code>localRepository</code> is not a directory
-     *             or parameter <code>mavenArtifacts</code> is <code>null</code> or
-     *             <code>mavenArtifacts.isEmpty()</code> is <code>true</code>.
+     * @throws IllegalArgumentException in case of parameter {@code request} is {@code null} or parameter
+     *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory
+     *             or parameter {@code mavenArtifacts} is {@code null} or
+     *             {@code mavenArtifacts.isEmpty()} is {@code true}.
      */
     default void install( Session session, Collection<Artifact> artifacts )
-            throws ArtifactInstallerException
     {
         install( ArtifactInstallerRequest.build( session, artifacts ) );
     }

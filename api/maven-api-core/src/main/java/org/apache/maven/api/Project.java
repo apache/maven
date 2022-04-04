@@ -23,6 +23,7 @@ import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.api.model.Model;
 
@@ -57,12 +58,13 @@ public interface Project
      * will not point to an actual pom file.
      * @return the path of the pom
      */
-    Path getPomPath();
+    @Nonnull
+    Optional<Path> getPomPath();
 
-    default Path getBasedir()
+    @Nonnull
+    default Optional<Path> getBasedir()
     {
-        Path pomPath = getPomPath();
-        return pomPath != null ? pomPath.getParent() : null;
+        return getPomPath().map( Path::getParent );
     }
 
     @Nonnull
@@ -71,6 +73,7 @@ public interface Project
     @Nonnull
     List<Dependency> getManagedDependencies();
 
+    @Nonnull
     default String getId()
     {
         return getModel().getId();

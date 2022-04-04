@@ -24,7 +24,9 @@ import org.apache.maven.api.annotations.Nonnull;
 import java.util.Optional;
 
 /**
- * Event
+ * Event sent by maven during various phases of the build process.
+ * Such events can be listened to using {@link Listener}s objects
+ * registered in the {@link Session}.
  */
 public interface Event
 {

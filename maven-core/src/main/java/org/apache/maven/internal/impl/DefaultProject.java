@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
@@ -103,10 +105,10 @@ public class DefaultProject implements Project
 
     @Nonnull
     @Override
-    public Path getPomPath()
+    public Optional<Path> getPomPath()
     {
         File file = project.getFile();
-        return file != null ? file.toPath() : null;
+        return Optional.ofNullable( file ).map( File::toPath );
     }
 
     @Nonnull
@@ -134,6 +136,7 @@ public class DefaultProject implements Project
         return project.isExecutionRoot();
     }
 
+    @Nonnull
     private Dependency toDependency( org.apache.maven.api.model.Dependency dependency )
     {
         return new Dependency()
@@ -150,7 +153,7 @@ public class DefaultProject implements Project
             @Override
             public String getScope()
             {
-                return dependency.getScope();
+                return dependency.getScope().toUpperCase( Locale.ROOT );
             }
 
             @Override

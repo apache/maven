@@ -29,27 +29,58 @@ import org.apache.maven.api.Artifact;
 public interface ProjectBuilder extends Service
 {
 
+    /**
+     * Creates a {@link org.apache.maven.api.Project} from a POM file.
+     *
+     * @param request {@link ProjectBuilderRequest}
+     * @return the {@link ProjectBuilderResult} containing the built project and possible errors
+     * @throws ProjectBuilderException if the project can not be created
+     * @throws IllegalArgumentException if an argument is {@code null} or invalid
+     */
     @Nonnull
-    ProjectBuilderResult build( ProjectBuilderRequest request )
-        throws ProjectBuilderException, IllegalArgumentException;
+    ProjectBuilderResult build( ProjectBuilderRequest request );
 
+    /**
+     * Creates a {@link org.apache.maven.api.Project} from a POM file.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param source The {@link ProjectBuilderSource}, must not be {@code null}.
+     * @throws ProjectBuilderException if the project can not be created
+     * @throws IllegalArgumentException if an argument is {@code null} or invalid
+     * @see #build(ProjectBuilderRequest)
+     */
     @Nonnull
     default ProjectBuilderResult build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
-            throws ProjectBuilderException, IllegalArgumentException
     {
         return build( ProjectBuilderRequest.build( session, source ) );
     }
 
+    /**
+     * Creates a {@link org.apache.maven.api.Project} from a POM file.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param path The {@link Path}, must not be {@code null}.
+     * @throws ProjectBuilderException if the project can not be created
+     * @throws IllegalArgumentException if an argument is {@code null} or invalid
+     * @see #build(ProjectBuilderRequest)
+     */
     @Nonnull
     default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Path path )
-            throws ProjectBuilderException, IllegalArgumentException
     {
         return build( ProjectBuilderRequest.build( session, path ) );
     }
 
+    /**
+     * Creates a {@link org.apache.maven.api.Project} from an artifact.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param artifact The {@link Artifact}, must not be {@code null}.
+     * @throws ProjectBuilderException if the project can not be created
+     * @throws IllegalArgumentException if an argument is {@code null} or invalid
+     * @see #build(ProjectBuilderRequest)
+     */
     @Nonnull
     default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Artifact artifact )
-            throws ProjectBuilderException, IllegalArgumentException
     {
         return build( ProjectBuilderRequest.build( session, artifact ) );
     }

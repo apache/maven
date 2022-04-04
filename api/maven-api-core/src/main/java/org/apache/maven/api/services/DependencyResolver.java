@@ -19,13 +19,14 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import java.util.List;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * The DependencyResolver service can be used to collect the dependencies
@@ -42,15 +43,12 @@ public interface DependencyResolver extends Service
      * @param request {@link DependencyResolverRequest}
      * @return the resolved dependencies.
      * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code request} is null or invalid
      */
-    DependencyResolverResult resolve( DependencyResolverRequest request )
-            throws DependencyResolverException;
+    DependencyResolverResult resolve( DependencyResolverRequest request );
 
     /**
-     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself. If
-     * the coordinate needs to be resolved too, use
-     * {@link #resolveDependencies(Session, List, List, Predicate< Node >)} passing
-     * {@code Collections.singletonList(coordinate)}
+     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.
      *
      * @param session The {@link Session}, must not be {@code null}.
      * @param root {@link Dependency}
@@ -58,31 +56,30 @@ public interface DependencyResolver extends Service
      *               when downloading (can be {@code null}).
      * @return the resolved dependencies.
      * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code request} is null or invalid
      */
-    default DependencyResolverResult resolve( Session session,
-                                              Dependency root,
-                                              Predicate<Node> filter )
-        throws DependencyResolverException
+    @Nonnull
+    default DependencyResolverResult resolve( @Nonnull Session session,
+                                              @Nonnull Dependency root,
+                                              @Nullable Predicate<Node> filter )
     {
         return resolve( DependencyResolverRequest.build( session, root, filter ) );
     }
 
     /**
-     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself. If
-     * the coordinate needs to be resolved too, use
-     * {@link #resolveDependencies(Session, List, List, Predicate< Node >)} passing
-     * {@code Collections.singletonList(coordinate)}
+     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.
      *
      * @param session The {@link Session}, must not be {@code null}.
      * @param project {@link Project}
-     * @param filter {@link Predicate< Node >} (can be {@code null}).
+     * @param filter {@link Predicate} (can be {@code null}).
      * @return the resolved dependencies.
      * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code session} or {@code project} is null or invalid
      */
-    default DependencyResolverResult resolve( Session session,
-                                              Project project,
-                                              Predicate<Node> filter )
-        throws DependencyResolverException
+    @Nonnull
+    default DependencyResolverResult resolve( @Nonnull Session session,
+                                              @Nonnull Project project,
+                                              @Nullable Predicate<Node> filter )
     {
         return resolve( DependencyResolverRequest.build( session, project, filter ) );
     }

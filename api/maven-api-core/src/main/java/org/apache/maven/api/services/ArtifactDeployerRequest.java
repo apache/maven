@@ -27,6 +27,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.RemoteRepository;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * A request for deploying one or more artifacts to a remote repository.
  */
@@ -51,10 +53,12 @@ public interface ArtifactDeployerRequest
     }
 
     @Nonnull
-    static ArtifactDeployerRequest build( Session session, RemoteRepository repository, Collection<Artifact> artifacts )
+    static ArtifactDeployerRequest build( @Nonnull Session session,
+                                          @Nonnull RemoteRepository repository,
+                                          @Nonnull Collection<Artifact> artifacts )
     {
         return builder()
-                .session( session )
+                .session( nonNull( session, "session can not be null" ) )
                 .repository( repository )
                 .artifacts( artifacts )
                 .build();
@@ -113,8 +117,8 @@ public interface ArtifactDeployerRequest
                                             int retryFailedDeploymentCount )
             {
                 super( session );
-                this.repository = requireNonNull( repository, "repository" );
-                this.artifacts = unmodifiable( artifacts, "artifacts" );
+                this.repository = nonNull( repository, "repository can not be null" );
+                this.artifacts = nonNull( artifacts, "artifacts can not be null" );
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 

@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * TODO: split between Coordinates / AttachedArtifact / ResolvedArtifact
+ * TODO: split between Coordinates / AttachedArtifact / ResolvedArtifact ?
  */
 @Immutable
 public interface Artifact

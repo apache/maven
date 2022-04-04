@@ -27,15 +27,43 @@ import org.apache.maven.api.Toolchain;
 
 public interface ToolchainManager extends Service
 {
-    List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements )
-            throws ToolchainManagerException;
 
+    /**
+     *
+     * @param session
+     * @param type
+     * @param requirements
+     * @return the selected {@link Toolchain}s
+     * @throws ToolchainManagerException if an exceptino occurs
+     */
+    List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements );
+
+    /**
+     *
+     * @param session
+     * @param type
+     * @return the selected {@link Toolchain}
+     * @throws ToolchainManagerException if an exceptino occurs
+     */
     Toolchain getToolchainFromBuildContext( Session session, String type )
             throws ToolchainManagerException;
 
+    /**
+     *
+     * @param session
+     * @param type
+     * @return the selected {@link Toolchain}s
+     * @throws ToolchainManagerException if an exceptino occurs
+     */
     List<Toolchain> getToolchainsForType( Session session, String type )
             throws ToolchainManagerException;
 
+    /**
+     *
+     * @param session
+     * @param toolchain
+     * @throws ToolchainManagerException if an exceptino occurs
+     */
     void storeToolchainToBuildContext( Session session, Toolchain toolchain )
             throws ToolchainManagerException;
 }

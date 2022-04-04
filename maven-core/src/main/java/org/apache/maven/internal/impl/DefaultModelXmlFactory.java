@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
@@ -39,13 +38,15 @@ import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.apache.maven.model.v4.MavenXpp3WriterEx;
 import org.codehaus.plexus.util.ReaderFactory;
 
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
 public class DefaultModelXmlFactory
         implements ModelXmlFactory
 {
     @Override
     public Model read( @Nonnull XmlReaderRequest request ) throws XmlReaderException
     {
-        Objects.requireNonNull( request, "request can not be null" );
+        nonNull( request, "request can not be null" );
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
@@ -86,8 +87,8 @@ public class DefaultModelXmlFactory
     @Override
     public void write( XmlWriterRequest<Model> request ) throws XmlWriterException
     {
-        Objects.requireNonNull( request, "request can not be null" );
-        Model content = Objects.requireNonNull( request.getContent(), "content can not be null" );
+        nonNull( request, "request can not be null" );
+        Model content = nonNull( request.getContent(), "content can not be null" );
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         if ( writer == null && outputStream == null )

@@ -32,23 +32,21 @@ public interface ArtifactResolver extends Service
      * @param request {@link ArtifactResolverRequest}
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
-     * @throws NullPointerException in case of parameter <code>buildingRequest</code> is <code>null</code> or
-     *             parameter <code>mavenArtifact</code> is <code>null</code>.
+     * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
+     *             parameter {@code mavenArtifact} is {@code null} or invalid.
      */
-    ArtifactResolverResult resolve( ArtifactResolverRequest request )
-            throws ArtifactResolverException, IllegalArgumentException;
+    ArtifactResolverResult resolve( ArtifactResolverRequest request );
 
     /**
      * @param session {@link Session}
      * @param artifact {@link Artifact}
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
-     * @throws NullPointerException in case of parameter <code>buildingRequest</code> is <code>null</code> or
-     *             parameter <code>coordinate</code> is <code>null</code>.
+     * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
+     *             parameter {@code coordinate} is {@code null} or invalid.
      */
     default ArtifactResolverResult resolve( Session session,
                                             Artifact artifact )
-            throws ArtifactResolverException, IllegalArgumentException
     {
         return resolve( ArtifactResolverRequest.build( session, artifact ) );
     }

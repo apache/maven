@@ -39,7 +39,6 @@ public interface Mojo
      *
      * @throws MojoException if a problem occurs.
      */
-    void execute()
-        throws MojoException;
+    void execute();
 
 }

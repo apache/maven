@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.ArrayList;
@@ -28,7 +29,9 @@ import java.util.Collections;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.annotations.NotThreadSafe;
 
+@Immutable
 public interface DependencyFactoryRequest
 {
 
@@ -57,6 +60,7 @@ public interface DependencyFactoryRequest
         return new DependencyFactoryRequestBuilder();
     }
 
+    @NotThreadSafe
     class DependencyFactoryRequestBuilder
     {
         private Session session;

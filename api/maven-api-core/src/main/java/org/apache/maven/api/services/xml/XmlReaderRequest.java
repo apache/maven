@@ -24,6 +24,11 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.NotThreadSafe;
+
+@Immutable
 public interface XmlReaderRequest
 {
 
@@ -58,11 +63,13 @@ public interface XmlReaderRequest
         String transform( String source, String fieldName );
     }
 
+    @Nonnull
     static XmlReaderRequestBuilder builder()
     {
         return new XmlReaderRequestBuilder();
     }
 
+    @NotThreadSafe
     class XmlReaderRequestBuilder
     {
         Path path;

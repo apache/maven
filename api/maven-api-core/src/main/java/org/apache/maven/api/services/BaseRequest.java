@@ -37,7 +37,7 @@ abstract class BaseRequest
 
     protected BaseRequest( @Nonnull Session session )
     {
-        this.session = requireNonNull( session, "session" );
+        this.session = nonNull( session, "session can not be null" );
     }
 
     @Nonnull
@@ -46,21 +46,18 @@ abstract class BaseRequest
         return session;
     }
 
-    public static <T> T requireNonNull( T obj, String message )
+    public static <T> T nonNull( T obj, String message )
     {
         if ( obj == null )
         {
-            throw new IllegalArgumentException( message + " must mot be null" );
+            throw new IllegalArgumentException( message );
         }
         return obj;
     }
 
-    protected static <T> Collection<T> unmodifiable( Collection<T> obj, String message )
+    protected static <T> Collection<T> unmodifiable( Collection<T> obj )
     {
-        if ( requireNonNull( obj, message ).isEmpty() )
-        {
-            throw new IllegalArgumentException( message + " must not be empty" );
-        }
-        return Collections.unmodifiableCollection( new ArrayList<>( obj ) );
+        return obj != null && !obj.isEmpty()
+                ? Collections.unmodifiableCollection( new ArrayList<>( obj ) ) : Collections.emptyList();
     }
 }

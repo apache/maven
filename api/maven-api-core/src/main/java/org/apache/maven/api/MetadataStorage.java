@@ -24,5 +24,7 @@ package org.apache.maven.api;
  */
 public enum MetadataStorage
 {
-    Group, Artifact, Version
+    GROUP,
+    ARTIFACT,
+    VERSION
 }

@@ -33,7 +33,7 @@ public interface ArtifactManager extends Service
 
     /**
      * Returns the path of the file previously associated to this artifact
-     * or <code>Optional.empty()</code> if no path has been associated.
+     * or {@code Optional.empty()} if no path has been associated.
      */
     @Nonnull
     Optional<Path> getPath( @Nonnull Artifact artifact );
@@ -55,7 +55,7 @@ public interface ArtifactManager extends Service
     void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 
     /**
-     * Checks whether a given artifact version is considered a <code>SNAPSHOT</code> or not.
+     * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
      */
     boolean isSnapshot( String version );
 

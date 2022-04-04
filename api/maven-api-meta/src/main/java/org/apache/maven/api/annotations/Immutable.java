@@ -25,6 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Documented
 @Retention( RetentionPolicy.CLASS )
+@ThreadSafe
 public @interface Immutable
 {
 }

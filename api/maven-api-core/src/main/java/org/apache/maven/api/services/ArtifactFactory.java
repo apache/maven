@@ -21,22 +21,34 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Service used to create {@link Artifact} objects.
+ */
 public interface ArtifactFactory extends Service
 {
 
-    Artifact create( ArtifactFactoryRequest request )
-            throws ArtifactFactoryException, IllegalArgumentException;
+    /**
+     * Creates an artifact.
+     *
+     * @param request the request holding artifact creation parameters
+     * @return an {@code Artifact}, never {@code null}
+     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
+     */
+    @Nonnull
+    Artifact create( @Nonnull ArtifactFactoryRequest request );
 
-    default Artifact create( Session session, String groupId, String artifactId, String version, String extension )
-            throws ArtifactFactoryException, IllegalArgumentException
+    @Nonnull
+    default Artifact create( @Nonnull Session session, String groupId,
+                             String artifactId, String version, String extension )
     {
         return create( ArtifactFactoryRequest.build( session, groupId, artifactId, version, extension ) );
     }
 
-    default Artifact create( Session session, String groupId, String artifactId, String version,
+    @Nonnull
+    default Artifact create( @Nonnull Session session, String groupId, String artifactId, String version,
                              String classifier, String extension, String type )
-            throws ArtifactFactoryException, IllegalArgumentException
     {
         return create( ArtifactFactoryRequest.build( session, groupId, artifactId,
                                                      version, classifier, extension, type ) );
