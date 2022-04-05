@@ -139,7 +139,7 @@ public class DefaultPluginManagementInjector
                     merged.put( key, element );
                 }
 
-                builder.executions( new ArrayList<>( merged.values() ) );
+                builder.executions( merged.values() );
             }
         }
     }

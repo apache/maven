@@ -76,7 +76,7 @@ public class DefaultModelNormalizer
             if ( plugins.size() != normalized.size() )
             {
                 builder.build( Build.newBuilder( build )
-                            .plugins( new ArrayList<>( normalized.values() ) )
+                            .plugins( normalized.values() )
                             .build() );
             }
         }
@@ -98,7 +98,7 @@ public class DefaultModelNormalizer
 
         if ( dependencies.size() != normalized.size() )
         {
-            builder.dependencies( new ArrayList<>( normalized.values() ) );
+            builder.dependencies( normalized.values() );
         }
 
         return builder.build();

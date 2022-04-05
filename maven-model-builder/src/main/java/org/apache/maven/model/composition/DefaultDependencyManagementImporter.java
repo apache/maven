@@ -19,7 +19,6 @@ package org.apache.maven.model.composition;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class DefaultDependencyManagementImporter
             }
 
             return target.withDependencyManagement(
-                    depMgmt.withDependencies( new ArrayList<>( dependencies.values() ) ) );
+                    depMgmt.withDependencies( dependencies.values() ) );
         }
         return target;
     }

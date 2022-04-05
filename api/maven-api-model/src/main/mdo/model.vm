@@ -276,6 +276,9 @@ public class ${class.name}
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type.startsWith("List<") )
+        #set ( $type = ${type.replace('List<','Collection<')} )
+      #end
     /** Creates a new ${class.name} instance using the specified ${field.name}. */
     @Nonnull
     public ${class.name} with${cap}( $type $field.name )

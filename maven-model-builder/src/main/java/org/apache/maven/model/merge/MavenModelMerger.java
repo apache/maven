@@ -220,7 +220,7 @@ public class MavenModelMerger
     {
         if ( target.getMailingLists().isEmpty() )
         {
-            builder.mailingLists( new ArrayList<>( source.getMailingLists() ) );
+            builder.mailingLists( source.getMailingLists() );
         }
     }
 
@@ -296,7 +296,7 @@ public class MavenModelMerger
                 }
             }
 
-            builder.repositories( new ArrayList<>( merged.values() ) );
+            builder.repositories( merged.values() );
         }
     }
 
@@ -337,7 +337,7 @@ public class MavenModelMerger
                 }
             }
 
-            builder.pluginRepositories( new ArrayList<>( merged.values() ) );
+            builder.pluginRepositories( merged.values() );
         }
     }
 
@@ -578,7 +578,7 @@ public class MavenModelMerger
                 merged.put( key, element );
             }
 
-            builder.executions( new ArrayList<>( merged.values() ) );
+            builder.executions( merged.values() );
         }
     }
 
@@ -636,7 +636,7 @@ public class MavenModelMerger
                 merged.put( key, element );
             }
 
-            builder.reportSets( new ArrayList<>( merged.values() ) );
+            builder.reportSets( merged.values() );
         }
     }
 

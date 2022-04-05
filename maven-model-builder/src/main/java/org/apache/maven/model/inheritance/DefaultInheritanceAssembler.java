@@ -356,7 +356,7 @@ public class DefaultInheritanceAssembler
                     merged.put( key, element );
                 }
 
-                builder.plugins( new ArrayList<>( merged.values() ) );
+                builder.plugins( merged.values() );
             }
         }
     }

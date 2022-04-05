@@ -178,7 +178,7 @@ public class DefaultProfileInjector
                     merged.put( key, element );
                 }
 
-                builder.executions( new ArrayList<>( merged.values() ) );
+                builder.executions( merged.values() );
             }
         }
 
@@ -210,7 +210,7 @@ public class DefaultProfileInjector
                     merged.put( key, element );
                 }
 
-                builder.plugins( new ArrayList<>( merged.values() ) );
+                builder.plugins( merged.values() );
             }
         }
 
@@ -242,7 +242,7 @@ public class DefaultProfileInjector
                     merged.put( key, element );
                 }
 
-                builder.reportSets( new ArrayList<>( merged.values() ) );
+                builder.reportSets( merged.values() );
             }
         }
 
