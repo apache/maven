@@ -140,7 +140,11 @@ public class ${class.name}
         String modelEncoding,
     #end
     #foreach ( $field in $allFields )
-        ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name,
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type.startsWith("List<") )
+        #set ( $type = ${type.replace('List<','Collection<')} )
+      #end
+        $type $field.name,
     #end
         Map<Object, InputLocation> locations,
         InputLocation location,
@@ -175,10 +179,18 @@ public class ${class.name}
         this.modelEncoding = modelEncoding;
     #end
     #foreach ( $field in $class.allFields )
+      #if ( $field.type == "java.util.List" )
+        this.${field.name} = ImmutableCollections.copy( ${field.name} );
+      #elseif ( $field.type == "java.util.Properties" )
+        this.${field.name} = new ROProperties( ${field.name} );
+      #elseif ( $field.type == "java.util.Map" )
+        this.${field.name} = ImmutableCollections.copy( ${field.name} );
+      #else
         this.${field.name} = ${field.name};
+      #end
     #end
     #if ( ! $class.superClass )
-        this.locations = locations;
+        this.locations = ImmutableCollections.copy( locations );
         this.location = location;
     #end
     #foreach ( $field in $class.allFields )
@@ -471,17 +483,13 @@ public class ${class.name}
                 modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : null ),
     #end
     #foreach ( $field in $allFields )
-      #if ( $field.type == "java.util.List" )
-                ${field.name} != null ? Collections.unmodifiableList( new ArrayList<>( ${field.name} ) ) : ( base != null ? base.${field.name} : Collections.emptyList() ),
-      #elseif ( $field.type == "java.util.Properties" )
-                new ROProperties( ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null ) ),
-      #elseif ( $field.type == "boolean" || $field.type == "int" )
+      #if ( $field.type == "boolean" || $field.type == "int" )
                 ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : ${field.defaultValue} ),
       #else
                 ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null ),
       #end
     #end
-                Collections.unmodifiableMap( locations ),
+                locations,
                 location != null ? location : ( base != null ? base.location : null ),
     #foreach ( $field in $allFields )
       #if ( $field == ${allFields[${allFields.size()} - 1]} )

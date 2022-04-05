@@ -1,4 +1,4 @@
-package org.apache.maven.model;
+package org.apache.maven.api.model;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,12 +19,12 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import java.lang.reflect.Array;
 import java.util.AbstractList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -67,12 +67,16 @@ public class ImmutableCollections
                     return emptyList();
                 case 1:
                     return singletonList( collection.iterator().next() );
+                case 2:
+                    Iterator<E> it = collection.iterator();
+                    return new List2<>( it.next(), it.next() );
                 default:
-                    return (List<E>) new ListN<>( collection );
+                    return new ListN<>( collection );
             }
         }
     }
 
+    @SuppressWarnings( "unchecked" )
     static <E> List<E> emptyList()
     {
         return ( List<E> ) EMPTY_LIST;
@@ -83,11 +87,46 @@ public class ImmutableCollections
         return new List1<>( element );
     }
 
+    static <K, V> Map<K, V> copy( Map<K, V> map )
+    {
+        if ( map == null )
+        {
+            return emptyMap();
+        }
+        else if ( map.getClass().getDeclaringClass() == Collections.class )
+        {
+            return map;
+        }
+        else
+        {
+            switch ( map.size() )
+            {
+                case 0:
+                    return emptyMap();
+                case 1:
+                    Map.Entry<K, V> entry = map.entrySet().iterator().next();
+                    return singletonMap( entry.getKey(), entry.getValue() );
+                default:
+                    return Collections.unmodifiableMap( new LinkedHashMap<>( map ) );
+            }
+        }
+    }
+
+    static <K, V> Map<K, V> emptyMap()
+    {
+        return Collections.emptyMap();
+    }
+
+    static <K, V> Map<K, V> singletonMap( K key, V value )
+    {
+        return Collections.singletonMap( key, value );
+    }
+
     private static class List1<E> extends AbstractImmutableList<E>
     {
         private final E element;
 
-        public List1( E element )
+        private List1( E element )
         {
             this.element = element;
         }
@@ -109,20 +148,52 @@ public class ImmutableCollections
         }
     }
 
-    private static class ListN<E> extends AbstractImmutableList<E>
+    private static class List2<E> extends AbstractImmutableList<E>
     {
-        private final E[] elements;
+        private final E element1;
+        private final E element2;
 
-        private ListN( Collection<E> elements )
+        private List2( E element1, E element2 )
         {
-            E[] tmp = (E[]) Array.newInstance( elements.getClass().getComponentType(), elements.size() );
-            this.elements = elements.toArray( tmp );
+            this.element1 = element1;
+            this.element2 = element2;
         }
 
         @Override
         public E get( int index )
         {
-            return elements[ index ];
+            if ( index == 0 )
+            {
+                return element1;
+            }
+            else if ( index == 1 )
+            {
+                return element2;
+            }
+            throw outOfBounds( index );
+        }
+
+        @Override
+        public int size()
+        {
+            return 2;
+        }
+    }
+
+    private static class ListN<E> extends AbstractImmutableList<E>
+    {
+        private final Object[] elements;
+
+        private ListN( Collection<E> elements )
+        {
+            this.elements = elements.toArray();
+        }
+
+        @SuppressWarnings( "unchecked" )
+        @Override
+        public E get( int index )
+        {
+            return ( E ) elements[ index ];
         }
 
         @Override
@@ -132,7 +203,7 @@ public class ImmutableCollections
         }
     }
 
-    private static abstract class AbstractImmutableList<E> extends AbstractList<E> implements RandomAccess
+    private abstract static class AbstractImmutableList<E> extends AbstractList<E> implements RandomAccess
     {
         @Override
         public boolean add( E e )
@@ -191,13 +262,13 @@ public class ImmutableCollections
         @Override
         public Iterator<E> iterator()
         {
-            return new Itr();
+            return new Itr( 0 );
         }
 
         @Override
         public ListIterator<E> listIterator()
         {
-            return new Itr();
+            return new Itr( 0 );
         }
 
         @Override
@@ -213,12 +284,18 @@ public class ImmutableCollections
         @Override
         public List<E> subList( int fromIndex, int toIndex )
         {
-            if ( fromIndex < 0)
+            if ( fromIndex < 0 )
+            {
                 throw new IndexOutOfBoundsException( "fromIndex = " + fromIndex );
+            }
             if ( toIndex > size() )
+            {
                 throw new IndexOutOfBoundsException( "toIndex = " + toIndex );
+            }
             if ( fromIndex > toIndex )
+            {
                 throw new IllegalArgumentException( "fromIndex(" + fromIndex + ") > toIndex(" + toIndex + ")" );
+            }
             return new SubList( fromIndex, toIndex );
         }
 
@@ -227,12 +304,12 @@ public class ImmutableCollections
             return new IndexOutOfBoundsException( "Index: " + index + ", Size: " + size() );
         }
 
-        class SubList extends AbstractImmutableList<E>
+        private class SubList extends AbstractImmutableList<E>
         {
             private final int fromIndex;
             private final int toIndex;
 
-            public SubList( int fromIndex, int toIndex )
+            private SubList( int fromIndex, int toIndex )
             {
                 this.fromIndex = fromIndex;
                 this.toIndex = toIndex;
@@ -255,16 +332,11 @@ public class ImmutableCollections
             }
         }
 
-        class Itr implements ListIterator<E>
+        private class Itr implements ListIterator<E>
         {
             int index;
 
-            public Itr()
-            {
-                this.index = 0;
-            }
-
-            public Itr( int index )
+            private Itr( int index )
             {
                 this.index = index;
             }
