@@ -42,7 +42,7 @@
         #set ( $root = $class )
       #end
     #end
-    #set ( $types = { "DOM": "org.apache.maven.api.xml.Dom" } )
+    #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
@@ -56,8 +56,12 @@
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
           #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
+          #set ( $dummy = $imports.add( "java.util.Collection" ) )
           #set ( $dummy = $imports.add( "java.util.List" ) )
           #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
+      #elseif ( $field.type == "DOM" )
+        #set ( $dummy = $imports.add( "org.apache.maven.api.xml.Dom" ) )
+        #set ( $dummy = $types.put( $field, "Dom" ) )
       #else
         #set ( $fieldType = ${types.getOrDefault($field.type,$field.type)} )
         #set ( $idx = $fieldType.lastIndexOf('.') )
@@ -296,6 +300,9 @@ public class ${class.name}
     #end
     #foreach ( $field in $class.allFields )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type.startsWith("List<") )
+        #set ( $type = ${type.replace('List<','Collection<')} )
+      #end
       #if ( $type == 'boolean' )
         Boolean ${field.name};
       #elseif ( $type == 'int' )
@@ -355,8 +362,12 @@ public class ${class.name}
 
     #end
     #foreach ( $field in $allFields )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $type.startsWith("List<") )
+        #set ( $type = ${type.replace('List<','Collection<')} )
+      #end
         @Nonnull
-        public Builder ${field.name}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
+        public Builder ${field.name}( ${type} ${field.name} )
         {
             this.${field.name} = ${field.name};
             return this;
