@@ -95,6 +95,11 @@ package ${package};
 import $imp;
   #end
 
+/**
+#foreach ( $line in ${class.description.trim().split("\n")} )
+ * ${line.trim()}
+#end
+ */
 @Generated @ThreadSafe @Immutable
 public class ${class.name}
     #if ( $class.superClass )
@@ -106,16 +111,30 @@ public class ${class.name}
     final String modelEncoding;
     #end
     #foreach ( $field in $class.allFields )
+    /**
+      #foreach ( $line in ${field.description.trim().split("\n")} )
+     * ${line.trim()}
+      #end
+     */
     final ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name;
     #end
     #if ( ! $class.superClass )
-    final Map<Object, InputLocation> locations;
+    /** Location of the xml element for this object. */
     final InputLocation location;
     #end
     #foreach ( $field in $class.allFields )
+    /** Location of the xml element for the field ${field.name}. */
     final InputLocation ${field.name}Location;
     #end
+    #if ( ! $class.superClass )
+    /** Other locations */
+    final Map<Object, InputLocation> locations;
+    #end
 
+    /**
+      * Constructor for this class, package protected.
+      * @see Builder#build()
+      */
     ${class.name}(
     #if ( $class == $root )
         String modelEncoding,
@@ -205,6 +224,12 @@ public class ${class.name}
       #else
         #set ( $pfx = "get" )
       #end
+    /**
+      #set ( $desc = ${field.description.trim()} )
+      #foreach ( $line in ${desc.split("\n")} )
+     * ${line.trim()}
+      #end
+     */
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
@@ -214,6 +239,9 @@ public class ${class.name}
     }
 
     #end
+    /**
+     * Gets the location of the specified field in the input source.
+     */
     public InputLocation getLocation( Object key )
     {
         if ( key instanceof String )
@@ -237,6 +265,9 @@ public class ${class.name}
     #end
     }
 
+    /**
+     * Creates a new builder with this object as the basis.
+     */
     @Nonnull
     public Builder with()
     {
@@ -245,6 +276,7 @@ public class ${class.name}
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+    /** Creates a new ${class.name} instance using the specified ${field.name}. */
     @Nonnull
     public ${class.name} with${cap}( $type $field.name )
     {
@@ -252,42 +284,71 @@ public class ${class.name}
     }
     #end
 
+    /**
+     * Creates a new ${class.name} instance.
+     * Equivalent to {@code newInstance( true )}.
+     * @see #newInstance(boolean)
+     */
     @Nonnull
     public static ${class.name} newInstance()
     {
         return newInstance( true );
     }
 
+    /**
+     * Creates a new ${class.name} instance using default values or not.
+     * Equivalent to {@code newBuilder( withDefaults ).build()}.
+     */
     @Nonnull
     public static ${class.name} newInstance( boolean withDefaults )
     {
         return newBuilder( withDefaults ).build();
     }
 
+    /**
+     * Creates a new ${class.name} builder instance.
+     * Equivalent to {@code newBuilder( true )}.
+     * @see #newBuilder(boolean)
+     */
     @Nonnull
     public static Builder newBuilder()
     {
         return newBuilder( true );
     }
 
+    /**
+     * Creates a new ${class.name} builder instance using default values or not.
+     */
     @Nonnull
     public static Builder newBuilder( boolean withDefaults )
     {
         return new Builder( withDefaults );
     }
 
+    /**
+     * Creates a new ${class.name} builder instance using the specified object as a basis.
+     * Equivalent to {@code newBuilder( from, false )}.
+     */
     @Nonnull
     public static Builder newBuilder( ${class.name} from )
     {
         return newBuilder( from, false );
     }
 
+    /**
+     * Creates a new ${class.name} builder instance using the specified object as a basis.
+     */
     @Nonnull
     public static Builder newBuilder( ${class.name} from, boolean forceCopy )
     {
         return new Builder( from, forceCopy );
     }
 
+    /**
+     * Builder class used to create ${class.name} instances.
+     * @see #with()
+     * @see #newBuilder()
+     */
     @NotThreadSafe
     public static class Builder
     #if ( $class.superClass )
