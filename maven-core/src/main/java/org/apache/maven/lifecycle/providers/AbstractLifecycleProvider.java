@@ -22,6 +22,7 @@ package org.apache.maven.lifecycle.providers;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.inject.Provider;
 
@@ -48,7 +49,7 @@ public abstract class AbstractLifecycleProvider
                 throw new IllegalArgumentException( "Plugin bindings must have more than 0, even count of elements" );
             }
 
-            defaultBindings = new HashMap<>( len / 2 );
+            defaultBindings = new LinkedHashMap<>( len / 2 );
 
             for ( int i = 0; i < len; i += 2 )
             {

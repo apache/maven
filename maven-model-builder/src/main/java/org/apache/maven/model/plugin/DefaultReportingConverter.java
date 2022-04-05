@@ -160,22 +160,36 @@ public class DefaultReportingConverter
         configChildren.add( newDom( "reportPlugins", reportPlugins, location ) );
         configuration = newDom( "configuration", configChildren, location );
 
-        sitePlugin = sitePlugin.withConfiguration( configuration );
+        Plugin finalSitePlugin = sitePlugin.withConfiguration( configuration );
 
-        PluginManagement pluginManagement = build.getPluginManagement();
-        if ( pluginManagement == null )
+        Plugin sitePluginFromPlugins = build.getPlugins().stream()
+                .filter( this::isSitePlugin ).findFirst().orElse( null );
+        if ( sitePluginFromPlugins != null )
         {
-            pluginManagement = PluginManagement.newBuilder()
-                    .plugins( Collections.singletonList( sitePlugin ) )
-                    .build();
+            List<Plugin> plugins = new ArrayList<>( build.getPlugins() );
+            plugins.replaceAll( p -> p == sitePluginFromPlugins ? finalSitePlugin : p );
+            build = build.withPlugins( plugins );
+        }
+        else if ( build.getPluginManagement() == null )
+        {
+            build = build.withPluginManagement( PluginManagement.newBuilder()
+                    .plugins( Collections.singletonList( finalSitePlugin ) ).build() );
         }
         else
         {
-            List<Plugin> plugins = new ArrayList<>( pluginManagement.getPlugins() );
-            plugins.add( sitePlugin );
-            pluginManagement = pluginManagement.withPlugins( plugins );
+            Plugin sitePluginFromManagement = build.getPluginManagement().getPlugins().stream()
+                    .filter( this::isSitePlugin ).findFirst().orElse( null );
+            List<Plugin> plugins = new ArrayList<>( build.getPluginManagement().getPlugins() );
+            if ( sitePluginFromManagement != null )
+            {
+                plugins.replaceAll( p -> p == sitePluginFromManagement ? finalSitePlugin : p );
+            }
+            else
+            {
+                plugins.add( finalSitePlugin );
+            }
+            build = build.withPluginManagement( build.getPluginManagement().withPlugins( plugins ) );
         }
-        build = build.withPluginManagement( pluginManagement );
 
         return builder.build( build ).build();
     }

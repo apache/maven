@@ -1080,7 +1080,15 @@ public class DefaultModelBuilder
         {
             try
             {
-                modelResolver.addRepository( repository, replaceRepositories );
+                try
+                {
+                    modelResolver.addRepository( repository, replaceRepositories );
+                }
+                catch ( AbstractMethodError e )
+                {
+                    modelResolver.addRepository( new org.apache.maven.model.Repository( repository ),
+                            replaceRepositories );
+                }
             }
             catch ( InvalidRepositoryException e )
             {
