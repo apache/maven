@@ -202,16 +202,21 @@ public class ${className}
         #set ( $fieldTagName = $field.name )
       #end
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
+      #set ( $def = ${field.defaultValue} )
       #if ( $field.type == "String" )
-            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.get${fieldCapName}(), serializer );
+        #if ( ! $def )
+            writeTag( "$fieldTagName", null, ${classLcapName}.get${fieldCapName}(), serializer );
+        #else
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer );
+        #end
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
         #if ( ${field.defaultValue} == "true" )
-            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
         #else
-            writeTag( "$fieldTagName", "${field.defaultValue}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
         #end
       #elseif ( $field.type == "int" )
-            // TODO: name=${field.name} type=${field.type}
+            writeTag( "$fieldTagName", "${def}", Integer.toString( ${classLcapName}.get${fieldCapName}() ), serializer );
       #elseif ( $field.type == "DOM" )
             writeDom( ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
