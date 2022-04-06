@@ -39,9 +39,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Generated;
+import org.apache.maven.api.xml.Dom;
 #foreach ( $class in $model.allClasses )
 import ${basePackage}.${class.name};
 #end
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Generated
 public class ${className}
@@ -125,6 +127,9 @@ public class ${className}
         builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
       #elseif ( $field.to && $field.multiplicity == "*" )
         builder.${field.name}( transform( target.get${capField}(), this::transform${field.to} ) );
+      #elseif ( $field.type == "DOM" )
+        Dom newVal = transform( target.get${capField}() );
+        builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -151,4 +156,44 @@ public class ${className}
         return newList;
     }
 
+    protected Dom transform( Dom node )
+    {
+        if ( node != null )
+        {
+            Xpp3Dom xpp = new Xpp3Dom( node );
+            transform( xpp );
+            return xpp.getDom();
+        }
+        return node;
+    }
+
+    protected void transform( Xpp3Dom dom )
+    {
+        if ( dom != null )
+        {
+            String org, val;
+            // Content
+            org = dom.getValue();
+            val = transform( org );
+            if ( org != val )
+            {
+                dom.setValue( val );
+            }
+            // Attributes
+            for ( String attr : dom.getAttributeNames() )
+            {
+                org = dom.getAttribute( attr );
+                val = transform( org );
+                if ( org != val )
+                {
+                    dom.setAttribute( attr, val );
+                }
+            }
+            // Children
+            for ( int i = 0, l = dom.getChildCount(); i < l; i++ )
+            {
+                transform( dom.getChild( i ) );
+            }
+        }
+    }
 }
