@@ -91,13 +91,11 @@ import $imp;
 public class ${class.name}
     #if ( $class.superClass )
     extends ${class.superClass}
-    #end
     implements Serializable, Cloneable
-{
-
-    #if ( ! $class.superClass )
-    org.apache.maven.api.model.${class.name} delegate;
+    #else
+    extends BaseObject
     #end
+{
 
     public ${class.name}()
     {
@@ -106,11 +104,12 @@ public class ${class.name}
 
     public ${class.name}( org.apache.maven.api.model.${class.name} delegate )
     {
-    #if ( $class.superClass )
-        super( delegate );
-    #else
-        this.delegate = delegate;
-    #end
+        this( delegate, null );
+    }
+
+    public ${class.name}( org.apache.maven.api.model.${class.name} delegate, BaseObject parent )
+    {
+        super( delegate, parent );
     }
 
     public ${class.name} clone()
@@ -123,11 +122,7 @@ public class ${class.name}
     #end
     public org.apache.maven.api.model.${class.name} getDelegate()
     {
-    #if ( $class.superClass )
-        return ( org.apache.maven.api.model.${class.name} ) delegate;
-    #else
-        return delegate;
-    #end
+        return ( org.apache.maven.api.model.${class.name} ) super.getDelegate();
     }
 
     #if ( ! $eq.empty )
@@ -175,14 +170,14 @@ public class ${class.name}
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         return new WrapperList<${field.to}, org.apache.maven.api.model.${field.to}>(
-                    getDelegate()::get${cap}, l -> delegate = getDelegate().with${cap}( l ),
-                    ${field.to}::new, ${field.to}::getDelegate );
+                    getDelegate()::get${cap}, l -> update( getDelegate().with${cap}( l ) ),
+                    d -> new ${field.to}( d, this ), ${field.to}::getDelegate );
       #elseif ( $field.to == "String" && $field.type == "java.util.Properties" && $field.multiplicity == "*" )
         return new WrapperProperties( getDelegate()::get${cap}, this::set${cap} );
       #elseif ( $field.to == "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         return new WrapperList<String, ${field.to}>( getDelegate()::get${cap}, this::set${cap}, s -> s, s -> s );
       #elseif ( $field.to )
-        return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}() ) : null;
+        return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}(), this ) : null;
       #elseif ( $field.type == "DOM" )
         return getDelegate().${pfx}${cap}() != null ? new org.codehaus.plexus.util.xml.Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
       #else
@@ -200,18 +195,18 @@ public class ${class.name}
         org.apache.maven.api.xml.Dom dom = ( org.apache.maven.api.xml.Dom ) ${field.name};
         if ( ! Objects.equals( dom, getDelegate().${pfx}${cap}() ) )
         {
-            delegate = getDelegate().with${cap}( dom );
+            update( getDelegate().with${cap}( dom ) );
         }
       #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
         {
         #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-            delegate = getDelegate().with${cap}(
-                    ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
+            update( getDelegate().with${cap}(
+                    ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) ) );
         #elseif ( $field.to && $field.to != "String" )
-            delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
+            update( getDelegate().with${cap}( ${field.name}.getDelegate() ) );
         #else
-            delegate = getDelegate().with${cap}( ${field.name} );
+            update( getDelegate().with${cap}( ${field.name} ) );
         #end
         }
       #end
@@ -223,13 +218,13 @@ public class ${class.name}
     public void add${scap}( ${field.to} ${v} )
     {
         #if ( $field.to == "String" )
-        delegate = getDelegate().with${cap}(
+        update( getDelegate().with${cap}(
                 Stream.concat( getDelegate().get${cap}().stream(), Stream.of( ${v} ) )
-                        .collect( Collectors.toList() ) );
+                        .collect( Collectors.toList() ) ) );
         #else
-        delegate = getDelegate().with${cap}(
+        update( getDelegate().with${cap}(
                 Stream.concat( getDelegate().get${cap}().stream(), Stream.of( ${v}.getDelegate() ) )
-                        .collect( Collectors.toList() ) );
+                        .collect( Collectors.toList() ) ) );
         #end
     }
 
@@ -243,8 +238,23 @@ public class ${class.name}
 
     public void setLocation( Object key, InputLocation location )
     {
-        delegate = org.apache.maven.api.model.${class.name}.newBuilder( getDelegate(), true )
-                        .location( key, location.toApiLocation() ).build();
+        update( org.apache.maven.api.model.${class.name}.newBuilder( getDelegate(), true )
+                        .location( key, location.toApiLocation() ).build() );
+    }
+
+    protected void replace( Object oldDelegate, Object newDelegate )
+    {
+    #foreach ( $field in $class.getFields($version) )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $field.to && $field.multiplicity != "*" )
+        if ( oldDelegate == getDelegate().get${cap}() )
+        {
+            update( getDelegate().with${cap}( ( org.apache.maven.api.model.${field.to} ) newDelegate ) );
+            return;
+        }
+      #end
+    #end
     }
 
     public static List<org.apache.maven.api.model.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
