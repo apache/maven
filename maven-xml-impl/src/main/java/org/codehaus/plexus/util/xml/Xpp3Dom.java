@@ -69,6 +69,7 @@ public class Xpp3Dom
      */
     public static final String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
+    private Xpp3Dom parent;
     private Dom dom;
 
     public Xpp3Dom( String name )
@@ -103,12 +104,18 @@ public class Xpp3Dom
     public Xpp3Dom( Xpp3Dom src, String name )
     {
         this.dom = new org.apache.maven.internal.xml.Xpp3Dom( src.dom, name );
-   }
+    }
 
-   public Xpp3Dom( Dom dom )
-   {
-       this.dom = dom;
-   }
+    public Xpp3Dom( Dom dom )
+    {
+        this.dom = dom;
+    }
+
+    public Xpp3Dom( Dom dom, Xpp3Dom parent )
+    {
+        this.dom = dom;
+        this.parent = parent;
+    }
 
     public Dom getDom()
     {
@@ -135,8 +142,8 @@ public class Xpp3Dom
 
     public void setValue( String value )
     {
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), value, dom.getAttributes(), dom.getChildren(), dom.getInputLocation() );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), value, dom.getAttributes(), dom.getChildren(), dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -167,8 +174,8 @@ public class Xpp3Dom
             boolean ret = attrs.remove( name ) != null;
             if ( ret )
             {
-                this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                        dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() );
+                update( new org.apache.maven.internal.xml.Xpp3Dom(
+                        dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() ) );
             }
             return ret;
         }
@@ -193,8 +200,8 @@ public class Xpp3Dom
         }
         Map<String, String> attrs = new HashMap<>( dom.getAttributes() );
         attrs.put( name, value );
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -203,34 +210,34 @@ public class Xpp3Dom
 
     public Xpp3Dom getChild( int i )
     {
-        return new Xpp3Dom( dom.getChildren().get( i ) );
+        return new Xpp3Dom( dom.getChildren().get( i ), this );
     }
 
     public Xpp3Dom getChild( String name )
     {
         Dom child = dom.getChild( name );
-        return child != null ? new Xpp3Dom( child ) : null;
+        return child != null ? new Xpp3Dom( child, this ) : null;
     }
 
     public void addChild( Xpp3Dom xpp3Dom )
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.add( xpp3Dom.dom );
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
     }
 
     public Xpp3Dom[] getChildren()
     {
         return dom.getChildren().stream()
-                .map( Xpp3Dom::new ).toArray( Xpp3Dom[]::new );
+                .map( d -> new Xpp3Dom( d, this ) ).toArray( Xpp3Dom[]::new );
     }
 
     public Xpp3Dom[] getChildren( String name )
     {
         return dom.getChildren().stream()
                 .filter( c -> c.getName().equals( name ) )
-                .map( Xpp3Dom::new ).toArray( Xpp3Dom[]::new );
+                .map( d -> new Xpp3Dom( d, this ) ).toArray( Xpp3Dom[]::new );
     }
 
     public int getChildCount()
@@ -242,16 +249,16 @@ public class Xpp3Dom
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.remove( i );
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
     }
 
     public void removeChild( Xpp3Dom child )
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.remove( child.dom );
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -286,8 +293,8 @@ public class Xpp3Dom
      */
     public void setInputLocation( Object inputLocation )
     {
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), dom.getChildren(), inputLocation );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), dom.getAttributes(), dom.getChildren(), inputLocation ) );
     }
 
     // ----------------------------------------------------------------------
@@ -443,4 +450,20 @@ public class Xpp3Dom
         return ( ( str == null ) || ( str.trim().length() == 0 ) );
     }
 
+    private void update( Dom dom )
+    {
+        if ( parent != null )
+        {
+            parent.replace( this.dom, dom );
+        }
+        this.dom = dom;
+    }
+
+    private void replace( Dom prevChild, Dom newChild )
+    {
+        List<Dom> children = new ArrayList<>( dom.getChildren() );
+        children.replaceAll( d -> d == prevChild ? newChild : d );
+        update( new org.apache.maven.internal.xml.Xpp3Dom(
+                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+    }
 }
