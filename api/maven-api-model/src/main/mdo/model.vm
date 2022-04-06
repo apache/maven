@@ -179,11 +179,7 @@ public class ${class.name}
         this.modelEncoding = modelEncoding;
     #end
     #foreach ( $field in $class.allFields )
-      #if ( $field.type == "java.util.List" )
-        this.${field.name} = ImmutableCollections.copy( ${field.name} );
-      #elseif ( $field.type == "java.util.Properties" )
-        this.${field.name} = new ROProperties( ${field.name} );
-      #elseif ( $field.type == "java.util.Map" )
+      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
         this.${field.name} = ImmutableCollections.copy( ${field.name} );
       #else
         this.${field.name} = ${field.name};
@@ -454,11 +450,14 @@ public class ${class.name}
         @Nonnull
         public Builder location( Object key, InputLocation location )
         {
-            if ( this.locations == null )
+            if ( location != null )
             {
-                this.locations = new HashMap<>();
+                if ( this.locations == null )
+                {
+                    this.locations = new HashMap<>();
+                }
+                this.locations.put( key, location );
             }
-            this.locations.put( key, location );
             return this;
         }
 

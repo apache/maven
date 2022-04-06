@@ -20,19 +20,24 @@ package org.apache.maven.api.model;
  */
 
 import java.util.AbstractList;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.RandomAccess;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public class ImmutableCollections
+class ImmutableCollections
 {
 
     private static final List<?> EMPTY_LIST = new AbstractImmutableList<Object>()
@@ -46,6 +51,39 @@ public class ImmutableCollections
         public int size()
         {
             return 0;
+        }
+    };
+
+    private static final Map<?, ?> EMPTY_MAP = new AbstractImmutableMap<Object, Object>()
+    {
+        @Override
+        public Set<Entry<Object, Object>> entrySet()
+        {
+            return new AbstractImmutableSet<Entry<Object, Object>>()
+            {
+                @Override
+                public Iterator<Entry<Object, Object>> iterator()
+                {
+                    return new Iterator<Entry<Object, Object>>()
+                    {
+                        @Override
+                        public boolean hasNext()
+                        {
+                            return false;
+                        }
+                        @Override
+                        public Entry<Object, Object> next()
+                        {
+                            throw new NoSuchElementException();
+                        }
+                    };
+                }
+                @Override
+                public int size()
+                {
+                    return 0;
+                }
+            };
         }
     };
 
@@ -93,7 +131,7 @@ public class ImmutableCollections
         {
             return emptyMap();
         }
-        else if ( map.getClass().getDeclaringClass() == Collections.class )
+        else if ( map instanceof AbstractImmutableMap )
         {
             return map;
         }
@@ -107,19 +145,29 @@ public class ImmutableCollections
                     Map.Entry<K, V> entry = map.entrySet().iterator().next();
                     return singletonMap( entry.getKey(), entry.getValue() );
                 default:
-                    return Collections.unmodifiableMap( new LinkedHashMap<>( map ) );
+                    return new MapN<>( map );
             }
         }
     }
 
+    @SuppressWarnings( "unchecked" )
     static <K, V> Map<K, V> emptyMap()
     {
-        return Collections.emptyMap();
+        return ( Map<K, V> ) EMPTY_MAP;
     }
 
     static <K, V> Map<K, V> singletonMap( K key, V value )
     {
-        return Collections.singletonMap( key, value );
+        return new Map1<>( key, value );
+    }
+
+    static Properties copy( Properties properties )
+    {
+        if ( properties instanceof ROProperties )
+        {
+            return properties;
+        }
+        return new ROProperties( properties );
     }
 
     private static class List1<E> extends AbstractImmutableList<E>
@@ -397,7 +445,292 @@ public class ImmutableCollections
         }
     }
 
-    static UnsupportedOperationException uoe()
+    private static class ROProperties extends Properties
+    {
+        private ROProperties( Properties props )
+        {
+            super();
+            if ( props != null )
+            {
+                // Do not use super.putAll, as it may delegate to put which throws an UnsupportedOperationException
+                for ( Map.Entry<Object, Object> e : props.entrySet() )
+                {
+                    super.put( e.getKey(), e.getValue() );
+                }
+            }
+        }
+
+        @Override
+        public Object put( Object key, Object value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object remove( Object key )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public void putAll( Map<?, ?> t )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public void clear()
+        {
+            throw uoe();
+        }
+
+        @Override
+        public void replaceAll( BiFunction<? super Object, ? super Object, ?> function )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object putIfAbsent( Object key, Object value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean remove( Object key, Object value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean replace( Object key, Object oldValue, Object newValue )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object replace( Object key, Object value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object computeIfAbsent( Object key, Function<? super Object, ?> mappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object computeIfPresent( Object key, BiFunction<? super Object, ? super Object, ?> remappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object compute( Object key, BiFunction<? super Object, ? super Object, ?> remappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public Object merge( Object key, Object value, BiFunction<? super Object, ? super Object, ?> remappingFunction )
+        {
+            throw uoe();
+        }
+    }
+
+    private static class Map1<K, V> extends AbstractImmutableMap<K, V>
+    {
+        private final Map.Entry<K, V> entry;
+
+        private Map1( K key, V value )
+        {
+            this.entry = new SimpleImmutableEntry<>( key, value );
+        }
+
+        @Override
+        public Set<Entry<K, V>> entrySet()
+        {
+            return new AbstractImmutableSet<Entry<K, V>>()
+            {
+                @Override
+                public Iterator<Entry<K, V>> iterator()
+                {
+                    return new Iterator<Entry<K, V>>()
+                    {
+                        int index = 0;
+                        @Override
+                        public boolean hasNext()
+                        {
+                            return index == 0;
+                        }
+
+                        @Override
+                        public Entry<K, V> next()
+                        {
+                            if ( index++ == 0 )
+                            {
+                                return entry;
+                            }
+                            throw new NoSuchElementException();
+                        }
+                    };
+                }
+
+                @Override
+                public int size()
+                {
+                    return 1;
+                }
+            };
+        }
+    }
+
+    private static class MapN<K, V> extends AbstractImmutableMap<K, V>
+    {
+        private final Object[] entries;
+
+        private MapN( Map<K, V> map )
+        {
+            entries = map != null ? map.entrySet().toArray() : new Object[0];
+        }
+
+        @Override
+        public Set<Entry<K, V>> entrySet()
+        {
+            return new AbstractImmutableSet<Entry<K, V>>()
+            {
+                @Override
+                public Iterator<Entry<K, V>> iterator()
+                {
+                    return new Iterator<Entry<K, V>>()
+                    {
+                        int index = 0;
+                        @Override
+                        public boolean hasNext()
+                        {
+                            return index < entries.length;
+                        }
+
+                        @SuppressWarnings( "unchecked" )
+                        @Override
+                        public Entry<K, V> next()
+                        {
+                            if ( index < entries.length )
+                            {
+                                return ( Map.Entry<K, V> ) entries[index++];
+                            }
+                            throw new NoSuchElementException();
+                        }
+                    };
+                }
+
+                @Override
+                public int size()
+                {
+                    return entries.length;
+                }
+            };
+        }
+    }
+
+    private abstract static class AbstractImmutableMap<K, V> extends AbstractMap<K, V>
+    {
+        @Override
+        public void replaceAll( BiFunction<? super K, ? super V, ? extends V> function )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V putIfAbsent( K key, V value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean remove( Object key, Object value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean replace( K key, V oldValue, V newValue )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V replace( K key, V value )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V computeIfAbsent( K key, Function<? super K, ? extends V> mappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V computeIfPresent( K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V compute( K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public V merge( K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction )
+        {
+            throw uoe();
+        }
+    }
+
+    private abstract static class AbstractImmutableSet<E> extends AbstractSet<E>
+    {
+        @Override
+        public boolean removeAll( Collection<?> c )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean add( E e )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean remove( Object o )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean retainAll( Collection<?> c )
+        {
+            throw uoe();
+        }
+
+        @Override
+        public void clear()
+        {
+            throw uoe();
+        }
+
+        @Override
+        public boolean removeIf( Predicate<? super E> filter )
+        {
+            throw uoe();
+        }
+    }
+
+    private static UnsupportedOperationException uoe()
     {
         return new UnsupportedOperationException();
     }
