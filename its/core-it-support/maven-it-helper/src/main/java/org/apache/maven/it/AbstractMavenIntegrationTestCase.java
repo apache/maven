@@ -600,6 +600,12 @@ public abstract class AbstractMavenIntegrationTestCase
 
         try
         {
+            // Java7 TLS protocol
+            if ( VersionRange.createFromVersionSpec( "(,1.8.0)" ).containsVersion( getJavaVersion() ) )
+            {
+                verifier.getCliOptions().add( "-Dhttps.protocols=TLSv1.2" );
+            }
+
             // auto set source+target to lowest reasonable java version
             // Java9 requires at least 1.6
             if ( VersionRange.createFromVersionSpec( "[9,12)" ).containsVersion( getJavaVersion() ) )

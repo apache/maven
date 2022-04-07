@@ -22,6 +22,9 @@
 # How I run the ITs from a clean slate. Though I do this with a primed Nexus instance. JvZ.
 # build maven core using -PversionlessMavenDist
 
+# For Jdk 7 use with -Dhttps.protocols=TLSv1.2
+# mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo -Dhttps.protocols=TLSv1.2
+
 mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo
 
 # If behind a proxy try this
