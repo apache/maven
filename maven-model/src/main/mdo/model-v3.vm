@@ -16,9 +16,9 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#set ( $basePackage = "org.apache.maven.model" )
-#set ( $package = "${basePackage}" )
-#set ( $wrapPackage = "org.apache.maven.api.model" )
+#
+#set ( $package = "${packageModelV3}" )
+#
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
 #foreach ( $class in $model.allClasses )
@@ -102,15 +102,15 @@ public class ${class.name}
 
     public ${class.name}()
     {
-        this( ${wrapPackage}.${class.name}.newInstance() );
+        this( ${packageModelV4}.${class.name}.newInstance() );
     }
 
-    public ${class.name}( ${wrapPackage}.${class.name} delegate )
+    public ${class.name}( ${packageModelV4}.${class.name} delegate )
     {
         this( delegate, null );
     }
 
-    public ${class.name}( ${wrapPackage}.${class.name} delegate, BaseObject parent )
+    public ${class.name}( ${packageModelV4}.${class.name} delegate, BaseObject parent )
     {
         super( delegate, parent );
     }
@@ -123,9 +123,9 @@ public class ${class.name}
     #if ( $class.superClass )
     @Override
     #end
-    public ${wrapPackage}.${class.name} getDelegate()
+    public ${packageModelV4}.${class.name} getDelegate()
     {
-        return ( ${wrapPackage}.${class.name} ) super.getDelegate();
+        return ( ${packageModelV4}.${class.name} ) super.getDelegate();
     }
 
     #if ( ! $eq.empty )

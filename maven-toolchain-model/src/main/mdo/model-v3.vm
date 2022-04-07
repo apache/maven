@@ -16,9 +16,9 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#set ( $basePackage = "org.apache.maven.toolchain.model" )
-#set ( $package = "${basePackage}" )
-#set ( $wrapPackage = "org.apache.maven.api.toolchain" )
+#
+#set ( $package = "${packageModelV3}" )
+#
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
 #foreach ( $class in $model.allClasses )
@@ -98,15 +98,15 @@ public class ${class.name}
 {
 
     #if ( ! $class.superClass )
-    ${wrapPackage}.${class.name} delegate;
+    ${packageModelV4}.${class.name} delegate;
     #end
 
     public ${class.name}()
     {
-        this( ${wrapPackage}.${class.name}.newInstance() );
+        this( ${packageModelV4}.${class.name}.newInstance() );
     }
 
-    public ${class.name}( ${wrapPackage}.${class.name} delegate )
+    public ${class.name}( ${packageModelV4}.${class.name} delegate )
     {
     #if ( $class.superClass )
         super( delegate );
@@ -123,10 +123,10 @@ public class ${class.name}
     #if ( $class.superClass )
     @Override
     #end
-    public ${wrapPackage}.${class.name} getDelegate()
+    public ${packageModelV4}.${class.name} getDelegate()
     {
     #if ( $class.superClass )
-        return ( ${wrapPackage}.${class.name} ) delegate;
+        return ( ${packageModelV4}.${class.name} ) delegate;
     #else
         return delegate;
     #end
@@ -176,7 +176,7 @@ public class ${class.name}
     public ${type} ${pfx}${cap}()
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        return new WrapperList<${field.to}, ${wrapPackage}.${field.to}>(
+        return new WrapperList<${field.to}, ${packageModelV4}.${field.to}>(
                     getDelegate()::get${cap}, l -> delegate = getDelegate().with${cap}( l ),
                     ${field.to}::new, ${field.to}::getDelegate );
       #elseif ( $field.to == "String" && $field.type == "java.util.Properties" && $field.multiplicity == "*" )
@@ -232,12 +232,12 @@ public class ${class.name}
 
       #end
     #end
-    public static List<${wrapPackage}.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
+    public static List<${packageModelV4}.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
     {
         return list != null ? new WrapperList<>( list, ${class.name}::getDelegate, ${class.name}::new ) : null;
     }
 
-    public static List<${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV3( List<${wrapPackage}.${class.name}> list )
+    public static List<${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV3( List<${packageModelV4}.${class.name}> list )
     {
         return list != null ? new WrapperList<>( list, ${class.name}::new, ${class.name}::getDelegate ) : null;
     }

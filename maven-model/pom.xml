@@ -104,6 +104,11 @@ under the License.
                 <template>src/main/mdo/writer.vm</template>
                 <template>src/main/mdo/writer-ex.vm</template>
               </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.model</param>
+                <param>packageModelV4=org.apache.maven.api.model</param>
+                <param>packageToolV4=org.apache.maven.model.v4</param>
+              </params>
             </configuration>
           </execution>
         </executions>

@@ -16,8 +16,8 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#set ( $basePackage = "org.apache.maven.api.model" )
-#set ( $package = "org.apache.maven.model.v4" )
+#
+#set ( $package = "${packageToolV4}" )
 #set ( $className = "ModelTransformer" )
 #
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.api.xml.Dom;
 #foreach ( $class in $model.allClasses )
-import ${basePackage}.${class.name};
+import ${packageModelV4}.${class.name};
 #end
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 

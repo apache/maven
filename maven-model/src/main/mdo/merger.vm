@@ -16,9 +16,10 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#set ( $basePackage = "org.apache.maven.api.model" )
-#set ( $package = "org.apache.maven.model.v4" )
+#
+#set ( $package = "${packageToolV4}" )
 #set ( $className = "ModelMerger" )
+#
 #foreach ( $field in $model.getClass("Model", $version).allFields )
   #if ( $field.name == "pomFile" )
     #set ( $dummy = $field.setType("java.nio.file.Path") )
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.api.xml.Dom;
 #foreach ( $class in $model.allClasses )
-import ${basePackage}.${class.Name};
+import ${packageModelV4}.${class.Name};
 #end
 
 @Generated

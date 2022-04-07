@@ -16,9 +16,10 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#set ( $basePackage = "org.apache.maven.api.settings" )
-#set ( $package = "org.apache.maven.settings.v4" )
+#
+#set ( $package = "${packageToolV4}" )
 #set ( $className = "${model.name}Xpp3Reader" )
+#
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
 #set ( $rootTag = $rootXml.tagName )
@@ -44,7 +45,7 @@ import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.internal.xml.DomBuilder;
 #foreach ( $class in $model.allClasses )
-import ${basePackage}.${class.name};
+import ${packageModelV4}.${class.name};
 #end
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
