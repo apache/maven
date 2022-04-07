@@ -210,7 +210,7 @@ public class ${className}
             writeTag( "$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer );
         #end
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-        #if ( ${field.defaultValue} == "true" )
+        #if ( ${def} == "true" )
             writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
         #else
             writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
@@ -221,7 +221,7 @@ public class ${className}
             writeDom( ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
         #set( $singularField = ${Helper.singular($fieldTagName)} )
-            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, t -> writeTag( "$singularField", "${field.defaultValue}", t, serializer ) );
+            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, t -> writeTag( "$singularField", "${def}", t, serializer ) );
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
             writeProperties( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.to && $field.multiplicity == "1" )
