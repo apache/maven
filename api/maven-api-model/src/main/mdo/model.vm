@@ -114,12 +114,13 @@ public class ${class.name}
     final String modelEncoding;
     #end
     #foreach ( $field in $class.allFields )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
     /**
       #foreach ( $line in ${field.description.trim().split("\n")} )
      * ${line.trim()}
       #end
      */
-    final ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name;
+    final ${type} $field.name;
     #end
     #if ( ! $class.superClass )
     /** Location of the xml element for this object. */
@@ -244,7 +245,7 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
-    public ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${pfx}${cap}()
+    public ${type} ${pfx}${cap}()
     {
         return this.${field.name};
     }

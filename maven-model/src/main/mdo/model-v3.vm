@@ -18,6 +18,7 @@
 *#
 #set ( $basePackage = "org.apache.maven.model" )
 #set ( $package = "${basePackage}" )
+#set ( $wrapPackage = "org.apache.maven.api.model" )
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
 #foreach ( $class in $model.allClasses )
@@ -33,7 +34,7 @@
   #set ( $className = "${class.name}" )
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
-    #set ( $types = { "DOM": "Object" } )
+    #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )
     #set ( $dummy = $imports.add( "java.util.AbstractList" ) )
@@ -50,6 +51,9 @@
       #if ( $field.type == "java.util.List" )
           #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
           #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
+      #elseif ( $field.type == "DOM" )
+          #set ( $dummy = $imports.add( "org.codehaus.plexus.util.xml.Xpp3Dom" ) )
+          #set ( $dummy = $types.put( $field, "Object" ) )
       #else
         #set ( $fieldType = ${types.getOrDefault($field.type,$field.type)} )
         #set ( $idx = $fieldType.lastIndexOf('.') )
@@ -98,15 +102,15 @@ public class ${class.name}
 
     public ${class.name}()
     {
-        this( org.apache.maven.api.model.${class.name}.newInstance() );
+        this( ${wrapPackage}.${class.name}.newInstance() );
     }
 
-    public ${class.name}( org.apache.maven.api.model.${class.name} delegate )
+    public ${class.name}( ${wrapPackage}.${class.name} delegate )
     {
         this( delegate, null );
     }
 
-    public ${class.name}( org.apache.maven.api.model.${class.name} delegate, BaseObject parent )
+    public ${class.name}( ${wrapPackage}.${class.name} delegate, BaseObject parent )
     {
         super( delegate, parent );
     }
@@ -119,9 +123,9 @@ public class ${class.name}
     #if ( $class.superClass )
     @Override
     #end
-    public org.apache.maven.api.model.${class.name} getDelegate()
+    public ${wrapPackage}.${class.name} getDelegate()
     {
-        return ( org.apache.maven.api.model.${class.name} ) super.getDelegate();
+        return ( ${wrapPackage}.${class.name} ) super.getDelegate();
     }
 
     #if ( ! $eq.empty )
@@ -165,7 +169,7 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
-    public ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${pfx}${cap}()
+    public ${type} ${pfx}${cap}()
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         return new WrapperList<${field.to}, org.apache.maven.api.model.${field.to}>(
@@ -178,23 +182,18 @@ public class ${class.name}
       #elseif ( $field.to )
         return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}(), this ) : null;
       #elseif ( $field.type == "DOM" )
-        return getDelegate().${pfx}${cap}() != null ? new org.codehaus.plexus.util.xml.Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
+        return getDelegate().${pfx}${cap}() != null ? new Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
       #else
         return getDelegate().${pfx}${cap}();
       #end
     }
 
-    public void set${cap}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
+    public void set${cap}( ${type} ${field.name} )
     {
       #if ( $field.type == "DOM" )
-        if ( ${field.name} instanceof org.codehaus.plexus.util.xml.Xpp3Dom )
+        if ( ! Objects.equals( ( ( Xpp3Dom ) ${field.name} ).getDom(), getDelegate().${pfx}${cap}() ) )
         {
-            ${field.name} = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) ${field.name} ).getDom();
-        }
-        org.apache.maven.api.xml.Dom dom = ( org.apache.maven.api.xml.Dom ) ${field.name};
-        if ( ! Objects.equals( dom, getDelegate().${pfx}${cap}() ) )
-        {
-            update( getDelegate().with${cap}( dom ) );
+            update( getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() ) );
         }
       #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )

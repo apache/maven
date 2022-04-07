@@ -94,7 +94,8 @@ public class ${class.name}
     final String modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
-    final ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} $field.name;
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+    final ${type} $field.name;
     #end
 
     ${class.name}(
@@ -172,7 +173,7 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
-    public ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${pfx}${cap}()
+    public ${type} ${pfx}${cap}()
     {
         return this.${field.name};
     }
@@ -283,7 +284,8 @@ public class ${class.name}
 
     #end
     #foreach ( $field in $allFields )
-        public Builder ${field.name}( ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} ${field.name} )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+        public Builder ${field.name}( ${type} ${field.name} )
         {
             this.${field.name} = ${field.name};
             return this;
