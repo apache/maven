@@ -22,6 +22,8 @@ package org.apache.maven.model.io.xpp3;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 
 public class MavenXpp3WriterEx
@@ -34,6 +36,11 @@ public class MavenXpp3WriterEx
      * Field fileComment.
      */
     private String fileComment = null;
+
+    /**
+     * Field stringFormatter.
+     */
+    protected InputLocation.StringFormatter stringFormatter;
 
 
     //-----------/
@@ -51,6 +58,16 @@ public class MavenXpp3WriterEx
     } //-- void setFileComment( String )
 
     /**
+     * Method setStringFormatter.
+     *
+     * @param stringFormatter
+     */
+    public void setStringFormatter( InputLocation.StringFormatter stringFormatter )
+    {
+        this.stringFormatter = stringFormatter;
+    } //-- void setStringFormatter( InputLocation.StringFormatter )
+
+    /**
      * Method write.
      *
      * @param writer a writer object.
@@ -62,6 +79,14 @@ public class MavenXpp3WriterEx
     {
         org.apache.maven.model.v4.MavenXpp3WriterEx xw = new org.apache.maven.model.v4.MavenXpp3WriterEx();
         xw.setFileComment( fileComment );
+        xw.setStringFormatter( stringFormatter != null ? new org.apache.maven.api.model.InputLocation.StringFormatter()
+        {
+            @Override
+            public String toString( org.apache.maven.api.model.InputLocation location )
+            {
+                return stringFormatter.toString( new InputLocation( location ) );
+            }
+        } : null );
         xw.write( writer, model.getDelegate() );
     } //-- void write( Writer, Model )
 

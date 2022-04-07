@@ -181,6 +181,16 @@ public class ${className}
                 builder.configuration( tgt.merge( src ) );
             }
         }
+      #elseif ( $field.type == "boolean" )
+        if ( sourceDominant )
+        {
+            builder.${field.name}( source.is${capField}() );
+        }
+      #elseif ( $field.type == "int" || $field.type == "java.nio.file.Path" )
+        if ( sourceDominant )
+        {
+            builder.${field.name}( source.get${capField}() );
+        }
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end

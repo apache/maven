@@ -76,29 +76,298 @@ public class ${className}
     }
 
     /**
-     * Method checkFieldWithDuplicate.
+     * Returns the state of the "add default entities" flag.
      *
-     * @param parser a parser object.
-     * @param parsed a parsed object.
-     * @param alias a alias object.
-     * @param tagName a tagName object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
      * @return boolean
      */
-    private boolean checkFieldWithDuplicate( XmlPullParser parser, String tagName, String alias, Set<String> parsed )
-        throws XmlPullParserException
+    public boolean getAddDefaultEntities()
     {
-        if ( !( parser.getName().equals( tagName ) || parser.getName().equals( alias ) ) )
+        return addDefaultEntities;
+    } //-- boolean getAddDefaultEntities()
+
+    /**
+     * Sets the state of the "add default entities" flag.
+     *
+     * @param addDefaultEntities a addDefaultEntities object.
+     */
+    public void setAddDefaultEntities( boolean addDefaultEntities )
+    {
+        this.addDefaultEntities = addDefaultEntities;
+    } //-- void setAddDefaultEntities( boolean )
+
+    /**
+     * @see ReaderFactory#newXmlReader
+     *
+     * @param reader a reader object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Model read( Reader reader, boolean strict )
+        throws IOException, XmlPullParserException
+    {
+        XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser( );
+
+        parser.setInput( reader );
+
+
+        return read( parser, strict );
+    } //-- Model read( Reader, boolean )
+
+    /**
+     * @see ReaderFactory#newXmlReader
+     *
+     * @param reader a reader object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Model read( Reader reader )
+        throws IOException, XmlPullParserException
+    {
+        return read( reader, true );
+    } //-- Model read( Reader )
+
+    /**
+     * Method read.
+     *
+     * @param in a in object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Model read( InputStream in, boolean strict )
+        throws IOException, XmlPullParserException
+    {
+        return read( ReaderFactory.newXmlReader( in ), strict );
+    } //-- Model read( InputStream, boolean )
+
+    /**
+     * Method read.
+     *
+     * @param in a in object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Model read( InputStream in )
+        throws IOException, XmlPullParserException
+    {
+        return read( ReaderFactory.newXmlReader( in ) );
+    } //-- Model read( InputStream )
+
+    /**
+     * Method read.
+     *
+     * @param parser a parser object.
+     * @param strict a strict object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return Model
+     */
+    public Model read( XmlPullParser parser, boolean strict )
+        throws IOException, XmlPullParserException
+    {
+        $rootUcapName $rootLcapName = null;
+        int eventType = parser.getEventType();
+        boolean parsed = false;
+        while ( eventType != XmlPullParser.END_DOCUMENT )
         {
-            return false;
+            if ( eventType == XmlPullParser.START_TAG )
+            {
+                if ( strict && ! "${rootTag}".equals( parser.getName() ) )
+                {
+                    throw new XmlPullParserException( "Expected root element '${rootTag}' but found '" + parser.getName() + "'", parser, null );
+                }
+                else if ( parsed )
+                {
+                    // fallback, already expected a XmlPullParserException due to invalid XML
+                    throw new XmlPullParserException( "Duplicated tag: '${rootTag}'", parser, null );
+                }
+                $rootLcapName = parse${rootUcapName}( parser, strict );
+                parsed = true;
+            }
+            eventType = parser.next();
         }
-        if ( !parsed.add( tagName ) )
+        if ( parsed )
         {
-            throw new XmlPullParserException( "Duplicated tag: '" + tagName + "'", parser, null );
+            return $rootLcapName;
         }
-        return true;
-    } //-- boolean checkFieldWithDuplicate( XmlPullParser, String, String, Set<String> )
+        throw new XmlPullParserException( "Expected root element '${rootTag}' but found no element at all: invalid XML document", parser, null );
+    } //-- Model read( XmlPullParser, boolean )
+
+#foreach ( $class in $model.allClasses )
+ #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
+  #set ( $classUcapName = $Helper.capitalise( $class.name ) )
+  #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
+  #set ( $ancestors = $Helper.ancestors( $class ) )
+  #set ( $allFields = [] )
+  #foreach ( $cl in $ancestors )
+    #set ( $dummy = $allFields.addAll( $cl.allFields ) )
+  #end
+    private ${classUcapName} parse${classUcapName}( XmlPullParser parser, boolean strict )
+        throws IOException, XmlPullParserException
+    {
+        String tagName = parser.getName();
+        ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder( true );
+        for ( int i = parser.getAttributeCount() - 1; i >= 0; i-- )
+        {
+            String name = parser.getAttributeName( i );
+            String value = parser.getAttributeValue( i );
+            if ( name.indexOf( ':' ) >= 0 )
+            {
+                // just ignore attributes with non-default namespace (for example: xmlns:xsi)
+            }
+  #if ( $class == $root )
+            else if ( "xmlns".equals( name ) )
+            {
+                // ignore xmlns attribute in root class, which is a reserved attribute name
+            }
+  #end
+  #foreach ( $field in $allFields )
+    #if ( $Helper.xmlFieldMetadata( $field ).attribute )
+      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
+            else if ( "$fieldTagName".equals( name ) )
+            {
+      #if ( $field.type == "String" )
+                ${classLcapName}.${field.name}( interpolatedTrimmed( value, "$fieldTagName" ) );
+      #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
+                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, "${field.defaultValue}" ) );
+      #else
+                // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+      #end
+            }
+    #end
+  #end
+            else
+            {
+                checkUnknownAttribute( parser, name, tagName, strict );
+            }
+        }
+        Set<String> parsed = new HashSet<>();
+        while ( ( strict ? parser.nextTag() : nextTag( parser ) ) == XmlPullParser.START_TAG )
+        {
+            String childName = unalias( parser.getName() );
+            if ( !parsed.add( childName ) )
+            {
+                throw new XmlPullParserException( "Duplicated tag: '" + childName + "'", parser, null );
+            }
+            switch ( childName )
+            {
+  #set( $ift = "if" )
+  #foreach ( $field in $allFields )
+    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient )
+      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
+      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
+                case "${fieldTagName}":
+                {
+      #if ( $field.type == "String" )
+                    ${classLcapName}.${field.name}( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
+                    break;
+      #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
+                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
+                    break;
+      #elseif ( $field.type == "int" )
+                    ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
+                    break;
+      #elseif ( $field.type == "DOM" )
+                    ${classLcapName}.${field.name}( DomBuilder.build( parser, true ) );
+                    break;
+      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
+                    List<String> ${field.name} = new ArrayList<>();
+                    while ( parser.nextTag() == XmlPullParser.START_TAG )
+                    {
+                        if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
+                        {
+                            ${field.name}.add( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
+                        }
+                        else
+                        {
+                            checkUnknownElement( parser, strict );
+                        }
+                    }
+                    ${classLcapName}.${field.name}( ${field.name} );
+                    break;
+      #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
+                    Properties ${field.name} = new Properties();
+                    while ( parser.nextTag() == XmlPullParser.START_TAG )
+                    {
+                        String key = parser.getName();
+                        String value = parser.nextText().trim();
+                        ${field.name}.put( key, value );
+                    }
+                    ${classLcapName}.${field.name}( ${field.name} );
+                    break;
+      #elseif ( $field.to && $field.multiplicity == "1" )
+                    ${classLcapName}.${field.name}( parse${field.toClass.name}( parser, strict ) );
+                    break;
+      #elseif ( $field.to && $field.multiplicity == "*" )
+                    List<$field.to> ${field.name} = new ArrayList<>();
+                    while ( parser.nextTag() == XmlPullParser.START_TAG )
+                    {
+                        if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
+                        {
+                            ${field.name}.add( parse${field.toClass.name}( parser, strict ) );
+                        }
+                        else
+                        {
+                            checkUnknownElement( parser, strict );
+                        }
+                    }
+                    ${classLcapName}.${field.name}( ${field.name} );
+                    break;
+      #else
+                    // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+                    break;
+      #end
+                }
+      #set( $ift = "else if" )
+    #end
+  #end
+                default:
+                {
+                    checkUnknownElement( parser, strict );
+                    break;
+                }
+            }
+        }
+        return ${classLcapName}.build();
+    }
+
+ #end
+#end
+
+    private String unalias( String tagName )
+    {
+        switch ( tagName )
+        {
+#set( $aliases = { } )
+#foreach( $class in $model.allClasses )
+  #foreach ( $field in $class.allFields )
+    #if ( $field.alias )
+      #set ( $dummy = $aliases.put( $field.alias, $field.name ) )
+    #end
+  #end
+#end
+#foreach( $entry in $aliases.entrySet() )
+            case "${entry.key}":
+                return "${entry.value}";
+#end
+            default:
+                return tagName;
+        }
+    }
 
     /**
      * Method checkUnknownAttribute.
@@ -153,32 +422,6 @@ public class ${className}
     } //-- void checkUnknownElement( XmlPullParser, boolean )
 
     /**
-     * Returns the state of the "add default entities" flag.
-     *
-     * @return boolean
-     */
-    public boolean getAddDefaultEntities()
-    {
-        return addDefaultEntities;
-    } //-- boolean getAddDefaultEntities()
-
-    /**
-     * Method getBooleanValue.
-     *
-     * @param s a s object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return boolean
-     */
-    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser )
-        throws XmlPullParserException
-    {
-        return getBooleanValue( s, attribute, parser, null );
-    } //-- boolean getBooleanValue( String, String, XmlPullParser )
-
-    /**
      * Method getBooleanValue.
      *
      * @param s a s object.
@@ -202,6 +445,74 @@ public class ${className}
         }
         return false;
     } //-- boolean getBooleanValue( String, String, XmlPullParser, String )
+
+    /**
+     * Method getTrimmedValue.
+     *
+     * @param s a s object.
+     * @return String
+     */
+    private String getTrimmedValue( String s )
+    {
+        if ( s != null )
+        {
+            s = s.trim();
+        }
+        return s;
+    } //-- String getTrimmedValue( String )
+
+    /**
+     * Method interpolatedTrimmed.
+     *
+     * @param value a value object.
+     * @param context a context object.
+     * @return String
+     */
+    private String interpolatedTrimmed( String value, String context )
+    {
+        return getTrimmedValue( contentTransformer.transform( value, context ) );
+    } //-- String interpolatedTrimmed( String, String )
+
+    /**
+     * Method nextTag.
+     *
+     * @param parser a parser object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return int
+     */
+    private int nextTag( XmlPullParser parser )
+        throws IOException, XmlPullParserException
+    {
+        int eventType = parser.next();
+        if ( eventType == XmlPullParser.TEXT )
+        {
+            eventType = parser.next();
+        }
+        if ( eventType != XmlPullParser.START_TAG && eventType != XmlPullParser.END_TAG )
+        {
+            throw new XmlPullParserException( "expected START_TAG or END_TAG not " + XmlPullParser.TYPES[eventType], parser, null );
+        }
+        return eventType;
+    } //-- int nextTag( XmlPullParser )
+
+#if ( "0" == "1" )
+    /**
+     * Method getBooleanValue.
+     *
+     * @param s a s object.
+     * @param parser a parser object.
+     * @param attribute a attribute object.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return boolean
+     */
+    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser )
+        throws XmlPullParserException
+    {
+        return getBooleanValue( s, attribute, parser, null );
+    } //-- boolean getBooleanValue( String, String, XmlPullParser )
 
     /**
      * Method getByteValue.
@@ -497,341 +808,7 @@ public class ${className}
         return 0;
     } //-- short getShortValue( String, String, XmlPullParser, boolean )
 
-    /**
-     * Method getTrimmedValue.
-     *
-     * @param s a s object.
-     * @return String
-     */
-    private String getTrimmedValue( String s )
-    {
-        if ( s != null )
-        {
-            s = s.trim();
-        }
-        return s;
-    } //-- String getTrimmedValue( String )
-
-    /**
-     * Method interpolatedTrimmed.
-     *
-     * @param value a value object.
-     * @param context a context object.
-     * @return String
-     */
-    private String interpolatedTrimmed( String value, String context )
-    {
-        return getTrimmedValue( contentTransformer.transform( value, context ) );
-    } //-- String interpolatedTrimmed( String, String )
-
-    /**
-     * Method nextTag.
-     *
-     * @param parser a parser object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return int
-     */
-    private int nextTag( XmlPullParser parser )
-        throws IOException, XmlPullParserException
-    {
-        int eventType = parser.next();
-        if ( eventType == XmlPullParser.TEXT )
-        {
-            eventType = parser.next();
-        }
-        if ( eventType != XmlPullParser.START_TAG && eventType != XmlPullParser.END_TAG )
-        {
-            throw new XmlPullParserException( "expected START_TAG or END_TAG not " + XmlPullParser.TYPES[eventType], parser, null );
-        }
-        return eventType;
-    } //-- int nextTag( XmlPullParser )
-
-    /**
-     * @see ReaderFactory#newXmlReader
-     *
-     * @param reader a reader object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read( Reader reader, boolean strict )
-        throws IOException, XmlPullParserException
-    {
-        XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser( );
-
-        parser.setInput( reader );
-
-
-        return read( parser, strict );
-    } //-- Model read( Reader, boolean )
-
-    /**
-     * @see ReaderFactory#newXmlReader
-     *
-     * @param reader a reader object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read( Reader reader )
-        throws IOException, XmlPullParserException
-    {
-        return read( reader, true );
-    } //-- Model read( Reader )
-
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read( InputStream in, boolean strict )
-        throws IOException, XmlPullParserException
-    {
-        return read( ReaderFactory.newXmlReader( in ), strict );
-    } //-- Model read( InputStream, boolean )
-
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read( InputStream in )
-        throws IOException, XmlPullParserException
-    {
-        return read( ReaderFactory.newXmlReader( in ) );
-    } //-- Model read( InputStream )
-
-    /**
-     * Method read.
-     *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
-    public Model read( XmlPullParser parser, boolean strict )
-        throws IOException, XmlPullParserException
-    {
-        $rootUcapName $rootLcapName = null;
-        int eventType = parser.getEventType();
-        boolean parsed = false;
-        while ( eventType != XmlPullParser.END_DOCUMENT )
-        {
-            if ( eventType == XmlPullParser.START_TAG )
-            {
-                if ( strict && ! "${rootTag}".equals( parser.getName() ) )
-                {
-                    throw new XmlPullParserException( "Expected root element '${rootTag}' but found '" + parser.getName() + "'", parser, null );
-                }
-                else if ( parsed )
-                {
-                    // fallback, already expected a XmlPullParserException due to invalid XML
-                    throw new XmlPullParserException( "Duplicated tag: '${rootTag}'", parser, null );
-                }
-                $rootLcapName = parse${rootUcapName}( parser, strict );
-                parsed = true;
-            }
-            eventType = parser.next();
-        }
-        if ( parsed )
-        {
-            return $rootLcapName;
-        }
-        throw new XmlPullParserException( "Expected root element '${rootTag}' but found no element at all: invalid XML document", parser, null );
-    } //-- Model read( XmlPullParser, boolean )
-
-#foreach ( $class in $model.allClasses )
- #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
-  #set ( $classUcapName = $Helper.capitalise( $class.name ) )
-  #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
-  #set ( $ancestors = $Helper.ancestors( $class ) )
-  #set ( $allFields = [] )
-  #foreach ( $cl in $ancestors )
-    #set ( $dummy = $allFields.addAll( $cl.allFields ) )
-  #end
-    private ${classUcapName} parse${classUcapName}( XmlPullParser parser, boolean strict )
-        throws IOException, XmlPullParserException
-    {
-        String tagName = parser.getName();
-        ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder( true );
-        for ( int i = parser.getAttributeCount() - 1; i >= 0; i-- )
-        {
-            String name = parser.getAttributeName( i );
-            String value = parser.getAttributeValue( i );
-            if ( name.indexOf( ':' ) >= 0 )
-            {
-                // just ignore attributes with non-default namespace (for example: xmlns:xsi)
-            }
-  #if ( $class == $root )
-            else if ( "xmlns".equals( name ) )
-            {
-                // ignore xmlns attribute in root class, which is a reserved attribute name
-            }
-  #end
-  #foreach ( $field in $allFields )
-    #if ( $Helper.xmlFieldMetadata( $field ).attribute )
-      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
-      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
-            else if ( "$fieldTagName".equals( name ) )
-            {
-      #if ( $field.type == "String" )
-                ${classLcapName}.${field.name}( interpolatedTrimmed( value, "$fieldTagName" ) );
-      #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, "${field.defaultValue}" ) );
-      #else
-                // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
-      #end
-            }
-    #end
-  #end
-            else
-            {
-                checkUnknownAttribute( parser, name, tagName, strict );
-            }
-        }
-        Set<String> parsed = new HashSet<>();
-        while ( ( strict ? parser.nextTag() : nextTag( parser ) ) == XmlPullParser.START_TAG )
-        {
-            String childName = unalias( parser.getName() );
-            if ( !parsed.add( childName ) )
-            {
-                throw new XmlPullParserException( "Duplicated tag: '" + childName + "'", parser, null );
-            }
-            switch ( childName )
-            {
-  #set( $ift = "if" )
-  #foreach ( $field in $allFields )
-    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient )
-      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
-      #if ( ! $fieldTagName )
-        #set ( $fieldTagName = $field.name )
-      #end
-      #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
-                case "${fieldTagName}":
-                {
-      #if ( $field.type == "String" )
-                    ${classLcapName}.${field.name}( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
-                    break;
-      #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
-                    break;
-      #elseif ( $field.type == "int" )
-                    ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
-                    break;
-      #elseif ( $field.type == "DOM" )
-                    ${classLcapName}.${field.name}( DomBuilder.build( parser, true ) );
-                    break;
-      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
-                    List<String> ${field.name} = new ArrayList<>();
-                    while ( parser.nextTag() == XmlPullParser.START_TAG )
-                    {
-                        if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
-                        {
-                            ${field.name}.add( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
-                        }
-                        else
-                        {
-                            checkUnknownElement( parser, strict );
-                        }
-                    }
-                    ${classLcapName}.${field.name}( ${field.name} );
-                    break;
-      #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-                    Properties ${field.name} = new Properties();
-                    while ( parser.nextTag() == XmlPullParser.START_TAG )
-                    {
-                        String key = parser.getName();
-                        String value = parser.nextText().trim();
-                        ${field.name}.put( key, value );
-                    }
-                    ${classLcapName}.${field.name}( ${field.name} );
-                    break;
-      #elseif ( $field.to && $field.multiplicity == "1" )
-                    ${classLcapName}.${field.name}( parse${field.toClass.name}( parser, strict ) );
-                    break;
-      #elseif ( $field.to && $field.multiplicity == "*" )
-                    List<$field.to> ${field.name} = new ArrayList<>();
-                    while ( parser.nextTag() == XmlPullParser.START_TAG )
-                    {
-                        if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
-                        {
-                            ${field.name}.add( parse${field.toClass.name}( parser, strict ) );
-                        }
-                        else
-                        {
-                            checkUnknownElement( parser, strict );
-                        }
-                    }
-                    ${classLcapName}.${field.name}( ${field.name} );
-                    break;
-      #else
-                    // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
-                    break;
-      #end
-                }
-      #set( $ift = "else if" )
-    #end
-  #end
-                default:
-                {
-                    checkUnknownElement( parser, strict );
-                    break;
-                }
-            }
-        }
-        return ${classLcapName}.build();
-    }
-
- #end
 #end
-
-    private String unalias( String tagName )
-    {
-        switch ( tagName )
-        {
-#set( $aliases = { } )
-#foreach( $class in $model.allClasses )
-  #foreach ( $field in $class.allFields )
-    #if ( $field.alias )
-      #set ( $dummy = $aliases.put( $field.alias, $field.name ) )
-    #end
-  #end
-#end
-#foreach( $entry in $aliases.entrySet() )
-            case "${entry.key}":
-                return "${entry.value}";
-#end
-            default:
-                return tagName;
-        }
-    }
-
-    /**
-     * Sets the state of the "add default entities" flag.
-     *
-     * @param addDefaultEntities a addDefaultEntities object.
-     */
-    public void setAddDefaultEntities( boolean addDefaultEntities )
-    {
-        this.addDefaultEntities = addDefaultEntities;
-    } //-- void setAddDefaultEntities( boolean )
-
     public static interface ContentTransformer
     {
         /**

@@ -133,6 +133,8 @@ public class ${className}
       #elseif ( $field.type == "DOM" )
         Dom newVal = transform( target.get${capField}() );
         builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
+      #elseif ( $field.type == "boolean" || $field.type == "int" || $field.type == "java.nio.file.Path" )
+        // nothing to do, the transformer only handles strings
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
