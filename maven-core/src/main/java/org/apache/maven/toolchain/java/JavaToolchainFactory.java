@@ -26,14 +26,14 @@ import java.util.Properties;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.xml.Dom;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +92,8 @@ public class JavaToolchainFactory
         }
 
         // populate the configuration section
-        Dom dom = model.getConfiguration();
-        Dom javahome = dom.getChild( JavaToolchainImpl.KEY_JAVAHOME );
+        Xpp3Dom dom = ( Xpp3Dom ) model.getConfiguration();
+        Xpp3Dom javahome = dom != null ? dom.getChild( JavaToolchainImpl.KEY_JAVAHOME ) : null;
         if ( javahome == null )
         {
             throw new MisconfiguredToolchainException( "Java toolchain without the "

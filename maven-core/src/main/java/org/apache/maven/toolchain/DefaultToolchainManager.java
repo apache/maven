@@ -115,7 +115,9 @@ public class DefaultToolchainManager
                 {
                     try
                     {
-                        ToolchainPrivate toolchain = fact.createToolchain( model );
+                        org.apache.maven.toolchain.model.ToolchainModel tm =
+                                new org.apache.maven.toolchain.model.ToolchainModel( model );
+                        ToolchainPrivate toolchain = fact.createToolchain( tm );
                         if ( requirements == null || toolchain.matchesRequirements( requirements ) )
                         {
                             toolchains.add( toolchain );

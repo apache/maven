@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Objects;
 
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
 
 /**

@@ -19,7 +19,7 @@ package org.apache.maven.toolchain.java;
  * under the License.
  */
 
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
 
 /**

@@ -79,7 +79,9 @@ public class DefaultToolchainManagerPrivate
             {
                 for ( ToolchainModel toolchainModel : availableToolchains )
                 {
-                    toRet.add( fact.createToolchain( toolchainModel ) );
+                    org.apache.maven.toolchain.model.ToolchainModel tm =
+                            new org.apache.maven.toolchain.model.ToolchainModel( toolchainModel );
+                    toRet.add( fact.createToolchain( tm ) );
                 }
             }
 
