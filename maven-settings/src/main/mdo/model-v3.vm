@@ -19,6 +19,7 @@
 #set ( $basePackage = "org.apache.maven.settings" )
 #set ( $package = "${basePackage}" )
 #set ( $wrapPackage = "org.apache.maven.api.settings" )
+#set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
@@ -33,11 +34,6 @@
   #set ( $className = "${class.name}" )
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
-    #foreach ( $class in $model.allClasses )
-      #if ( $class.getMetadata("org.codehaus.modello.plugin.model.ModelClassMetadata").rootElement )
-        #set ( $root = $class )
-      #end
-    #end
     #set ( $types = { "DOM": "org.apache.maven.api.xml.Dom" } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )

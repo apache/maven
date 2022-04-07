@@ -17,6 +17,7 @@
   under the License.
 *#
 #set ( $package = "${basePackage}" )
+#set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
@@ -30,7 +31,6 @@
   #end
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${class.name}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
-    #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
     #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )

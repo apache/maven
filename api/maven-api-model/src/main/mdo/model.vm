@@ -28,6 +28,7 @@
 #end
 #
 #set ( $package = "${basePackage}" )
+#set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = [] )
@@ -41,7 +42,6 @@
   #set ( $className = "${class.name}" )
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
-    #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
     #set ( $types = { } )
     #set ( $imports = $class.getClass().forName("java.util.TreeSet").newInstance() )
     #set ( $dummy = $imports.add( "java.io.Serializable" ) )

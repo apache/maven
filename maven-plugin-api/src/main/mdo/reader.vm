@@ -19,11 +19,7 @@
 #set ( $basePackage = "${model.getDefault('package').getValue()}" )
 #set ( $package = "${basePackage}.io.xpp3" )
 #set ( $className = "${model.name}Xpp3Reader" )
-#foreach ( $class in $model.allClasses )
-  #if ( $class.getMetadata("org.codehaus.modello.plugin.model.ModelClassMetadata").rootElement )
-    #set ( $root = $class )
-  #end
-#end
+#set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
 #set ( $rootTag = $rootXml.tagName )
 #set ( $rootUcapName = $Helper.capitalise( $root.name ) )

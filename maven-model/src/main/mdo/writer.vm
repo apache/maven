@@ -19,11 +19,7 @@
 #set ( $basePackage = "org.apache.maven.api.model" )
 #set ( $package = "org.apache.maven.model.v4" )
 #set ( $className = "MavenXpp3Writer" )
-#foreach ( $class in $model.allClasses )
-  #if ( $class.getMetadata("org.codehaus.modello.plugin.model.ModelClassMetadata").rootElement )
-    #set ( $root = $class )
-  #end
-#end
+#set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
 #set ( $rootTag = $rootXml.tagName )
 #set ( $rootUcapName = $Helper.capitalise( $root.name ) )
