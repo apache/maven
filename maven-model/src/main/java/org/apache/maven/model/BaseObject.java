@@ -64,5 +64,8 @@ public abstract class BaseObject
         }
     }
 
-    protected abstract void replace( Object oldDelegate, Object newDelegate );
+    protected boolean replace( Object oldDelegate, Object newDelegate )
+    {
+        return false;
+    }
 }

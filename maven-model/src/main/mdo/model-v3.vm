@@ -242,8 +242,12 @@ public class ${class.name}
                         .location( key, location.toApiLocation() ).build() );
     }
 
-    protected void replace( Object oldDelegate, Object newDelegate )
+    protected boolean replace( Object oldDelegate, Object newDelegate )
     {
+        if ( super.replace( oldDelegate, newDelegate ) )
+        {
+            return true;
+        }
     #foreach ( $field in $class.getFields($version) )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
@@ -251,10 +255,19 @@ public class ${class.name}
         if ( oldDelegate == getDelegate().get${cap}() )
         {
             update( getDelegate().with${cap}( ( org.apache.maven.api.model.${field.to} ) newDelegate ) );
-            return;
+            return true;
+        }
+      #elseif ( $field.type == "java.util.List" && $field.to != "String" )
+        if ( getDelegate().get${cap}().contains( oldDelegate ) )
+        {
+            List<org.apache.maven.api.model.${field.to}> list = new ArrayList<>( getDelegate().get${cap}() );
+            list.replaceAll( d -> d == oldDelegate ? ( org.apache.maven.api.model.${field.to} ) newDelegate : d );
+            update( getDelegate().with${cap}( list ) );
+            return true;
         }
       #end
     #end
+        return false;
     }
 
     public static List<org.apache.maven.api.model.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
