@@ -13,11 +13,15 @@
   <version>1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <properties>
+    <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>${maven-enforcer-plugin.version}</version>
         <executions>
           <execution>
             <inherited>false</inherited>
@@ -36,4 +40,16 @@
     </plugins>
   </build>
 
+  <!-- JDK 7 require older version of enforcer -->
+  <profiles>
+    <profile>
+      <id>jdk7</id>
+      <activation>
+        <jdk>(,1.8)</jdk>
+      </activation>
+      <properties>
+        <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
+      </properties>
+    </profile>
+  </profiles>
 </project>
