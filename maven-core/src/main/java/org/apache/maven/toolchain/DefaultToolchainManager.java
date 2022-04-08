@@ -32,7 +32,7 @@ import javax.inject.Singleton;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,8 +89,7 @@ public class DefaultToolchainManager
     @Override
     public List<Toolchain> getToolchains( MavenSession session, String type, Map<String, String> requirements )
     {
-        List<ToolchainModel> models = org.apache.maven.toolchain.model.ToolchainModel.toolchainModelToApiV4(
-                session.getRequest().getToolchains().get( type ) );
+        List<ToolchainModel> models = session.getRequest().getToolchains().get( type );
 
         return selectToolchains( models, type, requirements );
     }
@@ -115,9 +114,7 @@ public class DefaultToolchainManager
                 {
                     try
                     {
-                        org.apache.maven.toolchain.model.ToolchainModel tm =
-                                new org.apache.maven.toolchain.model.ToolchainModel( model );
-                        ToolchainPrivate toolchain = fact.createToolchain( tm );
+                        ToolchainPrivate toolchain = fact.createToolchain( model );
                         if ( requirements == null || toolchain.matchesRequirements( requirements ) )
                         {
                             toolchains.add( toolchain );
