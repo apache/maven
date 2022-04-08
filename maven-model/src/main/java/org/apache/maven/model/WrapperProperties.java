@@ -320,19 +320,19 @@ class WrapperProperties extends Properties
     @Override
     public void save( OutputStream out, String comments )
     {
-        throw new UnsupportedOperationException();
+        getter.get().save( out, comments );
     }
 
     @Override
     public void store( Writer writer, String comments ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        getter.get().store( writer, comments );
     }
 
     @Override
     public void store( OutputStream out, String comments ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        getter.get().store( out, comments );
     }
 
     @Override
@@ -344,13 +344,13 @@ class WrapperProperties extends Properties
     @Override
     public void storeToXML( OutputStream os, String comment ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        getter.get().storeToXML( os, comment );
     }
 
     @Override
     public void storeToXML( OutputStream os, String comment, String encoding ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        getter.get().storeToXML( os, comment, encoding );
     }
 
 }
