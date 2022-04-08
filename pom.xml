@@ -65,7 +65,7 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>2.0.0</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.7.2</resolverVersion>
+    <resolverVersion>1.7.3</resolverVersion>
     <slf4jVersion>1.7.32</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -340,7 +340,6 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
-        <classifier>shaded</classifier>
       </dependency>
       <!--  Repository -->
       <dependency>
@@ -366,6 +365,16 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-file</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-http</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
       <dependency>
