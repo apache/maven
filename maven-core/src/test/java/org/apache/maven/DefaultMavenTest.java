@@ -20,23 +20,42 @@ package org.apache.maven;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultMavenTest
-    extends AbstractCoreMavenComponentTestCase
+        extends AbstractCoreMavenComponentTestCase
 {
+    @Singleton
+    @Named( "WsrClassCatcher" )
+    private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant
+    {
+        private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>( null );
+
+        @Override
+        public void afterProjectsRead( MavenSession session ) throws MavenExecutionException
+        {
+            wsrClassRef.set( session.getRepositorySession().getWorkspaceReader().getClass() );
+        }
+    }
 
     @Inject
     private Maven maven;
@@ -47,6 +66,21 @@ public class DefaultMavenTest
         return "src/test/projects/default-maven";
     }
 
+    @Test
+    public void testEnsureResolverSessionHasMavenWorkspaceReader()
+            throws Exception
+    {
+        WsrClassCatcher wsrClassCatcher = ( WsrClassCatcher ) getContainer()
+                .lookup( AbstractMavenLifecycleParticipant.class, "WsrClassCatcher" );
+        Maven maven = getContainer().lookup( Maven.class );
+        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "simple" ) ).setGoals( asList("validate") );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
+        assertNotNull( wsrClass, "wsr cannot be null" );
+        assertTrue( MavenWorkspaceReader.class.isAssignableFrom( wsrClass ), String.valueOf( wsrClass ) );
+    }
 
     @Test
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
