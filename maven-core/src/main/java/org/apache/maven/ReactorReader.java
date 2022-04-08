@@ -80,7 +80,7 @@ class ReactorReader
     {
         this.session = session;
         this.projectsByGAV =
-                session.getAllProjects().stream()
+                session.getProjects().stream()
                         .collect( toMap( projectIntoKey, identity() ) );
 
         this.projectsByGA = projectsByGAV.values().stream()
