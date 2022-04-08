@@ -57,7 +57,7 @@ public class MavenSettingsMerger
 
         recessive.setSourceLevel( recessiveSourceLevel );
 
-        Settings.Builder merged = Settings.newBuilder();
+        Settings.Builder merged = Settings.newBuilder( dominant );
 
         List<String> dominantActiveProfiles = dominant.getActiveProfiles();
         List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
