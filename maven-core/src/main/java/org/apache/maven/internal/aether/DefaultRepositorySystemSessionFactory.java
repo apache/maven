@@ -244,13 +244,13 @@ public class DefaultRepositorySystemSessionFactory
         String transport = request.getUserProperties().getProperty( MAVEN_TRANSPORT_KEY, MAVEN_TRANSPORT_WAGON );
         if ( MAVEN_TRANSPORT_RESOLVER.equals( transport ) )
         {
-            // Is not needed, as resolver prefers native transport if both present
+            // Make sure (whatever extra priority is set) that resolver native is selected
             configProps.put( RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
             configProps.put( RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
         else if ( MAVEN_TRANSPORT_WAGON.equals( transport ) )
         {
-            // is needed, as resolver prefers native transport if both present
+            // Make sure (whatever extra priority is set) that wagon is selected
             configProps.put( WAGON_TRANSPORTER_KEY_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
         else if ( !MAVEN_TRANSPORT_AUTO.equals( transport ) )
