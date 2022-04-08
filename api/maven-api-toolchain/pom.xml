@@ -78,7 +78,7 @@ under the License.
                         <template>src/main/mdo/model.vm</template>
                     </templates>
                     <params>
-                        <param>basePackage=org.apache.maven.api.toolchain</param>
+                        <param>packageModelV4=org.apache.maven.api.toolchain</param>
                     </params>
                 </configuration>
                 <executions>

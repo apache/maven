@@ -87,7 +87,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
-import org.apache.maven.model.v4.ModelMerger;
+import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -106,7 +106,7 @@ import static org.apache.maven.model.building.Result.newResult;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
-    private final ModelMerger modelMerger = new FileToRawModelMerger();
+    private final MavenMerger mavenMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -993,7 +993,7 @@ public class DefaultModelBuilder
                 // rawModel with locationTrackers, required for proper feedback during validations
 
                 // Apply enriched data
-                rawModel = modelMerger.merge( rawModel, transformedFileModel, false, null );
+                rawModel = mavenMerger.merge( rawModel, transformedFileModel, false, null );
             }
             catch ( IOException e )
             {

@@ -24,7 +24,7 @@ import java.util.Arrays;
 import org.apache.maven.api.model.Contributor;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.v4.ModelMerger;
+import org.apache.maven.model.v4.MavenMerger;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,14 +32,14 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 /**
- * ModelMerger is based on same instances, subclasses should override KeyComputer per type
+ * MavenMerger is based on same instances, subclasses should override KeyComputer per type
  *
  * @author Robert Scholte
  *
  */
-public class ModelMergerTest
+public class MavenMergerTest
 {
-    private ModelMerger modelMerger = new ModelMerger();
+    private MavenMerger mavenMerger = new MavenMerger();
 
     @Test
     public void mergeArtifactId()
@@ -48,10 +48,10 @@ public class ModelMergerTest
 
         Model source = Model.newBuilder().artifactId( "SOURCE" ).build();
 
-        Model merged = modelMerger.merge( target, source, true, null );
+        Model merged = mavenMerger.merge( target, source, true, null );
         assertThat( merged.getArtifactId(), is( "SOURCE" ) );
 
-        merged = modelMerger.merge( target, source, false, null );
+        merged = mavenMerger.merge( target, source, false, null );
         assertThat( merged.getArtifactId(), is( "TARGET" ) );
     }
 
@@ -64,7 +64,7 @@ public class ModelMergerTest
 
         Model source = Model.newBuilder().contributors( Arrays.asList( contributor ) ).build();
 
-        Model merged = modelMerger.merge( target, source, true, null );
+        Model merged = mavenMerger.merge( target, source, true, null );
 
         assertThat( merged.getContributors(), contains( contributor ) );
     }
@@ -78,7 +78,7 @@ public class ModelMergerTest
 
         Model source = Model.newBuilder().dependencies( Arrays.asList( dependency ) ).build();
 
-        Model merged = modelMerger.merge( target, source, true, null );
+        Model merged = mavenMerger.merge( target, source, true, null );
 
         assertThat( merged.getDependencies(), contains( dependency ) );
     }
@@ -420,7 +420,7 @@ public class ModelMergerTest
         source.setLicenses(new ArrayList<License>());
         source.getLicenses().add(lic2);
 
-        new ModelMerger().mergeModel(target, source, false, null);
+        new MavenMerger().mergeModel(target, source, false, null);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);

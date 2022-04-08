@@ -16,6 +16,7 @@
   specific language governing permissions and limitations
   under the License.
 *#
+#parse ( "src/main/mdo/common.vm" )
 #
 #set ( $package = "${packageToolV4}" )
 #set ( $className = "${model.name}Xpp3Reader" )
@@ -62,13 +63,7 @@ public class ${className}
 
     public ${className}()
     {
-        this( new ContentTransformer()
-        {
-            public String transform( String source, String fieldName )
-            {
-                return source;
-            }
-        } );
+        this( ( s, f ) -> s );
     }
 
     public ${className}( ContentTransformer contentTransformer )

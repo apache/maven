@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.model.v4.ModelMerger;
+import org.apache.maven.model.v4.MavenMerger;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,7 +42,7 @@ public class FileToRawModelMergerTest
     public void testOverriddenMergeMethods()
     {
         List<String> methodNames =
-            Stream.of( ModelMerger.class.getDeclaredMethods() )
+            Stream.of( MavenMerger.class.getDeclaredMethods() )
                 .filter( m -> m.getName().startsWith( "merge" ) )
                 .filter( m ->
                     {

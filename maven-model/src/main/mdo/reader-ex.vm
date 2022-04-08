@@ -16,9 +16,10 @@
   specific language governing permissions and limitations
   under the License.
 *#
+#parse ( "src/main/mdo/common.vm" )
 #
 #set ( $package = "${packageToolV4}" )
-#set ( $className = "MavenXpp3ReaderEx" )
+#set ( $className = "${model.name}Xpp3ReaderEx" )
 #
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )

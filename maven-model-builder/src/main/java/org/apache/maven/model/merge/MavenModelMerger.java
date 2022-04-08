@@ -46,7 +46,7 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.RepositoryBase;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.model.Site;
-import org.apache.maven.model.v4.ModelMerger;
+import org.apache.maven.model.v4.MavenMerger;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -56,7 +56,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Benjamin Bentmann
  */
 public class MavenModelMerger
-        extends ModelMerger
+        extends MavenMerger
 {
 
     /**

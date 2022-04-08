@@ -35,7 +35,7 @@ import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.Reporting;
-import org.apache.maven.model.v4.ModelMerger;
+import org.apache.maven.model.v4.MavenMerger;
 
 /**
  * As long as Maven controls the BuildPomXMLFilter, the entities that need merging are known.
@@ -44,7 +44,7 @@ import org.apache.maven.model.v4.ModelMerger;
  * @author Robert Scholte
  * @since 4.0.0
  */
-class FileToRawModelMerger extends ModelMerger
+class FileToRawModelMerger extends MavenMerger
 {
 
     @Override

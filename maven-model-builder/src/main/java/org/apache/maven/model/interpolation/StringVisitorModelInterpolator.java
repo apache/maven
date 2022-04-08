@@ -34,7 +34,7 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.apache.maven.model.v4.ModelTransformer;
+import org.apache.maven.model.v4.MavenTransformer;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -75,7 +75,7 @@ public class StringVisitorModelInterpolator
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
 
-        return new ModelTransformer( innerInterpolator::interpolate ).visit( model );
+        return new MavenTransformer( innerInterpolator::interpolate ).visit( model );
     }
 
     private InnerInterpolator createInterpolator( List<? extends ValueSource> valueSources,

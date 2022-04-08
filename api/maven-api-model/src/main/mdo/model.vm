@@ -16,18 +16,9 @@
   specific language governing permissions and limitations
   under the License.
 *#
-##
-## The following loop code is required in order to change the type of the
-## pomFile attribute to a java.nio.file.Path.  Modello does not support this
-## type and loading a model with such a type would fail the modello validation.
-##
-#foreach ( $field in $model.getClass("Model", $version).allFields )
-  #if ( $field.name == "pomFile" )
-    #set ( $dummy = $field.setType("java.nio.file.Path") )
-  #end
-#end
+#parse ( "src/main/mdo/common.vm" )
 #
-#set ( $package = "${basePackage}" )
+#set ( $package = "${packageModelV4}" )
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
@@ -35,9 +26,9 @@
   #set ( $inheritedFields = [] )
   #foreach ( $cl in $ancestors )
     #if ( $cl != $class )
-      #set ( $dummy = $inheritedFields.addAll( $cl.allFields ) )
+      #set ( $dummy = $inheritedFields.addAll( $cl.getFields($version) ) )
     #end
-    #set ( $dummy = $allFields.addAll( $cl.allFields ) )
+    #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
   #end
   #set ( $className = "${class.name}" )
 #MODELLO-VELOCITY#REDIRECT ${package.replace('.','/')}/${className}.java
@@ -94,26 +85,30 @@
 // ==============================================================
 package ${package};
 
-  #foreach ( $imp in $imports )
+    #foreach ( $imp in $imports )
 import $imp;
-  #end
+    #end
 
 /**
-#foreach ( $line in ${class.description.trim().split("\n")} )
+    #foreach ( $line in ${class.description.trim().split("\n")} )
  * ${line.trim()}
-#end
+    #end
  */
 @Generated @ThreadSafe @Immutable
 public class ${class.name}
     #if ( $class.superClass )
     extends ${class.superClass}
     #end
+    #if ( $locationTracking )
     implements Serializable, InputLocationTracker
+    #else
+    implements Serializable
+    #end
 {
     #if ( $class == $root )
     final String modelEncoding;
     #end
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
     /**
       #foreach ( $line in ${field.description.trim().split("\n")} )
@@ -122,17 +117,19 @@ public class ${class.name}
      */
     final ${type} $field.name;
     #end
-    #if ( ! $class.superClass )
+    #if ( $locationTracking )
+      #if ( ! $class.superClass )
     /** Location of the xml element for this object. */
     final InputLocation location;
-    #end
-    #foreach ( $field in $class.allFields )
+      #end
+      #foreach ( $field in $class.getFields($version) )
     /** Location of the xml element for the field ${field.name}. */
     final InputLocation ${field.name}Location;
-    #end
-    #if ( ! $class.superClass )
+      #end
+      #if ( ! $class.superClass )
     /** Other locations */
     final Map<Object, InputLocation> locations;
+      #end
     #end
 
     /**
@@ -144,57 +141,57 @@ public class ${class.name}
         String modelEncoding,
     #end
     #foreach ( $field in $allFields )
+      #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
       #if ( $type.startsWith("List<") )
         #set ( $type = ${type.replace('List<','Collection<')} )
       #end
-        $type $field.name,
+        $type $field.name${sep}
     #end
+    #if ( $locationTracking )
         Map<Object, InputLocation> locations,
         InputLocation location,
-    #foreach ( $field in $allFields )
-      #if ( $field == ${allFields[${allFields.size()} - 1]} )
-        #set ( $sep = "" )
-      #else
-        #set ( $sep = "," )
-      #end
+      #foreach ( $field in $allFields )
+        #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
         InputLocation ${field.name}Location${sep}
+      #end
     #end
     )
     {
     #if ( $class.superClass )
         super(
       #foreach ( $field in $inheritedFields )
-            ${field.name},
+        #set ( $sep = "#if(${locationTracking}||$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
+            ${field.name}${sep}
       #end
+      #if ( $locationTracking )
             locations,
             location,
-      #foreach ( $field in $inheritedFields )
-        #if ( $field == ${inheritedFields[${inheritedFields.size()} - 1]} )
-          #set ( $sep = "" )
-        #else
-          #set ( $sep = "," )
-        #end
+        #foreach ( $field in $inheritedFields )
+          #set ( $sep = "#if(${locationTracking}&&$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
             ${field.name}Location${sep}
+        #end
       #end
         );
     #end
     #if ( $class == $root )
         this.modelEncoding = modelEncoding;
     #end
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
         this.${field.name} = ImmutableCollections.copy( ${field.name} );
       #else
         this.${field.name} = ${field.name};
       #end
     #end
-    #if ( ! $class.superClass )
+    #if ( $locationTracking )
+      #if ( ! $class.superClass )
         this.locations = ImmutableCollections.copy( locations );
         this.location = location;
-    #end
-    #foreach ( $field in $class.allFields )
+      #end
+      #foreach ( $field in $class.getFields($version) )
         this.${field.name}Location = ${field.name}Location;
+      #end
     #end
     }
 
@@ -228,7 +225,7 @@ public class ${class.name}
     }
 
     #end
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
       #if ( $type == "boolean" || $type == "Boolean" )
@@ -251,6 +248,7 @@ public class ${class.name}
     }
 
     #end
+    #if ( $locationTracking )
     /**
      * Gets the location of the specified field in the input source.
      */
@@ -260,23 +258,24 @@ public class ${class.name}
         {
             switch ( ( String ) key )
             {
-    #if ( ! $class.superClass )
+      #if ( ! $class.superClass )
                 case "":
                     return location;
-    #end
-    #foreach ( $field in $class.allFields )
+      #end
+      #foreach ( $field in $class.getFields($version) )
                 case "${field.name}":
                     return ${field.name}Location;
-    #end
+      #end
             }
         }
-    #if ( $class.superClass )
+      #if ( $class.superClass )
         return super.getLocation( key );
-    #else
+      #else
         return locations != null ? locations.get( key ) : null;
-    #end
+      #end
     }
 
+    #end
     /**
      * Creates a new builder with this object as the basis.
      */
@@ -374,7 +373,7 @@ public class ${class.name}
     #if ( $class == $root )
         String modelEncoding;
     #end
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
       #if ( $type.startsWith("List<") )
         #set ( $type = ${type.replace('List<','Collection<')} )
@@ -387,7 +386,7 @@ public class ${class.name}
         ${type} ${field.name};
     #end
     #end
-    #if ( ! $class.superClass )
+    #if ( ! $class.superClass && $locationTracking )
         Map<Object, InputLocation> locations;
     #end
 
@@ -398,7 +397,7 @@ public class ${class.name}
     #end
             if ( withDefaults )
             {
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
       #if ( $field.defaultValue )
         #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
         #if ( $field.type == "String" )
@@ -418,7 +417,7 @@ public class ${class.name}
     #end
             if ( forceCopy )
             {
-    #foreach ( $field in $class.allFields )
+    #foreach ( $field in $class.getFields($version) )
                 this.${field.name} = base.${field.name};
     #end
             }
@@ -451,6 +450,7 @@ public class ${class.name}
 
     #end
 
+    #if ( $locationTracking )
         @Nonnull
         public Builder location( Object key, InputLocation location )
         {
@@ -465,6 +465,7 @@ public class ${class.name}
             return this;
         }
 
+    #end
         @Nonnull
         public ${class.name} build()
         {
@@ -476,31 +477,32 @@ public class ${class.name}
             {
                 return base;
             }
+    #if ( $locationTracking )
             Map<Object, InputLocation> locations = new HashMap<>( this.locations != null ? this.locations : ( base != null ? base.locations : Collections.emptyMap() ) );
             InputLocation location = locations.remove( "" );
-    #foreach ( $field in $allFields )
+      #foreach ( $field in $allFields )
             InputLocation ${field.name}Location = locations.remove( "${field.name}" );
+      #end
     #end
             return new ${class.name}(
     #if ( $class == $root )
                 modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : null ),
     #end
     #foreach ( $field in $allFields )
+      #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )
       #if ( $field.type == "boolean" || $field.type == "int" )
-                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : ${field.defaultValue} ),
+                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : ${field.defaultValue} )${sep}
       #else
-                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null ),
+                ${field.name} != null ? ${field.name} : ( base != null ? base.${field.name} : null )${sep}
       #end
     #end
+    #if ( $locationTracking )
                 locations,
                 location != null ? location : ( base != null ? base.location : null ),
-    #foreach ( $field in $allFields )
-      #if ( $field == ${allFields[${allFields.size()} - 1]} )
-        #set ( $sep = "" )
-      #else
-        #set ( $sep = "," )
-      #end
+      #foreach ( $field in $allFields )
+        #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
                 ${field.name}Location != null ? ${field.name}Location : ( base != null ? base.${field.name}Location : null )${sep}
+      #end
     #end
             );
         }
