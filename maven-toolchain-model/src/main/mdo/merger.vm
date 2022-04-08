@@ -123,10 +123,10 @@ public class ${className}
         builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, e -> e ) );
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
         Properties src = source.get${capField}();
-        if ( src != null )
+        if ( !src.isEmpty() )
         {
             Properties tgt = target.get${capField}();
-            if ( tgt == null )
+            if ( tgt.isEmpty() )
             {
                 builder.${field.name}( src );
         #if ( $locationTracking )
