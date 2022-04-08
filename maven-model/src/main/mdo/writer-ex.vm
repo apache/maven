@@ -48,11 +48,14 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
-import org.apache.maven.api.model.InputLocationTracker;
+import ${packageModelV4}.InputLocation;
+import ${packageModelV4}.InputLocationTracker;
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.internal.xml.DomBuilder;
 #foreach ( $class in $model.allClasses )
+  #if ( $class.name != "InputLocation" )
 import ${packageModelV4}.${class.name};
+  #end
 #end
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;

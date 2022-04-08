@@ -63,10 +63,10 @@ public class ${className}
     /**
      * Transforms the given model
      */
-    public Model visit( Model target )
+    public ${root.name} visit( ${root.name} target )
     {
         Objects.requireNonNull( target, "target cannot be null" );
-        return transformModel( target );
+        return transform${root.name}( target );
     }
 
     /**

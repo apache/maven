@@ -47,6 +47,8 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.internal.xml.DomBuilder;
+import ${packageModelV4}.InputSource;
+import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
@@ -101,15 +103,15 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return Model
+     * @return ${root.name}
      */
-    public Model read( Reader reader, boolean strict, InputSource source )
+    public ${root.name} read( Reader reader, boolean strict, InputSource source )
         throws IOException, XmlPullParserException
     {
         XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser( );
         parser.setInput( reader );
         return read( parser, strict, source );
-    } //-- Model read( Reader, boolean )
+    } //-- ${root.name} read( Reader, boolean )
 
     /**
      * Method read.
@@ -119,13 +121,13 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return Model
+     * @return ${root.name}
      */
-    public Model read( InputStream in, boolean strict, InputSource source )
+    public ${root.name} read( InputStream in, boolean strict, InputSource source )
         throws IOException, XmlPullParserException
     {
         return read( ReaderFactory.newXmlReader( in ), strict, source );
-    } //-- Model read( InputStream, boolean )
+    } //-- ${root.name} read( InputStream, boolean )
 
     /**
      * Method read.
@@ -135,9 +137,9 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return Model
+     * @return ${root.name}
      */
-    public Model read( XmlPullParser parser, boolean strict, InputSource source )
+    public ${root.name} read( XmlPullParser parser, boolean strict, InputSource source )
         throws IOException, XmlPullParserException
     {
         $rootUcapName $rootLcapName = null;
@@ -166,7 +168,7 @@ public class ${className}
             return $rootLcapName;
         }
         throw new XmlPullParserException( "Expected root element '${rootTag}' but found no element at all: invalid XML document", parser, null );
-    } //-- Model read( XmlPullParser, boolean )
+    } //-- ${root.name} read( XmlPullParser, boolean )
 
 #foreach ( $class in $model.allClasses )
  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
@@ -207,7 +209,7 @@ public class ${className}
       #if ( $field.type == "String" )
                 ${classLcapName}.${field.name}( interpolatedTrimmed( value, "$fieldTagName" ) );
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, "${field.defaultValue}" ) );
+                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, strict, "${field.defaultValue}" ) );
       #else
                 // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -246,10 +248,10 @@ public class ${className}
                     ${classLcapName}.${field.name}( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
                     break;
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
+                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, ${field.defaultValue} ) );
                     break;
       #elseif ( $field.type == "int" )
-                    ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
+                    ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, strict, ${field.defaultValue} ) );
                     break;
       #elseif ( $field.type == "DOM" )
                     ${classLcapName}.${field.name}( DomBuilder.build( parser, true ) );
@@ -447,6 +449,16 @@ public class ${className}
         return eventType;
     } //-- int nextTag( XmlPullParser )
 
+#foreach ( $class in $model.allClasses )
+  #foreach ( $field in $class.getFields($version) )
+    #if ( $field.type == "boolean" || $field.type == "Boolean" )
+      #set ( $hasBooleanField = true )
+    #elseif ( $field.type == "int" || $field.type == "Integer" )
+      #set ( $hasIntegerField = true )
+    #end
+  #end
+#end
+#if ( $hasBooleanField )
     /**
      * Method getBooleanValue.
      *
@@ -458,214 +470,18 @@ public class ${className}
      * any.
      * @return boolean
      */
-    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser, String defaultValue )
+    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser, boolean defaultValue )
         throws XmlPullParserException
     {
         if ( s != null && s.length() != 0 )
         {
             return Boolean.valueOf( s ).booleanValue();
         }
-        if ( defaultValue != null )
-        {
-            return Boolean.valueOf( defaultValue ).booleanValue();
-        }
-        return false;
+        return defaultValue;
     } //-- boolean getBooleanValue( String, String, XmlPullParser, String )
 
-#if ( "0" == "1" )
-    /**
-     * Method getBooleanValue.
-     *
-     * @param s a s object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return boolean
-     */
-    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser )
-        throws XmlPullParserException
-    {
-        return getBooleanValue( s, attribute, parser, null );
-    } //-- boolean getBooleanValue( String, String, XmlPullParser )
-
-    /**
-     * Method getByteValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return byte
-     */
-    private byte getByteValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            try
-            {
-                return Byte.valueOf( s ).byteValue();
-            }
-            catch ( NumberFormatException nfe )
-            {
-                if ( strict )
-                {
-                    throw new XmlPullParserException( "Unable to parse element '" + attribute + "', must be a byte", parser, nfe );
-                }
-            }
-        }
-        return 0;
-    } //-- byte getByteValue( String, String, XmlPullParser, boolean )
-
-    /**
-     * Method getCharacterValue.
-     *
-     * @param s a s object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return char
-     */
-    private char getCharacterValue( String s, String attribute, XmlPullParser parser )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            return s.charAt( 0 );
-        }
-        return 0;
-    } //-- char getCharacterValue( String, String, XmlPullParser )
-
-    /**
-     * Method getDateValue.
-     *
-     * @param s a s object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Date
-     */
-    private Date getDateValue( String s, String attribute, XmlPullParser parser )
-        throws XmlPullParserException
-    {
-        return getDateValue( s, attribute, null, parser );
-    } //-- Date getDateValue( String, String, XmlPullParser )
-
-    /**
-     * Method getDateValue.
-     *
-     * @param s a s object.
-     * @param parser a parser object.
-     * @param dateFormat a dateFormat object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Date
-     */
-    private Date getDateValue( String s, String attribute, String dateFormat, XmlPullParser parser )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            String effectiveDateFormat = dateFormat;
-            if ( dateFormat == null )
-            {
-                effectiveDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-            }
-            if ( "long".equals( effectiveDateFormat ) )
-            {
-                try
-                {
-                    return new java.util.Date( Long.parseLong( s ) );
-                }
-                catch ( NumberFormatException e )
-                {
-                    throw new XmlPullParserException( e.getMessage(), parser, e );
-                }
-            }
-            else
-            {
-                try
-                {
-                    DateFormat dateParser = new java.text.SimpleDateFormat( effectiveDateFormat, java.util.Locale.US );
-                    return dateParser.parse( s );
-                }
-                catch ( java.text.ParseException e )
-                {
-                    throw new XmlPullParserException( e.getMessage(), parser, e );
-                }
-            }
-        }
-        return null;
-    } //-- Date getDateValue( String, String, String, XmlPullParser )
-
-    /**
-     * Method getDoubleValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return double
-     */
-    private double getDoubleValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            try
-            {
-                return Double.valueOf( s ).doubleValue();
-            }
-            catch ( NumberFormatException nfe )
-            {
-                if ( strict )
-                {
-                    throw new XmlPullParserException( "Unable to parse element '" + attribute + "', must be a floating point number", parser, nfe );
-                }
-            }
-        }
-        return 0;
-    } //-- double getDoubleValue( String, String, XmlPullParser, boolean )
-
-    /**
-     * Method getFloatValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return float
-     */
-    private float getFloatValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            try
-            {
-                return Float.valueOf( s ).floatValue();
-            }
-            catch ( NumberFormatException nfe )
-            {
-                if ( strict )
-                {
-                    throw new XmlPullParserException( "Unable to parse element '" + attribute + "', must be a floating point number", parser, nfe );
-                }
-            }
-        }
-        return 0;
-    } //-- float getFloatValue( String, String, XmlPullParser, boolean )
-
+#end
+#if ( $hasIntegerField )
     /**
      * Method getIntegerValue.
      *
@@ -677,7 +493,7 @@ public class ${className}
      * any.
      * @return int
      */
-    private int getIntegerValue( String s, String attribute, XmlPullParser parser, boolean strict )
+    private int getIntegerValue( String s, String attribute, XmlPullParser parser, boolean strict, int defaultValue )
         throws XmlPullParserException
     {
         if ( s != null )
@@ -694,97 +510,10 @@ public class ${className}
                 }
             }
         }
-        return 0;
+        return defaultValue;
     } //-- int getIntegerValue( String, String, XmlPullParser, boolean )
 
-    /**
-     * Method getLongValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return long
-     */
-    private long getLongValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            try
-            {
-                return Long.valueOf( s ).longValue();
-            }
-            catch ( NumberFormatException nfe )
-            {
-                if ( strict )
-                {
-                    throw new XmlPullParserException( "Unable to parse element '" + attribute + "', must be a long integer", parser, nfe );
-                }
-            }
-        }
-        return 0;
-    } //-- long getLongValue( String, String, XmlPullParser, boolean )
-
-    /**
-     * Method getRequiredAttributeValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return String
-     */
-    private String getRequiredAttributeValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s == null )
-        {
-            if ( strict )
-            {
-                throw new XmlPullParserException( "Missing required value for attribute '" + attribute + "'", parser, null );
-            }
-        }
-        return s;
-    } //-- String getRequiredAttributeValue( String, String, XmlPullParser, boolean )
-
-    /**
-     * Method getShortValue.
-     *
-     * @param s a s object.
-     * @param strict a strict object.
-     * @param parser a parser object.
-     * @param attribute a attribute object.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return short
-     */
-    private short getShortValue( String s, String attribute, XmlPullParser parser, boolean strict )
-        throws XmlPullParserException
-    {
-        if ( s != null )
-        {
-            try
-            {
-                return Short.valueOf( s ).shortValue();
-            }
-            catch ( NumberFormatException nfe )
-            {
-                if ( strict )
-                {
-                    throw new XmlPullParserException( "Unable to parse element '" + attribute + "', must be a short integer", parser, nfe );
-                }
-            }
-        }
-        return 0;
-    } //-- short getShortValue( String, String, XmlPullParser, boolean )
-
 #end
-
     public static interface ContentTransformer
     {
         /**
