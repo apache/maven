@@ -150,7 +150,8 @@ public class ${class.name}
     #end
     #if ( $locationTracking )
         Map<Object, InputLocation> locations,
-        InputLocation location,
+      #set ( $sep = "#if(${allFields.size()}>0),#end" )
+        InputLocation location${sep}
       #foreach ( $field in $allFields )
         #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
         InputLocation ${field.name}Location${sep}
@@ -166,7 +167,8 @@ public class ${class.name}
       #end
       #if ( $locationTracking )
             locations,
-            location,
+        #set ( $sep = "#if(${inheritedFields.size()}>0),#end" )
+            location${sep}
         #foreach ( $field in $inheritedFields )
           #set ( $sep = "#if(${locationTracking}&&$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
             ${field.name}Location${sep}
@@ -498,7 +500,8 @@ public class ${class.name}
     #end
     #if ( $locationTracking )
                 locations,
-                location != null ? location : ( base != null ? base.location : null ),
+      #set ( $sep = "#if(${allFields.size()}>0),#end" )
+                location != null ? location : ( base != null ? base.location : null )${sep}
       #foreach ( $field in $allFields )
         #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
                 ${field.name}Location != null ? ${field.name}Location : ( base != null ? base.${field.name}Location : null )${sep}
