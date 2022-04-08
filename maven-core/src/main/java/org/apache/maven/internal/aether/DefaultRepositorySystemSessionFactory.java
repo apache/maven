@@ -63,6 +63,20 @@ import java.util.Map;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
+    private static final String MAVEN_TRANSPORT_KEY = "maven.transport";
+
+    private static final String MAVEN_TRANSPORT_WAGON = "wagon";
+
+    private static final String MAVEN_TRANSPORT_RESOLVER = "resolver";
+
+    private static final String MAVEN_TRANSPORT_AUTO = "auto";
+
+    private static final String WAGON_TRANSPORTER_KEY_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
+
+    private static final String RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+
+    private static final String RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+
     @Inject
     private Logger logger;
 
@@ -94,6 +108,7 @@ public class DefaultRepositorySystemSessionFactory
     @Inject
     private RuntimeInformation runtimeInformation;
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -223,6 +238,25 @@ public class DefaultRepositorySystemSessionFactory
             configProps.put( "aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions() );
         }
         session.setAuthenticationSelector( authSelector );
+
+        String transport = request.getUserProperties().getProperty( MAVEN_TRANSPORT_KEY, MAVEN_TRANSPORT_WAGON );
+        if ( MAVEN_TRANSPORT_RESOLVER.equals( transport ) )
+        {
+            // Is not needed, as resolver prefers native transport if both present
+            configProps.put( RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY, "100" );
+            configProps.put( RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY, "100" );
+        }
+        else if ( MAVEN_TRANSPORT_WAGON.equals( transport ) )
+        {
+            // is needed, as resolver prefers native transport if both present
+            configProps.put( WAGON_TRANSPORTER_KEY_PRIORITY_KEY, "100" );
+        }
+        else if ( !MAVEN_TRANSPORT_AUTO.equals( transport ) )
+        {
+            throw new IllegalArgumentException( "Unknown maven.transport=" + transport
+                    + ". Supported ones are: " + MAVEN_TRANSPORT_WAGON + ", "
+                    + MAVEN_TRANSPORT_RESOLVER + " and " + MAVEN_TRANSPORT_AUTO );
+        }
 
         session.setTransferListener( request.getTransferListener() );
 
