@@ -2488,7 +2488,35 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0+</version>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public static final String SOURCE_POM = "pom";
+
+    public static final String SOURCE_SETTINGS = "settings.xml";
+
+    public void setSource( String source )
+    {
+        getDelegate().setSource( source );
+    }
+
+    public String getSource()
+    {
+        return getDelegate().getSource();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Profile {id: " + getId() + ", source: " + getSource() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>5.0.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";

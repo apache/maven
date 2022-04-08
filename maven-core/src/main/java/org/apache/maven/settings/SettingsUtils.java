@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.ActivationFile;
-import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.ActivationOS;
 import org.apache.maven.api.settings.ActivationProperty;
@@ -156,8 +154,6 @@ public final class SettingsUtils
 
         profile.id( settingsProfile.getId() );
 
-        profile.location( "", new InputLocation( new InputSource( "settings.xml", null ) ) );
-
         Activation settingsActivation = settingsProfile.getActivation();
 
         if ( settingsActivation != null )
@@ -219,7 +215,9 @@ public final class SettingsUtils
                     .collect( Collectors.toList() ) );
         }
 
-        return new org.apache.maven.model.Profile( profile.build() );
+        org.apache.maven.model.Profile value = new org.apache.maven.model.Profile( profile.build() );
+        value.setSource( "settings.xml" );
+        return value;
     }
 
     /**
