@@ -390,6 +390,16 @@ public class MavenModelMerger
     }
 
     @Override
+    protected void mergeDistributionManagement_Relocation( DistributionManagement.Builder builder,
+                                                           DistributionManagement target,
+                                                           DistributionManagement source,
+                                                           boolean sourceDominant,
+                                                           Map<Object, Object> context )
+    {
+    }
+
+
+    @Override
     protected void mergeDistributionManagement_Repository( DistributionManagement.Builder builder,
                                                            DistributionManagement target,
                                                            DistributionManagement source,
