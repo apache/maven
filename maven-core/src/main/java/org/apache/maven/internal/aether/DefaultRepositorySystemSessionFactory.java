@@ -77,6 +77,8 @@ public class DefaultRepositorySystemSessionFactory
 
     private static final String RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
+    private static final String RESOLVER_MAX_PRIORITY = String.valueOf( Float.MAX_VALUE );
+
     @Inject
     private Logger logger;
 
@@ -243,13 +245,13 @@ public class DefaultRepositorySystemSessionFactory
         if ( MAVEN_TRANSPORT_RESOLVER.equals( transport ) )
         {
             // Is not needed, as resolver prefers native transport if both present
-            configProps.put( RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY, "100" );
-            configProps.put( RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY, "100" );
+            configProps.put( RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+            configProps.put( RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
         else if ( MAVEN_TRANSPORT_WAGON.equals( transport ) )
         {
             // is needed, as resolver prefers native transport if both present
-            configProps.put( WAGON_TRANSPORTER_KEY_PRIORITY_KEY, "100" );
+            configProps.put( WAGON_TRANSPORTER_KEY_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
         else if ( !MAVEN_TRANSPORT_AUTO.equals( transport ) )
         {
