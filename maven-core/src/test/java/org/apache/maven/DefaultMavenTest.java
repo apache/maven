@@ -4,11 +4,15 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.repository.internal.MavenWorkspaceReader;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Arrays.asList;
 
@@ -33,6 +37,31 @@ import static java.util.Arrays.asList;
 public class DefaultMavenTest
     extends AbstractCoreMavenComponentTestCase
 {
+    @Component( role = AbstractMavenLifecycleParticipant.class, hint = "WsrClassCatcher" )
+    private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant
+    {
+        private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>( null );
+
+        @Override
+        public void afterProjectsRead( MavenSession session ) throws MavenExecutionException
+        {
+            wsrClassRef.set( session.getRepositorySession().getWorkspaceReader().getClass() );
+        }
+    }
+
+    public void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception
+    {
+        WsrClassCatcher wsrClassCatcher = ( WsrClassCatcher ) getContainer()
+                .lookup( AbstractMavenLifecycleParticipant.class, "WsrClassCatcher" );
+        Maven maven = getContainer().lookup( Maven.class );
+        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "simple" ) ).setGoals( asList("validate") );
+
+        MavenExecutionResult result = maven.execute( request );
+
+        Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
+        assertTrue( "is null", wsrClass != null );
+        assertTrue( String.valueOf( wsrClass ), MavenWorkspaceReader.class.isAssignableFrom( wsrClass ) );
+    }
 
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
             throws Exception

@@ -40,6 +40,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.Prerequisites;
@@ -58,7 +59,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 
 /**
  * @author Jason van Zyl
@@ -338,9 +338,7 @@ public class DefaultMaven
             }
             workspaceReaders.add( workspaceReader );
         }
-        WorkspaceReader[] readers = workspaceReaders.toArray( new WorkspaceReader[0] );
-        repoSession.setWorkspaceReader( new ChainedWorkspaceReader( readers ) );
-
+        repoSession.setWorkspaceReader( MavenChainedWorkspaceReader.of( workspaceReaders ) );
     }
 
     private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
