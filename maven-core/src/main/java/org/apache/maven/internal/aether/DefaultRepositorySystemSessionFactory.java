@@ -20,6 +20,7 @@ package org.apache.maven.internal.aether;
  */
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,7 +31,6 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.feature.Features;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -51,12 +51,15 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
-import org.eclipse.aether.transform.ArtifactTransformer;
+import org.eclipse.aether.transform.DeployRequestTransformer;
+import org.eclipse.aether.transform.InstallRequestTransformer;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
+import org.eclipse.aether.util.transform.ChainedDeployRequestTransformer;
+import org.eclipse.aether.util.transform.ChainedInstallRequestTransformer;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +88,9 @@ public class DefaultRepositorySystemSessionFactory
 
     private final RuntimeInformation runtimeInformation;
 
-    private final Map<String, ArtifactTransformer> artifactTransformers;
+    private final List<InstallRequestTransformer> installRequestTransformers;
+
+    private final List<DeployRequestTransformer> deployRequestTransformers;
 
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -97,7 +102,8 @@ public class DefaultRepositorySystemSessionFactory
             EventSpyDispatcher eventSpyDispatcher,
             MavenRepositorySystem mavenRepositorySystem,
             RuntimeInformation runtimeInformation,
-            Map<String, ArtifactTransformer> artifactTransformers )
+            List<InstallRequestTransformer> installRequestTransformers,
+            List<DeployRequestTransformer> deployRequestTransformers )
     {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
@@ -107,7 +113,8 @@ public class DefaultRepositorySystemSessionFactory
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
-        this.artifactTransformers = artifactTransformers;
+        this.installRequestTransformers = installRequestTransformers;
+        this.deployRequestTransformers = deployRequestTransformers;
     }
 
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
@@ -254,10 +261,37 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
-        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
+        if ( !installRequestTransformers.isEmpty() )
         {
-            // TODO: this is ugly, we could do it smarter but will do it for now
-            session.setArtifactTransformerManager( a -> artifactTransformers.values() );
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Applying install request transformers (shown in order):" );
+                for ( InstallRequestTransformer transformer : installRequestTransformers )
+                {
+                    logger.debug( " * {}", transformer.getClass() );
+                }
+                logger.debug( "" );
+            }
+            session.getData().set(
+                    InstallRequestTransformer.KEY,
+                    new ChainedInstallRequestTransformer( installRequestTransformers )
+            );
+        }
+        if ( !deployRequestTransformers.isEmpty() )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Applying deploy request transformers (shown in order):" );
+                for ( DeployRequestTransformer transformer : deployRequestTransformers )
+                {
+                    logger.debug( " * {}", transformer.getClass() );
+                }
+                logger.debug( "" );
+            }
+            session.getData().set(
+                    DeployRequestTransformer.KEY,
+                    new ChainedDeployRequestTransformer( deployRequestTransformers )
+            );
         }
 
         return session;
