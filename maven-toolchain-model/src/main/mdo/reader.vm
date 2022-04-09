@@ -819,6 +819,9 @@ public class ${className}
         ${classLcapName}.${field.name}( ${field.name} );
     #end
   #end
+  #if ( $class == $root )
+        ${classLcapName}.modelEncoding( parser.getInputEncoding() );
+  #end
         return ${classLcapName}.build();
     }
 

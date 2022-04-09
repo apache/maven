@@ -52,7 +52,7 @@ public abstract class BaseObject
         this.parent = parent;
     }
 
-    protected void update( Object newDelegate )
+    public void update( Object newDelegate )
     {
         if ( delegate != newDelegate )
         {

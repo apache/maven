@@ -174,12 +174,12 @@ public class ${class.name}
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         return new WrapperList<${field.to}, org.apache.maven.api.model.${field.to}>(
-                    getDelegate()::get${cap}, l -> update( getDelegate().with${cap}( l ) ),
+                    () -> getDelegate().get${cap}(), l -> update( getDelegate().with${cap}( l ) ),
                     d -> new ${field.to}( d, this ), ${field.to}::getDelegate );
       #elseif ( $field.to == "String" && $field.type == "java.util.Properties" && $field.multiplicity == "*" )
-        return new WrapperProperties( getDelegate()::get${cap}, this::set${cap} );
+        return new WrapperProperties( () -> getDelegate().get${cap}(), this::set${cap} );
       #elseif ( $field.to == "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        return new WrapperList<String, ${field.to}>( getDelegate()::get${cap}, this::set${cap}, s -> s, s -> s );
+        return new WrapperList<String, ${field.to}>( () -> getDelegate().get${cap}(), this::set${cap}, s -> s, s -> s );
       #elseif ( $field.to )
         return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}(), this ) : null;
       #elseif ( $field.type == "DOM" )

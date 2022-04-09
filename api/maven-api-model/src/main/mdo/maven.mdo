@@ -377,7 +377,12 @@
 
     public void setPomFile( java.io.File pomFile )
     {
-        delegate = getDelegate().withPomFile( pomFile.toPath() );
+        update( getDelegate().withPomFile( pomFile != null ? pomFile.toPath() : null ) );
+    }
+
+    public void setModelEncoding( String modelEncoding )
+    {
+        update( getDelegate().with().modelEncoding( modelEncoding ).build() );
     }
 
     /**

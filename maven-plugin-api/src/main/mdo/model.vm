@@ -486,7 +486,7 @@ public class ${class.name}
     #end
             return new ${class.name}(
     #if ( $class == $root )
-                modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : null ),
+                modelEncoding != null ? modelEncoding : ( base != null ? base.modelEncoding : "UTF-8" ),
     #end
     #foreach ( $field in $allFields )
       #set ( $sep = "#if(${locationTracking}||$field!=${allFields[${allFields.size()} - 1]}),#end" )

@@ -319,6 +319,9 @@ public class ${className}
             }
             ${classLcapName}.location( childName, new InputLocation( line, column, source, locations ) );
         }
+  #if ( $class == $root )
+        ${classLcapName}.modelEncoding( parser.getInputEncoding() );
+  #end
         return ${classLcapName}.build();
     }
 

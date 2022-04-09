@@ -338,6 +338,9 @@ public class ${className}
                 }
             }
         }
+  #if ( $class == $root )
+        ${classLcapName}.modelEncoding( parser.getInputEncoding() );
+  #end
         return ${classLcapName}.build();
     }
 
