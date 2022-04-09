@@ -1,4 +1,4 @@
-package org.apache.maven.internal.aether;
+package org.apache.maven.artifact.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -31,7 +31,8 @@ import org.xmlunit.assertj.XmlAssert;
 
 public class ConsumerModelSourceTransformerTest
 {
-    private ConsumerModelSourceTransformer transformer = new ConsumerModelSourceTransformer();
+    private ConsumerModelSourceTransformer
+            transformer = new ConsumerModelSourceTransformer();
 
     @Test
     public void transform() throws Exception

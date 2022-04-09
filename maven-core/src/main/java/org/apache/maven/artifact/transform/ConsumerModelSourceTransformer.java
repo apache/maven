@@ -1,4 +1,4 @@
-package org.apache.maven.internal.aether;
+package org.apache.maven.artifact.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

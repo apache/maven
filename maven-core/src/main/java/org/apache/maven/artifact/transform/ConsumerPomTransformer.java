@@ -1,4 +1,4 @@
-package org.apache.maven.internal.aether;
+package org.apache.maven.artifact.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -42,8 +42,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
-import org.eclipse.aether.transform.DeployRequestTransformer;
-import org.eclipse.aether.transform.InstallRequestTransformer;
 
 /**
  * Consumer POM install and deploy transformer.
